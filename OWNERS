@@ -1,3 +1,4 @@
 inherited: true
 owners:
-- devtools@criteo.com
+- endeavour@criteo.com
+- group/endeavour
