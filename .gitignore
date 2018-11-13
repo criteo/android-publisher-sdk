@@ -1,0 +1,47 @@
+#built application files
+*.apk
+*.ap_
+
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# generated files
+*.bin
+*.lock
+cache.properties
+gc.properties
+
+#ignore gradle files
+settings.gradle
+gradlew*
+gradle.properties
+proguard-rules.pro
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Windows thumbnail db
+Thumbs.db
+
+# OSX files
+.DS_Store
+
+#temporary editor files
+*~
+*.swp
+
+# Android Studio
+*.iml
+.idea
+#.idea/workspace.xml - remove # and delete .idea if it better suit your needs.
+build/
+gradle/
+.navigation
+captures/
+
+#NDK
+obj/
+.externalNativeBuild
