@@ -15,7 +15,7 @@ cache.properties
 gc.properties
 
 #ignore gradle files
-proguard-rules.pro
+
 
 # Local configuration file (sdk path, etc)
 local.properties

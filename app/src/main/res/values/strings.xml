@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">pubsdk_android</string>
+    <string name="app_name">Cretio</string>
+    <string name="title_activity_splash">SplashActivity</string>
 </resources>
