@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PubSdk</string>
+    <string name="criteo_publisher_id">not set</string>
 </resources>

@@ -28,6 +28,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.criteo.pubsdk_android.MainActivity" />
         </activity>
+        <activity
+            android:name=".cdb.CdbCallActivity"
+            android:label="@string/title_activity_cdb_call"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>
