@@ -1,6 +1,9 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
+
 def support_version = "27.0.1"
 def lifecycle_version = "1.1.1"
+
 android {
     buildToolsVersion '27.0.3'
     compileSdkVersion 27
@@ -59,4 +62,35 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads:16.0.0'
     implementation 'com.google.android.gms:play-services-base:16.0.1'
 
+}
+
+// Define artifacts to publish to Nexus
+
+class Arr extends Jar {
+    String getExtension() { 'arr' }
+}
+
+task packageArrRelease(type: Arr, dependsOn: 'bundleRelease') {
+    from file("${project.buildDir}/outputs/apk/pubsdk-release.aar")
+    classifier 'release'
+}
+
+task packageArrDebug(type: Arr, dependsOn: 'bundleDebug') {
+    from file("${project.buildDir}/outputs/apk/pubsdk-debug.aar")
+    classifier 'debug'
+}
+
+publish {
+    publishing {
+        with rootProject.publishRepositoryConfig
+        publications {
+            apk(MavenPublication) {
+                groupId 'com.criteo.android.pub'
+                artifactId 'pub-sdk'
+                version rootProject.publishVersion
+                artifact packageArrRelease
+                artifact packageArrDebug
+            }
+        }
+    }
 }

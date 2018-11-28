@@ -24,3 +24,25 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+// Share publication configuration for subProjects
+ext {
+    publishVersion = project.findProperty('version') ?: 'undefined'
+    publishRepositoryConfig = {
+        if (!project.hasProperty('publishUrl')) {
+            project.ext.set('publishUrl', 'http://nexus.criteo.preprod/content/repositories/criteo.android.releases/')
+        }
+        repositories {
+            maven {
+                name 'Nexus'
+                url publishUrl
+                if (System.getenv('MAVEN_USER')) {
+                    credentials {
+                        username = System.getenv('MAVEN_USER')
+                        password = System.getenv('MAVEN_PASSWORD')
+                    }
+                }
+            }
+        }
+    }
+}
