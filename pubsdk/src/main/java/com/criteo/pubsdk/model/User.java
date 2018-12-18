@@ -6,14 +6,14 @@ import com.criteo.pubsdk.Util.DeviceUtil;
 import com.google.gson.JsonObject;
 
 public class User {
-    private static final String DEVICE_ID = "deviceid";
-    private static final String DEVICE_ID_TYPE = "deviceidtype";
-    private static final String DEVICE_MODEL = "devicemodel";
-    private static final String DEVICE_OS = "deviceos";
+    private static final String DEVICE_ID = "deviceId";
+    private static final String DEVICE_ID_TYPE = "deviceIdType";
+    private static final String DEVICE_MODEL = "deviceModel";
+    private static final String DEVICE_OS = "deviceOs";
     private static final String SDK_VER = "sdkver";
     private static final String LMT = "lmt";
     private static final String CONNECTION = "connection";
-    private static final String USER_AGENT = "useragent";
+    private static final String USER_AGENT = "userAgent";
     private static final String GAID = "gaid";
     private static final String ANDROID = "android";
     private static final int LMT_VAL = 0;

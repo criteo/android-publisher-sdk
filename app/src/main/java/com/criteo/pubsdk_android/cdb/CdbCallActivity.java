@@ -8,7 +8,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
 import com.criteo.pubsdk.model.Publisher;
+import com.criteo.pubsdk.model.Slot;
 import com.criteo.pubsdk_android.R;
 
 public class CdbCallActivity extends AppCompatActivity {
@@ -33,7 +35,17 @@ public class CdbCallActivity extends AppCompatActivity {
         Log.d(TAG, "onClickCdbCallButton");
         ((CdbViewModel) viewModel).getDataFromCbd(new Publisher(getApplicationContext()))
                 .observe(this, data -> {
-                    mTextViewContent.setText(mTextViewContent.getText() + "\n" + data.toString());
+                    if (data != null && data.getSlots() != null) {
+                        StringBuilder builder = new StringBuilder();
+                        for (Slot slot : data.getSlots()) {
+                            builder.append(slot.toString());
+                            builder.append("\n");
+                        }
+                        mTextViewContent.setText(mTextViewContent.getText() + "\n" + builder.toString());
+                    } else {
+                        mTextViewContent.setText(mTextViewContent.getText() + "\n" + " No Content ");
+                    }
+
                 });
     }
 

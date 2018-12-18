@@ -2,15 +2,16 @@ package com.criteo.pubsdk_android.cdb;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
+
+import com.criteo.pubsdk.model.Cdb;
 import com.criteo.pubsdk.model.Publisher;
 import com.criteo.pubsdk.model.Slot;
 import com.criteo.pubsdk.model.User;
-import com.criteo.pubsdk.network.RestAPI;
-import com.google.gson.JsonObject;
+import com.criteo.pubsdk.network.PubSdkNetwork;
 
 import java.util.ArrayList;
 
-public class CdbLiveData extends MutableLiveData<JsonObject> {
+public class CdbLiveData extends MutableLiveData<Cdb> {
     private CdbDownloadTask task;
 
     public CdbLiveData() {
@@ -39,8 +40,14 @@ public class CdbLiveData extends MutableLiveData<JsonObject> {
             User user = (User) objects[1];
             Publisher publisher = (Publisher) objects[2];
             ArrayList<Slot> slots = (ArrayList<Slot>) objects[3];
-            JsonObject object = RestAPI.callCdb(profile, user, publisher, slots);
-            postValue(object);
+            Cdb cdb = new Cdb();
+            cdb.setSlots(slots);
+            cdb.setUser(user);
+            cdb.setPublisher(publisher);
+            cdb.setSdkVersion("2.3.0");
+            cdb.setProfileId(profile);
+            Cdb response = PubSdkNetwork.loadCdb(cdb);
+            postValue(response);
             return null;
         }
     }
