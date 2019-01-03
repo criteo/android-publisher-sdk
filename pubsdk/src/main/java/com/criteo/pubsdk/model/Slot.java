@@ -20,6 +20,8 @@ public class Slot {
     private static final String PLACEMENT_ID = "placementId";
     private static final String SIZES = "sizes";
     private static final String NATIVE = "isNative";
+    private static final String TTL = "ttl";
+    private static final int DEFAULT_TTL = 0;
 
     private String slotId;
     private String impId;
@@ -32,12 +34,16 @@ public class Slot {
     private String placementId;
     private List<String> sizes;
     private boolean nativeImpression;
+    private int ttl;
+    //require for cache
+    private long timeOfDownload;
 
     public Slot() {
         sizes = new ArrayList<>();
     }
 
     public Slot(JsonObject json) {
+        placementId = json.has(PLACEMENT_ID) ? json.get(PLACEMENT_ID).getAsString() : null;
         impId = json.has(IMP_ID) ? json.get(IMP_ID).getAsString() : null;
         slotId = json.has(SLOT_ID) ? json.get(SLOT_ID).getAsString() : null;
         zoneId = json.has(ZONE_ID) ? json.get(ZONE_ID).getAsInt() : 0;
@@ -47,6 +53,8 @@ public class Slot {
         height = json.has(HEIGHT) ? json.get(HEIGHT).getAsInt() : 0;
         creative = json.has(CREATIVE) ? json.get(CREATIVE).getAsString() : null;
         sizes = new ArrayList<>();
+        ttl = json.has(TTL) ? json.get(TTL).getAsInt() : DEFAULT_TTL;
+        timeOfDownload = System.currentTimeMillis();
     }
 
     public String getPlacementId() {
@@ -141,6 +149,22 @@ public class Slot {
         this.creative = creative;
     }
 
+    public int getTtl() {
+        return ttl;
+    }
+
+    public void setTtl(int ttl) {
+        this.ttl = ttl;
+    }
+
+    public long getTimeOfDownload() {
+        return timeOfDownload;
+    }
+
+    public void setTimeOfDownload(long timeOfDownload) {
+        this.timeOfDownload = timeOfDownload;
+    }
+
     public JsonObject toJson() {
         JsonObject json = new JsonObject();
         if (sizes.size() > 0) {
@@ -173,6 +197,8 @@ public class Slot {
                 ", placementId='" + placementId + '\'' +
                 ", sizes=" + sizes +
                 ", nativeImpression=" + nativeImpression +
+                ", ttl=" + ttl +
+                ", timeOfDownload=" + timeOfDownload +
                 '}';
     }
 }
