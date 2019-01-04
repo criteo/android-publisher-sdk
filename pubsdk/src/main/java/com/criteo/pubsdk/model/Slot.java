@@ -21,7 +21,7 @@ public class Slot {
     private static final String SIZES = "sizes";
     private static final String NATIVE = "isNative";
     private static final String TTL = "ttl";
-    private static final int DEFAULT_TTL = 0;
+    private static final int DEFAULT_TTL = 15*1000*1000;
 
     private String slotId;
     private String impId;
