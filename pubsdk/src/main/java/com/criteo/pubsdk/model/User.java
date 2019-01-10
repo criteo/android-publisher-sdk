@@ -1,11 +1,14 @@
 package com.criteo.pubsdk.model;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.criteo.pubsdk.BuildConfig;
 import com.criteo.pubsdk.Util.DeviceUtil;
 import com.google.gson.JsonObject;
 
-public class User {
+public class User implements Parcelable {
     private static final String DEVICE_ID = "deviceId";
     private static final String DEVICE_ID_TYPE = "deviceIdType";
     private static final String DEVICE_MODEL = "deviceModel";
@@ -102,18 +105,6 @@ public class User {
         this.userAgent = userAgent;
     }
 
-    /*   public JSONObject toJson() throws JSONException {
-           JSONObject object=new JSONObject();
-           object.put(DEVICE_ID, deviceId);
-           object.put(DEVICE_ID_TYPE, deviceIdType);
-           object.put(DEVICE_MODEL, deviceModel);
-           object.put(DEVICE_OS, deviceOs);
-           object.put(SDK_VER, sdkVer);
-           object.put(LMT, lmt);
-           object.put(CONNECTION, connection);
-           object.put(USER_AGENT, userAgent);
-           return object;
-       }*/
     public JsonObject toJson() {
         JsonObject object = new JsonObject();
         object.addProperty(DEVICE_ID, deviceId);
@@ -126,4 +117,44 @@ public class User {
         object.addProperty(USER_AGENT, userAgent);
         return object;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.deviceId);
+        dest.writeString(this.deviceIdType);
+        dest.writeString(this.deviceModel);
+        dest.writeString(this.deviceOs);
+        dest.writeString(this.sdkVer);
+        dest.writeInt(this.lmt);
+        dest.writeString(this.connection);
+        dest.writeString(this.userAgent);
+    }
+
+    protected User(Parcel in) {
+        this.deviceId = in.readString();
+        this.deviceIdType = in.readString();
+        this.deviceModel = in.readString();
+        this.deviceOs = in.readString();
+        this.sdkVer = in.readString();
+        this.lmt = in.readInt();
+        this.connection = in.readString();
+        this.userAgent = in.readString();
+    }
+
+    public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel source) {
+            return new User(source);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 }

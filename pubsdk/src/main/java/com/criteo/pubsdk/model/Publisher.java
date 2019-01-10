@@ -1,12 +1,14 @@
 package com.criteo.pubsdk.model;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.criteo.pubsdk.BuildConfig;
 import com.criteo.pubsdk.Util.HostAppUtil;
 import com.google.gson.JsonObject;
 
-public class Publisher {
+public class Publisher implements Parcelable {
 
     private static final String BUNDLE_ID = "bundleId";
     private static final String PUBLISHER_ID = "publisherId";
@@ -53,4 +55,34 @@ public class Publisher {
         }
         return json;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.bundleId);
+        dest.writeString(this.publisherId);
+        dest.writeInt(this.networkId);
+    }
+
+    protected Publisher(Parcel in) {
+        this.bundleId = in.readString();
+        this.publisherId = in.readString();
+        this.networkId = in.readInt();
+    }
+
+    public static final Parcelable.Creator<Publisher> CREATOR = new Parcelable.Creator<Publisher>() {
+        @Override
+        public Publisher createFromParcel(Parcel source) {
+            return new Publisher(source);
+        }
+
+        @Override
+        public Publisher[] newArray(int size) {
+            return new Publisher[size];
+        }
+    };
 }

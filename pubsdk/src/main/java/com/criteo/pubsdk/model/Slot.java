@@ -1,5 +1,8 @@
 package com.criteo.pubsdk.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -7,7 +10,7 @@ import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Slot {
+public class Slot implements Parcelable {
 
     private static final String SLOT_ID = "slotId";
     private static final String IMP_ID = "impId";
@@ -201,4 +204,54 @@ public class Slot {
                 ", timeOfDownload=" + timeOfDownload +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.slotId);
+        dest.writeString(this.impId);
+        dest.writeFloat(this.cpm);
+        dest.writeString(this.currency);
+        dest.writeString(this.creative);
+        dest.writeInt(this.zoneId);
+        dest.writeInt(this.width);
+        dest.writeInt(this.height);
+        dest.writeString(this.placementId);
+        dest.writeStringList(this.sizes);
+        dest.writeByte(this.nativeImpression ? (byte) 1 : (byte) 0);
+        dest.writeInt(this.ttl);
+        dest.writeLong(this.timeOfDownload);
+    }
+
+    protected Slot(Parcel in) {
+        this.slotId = in.readString();
+        this.impId = in.readString();
+        this.cpm = in.readFloat();
+        this.currency = in.readString();
+        this.creative = in.readString();
+        this.zoneId = in.readInt();
+        this.width = in.readInt();
+        this.height = in.readInt();
+        this.placementId = in.readString();
+        this.sizes = in.createStringArrayList();
+        this.nativeImpression = in.readByte() != 0;
+        this.ttl = in.readInt();
+        this.timeOfDownload = in.readLong();
+    }
+
+    public static final Parcelable.Creator<Slot> CREATOR = new Parcelable.Creator<Slot>() {
+        @Override
+        public Slot createFromParcel(Parcel source) {
+            return new Slot(source);
+        }
+
+        @Override
+        public Slot[] newArray(int size) {
+            return new Slot[size];
+        }
+    };
 }

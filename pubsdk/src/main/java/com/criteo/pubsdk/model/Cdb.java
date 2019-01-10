@@ -1,5 +1,8 @@
 package com.criteo.pubsdk.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -7,7 +10,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 
-public class Cdb {
+public class Cdb implements Parcelable {
     private static final String PUBLISHER = "publisher";
     private static final String USER = "user";
     private static final String SDK_VERSION = "sdkVersion";
@@ -98,4 +101,38 @@ public class Cdb {
         return json;
 
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeTypedList(this.slots);
+        dest.writeParcelable(this.publisher, flags);
+        dest.writeParcelable(this.user, flags);
+        dest.writeString(this.sdkVersion);
+        dest.writeString(this.profileId);
+    }
+
+    protected Cdb(Parcel in) {
+        this.slots = in.createTypedArrayList(Slot.CREATOR);
+        this.publisher = in.readParcelable(Publisher.class.getClassLoader());
+        this.user = in.readParcelable(User.class.getClassLoader());
+        this.sdkVersion = in.readString();
+        this.profileId = in.readString();
+    }
+
+    public static final Parcelable.Creator<Cdb> CREATOR = new Parcelable.Creator<Cdb>() {
+        @Override
+        public Cdb createFromParcel(Parcel source) {
+            return new Cdb(source);
+        }
+
+        @Override
+        public Cdb[] newArray(int size) {
+            return new Cdb[size];
+        }
+    };
 }
