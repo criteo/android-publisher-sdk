@@ -3,9 +3,14 @@ package com.criteo.pubsdk.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 public class AdUnit implements Parcelable {
+    private static final String PLACEMENT_ID = "placementId";
+    private static final String SIZES = "sizes";
     private String placementId;
-    private AdSize size;
+    private AdSize adSize;
 
     public String getPlacementId() {
         return placementId;
@@ -15,6 +20,24 @@ public class AdUnit implements Parcelable {
         this.placementId = placementId;
     }
 
+    public AdSize getSize() {
+        return adSize;
+    }
+
+    public void setSize(AdSize size) {
+        this.adSize = size;
+    }
+
+    public JsonObject toJson() {
+        JsonObject json = new JsonObject();
+        JsonArray array = new JsonArray();
+        array.add(adSize.getWidth() + "x" + adSize.getHight());
+        if (adSize != null) {
+            json.add(SIZES, array);
+        }
+        json.addProperty(PLACEMENT_ID, placementId);
+        return json;
+    }
 
     @Override
     public int describeContents() {
@@ -24,7 +47,7 @@ public class AdUnit implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.placementId);
-        dest.writeParcelable(this.size, flags);
+        dest.writeParcelable(this.adSize, flags);
     }
 
     public AdUnit() {
@@ -32,7 +55,7 @@ public class AdUnit implements Parcelable {
 
     protected AdUnit(Parcel in) {
         this.placementId = in.readString();
-        this.size = in.readParcelable(AdSize.class.getClassLoader());
+        this.adSize = in.readParcelable(AdSize.class.getClassLoader());
     }
 
     public static final Parcelable.Creator<AdUnit> CREATOR = new Parcelable.Creator<AdUnit>() {

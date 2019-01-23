@@ -4,79 +4,97 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+
+import com.criteo.pubsdk.Criteo;
+import com.criteo.pubsdk.model.AdSize;
+import com.criteo.pubsdk.model.AdUnit;
 import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import com.google.android.gms.ads.doubleclick.PublisherInterstitialAd;
 
 public class DfpActivity extends AppCompatActivity {
 
-  private PublisherInterstitialAd mPublisherInterstitialAd;
-  private PublisherAdView mPublisherAdView;
+    private PublisherInterstitialAd mPublisherInterstitialAd;
+    private PublisherAdView mPublisherAdView;
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_dfp);
-    mPublisherAdView = findViewById(R.id.publisherAdView);
-    PublisherAdRequest adRequest = new PublisherAdRequest.Builder()
-        .build();
-    mPublisherAdView.loadAd(adRequest);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_dfp);
+        mPublisherAdView = findViewById(R.id.publisherAdView);
 
-    findViewById(R.id.buttonBanner).setOnClickListener((View v) -> {
-      onBannerClick();
-    });
-    findViewById(R.id.buttonInterstitial).setOnClickListener((View v) -> {
-      onInterstitialClick();
-    });
-  }
 
-  private void onBannerClick() {
-    mPublisherAdView.setVisibility(View.VISIBLE);
-  }
+        findViewById(R.id.buttonBanner).setOnClickListener((View v) -> {
+            onBannerClick();
+        });
+        findViewById(R.id.buttonInterstitial).setOnClickListener((View v) -> {
+            onInterstitialClick();
+        });
+    }
 
-  private void onInterstitialClick() {
-    mPublisherAdView.setVisibility(View.GONE);
-    mPublisherInterstitialAd = new PublisherInterstitialAd(this);
-    mPublisherInterstitialAd.setAdUnitId("/6499/example/interstitial");
-    mPublisherInterstitialAd
-        .loadAd(new PublisherAdRequest.Builder().build());
-    mPublisherInterstitialAd.setAdListener(new AdListener() {
-      @Override
-      public void onAdLoaded() {
-        // Code to be executed when an ad finishes loading.
-        Log.d("TAG", "adLoaded.");
-        if (mPublisherInterstitialAd.isLoaded()) {
-          mPublisherInterstitialAd.show();
-        } else {
-          Log.d("TAG", "The interstitial wasn't loaded yet.");
-        }
-      }
+    private void onBannerClick() {
+        //mPublisherAdView.setVisibility(View.VISIBLE);
+        PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
+        builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
+        Criteo criteo = Criteo.init(this, null, 0);
+        AdUnit adUnit = new AdUnit();
+        adUnit.setPlacementId("/140800857/Endeavour_320x50");
+        AdSize adSize = new AdSize();
+        adSize.setWidth(320);
+        adSize.setHight(50);
+        adUnit.setSize(adSize);
+        PublisherAdRequest request = criteo.enrich(builder, adUnit).build();
 
-      @Override
-      public void onAdFailedToLoad(int errorCode) {
-        // Code to be executed when an ad request fails
-        Log.d("TAG", "ad Failed");
-      }
+        mPublisherAdView.loadAd(request);
+    }
 
-      @Override
-      public void onAdOpened() {
-        // Code to be executed when the ad is displayed.
-        Log.d("TAG", "ad Opened");
-      }
+    private void onInterstitialClick() {
+        mPublisherAdView.setVisibility(View.GONE);
+        mPublisherInterstitialAd = new PublisherInterstitialAd(this);
+        mPublisherInterstitialAd.setAdUnitId("/6499/example/interstitial");
 
-      @Override
-      public void onAdLeftApplication() {
-        // Code to be executed when the user has left the app.
-        Log.d("TAG", "Left Application");
-      }
+        PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
 
-      @Override
-      public void onAdClosed() {
-        // Code to be executed when when the interstitial ad is closed.
-      }
-    });
+        mPublisherInterstitialAd
+                .loadAd(adRequest);
+        mPublisherInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+                Log.d("TAG", "adLoaded.");
+                if (mPublisherInterstitialAd.isLoaded()) {
+                    mPublisherInterstitialAd.show();
+                } else {
+                    Log.d("TAG", "The interstitial wasn't loaded yet.");
+                }
+            }
 
-  }
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                // Code to be executed when an ad request fails
+                Log.d("TAG", "ad Failed:" + errorCode);
+            }
+
+            @Override
+            public void onAdOpened() {
+                // Code to be executed when the ad is displayed.
+                Log.d("TAG", "ad Opened");
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+                // Code to be executed when the user has left the app.
+                Log.d("TAG", "Left Application");
+            }
+
+            @Override
+            public void onAdClosed() {
+                // Code to be executed when when the interstitial ad is closed.
+            }
+        });
+
+    }
 
 }

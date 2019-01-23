@@ -7,7 +7,10 @@ import android.util.Log;
 
 import com.criteo.pubsdk.BuildConfig;
 import com.criteo.pubsdk.R;
+import com.criteo.pubsdk.Util.CacheUtil;
 import com.criteo.pubsdk.Util.DeviceUtil;
+import com.criteo.pubsdk.cache.SdkCache;
+import com.criteo.pubsdk.model.AdUnit;
 import com.criteo.pubsdk.model.Cdb;
 import com.criteo.pubsdk.model.Publisher;
 import com.criteo.pubsdk.model.Slot;
@@ -15,20 +18,22 @@ import com.criteo.pubsdk.model.User;
 
 import java.util.ArrayList;
 
-public class CdbDownloadTask extends AsyncTask<Object, Void, Void> {
-    private final Context mContext;
+public class CdbDownloadTask extends AsyncTask<Object, Void, Cdb> {
     private static final String TAG = CdbDownloadTask.class.getSimpleName();
+    private final Context mContext;
+    private final SdkCache cache;
 
-    public CdbDownloadTask(Context context) {
+    public CdbDownloadTask(Context context, SdkCache cache) {
         this.mContext = context;
+        this.cache=cache;
     }
 
     @Override
-    protected Void doInBackground(Object... objects) {
-        String profile = (String) objects[0];
+    protected Cdb doInBackground(Object... objects) {
+        int profile = (Integer) objects[0];
         User user = (User) objects[1];
         Publisher publisher = (Publisher) objects[2];
-        ArrayList<Slot> slots = (ArrayList<Slot>) objects[3];
+        ArrayList<AdUnit> slots = (ArrayList<AdUnit>) objects[3];
         if (DeviceUtil.hasPlayServices(mContext)) {
             String addId = DeviceUtil.getAdvertisingId(mContext);
             if (!TextUtils.isEmpty(addId)) {
@@ -36,10 +41,10 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, Void> {
             }
         }
         Cdb cdb = new Cdb();
-        cdb.setSlots(slots);
+        cdb.setAdUnits(slots);
         cdb.setUser(user);
         cdb.setPublisher(publisher);
-        cdb.setSdkVersion(mContext.getString(BuildConfig.VERSION_CODE));
+        cdb.setSdkVersion(String.valueOf(BuildConfig.VERSION_NAME));
         cdb.setProfileId(profile);
         Cdb response = PubSdkNetwork.loadCdb(cdb);
         if (response != null && response.getSlots() != null && response.getSlots().size() > 0) {
@@ -50,6 +55,13 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, Void> {
             }
             Log.d(TAG, builder.toString());
         }
-        return null;
+        //cache.setAdUnits(cdb.getSlots());
+        return response;
+    }
+
+    @Override
+    protected void onPostExecute(Cdb cdb) {
+        super.onPostExecute(cdb);
+        cache.setAdUnits(cdb.getSlots());
     }
 }

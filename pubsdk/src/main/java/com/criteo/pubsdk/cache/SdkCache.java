@@ -24,6 +24,7 @@ public class SdkCache {
     }
 
     public void addAll(List<Slot> slots) {
+        if (slots == null) return;
         for (Slot slot : slots) {
             this.add(slot);
         }

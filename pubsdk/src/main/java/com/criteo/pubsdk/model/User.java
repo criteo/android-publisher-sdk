@@ -14,7 +14,7 @@ public class User implements Parcelable {
     private static final String DEVICE_MODEL = "deviceModel";
     private static final String DEVICE_OS = "deviceOs";
     private static final String SDK_VER = "sdkver";
-    private static final String LMT = "lmt";
+    private static final String LIMIT = "lmt";
     private static final String CONNECTION = "connection";
     private static final String USER_AGENT = "userAgent";
     private static final String GAID = "gaid";
@@ -26,7 +26,7 @@ public class User implements Parcelable {
     private String deviceModel;
     private String deviceOs;
     private String sdkVer;
-    private int lmt;
+    private int limit;
     private String connection;
     private String userAgent;
 
@@ -36,7 +36,7 @@ public class User implements Parcelable {
         deviceModel = DeviceUtil.getDeviceModel();
         deviceOs = ANDROID;
         sdkVer = BuildConfig.VERSION_NAME;
-        lmt = LMT_VAL;
+        limit = LMT_VAL;
         userAgent = DeviceUtil.getUserAgent(context);
     }
 
@@ -81,12 +81,12 @@ public class User implements Parcelable {
         this.sdkVer = sdkVer;
     }
 
-    public int getLmt() {
-        return lmt;
+    public int getLimit() {
+        return limit;
     }
 
-    public void setLmt(int lmt) {
-        this.lmt = lmt;
+    public void setLimit(int limit) {
+        this.limit = limit;
     }
 
     public String getConnection() {
@@ -112,7 +112,7 @@ public class User implements Parcelable {
         object.addProperty(DEVICE_MODEL, deviceModel);
         object.addProperty(DEVICE_OS, deviceOs);
         object.addProperty(SDK_VER, sdkVer);
-        object.addProperty(LMT, lmt);
+        object.addProperty(LIMIT, limit);
         object.addProperty(CONNECTION, connection);
         object.addProperty(USER_AGENT, userAgent);
         return object;
@@ -130,7 +130,7 @@ public class User implements Parcelable {
         dest.writeString(this.deviceModel);
         dest.writeString(this.deviceOs);
         dest.writeString(this.sdkVer);
-        dest.writeInt(this.lmt);
+        dest.writeInt(this.limit);
         dest.writeString(this.connection);
         dest.writeString(this.userAgent);
     }
@@ -141,7 +141,7 @@ public class User implements Parcelable {
         this.deviceModel = in.readString();
         this.deviceOs = in.readString();
         this.sdkVer = in.readString();
-        this.lmt = in.readInt();
+        this.limit = in.readInt();
         this.connection = in.readString();
         this.userAgent = in.readString();
     }

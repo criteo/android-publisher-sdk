@@ -36,7 +36,7 @@ public class CdbLiveData extends MutableLiveData<Cdb> {
     private class CdbDownloadTask extends AsyncTask<Object, Void, Void> {
         @Override
         protected Void doInBackground(Object... objects) {
-            String profile = (String) objects[0];
+            int profileId = (Integer) objects[0];
             User user = (User) objects[1];
             Publisher publisher = (Publisher) objects[2];
             ArrayList<Slot> slots = (ArrayList<Slot>) objects[3];
@@ -45,7 +45,7 @@ public class CdbLiveData extends MutableLiveData<Cdb> {
             cdb.setUser(user);
             cdb.setPublisher(publisher);
             cdb.setSdkVersion("2.3.0");
-            cdb.setProfileId(profile);
+            cdb.setProfileId(profileId);
             Cdb response = PubSdkNetwork.loadCdb(cdb);
             postValue(response);
             return null;

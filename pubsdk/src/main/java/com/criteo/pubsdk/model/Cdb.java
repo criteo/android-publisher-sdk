@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Cdb implements Parcelable {
     private static final String PUBLISHER = "publisher";
@@ -16,11 +17,12 @@ public class Cdb implements Parcelable {
     private static final String SDK_VERSION = "sdkVersion";
     private static final String PROFILE_ID = "profileId";
     public static final String SLOTS = "slots";
-    private ArrayList<Slot> slots;
+    private List<Slot> slots;
+    private List<AdUnit> adUnits;
     private Publisher publisher;
     private User user;
     private String sdkVersion;
-    private String profileId;
+    private int profileId;
 
     public Cdb() {
         slots = new ArrayList<Slot>();
@@ -39,12 +41,20 @@ public class Cdb implements Parcelable {
         this.slots.add(slot);
     }
 
-    public ArrayList<Slot> getSlots() {
+    public List<Slot> getSlots() {
         return slots;
     }
 
     public void setSlots(ArrayList<Slot> slots) {
         this.slots = slots;
+    }
+
+    public List<AdUnit> getAdUnits() {
+        return adUnits;
+    }
+
+    public void setAdUnits(ArrayList<AdUnit> adUnits) {
+        this.adUnits = adUnits;
     }
 
     public Publisher getPublisher() {
@@ -71,11 +81,11 @@ public class Cdb implements Parcelable {
         this.sdkVersion = sdkVersion;
     }
 
-    public String getProfileId() {
+    public int getProfileId() {
         return profileId;
     }
 
-    public void setProfileId(String profileId) {
+    public void setProfileId(int profileId) {
         this.profileId = profileId;
     }
 
@@ -91,8 +101,8 @@ public class Cdb implements Parcelable {
         json.addProperty(PROFILE_ID, profileId);
 
         JsonArray array = new JsonArray();
-        for (Slot slot : slots) {
-            array.add(slot.toJson());
+        for (AdUnit adUnit : adUnits) {
+            array.add(adUnit.toJson());
         }
         if (array.size() > 0) {
             json.add(SLOTS, array);
@@ -110,21 +120,23 @@ public class Cdb implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeTypedList(this.slots);
+        dest.writeTypedList(this.adUnits);
         dest.writeParcelable(this.publisher, flags);
         dest.writeParcelable(this.user, flags);
         dest.writeString(this.sdkVersion);
-        dest.writeString(this.profileId);
+        dest.writeInt(this.profileId);
     }
 
     protected Cdb(Parcel in) {
         this.slots = in.createTypedArrayList(Slot.CREATOR);
+        this.adUnits = in.createTypedArrayList(AdUnit.CREATOR);
         this.publisher = in.readParcelable(Publisher.class.getClassLoader());
         this.user = in.readParcelable(User.class.getClassLoader());
         this.sdkVersion = in.readString();
-        this.profileId = in.readString();
+        this.profileId = in.readInt();
     }
 
-    public static final Parcelable.Creator<Cdb> CREATOR = new Parcelable.Creator<Cdb>() {
+    public static final Creator<Cdb> CREATOR = new Creator<Cdb>() {
         @Override
         public Cdb createFromParcel(Parcel source) {
             return new Cdb(source);

@@ -14,7 +14,6 @@ public class Slot implements Parcelable {
 
     private static final String SLOT_ID = "slotId";
     private static final String IMP_ID = "impId";
-    private static final String ZONE_ID = "zoneId";
     private static final String CPM = "cpm";
     private static final String CURRENCY = "currency";
     private static final String CREATIVE = "creative";
@@ -25,18 +24,19 @@ public class Slot implements Parcelable {
     private static final String NATIVE = "isNative";
     private static final String TTL = "ttl";
     private static final int DEFAULT_TTL = 15*1000*1000;
+    private static final String DISPLAY_URL = "displayUrl";
 
     private String slotId;
     private String impId;
     private float cpm;
     private String currency;
     private String creative;
-    private int zoneId;
     private int width;
     private int height;
     private String placementId;
     private List<String> sizes;
     private boolean nativeImpression;
+    private String displayUrl;
     private int ttl;
     //require for cache
     private long timeOfDownload;
@@ -49,12 +49,12 @@ public class Slot implements Parcelable {
         placementId = json.has(PLACEMENT_ID) ? json.get(PLACEMENT_ID).getAsString() : null;
         impId = json.has(IMP_ID) ? json.get(IMP_ID).getAsString() : null;
         slotId = json.has(SLOT_ID) ? json.get(SLOT_ID).getAsString() : null;
-        zoneId = json.has(ZONE_ID) ? json.get(ZONE_ID).getAsInt() : 0;
         cpm = json.has(CPM) ? json.get(CPM).getAsFloat() : 0.0f;
         currency = json.has(CURRENCY) ? json.get(CURRENCY).getAsString() : null;
         width = json.has(WIDTH) ? json.get(WIDTH).getAsInt() : 0;
         height = json.has(HEIGHT) ? json.get(HEIGHT).getAsInt() : 0;
         creative = json.has(CREATIVE) ? json.get(CREATIVE).getAsString() : null;
+        displayUrl = json.has(DISPLAY_URL) ? json.get(DISPLAY_URL).getAsString() : null;
         sizes = new ArrayList<>();
         ttl = json.has(TTL) ? json.get(TTL).getAsInt() : DEFAULT_TTL;
         timeOfDownload = System.currentTimeMillis();
@@ -90,14 +90,6 @@ public class Slot implements Parcelable {
 
     public void setCpm(float cpm) {
         this.cpm = cpm;
-    }
-
-    public int getZoneId() {
-        return zoneId;
-    }
-
-    public void setZoneId(int zoneId) {
-        this.zoneId = zoneId;
     }
 
     public int getWidth() {
@@ -168,6 +160,14 @@ public class Slot implements Parcelable {
         this.timeOfDownload = timeOfDownload;
     }
 
+    public String getDisplayUrl() {
+        return displayUrl;
+    }
+
+    public void setDisplayUrl(String displayUrl) {
+        this.displayUrl = displayUrl;
+    }
+
     public JsonObject toJson() {
         JsonObject json = new JsonObject();
         if (sizes.size() > 0) {
@@ -176,9 +176,6 @@ public class Slot implements Parcelable {
             Gson gson = new Gson();
             json.addProperty(SIZES, gson.toJson(sizes, token.getType()));
         }
-        if (zoneId > 0) {
-            json.addProperty(ZONE_ID, zoneId);
-        }
         json.addProperty(PLACEMENT_ID, placementId);
         if (nativeImpression) {
             json.addProperty(NATIVE, nativeImpression);
@@ -186,24 +183,6 @@ public class Slot implements Parcelable {
         return json;
     }
 
-    @Override
-    public String toString() {
-        return "Slot{" +
-                "slotId='" + slotId + '\'' +
-                ", impId='" + impId + '\'' +
-                ", cpm=" + cpm +
-                ", currency='" + currency + '\'' +
-                ", creative='" + creative + '\'' +
-                ", zoneId=" + zoneId +
-                ", width=" + width +
-                ", height=" + height +
-                ", placementId='" + placementId + '\'' +
-                ", sizes=" + sizes +
-                ", nativeImpression=" + nativeImpression +
-                ", ttl=" + ttl +
-                ", timeOfDownload=" + timeOfDownload +
-                '}';
-    }
 
     @Override
     public int describeContents() {
@@ -217,12 +196,12 @@ public class Slot implements Parcelable {
         dest.writeFloat(this.cpm);
         dest.writeString(this.currency);
         dest.writeString(this.creative);
-        dest.writeInt(this.zoneId);
         dest.writeInt(this.width);
         dest.writeInt(this.height);
         dest.writeString(this.placementId);
         dest.writeStringList(this.sizes);
         dest.writeByte(this.nativeImpression ? (byte) 1 : (byte) 0);
+        dest.writeString(this.displayUrl);
         dest.writeInt(this.ttl);
         dest.writeLong(this.timeOfDownload);
     }
@@ -233,17 +212,17 @@ public class Slot implements Parcelable {
         this.cpm = in.readFloat();
         this.currency = in.readString();
         this.creative = in.readString();
-        this.zoneId = in.readInt();
         this.width = in.readInt();
         this.height = in.readInt();
         this.placementId = in.readString();
         this.sizes = in.createStringArrayList();
         this.nativeImpression = in.readByte() != 0;
+        this.displayUrl = in.readString();
         this.ttl = in.readInt();
         this.timeOfDownload = in.readLong();
     }
 
-    public static final Parcelable.Creator<Slot> CREATOR = new Parcelable.Creator<Slot>() {
+    public static final Creator<Slot> CREATOR = new Creator<Slot>() {
         @Override
         public Slot createFromParcel(Parcel source) {
             return new Slot(source);

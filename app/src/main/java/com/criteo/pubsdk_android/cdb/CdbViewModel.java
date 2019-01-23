@@ -33,13 +33,11 @@ public class CdbViewModel extends AndroidViewModel {
         ArrayList<Slot> slots = new ArrayList<>();
 
         Slot slot = new Slot();
-        slot.setZoneId(497747);
         slot.setImpId("ad-unit-1");
         slot.setPlacementId("adunitid");
         slots.add(slot);
 
         Slot slot1 = new Slot();
-        slot1.setZoneId(497747);
         slot1.setImpId("ad-unit-2");
         slot1.setNativeImpression(true);
         slot1.setPlacementId("adunitid");
