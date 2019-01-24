@@ -1,6 +1,8 @@
 package com.criteo.pubsdk_android;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +25,12 @@ public class DfpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dfp);
+        String consentDatagiven = "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111";
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+        editor.putString("IABConsent_ParsedVendorConsents", consentDatagiven);
+        editor.putString("IABConsent_SubjectToGDPR", "1");
+        editor.putString("IABConsent_ConsentString", "1");
+        editor.apply();
         mPublisherAdView = findViewById(R.id.publisherAdView);
 
 

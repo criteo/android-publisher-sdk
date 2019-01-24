@@ -16,6 +16,7 @@ public class Cdb implements Parcelable {
     private static final String USER = "user";
     private static final String SDK_VERSION = "sdkVersion";
     private static final String PROFILE_ID = "profileId";
+    private static final String GDPR_CONSENT = "gdprConsent";
     public static final String SLOTS = "slots";
     private List<Slot> slots;
     private List<AdUnit> adUnits;
@@ -23,6 +24,7 @@ public class Cdb implements Parcelable {
     private User user;
     private String sdkVersion;
     private int profileId;
+    private JsonObject gdprConsent;
 
     public Cdb() {
         slots = new ArrayList<Slot>();
@@ -35,6 +37,14 @@ public class Cdb implements Parcelable {
             String slotStr = json.get(SLOTS).toString();
             slots = new Gson().fromJson(slotStr, token.getType());
         }
+    }
+
+    public JsonObject getGdprConsent() {
+        return gdprConsent;
+    }
+
+    public void setGdprConsent(JsonObject gdprConsent) {
+        this.gdprConsent = gdprConsent;
     }
 
     public void addSlot(Slot slot) {
@@ -100,12 +110,15 @@ public class Cdb implements Parcelable {
         json.addProperty(SDK_VERSION, sdkVersion);
         json.addProperty(PROFILE_ID, profileId);
 
-        JsonArray array = new JsonArray();
+        JsonArray jsonAdUnits = new JsonArray();
         for (AdUnit adUnit : adUnits) {
-            array.add(adUnit.toJson());
+            jsonAdUnits.add(adUnit.toJson());
         }
-        if (array.size() > 0) {
-            json.add(SLOTS, array);
+        if (jsonAdUnits.size() > 0) {
+            json.add(SLOTS, jsonAdUnits);
+        }
+        if (gdprConsent != null) {
+            json.add(GDPR_CONSENT, gdprConsent);
         }
 
         return json;

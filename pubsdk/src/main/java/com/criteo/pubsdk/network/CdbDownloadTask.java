@@ -6,15 +6,15 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.criteo.pubsdk.BuildConfig;
-import com.criteo.pubsdk.R;
-import com.criteo.pubsdk.Util.CacheUtil;
 import com.criteo.pubsdk.Util.DeviceUtil;
+import com.criteo.pubsdk.Util.HostAppUtil;
 import com.criteo.pubsdk.cache.SdkCache;
 import com.criteo.pubsdk.model.AdUnit;
 import com.criteo.pubsdk.model.Cdb;
 import com.criteo.pubsdk.model.Publisher;
 import com.criteo.pubsdk.model.Slot;
 import com.criteo.pubsdk.model.User;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 
@@ -25,7 +25,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, Cdb> {
 
     public CdbDownloadTask(Context context, SdkCache cache) {
         this.mContext = context;
-        this.cache=cache;
+        this.cache = cache;
     }
 
     @Override
@@ -46,6 +46,10 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, Cdb> {
         cdb.setPublisher(publisher);
         cdb.setSdkVersion(String.valueOf(BuildConfig.VERSION_NAME));
         cdb.setProfileId(profile);
+        JsonObject gdpr = HostAppUtil.gdpr(mContext.getApplicationContext());
+        if (gdpr != null) {
+            cdb.setGdprConsent(gdpr);
+        }
         Cdb response = PubSdkNetwork.loadCdb(cdb);
         if (response != null && response.getSlots() != null && response.getSlots().size() > 0) {
             StringBuilder builder = new StringBuilder();
