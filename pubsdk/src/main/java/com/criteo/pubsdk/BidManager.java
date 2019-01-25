@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 class BidManager {
-    private static final String CRT_CPM = "CRT_CPM";
-    private static final String CRT_DISPLAY_URL = "CRT_displayUrl";
+    private static final String CRT_CPM = "crt_cpm";
+    private static final String CRT_DISPLAY_URL = "crt_displayUrl";
     private static final int PROFILE_ID = 235;
     private List<AdUnit> adUnits;
     private Context mContext;
@@ -30,16 +30,15 @@ class BidManager {
         this.cache = new SdkCache();
         publisher = new Publisher(mContext);
         publisher.setNetworkId(networkId);
-        mTask = new CdbDownloadTask(context, this.cache);
+        mTask = new CdbDownloadTask(context, this.cache, true);
         user = new User(mContext);
-
     }
 
     void prefetch() {
-        if (mTask.getStatus() != AsyncTask.Status.RUNNING) {
-            mTask.execute(PROFILE_ID, user, publisher, this.adUnits);
+        if (mTask.getStatus() != AsyncTask.Status.RUNNING
+                && mTask.getStatus() != AsyncTask.Status.FINISHED) {
+            mTask.execute(PROFILE_ID, user, publisher, adUnits);
         }
-
     }
 
     void cancelLoad() {
@@ -56,7 +55,7 @@ class BidManager {
             request.addCustomTargeting(CRT_DISPLAY_URL, slot.getDisplayUrl());
         }
         if (mTask.getStatus() != AsyncTask.Status.RUNNING) {
-            mTask = new CdbDownloadTask(mContext, this.cache);
+            mTask = new CdbDownloadTask(mContext, this.cache, false);
             List<AdUnit> adUnits = new ArrayList<AdUnit>();
             adUnits.add(adUnit);
             mTask.execute(PROFILE_ID, user, publisher, adUnits);

@@ -1,6 +1,9 @@
 package com.criteo.pubsdk.network;
 
+import android.content.Context;
+
 import com.criteo.pubsdk.BuildConfig;
+import com.criteo.pubsdk.R;
 import com.criteo.pubsdk.model.Cdb;
 import com.criteo.pubsdk.model.Config;
 import com.google.gson.Gson;
@@ -21,18 +24,16 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 final class PubSdkApi {
     private static final int TIMEOUT = 60;
-    private static final String CDB_BASE_URL = "https://directbidder-test-app.par.preprod.crto.in";
-    private static final String CONFIG_BASE_URL = "https://endeavour-app.par.preprod.crto.in";
 
     private PubSdkApi() {
     }
 
-    static Config loadConfig(String publisherId, String appId, String sdkVersion) {
+    static Config loadConfig(Context context, int networkId, String appId, String sdkVersion) {
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(CONFIG_BASE_URL)
+                .baseUrl(context.getString(R.string.config_url))
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .client(getCdbHttpConfig())
@@ -40,7 +41,7 @@ final class PubSdkApi {
         Endpoints endpoints = retrofit.create(Endpoints.class);
 
         Call<JsonObject> responseCall
-                = endpoints.config(publisherId, appId, sdkVersion);
+                = endpoints.config(networkId, appId, sdkVersion);
         Response<JsonObject> retrofitResponse = null;
         JsonObject result = new JsonObject();
         try {
@@ -54,12 +55,12 @@ final class PubSdkApi {
         return new Config(result);
     }
 
-    static Cdb loadCdb(Cdb cdb) {
+    static Cdb loadCdb(Context context, Cdb cdb) {
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(CDB_BASE_URL)
+                .baseUrl(context.getString(R.string.cdb_url))
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .client(getCdbHttpConfig())

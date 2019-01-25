@@ -1,6 +1,7 @@
 package com.criteo.pubsdk_android.cdb;
 
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Context;
 import android.os.AsyncTask;
 
 import com.criteo.pubsdk.model.Cdb;
@@ -12,23 +13,25 @@ import com.criteo.pubsdk.network.PubSdkNetwork;
 import java.util.ArrayList;
 
 public class CdbLiveData extends MutableLiveData<Cdb> {
-    private CdbDownloadTask task;
+    private CdbDownloadTask cdbDownloadTask;
+    private Context mContext;
 
-    public CdbLiveData() {
-        task = new CdbDownloadTask();
+    public CdbLiveData(Context context) {
+        cdbDownloadTask = new CdbDownloadTask();
+        this.mContext = context;
     }
 
     public void loadCbdData(final String profile, final User user,
                             final Publisher publisher, final ArrayList<Slot> slots) {
-        if (task.getStatus() != AsyncTask.Status.RUNNING) {
-            task.execute(profile, user, publisher, slots);
+        if (cdbDownloadTask.getStatus() != AsyncTask.Status.RUNNING) {
+            cdbDownloadTask.execute(profile, user, publisher, slots);
         }
     }
 
     @Override
     protected void onInactive() {
-        if (task.getStatus() == AsyncTask.Status.RUNNING) {
-            task.cancel(true);
+        if (cdbDownloadTask.getStatus() == AsyncTask.Status.RUNNING) {
+            cdbDownloadTask.cancel(true);
         }
         super.onInactive();
     }
@@ -46,7 +49,7 @@ public class CdbLiveData extends MutableLiveData<Cdb> {
             cdb.setPublisher(publisher);
             cdb.setSdkVersion("2.3.0");
             cdb.setProfileId(profileId);
-            Cdb response = PubSdkNetwork.loadCdb(cdb);
+            Cdb response = PubSdkNetwork.loadCdb(mContext, cdb);
             postValue(response);
             return null;
         }

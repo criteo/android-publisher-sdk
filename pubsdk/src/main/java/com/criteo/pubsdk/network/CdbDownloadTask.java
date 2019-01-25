@@ -11,6 +11,7 @@ import com.criteo.pubsdk.Util.HostAppUtil;
 import com.criteo.pubsdk.cache.SdkCache;
 import com.criteo.pubsdk.model.AdUnit;
 import com.criteo.pubsdk.model.Cdb;
+import com.criteo.pubsdk.model.Config;
 import com.criteo.pubsdk.model.Publisher;
 import com.criteo.pubsdk.model.Slot;
 import com.criteo.pubsdk.model.User;
@@ -22,10 +23,12 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, Cdb> {
     private static final String TAG = CdbDownloadTask.class.getSimpleName();
     private final Context mContext;
     private final SdkCache cache;
+    private boolean callConfig;
 
-    public CdbDownloadTask(Context context, SdkCache cache) {
+    public CdbDownloadTask(Context context, SdkCache cache, boolean callConfig) {
         this.mContext = context;
         this.cache = cache;
+        this.callConfig = callConfig;
     }
 
     @Override
@@ -40,6 +43,13 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, Cdb> {
                 user.setDeviceId(addId);
             }
         }
+        if (callConfig) {
+            Config config = PubSdkNetwork.loadConfig(mContext, publisher.getNetworkId(),
+                    user.getSdkVer(), publisher.getBundleId());
+            if (config != null && config.isKillSwitch()) {
+                return null;
+            }
+        }
         Cdb cdb = new Cdb();
         cdb.setAdUnits(slots);
         cdb.setUser(user);
@@ -50,7 +60,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, Cdb> {
         if (gdpr != null) {
             cdb.setGdprConsent(gdpr);
         }
-        Cdb response = PubSdkNetwork.loadCdb(cdb);
+        Cdb response = PubSdkNetwork.loadCdb(mContext, cdb);
         if (response != null && response.getSlots() != null && response.getSlots().size() > 0) {
             StringBuilder builder = new StringBuilder();
             for (Slot slot : response.getSlots()) {
@@ -59,13 +69,14 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, Cdb> {
             }
             Log.d(TAG, builder.toString());
         }
-        //cache.setAdUnits(cdb.getSlots());
         return response;
     }
 
     @Override
     protected void onPostExecute(Cdb cdb) {
         super.onPostExecute(cdb);
-        cache.setAdUnits(cdb.getSlots());
+        if (cdb != null) {
+            cache.setAdUnits(cdb.getSlots());
+        }
     }
 }
