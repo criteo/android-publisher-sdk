@@ -69,16 +69,16 @@ dependencies {
 
 // Define artifacts to publish to Nexus
 
-class Arr extends Jar {
-    String getExtension() { 'arr' }
+class Aar extends Jar {
+    String getExtension() { 'aar' }
 }
 
-task packageArrRelease(type: Arr, dependsOn: 'bundleRelease') {
+task packageAarRelease(type: Aar, dependsOn: 'bundleRelease') {
     from file("${project.buildDir}/outputs/apk/pubsdk-release.aar")
     classifier 'release'
 }
 
-task packageArrDebug(type: Arr, dependsOn: 'bundleDebug') {
+task packageAarDebug(type: Aar, dependsOn: 'bundleDebug') {
     from file("${project.buildDir}/outputs/apk/pubsdk-debug.aar")
     classifier 'debug'
 }
@@ -91,8 +91,8 @@ publish {
                 groupId 'com.criteo.android.pub'
                 artifactId 'pub-sdk'
                 version rootProject.publishVersion
-                artifact packageArrRelease
-                artifact packageArrDebug
+                artifact packageAarRelease
+                artifact packageAarDebug
             }
         }
     }
