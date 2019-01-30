@@ -51,7 +51,7 @@ public class DfpActivity extends AppCompatActivity {
         adUnit.setPlacementId("/140800857/Endeavour_320x50");
         AdSize adSize = new AdSize();
         adSize.setWidth(320);
-        adSize.setHight(50);
+        adSize.setHeight(50);
         adUnit.setSize(adSize);
         PublisherAdRequest request = criteo.enrich(builder, adUnit).build();
 

@@ -2,11 +2,11 @@ package com.criteo.pubsdk.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 public class AdUnit implements Parcelable {
+
     private static final String PLACEMENT_ID = "placementId";
     private static final String SIZES = "sizes";
     private String placementId;
@@ -31,12 +31,20 @@ public class AdUnit implements Parcelable {
     public JsonObject toJson() {
         JsonObject json = new JsonObject();
         JsonArray array = new JsonArray();
-        array.add(adSize.getWidth() + "x" + adSize.getHight());
+        array.add(adSize.getWidth() + "x" + adSize.getHeight());
         if (adSize != null) {
             json.add(SIZES, array);
         }
         json.addProperty(PLACEMENT_ID, placementId);
         return json;
+    }
+
+    @Override
+    public String toString() {
+        return "AdUnit{" +
+                "placementId='" + placementId + '\'' +
+                ", adSize=" + adSize +
+                '}';
     }
 
     @Override

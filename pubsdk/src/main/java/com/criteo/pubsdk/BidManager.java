@@ -2,7 +2,6 @@ package com.criteo.pubsdk;
 
 import android.content.Context;
 import android.os.AsyncTask;
-
 import com.criteo.pubsdk.cache.SdkCache;
 import com.criteo.pubsdk.model.AdUnit;
 import com.criteo.pubsdk.model.Publisher;
@@ -19,7 +18,6 @@ class BidManager {
     private static final String CRT_DISPLAY_URL = "CRT_displayUrl";
     private static final int PROFILE_ID = 235;
     private List<AdUnit> adUnits;
-    private int networkId;
     private Context mContext;
     private CdbDownloadTask mTask;
     private SdkCache cache;
@@ -28,7 +26,6 @@ class BidManager {
 
     BidManager(Context context, int networkId, List<AdUnit> adUnits) {
         this.mContext = context;
-        this.networkId = networkId;
         this.adUnits = adUnits;
         this.cache = new SdkCache();
         publisher = new Publisher(mContext);
@@ -53,7 +50,7 @@ class BidManager {
 
     PublisherAdRequest.Builder enrichBid(PublisherAdRequest.Builder request, AdUnit adUnit) {
         Slot slot = cache.getAdUnit(adUnit.getPlacementId(),
-                adUnit.getSize().getWidth(), adUnit.getSize().getHight());
+                adUnit.getSize().getWidth(), adUnit.getSize().getHeight());
         if (slot != null) {
             request.addCustomTargeting(CRT_CPM, String.valueOf(slot.getCpm()));
             request.addCustomTargeting(CRT_DISPLAY_URL, slot.getDisplayUrl());

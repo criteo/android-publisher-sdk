@@ -17,7 +17,7 @@ public class PubSdkDemoApplication extends Application {
         adUnit.setPlacementId("/140800857/Endeavour_320x50");
         AdSize adSize = new AdSize();
         adSize.setWidth(320);
-        adSize.setHight(50);
+        adSize.setHeight(50);
         adUnit.setSize(adSize);
         List<AdUnit> adUnits = new ArrayList<>();
         adUnits.add(adUnit);
