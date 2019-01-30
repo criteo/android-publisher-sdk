@@ -23,7 +23,7 @@ public class Slot implements Parcelable {
     private static final String SIZES = "sizes";
     private static final String NATIVE = "isNative";
     private static final String TTL = "ttl";
-    private static final int DEFAULT_TTL = 15*1000*1000;
+    private static final int DEFAULT_TTL = 15*60*1000;
     private static final String DISPLAY_URL = "displayUrl";
 
     private String slotId;
