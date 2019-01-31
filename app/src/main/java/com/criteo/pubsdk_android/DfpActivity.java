@@ -61,12 +61,19 @@ public class DfpActivity extends AppCompatActivity {
     private void onInterstitialClick() {
         mPublisherAdView.setVisibility(View.GONE);
         mPublisherInterstitialAd = new PublisherInterstitialAd(this);
-        mPublisherInterstitialAd.setAdUnitId("/6499/example/interstitial");
-
-        PublisherAdRequest adRequest = new PublisherAdRequest.Builder().build();
-
+        mPublisherInterstitialAd.setAdUnitId("/140800857/Endeavour_Interstitial_320x480");
+        PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
+        builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
+        Criteo criteo = Criteo.init(this, null, 0);
+        AdUnit interstitialAdUnit = new AdUnit();
+        interstitialAdUnit.setPlacementId("/140800857/Endeavour_Interstitial_320x480");
+        AdSize interstitialadSize = new AdSize();
+        interstitialadSize.setWidth(320);
+        interstitialadSize.setHeight(480);
+        interstitialAdUnit.setSize(interstitialadSize);
+        PublisherAdRequest request = criteo.enrich(builder, interstitialAdUnit).build();
         mPublisherInterstitialAd
-                .loadAd(adRequest);
+                .loadAd(request);
         mPublisherInterstitialAd.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {
