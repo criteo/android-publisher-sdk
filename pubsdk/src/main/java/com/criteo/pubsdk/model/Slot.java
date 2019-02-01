@@ -23,7 +23,7 @@ public class Slot implements Parcelable {
     private static final String SIZES = "sizes";
     private static final String NATIVE = "isNative";
     private static final String TTL = "ttl";
-    private static final int DEFAULT_TTL = 15*60*1000;
+    private static final int DEFAULT_TTL = 15 * 60 * 1000;
     private static final String DISPLAY_URL = "displayUrl";
 
     private String slotId;
@@ -43,6 +43,7 @@ public class Slot implements Parcelable {
 
     public Slot() {
         sizes = new ArrayList<>();
+        timeOfDownload = System.currentTimeMillis();
     }
 
     public Slot(JsonObject json) {
@@ -183,6 +184,24 @@ public class Slot implements Parcelable {
         return json;
     }
 
+    @Override
+    public String toString() {
+        return "Slot{" +
+                "slotId='" + slotId + '\'' +
+                ", impId='" + impId + '\'' +
+                ", cpm=" + cpm +
+                ", currency='" + currency + '\'' +
+                ", creative='" + creative + '\'' +
+                ", width=" + width +
+                ", height=" + height +
+                ", placementId='" + placementId + '\'' +
+                ", sizes=" + sizes +
+                ", nativeImpression=" + nativeImpression +
+                ", displayUrl='" + displayUrl + '\'' +
+                ", ttl=" + ttl +
+                ", timeOfDownload=" + timeOfDownload +
+                '}';
+    }
 
     @Override
     public int describeContents() {
