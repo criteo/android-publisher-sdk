@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Build;
 import android.provider.Settings;
 import android.webkit.WebView;
+
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -63,5 +64,16 @@ public final class DeviceUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static int isLimitAdTrackingEnabled(Context context) {
+        try {
+            AdvertisingIdClient.Info adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
+            return adInfo.isLimitAdTrackingEnabled() ? 1 : 0;
+        } catch (IOException | GooglePlayServicesNotAvailableException
+                | GooglePlayServicesRepairableException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }
