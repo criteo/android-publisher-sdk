@@ -6,6 +6,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface Endpoints {
@@ -16,4 +17,11 @@ public interface Endpoints {
     Call<JsonObject> config(@Query("networkId") int networkId,
                             @Query("appId") String appId,
                             @Query("sdkVersion") String sdkVersion);
+
+    @GET("appevent/v1/{senderId}")
+    Call<JsonObject> event(@Path("senderId") int senderId,
+                           @Query("appId") String appId,
+                           @Query("eventType") String eventType,
+                           @Query("gaid") String gaid,
+                           @Query("limitedAdTracking") int adTracking);
 }
