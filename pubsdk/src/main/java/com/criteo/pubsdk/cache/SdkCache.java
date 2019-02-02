@@ -12,14 +12,13 @@ public class SdkCache {
     private static final String X = "x";
     private static final int SECOND_TO_MILLI = 1000;
     private HashMap<Pair<String, String>, Slot> slotMap;
-    private int ttl;
 
     public SdkCache() {
         slotMap = new HashMap<>();
     }
 
     public void add(Slot slot) {
-        slotMap.put(new Pair<String, String>(slot.getPlacementId(),
+        slotMap.put(new Pair<>(slot.getPlacementId(),
                 slot.getWidth() + X + slot.getHeight()), slot);
     }
 
@@ -48,16 +47,7 @@ public class SdkCache {
     }
 
     public Slot getAdUnit(String placement, int width, int height) {
-        return getAdUnit(new Pair<String, String>(placement,
-                width + X + height));
-    }
-
-    public int getTtl() {
-        return ttl;
-    }
-
-    public void setTtl(int ttl) {
-        this.ttl = ttl;
+        return getAdUnit(new Pair<>(placement, width + X + height));
     }
 
     public int getItemCount() {

@@ -36,7 +36,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, Cdb> {
         int profile = (Integer) objects[0];
         User user = (User) objects[1];
         Publisher publisher = (Publisher) objects[2];
-        ArrayList<AdUnit> slots = (ArrayList<AdUnit>) objects[3];
+        ArrayList<AdUnit> adUnits = (ArrayList<AdUnit>) objects[3];
         if (DeviceUtil.hasPlayServices(mContext)) {
             String addId = DeviceUtil.getAdvertisingId(mContext);
             if (!TextUtils.isEmpty(addId)) {
@@ -51,7 +51,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, Cdb> {
             }
         }
         Cdb cdb = new Cdb();
-        cdb.setAdUnits(slots);
+        cdb.setAdUnits(adUnits);
         cdb.setUser(user);
         cdb.setPublisher(publisher);
         cdb.setSdkVersion(String.valueOf(BuildConfig.VERSION_NAME));
