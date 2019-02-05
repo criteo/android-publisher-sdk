@@ -36,7 +36,7 @@ final class PubSdkApi {
                 .baseUrl(context.getString(R.string.config_url))
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addConverterFactory(ScalarsConverterFactory.create())
-                .client(getCdbHttpConfig())
+                .client(getHttpConfig())
                 .build();
         Endpoints endpoints = retrofit.create(Endpoints.class);
 
@@ -63,7 +63,7 @@ final class PubSdkApi {
                 .baseUrl(context.getString(R.string.cdb_url))
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addConverterFactory(ScalarsConverterFactory.create())
-                .client(getCdbHttpConfig())
+                .client(getHttpConfig())
                 .build();
         Endpoints endpoints = retrofit.create(Endpoints.class);
         Call<JsonObject> responseCall
@@ -81,31 +81,34 @@ final class PubSdkApi {
         return new Cdb(result);
     }
 
-    private static OkHttpClient getCdbHttpConfig() {
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        if (BuildConfig.DEBUG) {
-            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-        }
-        return new OkHttpClient.Builder()
-                .addInterceptor(new okhttp3.Interceptor() {
-                    @Override
-                    public okhttp3.Response intercept(Chain chain) throws IOException {
-                        Request request = chain.request();
-                        Request.Builder builder = request.newBuilder()
-                                .addHeader("Content-Type", "text/plain");
-                        request = builder.build();
-                        okhttp3.Response response = chain.proceed(request);
-                        return response;
-                    }
-                })
-                .addInterceptor(interceptor)
-                .readTimeout(TIMEOUT, TimeUnit.SECONDS)
-                .connectTimeout(TIMEOUT, TimeUnit.SECONDS)
-                .writeTimeout(TIMEOUT, TimeUnit.SECONDS)
+    static JsonObject postAppEvent(Context context, int senderId,
+                                   String appId, String gaid, String eventType, int limitedAdTracking) {
+        Gson gson = new GsonBuilder()
+                .setLenient()
+                .create();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(context.getString(R.string.event_url))
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .client(getHttpConfig())
                 .build();
+        Endpoints endpoints = retrofit.create(Endpoints.class);
+        Call<JsonObject> responseCall
+                = endpoints.event(senderId, appId, eventType, gaid, limitedAdTracking);
+        Response<JsonObject> retrofitResponse = null;
+        JsonObject result = null;
+        try {
+            retrofitResponse = responseCall.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (retrofitResponse != null && retrofitResponse.isSuccessful()) {
+            result = retrofitResponse.body();
+        }
+        return result;
     }
 
-    private static OkHttpClient getConfigHttpConfig() {
+    private static OkHttpClient getHttpConfig() {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         if (BuildConfig.DEBUG) {
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);

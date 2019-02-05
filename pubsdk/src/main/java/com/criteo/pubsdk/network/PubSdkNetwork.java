@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.criteo.pubsdk.model.Cdb;
 import com.criteo.pubsdk.model.Config;
+import com.google.gson.JsonObject;
 
 public final class PubSdkNetwork {
 
@@ -16,5 +17,10 @@ public final class PubSdkNetwork {
 
     public static Cdb loadCdb(Context context, Cdb cdb) {
         return PubSdkApi.loadCdb(context, cdb);
+    }
+
+    public static JsonObject postEvent(Context context, int senderId,
+                                       String appId, String gaid, String eventType, int limitedAdTracking) {
+        return PubSdkApi.postAppEvent(context, senderId, appId, gaid, eventType, limitedAdTracking);
     }
 }

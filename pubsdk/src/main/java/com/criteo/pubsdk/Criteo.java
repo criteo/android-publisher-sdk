@@ -6,13 +6,16 @@ import android.arch.lifecycle.OnLifecycleEvent;
 import android.arch.lifecycle.ProcessLifecycleOwner;
 import android.content.Context;
 import android.text.TextUtils;
+
 import com.criteo.pubsdk.model.AdUnit;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 
 import java.util.List;
 
 public final class Criteo implements LifecycleObserver {
-
+    public static final String EVENT_INACTIVE = "Inactive";
+    public static final String EVENT_ACTIVE = "Active";
+    public static final String EVENT_LAUNCH = "Launch";
     private static Criteo criteo;
     private BidManager bidManager;
 
@@ -44,7 +47,17 @@ public final class Criteo implements LifecycleObserver {
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     public void appStart() {
         bidManager.prefetch();
+        bidManager.postAppEvent(EVENT_LAUNCH);
+    }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    public void appActive() {
+        bidManager.postAppEvent(EVENT_ACTIVE);
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+    public void appInactive() {
+        bidManager.postAppEvent(EVENT_INACTIVE);
     }
 
     public PublisherAdRequest.Builder enrich(PublisherAdRequest.Builder request, AdUnit adUnit) {
