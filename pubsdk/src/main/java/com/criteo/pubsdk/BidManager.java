@@ -37,7 +37,7 @@ class BidManager implements AppEventResponseListener {
         this.cache = new SdkCache();
         publisher = new Publisher(mContext);
         publisher.setNetworkId(networkId);
-        cdbDownloadTask = new CdbDownloadTask(context, this.cache, true);
+        cdbDownloadTask = new CdbDownloadTask(context, this.cache, true, DeviceUtil.getUserAgent(mContext));
         user = new User(mContext);
         eventTask = new AppEventTask(context, this);
     }
@@ -80,7 +80,7 @@ class BidManager implements AppEventResponseListener {
             request.addCustomTargeting(CRT_DISPLAY_URL, DeviceUtil.createDfpCompatibleDisplayUrl(slot.getDisplayUrl()));
         }
         if (cdbDownloadTask.getStatus() != AsyncTask.Status.RUNNING) {
-            cdbDownloadTask = new CdbDownloadTask(mContext, this.cache, false);
+            cdbDownloadTask = new CdbDownloadTask(mContext, this.cache, false, DeviceUtil.getUserAgent(mContext));
             List<AdUnit> adUnits = new ArrayList<AdUnit>();
             adUnits.add(adUnit);
             cdbDownloadTask.execute(PROFILE_ID, user, publisher, adUnits);

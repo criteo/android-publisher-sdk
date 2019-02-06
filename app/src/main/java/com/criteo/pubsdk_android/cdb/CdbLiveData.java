@@ -4,6 +4,8 @@ import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import com.criteo.pubsdk.BuildConfig;
+import com.criteo.pubsdk.Util.DeviceUtil;
 import com.criteo.pubsdk.model.Cdb;
 import com.criteo.pubsdk.model.Publisher;
 import com.criteo.pubsdk.model.Slot;
@@ -47,9 +49,9 @@ public class CdbLiveData extends MutableLiveData<Cdb> {
             cdb.setSlots(slots);
             cdb.setUser(user);
             cdb.setPublisher(publisher);
-            cdb.setSdkVersion("2.3.0");
+            cdb.setSdkVersion(String.valueOf(BuildConfig.VERSION_NAME));
             cdb.setProfileId(profileId);
-            Cdb response = PubSdkNetwork.loadCdb(mContext, cdb);
+            Cdb response = PubSdkNetwork.loadCdb(mContext, cdb, DeviceUtil.getUserAgent(mContext));
             postValue(response);
             return null;
         }

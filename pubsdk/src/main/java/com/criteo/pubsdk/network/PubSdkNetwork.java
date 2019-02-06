@@ -15,8 +15,8 @@ public final class PubSdkNetwork {
         return PubSdkApi.loadConfig(context, networkId, appId, sdkVersion);
     }
 
-    public static Cdb loadCdb(Context context, Cdb cdb) {
-        return PubSdkApi.loadCdb(context, cdb);
+    public static Cdb loadCdb(Context context, Cdb cdb, String userAgent) {
+        return PubSdkApi.loadCdb(context, cdb, userAgent);
     }
 
     public static JsonObject postEvent(Context context, int senderId,

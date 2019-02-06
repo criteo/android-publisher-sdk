@@ -1,6 +1,7 @@
 package com.criteo.pubsdk.network;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.criteo.pubsdk.BuildConfig;
 import com.criteo.pubsdk.R;
@@ -36,7 +37,7 @@ final class PubSdkApi {
                 .baseUrl(context.getString(R.string.config_url))
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addConverterFactory(ScalarsConverterFactory.create())
-                .client(getHttpConfig())
+                .client(getHttpConfig(null))
                 .build();
         Endpoints endpoints = retrofit.create(Endpoints.class);
 
@@ -55,7 +56,7 @@ final class PubSdkApi {
         return new Config(result);
     }
 
-    static Cdb loadCdb(Context context, Cdb cdb) {
+    static Cdb loadCdb(Context context, Cdb cdb, String userAgent) {
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
@@ -63,7 +64,7 @@ final class PubSdkApi {
                 .baseUrl(context.getString(R.string.cdb_url))
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addConverterFactory(ScalarsConverterFactory.create())
-                .client(getHttpConfig())
+                .client(getHttpConfig(userAgent))
                 .build();
         Endpoints endpoints = retrofit.create(Endpoints.class);
         Call<JsonObject> responseCall
@@ -90,7 +91,7 @@ final class PubSdkApi {
                 .baseUrl(context.getString(R.string.event_url))
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addConverterFactory(ScalarsConverterFactory.create())
-                .client(getHttpConfig())
+                .client(getHttpConfig(null))
                 .build();
         Endpoints endpoints = retrofit.create(Endpoints.class);
         Call<JsonObject> responseCall
@@ -108,7 +109,7 @@ final class PubSdkApi {
         return result;
     }
 
-    private static OkHttpClient getHttpConfig() {
+    private static OkHttpClient getHttpConfig(final String userAgent) {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
         if (BuildConfig.DEBUG) {
             interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -120,6 +121,9 @@ final class PubSdkApi {
                         Request request = chain.request();
                         Request.Builder builder = request.newBuilder()
                                 .addHeader("Content-Type", "text/plain");
+                        if (!TextUtils.isEmpty(userAgent)) {
+                            builder.addHeader("User-Agent", userAgent);
+                        }
                         request = builder.build();
                         okhttp3.Response response = chain.proceed(request);
                         return response;

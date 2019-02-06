@@ -28,7 +28,6 @@ public class User implements Parcelable {
     private String sdkVer;
     private int limit;
     private String connection;
-    private String userAgent;
 
     public User(Context context) {
         deviceId = DeviceUtil.getDeviceId(context);
@@ -37,7 +36,6 @@ public class User implements Parcelable {
         deviceOs = ANDROID;
         sdkVer = BuildConfig.VERSION_NAME;
         limit = LMT_VAL;
-        userAgent = DeviceUtil.getUserAgent(context);
     }
 
 
@@ -97,14 +95,6 @@ public class User implements Parcelable {
         this.connection = connection;
     }
 
-    public String getUserAgent() {
-        return userAgent;
-    }
-
-    public void setUserAgent(String userAgent) {
-        this.userAgent = userAgent;
-    }
-
     public JsonObject toJson() {
         JsonObject object = new JsonObject();
         object.addProperty(DEVICE_ID, deviceId);
@@ -114,7 +104,6 @@ public class User implements Parcelable {
         object.addProperty(SDK_VER, sdkVer);
         object.addProperty(LIMIT, limit);
         object.addProperty(CONNECTION, connection);
-        object.addProperty(USER_AGENT, userAgent);
         return object;
     }
 
@@ -132,7 +121,6 @@ public class User implements Parcelable {
         dest.writeString(this.sdkVer);
         dest.writeInt(this.limit);
         dest.writeString(this.connection);
-        dest.writeString(this.userAgent);
     }
 
     protected User(Parcel in) {
@@ -143,7 +131,6 @@ public class User implements Parcelable {
         this.sdkVer = in.readString();
         this.limit = in.readInt();
         this.connection = in.readString();
-        this.userAgent = in.readString();
     }
 
     public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {

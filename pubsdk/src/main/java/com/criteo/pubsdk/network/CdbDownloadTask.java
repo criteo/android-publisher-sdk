@@ -24,19 +24,27 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, Cdb> {
     private final Context mContext;
     private final SdkCache cache;
     private boolean callConfig;
+    private String userAgent;
 
-    public CdbDownloadTask(Context context, SdkCache cache, boolean callConfig) {
+    public CdbDownloadTask(Context context, SdkCache cache, boolean callConfig, String userAgent) {
         this.mContext = context;
         this.cache = cache;
         this.callConfig = callConfig;
+        this.userAgent = userAgent;
     }
 
     @Override
     protected Cdb doInBackground(Object... objects) {
+        if (objects.length < 4) {
+            return null;
+        }
         int profile = (Integer) objects[0];
         User user = (User) objects[1];
         Publisher publisher = (Publisher) objects[2];
         ArrayList<AdUnit> adUnits = (ArrayList<AdUnit>) objects[3];
+        if (profile <= 0 || adUnits.size() == 0) {
+            return null;
+        }
         if (DeviceUtil.hasPlayServices(mContext)) {
             String addId = DeviceUtil.getAdvertisingId(mContext);
             if (!TextUtils.isEmpty(addId)) {
@@ -60,7 +68,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, Cdb> {
         if (gdpr != null) {
             cdb.setGdprConsent(gdpr);
         }
-        Cdb response = PubSdkNetwork.loadCdb(mContext, cdb);
+        Cdb response = PubSdkNetwork.loadCdb(mContext, cdb, userAgent);
         if (response != null && response.getSlots() != null && response.getSlots().size() > 0) {
             StringBuilder builder = new StringBuilder();
             for (Slot slot : response.getSlots()) {
