@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import com.criteo.pubsdk.Util.AppEventResponseListener;
+import com.criteo.pubsdk.Util.DeviceUtil;
 import com.criteo.pubsdk.cache.SdkCache;
 import com.criteo.pubsdk.model.AdUnit;
 import com.criteo.pubsdk.model.Publisher;
@@ -76,7 +77,7 @@ class BidManager implements AppEventResponseListener {
                 adUnit.getSize().getWidth(), adUnit.getSize().getHeight());
         if (slot != null) {
             request.addCustomTargeting(CRT_CPM, String.valueOf(slot.getCpm()));
-            request.addCustomTargeting(CRT_DISPLAY_URL, slot.getDisplayUrl());
+            request.addCustomTargeting(CRT_DISPLAY_URL, DeviceUtil.createDfpCompatibleDisplayUrl(slot.getDisplayUrl()));
         }
         if (cdbDownloadTask.getStatus() != AsyncTask.Status.RUNNING) {
             cdbDownloadTask = new CdbDownloadTask(mContext, this.cache, false);

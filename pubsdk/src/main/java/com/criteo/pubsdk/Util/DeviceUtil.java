@@ -3,6 +3,7 @@ package com.criteo.pubsdk.Util;
 import android.content.Context;
 import android.os.Build;
 import android.provider.Settings;
+import android.util.Base64;
 import android.webkit.WebView;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
@@ -12,6 +13,9 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 public final class DeviceUtil {
     private DeviceUtil() {
@@ -76,4 +80,17 @@ public final class DeviceUtil {
         }
         return 0;
     }
+
+    public static String createDfpCompatibleDisplayUrl(String displayUrl) {
+        byte[] byteUrl = displayUrl.getBytes(StandardCharsets.UTF_8);
+        String base64Url = Base64.encodeToString(byteUrl, Base64.NO_WRAP);
+        String utf8 = StandardCharsets.UTF_8.name();
+        try {
+            return URLEncoder.encode(URLEncoder.encode(base64Url, utf8), utf8).toString();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 }
