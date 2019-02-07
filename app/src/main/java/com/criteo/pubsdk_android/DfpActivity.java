@@ -1,11 +1,13 @@
 package com.criteo.pubsdk_android;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import com.criteo.pubsdk.Criteo;
 import com.criteo.pubsdk.model.AdSize;
@@ -19,7 +21,7 @@ import com.google.android.gms.ads.doubleclick.PublisherInterstitialAd;
 public class DfpActivity extends AppCompatActivity {
 
     private PublisherInterstitialAd mPublisherInterstitialAd;
-    private PublisherAdView mPublisherAdView;
+    private LinearLayout linearLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,9 +33,7 @@ public class DfpActivity extends AppCompatActivity {
         editor.putString("IABConsent_SubjectToGDPR", "1");
         editor.putString("IABConsent_ConsentString", "1");
         editor.apply();
-        mPublisherAdView = findViewById(R.id.publisherAdView);
-
-
+        linearLayout = ((LinearLayout) findViewById(R.id.adViewHolder));
         findViewById(R.id.buttonBanner).setOnClickListener((View v) -> {
             onBannerClick();
         });
@@ -43,7 +43,12 @@ public class DfpActivity extends AppCompatActivity {
     }
 
     private void onBannerClick() {
-        //mPublisherAdView.setVisibility(View.VISIBLE);
+        linearLayout.setBackgroundColor(Color.RED);
+        linearLayout.removeAllViews();
+        linearLayout.setVisibility(View.VISIBLE);
+        PublisherAdView publisherAdView = new PublisherAdView(this);
+        publisherAdView.setAdSizes(com.google.android.gms.ads.AdSize.BANNER);
+        publisherAdView.setAdUnitId("/140800857/Endeavour_320x50");
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
         Criteo criteo = Criteo.init(this, null, 0);
@@ -53,13 +58,19 @@ public class DfpActivity extends AppCompatActivity {
         adSize.setWidth(320);
         adSize.setHeight(50);
         adUnit.setSize(adSize);
+        publisherAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdFailedToLoad(int i) {
+                super.onAdFailedToLoad(i);
+                linearLayout.setBackgroundColor(Color.TRANSPARENT);
+            }
+        });
         PublisherAdRequest request = criteo.enrich(builder, adUnit).build();
-
-        mPublisherAdView.loadAd(request);
+        publisherAdView.loadAd(request);
+        linearLayout.addView(publisherAdView);
     }
 
     private void onInterstitialClick() {
-        mPublisherAdView.setVisibility(View.GONE);
         mPublisherInterstitialAd = new PublisherInterstitialAd(this);
         mPublisherInterstitialAd.setAdUnitId("/140800857/Endeavour_Interstitial_320x480");
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
