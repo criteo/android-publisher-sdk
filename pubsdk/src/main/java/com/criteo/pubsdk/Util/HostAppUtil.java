@@ -36,7 +36,7 @@ public final class HostAppUtil {
             gdprConsent = new JsonObject();
             gdprConsent.addProperty(CONSENT_DATA, consentString);
             gdprConsent.addProperty(GDPR_APPLIES, "1".equals(subjectToGdpr));
-            gdprConsent.addProperty(CONSENT_GIVEN, vendorConsents.charAt(90) == '1');
+            gdprConsent.addProperty(CONSENT_GIVEN, vendorConsents.length() <= 90 && vendorConsents.charAt(90) == '1');
         }
         return gdprConsent;
     }
