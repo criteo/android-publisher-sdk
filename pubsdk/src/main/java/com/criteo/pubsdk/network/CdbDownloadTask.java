@@ -8,7 +8,7 @@ import android.util.Log;
 import com.criteo.pubsdk.BuildConfig;
 import com.criteo.pubsdk.Util.DeviceUtil;
 import com.criteo.pubsdk.Util.HostAppUtil;
-import com.criteo.pubsdk.cache.SdkCache;
+import com.criteo.pubsdk.Util.NetworkResponseListener;
 import com.criteo.pubsdk.model.AdUnit;
 import com.criteo.pubsdk.model.Cdb;
 import com.criteo.pubsdk.model.Config;
@@ -19,22 +19,22 @@ import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 
-public class CdbDownloadTask extends AsyncTask<Object, Void, Cdb> {
+public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     private static final String TAG = CdbDownloadTask.class.getSimpleName();
     private final Context mContext;
-    private final SdkCache cache;
     private boolean callConfig;
     private String userAgent;
+    private final NetworkResponseListener responseListener;
 
-    public CdbDownloadTask(Context context, SdkCache cache, boolean callConfig, String userAgent) {
+    public CdbDownloadTask(Context context, NetworkResponseListener responseListener, boolean callConfig, String userAgent) {
         this.mContext = context;
-        this.cache = cache;
+        this.responseListener = responseListener;
         this.callConfig = callConfig;
         this.userAgent = userAgent;
     }
 
     @Override
-    protected Cdb doInBackground(Object... objects) {
+    protected NetworkResult doInBackground(Object... objects) {
         if (objects.length < 4) {
             return null;
         }
@@ -51,40 +51,50 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, Cdb> {
                 user.setDeviceId(addId);
             }
         }
+        NetworkResult result = new NetworkResult();
+        Config configResult = null;
         if (callConfig) {
-            Config config = PubSdkNetwork.loadConfig(mContext, publisher.getNetworkId(),
+            configResult = PubSdkNetwork.loadConfig(mContext, publisher.getNetworkId(),
                     user.getSdkVer(), publisher.getBundleId());
-            if (config != null && config.isKillSwitch()) {
-                return null;
+            if (configResult != null && configResult.isKillSwitch()) {
+                result.setConfig(configResult);
+                return result;
             }
         }
-        Cdb cdb = new Cdb();
-        cdb.setAdUnits(adUnits);
-        cdb.setUser(user);
-        cdb.setPublisher(publisher);
-        cdb.setSdkVersion(String.valueOf(BuildConfig.VERSION_NAME));
-        cdb.setProfileId(profile);
+        Cdb cdbRequest = new Cdb();
+        cdbRequest.setAdUnits(adUnits);
+        cdbRequest.setUser(user);
+        cdbRequest.setPublisher(publisher);
+        cdbRequest.setSdkVersion(String.valueOf(BuildConfig.VERSION_NAME));
+        cdbRequest.setProfileId(profile);
         JsonObject gdpr = HostAppUtil.gdpr(mContext.getApplicationContext());
         if (gdpr != null) {
-            cdb.setGdprConsent(gdpr);
+            cdbRequest.setGdprConsent(gdpr);
         }
-        Cdb response = PubSdkNetwork.loadCdb(mContext, cdb, userAgent);
-        if (response != null && response.getSlots() != null && response.getSlots().size() > 0) {
+        Cdb cdbResult = PubSdkNetwork.loadCdb(mContext, cdbRequest, userAgent);
+        if (cdbResult != null && cdbResult.getSlots() != null
+                && cdbResult.getSlots().size() > 0) {
             StringBuilder builder = new StringBuilder();
-            for (Slot slot : response.getSlots()) {
+            for (Slot slot : cdbResult.getSlots()) {
                 builder.append(slot.toString());
                 builder.append("\n");
             }
             Log.d(TAG, builder.toString());
         }
-        return response;
+        return new NetworkResult(cdbResult, configResult);
     }
 
     @Override
-    protected void onPostExecute(Cdb cdb) {
-        super.onPostExecute(cdb);
-        if (cdb != null) {
-            cache.setAdUnits(cdb.getSlots());
+    protected void onPostExecute(NetworkResult networkResult) {
+        super.onPostExecute(networkResult);
+        if (responseListener != null && networkResult != null) {
+            if (networkResult.getCdb() != null) {
+                responseListener.setAdUnits(networkResult.getCdb().getSlots());
+            }
+            if (networkResult.getConfig() != null) {
+                responseListener.setConfig(networkResult.getConfig());
+            }
+
         }
     }
 }

@@ -4,8 +4,8 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.criteo.pubsdk.Util.AppEventResponseListener;
 import com.criteo.pubsdk.Util.DeviceUtil;
+import com.criteo.pubsdk.Util.NetworkResponseListener;
 import com.google.gson.JsonObject;
 
 public class AppEventTask extends AsyncTask<Object, Void, JsonObject> {
@@ -13,11 +13,11 @@ public class AppEventTask extends AsyncTask<Object, Void, JsonObject> {
     private static final int SENDER_ID = 1000;
     private static final String THROTTLE = "throttleSec";
     private final Context mContext;
-    private AppEventResponseListener responseListener;
+    private NetworkResponseListener responseListener;
 
-    public AppEventTask(Context context, AppEventResponseListener eventResponseListener) {
+    public AppEventTask(Context context, NetworkResponseListener responseListener) {
         this.mContext = context;
-        this.responseListener = eventResponseListener;
+        this.responseListener = responseListener;
     }
 
     @Override
@@ -41,10 +41,12 @@ public class AppEventTask extends AsyncTask<Object, Void, JsonObject> {
     @Override
     protected void onPostExecute(JsonObject result) {
         super.onPostExecute(result);
-        if (responseListener != null && result != null && result.has(THROTTLE)) {
-            responseListener.setThreshold(result.get(THROTTLE).getAsInt());
-        } else {
-            responseListener.setThreshold(0);
+        if (responseListener != null) {
+            if (result != null && result.has(THROTTLE)) {
+                responseListener.setThrottle(result.get(THROTTLE).getAsInt());
+            } else {
+                responseListener.setThrottle(0);
+            }
         }
     }
 }
