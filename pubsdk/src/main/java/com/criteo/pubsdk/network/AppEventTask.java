@@ -10,7 +10,7 @@ import com.google.gson.JsonObject;
 
 public class AppEventTask extends AsyncTask<Object, Void, JsonObject> {
     private static final String TAG = AppEventTask.class.getSimpleName();
-    private static final int SENDER_ID = 1000;
+    private static final int SENDER_ID = 2379;
     private static final String THROTTLE = "throttleSec";
     private final Context mContext;
     private NetworkResponseListener responseListener;
