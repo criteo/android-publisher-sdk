@@ -11,4 +11,6 @@ public interface NetworkResponseListener {
     void setAdUnits(List<Slot> Slots);
 
     void setConfig(Config config);
+
+    void setTimeToNextCall(int seconds);
 }

@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.criteo.pubsdk.Util.SlotDeserializer;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -21,6 +20,7 @@ public class Cdb implements Parcelable {
     private static final String SDK_VERSION = "sdkVersion";
     private static final String PROFILE_ID = "profileId";
     private static final String GDPR_CONSENT = "gdprConsent";
+    private static final String TIME_TO_NEXT_CALL = "timeToNextCall";
     public static final String SLOTS = "slots";
     private List<Slot> slots;
     private List<AdUnit> adUnits;
@@ -29,6 +29,7 @@ public class Cdb implements Parcelable {
     private String sdkVersion;
     private int profileId;
     private JsonObject gdprConsent;
+    private int timeToNextCall;
 
     public Cdb() {
         slots = new ArrayList<>();
@@ -108,6 +109,14 @@ public class Cdb implements Parcelable {
 
     public void setProfileId(int profileId) {
         this.profileId = profileId;
+    }
+
+    public int getTimeToNextCall() {
+        return timeToNextCall;
+    }
+
+    public void setTimeToNextCall(int timeToNextCall) {
+        this.timeToNextCall = timeToNextCall;
     }
 
     public JsonObject toJson() {
