@@ -60,7 +60,7 @@ public final class Criteo implements LifecycleObserver {
         bidManager.postAppEvent(EVENT_INACTIVE);
     }
 
-    public PublisherAdRequest.Builder setBidForAdUnit(PublisherAdRequest.Builder request, AdUnit adUnit) {
+    public PublisherAdRequest.Builder setBidsForAdUnit(PublisherAdRequest.Builder request, AdUnit adUnit) {
         return bidManager.enrichBid(request, adUnit);
     }
 

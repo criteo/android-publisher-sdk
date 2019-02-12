@@ -65,7 +65,7 @@ public class DfpActivity extends AppCompatActivity {
                 linearLayout.setBackgroundColor(Color.TRANSPARENT);
             }
         });
-        PublisherAdRequest request = criteo.setBidForAdUnit(builder, adUnit).build();
+        PublisherAdRequest request = criteo.setBidsForAdUnit(builder, adUnit).build();
         publisherAdView.loadAd(request);
         linearLayout.addView(publisherAdView);
     }
@@ -82,7 +82,7 @@ public class DfpActivity extends AppCompatActivity {
         interstitialadSize.setWidth(320);
         interstitialadSize.setHeight(480);
         interstitialAdUnit.setSize(interstitialadSize);
-        PublisherAdRequest request = criteo.setBidForAdUnit(builder, interstitialAdUnit).build();
+        PublisherAdRequest request = criteo.setBidsForAdUnit(builder, interstitialAdUnit).build();
         mPublisherInterstitialAd
                 .loadAd(request);
         mPublisherInterstitialAd.setAdListener(new AdListener() {
