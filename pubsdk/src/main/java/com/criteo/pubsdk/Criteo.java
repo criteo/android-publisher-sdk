@@ -47,16 +47,16 @@ public final class Criteo implements LifecycleObserver {
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     public void appStart() {
         bidManager.prefetch();
-        bidManager.postAppEvent(EVENT_LAUNCH);
-    }
-
-    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-    public void appActive() {
         bidManager.postAppEvent(EVENT_ACTIVE);
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+    public void appCreate() {
+        bidManager.postAppEvent(EVENT_LAUNCH);
+    }
+
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    public void appInactive() {
+    public void appPause() {
         bidManager.postAppEvent(EVENT_INACTIVE);
     }
 
@@ -65,7 +65,7 @@ public final class Criteo implements LifecycleObserver {
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    public void appPause() {
+    public void appStop() {
         bidManager.cancelLoad();
     }
 
