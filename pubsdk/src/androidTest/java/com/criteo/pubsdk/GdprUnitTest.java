@@ -35,16 +35,22 @@ public class GdprUnitTest {
         editor.apply();
     }
 
+    private void initializeGdprParameters(String subjectToGdpr, String consentData, String vendorConsent) {
+        if (subjectToGdpr != null) {
+            editor.putString("IABConsent_SubjectToGDPR", subjectToGdpr);
+        }
+        editor.putString("IABConsent_ConsentString", consentData);
+        editor.putString("IABConsent_ParsedVendorConsents", vendorConsent);
+        editor.apply();
+    }
+
     @Test
     public void testGdprConsentWithCriteoAsApprovedVendor() {
         String subjectToGdpr = "1";
         String consentData = "BOO9ZXlOO9auMAKABBITA1-AAAAZ17_______9______9uz_Gv_r_f__33e8_39v_h_7_u__7m_-zzV4-_lrQV1yPA1OrZArgEA";
-        //Criteo is at index 90 and set to 1
+        //Criteo is 91st character and set to 1
         String vendorConsent = "0000000000000010000000000000000000000100000000000000000000000000000000000000000000000000001";
-        editor.putString("IABConsent_SubjectToGDPR", subjectToGdpr);
-        editor.putString("IABConsent_ConsentString", consentData);
-        editor.putString("IABConsent_ParsedVendorConsents", vendorConsent);
-        editor.apply();
+        initializeGdprParameters(subjectToGdpr, consentData, vendorConsent);
         JsonObject gdprResponse = HostAppUtil.gdpr(context);
         Assert.assertEquals(gdprResponse.get("consentData").getAsString(), consentData);
         Assert.assertEquals(gdprResponse.get("gdprApplies").getAsBoolean(), true);
@@ -55,12 +61,9 @@ public class GdprUnitTest {
     public void testGdprConsentWithCriteoAsNotApprovedVendor() {
         String subjectToGdpr = "1";
         String consentData = "BOO9ZXlOO9auMAKABBITA1-AAAAZ17_______9______9uz_Gv_r_f__33e8_39v_h_7_u__7m_-zzV4-_lrQV1yPA1OrZArgEA";
-        //Criteo is at index 90 and set to 0
+        //Criteo is 91st character and set to 0
         String vendorConsent = "0000000000000010000000000000000000000100000000000000000000000000000000000000000000000000000";
-        editor.putString("IABConsent_SubjectToGDPR", subjectToGdpr);
-        editor.putString("IABConsent_ConsentString", consentData);
-        editor.putString("IABConsent_ParsedVendorConsents", vendorConsent);
-        editor.apply();
+        initializeGdprParameters(subjectToGdpr, consentData, vendorConsent);
         JsonObject gdprResponse = HostAppUtil.gdpr(context);
         Assert.assertEquals(gdprResponse.get("consentData").getAsString(), consentData);
         Assert.assertEquals(gdprResponse.get("gdprApplies").getAsBoolean(), true);
@@ -73,10 +76,7 @@ public class GdprUnitTest {
         String consentData = "BOO9ZXlOO9auMAKABBITA1-AAAAZ17_______9______9uz_Gv_r_f__33e8_39v_h_7_u__7m_-zzV4-_lrQV1yPA1OrZArgEA";
         //Vendor string is only 81 chars long
         String vendorConsent = "000000000000000000000000000000000000000000000000000000000000000000000000000000001";
-        editor.putString("IABConsent_SubjectToGDPR", subjectToGdpr);
-        editor.putString("IABConsent_ConsentString", consentData);
-        editor.putString("IABConsent_ParsedVendorConsents", vendorConsent);
-        editor.apply();
+        initializeGdprParameters(subjectToGdpr, consentData, vendorConsent);
         JsonObject gdprResponse = HostAppUtil.gdpr(context);
         Assert.assertEquals(gdprResponse.get("consentData").getAsString(), consentData);
         Assert.assertEquals(gdprResponse.get("gdprApplies").getAsBoolean(), true);
@@ -89,10 +89,7 @@ public class GdprUnitTest {
         String consentData = "BOO9ZXlOO9auMAKABBITA1-AAAAZ17_______9______9uz_Gv_r_f__33e8_39v_h_7_u__7m_-zzV4-_lrQV1yPA1OrZArgEA";
         //Vendor string is only 90 chars long
         String vendorConsent = "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-        editor.putString("IABConsent_SubjectToGDPR", subjectToGdpr);
-        editor.putString("IABConsent_ConsentString", consentData);
-        editor.putString("IABConsent_ParsedVendorConsents", vendorConsent);
-        editor.apply();
+        initializeGdprParameters(subjectToGdpr, consentData, vendorConsent);
         JsonObject gdprResponse = HostAppUtil.gdpr(context);
         Assert.assertEquals(gdprResponse.get("consentData").getAsString(), consentData);
         Assert.assertEquals(gdprResponse.get("gdprApplies").getAsBoolean(), true);
@@ -103,10 +100,8 @@ public class GdprUnitTest {
     public void testGdprConsentWithMissingProperties() {
         String consentData = "BOO9ZXlOO9auMAKABBITA1-AAAAZ17_______9______9uz_Gv_r_f__33e8_39v_h_7_u__7m_-zzV4-_lrQV1yPA1OrZArgEA";
         String vendorConsent = "0000000000000010000000000000000000000100000000000000000000000000000000000000000000000000001";
-        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-        editor.putString("IABConsent_ConsentString", consentData);
-        editor.putString("IABConsent_ParsedVendorConsents", vendorConsent);
-        editor.apply();
+        //SubjectToGdpr property is missing
+        initializeGdprParameters(null, consentData, vendorConsent);
         JsonObject gdprResponse = HostAppUtil.gdpr(context);
         Assert.assertNull(gdprResponse);
     }
