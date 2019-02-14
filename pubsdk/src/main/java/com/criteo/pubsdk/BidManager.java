@@ -81,7 +81,7 @@ class BidManager implements NetworkResponseListener {
         Slot slot = cache.getAdUnit(adUnit.getPlacementId(),
                 adUnit.getSize().getWidth(), adUnit.getSize().getHeight());
         if (slot != null) {
-            request.addCustomTargeting(CRT_CPM, String.valueOf(slot.getCpm()));
+            request.addCustomTargeting(CRT_CPM, slot.getCpm());
             request.addCustomTargeting(CRT_DISPLAY_URL, DeviceUtil.createDfpCompatibleDisplayUrl(slot.getDisplayUrl()));
         }
         if (cdbDownloadTask.getStatus() != AsyncTask.Status.RUNNING) {
@@ -101,11 +101,12 @@ class BidManager implements NetworkResponseListener {
 
     @Override
     public void setAdUnits(List<Slot> slots) {
-        cache.setAdUnits(slots);
+        //TODO: Decide whether to use setAdUnits or addAll
+        cache.addAll(slots);
     }
 
     @Override
     public void setConfig(Config config) {
-        this.config=config;
+        this.config = config;
     }
 }

@@ -2,9 +2,9 @@ package com.criteo.pubsdk.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
@@ -28,7 +28,7 @@ public class Slot implements Parcelable {
 
     private String slotId;
     private String impId;
-    private float cpm;
+    private String cpm;
     private String currency;
     private String creative;
     private int width;
@@ -50,7 +50,16 @@ public class Slot implements Parcelable {
         placementId = json.has(PLACEMENT_ID) ? json.get(PLACEMENT_ID).getAsString() : null;
         impId = json.has(IMP_ID) ? json.get(IMP_ID).getAsString() : null;
         slotId = json.has(SLOT_ID) ? json.get(SLOT_ID).getAsString() : null;
-        cpm = json.has(CPM) ? json.get(CPM).getAsFloat() : 0.0f;
+        if (json.has(CPM)) {
+            JsonPrimitive cpmPrimitive = json.get(CPM).getAsJsonPrimitive();
+            if (cpmPrimitive.isString()) {
+                cpm = cpmPrimitive.getAsString();
+            } else {
+                cpm = String.valueOf(cpmPrimitive.getAsFloat());
+            }
+        } else {
+            cpm = "0.0";
+        }
         currency = json.has(CURRENCY) ? json.get(CURRENCY).getAsString() : null;
         width = json.has(WIDTH) ? json.get(WIDTH).getAsInt() : 0;
         height = json.has(HEIGHT) ? json.get(HEIGHT).getAsInt() : 0;
@@ -85,11 +94,11 @@ public class Slot implements Parcelable {
         this.impId = impId;
     }
 
-    public float getCpm() {
+    public String getCpm() {
         return cpm;
     }
 
-    public void setCpm(float cpm) {
+    public void setCpm(String cpm) {
         this.cpm = cpm;
     }
 
@@ -212,7 +221,7 @@ public class Slot implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.slotId);
         dest.writeString(this.impId);
-        dest.writeFloat(this.cpm);
+        dest.writeString(this.cpm);
         dest.writeString(this.currency);
         dest.writeString(this.creative);
         dest.writeInt(this.width);
@@ -228,7 +237,7 @@ public class Slot implements Parcelable {
     protected Slot(Parcel in) {
         this.slotId = in.readString();
         this.impId = in.readString();
-        this.cpm = in.readFloat();
+        this.cpm = in.readString();
         this.currency = in.readString();
         this.creative = in.readString();
         this.width = in.readInt();

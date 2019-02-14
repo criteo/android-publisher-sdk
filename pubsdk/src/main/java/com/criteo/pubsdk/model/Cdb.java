@@ -3,9 +3,13 @@ package com.criteo.pubsdk.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.criteo.pubsdk.Util.SlotDeserializer;
+
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
@@ -27,15 +31,22 @@ public class Cdb implements Parcelable {
     private JsonObject gdprConsent;
 
     public Cdb() {
-        slots = new ArrayList<Slot>();
+        slots = new ArrayList<>();
     }
 
     public Cdb(JsonObject json) {
         if (json != null && json.has(SLOTS)) {
-            TypeToken<ArrayList<Slot>> token = new TypeToken<ArrayList<Slot>>() {
-            };
-            String slotStr = json.get(SLOTS).toString();
-            slots = new Gson().fromJson(slotStr, token.getType());
+            try {
+                GsonBuilder gsonBuilder = new GsonBuilder();
+                gsonBuilder.registerTypeAdapter(Slot.class, new SlotDeserializer());
+                TypeToken<ArrayList<Slot>> token = new TypeToken<ArrayList<Slot>>() {
+                };
+                String slotStr = json.get(SLOTS).toString();
+                Gson gson = gsonBuilder.create();
+                slots = gson.fromJson(slotStr, token.getType());
+            } catch (JsonParseException ex) {
+                slots = new ArrayList<>();
+            }
         }
     }
 
