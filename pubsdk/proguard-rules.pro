@@ -39,3 +39,17 @@
 
 # Top-level functions that can only be used by Kotlin.
 -dontwarn retrofit2.-KotlinExtensions
+
+# Leaving Criteo SDK models.
+-keep public class com.criteo.pubsdk.Criteo
+-keepclassmembers class com.criteo.pubsdk.Criteo {
+   public *;
+}
+-keep public class com.criteo.pubsdk.model.AdSize
+-keepclassmembers class com.criteo.pubsdk.model.AdSize {
+   public *;
+}
+-keep public class com.criteo.pubsdk.model.AdUnit
+-keepclassmembers class com.criteo.pubsdk.model.AdUnit {
+   public *;
+}
