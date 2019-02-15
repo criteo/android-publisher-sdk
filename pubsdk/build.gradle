@@ -74,12 +74,12 @@ class Aar extends Jar {
 }
 
 task packageAarRelease(type: Aar, dependsOn: 'bundleRelease') {
-    from file("${project.buildDir}/outputs/apk/pubsdk-release.aar")
+    from file("${project.buildDir}/outputs/aar/pubsdk-release.aar")
     classifier 'release'
 }
 
 task packageAarDebug(type: Aar, dependsOn: 'bundleDebug') {
-    from file("${project.buildDir}/outputs/apk/pubsdk-debug.aar")
+    from file("${project.buildDir}/outputs/aar/pubsdk-debug.aar")
     classifier 'debug'
 }
 
@@ -87,9 +87,9 @@ publish {
     publishing {
         with rootProject.publishRepositoryConfig
         publications {
-            apk(MavenPublication) {
-                groupId 'com.criteo.android.pub'
-                artifactId 'pub-sdk'
+            aar(MavenPublication) {
+                groupId 'com.criteo.pubsdk'
+                artifactId 'pubsdk'
                 version rootProject.publishVersion
                 artifact packageAarRelease
                 artifact packageAarDebug
