@@ -136,7 +136,7 @@ final class PubSdkApi {
 
     private static String readStream(InputStream in) throws IOException {
         BufferedReader reader = null;
-        StringBuffer response = new StringBuffer();
+        StringBuilder response = new StringBuilder();
         try {
             reader = new BufferedReader(new InputStreamReader(in));
             String line;
