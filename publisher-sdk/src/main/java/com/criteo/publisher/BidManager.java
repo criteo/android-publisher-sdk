@@ -22,13 +22,13 @@ class BidManager implements NetworkResponseListener {
     private static final String CRT_CPM = "crt_cpm";
     private static final String CRT_DISPLAY_URL = "crt_displayUrl";
     private static final int PROFILE_ID = 235;
-    private List<AdUnit> adUnits;
-    private Context mContext;
+    private final List<AdUnit> adUnits;
+    private final Context mContext;
+    private final SdkCache cache;
+    private final Publisher publisher;
+    private final User user;
     private CdbDownloadTask cdbDownloadTask;
     private AppEventTask eventTask;
-    private SdkCache cache;
-    private Publisher publisher;
-    private User user;
     private int appEventThrottle = -1;
     private long throttleSetTime = 0;
     private long cdbTimeToNextCall = 0;
