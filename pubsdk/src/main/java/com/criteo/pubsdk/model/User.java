@@ -6,7 +6,9 @@ import android.os.Parcelable;
 
 import com.criteo.pubsdk.BuildConfig;
 import com.criteo.pubsdk.Util.DeviceUtil;
-import com.google.gson.JsonObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class User implements Parcelable {
     private static final String DEVICE_ID = "deviceId";
@@ -16,7 +18,6 @@ public class User implements Parcelable {
     private static final String SDK_VER = "sdkver";
     private static final String LIMIT = "lmt";
     private static final String CONNECTION = "connection";
-    private static final String USER_AGENT = "userAgent";
     private static final String GAID = "gaid";
     private static final String ANDROID = "android";
     private static final int LMT_VAL = 0;
@@ -95,15 +96,15 @@ public class User implements Parcelable {
         this.connection = connection;
     }
 
-    public JsonObject toJson() {
-        JsonObject object = new JsonObject();
-        object.addProperty(DEVICE_ID, deviceId);
-        object.addProperty(DEVICE_ID_TYPE, deviceIdType);
-        object.addProperty(DEVICE_MODEL, deviceModel);
-        object.addProperty(DEVICE_OS, deviceOs);
-        object.addProperty(SDK_VER, sdkVer);
-        object.addProperty(LIMIT, limit);
-        object.addProperty(CONNECTION, connection);
+    public JSONObject toJson() throws JSONException {
+        JSONObject object = new JSONObject();
+        object.put(DEVICE_ID, deviceId);
+        object.put(DEVICE_ID_TYPE, deviceIdType);
+        object.put(DEVICE_MODEL, deviceModel);
+        object.put(DEVICE_OS, deviceOs);
+        object.put(SDK_VER, sdkVer);
+        object.put(LIMIT, limit);
+        object.put(CONNECTION, connection);
         return object;
     }
 

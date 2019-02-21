@@ -2,19 +2,17 @@ package com.criteo.pubsdk.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
-import com.criteo.pubsdk.Util.SlotDeserializer;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.reflect.TypeToken;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Cdb implements Parcelable {
+    private static final String TAG = Cdb.class.getSimpleName();
     private static final String PUBLISHER = "publisher";
     private static final String USER = "user";
     private static final String SDK_VERSION = "sdkVersion";
@@ -28,34 +26,39 @@ public class Cdb implements Parcelable {
     private User user;
     private String sdkVersion;
     private int profileId;
-    private JsonObject gdprConsent;
     private int timeToNextCall;
+    private JSONObject gdprConsent;
 
     public Cdb() {
         slots = new ArrayList<>();
     }
 
-    public Cdb(JsonObject json) {
+    public Cdb(JSONObject json) {
         if (json != null && json.has(SLOTS)) {
+            JSONArray array = new JSONArray();
             try {
-                GsonBuilder gsonBuilder = new GsonBuilder();
-                gsonBuilder.registerTypeAdapter(Slot.class, new SlotDeserializer());
-                TypeToken<ArrayList<Slot>> token = new TypeToken<ArrayList<Slot>>() {
-                };
-                String slotStr = json.get(SLOTS).toString();
-                Gson gson = gsonBuilder.create();
-                slots = gson.fromJson(slotStr, token.getType());
-            } catch (JsonParseException ex) {
-                slots = new ArrayList<>();
+                array = json.getJSONArray(SLOTS);
+            } catch (JSONException ex) {
+                Log.d(TAG, "Exception while reading slots array" + ex.getMessage());
+            }
+            slots = new ArrayList<>();
+            for (int i = 0; i < array.length(); i++) {
+                try {
+                    JSONObject slotStr = array.getJSONObject(i);
+                    slots.add(new Slot(slotStr));
+                } catch (JSONException ex) {
+                    Log.d(TAG, "Exception while reading slot from slots array" + ex.getMessage());
+                    ex.printStackTrace();
+                }
             }
         }
     }
 
-    public JsonObject getGdprConsent() {
+    public JSONObject getGdprConsent() {
         return gdprConsent;
     }
 
-    public void setGdprConsent(JsonObject gdprConsent) {
+    public void setGdprConsent(JSONObject gdprConsent) {
         this.gdprConsent = gdprConsent;
     }
 
@@ -111,6 +114,7 @@ public class Cdb implements Parcelable {
         this.profileId = profileId;
     }
 
+
     public int getTimeToNextCall() {
         return timeToNextCall;
     }
@@ -119,30 +123,29 @@ public class Cdb implements Parcelable {
         this.timeToNextCall = timeToNextCall;
     }
 
-    public JsonObject toJson() {
-        JsonObject json = new JsonObject();
+
+    public JSONObject toJson() throws JSONException {
+        JSONObject json = new JSONObject();
         if (user != null) {
-            json.add(USER, user.toJson());
+            json.put(USER, user.toJson());
         }
         if (publisher != null) {
-            json.add(PUBLISHER, publisher.toJson());
+            json.put(PUBLISHER, publisher.toJson());
         }
-        json.addProperty(SDK_VERSION, sdkVersion);
-        json.addProperty(PROFILE_ID, profileId);
+        json.put(SDK_VERSION, sdkVersion);
+        json.put(PROFILE_ID, profileId);
 
-        JsonArray jsonAdUnits = new JsonArray();
+        JSONArray jsonAdUnits = new JSONArray();
         for (AdUnit adUnit : adUnits) {
-            jsonAdUnits.add(adUnit.toJson());
+            jsonAdUnits.put(adUnit.toJson());
         }
-        if (jsonAdUnits.size() > 0) {
-            json.add(SLOTS, jsonAdUnits);
+        if (jsonAdUnits.length() > 0) {
+            json.put(SLOTS, jsonAdUnits);
         }
         if (gdprConsent != null) {
-            json.add(GDPR_CONSENT, gdprConsent);
+            json.put(GDPR_CONSENT, gdprConsent);
         }
-
         return json;
-
     }
 
     @Override

@@ -4,7 +4,8 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.google.gson.JsonObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Publisher implements Parcelable {
 
@@ -33,11 +34,11 @@ public class Publisher implements Parcelable {
         this.networkId = networkId;
     }
 
-    public JsonObject toJson() {
-        JsonObject json = new JsonObject();
-        json.addProperty(BUNDLE_ID, bundleId);
+    public JSONObject toJson() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put(BUNDLE_ID, bundleId);
         if (networkId > 0) {
-            json.addProperty(NETWORK_ID, networkId);
+            json.put(NETWORK_ID, networkId);
         }
         return json;
     }

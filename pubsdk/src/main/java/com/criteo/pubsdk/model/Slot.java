@@ -2,16 +2,17 @@ package com.criteo.pubsdk.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.reflect.TypeToken;
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Slot implements Parcelable {
-
+    private static final String TAG = Slot.class.getSimpleName();
     private static final String SLOT_ID = "slotId";
     private static final String IMP_ID = "impId";
     private static final String CPM = "cpm";
@@ -46,27 +47,28 @@ public class Slot implements Parcelable {
         timeOfDownload = System.currentTimeMillis();
     }
 
-    public Slot(JsonObject json) {
-        placementId = json.has(PLACEMENT_ID) ? json.get(PLACEMENT_ID).getAsString() : null;
-        impId = json.has(IMP_ID) ? json.get(IMP_ID).getAsString() : null;
-        slotId = json.has(SLOT_ID) ? json.get(SLOT_ID).getAsString() : null;
+    public Slot(JSONObject json) {
+        placementId = json.optString(PLACEMENT_ID, null);
+        impId = json.optString(IMP_ID, null);
+        slotId = json.optString(SLOT_ID, null);
         if (json.has(CPM)) {
-            JsonPrimitive cpmPrimitive = json.get(CPM).getAsJsonPrimitive();
-            if (cpmPrimitive.isString()) {
-                cpm = cpmPrimitive.getAsString();
-            } else {
-                cpm = String.valueOf(cpmPrimitive.getAsFloat());
+            try {
+                cpm = json.getString(CPM);
+            } catch (JSONException e) {
+                Log.d(TAG, "Unable to parse CPM " + e.getMessage());
+                double cpmInt = json.optDouble(CPM, 0.0);
+                cpm = String.valueOf(cpmInt);
             }
         } else {
             cpm = "0.0";
         }
-        currency = json.has(CURRENCY) ? json.get(CURRENCY).getAsString() : null;
-        width = json.has(WIDTH) ? json.get(WIDTH).getAsInt() : 0;
-        height = json.has(HEIGHT) ? json.get(HEIGHT).getAsInt() : 0;
-        creative = json.has(CREATIVE) ? json.get(CREATIVE).getAsString() : null;
-        displayUrl = json.has(DISPLAY_URL) ? json.get(DISPLAY_URL).getAsString() : null;
+        currency = json.optString(CURRENCY, null);
+        width = json.optInt(WIDTH, 0);
+        height = json.optInt(HEIGHT, 0);
+        creative = json.optString(CREATIVE, null);
+        displayUrl = json.optString(DISPLAY_URL, null);
         sizes = new ArrayList<>();
-        ttl = json.has(TTL) ? json.get(TTL).getAsInt() : DEFAULT_TTL;
+        ttl = json.optInt(TTL, DEFAULT_TTL);
         timeOfDownload = System.currentTimeMillis();
     }
 
@@ -182,17 +184,18 @@ public class Slot implements Parcelable {
         this.displayUrl = displayUrl;
     }
 
-    public JsonObject toJson() {
-        JsonObject json = new JsonObject();
+    public JSONObject toJson() throws JSONException {
+        JSONObject json = new JSONObject();
         if (sizes.size() > 0) {
-            TypeToken<ArrayList<String>> token = new TypeToken<ArrayList<String>>() {
-            };
-            Gson gson = new Gson();
-            json.addProperty(SIZES, gson.toJson(sizes, token.getType()));
+            JSONArray array = new JSONArray();
+            for (String size : sizes) {
+                array.put(size);
+            }
+            json.put(SIZES, array);
         }
-        json.addProperty(PLACEMENT_ID, placementId);
+        json.put(PLACEMENT_ID, placementId);
         if (nativeImpression) {
-            json.addProperty(NATIVE, nativeImpression);
+            json.put(NATIVE, nativeImpression);
         }
         return json;
     }

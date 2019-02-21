@@ -6,9 +6,10 @@ import android.util.Log;
 
 import com.criteo.pubsdk.Util.DeviceUtil;
 import com.criteo.pubsdk.Util.NetworkResponseListener;
-import com.google.gson.JsonObject;
 
-public class AppEventTask extends AsyncTask<Object, Void, JsonObject> {
+import org.json.JSONObject;
+
+public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
     private static final String TAG = AppEventTask.class.getSimpleName();
     private static final int SENDER_ID = 2379;
     private static final String THROTTLE = "throttleSec";
@@ -21,7 +22,7 @@ public class AppEventTask extends AsyncTask<Object, Void, JsonObject> {
     }
 
     @Override
-    protected JsonObject doInBackground(Object... objects) {
+    protected JSONObject doInBackground(Object... objects) {
         String eventType = (String) objects[0];
         int limitedAdTracking = 0;
         String gaid = null;
@@ -31,7 +32,7 @@ public class AppEventTask extends AsyncTask<Object, Void, JsonObject> {
 
         }
         String appId = mContext.getApplicationContext().getPackageName();
-        JsonObject response = PubSdkNetwork.postEvent(mContext, SENDER_ID, appId, gaid, eventType, limitedAdTracking);
+        JSONObject response = PubSdkNetwork.postEvent(mContext, SENDER_ID, appId, gaid, eventType, limitedAdTracking);
         if (response != null) {
             Log.d(TAG, response.toString());
         }
@@ -39,11 +40,11 @@ public class AppEventTask extends AsyncTask<Object, Void, JsonObject> {
     }
 
     @Override
-    protected void onPostExecute(JsonObject result) {
+    protected void onPostExecute(JSONObject result) {
         super.onPostExecute(result);
         if (responseListener != null) {
             if (result != null && result.has(THROTTLE)) {
-                responseListener.setThrottle(result.get(THROTTLE).getAsInt());
+                responseListener.setThrottle(result.optInt(THROTTLE, 0));
             } else {
                 responseListener.setThrottle(0);
             }

@@ -1,26 +1,26 @@
 package com.criteo.pubsdk.model;
 
-import com.google.gson.JsonObject;
+import org.json.JSONObject;
 
 public class Config {
 
-  public static final String KILL_SWITCH = "killSwitch";
-  private boolean killSwitch;
+    public static final String KILL_SWITCH = "killSwitch";
+    private boolean killSwitch;
 
-  public Config() {
+    public Config() {
 
-  }
+    }
 
-  public Config(JsonObject json) {
-    this.killSwitch = json.has(KILL_SWITCH) ? json.get(KILL_SWITCH).getAsBoolean() : false;
+    public Config(JSONObject json) {
+        this.killSwitch = json.optBoolean(KILL_SWITCH, false);
 
-  }
+    }
 
-  public boolean isKillSwitch() {
-    return killSwitch;
-  }
+    public boolean isKillSwitch() {
+        return killSwitch;
+    }
 
-  public void setKillSwitch(boolean killSwitch) {
-    this.killSwitch = killSwitch;
-  }
+    public void setKillSwitch(boolean killSwitch) {
+        this.killSwitch = killSwitch;
+    }
 }

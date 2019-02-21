@@ -4,8 +4,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+
 import com.criteo.pubsdk.R;
-import com.google.gson.JsonObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public final class HostAppUtil {
@@ -23,19 +26,23 @@ public final class HostAppUtil {
         return context.getString(R.string.criteo_publisher_id);
     }
 
-    public static JsonObject gdpr(Context context) {
+    public static JSONObject gdpr(Context context){
         SharedPreferences mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String consentString = mPreferences.getString(CONSENT_STRING, "");
         String subjectToGdpr = mPreferences.getString(SUBJECT_TO_GDPR, "");
         String vendorConsents = mPreferences.getString(VENDORS, "");
-        JsonObject gdprConsent = null;
+        JSONObject gdprConsent = null;
         if (!TextUtils.isEmpty(consentString) &&
                 !TextUtils.isEmpty(subjectToGdpr) &&
                 !TextUtils.isEmpty(vendorConsents)) {
-            gdprConsent = new JsonObject();
-            gdprConsent.addProperty(CONSENT_DATA, consentString);
-            gdprConsent.addProperty(GDPR_APPLIES, "1".equals(subjectToGdpr));
-            gdprConsent.addProperty(CONSENT_GIVEN, (vendorConsents.length() > 90 && vendorConsents.charAt(90) == '1'));
+            gdprConsent = new JSONObject();
+            try {
+                gdprConsent.put(CONSENT_DATA, consentString);
+                gdprConsent.put(GDPR_APPLIES, "1".equals(subjectToGdpr));
+                gdprConsent.put(CONSENT_GIVEN, (vendorConsents.length() > 90 && vendorConsents.charAt(90) == '1'));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
         return gdprConsent;
     }

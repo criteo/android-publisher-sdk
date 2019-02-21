@@ -15,7 +15,8 @@ import com.criteo.pubsdk.model.Config;
 import com.criteo.pubsdk.model.Publisher;
 import com.criteo.pubsdk.model.Slot;
 import com.criteo.pubsdk.model.User;
-import com.google.gson.JsonObject;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -67,7 +68,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         cdbRequest.setPublisher(publisher);
         cdbRequest.setSdkVersion(String.valueOf(BuildConfig.VERSION_NAME));
         cdbRequest.setProfileId(profile);
-        JsonObject gdpr = HostAppUtil.gdpr(mContext.getApplicationContext());
+        JSONObject gdpr = HostAppUtil.gdpr(mContext.getApplicationContext());
         if (gdpr != null) {
             cdbRequest.setGdprConsent(gdpr);
         }

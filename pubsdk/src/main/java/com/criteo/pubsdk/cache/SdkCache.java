@@ -9,7 +9,6 @@ import java.util.List;
 
 public class SdkCache {
     //act as a delimiter to the CDB call.
-    private static final String X = "x";
     private static final int SECOND_TO_MILLI = 1000;
     private HashMap<Pair<String, String>, Slot> slotMap;
 
