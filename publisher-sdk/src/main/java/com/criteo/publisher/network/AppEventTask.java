@@ -5,8 +5,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.NetworkResponseListener;
-
+import com.criteo.publisher.Util.AppEventResponseListener;
 import org.json.JSONObject;
 
 public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
@@ -14,9 +13,9 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
     private static final int SENDER_ID = 2379;
     private static final String THROTTLE = "throttleSec";
     private final Context mContext;
-    private final NetworkResponseListener responseListener;
+    private final AppEventResponseListener responseListener;
 
-    public AppEventTask(Context context, NetworkResponseListener responseListener) {
+    public AppEventTask(Context context, AppEventResponseListener responseListener) {
         this.mContext = context;
         this.responseListener = responseListener;
     }

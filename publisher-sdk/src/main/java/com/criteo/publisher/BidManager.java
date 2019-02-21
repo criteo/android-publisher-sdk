@@ -2,8 +2,8 @@ package com.criteo.publisher;
 
 import android.content.Context;
 import android.os.AsyncTask;
-
 import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdUnit;
@@ -11,14 +11,13 @@ import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
-import com.criteo.publisher.network.AppEventTask;
 import com.criteo.publisher.network.CdbDownloadTask;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 
 import java.util.ArrayList;
 import java.util.List;
 
-class BidManager implements NetworkResponseListener {
+public class BidManager implements NetworkResponseListener, ApplicationStoppedListener {
     private static final String CRT_CPM = "crt_cpm";
     private static final String CRT_DISPLAY_URL = "crt_displayUrl";
     private static final int PROFILE_ID = 235;
@@ -28,9 +27,6 @@ class BidManager implements NetworkResponseListener {
     private final Publisher publisher;
     private final User user;
     private CdbDownloadTask cdbDownloadTask;
-    private AppEventTask eventTask;
-    private int appEventThrottle = -1;
-    private long throttleSetTime = 0;
     private long cdbTimeToNextCall = 0;
     private Config config;
 
@@ -42,7 +38,6 @@ class BidManager implements NetworkResponseListener {
         publisher.setNetworkId(networkId);
         cdbDownloadTask = new CdbDownloadTask(context, this, true, DeviceUtil.getUserAgent(mContext));
         user = new User();
-        eventTask = new AppEventTask(context, this);
     }
 
     void prefetch() {
@@ -50,20 +45,6 @@ class BidManager implements NetworkResponseListener {
                 && cdbDownloadTask.getStatus() != AsyncTask.Status.FINISHED) {
             cdbDownloadTask.execute(PROFILE_ID, user, publisher, adUnits);
         }
-    }
-
-    void postAppEvent(String eventType) {
-        if (appEventThrottle > 0 &&
-                System.currentTimeMillis() - throttleSetTime < appEventThrottle * 1000) {
-            return;
-        }
-        if (eventTask.getStatus() == AsyncTask.Status.FINISHED) {
-            eventTask = new AppEventTask(mContext, this);
-        }
-        if (eventTask.getStatus() != AsyncTask.Status.RUNNING) {
-            eventTask.execute(eventType);
-        }
-
     }
 
     PublisherAdRequest.Builder enrichBid(PublisherAdRequest.Builder request, AdUnit adUnit) {
@@ -88,12 +69,6 @@ class BidManager implements NetworkResponseListener {
     }
 
     @Override
-    public void setThrottle(int throttle) {
-        this.appEventThrottle = throttle;
-        this.throttleSetTime = System.currentTimeMillis();
-    }
-
-    @Override
     public void setAdUnits(List<Slot> slots) {
         cache.addAll(slots);
     }
@@ -106,5 +81,12 @@ class BidManager implements NetworkResponseListener {
     @Override
     public void setTimeToNextCall(int seconds) {
         this.cdbTimeToNextCall = System.currentTimeMillis() + seconds * 1000;
+    }
+
+    @Override
+    public void onApplicationStopped() {
+        if (cdbDownloadTask.getStatus() == AsyncTask.Status.RUNNING) {
+            cdbDownloadTask.cancel(true);
+        }
     }
 }

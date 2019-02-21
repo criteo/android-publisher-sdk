@@ -2,17 +2,18 @@ package com.criteo.publisher;
 
 import android.app.Application;
 import android.text.TextUtils;
-
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.AppEvents.AppEvents;
+import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 
 import java.util.List;
 
 public final class Criteo {
-    private static final String EVENT_LAUNCH = "Launch";
-
     private static Criteo criteo;
     private BidManager bidManager;
+    private AppEvents appEvents;
+    private AppLifecycleUtil appLifecycleUtil;
 
     public static Criteo init(Application application, List<AdUnit> adUnits, int networkId) {
         synchronized (Criteo.class) {
@@ -40,12 +41,12 @@ public final class Criteo {
         }
         if (networkId == 0) throw new IllegalArgumentException("NetworkId is required.");
         this.bidManager = new BidManager(application.getApplicationContext(), networkId, adUnits);
+        this.appEvents = new AppEvents(application.getApplicationContext());
+        this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
         bidManager.prefetch();
-        bidManager.postAppEvent(EVENT_LAUNCH);
     }
 
     public PublisherAdRequest.Builder setBidsForAdUnit(PublisherAdRequest.Builder request, AdUnit adUnit) {
         return bidManager.enrichBid(request, adUnit);
     }
-
 }
