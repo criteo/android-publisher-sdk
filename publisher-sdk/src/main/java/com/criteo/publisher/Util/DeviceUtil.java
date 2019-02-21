@@ -56,11 +56,8 @@ public final class DeviceUtil {
         try {
             adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
             return adInfo.getId();
-        } catch (IOException e) {
-        } catch (GooglePlayServicesNotAvailableException e) {
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        } catch (GooglePlayServicesRepairableException e) {
+        } catch (IOException | GooglePlayServicesNotAvailableException | IllegalStateException
+                | GooglePlayServicesRepairableException e) {
             e.printStackTrace();
         }
         return null;
