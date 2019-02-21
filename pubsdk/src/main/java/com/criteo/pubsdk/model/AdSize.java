@@ -23,6 +23,10 @@ public class AdSize implements Parcelable {
         this.width = width;
     }
 
+    public String getFormattedSize() {
+        return width + "x" + height;
+    }
+
     @Override
     public int describeContents() {
         return 0;

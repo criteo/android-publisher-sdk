@@ -19,7 +19,7 @@ public class SdkCache {
 
     public void add(Slot slot) {
         slotMap.put(new Pair<>(slot.getPlacementId(),
-                slot.getWidth() + X + slot.getHeight()), slot);
+                slot.getFormattedSize()), slot);
     }
 
     public void addAll(List<Slot> slots) {
@@ -46,8 +46,8 @@ public class SdkCache {
         return slot;
     }
 
-    public Slot getAdUnit(String placement, int width, int height) {
-        return getAdUnit(new Pair<>(placement, width + X + height));
+    public Slot getAdUnit(String placement, String formattedSize) {
+        return getAdUnit(new Pair<>(placement, formattedSize));
     }
 
     public int getItemCount() {

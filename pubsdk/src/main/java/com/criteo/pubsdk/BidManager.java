@@ -80,7 +80,7 @@ class BidManager implements NetworkResponseListener {
             return request;
         }
         Slot slot = cache.getAdUnit(adUnit.getPlacementId(),
-                adUnit.getSize().getWidth(), adUnit.getSize().getHeight());
+                adUnit.getSize().getFormattedSize());
 
         if (slot != null) {
             request.addCustomTargeting(CRT_CPM, slot.getCpm());

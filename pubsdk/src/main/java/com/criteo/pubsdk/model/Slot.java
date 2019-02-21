@@ -118,6 +118,10 @@ public class Slot implements Parcelable {
         this.height = height;
     }
 
+    public String getFormattedSize() {
+        return width + "x" + height;
+    }
+
     public List<String> getSizes() {
         return sizes;
     }
