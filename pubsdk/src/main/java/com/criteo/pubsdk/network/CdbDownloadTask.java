@@ -55,7 +55,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         Config configResult = null;
         if (callConfig) {
             configResult = PubSdkNetwork.loadConfig(mContext, publisher.getNetworkId(),
-                    user.getSdkVer(), publisher.getBundleId());
+                    publisher.getBundleId(), user.getSdkVer());
             if (configResult != null && configResult.isKillSwitch()) {
                 result.setConfig(configResult);
                 return result;
