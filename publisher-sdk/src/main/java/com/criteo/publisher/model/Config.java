@@ -4,7 +4,7 @@ import org.json.JSONObject;
 
 public class Config {
 
-    public static final String KILL_SWITCH = "killSwitch";
+    private static final String KILL_SWITCH = "killSwitch";
     private boolean killSwitch;
 
     public Config() {

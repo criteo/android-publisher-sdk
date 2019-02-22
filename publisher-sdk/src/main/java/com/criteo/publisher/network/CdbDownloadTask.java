@@ -22,9 +22,9 @@ import java.util.ArrayList;
 
 public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     private static final String TAG = CdbDownloadTask.class.getSimpleName();
-    private Context mContext;
-    private boolean callConfig;
-    private String userAgent;
+    private final Context mContext;
+    private final boolean callConfig;
+    private final String userAgent;
     private final NetworkResponseListener responseListener;
 
     public CdbDownloadTask(Context context, NetworkResponseListener responseListener, boolean callConfig, String userAgent) {

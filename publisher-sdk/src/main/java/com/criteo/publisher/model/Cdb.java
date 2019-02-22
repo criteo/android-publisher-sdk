@@ -19,7 +19,7 @@ public class Cdb implements Parcelable {
     private static final String PROFILE_ID = "profileId";
     private static final String GDPR_CONSENT = "gdprConsent";
     private static final String TIME_TO_NEXT_CALL = "timeToNextCall";
-    public static final String SLOTS = "slots";
+    private static final String SLOTS = "slots";
     private List<Slot> slots;
     private List<AdUnit> adUnits;
     private Publisher publisher;

@@ -14,7 +14,7 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
     private static final int SENDER_ID = 2379;
     private static final String THROTTLE = "throttleSec";
     private final Context mContext;
-    private NetworkResponseListener responseListener;
+    private final NetworkResponseListener responseListener;
 
     public AppEventTask(Context context, NetworkResponseListener responseListener) {
         this.mContext = context;
