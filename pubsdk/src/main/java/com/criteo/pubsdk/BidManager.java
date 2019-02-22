@@ -52,15 +52,6 @@ class BidManager implements NetworkResponseListener {
         }
     }
 
-    void cancelLoad() {
-        if (cdbDownloadTask.getStatus() == AsyncTask.Status.RUNNING) {
-            cdbDownloadTask.cancel(true);
-        }
-        if (eventTask.getStatus() == AsyncTask.Status.RUNNING) {
-            eventTask.cancel(true);
-        }
-    }
-
     void postAppEvent(String eventType) {
         if (appEventThrottle > 0 &&
                 System.currentTimeMillis() - throttleSetTime < appEventThrottle * 1000) {
