@@ -65,7 +65,7 @@ public class GdprUnitTest {
         String vendorConsent = "0000000000000010000000000000000000000100000000000000000000000000000000000000000000000000000";
         initializeGdprParameters(subjectToGdpr, consentData, vendorConsent);
         JSONObject gdprResponse = HostAppUtil.gdpr(context);
-        Assert.assertEquals(((JSONObject) gdprResponse).optString("consentData"), consentData);
+        Assert.assertEquals(gdprResponse.optString("consentData"), consentData);
         Assert.assertEquals(gdprResponse.optBoolean("gdprApplies"), true);
         Assert.assertEquals(gdprResponse.optBoolean("consentGiven"), false);
     }
