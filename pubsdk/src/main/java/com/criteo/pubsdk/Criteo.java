@@ -9,7 +9,7 @@ import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import java.util.List;
 
 public final class Criteo {
-    public static final String EVENT_LAUNCH = "Launch";
+    private static final String EVENT_LAUNCH = "Launch";
 
     private static Criteo criteo;
     private BidManager bidManager;
