@@ -9,9 +9,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.criteo.pubsdk.Criteo;
-import com.criteo.pubsdk.model.AdSize;
-import com.criteo.pubsdk.model.AdUnit;
+import com.criteo.publisher.Criteo;
+import com.criteo.publisher.model.AdSize;
+import com.criteo.publisher.model.AdUnit;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;

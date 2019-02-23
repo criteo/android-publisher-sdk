@@ -4,13 +4,13 @@ import android.arch.lifecycle.MutableLiveData;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.criteo.pubsdk.BuildConfig;
-import com.criteo.pubsdk.Util.DeviceUtil;
-import com.criteo.pubsdk.model.Cdb;
-import com.criteo.pubsdk.model.Publisher;
-import com.criteo.pubsdk.model.Slot;
-import com.criteo.pubsdk.model.User;
-import com.criteo.pubsdk.network.PubSdkNetwork;
+import com.criteo.publisher.BuildConfig;
+import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.model.Cdb;
+import com.criteo.publisher.model.Publisher;
+import com.criteo.publisher.model.Slot;
+import com.criteo.publisher.model.User;
+import com.criteo.publisher.network.PubSdkNetwork;
 
 import java.util.ArrayList;
 

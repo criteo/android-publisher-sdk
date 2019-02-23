@@ -1,1 +1,1 @@
-include ':app', ':pubsdk'
+include ':app', ':publisher-sdk'

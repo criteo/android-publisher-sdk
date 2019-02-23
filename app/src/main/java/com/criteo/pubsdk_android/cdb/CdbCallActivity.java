@@ -9,8 +9,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.criteo.pubsdk.model.Publisher;
-import com.criteo.pubsdk.model.Slot;
+import com.criteo.publisher.model.Publisher;
+import com.criteo.publisher.model.Slot;
 import com.criteo.pubsdk_android.R;
 
 public class CdbCallActivity extends AppCompatActivity {

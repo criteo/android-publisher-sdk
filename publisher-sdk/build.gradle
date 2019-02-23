@@ -1,24 +1,30 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
 def support_version = "27.0.1"
-def lifecycle_version = "1.1.1"
 
 android {
     buildToolsVersion '27.0.3'
     compileSdkVersion 27
+
     defaultConfig {
-        applicationId "com.criteo.pubsdk_android"
         minSdkVersion 19
         targetSdkVersion 27
         versionCode 1
         versionName "2.0.0"
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
     }
+
+    lintOptions {
+        abortOnError false
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
-            debuggable true
+            minifyEnabled true
+            debuggable false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
@@ -27,20 +33,16 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+    testOptions {
+        unitTests.returnDefaultValues = true
     }
-    lintOptions {
-        abortOnError false
-    }
+
 }
+
 configurations.all {
     resolutionStrategy {
-        force 'com.google.code.gson:gson:2.8.5'
         force "com.android.support:support-annotations:$support_version"
         force "com.android.support:support-v4:$support_version"
-        force "android.arch.lifecycle:extensions:$lifecycle_version"
         force "com.android.support:asynclayoutinflater:$support_version"
         force "com.android.support:customtabs:$support_version"
     }
@@ -48,31 +50,27 @@ configurations.all {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "com.android.support:appcompat-v7:$support_version"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-    implementation "com.android.support:design:$support_version"
     testImplementation 'junit:junit:4.12'
+    testImplementation 'org.json:json:20140107'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation 'android.arch.lifecycle:extensions:1.1.1'
-    implementation project(':publisher-sdk')
-    implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.google.android.gms:play-services-ads:15.0.1'
+    implementation 'com.google.android.gms:play-services-base:15.0.1'
 }
 
 // Define artifacts to publish to Nexus
 
-class Apk extends Jar {
-    String getExtension() { 'apk' }
+class Aar extends Jar {
+    String getExtension() { 'aar' }
 }
 
-task packageApkRelease(type: Apk, dependsOn: 'packageRelease') {
-    from file("${project.buildDir}/outputs/apk/app-release-unsigned.apk")
+task packageAarRelease(type: Aar, dependsOn: 'bundleRelease') {
+    from file("${project.buildDir}/outputs/aar/publisher-release.aar")
     classifier 'release'
 }
 
-task packageApkDebug(type: Apk, dependsOn: 'packageDebug') {
-    from file("${project.buildDir}/outputs/apk/app-debug-unsigned.apk")
+task packageAarDebug(type: Aar, dependsOn: 'bundleDebug') {
+    from file("${project.buildDir}/outputs/aar/publisher-debug.aar")
     classifier 'debug'
 }
 
@@ -80,12 +78,12 @@ publish {
     publishing {
         with rootProject.publishRepositoryConfig
         publications {
-            apk(MavenPublication) {
-                groupId 'com.criteo.pubsdk_android'
-                artifactId 'publisher-app'
+            aar(MavenPublication) {
+                groupId 'com.criteo.publisher'
+                artifactId 'publisher'
                 version rootProject.publishVersion
-                artifact packageApkRelease
-                artifact packageApkDebug
+                artifact packageAarRelease
+                artifact packageAarDebug
             }
         }
     }

@@ -4,9 +4,9 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.support.annotation.NonNull;
 
-import com.criteo.pubsdk.model.Publisher;
-import com.criteo.pubsdk.model.Slot;
-import com.criteo.pubsdk.model.User;
+import com.criteo.publisher.model.Publisher;
+import com.criteo.publisher.model.Slot;
+import com.criteo.publisher.model.User;
 
 import java.util.ArrayList;
 
