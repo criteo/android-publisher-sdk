@@ -47,9 +47,9 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
             return null;
         }
         if (DeviceUtil.hasPlayServices(mContext)) {
-            String addId = DeviceUtil.getAdvertisingId(mContext);
-            if (!TextUtils.isEmpty(addId)) {
-                user.setDeviceId(addId);
+            String advertisingId = DeviceUtil.getAdvertisingId(mContext);
+            if (!TextUtils.isEmpty(advertisingId)) {
+                user.setDeviceId(advertisingId);
             }
         }
         NetworkResult result = new NetworkResult();

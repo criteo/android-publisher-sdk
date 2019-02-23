@@ -41,7 +41,7 @@ class BidManager implements NetworkResponseListener {
         publisher = new Publisher(mContext);
         publisher.setNetworkId(networkId);
         cdbDownloadTask = new CdbDownloadTask(context, this, true, DeviceUtil.getUserAgent(mContext));
-        user = new User(mContext);
+        user = new User();
         eventTask = new AppEventTask(context, this);
     }
 

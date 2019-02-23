@@ -5,8 +5,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
-import com.criteo.pubsdk.R;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,11 +20,7 @@ public final class HostAppUtil {
     private HostAppUtil() {
     }
 
-    public static String getPublisherId(Context context) {
-        return context.getString(R.string.criteo_publisher_id);
-    }
-
-    public static JSONObject gdpr(Context context){
+    public static JSONObject gdpr(Context context) {
         SharedPreferences mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         String consentString = mPreferences.getString(CONSENT_STRING, "");
         String subjectToGdpr = mPreferences.getString(SUBJECT_TO_GDPR, "");

@@ -1,6 +1,5 @@
 package com.criteo.pubsdk.model;
 
-import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -11,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class User implements Parcelable {
+    //TODO: Rename to advertisingId
     private static final String DEVICE_ID = "deviceId";
     private static final String DEVICE_ID_TYPE = "deviceIdType";
     private static final String DEVICE_MODEL = "deviceModel";
@@ -30,8 +30,8 @@ public class User implements Parcelable {
     private int limit;
     private String connection;
 
-    public User(Context context) {
-        deviceId = DeviceUtil.getDeviceId(context);
+    public User() {
+        deviceId = "";
         deviceIdType = GAID;
         deviceModel = DeviceUtil.getDeviceModel();
         deviceOs = ANDROID;

@@ -21,10 +21,6 @@ public final class DeviceUtil {
     private DeviceUtil() {
     }
 
-    public static String getDeviceId(Context context) {
-        return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-    }
-
     public static String getUserAgent(Context context) {
         return new WebView(context).getSettings().getUserAgentString();
     }

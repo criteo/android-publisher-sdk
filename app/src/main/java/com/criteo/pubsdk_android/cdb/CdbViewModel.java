@@ -23,7 +23,7 @@ public class CdbViewModel extends AndroidViewModel {
     public CdbLiveData getDataFromCbd(Publisher publisher) {
         if (mCbdLiveData == null) {
             mCbdLiveData = new CdbLiveData(getApplication());
-            mCbdLiveData.loadCbdData(PROFILE_ID, new User(getApplication()),
+            mCbdLiveData.loadCbdData(PROFILE_ID, new User(),
                     publisher, getTestSlots());
         }
         return mCbdLiveData;
