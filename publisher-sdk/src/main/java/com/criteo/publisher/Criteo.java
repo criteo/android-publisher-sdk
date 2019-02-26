@@ -23,6 +23,10 @@ public final class Criteo {
         return criteo;
     }
 
+    public static Criteo getInstance() {
+        return criteo;
+    }
+
     private Criteo(Context context, List<AdUnit> adUnits, int networkId) {
         if (context == null) throw new IllegalArgumentException("Application context is required.");
         if (adUnits == null || adUnits.size() == 0)

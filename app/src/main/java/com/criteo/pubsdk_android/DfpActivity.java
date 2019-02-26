@@ -51,7 +51,6 @@ public class DfpActivity extends AppCompatActivity {
         publisherAdView.setAdUnitId("/140800857/Endeavour_320x50");
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-        Criteo criteo = Criteo.init(this, null, 0);
         AdUnit adUnit = new AdUnit();
         adUnit.setPlacementId("/140800857/Endeavour_320x50");
         AdSize adSize = new AdSize();
@@ -65,7 +64,7 @@ public class DfpActivity extends AppCompatActivity {
                 linearLayout.setBackgroundColor(Color.TRANSPARENT);
             }
         });
-        PublisherAdRequest request = criteo.setBidsForAdUnit(builder, adUnit).build();
+        PublisherAdRequest request = Criteo.getInstance().setBidsForAdUnit(builder, adUnit).build();
         publisherAdView.loadAd(request);
         linearLayout.addView(publisherAdView);
     }
@@ -75,14 +74,13 @@ public class DfpActivity extends AppCompatActivity {
         mPublisherInterstitialAd.setAdUnitId("/140800857/Endeavour_Interstitial_320x480");
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-        Criteo criteo = Criteo.init(this, null, 0);
         AdUnit interstitialAdUnit = new AdUnit();
         interstitialAdUnit.setPlacementId("/140800857/Endeavour_Interstitial_320x480");
         AdSize interstitialadSize = new AdSize();
         interstitialadSize.setWidth(320);
         interstitialadSize.setHeight(480);
         interstitialAdUnit.setSize(interstitialadSize);
-        PublisherAdRequest request = criteo.setBidsForAdUnit(builder, interstitialAdUnit).build();
+        PublisherAdRequest request = Criteo.getInstance().setBidsForAdUnit(builder, interstitialAdUnit).build();
         mPublisherInterstitialAd
                 .loadAd(request);
         mPublisherInterstitialAd.setAdListener(new AdListener() {
