@@ -1,6 +1,6 @@
 package com.criteo.publisher;
 
-import android.content.Context;
+import android.app.Application;
 import android.text.TextUtils;
 
 import com.criteo.publisher.model.AdUnit;
@@ -14,10 +14,10 @@ public final class Criteo {
     private static Criteo criteo;
     private BidManager bidManager;
 
-    public static Criteo init(Context context, List<AdUnit> adUnits, int networkId) {
+    public static Criteo init(Application application, List<AdUnit> adUnits, int networkId) {
         synchronized (Criteo.class) {
             if (criteo == null) {
-                criteo = new Criteo(context, adUnits, networkId);
+                criteo = new Criteo(application, adUnits, networkId);
             }
         }
         return criteo;
@@ -27,8 +27,9 @@ public final class Criteo {
         return criteo;
     }
 
-    private Criteo(Context context, List<AdUnit> adUnits, int networkId) {
-        if (context == null) throw new IllegalArgumentException("Application context is required.");
+    private Criteo(Application application, List<AdUnit> adUnits, int networkId) {
+        if (application == null)
+            throw new IllegalArgumentException("Application reference is required.");
         if (adUnits == null || adUnits.size() == 0)
             throw new IllegalArgumentException("AdUnits are required.");
         for (AdUnit adUnit : adUnits) {
@@ -38,7 +39,7 @@ public final class Criteo {
             }
         }
         if (networkId == 0) throw new IllegalArgumentException("NetworkId is required.");
-        this.bidManager = new BidManager(context, networkId, adUnits);
+        this.bidManager = new BidManager(application.getApplicationContext(), networkId, adUnits);
         bidManager.prefetch();
         bidManager.postAppEvent(EVENT_LAUNCH);
     }
