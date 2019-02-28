@@ -1,4 +1,4 @@
-package com.criteo.publisher;
+package com.criteo.publisher.cache;
 
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
@@ -12,7 +12,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class CacheUnitTest {
+public class SdkCacheTest {
     private SdkCache cache;
     private JSONArray slots;
 

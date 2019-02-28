@@ -3,6 +3,8 @@ package com.criteo.publisher.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Objects;
+
 public class AdSize implements Parcelable {
     private int height;
     private int width;
@@ -54,6 +56,11 @@ public class AdSize implements Parcelable {
         this.width = in.readInt();
     }
 
+    public AdSize(int height, int width) {
+        this.height = height;
+        this.width = width;
+    }
+
     public static final Parcelable.Creator<AdSize> CREATOR = new Parcelable.Creator<AdSize>() {
         @Override
         public AdSize createFromParcel(Parcel source) {
@@ -65,4 +72,18 @@ public class AdSize implements Parcelable {
             return new AdSize[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AdSize adSize = (AdSize) o;
+        return height == adSize.height &&
+                width == adSize.width;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(height, width);
+    }
 }

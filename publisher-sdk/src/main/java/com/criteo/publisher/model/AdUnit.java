@@ -7,6 +7,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 public class AdUnit implements Parcelable {
 
     private static final String PLACEMENT_ID = "placementId";
@@ -33,8 +35,8 @@ public class AdUnit implements Parcelable {
     public JSONObject toJson() throws JSONException {
         JSONObject adUnitJson = new JSONObject();
         JSONArray adUnitSizes = new JSONArray();
-        adUnitSizes.put(adSize.getFormattedSize());
         if (adSize != null) {
+            adUnitSizes.put(adSize.getFormattedSize());
             adUnitJson.put(SIZES, adUnitSizes);
         }
         adUnitJson.put(PLACEMENT_ID, placementId);
@@ -68,6 +70,11 @@ public class AdUnit implements Parcelable {
         this.adSize = in.readParcelable(AdSize.class.getClassLoader());
     }
 
+    public AdUnit(AdSize adSize, String placementId) {
+        this.adSize = adSize;
+        this.placementId = placementId;
+    }
+
     public static final Parcelable.Creator<AdUnit> CREATOR = new Parcelable.Creator<AdUnit>() {
         @Override
         public AdUnit createFromParcel(Parcel source) {
@@ -79,4 +86,18 @@ public class AdUnit implements Parcelable {
             return new AdUnit[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AdUnit adUnit = (AdUnit) o;
+        return Objects.equals(placementId, adUnit.placementId) &&
+                Objects.equals(adSize, adUnit.adSize);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(placementId, adSize);
+    }
 }
