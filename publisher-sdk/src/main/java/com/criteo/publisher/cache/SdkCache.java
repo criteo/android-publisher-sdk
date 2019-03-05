@@ -22,7 +22,9 @@ public class SdkCache {
     }
 
     public void addAll(List<Slot> slots) {
-        if (slots == null) return;
+        if (slots == null) {
+            return;
+        }
         for (Slot slot : slots) {
             this.add(slot);
         }
@@ -43,6 +45,14 @@ public class SdkCache {
             return null;
         }
         return slot;
+    }
+
+    public Slot peekAdUnit(String placement, String formattedSize) {
+        Pair<String, String> placementKey = new Pair<String, String>(placement, formattedSize);
+        if (!slotMap.containsKey(placementKey)) {
+            return null;
+        }
+        return slotMap.get(placementKey);
     }
 
     public Slot getAdUnit(String placement, String formattedSize) {
