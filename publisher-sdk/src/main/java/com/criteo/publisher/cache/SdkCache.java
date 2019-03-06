@@ -35,18 +35,6 @@ public class SdkCache {
         addAll(slots);
     }
 
-    public Slot getAdUnit(Pair<String, String> placementKey) {
-        if (!slotMap.containsKey(placementKey)) {
-            return null;
-        }
-        Slot slot = this.slotMap.get(placementKey);
-        this.slotMap.remove(placementKey);
-        if (slot.getTtl() * SECOND_TO_MILLI + slot.getTimeOfDownload() < System.currentTimeMillis()) {
-            return null;
-        }
-        return slot;
-    }
-
     public Slot peekAdUnit(String placement, String formattedSize) {
         Pair<String, String> placementKey = new Pair<String, String>(placement, formattedSize);
         if (!slotMap.containsKey(placementKey)) {
@@ -56,7 +44,17 @@ public class SdkCache {
     }
 
     public Slot getAdUnit(String placement, String formattedSize) {
-        return getAdUnit(new Pair<>(placement, formattedSize));
+        Pair<String, String> placementKey = new Pair<String, String>(placement, formattedSize);
+        if (!slotMap.containsKey(placementKey)) {
+            return null;
+        }
+        Slot slot = slotMap.get(placementKey);
+        slotMap.remove(placementKey);
+        long expiryTimeMillis = slot.getTtl() * SECOND_TO_MILLI + slot.getTimeOfDownload();
+        if (expiryTimeMillis < System.currentTimeMillis()) {
+            return null;
+        }
+        return slot;
     }
 
     public int getItemCount() {

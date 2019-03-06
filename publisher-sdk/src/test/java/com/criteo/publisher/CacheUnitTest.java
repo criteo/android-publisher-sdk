@@ -1,8 +1,7 @@
 package com.criteo.publisher;
 
-import android.util.Pair;
-
 import com.criteo.publisher.cache.SdkCache;
+import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.Slot;
 
 import org.json.JSONArray;
@@ -32,20 +31,20 @@ public class CacheUnitTest {
             e.printStackTrace();
         }
         String placement = slots.getJSONObject(0).getString("placementId");
-        int width = slots.getJSONObject(0).getInt("width");
-        int height = slots.getJSONObject(0).getInt("height");
-        Pair<String, String> pair = new Pair<>(placement, width + "x" + height);
-        assertNull(cache.getAdUnit(pair));
+        AdSize adSize = new AdSize();
+        adSize.setWidth(slots.getJSONObject(0).getInt("width"));
+        adSize.setHeight(slots.getJSONObject(0).getInt("height"));
+        assertNull(cache.getAdUnit(placement, adSize.getFormattedSize()));
     }
 
     @Test
     public void getOneAdUnitTest() throws JSONException {
         initializeCache();
         String placement = slots.getJSONObject(0).getString("placementId");
-        int width = slots.getJSONObject(0).getInt("width");
-        int height = slots.getJSONObject(0).getInt("height");
-        Pair<String, String> pair = new Pair<>(placement, width + "x" + height);
-        assertNull(cache.getAdUnit(pair));
+        AdSize adSize = new AdSize();
+        adSize.setWidth(slots.getJSONObject(0).getInt("width"));
+        adSize.setHeight(slots.getJSONObject(0).getInt("height"));
+        assertNull(cache.getAdUnit(placement, adSize.getFormattedSize()));
 
     }
 
