@@ -85,7 +85,7 @@ final class PubSdkApi {
             JSONObject result = executeGet(url);
             return result;
         } catch (IOException | JSONException e) {
-            Log.d(TAG, "Unable to process request to bearcat:" + e.getMessage());
+            Log.d(TAG, "Unable to process request to post app event:" + e.getMessage());
             e.printStackTrace();
             return null;
         }
