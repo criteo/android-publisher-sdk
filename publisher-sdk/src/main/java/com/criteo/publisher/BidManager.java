@@ -7,8 +7,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
+import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.Util.UserAgentCallback;
 import com.criteo.publisher.Util.UserAgentHandler;
@@ -27,6 +27,7 @@ import java.util.List;
 public class BidManager implements NetworkResponseListener, ApplicationStoppedListener {
     private static final String CRT_CPM = "crt_cpm";
     private static final String CRT_DISPLAY_URL = "crt_displayUrl";
+    private static final int SECOND_TO_MILLI = 1000;
     private static final int PROFILE_ID = 235;
     private final List<AdUnit> adUnits;
     private final Context mContext;
@@ -48,16 +49,24 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         userAgent = "";
     }
 
-
     /**
      * Method to start new CdbDownload Asynctask
      *
      * @param callConfig
      * @param userAgent
      */
-    private void startCdbDownloadTask(boolean callConfig, String userAgent, List<AdUnit> cdbAdUnits ) {
-        cdbDownloadTask = new CdbDownloadTask(mContext, this, callConfig, userAgent);
-        cdbDownloadTask.execute(PROFILE_ID, user, publisher, cdbAdUnits);
+    private void startCdbDownloadTask(boolean callConfig, String userAgent, AdUnit adUnit) {
+        List<AdUnit> prefetchAdUnits = new ArrayList<AdUnit>();
+        prefetchAdUnits.add(adUnit);
+        startCdbDownloadTask(callConfig, userAgent, prefetchAdUnits);
+    }
+
+    private void startCdbDownloadTask(boolean callConfig, String userAgent, List<AdUnit> prefetchAdUnits) {
+        if (cdbDownloadTask != null && cdbDownloadTask.getStatus() != AsyncTask.Status.RUNNING &&
+                cdbTimeToNextCall < System.currentTimeMillis()) {
+            cdbDownloadTask = new CdbDownloadTask(mContext, this, callConfig, userAgent);
+            cdbDownloadTask.execute(PROFILE_ID, user, publisher, prefetchAdUnits);
+        }
     }
 
 
@@ -65,21 +74,46 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         if (config != null && config.isKillSwitch()) {
             return request;
         }
-        Slot slot = cache.getAdUnit(adUnit.getPlacementId(),
-                adUnit.getSize().getFormattedSize());
-
+        Slot slot = validateAndPrefetchSlotInCache(adUnit);
         if (slot != null) {
             request.addCustomTargeting(CRT_CPM, slot.getCpm());
             request.addCustomTargeting(CRT_DISPLAY_URL, DeviceUtil.createDfpCompatibleDisplayUrl(slot.getDisplayUrl()));
         }
-        if (cdbDownloadTask != null && cdbDownloadTask.getStatus() != AsyncTask.Status.RUNNING &&
-                cdbTimeToNextCall < System.currentTimeMillis()) {
-            List<AdUnit> enrichBidAdUnits = new ArrayList<AdUnit>();
-            enrichBidAdUnits.add(adUnit);
-            startCdbDownloadTask(false, userAgent, enrichBidAdUnits);
-        }
         return request;
+
     }
+
+    private Slot validateAndPrefetchSlotInCache(AdUnit adUnit) {
+        Slot peekSlot = cache.peekAdUnit(adUnit.getPlacementId(), adUnit.getSize().getFormattedSize());
+        if (peekSlot == null) {
+            return null;
+        }
+        float cpm = Float.valueOf(peekSlot.getCpm());
+        long ttl = peekSlot.getTtl();
+        long expiryTimeMillis = ttl * SECOND_TO_MILLI + peekSlot.getTimeOfDownload();
+        //If cpm and ttl in slot are 0:
+        // Prefetch from CDB and do not update request;
+        if (cpm == 0 && ttl == 0) {
+            cache.remove(adUnit.getPlacementId(),
+                    adUnit.getSize().getFormattedSize());
+            startCdbDownloadTask(false, userAgent, adUnit);
+            return null;
+        }
+        //If cpm is 0, ttl in slot > 0
+        // we will stay silent until ttl expires;
+        else if (cpm == 0 && ttl > 0
+                && expiryTimeMillis > System.currentTimeMillis()) {
+            return null;
+        } else {
+            //If cpm > 0, ttl > 0 but we are done staying silent
+            Slot slot = cache.getAdUnit(adUnit.getPlacementId(),
+                    adUnit.getSize().getFormattedSize());
+            startCdbDownloadTask(false, userAgent, adUnit);
+            return slot;
+        }
+
+    }
+
 
     @Override
     public void setAdUnits(List<Slot> slots) {
@@ -106,7 +140,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
     /**
      * Method to post new Handler to the Main Thread
-     *
      * When we get "useragent" from the Listener we start new CdbDownload Asynctask
      * to get Cdb and Config
      */

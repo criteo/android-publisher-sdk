@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public class SdkCache {
-    //act as a delimiter to the CDB call.
-    private static final int SECOND_TO_MILLI = 1000;
     private HashMap<Pair<String, String>, Slot> slotMap;
 
     public SdkCache() {
@@ -50,11 +48,12 @@ public class SdkCache {
         }
         Slot slot = slotMap.get(placementKey);
         slotMap.remove(placementKey);
-        long expiryTimeMillis = slot.getTtl() * SECOND_TO_MILLI + slot.getTimeOfDownload();
-        if (expiryTimeMillis < System.currentTimeMillis()) {
-            return null;
-        }
         return slot;
+    }
+
+    public void remove(String placement, String formattedSize) {
+        Pair<String, String> placementKey = new Pair<String, String>(placement, formattedSize);
+        slotMap.remove(placementKey);
     }
 
     public int getItemCount() {
