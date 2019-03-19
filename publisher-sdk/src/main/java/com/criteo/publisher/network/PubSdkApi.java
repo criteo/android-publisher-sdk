@@ -156,9 +156,9 @@ final class PubSdkApi {
 
         StringBuilder queryString = new StringBuilder();
         for (Map.Entry<String, String> entry : params.entrySet()) {
-            queryString.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8.toString()));
+            queryString.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8.name()));
             queryString.append("=");
-            queryString.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8.toString()));
+            queryString.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8.name()));
             queryString.append("&");
         }
 
