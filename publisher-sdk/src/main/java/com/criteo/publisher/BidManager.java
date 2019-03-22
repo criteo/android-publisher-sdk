@@ -2,9 +2,16 @@ package com.criteo.publisher;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.NetworkResponseListener;
+import com.criteo.publisher.Util.UserAgentCallback;
+import com.criteo.publisher.Util.UserAgentHandler;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
@@ -29,6 +36,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private CdbDownloadTask cdbDownloadTask;
     private long cdbTimeToNextCall = 0;
     private Config config;
+    private String userAgent;
 
     BidManager(Context context, int networkId, List<AdUnit> adUnits) {
         this.mContext = context;
@@ -36,16 +44,22 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         this.cache = new SdkCache();
         publisher = new Publisher(mContext);
         publisher.setNetworkId(networkId);
-        cdbDownloadTask = new CdbDownloadTask(context, this, true, DeviceUtil.getUserAgent(mContext));
         user = new User();
+        userAgent = "";
     }
 
-    void prefetch() {
-        if (cdbDownloadTask.getStatus() != AsyncTask.Status.RUNNING
-                && cdbDownloadTask.getStatus() != AsyncTask.Status.FINISHED) {
-            cdbDownloadTask.execute(PROFILE_ID, user, publisher, adUnits);
-        }
+
+    /**
+     * Method to start new CdbDownload Asynctask
+     *
+     * @param callConfig
+     * @param userAgent
+     */
+    private void startCdbDownloadTask(boolean callConfig, String userAgent) {
+        cdbDownloadTask = new CdbDownloadTask(mContext, this, callConfig, userAgent);
+        cdbDownloadTask.execute(PROFILE_ID, user, publisher, adUnits);
     }
+
 
     PublisherAdRequest.Builder enrichBid(PublisherAdRequest.Builder request, AdUnit adUnit) {
         if (config != null && config.isKillSwitch()) {
@@ -58,12 +72,13 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             request.addCustomTargeting(CRT_CPM, slot.getCpm());
             request.addCustomTargeting(CRT_DISPLAY_URL, DeviceUtil.createDfpCompatibleDisplayUrl(slot.getDisplayUrl()));
         }
-        if (cdbDownloadTask.getStatus() != AsyncTask.Status.RUNNING &&
+        if (cdbDownloadTask != null && cdbDownloadTask.getStatus() != AsyncTask.Status.RUNNING &&
                 cdbTimeToNextCall < System.currentTimeMillis()) {
-            cdbDownloadTask = new CdbDownloadTask(mContext, this, false, DeviceUtil.getUserAgent(mContext));
             List<AdUnit> adUnits = new ArrayList<AdUnit>();
             adUnits.add(adUnit);
-            cdbDownloadTask.execute(PROFILE_ID, user, publisher, adUnits);
+
+            //it is not the first time so callconfig = false
+            startCdbDownloadTask(false, userAgent);
         }
         return request;
     }
@@ -85,8 +100,46 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
     @Override
     public void onApplicationStopped() {
-        if (cdbDownloadTask.getStatus() == AsyncTask.Status.RUNNING) {
+        if (cdbDownloadTask != null && cdbDownloadTask.getStatus() == AsyncTask.Status.RUNNING) {
             cdbDownloadTask.cancel(true);
         }
     }
+
+
+    /**
+     * Method to post new Handler to the Main Thread
+     *
+     * When we get "useragent" from the Listener we start new CdbDownload Asynctask
+     * to get Cdb and Config
+     */
+    protected void prefetch() {
+
+        final Handler mainHandler = new UserAgentHandler(Looper.getMainLooper(), new UserAgentCallback() {
+            @Override
+            public void done(String useragent) {
+                userAgent = useragent;
+                startCdbDownloadTask(true, userAgent);
+
+            }
+        });
+
+        final Runnable setUserAgentTask = new Runnable() {
+            @Override
+            public void run() {
+
+                String userAgent = DeviceUtil.getUserAgent(mContext);
+                Message msg = mainHandler.obtainMessage();
+                Bundle bundle = new Bundle();
+                bundle.putString("userAgent", userAgent);
+                msg.setData(bundle);
+                mainHandler.sendMessage(msg);
+
+            }
+
+        };
+        mainHandler.post(setUserAgentTask);
+
+    }
+
+
 }
