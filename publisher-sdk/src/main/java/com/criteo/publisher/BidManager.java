@@ -55,9 +55,9 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
      * @param callConfig
      * @param userAgent
      */
-    private void startCdbDownloadTask(boolean callConfig, String userAgent) {
+    private void startCdbDownloadTask(boolean callConfig, String userAgent, List<AdUnit> cdbAdUnits ) {
         cdbDownloadTask = new CdbDownloadTask(mContext, this, callConfig, userAgent);
-        cdbDownloadTask.execute(PROFILE_ID, user, publisher, adUnits);
+        cdbDownloadTask.execute(PROFILE_ID, user, publisher, cdbAdUnits);
     }
 
 
@@ -74,11 +74,9 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         }
         if (cdbDownloadTask != null && cdbDownloadTask.getStatus() != AsyncTask.Status.RUNNING &&
                 cdbTimeToNextCall < System.currentTimeMillis()) {
-            List<AdUnit> adUnits = new ArrayList<AdUnit>();
-            adUnits.add(adUnit);
-
-            //it is not the first time so callconfig = false
-            startCdbDownloadTask(false, userAgent);
+            List<AdUnit> enrichBidAdUnits = new ArrayList<AdUnit>();
+            enrichBidAdUnits.add(adUnit);
+            startCdbDownloadTask(false, userAgent, enrichBidAdUnits);
         }
         return request;
     }
@@ -118,7 +116,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             @Override
             public void done(String useragent) {
                 userAgent = useragent;
-                startCdbDownloadTask(true, userAgent);
+                startCdbDownloadTask(true, userAgent, adUnits);
 
             }
         });

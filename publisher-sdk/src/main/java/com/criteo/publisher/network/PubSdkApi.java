@@ -77,7 +77,11 @@ final class PubSdkApi {
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put(APP_ID, appId);
-        parameters.put(GAID, gaid);
+
+        // If device doesnt support Playservices , gaid value stays as null
+        if (gaid != null)
+            parameters.put(GAID, gaid);
+
         parameters.put(EVENT_TYPE, eventType);
         parameters.put(LIMITED_AD_TRACKING, String.valueOf(limitedAdTracking));
         try {
@@ -117,7 +121,7 @@ final class PubSdkApi {
         return result;
     }
 
-    private static JSONObject executeGet(URL url) throws IOException, JSONException {
+    protected static JSONObject executeGet(URL url) throws IOException, JSONException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestMethod("GET");
         urlConnection.setRequestProperty("Content-Type", "text/plain");
@@ -151,7 +155,7 @@ final class PubSdkApi {
         return response.toString();
     }
 
-    private static String getParamsString(Map<String, String> params)
+    protected static String getParamsString(Map<String, String> params)
             throws UnsupportedEncodingException {
 
         StringBuilder queryString = new StringBuilder();
