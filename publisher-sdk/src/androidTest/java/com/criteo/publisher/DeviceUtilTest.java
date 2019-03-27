@@ -3,12 +3,14 @@ package com.criteo.publisher;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
 
 import com.criteo.publisher.Util.DeviceUtil;
 
 import org.junit.Before;
-import org.junit.runner.RunWith;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -31,6 +33,11 @@ public class DeviceUtilTest {
     @Test
     public void getAdvertisingIdTest() {
         assertNotNull(DeviceUtil.getAdvertisingId(context));
+    }
+
+    @Test
+    public void getEnviorementVairableTest() {
+        Log.d("DeviceUtilTest", "Environment variable found: " + DeviceUtil.isLoggingEnabled());
     }
 
     @Test

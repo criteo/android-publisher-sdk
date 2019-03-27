@@ -3,6 +3,7 @@ package com.criteo.publisher.Util;
 import android.content.Context;
 import android.os.Build;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.webkit.WebView;
 
@@ -18,6 +19,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 public final class DeviceUtil {
+    private static final String CRITEO_LOGGING="CRITEO_LOGGING";
     private DeviceUtil() {
     }
 
@@ -86,4 +88,8 @@ public final class DeviceUtil {
         return null;
     }
 
+    public static boolean isLoggingEnabled() {
+        String log = System.getenv(CRITEO_LOGGING);
+        return TextUtils.isEmpty(log) ? false : Boolean.parseBoolean(log);
+    }
 }

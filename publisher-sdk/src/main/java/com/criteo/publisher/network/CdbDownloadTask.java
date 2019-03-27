@@ -73,7 +73,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
             cdbRequest.setGdprConsent(gdpr);
         }
         Cdb cdbResult = PubSdkNetwork.loadCdb(mContext, cdbRequest, userAgent);
-        if (cdbResult != null && cdbResult.getSlots() != null
+        if (DeviceUtil.isLoggingEnabled() && cdbResult != null && cdbResult.getSlots() != null
                 && cdbResult.getSlots().size() > 0) {
             StringBuilder builder = new StringBuilder();
             for (Slot slot : cdbResult.getSlots()) {
