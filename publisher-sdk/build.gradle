@@ -60,17 +60,13 @@ dependencies {
 
 // Define artifacts to publish to Nexus
 
-class Aar extends Jar {
-    String getExtension() { 'aar' }
-}
-
-task packageAarRelease(type: Aar, dependsOn: 'bundleRelease') {
-    from file("${project.buildDir}/outputs/aar/publisher-release.aar")
+task packageAarRelease(type: Zip, dependsOn: 'bundleRelease') {
+    from file("${project.buildDir}/outputs/aar/publisher-sdk-release.aar")
     classifier 'release'
 }
 
-task packageAarDebug(type: Aar, dependsOn: 'bundleDebug') {
-    from file("${project.buildDir}/outputs/aar/publisher-debug.aar")
+task packageAarDebug(type: Zip, dependsOn: 'bundleDebug') {
+    from file("${project.buildDir}/outputs/aar/publisher-sdk-debug.aar")
     classifier 'debug'
 }
 
@@ -78,9 +74,9 @@ publish {
     publishing {
         with rootProject.publishRepositoryConfig
         publications {
-            aar(MavenPublication) {
+            zip(MavenPublication) {
                 groupId 'com.criteo.publisher'
-                artifactId 'publisher'
+                artifactId 'sdk'
                 version rootProject.publishVersion
                 artifact packageAarRelease
                 artifact packageAarDebug
