@@ -53,3 +53,27 @@
 -keepclassmembers class com.criteo.publisher.model.AdUnit {
    public *;
 }
+
+-keep public class com.criteo.publisher.mediation.Utils.CriteoErrorCode
+-keepclassmembers class com.criteo.publisher.mediation.Utils.CriteoErrorCode {
+   public *;
+}
+
+-keep public class com.criteo.publisher.mediation.Listeners.CriteoAdListener
+-keepclassmembers class com.criteo.publisher.mediation.Listeners.CriteoAdListener {
+   public *;
+}
+
+-keep public class com.criteo.publisher.mediation.Listeners.CriteoBannerAdListener
+-keepclassmembers class com.criteo.publisher.mediation.Listeners.CriteoBannerAdListener {
+   public *;
+}
+
+-keep public class com.criteo.publisher.mediation.Listeners.CriteoInterstitialAdListener
+-keepclassmembers class com.criteo.publisher.mediation.Listeners.CriteoInterstitialAdListener {
+   public *;
+}
+
+
+
+

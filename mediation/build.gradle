@@ -57,18 +57,31 @@ dependencies {
     implementation project(path: ':publisher-sdk')
 }
 
-class Aar extends Jar {
-    String getExtension() { 'aar' }
-}
 
-task packageAarRelease(type: Aar, dependsOn: 'bundleRelease') {
-    from file("${project.buildDir}/outputs/aar/mediation.aar")
+task packageAarRelease(type: Zip, dependsOn: 'bundleRelease') {
+    from file("${project.buildDir}/outputs/aar/mediation-release.aar")
     classifier 'release'
 }
 
-task packageAarDebug(type: Aar, dependsOn: 'bundleDebug') {
-    from file("${project.buildDir}/outputs/aar/mediation.aar")
+task packageAarDebug(type: Zip, dependsOn: 'bundleDebug') {
+    from file("${project.buildDir}/outputs/aar/mediation-debug.aar")
     classifier 'debug'
 }
+
+publish {
+    publishing {
+        with rootProject.publishRepositoryConfig
+        publications {
+            zip(MavenPublication) {
+                groupId 'com.criteo.mediation'
+                artifactId 'sdk'
+                version rootProject.publishVersion
+                artifact packageAarRelease
+                artifact packageAarDebug
+            }
+        }
+    }
+}
+
 
 
