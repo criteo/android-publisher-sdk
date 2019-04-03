@@ -149,7 +149,13 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
                 adUnits = new ArrayList<>();
                 adUnits.add(adUnit);
 
-                Criteo.init((Application) (context.getApplicationContext()), adUnits, networkId);
+                if (Criteo.getInstance() == null) {
+                    //TODO: We will pass the context
+                    Criteo.init((Application) (context.getApplicationContext()), adUnits, networkId);
+                } else {
+                    Criteo.getInstance().fetchBidForAdUnit(adUnits);
+                }
+
 
             } catch (JSONException e) {
                 listener.onAdFailedToLoad(AdRequest.ERROR_CODE_INTERNAL_ERROR);

@@ -56,6 +56,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'android.arch.lifecycle:extensions:1.1.1'
     implementation project(':publisher-sdk')
+    implementation project(':mediation')
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.google.android.gms:play-services-ads:15.0.1'
 }

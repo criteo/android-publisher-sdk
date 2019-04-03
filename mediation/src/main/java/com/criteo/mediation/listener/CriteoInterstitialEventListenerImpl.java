@@ -1,4 +1,4 @@
-package com.criteo.mediation.adapter;
+package com.criteo.mediation.listener;
 
 
 import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;

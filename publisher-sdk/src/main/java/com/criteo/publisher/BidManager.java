@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
@@ -20,11 +19,11 @@ import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.CdbDownloadTask;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class BidManager implements NetworkResponseListener, ApplicationStoppedListener {
+
     private static final String CRT_CPM = "crt_cpm";
     private static final String CRT_DISPLAY_URL = "crt_displayUrl";
     private static final int SECOND_TO_MILLI = 1000;
@@ -51,26 +50,20 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
     /**
      * load data for next time
-     *
-     * @param callConfig
-     * @param userAgent
      */
     private void prefetch(boolean callConfig, String userAgent, AdUnit adUnit) {
         List<AdUnit> prefetchAdUnits = new ArrayList<AdUnit>();
         prefetchAdUnits.add(adUnit);
         if (cdbDownloadTask != null && cdbDownloadTask.getStatus() != AsyncTask.Status.RUNNING &&
                 cdbTimeToNextCall < System.currentTimeMillis()) {
-            startCdbDownloadTask(callConfig, userAgent, prefetchAdUnits);
+            startCdbDownloadTask(callConfig, prefetchAdUnits);
         }
     }
 
     /**
      * Method to start new CdbDownload Asynctask
-     *
-     * @param callConfig
-     * @param userAgent
      */
-    private void startCdbDownloadTask(boolean callConfig, String userAgent, List<AdUnit> prefetchAdUnits) {
+    void startCdbDownloadTask(boolean callConfig, List<AdUnit> prefetchAdUnits) {
         cdbDownloadTask = new CdbDownloadTask(mContext, this, callConfig, userAgent);
         cdbDownloadTask.execute(PROFILE_ID, user, publisher, prefetchAdUnits);
     }
@@ -145,9 +138,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
 
     /**
-     * Method to post new Handler to the Main Thread
-     * When we get "useragent" from the Listener we start new CdbDownload Asynctask
-     * to get Cdb and Config
+     * Method to post new Handler to the Main Thread When we get "useragent" from the Listener we start new CdbDownload
+     * Asynctask to get Cdb and Config
      */
     protected void prefetch() {
 
@@ -155,7 +147,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             @Override
             public void done(String useragent) {
                 userAgent = useragent;
-                startCdbDownloadTask(true, userAgent, adUnits);
+                startCdbDownloadTask(true, adUnits);
 
             }
         });
@@ -164,10 +156,10 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             @Override
             public void run() {
 
-                String userAgent = DeviceUtil.getUserAgent(mContext);
+                String taskUserAgent = DeviceUtil.getUserAgent(mContext);
                 Message msg = mainHandler.obtainMessage();
                 Bundle bundle = new Bundle();
-                bundle.putString("userAgent", userAgent);
+                bundle.putString("userAgent", taskUserAgent);
                 msg.setData(bundle);
                 mainHandler.sendMessage(msg);
 
@@ -177,6 +169,4 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         mainHandler.post(setUserAgentTask);
 
     }
-
-
 }

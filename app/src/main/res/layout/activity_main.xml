@@ -28,6 +28,14 @@
             android:text="Google DFP \n v4.5.1"
             android:layout_height="wrap_content" />
         <Button
+            android:id="@+id/buttonMediationCall"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="#81C784"
+            android:text="Mediation" />
+        <Button
             android:layout_marginTop="20dp"
             style="@style/Widget.AppCompat.Button.Colored"
             android:background="#81D4FA"

@@ -1,21 +1,23 @@
 package com.criteo.publisher.mediation.controller;
 
 import android.content.Context;
-
-import com.criteo.publisher.mediation.listeners.CriteoBannerAdListener;
-import com.criteo.publisher.mediation.tasks.CriteoBannerFetchTask;
-import com.criteo.publisher.mediation.view.CriteoBannerView;
+import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
+import com.criteo.publisher.mediation.tasks.CriteoInterstitialFetchTask;
+import com.criteo.publisher.mediation.view.CriteoInterstitialView;
 
 
 public class CriteoInterstitialEventController {
 
-    private CriteoBannerView criteoBannerView;
+    private Context context;
+    private CriteoInterstitialView criteoInterstitialview;
+    private CriteoInterstitialAdListener criteoInterstitialAdListener;
+    private CriteoInterstitialFetchTask criteoInterstitialFetchTask;
 
-    private CriteoBannerFetchTask criteoBannerFetchTask;
-
-    public CriteoInterstitialEventController(Context context, CriteoBannerView bannerView, CriteoBannerAdListener listener) {
-        this.criteoBannerView = bannerView;
-        bannerView.setCriteoBannerAdListener(listener);
+    public CriteoInterstitialEventController(Context context, CriteoInterstitialView interstitialview,
+            CriteoInterstitialAdListener listener) {
+        this.criteoInterstitialview = interstitialview;
+        this.criteoInterstitialAdListener = listener;
+        this.context = context;
     }
 
     private boolean isAdLoaded() {
