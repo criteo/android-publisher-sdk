@@ -6,25 +6,29 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.webkit.WebView;
-
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 public final class DeviceUtil {
-    private static final String CRITEO_LOGGING="CRITEO_LOGGING";
+
+    private static final String CRITEO_LOGGING = "CRITEO_LOGGING";
+
     private DeviceUtil() {
     }
 
     public static String getUserAgent(Context context) {
-        return new WebView(context).getSettings().getUserAgentString();
+        WebView webView = new WebView(context);
+        String userAgent = webView.getSettings().getUserAgentString();
+        webView.destroy();
+        webView = null;
+        return userAgent;
     }
 
     public static String getDeviceModel() {
