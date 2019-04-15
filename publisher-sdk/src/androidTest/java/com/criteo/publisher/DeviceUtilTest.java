@@ -36,11 +36,6 @@ public class DeviceUtilTest {
     }
 
     @Test
-    public void getEnviorementVairableTest() {
-        Log.d("DeviceUtilTest", "Environment variable found: " + DeviceUtil.isLoggingEnabled());
-    }
-
-    @Test
     public void getDeviceModelTest() {
         assertNotNull(DeviceUtil.getDeviceModel());
     }

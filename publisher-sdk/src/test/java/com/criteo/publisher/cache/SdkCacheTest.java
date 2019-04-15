@@ -1,6 +1,5 @@
 package com.criteo.publisher.cache;
 
-import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.Slot;
 
