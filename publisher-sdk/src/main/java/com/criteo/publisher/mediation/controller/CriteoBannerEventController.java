@@ -1,25 +1,31 @@
 package com.criteo.publisher.mediation.controller;
 
-import android.content.Context;
-
 import com.criteo.publisher.mediation.listeners.CriteoBannerAdListener;
 import com.criteo.publisher.mediation.tasks.CriteoBannerFetchTask;
 import com.criteo.publisher.mediation.view.CriteoBannerView;
+import com.criteo.publisher.model.Slot;
 
 
 public class CriteoBannerEventController {
 
-    public CriteoBannerView criteoBannerView;
+    private CriteoBannerView bannerView;
 
-    private CriteoBannerFetchTask criteoBannerFetchTask;
+    private CriteoBannerAdListener listener;
 
-    public CriteoBannerEventController(Context context, CriteoBannerView bannerView, CriteoBannerAdListener listener) {
-        this.criteoBannerView = bannerView;
-        bannerView.setCriteoBannerAdListener(listener);
+    public CriteoBannerEventController(CriteoBannerView bannerView, CriteoBannerAdListener listener) {
+        this.bannerView = bannerView;
+        this.listener = listener;
     }
 
+    public void notifyListenerAsync() {
+        Slot slot = null;
+        //get slot using validateAndPrefetchSlotInCache
 
-    void fetchAdAsync() {
+        //load webview
 
+        //calling fetchtask to notify listeners
+        CriteoBannerFetchTask criteoBannerFetchTask = new CriteoBannerFetchTask(bannerView, listener);
+        criteoBannerFetchTask.execute(slot);
     }
+
 }
