@@ -2,11 +2,10 @@ package com.criteo.publisher.mediation.view;
 
 import android.content.Context;
 import android.webkit.WebView;
-
-import com.criteo.publisher.mediation.listeners.CriteoBannerAdListener;
 import com.criteo.publisher.mediation.controller.CriteoBannerEventController;
+import com.criteo.publisher.mediation.listeners.CriteoBannerAdListener;
+import com.criteo.publisher.model.Slot;
 import com.google.android.gms.ads.AdSize;
-
 import java.lang.ref.WeakReference;
 
 public class CriteoBannerView extends WebView {
@@ -14,6 +13,8 @@ public class CriteoBannerView extends WebView {
     private AdSize adSize;
 
     private String adUnit;
+
+    private Slot slot;
 
     private CriteoBannerAdListener criteoBannerAdListener;
 
@@ -28,6 +29,9 @@ public class CriteoBannerView extends WebView {
         this.criteoBannerAdListener = criteoBannerAdListener;
     }
 
+    public Slot getSlot() {
+        return slot;
+    }
 
     public void setAdSize(AdSize adSize) {
         this.adSize = adSize;
@@ -45,7 +49,7 @@ public class CriteoBannerView extends WebView {
         return adUnit;
     }
 
-    void loadAd() {
+    public void loadAd() {
 
     }
 }
