@@ -19,7 +19,7 @@ public class CriteoBannerFetchTask extends AsyncTask<Slot, Void, Slot> {
 
     @Override
     protected Slot doInBackground(Slot... slots) {
-        if (slots == null) {
+        if (slots == null || slots.length == 0) {
             return null;
         }
         Slot slot = slots[0];

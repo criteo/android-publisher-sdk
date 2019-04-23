@@ -3,14 +3,9 @@ package com.criteo.publisher.network;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
-
 import com.criteo.publisher.R;
 import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.model.Config;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,9 +18,12 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 //TODO: Add unit tests
 final class PubSdkApi {
+
     private static final int TIMEOUT = 60 * 1000;
     private static final String TAG = PubSdkApi.class.getSimpleName();
     private static final String NETWORK_ID = "networkId";
@@ -47,7 +45,8 @@ final class PubSdkApi {
 
         Config configResult = null;
         try {
-            URL url = new URL(context.getString(R.string.config_url) + "/v1.0/api/config" + "?" + getParamsString(parameters));
+            URL url = new URL(
+                    context.getString(R.string.config_url) + "/v1.0/api/config" + "?" + getParamsString(parameters));
             JSONObject result = executeGet(url);
             configResult = new Config(result);
         } catch (IOException | JSONException e) {
@@ -72,20 +71,23 @@ final class PubSdkApi {
     }
 
     static JSONObject postAppEvent(Context context, int senderId,
-                                   String appId, String gaid, String eventType,
-                                   int limitedAdTracking) {
+            String appId, String gaid, String eventType,
+            int limitedAdTracking) {
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put(APP_ID, appId);
 
         // If device doesnt support Playservices , gaid value stays as null
-        if (gaid != null)
+        if (gaid != null) {
             parameters.put(GAID, gaid);
+        }
 
         parameters.put(EVENT_TYPE, eventType);
         parameters.put(LIMITED_AD_TRACKING, String.valueOf(limitedAdTracking));
         try {
-            URL url = new URL(context.getString(R.string.event_url) + "/appevent/v1/" + senderId + "?" + getParamsString(parameters));
+            URL url = new URL(
+                    context.getString(R.string.event_url) + "/appevent/v1/" + senderId + "?" + getParamsString(
+                            parameters));
             JSONObject result = executeGet(url);
             return result;
         } catch (IOException | JSONException e) {
@@ -96,7 +98,8 @@ final class PubSdkApi {
     }
 
 
-    private static JSONObject executePost(URL url, JSONObject requestJson, String userAgent) throws IOException, JSONException {
+    private static JSONObject executePost(URL url, JSONObject requestJson, String userAgent)
+            throws IOException, JSONException {
 
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestMethod("POST");

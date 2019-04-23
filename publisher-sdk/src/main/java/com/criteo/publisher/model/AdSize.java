@@ -2,10 +2,10 @@ package com.criteo.publisher.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import java.util.Objects;
 
 public class AdSize implements Parcelable {
+
     private int height;
     private int width;
 
@@ -75,8 +75,12 @@ public class AdSize implements Parcelable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         AdSize adSize = (AdSize) o;
         return height == adSize.height &&
                 width == adSize.width;

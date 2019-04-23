@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Criteo Pub SDK Demo</string>
+    <string name="title_activity_standalone">Standalone</string>
     <string name="title_activity_splash">Splash Ui</string>
     <string name="criteo_publisher_id">PUB-X23-TEST</string>
     <string name="title_activity_cdb_call">Cdb Call Test</string>

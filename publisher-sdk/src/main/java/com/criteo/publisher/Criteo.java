@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.Slot;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import java.util.List;
 
@@ -57,8 +58,8 @@ public final class Criteo {
     /**
      * Method to start new CdbDownload Asynctask
      */
-    public void fetchBidForAdUnit(List<AdUnit> adUnits) {
-        bidManager.startCdbDownloadTask(false, adUnits);
+    public Slot getBidForAdUnit(AdUnit adUnit) {
+        return bidManager.getBidForAdUnitAndPrefetch(adUnit);
     }
 
 }

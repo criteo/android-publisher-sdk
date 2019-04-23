@@ -4,52 +4,37 @@ import android.content.Context;
 import android.webkit.WebView;
 import com.criteo.publisher.mediation.controller.CriteoBannerEventController;
 import com.criteo.publisher.mediation.listeners.CriteoBannerAdListener;
-import com.criteo.publisher.model.Slot;
-import com.google.android.gms.ads.AdSize;
+import com.criteo.publisher.model.AdUnit;
 import java.lang.ref.WeakReference;
 
 public class CriteoBannerView extends WebView {
 
-    private AdSize adSize;
-
-    private String adUnit;
-
-    private Slot slot;
+    private AdUnit adUnit;
 
     private CriteoBannerAdListener criteoBannerAdListener;
 
     private WeakReference<CriteoBannerEventController> bannerController;
 
+    private CriteoBannerEventController criteoBannerEventController;
 
-    public CriteoBannerView(Context context) {
+
+    public CriteoBannerView(Context context, AdUnit adUnit) {
         super(context);
+        this.adUnit = adUnit;
+
+
     }
 
     public void setCriteoBannerAdListener(CriteoBannerAdListener criteoBannerAdListener) {
         this.criteoBannerAdListener = criteoBannerAdListener;
-    }
 
-    public Slot getSlot() {
-        return slot;
-    }
-
-    public void setAdSize(AdSize adSize) {
-        this.adSize = adSize;
-    }
-
-    public void setAdUnit(String adUnit) {
-        this.adUnit = adUnit;
-    }
-
-    public AdSize getAdSize() {
-        return adSize;
-    }
-
-    public String getAdUnit() {
-        return adUnit;
     }
 
     public void loadAd() {
-
+        if (criteoBannerEventController == null) {
+            criteoBannerEventController = new CriteoBannerEventController(this, criteoBannerAdListener);
+        }
+        criteoBannerEventController.fetchAdAsync(adUnit);
     }
+
 }

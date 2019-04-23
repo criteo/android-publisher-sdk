@@ -5,13 +5,22 @@
   <uses-permission android:name="android.permission.INTERNET"/>
 
   <application
-    android:name=".PubSdkDemoApplication"
     android:allowBackup="true"
     android:icon="@mipmap/ic_launcher"
     android:label="@string/app_name"
+    android:name=".PubSdkDemoApplication"
     android:roundIcon="@mipmap/ic_launcher_round"
     android:supportsRtl="true"
     android:theme="@style/AppTheme">
+    <activity
+      android:name=".StandaloneActivity"
+      android:label="@string/title_activity_standalone"
+      android:theme="@style/AppTheme"
+      android:parentActivityName=".MainActivity">
+      <meta-data
+        android:name="android.support.PARENT_ACTIVITY"
+        android:value="com.criteo.pubsdk_android.MainActivity"/>
+    </activity>
 
     <meta-data
       android:name="com.google.android.gms.ads.AD_MANAGER_APP"
@@ -19,10 +28,10 @@
 
     <activity
       android:name=".MainActivity"
-      android:theme="@style/AppTheme.NoActionBar"></activity>
+      android:theme="@style/AppTheme.NoActionBar"/>
     <activity
-      android:name=".SplashActivity"
       android:label="@string/title_activity_splash"
+      android:name=".SplashActivity"
       android:parentActivityName=".MainActivity"
       android:theme="@style/AppTheme.NoActionBar">
       <intent-filter>
@@ -36,24 +45,24 @@
         android:value="com.criteo.pubsdk_android.MainActivity"/>
     </activity>
     <activity
-      android:name=".cdb.CdbCallActivity"
       android:label="@string/title_activity_cdb_call"
+      android:name=".cdb.CdbCallActivity"
       android:theme="@style/AppTheme">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
         android:value="com.criteo.pubsdk_android.MainActivity"/>
     </activity>
     <activity
-      android:name=".DfpActivity"
       android:label="@string/title_activity_dfp"
+      android:name=".DfpActivity"
       android:theme="@style/AppTheme">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
         android:value="com.criteo.pubsdk_android.MainActivity"/>
     </activity>
     <activity
-      android:name=".MediationActivity"
       android:label="@string/title_activity_mediation"
+      android:name=".MediationActivity"
       android:theme="@style/AppTheme">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"

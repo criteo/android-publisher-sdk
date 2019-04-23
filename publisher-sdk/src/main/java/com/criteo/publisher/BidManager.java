@@ -73,7 +73,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         if (config != null && config.isKillSwitch()) {
             return request;
         }
-        Slot slot = validateAndPrefetchSlotInCache(adUnit);
+        Slot slot = getBidForAdUnitAndPrefetch(adUnit);
         if (slot != null) {
             request.addCustomTargeting(CRT_CPM, slot.getCpm());
             request.addCustomTargeting(CRT_DISPLAY_URL, DeviceUtil.createDfpCompatibleDisplayUrl(slot.getDisplayUrl()));
@@ -82,7 +82,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
     }
 
-    private Slot validateAndPrefetchSlotInCache(AdUnit adUnit) {
+    Slot getBidForAdUnitAndPrefetch(AdUnit adUnit) {
         Slot peekSlot = cache.peekAdUnit(adUnit.getPlacementId(), adUnit.getSize().getFormattedSize());
         if (peekSlot == null) {
             return null;
