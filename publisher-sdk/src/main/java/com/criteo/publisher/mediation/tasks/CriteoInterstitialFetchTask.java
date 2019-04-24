@@ -1,31 +1,34 @@
 package com.criteo.publisher.mediation.tasks;
 
-import android.content.Context;
 import android.os.AsyncTask;
-import com.criteo.publisher.mediation.listeners.CriteoBannerAdListener;
-import com.criteo.publisher.mediation.view.CriteoInterstitialView;
-import java.lang.ref.WeakReference;
+import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
+import com.criteo.publisher.mediation.utils.CriteoErrorCode;
+import com.criteo.publisher.model.Slot;
 
-public class CriteoInterstitialFetchTask extends AsyncTask<Void, Void, Void> {
+public class CriteoInterstitialFetchTask extends AsyncTask<Slot, Void, Slot> {
 
-    private WeakReference<CriteoInterstitialView> criteoInterstitialView;
-    private Context context;
-    private CriteoBannerAdListener criteoBannerAdListener;
+    private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
-    public CriteoInterstitialFetchTask(Context context, WeakReference<CriteoInterstitialView> interstitialView,
-            CriteoBannerAdListener listener) {
-        criteoInterstitialView = interstitialView;
-        this.context = context;
-        this.criteoBannerAdListener = listener;
+    public CriteoInterstitialFetchTask(CriteoInterstitialAdListener listener) {
+        this.criteoInterstitialAdListener = listener;
     }
 
     @Override
-    protected Void doInBackground(Void... voids) {
-        return null;
+    protected Slot doInBackground(Slot... slots) {
+        if (slots == null || slots.length == 0) {
+            return null;
+        }
+        Slot slot = slots[0];
+        return slot;
     }
 
     @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
+    protected void onPostExecute(Slot slot) {
+        super.onPostExecute(slot);
+        if (slot == null) {
+            criteoInterstitialAdListener.onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NO_FILL);
+        } else {
+            criteoInterstitialAdListener.onAdFetchSucceededForInterstitial();
+        }
     }
 }
