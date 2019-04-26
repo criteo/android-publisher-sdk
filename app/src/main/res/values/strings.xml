@@ -6,4 +6,5 @@
     <string name="title_activity_cdb_call">Cdb Call Test</string>
     <string name="title_activity_dfp">Google DFP</string>
     <string name="title_activity_mediation">Mediation</string>
+    <string name="title_activity_mopub">Mopub</string>
 </resources>

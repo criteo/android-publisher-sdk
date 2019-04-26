@@ -68,6 +68,16 @@
         android:name="android.support.PARENT_ACTIVITY"
         android:value="com.criteo.pubsdk_android.MainActivity"/>
     </activity>
+    <activity
+        android:name=".MopubActivity"
+        android:label="@string/title_activity_mopub"
+        android:theme="@style/AppTheme"></activity>
+    <activity
+        android:name="com.mopub.common.MoPubBrowser"
+        android:configChanges="keyboardHidden|orientation|screenSize" />
+    <activity android:name="com.mopub.mobileads.MraidVideoPlayerActivity"
+        android:configChanges="keyboardHidden|orientation|screenSize"/>
   </application>
+
 
 </manifest>

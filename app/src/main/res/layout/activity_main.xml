@@ -44,10 +44,11 @@
           android:background="#81C784"
           android:text="Standalone"/>
         <Button
+            android:id="@+id/buttonMopubCall"
             android:layout_marginTop="20dp"
             style="@style/Widget.AppCompat.Button.Colored"
             android:background="#81D4FA"
-            android:text="Google DFP \n v4.5.1"
+            android:text="Mopub"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

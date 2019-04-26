@@ -2,11 +2,12 @@ package com.criteo.publisher;
 
 import android.app.Application;
 import android.text.TextUtils;
+
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Slot;
-import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
+
 import java.util.List;
 
 public final class Criteo {
@@ -51,8 +52,8 @@ public final class Criteo {
         bidManager.prefetch();
     }
 
-    public PublisherAdRequest.Builder setBidsForAdUnit(PublisherAdRequest.Builder request, AdUnit adUnit) {
-        return bidManager.enrichBid(request, adUnit);
+    public void setBidsForAdUnit(Object object, AdUnit adUnit) {
+        bidManager.enrichBid(object, adUnit);
     }
 
     /**

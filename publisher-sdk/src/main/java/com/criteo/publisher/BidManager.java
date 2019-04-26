@@ -6,9 +6,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
+import com.criteo.publisher.Util.ReflectionUtil;
 import com.criteo.publisher.Util.UserAgentCallback;
 import com.criteo.publisher.Util.UserAgentHandler;
 import com.criteo.publisher.cache.SdkCache;
@@ -18,12 +20,14 @@ import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.CdbDownloadTask;
-import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class BidManager implements NetworkResponseListener, ApplicationStoppedListener {
-
+    private static String MOPUB_ADVIEW_CLASS = "com.mopub.mobileads.MoPubView";
+    private static String MOPUB_INTERSTITIAL_CLASS = "com.mopub.mobileads.MoPubInterstitial";
+    private static String DFP_ADREQUEST_CLASS = "com.google.android.gms.ads.doubleclick.PublisherAdRequest$Builder";
     private static final String CRT_CPM = "crt_cpm";
     private static final String CRT_DISPLAY_URL = "crt_displayUrl";
     private static final int SECOND_TO_MILLI = 1000;
@@ -69,17 +73,38 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     }
 
 
-    PublisherAdRequest.Builder enrichBid(PublisherAdRequest.Builder request, AdUnit adUnit) {
+    public void enrichBid(Object object, AdUnit adUnit) {
         if (config != null && config.isKillSwitch()) {
-            return request;
+            return;
         }
+        if (object != null) {
+            if (object.getClass() == ReflectionUtil.getClassFromString(MOPUB_ADVIEW_CLASS)
+                    || object.getClass() == ReflectionUtil.getClassFromString(MOPUB_INTERSTITIAL_CLASS)) {
+                enrichMoPubBid(object, adUnit);
+            } else if (object.getClass() == ReflectionUtil.getClassFromString(DFP_ADREQUEST_CLASS)) {
+                enrichDfpBid(object, adUnit);
+            }
+        }
+    }
+
+    private void enrichMoPubBid(Object object, AdUnit adUnit) {
         Slot slot = getBidForAdUnitAndPrefetch(adUnit);
         if (slot != null) {
-            request.addCustomTargeting(CRT_CPM, slot.getCpm());
-            request.addCustomTargeting(CRT_DISPLAY_URL, DeviceUtil.createDfpCompatibleDisplayUrl(slot.getDisplayUrl()));
+            StringBuilder keywords = new StringBuilder();
+            keywords.append(CRT_CPM + ":" + slot.getCpm());
+            keywords.append(",");
+            keywords.append(CRT_DISPLAY_URL + ":" + slot.getDisplayUrl());
+            ReflectionUtil.callMethodOnObject(object, "setKeywords", keywords.toString());
         }
-        return request;
+    }
 
+
+    private void enrichDfpBid(Object object, AdUnit adUnit) {
+        Slot slot = getBidForAdUnitAndPrefetch(adUnit);
+        if (slot != null) {
+            ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", CRT_CPM, slot.getCpm());
+            ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", CRT_DISPLAY_URL, DeviceUtil.createDfpCompatibleDisplayUrl(slot.getDisplayUrl()));
+        }
     }
 
     Slot getBidForAdUnitAndPrefetch(AdUnit adUnit) {
