@@ -162,11 +162,15 @@ final class PubSdkApi {
             throws UnsupportedEncodingException {
 
         StringBuilder queryString = new StringBuilder();
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            queryString.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8.name()));
-            queryString.append("=");
-            queryString.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8.name()));
-            queryString.append("&");
+        try {
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                queryString.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8.name()));
+                queryString.append("=");
+                queryString.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8.name()));
+                queryString.append("&");
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
         }
 
         // drop the last '&' if result is not empty
