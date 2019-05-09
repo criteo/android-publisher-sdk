@@ -47,7 +47,8 @@ public class BidManagerTest {
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         manager.enrichBid(builder, adUnit);
         PublisherAdRequest.Builder builderUpdate = new PublisherAdRequest.Builder();
-        PublisherAdRequest request = manager.enrichBid(builderUpdate, adUnit).build();
+        manager.enrichBid(builderUpdate, adUnit);
+        PublisherAdRequest request = builderUpdate.build();
         assertNull(request.getCustomTargeting().getString("crt_displayUrl"));
     }
 
@@ -75,7 +76,8 @@ public class BidManagerTest {
         manager.setAdUnits(slots);
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         manager.enrichBid(builder, adUnit);
-        PublisherAdRequest request = manager.enrichBid(builder, adUnit).build();
+        manager.enrichBid(builder, adUnit);
+        PublisherAdRequest request = builder.build();
         assertNull(request.getCustomTargeting().getString("crt_displayUrl"));
     }
 
@@ -104,14 +106,16 @@ public class BidManagerTest {
         manager.setAdUnits(slots);
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         manager.enrichBid(builder, adUnit);
-        PublisherAdRequest request = manager.enrichBid(builder, adUnit).build();
+        manager.enrichBid(builder, adUnit);
+        PublisherAdRequest request = builder.build();
         assertNull(request.getCustomTargeting().getString("crt_displayUrl"));
         try {
             Thread.sleep(150000L);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        request = manager.enrichBid(builder, adUnit).build();
+        manager.enrichBid(builder, adUnit);
+        request = builder.build();
         assertNotNull(request.getCustomTargeting().getString("crt_displayUrl"));
     }
 
@@ -139,7 +143,8 @@ public class BidManagerTest {
         slots.add(slot1);
         manager.setAdUnits(slots);
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-        PublisherAdRequest request = manager.enrichBid(builder, adUnit).build();
+        manager.enrichBid(builder, adUnit);
+        PublisherAdRequest request =builder.build();
         assertNull(request.getCustomTargeting().getString("crt_displayUrl"));
         try {
             Thread.sleep(1500L);
@@ -158,7 +163,8 @@ public class BidManagerTest {
         slot2.setTtl(0);
         slots.add(slot2);
         manager.setAdUnits(slots);
-        request = manager.enrichBid(builder, adUnit).build();
+        manager.enrichBid(builder, adUnit);
+        request =builder.build();
         assertNotNull(request.getCustomTargeting().getString("crt_displayUrl"));
 
 
@@ -188,7 +194,8 @@ public class BidManagerTest {
 
         BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, adUnits);
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-        PublisherAdRequest request = manager.enrichBid(builder, adUnit).build();
+        manager.enrichBid(builder, adUnit);
+        PublisherAdRequest request = builder.build();
         assertNull(request.getCustomTargeting().getString("crt_displayUrl"));
     }
 

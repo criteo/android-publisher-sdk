@@ -1,59 +1,64 @@
 package com.criteo.publisher.mediation.controller;
 
 import android.content.Context;
+import android.text.TextUtils;
+import android.webkit.URLUtil;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
-import com.criteo.publisher.mediation.tasks.CriteoInterstitialFetchTask;
+import com.criteo.publisher.mediation.tasks.CriteoInterstitialListenerCallTask;
 import com.criteo.publisher.mediation.view.CriteoInterstitialView;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Slot;
 
 
 public class CriteoInterstitialEventController {
 
-    private static final String DISPLAY_URL_MACRO = "%%displayUrl%%";
 
     private Context context;
-    private boolean loaded;
+
     private CriteoInterstitialView criteoInterstitialview;
+
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
-    private CriteoInterstitialFetchTask criteoInterstitialFetchTask;
+
+    private CriteoInterstitialListenerCallTask criteoInterstitialFetchTask;
+
+    private WebViewDownloader webViewDownloader;
 
     public CriteoInterstitialEventController(Context context, CriteoInterstitialView interstitialview,
-            CriteoInterstitialAdListener listener) {
+            CriteoInterstitialAdListener listener, WebViewDownloader webViewDownloader) {
         this.criteoInterstitialview = interstitialview;
         this.criteoInterstitialAdListener = listener;
         this.context = context;
-        this.loaded = false;
+        this.webViewDownloader = webViewDownloader;
     }
 
-    private boolean isAdLoaded() {
-        return loaded;
+    public boolean isAdLoaded() {
+        return webViewDownloader.getWebViewData().isLoaded();
     }
 
-    void fetchAdAsync(AdUnit adUnit) {
-        loaded = false;
+    public void fetchAdAsync(AdUnit adUnit) {
+
         Slot slot = Criteo.getInstance().getBidForAdUnit(adUnit);
 
-        criteoInterstitialFetchTask = new CriteoInterstitialFetchTask(criteoInterstitialAdListener);
-        criteoInterstitialFetchTask.execute(slot);
-
         if (slot != null) {
-            String displayUrlWithTag = Config.mediationAdTag;
-            String displayUrl = displayUrlWithTag.replace(DISPLAY_URL_MACRO, slot.getDisplayUrl());
-
             //gets Webview data from Criteo before showing Interstitialview Activity
-            getWebviewDataAsync(displayUrl);
+            getWebviewDataAsync(slot.getDisplayUrl());
         }
+
+        criteoInterstitialFetchTask = new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener);
+        criteoInterstitialFetchTask.execute(slot);
     }
 
-    public void show() {
+    protected void getWebviewDataAsync(String displayUrl) {
+        if (TextUtils.isEmpty(displayUrl) || (!URLUtil.isValidUrl(String.valueOf(displayUrl)))) {
+            return;
+        }
+
+        webViewDownloader.fillWebViewHtmlContent(displayUrl);
 
     }
 
-    private void getWebviewDataAsync(String displayUrl) {
-
+    public String getWebViewDataContent() {
+        return webViewDownloader.getWebViewData().getContent();
     }
-
 }

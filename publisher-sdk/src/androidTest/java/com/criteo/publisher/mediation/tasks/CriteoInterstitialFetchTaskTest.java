@@ -14,13 +14,13 @@ public class CriteoInterstitialFetchTaskTest {
     @Mock
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
-    CriteoInterstitialFetchTask criteoInterstitialFetchTask;
+    CriteoInterstitialListenerCallTask criteoInterstitialFetchTask;
 
 
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        criteoInterstitialFetchTask = new CriteoInterstitialFetchTask(criteoInterstitialAdListener);
+        criteoInterstitialFetchTask = new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener);
     }
 
 

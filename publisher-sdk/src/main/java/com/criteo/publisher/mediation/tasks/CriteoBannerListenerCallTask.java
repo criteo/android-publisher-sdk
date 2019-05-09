@@ -7,12 +7,12 @@ import com.criteo.publisher.mediation.view.CriteoBannerView;
 import com.criteo.publisher.model.Slot;
 
 
-public class CriteoBannerFetchTask extends AsyncTask<Slot, Void, Slot> {
+public class CriteoBannerListenerCallTask extends AsyncTask<Slot, Void, Slot> {
 
     private CriteoBannerView criteoBannerView;
     private CriteoBannerAdListener criteoBannerAdListener;
 
-    public CriteoBannerFetchTask(CriteoBannerView bannerView, CriteoBannerAdListener listener) {
+    public CriteoBannerListenerCallTask(CriteoBannerView bannerView, CriteoBannerAdListener listener) {
         this.criteoBannerView = bannerView;
         this.criteoBannerAdListener = listener;
     }

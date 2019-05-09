@@ -18,13 +18,13 @@ public class CriteoBannerFetchTaskTest {
     @Mock
     private CriteoBannerView criteoBannerView;
 
-    CriteoBannerFetchTask criteoBannerFetchTask;
+    CriteoBannerListenerCallTask criteoBannerFetchTask;
 
 
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        criteoBannerFetchTask = new CriteoBannerFetchTask(criteoBannerView, criteoBannerAdListener);
+        criteoBannerFetchTask = new CriteoBannerListenerCallTask(criteoBannerView, criteoBannerAdListener);
     }
 
 

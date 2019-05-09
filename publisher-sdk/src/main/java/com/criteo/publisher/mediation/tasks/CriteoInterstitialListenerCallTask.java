@@ -5,11 +5,11 @@ import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
 import com.criteo.publisher.mediation.utils.CriteoErrorCode;
 import com.criteo.publisher.model.Slot;
 
-public class CriteoInterstitialFetchTask extends AsyncTask<Slot, Void, Slot> {
+public class CriteoInterstitialListenerCallTask extends AsyncTask<Slot, Void, Slot> {
 
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
-    public CriteoInterstitialFetchTask(CriteoInterstitialAdListener listener) {
+    public CriteoInterstitialListenerCallTask(CriteoInterstitialAdListener listener) {
         this.criteoInterstitialAdListener = listener;
     }
 

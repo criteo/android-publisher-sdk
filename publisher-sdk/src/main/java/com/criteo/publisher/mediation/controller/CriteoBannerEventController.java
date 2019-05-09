@@ -4,7 +4,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.mediation.listeners.CriteoBannerAdListener;
-import com.criteo.publisher.mediation.tasks.CriteoBannerFetchTask;
+import com.criteo.publisher.mediation.tasks.CriteoBannerListenerCallTask;
 import com.criteo.publisher.mediation.view.CriteoBannerView;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
@@ -13,8 +13,10 @@ import com.criteo.publisher.model.Slot;
 
 public class CriteoBannerEventController {
 
+    private static final String DISPLAY_URL_MACRO = "%%displayUrl%%";
+
     private CriteoBannerView criteoBannerView;
-    private CriteoBannerFetchTask criteoBannerFetchTask;
+    private CriteoBannerListenerCallTask criteoBannerFetchTask;
     private CriteoBannerAdListener criteoBannerAdListener;
 
     public CriteoBannerEventController(CriteoBannerView bannerView, CriteoBannerAdListener listener) {
@@ -26,7 +28,7 @@ public class CriteoBannerEventController {
     public void fetchAdAsync(AdUnit adUnit) {
         Slot slot = Criteo.getInstance().getBidForAdUnit(adUnit);
 
-        criteoBannerFetchTask = new CriteoBannerFetchTask(criteoBannerView, criteoBannerAdListener);
+        criteoBannerFetchTask = new CriteoBannerListenerCallTask(criteoBannerView, criteoBannerAdListener);
         criteoBannerFetchTask.execute(slot);
 
         if (slot != null) {
@@ -43,8 +45,8 @@ public class CriteoBannerEventController {
                 }
             });
 
-            String displayUrlWithTag = Config.mediationAdTag;
-            String displayUrl = displayUrlWithTag.replace("%%displayUrl%%", slot.getDisplayUrl());
+            String displayUrlWithTag = Config.mediationAdTagUrl;
+            String displayUrl = displayUrlWithTag.replace(DISPLAY_URL_MACRO, slot.getDisplayUrl());
 
             criteoBannerView.loadDataWithBaseURL("", displayUrl, "text/html", "UTF-8", "");
         }

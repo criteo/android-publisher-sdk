@@ -35,6 +35,7 @@
           android:layout_height="wrap_content"
           android:layout_weight=".5"
           android:background="@android:color/holo_blue_dark"
+          android:enabled="false"
           android:text="Interstitial"/>
         <Button
           android:id="@+id/buttonStandAloneBanner"

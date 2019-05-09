@@ -22,7 +22,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 //TODO: Add unit tests
-final class PubSdkApi {
+public final class PubSdkApi {
 
     private static final int TIMEOUT = 60 * 1000;
     private static final String TAG = PubSdkApi.class.getSimpleName();
@@ -143,7 +143,7 @@ final class PubSdkApi {
     }
 
 
-    private static String readStream(InputStream in) throws IOException {
+    public static String readStream(InputStream in) throws IOException {
         BufferedReader reader = null;
         StringBuilder response = new StringBuilder();
         try {
