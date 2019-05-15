@@ -69,6 +69,9 @@ public class Slot implements Parcelable {
         displayUrl = json.optString(DISPLAY_URL, null);
         sizes = new ArrayList<>();
         ttl = json.optInt(TTL, DEFAULT_TTL);
+        if (Double.parseDouble(cpm) > 0.0 && ttl == 0){
+            ttl = DEFAULT_TTL;
+        }
         timeOfDownload = System.currentTimeMillis();
     }
 
