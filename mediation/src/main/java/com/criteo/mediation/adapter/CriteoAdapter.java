@@ -25,7 +25,7 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
 
     protected static final String TAG = CriteoAdapter.class.getSimpleName();
 
-    protected static final String NETWORKID = "networkId";
+    protected static final String CRITEO_PUBLISHER_ID = "CriteoPublisherId";
     protected static final String ADUNIT = "adUnit";
     protected static final String PLACEMENTID = "placementid";
     protected static final String WIDTH = "width";
@@ -125,7 +125,7 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
     }
 
     private void initialize(String serverParameter, Context context, CustomEventListener listener) {
-        int networkId = 0;
+        int criteoPublisherId = 0;
         String placementId = "";
         int width = 0;
         int height = 0;
@@ -133,8 +133,8 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
         if (!TextUtils.isEmpty(serverParameter)) {
             try {
                 parameters = new JSONObject(serverParameter);
-                if (parameters.get(NETWORKID) != null) {
-                    networkId = parameters.getInt(NETWORKID);
+                if (parameters.get(CRITEO_PUBLISHER_ID) != null) {
+                    criteoPublisherId = parameters.getInt(CRITEO_PUBLISHER_ID);
                 }
                 if (parameters.get(ADUNIT) != null) {
                     JSONObject adUnit = parameters.getJSONObject(ADUNIT);
@@ -151,7 +151,7 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
 
                 if (Criteo.getInstance() == null) {
                     //TODO: We will pass the context
-                    Criteo.init((Application) (context.getApplicationContext()), adUnits, networkId);
+                    Criteo.init((Application) (context.getApplicationContext()), adUnits, criteoPublisherId);
                 } else {
                     Criteo.getInstance().getBidForAdUnit(adUnit);
                 }

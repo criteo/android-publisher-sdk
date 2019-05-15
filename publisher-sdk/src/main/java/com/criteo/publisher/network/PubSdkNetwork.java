@@ -12,8 +12,8 @@ public final class PubSdkNetwork {
     private PubSdkNetwork() {
     }
 
-    public static Config loadConfig(Context context, int networkId, String appId, String sdkVersion) {
-        return PubSdkApi.loadConfig(context, networkId, appId, sdkVersion);
+    public static Config loadConfig(Context context, int criteoPublisherId, String appId, String sdkVersion) {
+        return PubSdkApi.loadConfig(context, criteoPublisherId, appId, sdkVersion);
     }
 
     public static Cdb loadCdb(Context context, Cdb cdb, String userAgent) {

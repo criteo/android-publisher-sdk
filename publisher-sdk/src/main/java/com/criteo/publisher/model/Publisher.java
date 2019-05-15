@@ -10,9 +10,11 @@ import org.json.JSONObject;
 public class Publisher implements Parcelable {
 
     private static final String BUNDLE_ID = "bundleId";
+    // Not changing this string to "cpId" that CDB expects for now
+    // this should be done as part of https://jira.criteois.com/browse/EE-235
     private static final String NETWORK_ID = "networkId";
     private String bundleId;
-    private int networkId;
+    private int criteoPublisherId;
 
     public Publisher(Context context) {
         bundleId = context.getApplicationContext().getPackageName();
@@ -26,19 +28,19 @@ public class Publisher implements Parcelable {
         this.bundleId = bundleId;
     }
 
-    public int getNetworkId() {
-        return networkId;
+    public int getCriteoPublisherId() {
+        return criteoPublisherId;
     }
 
-    public void setNetworkId(int networkId) {
-        this.networkId = networkId;
+    public void setCriteoPublisherId(int criteoPublisherId) {
+        this.criteoPublisherId = criteoPublisherId;
     }
 
     public JSONObject toJson() throws JSONException {
         JSONObject json = new JSONObject();
         json.put(BUNDLE_ID, bundleId);
-        if (networkId > 0) {
-            json.put(NETWORK_ID, networkId);
+        if (criteoPublisherId > 0) {
+            json.put(NETWORK_ID, criteoPublisherId);
         }
         return json;
     }
@@ -51,12 +53,12 @@ public class Publisher implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.bundleId);
-        dest.writeInt(this.networkId);
+        dest.writeInt(this.criteoPublisherId);
     }
 
     protected Publisher(Parcel in) {
         this.bundleId = in.readString();
-        this.networkId = in.readInt();
+        this.criteoPublisherId = in.readInt();
     }
 
     public static final Parcelable.Creator<Publisher> CREATOR = new Parcelable.Creator<Publisher>() {

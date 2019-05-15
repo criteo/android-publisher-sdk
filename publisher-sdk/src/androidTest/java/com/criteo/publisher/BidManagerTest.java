@@ -23,7 +23,7 @@ import static junit.framework.Assert.assertNull;
 @RunWith(AndroidJUnit4.class)
 public class BidManagerTest {
     private static final String TEST_CREATIVE = "https://rdi.us.criteo.com/delivery/r/ajs.php?did=5c87fcdb7cc0d71b24ee2ee6454eb810&u=%7CvsLBMQ0Ek4IxXQb0B5n7RyCAQymjqwh29YhNM9EzK9Q%3D%7C&c1=fYGSyyN4O4mkT2ynhzfwbdpiG7v0SMGpms6Tk24GWc957HzbzgL1jw-HVL5D0BjRx5ef3wBVfDXXmh9StLy8pf5kDJtrQLTLQrexjq5CZt9tEDx9mY8Y-eTV19PWOQoNjXkJ4_mhKqV0IfwHDIfLVDBWmsizVCoAtU1brQ2weeEkUU5-mDfn3qzTX3jPXszef5bC3pbiLJAK3QamQlglD1dkWYOkUwLAXxMjr2MXeBQk2YK-_qYz0fMVJG0xWJ-jVmsqdOw9A9rkGIgToRoUewB0VAu5eSkjSBoGs4yEbsnJ5Ssq5fquJMNvm6T77b8fzQI-eXgwoEfKkdAuCbj3gNrPBgzGZAJPGO-TYvJgs22Bljy-hNCk1E0E030zLtKo-XvAVRvZ5PswtwoccPSl6u1wiV8fMCXHx9QW9-fdXaVxzZe9AZB6w7pHxKUwiRK9";
-    private static final int NETWORK_ID = 1000;
+    private static final int CRITEO_PUBLISHER_ID = 1000;
     private Context context;
 
     @Before
@@ -71,7 +71,7 @@ public class BidManagerTest {
         slot1.setTtl(0);
         List<Slot> slots = new ArrayList<>();
         slots.add(slot1);
-        BidManager manager = new BidManager(context, NETWORK_ID, adUnits);
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, adUnits);
         manager.setAdUnits(slots);
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         manager.enrichBid(builder, adUnit);
@@ -90,7 +90,7 @@ public class BidManagerTest {
         adSize.setHeight(50);
         adUnit.setSize(adSize);
         adUnits.add(adUnit);
-        BidManager manager = new BidManager(context, NETWORK_ID, adUnits);
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, adUnits);
         List<Slot> slots = new ArrayList<>();
         Slot slot1 = new Slot();
         slot1.setPlacementId("/140800857/Endeavour_320x50");
@@ -126,7 +126,7 @@ public class BidManagerTest {
         adSize.setHeight(50);
         adUnit.setSize(adSize);
         adUnits.add(adUnit);
-        BidManager manager = new BidManager(context, NETWORK_ID, adUnits);
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, adUnits);
         List<Slot> slots = new ArrayList<>();
         Slot slot1 = new Slot();
         slot1.setPlacementId("/140800857/Endeavour_320x50");
@@ -186,7 +186,7 @@ public class BidManagerTest {
         List<Slot> slots = new ArrayList<>();
         slots.add(bannerSlot);
 
-        BidManager manager = new BidManager(context, NETWORK_ID, adUnits);
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, adUnits);
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         PublisherAdRequest request = manager.enrichBid(builder, adUnit).build();
         assertNull(request.getCustomTargeting().getString("crt_displayUrl"));
@@ -230,7 +230,7 @@ public class BidManagerTest {
         slots.add(interstitialSlot);
 
         //initializing with adunits
-        BidManager manager = new BidManager(context, NETWORK_ID, adUnits);
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, adUnits);
         //mocking response by setting slots
         manager.setAdUnits(slots);
         return manager;

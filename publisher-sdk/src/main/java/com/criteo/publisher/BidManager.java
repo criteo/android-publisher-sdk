@@ -42,12 +42,12 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private Config config;
     private String userAgent;
 
-    BidManager(Context context, int networkId, List<AdUnit> adUnits) {
+    BidManager(Context context, int criteoPublisherId, List<AdUnit> adUnits) {
         this.mContext = context;
         this.adUnits = adUnits;
         this.cache = new SdkCache();
         publisher = new Publisher(mContext);
-        publisher.setNetworkId(networkId);
+        publisher.setCriteoPublisherId(criteoPublisherId);
         user = new User();
         userAgent = "";
     }
