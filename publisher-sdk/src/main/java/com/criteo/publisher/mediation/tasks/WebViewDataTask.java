@@ -1,9 +1,9 @@
 package com.criteo.publisher.mediation.tasks;
 
-import static com.criteo.publisher.network.PubSdkApi.readStream;
 
 import android.os.AsyncTask;
 import android.text.TextUtils;
+import com.criteo.publisher.Util.StreamUtil;
 import com.criteo.publisher.model.WebviewData;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -45,7 +45,7 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
 
         try {
             if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                String response = readStream(urlConnection.getInputStream());
+                String response = StreamUtil.readStream(urlConnection.getInputStream());
                 if (!TextUtils.isEmpty(response)) {
                     result = (response);
                 }

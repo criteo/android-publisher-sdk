@@ -4,12 +4,10 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.R;
+import com.criteo.publisher.Util.StreamUtil;
 import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.model.Config;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -22,7 +20,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 //TODO: Add unit tests
-public final class PubSdkApi {
+final class PubSdkApi {
 
     private static final int TIMEOUT = 60 * 1000;
     private static final String TAG = PubSdkApi.class.getSimpleName();
@@ -118,7 +116,7 @@ public final class PubSdkApi {
 
         JSONObject result = new JSONObject();
         if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-            String response = readStream(urlConnection.getInputStream());
+            String response = StreamUtil.readStream(urlConnection.getInputStream());
             if (!TextUtils.isEmpty(response)) {
                 result = new JSONObject(response);
             }
@@ -134,7 +132,7 @@ public final class PubSdkApi {
         urlConnection.setConnectTimeout(TIMEOUT);
         JSONObject result = new JSONObject();
         if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-            String response = readStream(urlConnection.getInputStream());
+            String response = StreamUtil.readStream(urlConnection.getInputStream());
             if (!TextUtils.isEmpty(response)) {
                 result = new JSONObject(response);
             }
@@ -142,23 +140,6 @@ public final class PubSdkApi {
         return result;
     }
 
-
-    public static String readStream(InputStream in) throws IOException {
-        BufferedReader reader = null;
-        StringBuilder response = new StringBuilder();
-        try {
-            reader = new BufferedReader(new InputStreamReader(in));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-        } finally {
-            if (reader != null) {
-                reader.close();
-            }
-        }
-        return response.toString();
-    }
 
     protected static String getParamsString(Map<String, String> params)
             throws UnsupportedEncodingException {
