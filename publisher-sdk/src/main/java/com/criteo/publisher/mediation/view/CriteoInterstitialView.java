@@ -3,6 +3,8 @@ package com.criteo.publisher.mediation.view;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import com.criteo.publisher.Util.CriteoResultReceiver;
 import com.criteo.publisher.mediation.controller.CriteoInterstitialEventController;
 import com.criteo.publisher.mediation.controller.WebViewDownloader;
 import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
@@ -47,9 +49,13 @@ public class CriteoInterstitialView {
             Intent intent = new Intent(context, CriteoInterstitialActivity.class);
             Bundle bundle = new Bundle();
             bundle.putString("webviewdata", criteoInterstitialEventController.getWebViewDataContent());
+            CriteoResultReceiver criteoResultReceiver = new CriteoResultReceiver(new Handler(),
+                    criteoInterstitialAdListener);
+            bundle.putParcelable("resultreceiver", criteoResultReceiver);
             intent.putExtras(bundle);
             context.startActivity(intent);
         }
     }
+
 
 }

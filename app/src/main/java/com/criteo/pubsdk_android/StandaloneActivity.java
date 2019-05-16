@@ -109,7 +109,7 @@ public class StandaloneActivity extends AppCompatActivity {
 
             @Override
             public void onAdClicked() {
-
+                Log.d(TAG, "Banner ad clicked");
             }
 
             @Override
@@ -142,7 +142,7 @@ public class StandaloneActivity extends AppCompatActivity {
 
             @Override
             public void onAdClicked() {
-
+                Log.d(TAG, "Interstitial ad clicked");
             }
 
             @Override

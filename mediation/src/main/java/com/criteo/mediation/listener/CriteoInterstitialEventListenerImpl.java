@@ -51,4 +51,9 @@ public class CriteoInterstitialEventListenerImpl implements CriteoInterstitialAd
         customEventInterstitialListener.onAdClosed();
     }
 
+    @Override
+    public void onAdClicked() {
+        customEventInterstitialListener.onAdClicked();
+    }
+
 }

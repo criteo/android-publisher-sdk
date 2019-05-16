@@ -47,7 +47,6 @@ public class CriteoBannerEventController {
 
             String displayUrlWithTag = Config.mediationAdTagUrl;
             String displayUrl = displayUrlWithTag.replace(DISPLAY_URL_MACRO, slot.getDisplayUrl());
-
             criteoBannerView.loadDataWithBaseURL("", displayUrl, "text/html", "UTF-8", "");
         }
 

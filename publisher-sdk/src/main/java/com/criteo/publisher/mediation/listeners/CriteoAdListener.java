@@ -21,4 +21,9 @@ public interface CriteoAdListener {
      */
     public void onAdClosed();
 
+    /**
+     * Called when an ad is clicked.
+     */
+    public void onAdClicked();
+
 }

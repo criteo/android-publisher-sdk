@@ -51,4 +51,9 @@ public class CriteoBannerEventListenerImpl implements CriteoBannerAdListener {
         customEventBannerListener.onAdClosed();
     }
 
+    @Override
+    public void onAdClicked() {
+        customEventBannerListener.onAdClicked();
+    }
+
 }
