@@ -59,7 +59,7 @@ final class PubSdkApi {
     static Cdb loadCdb(Context context, Cdb cdbRequest, String userAgent) {
         Cdb cdbResult = null;
         try {
-            URL url = new URL(context.getString(R.string.cdb_url) + "/inapp/v1");
+            URL url = new URL(context.getString(R.string.cdb_url) + "/inapp/v2");
             JSONObject cdbRequestJson = cdbRequest.toJson();
             JSONObject result = executePost(url, cdbRequestJson, userAgent);
             cdbResult = new Cdb(result);

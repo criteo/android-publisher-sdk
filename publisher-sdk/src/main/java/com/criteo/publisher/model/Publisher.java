@@ -10,9 +10,7 @@ import org.json.JSONObject;
 public class Publisher implements Parcelable {
 
     private static final String BUNDLE_ID = "bundleId";
-    // Not changing this string to "cpId" that CDB expects for now
-    // this should be done as part of https://jira.criteois.com/browse/EE-235
-    private static final String NETWORK_ID = "networkId";
+    private static final String CRITEO_PUBLISHER_ID = "cpId";
     private String bundleId;
     private int criteoPublisherId;
 
@@ -40,7 +38,7 @@ public class Publisher implements Parcelable {
         JSONObject json = new JSONObject();
         json.put(BUNDLE_ID, bundleId);
         if (criteoPublisherId > 0) {
-            json.put(NETWORK_ID, criteoPublisherId);
+            json.put(CRITEO_PUBLISHER_ID, criteoPublisherId);
         }
         return json;
     }
