@@ -51,4 +51,15 @@ public class CriteoResultReceiverTest {
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdClosed();
     }
 
+    @Test
+    public void sendWithNullListener() {
+        criteoInterstitialAdListener = null;
+        bundle = new Bundle();
+        bundle.putInt(INTERSTITIAL_ACTION, ACTION_CLOSED);
+        criteoResultReceiver = new CriteoResultReceiver(handler,
+                criteoInterstitialAdListener);
+        criteoResultReceiver.onReceiveResult(RESULT_CODE_SUCCESSFUL, bundle);
+    }
+
+
 }
