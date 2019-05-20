@@ -1,5 +1,6 @@
 <resources>
-    <string name="cdb_url">https://bidder.criteo.com</string>
-    <string name="config_url">https://pub-sdk-cfg.criteo.com</string>
-    <string name="event_url">https://gum.criteo.com</string>
+  <string name="cdb_url">https://bidder.criteo.com</string>
+  <string name="config_url">https://pub-sdk-cfg.criteo.com</string>
+  <string name="event_url">https://gum.criteo.com</string>
+  <string name="close_button">Close Button</string>
 </resources>

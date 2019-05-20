@@ -147,7 +147,7 @@ public class StandaloneActivity extends AppCompatActivity {
 
             @Override
             public void onAdClosed() {
-
+                Log.d(TAG, "Interstitial ad closed");
             }
 
             @Override

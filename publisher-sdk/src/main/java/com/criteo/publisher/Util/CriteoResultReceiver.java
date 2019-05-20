@@ -36,6 +36,10 @@ public class CriteoResultReceiver extends ResultReceiver {
                     criteoInterstitialAdListener.onAdClicked();
                     break;
 
+                case ACTION_CLOSED:
+                    criteoInterstitialAdListener.onAdClosed();
+                    break;
+
                 default:
                     break;
             }

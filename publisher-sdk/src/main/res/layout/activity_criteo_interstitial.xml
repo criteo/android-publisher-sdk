@@ -1,15 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools"
   android:id="@+id/AdLayout"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   android:orientation="vertical"
   tools:context=".mediation.view.CriteoInterstitialActivity">
-
   <WebView
     android:id="@+id/webview"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"/>
-</LinearLayout>
+    android:layout_height="match_parent"
+    >
+  </WebView>
+  <ImageButton
+    android:id="@+id/closeButton"
+    android:layout_width="45dp"
+    android:layout_height="45dp"
+    android:background="@android:color/transparent"
+    android:contentDescription="@string/close_button"
+    android:scaleType="fitXY"
+    android:src="@drawable/closebtn"
+    tools:layout_editor_absoluteX="239dp"
+    tools:layout_editor_absoluteY="1dp"/>
+</RelativeLayout>
