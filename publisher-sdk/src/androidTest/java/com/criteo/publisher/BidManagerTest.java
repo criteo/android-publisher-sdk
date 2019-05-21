@@ -199,6 +199,8 @@ public class BidManagerTest {
         assertNull(request.getCustomTargeting().getString("crt_displayUrl"));
     }
 
+    //TODO test for getBidForAdUnitAndPrefetch , clear the cache and check whats happening
+
     private BidManager getInitManager() {
         List<AdUnit> adUnits = new ArrayList<>();
         AdUnit adUnit = new AdUnit();

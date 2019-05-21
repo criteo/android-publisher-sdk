@@ -110,6 +110,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     Slot getBidForAdUnitAndPrefetch(AdUnit adUnit) {
         Slot peekSlot = cache.peekAdUnit(adUnit.getPlacementId(), adUnit.getSize().getFormattedSize());
         if (peekSlot == null) {
+            prefetch(false, userAgent, adUnit);
             return null;
         }
         float cpm = Float.valueOf(peekSlot.getCpm());
