@@ -1,36 +1,36 @@
 package com.criteo.publisher.model;
 
+import static com.criteo.publisher.model.Config.WEBVIEW_DATA_MACRO;
+
 import android.text.TextUtils;
-import com.criteo.publisher.mediation.view.CriteoInterstitialView;
+import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
 
-public class WebviewData {
-
-    private static final String WEBVIEW_DATA_MACRO = "%%webviewData%%";
+public class WebViewData {
 
     private String content;
     private Boolean loaded;
 
-    public WebviewData(String content, Boolean loaded) {
+    public WebViewData(String content, Boolean loaded) {
         this.content = content;
         this.loaded = loaded;
     }
 
-    public WebviewData() {
+    public WebViewData() {
         this.content = "";
         this.loaded = false;
     }
-
 
     public boolean isLoaded() {
         return loaded;
     }
 
-    public void setContent(String data) {
+    public void setContent(String data, CriteoInterstitialAdListener criteoInterstitialAdListener) {
         String dataWithTag = "";
 
         if (!TextUtils.isEmpty(data)) {
-            dataWithTag = Config.mediationAdTagData;
+            dataWithTag = Config.MEDIATION_AD_TAG_DATA;
             dataWithTag = dataWithTag.replace(WEBVIEW_DATA_MACRO, data);
+
         }
 
         this.loaded = !TextUtils.isEmpty(data);

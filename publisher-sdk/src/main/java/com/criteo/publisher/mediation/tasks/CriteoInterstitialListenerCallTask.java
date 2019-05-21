@@ -27,8 +27,6 @@ public class CriteoInterstitialListenerCallTask extends AsyncTask<Slot, Void, Sl
         super.onPostExecute(slot);
         if (slot == null) {
             criteoInterstitialAdListener.onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NO_FILL);
-        } else {
-            criteoInterstitialAdListener.onAdFetchSucceededForInterstitial();
         }
     }
 }

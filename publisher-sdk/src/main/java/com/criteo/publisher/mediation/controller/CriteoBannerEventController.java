@@ -1,5 +1,7 @@
 package com.criteo.publisher.mediation.controller;
 
+import static com.criteo.publisher.model.Config.DISPLAY_URL_MACRO;
+
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.criteo.publisher.Criteo;
@@ -12,8 +14,6 @@ import com.criteo.publisher.model.Slot;
 
 
 public class CriteoBannerEventController {
-
-    private static final String DISPLAY_URL_MACRO = "%%displayUrl%%";
 
     private CriteoBannerView criteoBannerView;
     private CriteoBannerListenerCallTask criteoBannerFetchTask;
@@ -45,7 +45,7 @@ public class CriteoBannerEventController {
                 }
             });
 
-            String displayUrlWithTag = Config.mediationAdTagUrl;
+            String displayUrlWithTag = Config.MEDIATION_AD_TAG_URL;
             String displayUrl = displayUrlWithTag.replace(DISPLAY_URL_MACRO, slot.getDisplayUrl());
             criteoBannerView.loadDataWithBaseURL("", displayUrl, "text/html", "UTF-8", "");
         }

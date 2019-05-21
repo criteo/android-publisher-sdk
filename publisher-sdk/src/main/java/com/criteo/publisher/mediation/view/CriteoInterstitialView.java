@@ -9,7 +9,7 @@ import com.criteo.publisher.mediation.controller.CriteoInterstitialEventControll
 import com.criteo.publisher.mediation.controller.WebViewDownloader;
 import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.WebviewData;
+import com.criteo.publisher.model.WebViewData;
 
 public class CriteoInterstitialView {
 
@@ -35,7 +35,7 @@ public class CriteoInterstitialView {
     public void loadAd() {
         if (criteoInterstitialEventController == null) {
             criteoInterstitialEventController = new CriteoInterstitialEventController(context, this,
-                    criteoInterstitialAdListener, new WebViewDownloader(new WebviewData()));
+                    criteoInterstitialAdListener, new WebViewDownloader(new WebViewData()));
         }
         criteoInterstitialEventController.fetchAdAsync(adUnit);
     }

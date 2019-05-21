@@ -1,30 +1,26 @@
 package com.criteo.publisher.mediation.controller;
 
-import android.text.TextUtils;
+import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
 import com.criteo.publisher.mediation.tasks.WebViewDataTask;
-import com.criteo.publisher.model.WebviewData;
+import com.criteo.publisher.model.WebViewData;
 
 public class WebViewDownloader {
 
-    private WebviewData webViewData;
+    private WebViewData webViewData;
 
-    public WebViewDownloader(WebviewData webviewData) {
+    public WebViewDownloader(WebViewData webviewData) {
         this.webViewData = webviewData;
 
     }
 
 
-    public void fillWebViewHtmlContent(String displayUrl) {
-        if (!TextUtils.isEmpty(webViewData.getContent())) {
-            webViewData.setLoaded(true);
-            return;
-        }
+    public void fillWebViewHtmlContent(String displayUrl, CriteoInterstitialAdListener listener) {
 
         webViewData.refresh();
-        new WebViewDataTask(webViewData).execute(displayUrl);
+        new WebViewDataTask(webViewData, listener).execute(displayUrl);
     }
 
-    public WebviewData getWebViewData() {
+    public WebViewData getWebViewData() {
         return webViewData;
     }
 }

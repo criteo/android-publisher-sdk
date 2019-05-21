@@ -3,12 +3,14 @@ package com.criteo.publisher.mediation.controller;
 import android.support.test.InstrumentationRegistry;
 import android.test.UiThreadTest;
 import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
+import com.criteo.publisher.mediation.utils.CriteoErrorCode;
 import com.criteo.publisher.mediation.view.CriteoInterstitialView;
-import com.criteo.publisher.model.WebviewData;
+import com.criteo.publisher.model.WebViewData;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class CriteoInterstitialEventControllerTest {
@@ -20,7 +22,13 @@ public class CriteoInterstitialEventControllerTest {
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
     @Mock
-    private CriteoInterstitialView criteoInterstitialView;
+    private CriteoInterstitialView criteoInterstitialView ;
+
+    @Mock
+    private WebViewData webViewData = new WebViewData("", false);
+
+    @Mock
+    private WebViewDownloader webViewDownloader = new WebViewDownloader(webViewData);
 
     private CriteoInterstitialEventController criteoInterstitialEventController;
 
@@ -31,43 +39,61 @@ public class CriteoInterstitialEventControllerTest {
         criteoInterstitialEventController = new CriteoInterstitialEventController(InstrumentationRegistry.getContext(),
                 criteoInterstitialView,
                 criteoInterstitialAdListener,
-                new WebViewDownloader(new WebviewData("html", true)));
+                webViewDownloader);
     }
 
     @Test
     public void TestWebViewData() {
-        criteoInterstitialEventController.getWebviewDataAsync(TEST_CREATIVE);
+        Mockito.doReturn(false).when(webViewData).isLoaded();
+        criteoInterstitialEventController = new CriteoInterstitialEventController(InstrumentationRegistry.getContext(),
+                criteoInterstitialView,
+                criteoInterstitialAdListener,
+                webViewDownloader);
+
+        criteoInterstitialEventController.getWebviewDataAsync(TEST_CREATIVE, criteoInterstitialAdListener);
 
         String data = criteoInterstitialEventController.getWebViewDataContent();
         Assert.assertFalse(data.equals(""));
         Assert.assertTrue(criteoInterstitialEventController.isAdLoaded());
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdFetchSucceededForInterstitial();
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(0))
+                .onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
     }
 
     @Test
     public void TestWebViewDataWithInvalidUrl() {
-        criteoInterstitialEventController.getWebviewDataAsync(INVALID_URL);
+        criteoInterstitialEventController.getWebviewDataAsync(INVALID_URL, criteoInterstitialAdListener);
 
         String data = criteoInterstitialEventController.getWebViewDataContent();
         Assert.assertFalse(data.equals(""));
         Assert.assertFalse(criteoInterstitialEventController.isAdLoaded());
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdFetchSucceededForInterstitial();
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(1))
+                .onAdFetchFailed(CriteoErrorCode.ERROR_CODE_INVALID_REQUEST);
     }
 
     @Test
     public void TestWebViewDataWithEmptyUrl() {
-        criteoInterstitialEventController.getWebviewDataAsync("");
+        criteoInterstitialEventController.getWebviewDataAsync("", criteoInterstitialAdListener);
 
         String data = criteoInterstitialEventController.getWebViewDataContent();
         Assert.assertFalse(data.equals(""));
         Assert.assertFalse(criteoInterstitialEventController.isAdLoaded());
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdFetchSucceededForInterstitial();
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(1))
+                .onAdFetchFailed(CriteoErrorCode.ERROR_CODE_INVALID_REQUEST);
     }
 
     @Test
     public void TestWebViewDataWithNullUrl() {
         String displayUrl = null;
-        criteoInterstitialEventController.getWebviewDataAsync(displayUrl);
+        criteoInterstitialEventController.getWebviewDataAsync(displayUrl, criteoInterstitialAdListener);
 
         String data = criteoInterstitialEventController.getWebViewDataContent();
         Assert.assertFalse(data.equals(""));
         Assert.assertFalse(criteoInterstitialEventController.isAdLoaded());
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdFetchSucceededForInterstitial();
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(1))
+                .onAdFetchFailed(CriteoErrorCode.ERROR_CODE_INVALID_REQUEST);
     }
 }
