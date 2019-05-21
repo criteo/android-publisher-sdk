@@ -12,7 +12,7 @@ public final class PubSdkNetwork {
     private PubSdkNetwork() {
     }
 
-    public static Config loadConfig(Context context, int criteoPublisherId, String appId, String sdkVersion) {
+    public static Config loadConfig(Context context, String criteoPublisherId, String appId, String sdkVersion) {
         return PubSdkApi.loadConfig(context, criteoPublisherId, appId, sdkVersion);
     }
 

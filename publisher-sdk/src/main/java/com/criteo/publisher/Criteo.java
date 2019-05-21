@@ -17,7 +17,7 @@ public final class Criteo {
     private AppEvents appEvents;
     private AppLifecycleUtil appLifecycleUtil;
 
-    public static Criteo init(Application application, List<AdUnit> adUnits, int criteoPublisherId) {
+    public static Criteo init(Application application, List<AdUnit> adUnits, String criteoPublisherId) {
         synchronized (Criteo.class) {
             if (criteo == null) {
                 criteo = new Criteo(application, adUnits, criteoPublisherId);
@@ -30,7 +30,7 @@ public final class Criteo {
         return criteo;
     }
 
-    private Criteo(Application application, List<AdUnit> adUnits, int criteoPublisherId) {
+    private Criteo(Application application, List<AdUnit> adUnits, String criteoPublisherId) {
         if (application == null) {
             throw new IllegalArgumentException("Application reference is required.");
         }
@@ -43,7 +43,7 @@ public final class Criteo {
                 throw new IllegalArgumentException("Found an invalid adUnit: " + adUnit);
             }
         }
-        if (criteoPublisherId == 0) {
+        if (TextUtils.isEmpty(criteoPublisherId)) {
             throw new IllegalArgumentException("Criteo Publisher Id is required.");
         }
         this.bidManager = new BidManager(application.getApplicationContext(), criteoPublisherId, adUnits);

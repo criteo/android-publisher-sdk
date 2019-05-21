@@ -34,10 +34,10 @@ final class PubSdkApi {
     private PubSdkApi() {
     }
 
-    static Config loadConfig(Context context, int criteoPublisherId, String appId, String sdkVersion) {
+    static Config loadConfig(Context context, String criteoPublisherId, String appId, String sdkVersion) {
 
         Map<String, String> parameters = new HashMap<>();
-        parameters.put(CRITEO_PUBLISHER_ID, String.valueOf(criteoPublisherId));
+        parameters.put(CRITEO_PUBLISHER_ID, criteoPublisherId);
         parameters.put(APP_ID, appId);
         parameters.put(SDK_VERSION, sdkVersion);
 

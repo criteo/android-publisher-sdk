@@ -125,7 +125,7 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
     }
 
     private void initialize(String serverParameter, Context context, CustomEventListener listener) {
-        int criteoPublisherId = 0;
+        String criteoPublisherId = "";
         String placementId = "";
         int width = 0;
         int height = 0;
@@ -134,7 +134,7 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
             try {
                 parameters = new JSONObject(serverParameter);
                 if (parameters.get(CRITEO_PUBLISHER_ID) != null) {
-                    criteoPublisherId = parameters.getInt(CRITEO_PUBLISHER_ID);
+                    criteoPublisherId = parameters.getString(CRITEO_PUBLISHER_ID);
                 }
                 if (parameters.get(ADUNIT) != null) {
                     JSONObject adUnit = parameters.getJSONObject(ADUNIT);
