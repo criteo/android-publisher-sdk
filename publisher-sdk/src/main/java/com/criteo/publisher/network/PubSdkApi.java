@@ -24,9 +24,7 @@ final class PubSdkApi {
 
     private static final int TIMEOUT = 60 * 1000;
     private static final String TAG = PubSdkApi.class.getSimpleName();
-    // Not changing this string to "cpId" or whatever remote config expects for now
-    // this should be done as part of https://jira.criteois.com/browse/EE-247
-    private static final String NETWORK_ID = "networkId";
+    private static final String CRITEO_PUBLISHER_ID = "cpId";
     private static final String APP_ID = "appId";
     private static final String SDK_VERSION = "sdkVersion";
     private static final String GAID = "gaid";
@@ -39,14 +37,14 @@ final class PubSdkApi {
     static Config loadConfig(Context context, int criteoPublisherId, String appId, String sdkVersion) {
 
         Map<String, String> parameters = new HashMap<>();
-        parameters.put(NETWORK_ID, String.valueOf(criteoPublisherId));
+        parameters.put(CRITEO_PUBLISHER_ID, String.valueOf(criteoPublisherId));
         parameters.put(APP_ID, appId);
         parameters.put(SDK_VERSION, sdkVersion);
 
         Config configResult = null;
         try {
             URL url = new URL(
-                    context.getString(R.string.config_url) + "/v1.0/api/config" + "?" + getParamsString(parameters));
+                    context.getString(R.string.config_url) + "/v2.0/api/config" + "?" + getParamsString(parameters));
             JSONObject result = executeGet(url);
             configResult = new Config(result);
         } catch (IOException | JSONException e) {
