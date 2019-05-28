@@ -34,7 +34,7 @@ public class CriteoInterstitialView {
 
     public void loadAd() {
         if (criteoInterstitialEventController == null) {
-            criteoInterstitialEventController = new CriteoInterstitialEventController(context, this,
+            criteoInterstitialEventController = new CriteoInterstitialEventController(
                     criteoInterstitialAdListener, new WebViewDownloader(new WebViewData()));
         }
         criteoInterstitialEventController.fetchAdAsync(adUnit);

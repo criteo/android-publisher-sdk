@@ -3,6 +3,7 @@ package com.criteo.publisher.mediation.tasks;
 
 import android.os.AsyncTask;
 import android.text.TextUtils;
+import android.webkit.URLUtil;
 import com.criteo.publisher.Util.StreamUtil;
 import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
 import com.criteo.publisher.mediation.utils.CriteoErrorCode;
@@ -29,7 +30,11 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
         String result = "";
         URL url = null;
         try {
+            if (urls.length > 0 && !URLUtil.isValidUrl(urls[0])) {
+                return "";
+            }
             url = new URL(urls[0]);
+
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
