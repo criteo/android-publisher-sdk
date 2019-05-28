@@ -39,6 +39,6 @@ public class PubSdkDemoApplication extends Application {
         interstitialAdUnit.setSize(adSizeInterstitial);
         adUnits.add(interstitialAdUnit);
 
-        Criteo.init(this, adUnits, "4916");
+        Criteo.init(this, adUnits, "B-056946");
     }
 }

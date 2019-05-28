@@ -1,7 +1,7 @@
 package com.criteo.publisher.mediation.controller;
 
-import static com.criteo.publisher.model.Config.DISPLAY_URL_MACRO;
-
+import android.content.Intent;
+import android.net.Uri;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.criteo.publisher.Criteo;
@@ -36,7 +36,9 @@ public class CriteoBannerEventController {
             criteoBannerView.setWebViewClient(new WebViewClient() {
                 @Override
                 public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                    view.loadUrl(url);
+                    view.getContext().startActivity(
+                            new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                    criteoBannerAdListener.onAdClicked();
                     return true;
                 }
 
@@ -46,7 +48,7 @@ public class CriteoBannerEventController {
             });
 
             String displayUrlWithTag = Config.MEDIATION_AD_TAG_URL;
-            String displayUrl = displayUrlWithTag.replace(DISPLAY_URL_MACRO, slot.getDisplayUrl());
+            String displayUrl = displayUrlWithTag.replace(Config.DISPLAY_URL_MACRO, slot.getDisplayUrl());
             criteoBannerView.loadDataWithBaseURL("", displayUrl, "text/html", "UTF-8", "");
         }
 

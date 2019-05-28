@@ -73,7 +73,6 @@ public class CriteoInterstitialActivity extends Activity {
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            Intent i = new Intent();
             view.getContext().startActivity(
                     new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             Bundle bundle = new Bundle();
