@@ -78,7 +78,6 @@ public class StandaloneActivity extends AppCompatActivity {
     private void interstitialAdLoad() {
         AdUnit adUnit = new AdUnit();
         adUnit.setPlacementId("/140800857/Endeavour_Interstitial_320x480");
-        adUnit.setSize(new AdSize(480, 320));
 
         criteoInterstitialView = new CriteoInterstitialView(context, adUnit);
 

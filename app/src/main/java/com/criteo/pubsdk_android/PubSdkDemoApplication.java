@@ -1,11 +1,10 @@
 package com.criteo.pubsdk_android;
 
 import android.app.Application;
-
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
-
+import com.criteo.publisher.model.InterstitialAdUnits;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,13 +30,9 @@ public class PubSdkDemoApplication extends Application {
         moPub.setSize(moPubAdSize);
         adUnits.add(moPub);
 
-        AdUnit interstitialAdUnit = new AdUnit();
-        interstitialAdUnit.setPlacementId("/140800857/Endeavour_Interstitial_320x480");
-        AdSize adSizeInterstitial = new AdSize();
-        adSizeInterstitial.setWidth(320);
-        adSizeInterstitial.setHeight(480);
-        interstitialAdUnit.setSize(adSizeInterstitial);
-        adUnits.add(interstitialAdUnit);
+        InterstitialAdUnits iAdUnits = new InterstitialAdUnits(this);
+        List<AdUnit> interstitialAdUnits = iAdUnits.createAdUnits("/140800857/Endeavour_Interstitial_320x480");
+        adUnits.addAll(interstitialAdUnits);
 
         Criteo.init(this, adUnits, "B-056946");
     }

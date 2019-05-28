@@ -2,6 +2,7 @@ package com.criteo.publisher.mediation.view;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import com.criteo.publisher.Util.CriteoResultReceiver;
@@ -21,6 +22,8 @@ public class CriteoInterstitialView {
 
     private CriteoInterstitialEventController criteoInterstitialEventController;
 
+    private int orientation = Configuration.ORIENTATION_PORTRAIT;
+
 
     public CriteoInterstitialView(Context context, AdUnit adUnit) {
         this.context = context;
@@ -37,6 +40,9 @@ public class CriteoInterstitialView {
             criteoInterstitialEventController = new CriteoInterstitialEventController(
                     criteoInterstitialAdListener, new WebViewDownloader(new WebViewData()));
         }
+        orientation = context.getResources().getConfiguration().orientation;
+        adUnit.setSizeGivenOrientation(orientation);
+
         criteoInterstitialEventController.fetchAdAsync(adUnit);
     }
 

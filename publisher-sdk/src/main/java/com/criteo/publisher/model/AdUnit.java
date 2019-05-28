@@ -1,13 +1,13 @@
 package com.criteo.publisher.model;
 
+import android.content.res.Configuration;
 import android.os.Parcel;
 import android.os.Parcelable;
-
+import com.criteo.publisher.Util.DeviceUtil;
+import java.util.Objects;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.Objects;
 
 public class AdUnit implements Parcelable {
 
@@ -30,6 +30,14 @@ public class AdUnit implements Parcelable {
 
     public void setSize(AdSize size) {
         this.adSize = size;
+    }
+
+    public void setSizeGivenOrientation(int orientation) {
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            this.adSize = DeviceUtil.getSizeLandscape();
+        } else {
+            this.adSize = DeviceUtil.getSizePortrait();
+        }
     }
 
     public JSONObject toJson() throws JSONException {
@@ -89,8 +97,12 @@ public class AdUnit implements Parcelable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         AdUnit adUnit = (AdUnit) o;
         return Objects.equals(placementId, adUnit.placementId) &&
                 Objects.equals(adSize, adUnit.adSize);

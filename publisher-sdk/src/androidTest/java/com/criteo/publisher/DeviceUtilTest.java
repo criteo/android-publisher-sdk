@@ -1,26 +1,64 @@
 package com.criteo.publisher;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
-import android.util.Log;
-
-import com.criteo.publisher.Util.DeviceUtil;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import android.content.Context;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.AndroidJUnit4;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.model.AdSize;
+import com.criteo.publisher.model.ScreenSize;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 @RunWith(AndroidJUnit4.class)
 public class DeviceUtilTest {
+
     private Context context;
+
+    private AdSize adSizeForTest = new AdSize(360, 480);
+
+    @Mock
+    private DisplayMetrics metrics;
+
+    private ArrayList<ScreenSize> screenSizesPortrait;
+
+    private ArrayList<ScreenSize> screenSizesLandscape;
+
+
+    private List<ScreenSize> screenSizes;
 
     @Before
     public void setup() {
         context = InstrumentationRegistry.getContext();
+        MockitoAnnotations.initMocks(this);
+
+        screenSizesPortrait = new ArrayList<>();
+        screenSizesPortrait.add(new ScreenSize(360, 540));
+        screenSizesPortrait.add(new ScreenSize(100, 200));
+        screenSizesPortrait.add(new ScreenSize(200, 350));
+        screenSizesPortrait.add(new ScreenSize(320, 600));
+        screenSizesPortrait.add(new ScreenSize(640, 960));
+        screenSizesPortrait.add(new ScreenSize(250, 400));
+
+        screenSizesLandscape = new ArrayList<>();
+        screenSizesLandscape.add(new ScreenSize(200, 100));
+        screenSizesLandscape.add(new ScreenSize(600, 320));
+        screenSizesLandscape.add(new ScreenSize(400, 250));
+        screenSizesLandscape.add(new ScreenSize(350, 200));
+        screenSizesLandscape.add(new ScreenSize(540, 360));
+        screenSizesLandscape.add(new ScreenSize(960, 640));
+
+
     }
 
     @Test
@@ -40,4 +78,26 @@ public class DeviceUtilTest {
         assertNotNull(DeviceUtil.getDeviceModel());
     }
 
+
+    @Test
+    public void testgetNearestAdSizeLandscape() {
+        DeviceUtil.setScreenSize(360, 692, screenSizesPortrait, screenSizesLandscape);
+        Assert.assertEquals(DeviceUtil.getSizePortrait().getWidth(), 360);
+        Assert.assertEquals(DeviceUtil.getSizePortrait().getHeight(), 540);
+        Assert.assertEquals(DeviceUtil.getSizeLandscape().getWidth(), 600);
+        Assert.assertEquals(DeviceUtil.getSizeLandscape().getHeight(), 320);
+
+        DeviceUtil.setScreenSize(120, 350, screenSizesPortrait, screenSizesLandscape);
+        Assert.assertEquals(DeviceUtil.getSizePortrait().getWidth(), 100);
+        Assert.assertEquals(DeviceUtil.getSizePortrait().getHeight(), 200);
+        Assert.assertEquals(DeviceUtil.getSizeLandscape().getWidth(), 350);
+        Assert.assertEquals(DeviceUtil.getSizeLandscape().getHeight(), 200);
+
+        DeviceUtil.setScreenSize(600, 900, screenSizesPortrait, screenSizesLandscape);
+        Assert.assertEquals(DeviceUtil.getSizePortrait().getWidth(), 360);
+        Assert.assertEquals(DeviceUtil.getSizePortrait().getHeight(), 540);
+        Assert.assertEquals(DeviceUtil.getSizeLandscape().getWidth(), 600);
+        Assert.assertEquals(DeviceUtil.getSizeLandscape().getHeight(), 320);
+
+    }
 }
