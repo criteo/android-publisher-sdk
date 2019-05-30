@@ -8,10 +8,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
-
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.Util.BannerAdUnit;
+import com.criteo.publisher.Util.InterstitialAdUnit;
 import com.criteo.publisher.model.AdSize;
-import com.criteo.publisher.model.AdUnit;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
@@ -51,12 +51,7 @@ public class DfpActivity extends AppCompatActivity {
         publisherAdView.setAdUnitId("/140800857/Endeavour_320x50");
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-        AdUnit adUnit = new AdUnit();
-        adUnit.setPlacementId("/140800857/Endeavour_320x50");
-        AdSize adSize = new AdSize();
-        adSize.setWidth(320);
-        adSize.setHeight(50);
-        adUnit.setSize(adSize);
+        BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/Endeavour_320x50" , new AdSize(50, 320));
         publisherAdView.setAdListener(new AdListener() {
             @Override
             public void onAdFailedToLoad(int i) {
@@ -64,7 +59,7 @@ public class DfpActivity extends AppCompatActivity {
                 linearLayout.setBackgroundColor(Color.TRANSPARENT);
             }
         });
-        Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
+        Criteo.getInstance().setBidsForAdUnit(builder, bannerAdUnit);
         PublisherAdRequest request = builder.build();
         publisherAdView.loadAd(request);
         linearLayout.addView(publisherAdView);
@@ -75,12 +70,7 @@ public class DfpActivity extends AppCompatActivity {
         mPublisherInterstitialAd.setAdUnitId("/140800857/Endeavour_Interstitial_320x480");
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-        AdUnit interstitialAdUnit = new AdUnit();
-        interstitialAdUnit.setPlacementId("/140800857/Endeavour_Interstitial_320x480");
-        AdSize interstitialadSize = new AdSize();
-        interstitialadSize.setWidth(320);
-        interstitialadSize.setHeight(480);
-        interstitialAdUnit.setSize(interstitialadSize);
+        InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit("/140800857/Endeavour_320x50");
         Criteo.getInstance().setBidsForAdUnit(builder, interstitialAdUnit);
         PublisherAdRequest request = builder.build();
         mPublisherInterstitialAd

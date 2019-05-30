@@ -6,7 +6,7 @@ import com.criteo.publisher.model.Slot;
 import java.util.List;
 
 public interface NetworkResponseListener {
-    void setAdUnits(List<Slot> Slots);
+    void setCacheAdUnits(List<Slot> Slots);
 
     void setConfig(Config config);
 

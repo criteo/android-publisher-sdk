@@ -7,7 +7,7 @@ import android.text.TextUtils;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.mediation.controller.CriteoBannerEventController;
 import com.criteo.publisher.mediation.controller.CriteoInterstitialEventController;
-import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.CacheAdUnit;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.mediation.MediationAdRequest;
@@ -33,7 +33,7 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
 
     private CriteoBannerEventController bannerEventController;
     private CriteoInterstitialEventController interstitialEventController;
-    private List<AdUnit> adUnits;
+    private List<CacheAdUnit> cacheAdUnits;
 
 
     /**
@@ -144,16 +144,16 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
                 }
 
                 com.criteo.publisher.model.AdSize adSize = new com.criteo.publisher.model.AdSize(width, height);
-                AdUnit adUnit = new AdUnit(adSize, placementId);
+                CacheAdUnit cacheAdUnit = new CacheAdUnit(adSize, placementId);
 
-                adUnits = new ArrayList<>();
-                adUnits.add(adUnit);
+                cacheAdUnits = new ArrayList<>();
+                cacheAdUnits.add(cacheAdUnit);
 
                 if (Criteo.getInstance() == null) {
                     //TODO: We will pass the context
-                    Criteo.init((Application) (context.getApplicationContext()), adUnits, criteoPublisherId);
+                 //   Criteo.init((Application) (context.getApplicationContext()), cacheAdUnits, criteoPublisherId);
                 } else {
-                    Criteo.getInstance().getBidForAdUnit(adUnit);
+                 //   Criteo.getInstance().getBidForAdUnit(cacheAdUnit);
                 }
 
 

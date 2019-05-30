@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
@@ -15,16 +14,18 @@ import com.criteo.publisher.Util.UserAgentCallback;
 import com.criteo.publisher.Util.UserAgentHandler;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.AdUnitHelper;
+import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.CdbDownloadTask;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class BidManager implements NetworkResponseListener, ApplicationStoppedListener {
+
     private static String MOPUB_ADVIEW_CLASS = "com.mopub.mobileads.MoPubView";
     private static String MOPUB_INTERSTITIAL_CLASS = "com.mopub.mobileads.MoPubInterstitial";
     private static String DFP_ADREQUEST_CLASS = "com.google.android.gms.ads.doubleclick.PublisherAdRequest$Builder";
@@ -32,7 +33,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private static final String CRT_DISPLAY_URL = "crt_displayUrl";
     private static final int SECOND_TO_MILLI = 1000;
     private static final int PROFILE_ID = 235;
-    private final List<AdUnit> adUnits;
+    private final List<CacheAdUnit> cacheAdUnits;
     private final Context mContext;
     private final SdkCache cache;
     private final Publisher publisher;
@@ -42,9 +43,9 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private Config config;
     private String userAgent;
 
-    BidManager(Context context, String criteoPublisherId, List<AdUnit> adUnits) {
+    BidManager(Context context, String criteoPublisherId, List<CacheAdUnit> cacheAdUnits) {
         this.mContext = context;
-        this.adUnits = adUnits;
+        this.cacheAdUnits = cacheAdUnits;
         this.cache = new SdkCache();
         publisher = new Publisher(mContext);
         publisher.setCriteoPublisherId(criteoPublisherId);
@@ -55,21 +56,21 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     /**
      * load data for next time
      */
-    private void prefetch(boolean callConfig, String userAgent, AdUnit adUnit) {
-        List<AdUnit> prefetchAdUnits = new ArrayList<AdUnit>();
-        prefetchAdUnits.add(adUnit);
+    private void prefetch(boolean callConfig, String userAgent, CacheAdUnit cacheAdUnit) {
+        List<CacheAdUnit> prefetchCacheAdUnits = new ArrayList<CacheAdUnit>();
+        prefetchCacheAdUnits.add(cacheAdUnit);
         if (cdbDownloadTask != null && cdbDownloadTask.getStatus() != AsyncTask.Status.RUNNING &&
                 cdbTimeToNextCall < System.currentTimeMillis()) {
-            startCdbDownloadTask(callConfig, prefetchAdUnits);
+            startCdbDownloadTask(callConfig, prefetchCacheAdUnits);
         }
     }
 
     /**
      * Method to start new CdbDownload Asynctask
      */
-    void startCdbDownloadTask(boolean callConfig, List<AdUnit> prefetchAdUnits) {
+    void startCdbDownloadTask(boolean callConfig, List<CacheAdUnit> prefetchCacheAdUnits) {
         cdbDownloadTask = new CdbDownloadTask(mContext, this, callConfig, userAgent);
-        cdbDownloadTask.execute(PROFILE_ID, user, publisher, prefetchAdUnits);
+        cdbDownloadTask.execute(PROFILE_ID, user, publisher, prefetchCacheAdUnits);
     }
 
 
@@ -103,14 +104,18 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         Slot slot = getBidForAdUnitAndPrefetch(adUnit);
         if (slot != null) {
             ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", CRT_CPM, slot.getCpm());
-            ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", CRT_DISPLAY_URL, DeviceUtil.createDfpCompatibleDisplayUrl(slot.getDisplayUrl()));
+            ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", CRT_DISPLAY_URL,
+                    DeviceUtil.createDfpCompatibleDisplayUrl(slot.getDisplayUrl()));
         }
     }
 
     Slot getBidForAdUnitAndPrefetch(AdUnit adUnit) {
-        Slot peekSlot = cache.peekAdUnit(adUnit.getPlacementId(), adUnit.getSize().getFormattedSize());
+        CacheAdUnit cacheAdUnit = AdUnitHelper
+                .convertoCacheAdUnit(adUnit, mContext.getResources().getConfiguration().orientation);
+
+        Slot peekSlot = cache.peekAdUnit(cacheAdUnit.getPlacementId(), cacheAdUnit.getSize().getFormattedSize());
         if (peekSlot == null) {
-            prefetch(false, userAgent, adUnit);
+            prefetch(false, userAgent, cacheAdUnit);
             return null;
         }
         float cpm = Float.valueOf(peekSlot.getCpm());
@@ -119,9 +124,9 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         //If cpm and ttl in slot are 0:
         // Prefetch from CDB and do not update request;
         if (cpm == 0 && ttl == 0) {
-            cache.remove(adUnit.getPlacementId(),
-                    adUnit.getSize().getFormattedSize());
-            prefetch(false, userAgent, adUnit);
+            cache.remove(cacheAdUnit.getPlacementId(),
+                    cacheAdUnit.getSize().getFormattedSize());
+            prefetch(false, userAgent, cacheAdUnit);
             return null;
         }
         //If cpm is 0, ttl in slot > 0
@@ -131,9 +136,9 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             return null;
         } else {
             //If cpm > 0, ttl > 0 but we are done staying silent
-            Slot slot = cache.getAdUnit(adUnit.getPlacementId(),
-                    adUnit.getSize().getFormattedSize());
-            prefetch(false, userAgent, adUnit);
+            Slot slot = cache.getAdUnit(cacheAdUnit.getPlacementId(),
+                    cacheAdUnit.getSize().getFormattedSize());
+            prefetch(false, userAgent, cacheAdUnit);
             return slot;
         }
 
@@ -141,7 +146,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
 
     @Override
-    public void setAdUnits(List<Slot> slots) {
+    public void setCacheAdUnits(List<Slot> slots) {
         cache.addAll(slots);
     }
 
@@ -173,7 +178,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             @Override
             public void done(String useragent) {
                 userAgent = useragent;
-                startCdbDownloadTask(true, adUnits);
+                startCdbDownloadTask(true, cacheAdUnits);
 
             }
         });

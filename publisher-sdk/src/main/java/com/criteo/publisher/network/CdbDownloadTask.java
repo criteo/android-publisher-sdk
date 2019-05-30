@@ -9,7 +9,7 @@ import com.criteo.publisher.BuildConfig;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.HostAppUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
-import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Publisher;
@@ -42,8 +42,8 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         int profile = (Integer) objects[0];
         User user = (User) objects[1];
         Publisher publisher = (Publisher) objects[2];
-        ArrayList<AdUnit> adUnits = (ArrayList<AdUnit>) objects[3];
-        if (profile <= 0 || adUnits.size() == 0) {
+        ArrayList<CacheAdUnit> cacheAdUnits = (ArrayList<CacheAdUnit>) objects[3];
+        if (profile <= 0 || cacheAdUnits.size() == 0) {
             return null;
         }
         if (DeviceUtil.hasPlayServices(mContext)) {
@@ -63,7 +63,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
             }
         }
         Cdb cdbRequest = new Cdb();
-        cdbRequest.setAdUnits(adUnits);
+        cdbRequest.setCacheAdUnits(cacheAdUnits);
         cdbRequest.setUser(user);
         cdbRequest.setPublisher(publisher);
         cdbRequest.setSdkVersion(String.valueOf(BuildConfig.VERSION_NAME));
@@ -90,7 +90,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         super.onPostExecute(networkResult);
         if (responseListener != null && networkResult != null) {
             if (networkResult.getCdb() != null) {
-                responseListener.setAdUnits(networkResult.getCdb().getSlots());
+                responseListener.setCacheAdUnits(networkResult.getCdb().getSlots());
                 responseListener.setTimeToNextCall(networkResult.getCdb().getTimeToNextCall());
             }
             if (networkResult.getConfig() != null) {

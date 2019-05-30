@@ -2,14 +2,14 @@ package com.criteo.publisher.mediation.view;
 
 import android.content.Context;
 import android.webkit.WebView;
+import com.criteo.publisher.Util.BannerAdUnit;
 import com.criteo.publisher.mediation.controller.CriteoBannerEventController;
 import com.criteo.publisher.mediation.listeners.CriteoBannerAdListener;
-import com.criteo.publisher.model.AdUnit;
 import java.lang.ref.WeakReference;
 
 public class CriteoBannerView extends WebView {
 
-    private AdUnit adUnit;
+    private BannerAdUnit bannerAdUnit;
 
     private CriteoBannerAdListener criteoBannerAdListener;
 
@@ -18,9 +18,9 @@ public class CriteoBannerView extends WebView {
     private CriteoBannerEventController criteoBannerEventController;
 
 
-    public CriteoBannerView(Context context, AdUnit adUnit) {
+    public CriteoBannerView(Context context, BannerAdUnit bannerAdUnit) {
         super(context);
-        this.adUnit = adUnit;
+        this.bannerAdUnit = bannerAdUnit;
 
 
     }
@@ -34,7 +34,7 @@ public class CriteoBannerView extends WebView {
         if (criteoBannerEventController == null) {
             criteoBannerEventController = new CriteoBannerEventController(this, criteoBannerAdListener);
         }
-        criteoBannerEventController.fetchAdAsync(adUnit);
+        criteoBannerEventController.fetchAdAsync(bannerAdUnit);
     }
 
 }

@@ -18,17 +18,17 @@ public class AdUnitTest {
     private static final int HEIGHT = 10;
     private static final int WIDTH = 350;
     private AdSize adSize;
-    private AdUnit adUnit;
+    private CacheAdUnit cacheAdUnit;
 
     @Before
     public void initialize() {
         adSize = new AdSize(HEIGHT, WIDTH);
-        adUnit = new AdUnit(adSize, PLACEMENT_ID_VALUE);
+        cacheAdUnit = new CacheAdUnit(adSize, PLACEMENT_ID_VALUE);
     }
 
     @Test
     public void testAdUnitJsonObject() throws JSONException {
-        JSONObject adUnitJson = adUnit.toJson();
+        JSONObject adUnitJson = cacheAdUnit.toJson();
         assertEquals(PLACEMENT_ID_VALUE, adUnitJson.get(PLACEMENT_ID));
         JSONArray adUnitSizes = (JSONArray) adUnitJson.get(SIZES);
         assertEquals(adSize.getFormattedSize(), adUnitSizes.getString(0));
@@ -36,8 +36,8 @@ public class AdUnitTest {
 
     @Test
     public void testAdUnitJsonObjectWhenParametersAreNull() throws JSONException {
-        AdUnit adUnit = new AdUnit();
-        JSONObject adUnitJson = adUnit.toJson();
+        CacheAdUnit cacheAdUnit = new CacheAdUnit();
+        JSONObject adUnitJson = cacheAdUnit.toJson();
         assertFalse(adUnitJson.has(PLACEMENT_ID));
         assertFalse(adUnitJson.has(SIZES));
     }
@@ -45,10 +45,10 @@ public class AdUnitTest {
     @Test
     public void testAdUnitParcelable() {
         Parcel parcel = Parcel.obtain();
-        adUnit.writeToParcel(parcel, adUnit.describeContents());
+        cacheAdUnit.writeToParcel(parcel, cacheAdUnit.describeContents());
         parcel.setDataPosition(0);
-        AdUnit adUnitFromParcel = AdUnit.CREATOR.createFromParcel(parcel);
-        assertEquals(adUnit, adUnitFromParcel);
+        CacheAdUnit cacheAdUnitFromParcel = CacheAdUnit.CREATOR.createFromParcel(parcel);
+        assertEquals(cacheAdUnit, cacheAdUnitFromParcel);
     }
 
 }

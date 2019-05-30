@@ -21,7 +21,7 @@ public class Cdb implements Parcelable {
     private static final String TIME_TO_NEXT_CALL = "timeToNextCall";
     private static final String SLOTS = "slots";
     private List<Slot> slots;
-    private List<AdUnit> adUnits;
+    private List<CacheAdUnit> cacheAdUnits;
     private Publisher publisher;
     private User user;
     private String sdkVersion;
@@ -74,12 +74,12 @@ public class Cdb implements Parcelable {
         this.slots = slots;
     }
 
-    public List<AdUnit> getAdUnits() {
-        return adUnits;
+    public List<CacheAdUnit> getCacheAdUnits() {
+        return cacheAdUnits;
     }
 
-    public void setAdUnits(ArrayList<AdUnit> adUnits) {
-        this.adUnits = adUnits;
+    public void setCacheAdUnits(ArrayList<CacheAdUnit> cacheAdUnits) {
+        this.cacheAdUnits = cacheAdUnits;
     }
 
     public Publisher getPublisher() {
@@ -136,8 +136,8 @@ public class Cdb implements Parcelable {
         json.put(PROFILE_ID, profileId);
 
         JSONArray jsonAdUnits = new JSONArray();
-        for (AdUnit adUnit : adUnits) {
-            jsonAdUnits.put(adUnit.toJson());
+        for (CacheAdUnit cacheAdUnit : cacheAdUnits) {
+            jsonAdUnits.put(cacheAdUnit.toJson());
         }
         if (jsonAdUnits.length() > 0) {
             json.put(SLOTS, jsonAdUnits);
@@ -156,7 +156,6 @@ public class Cdb implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeTypedList(this.slots);
-        dest.writeTypedList(this.adUnits);
         dest.writeParcelable(this.publisher, flags);
         dest.writeParcelable(this.user, flags);
         dest.writeString(this.sdkVersion);
@@ -165,7 +164,6 @@ public class Cdb implements Parcelable {
 
     protected Cdb(Parcel in) {
         this.slots = in.createTypedArrayList(Slot.CREATOR);
-        this.adUnits = in.createTypedArrayList(AdUnit.CREATOR);
         this.publisher = in.readParcelable(Publisher.class.getClassLoader());
         this.user = in.readParcelable(User.class.getClassLoader());
         this.sdkVersion = in.readString();

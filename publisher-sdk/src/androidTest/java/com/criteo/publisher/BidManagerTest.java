@@ -6,7 +6,7 @@ import android.support.test.runner.AndroidJUnit4;
 import android.test.UiThreadTest;
 
 import com.criteo.publisher.model.AdSize;
-import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Slot;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 
@@ -34,20 +34,20 @@ public class BidManagerTest {
     @Test
     @UiThreadTest
     public void testSilentMode() {
-        AdUnit adUnit = new AdUnit();
-        adUnit.setPlacementId("/140800857/Endeavour_320x50");
+        CacheAdUnit cacheAdUnit = new CacheAdUnit();
+        cacheAdUnit.setPlacementId("/140800857/Endeavour_320x50");
         AdSize adSize = new AdSize();
         adSize.setWidth(320);
         adSize.setHeight(50);
-        adUnit.setSize(adSize);
+        cacheAdUnit.setSize(adSize);
 
         BidManager manager = getInitManager();
         manager.setTimeToNextCall(1000);
 
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-        manager.enrichBid(builder, adUnit);
+        manager.enrichBid(builder, cacheAdUnit);
         PublisherAdRequest.Builder builderUpdate = new PublisherAdRequest.Builder();
-        manager.enrichBid(builderUpdate, adUnit);
+        manager.enrichBid(builderUpdate, cacheAdUnit);
         PublisherAdRequest request = builderUpdate.build();
         assertNull(request.getCustomTargeting().getString("crt_displayUrl"));
     }
@@ -55,14 +55,14 @@ public class BidManagerTest {
     @Test
     @UiThreadTest
     public void testSilentModeSlotZeroTtlZeroCPM() {
-        List<AdUnit> adUnits = new ArrayList<>();
-        AdUnit adUnit = new AdUnit();
-        adUnit.setPlacementId("/140800857/Endeavour_320x50");
+        List<CacheAdUnit> cacheAdUnits = new ArrayList<>();
+        CacheAdUnit cacheAdUnit = new CacheAdUnit();
+        cacheAdUnit.setPlacementId("/140800857/Endeavour_320x50");
         AdSize adSize = new AdSize();
         adSize.setWidth(320);
         adSize.setHeight(50);
-        adUnit.setSize(adSize);
-        adUnits.add(adUnit);
+        cacheAdUnit.setSize(adSize);
+        cacheAdUnits.add(cacheAdUnit);
         Slot slot1 = new Slot();
         slot1.setPlacementId("/140800857/Endeavour_320x50");
         slot1.setHeight(50);
@@ -72,11 +72,11 @@ public class BidManagerTest {
         slot1.setTtl(0);
         List<Slot> slots = new ArrayList<>();
         slots.add(slot1);
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, adUnits);
-        manager.setAdUnits(slots);
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, cacheAdUnits);
+        manager.setCacheAdUnits(slots);
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-        manager.enrichBid(builder, adUnit);
-        manager.enrichBid(builder, adUnit);
+        manager.enrichBid(builder, cacheAdUnit);
+        manager.enrichBid(builder, cacheAdUnit);
         PublisherAdRequest request = builder.build();
         assertNull(request.getCustomTargeting().getString("crt_displayUrl"));
     }
@@ -84,15 +84,15 @@ public class BidManagerTest {
     @Test
     @UiThreadTest
     public void testSilentModeSlotZeroCpmNonZeroTtl() {
-        List<AdUnit> adUnits = new ArrayList<>();
-        AdUnit adUnit = new AdUnit();
-        adUnit.setPlacementId("/140800857/Endeavour_320x50");
+        List<CacheAdUnit> cacheAdUnits = new ArrayList<>();
+        CacheAdUnit cacheAdUnit = new CacheAdUnit();
+        cacheAdUnit.setPlacementId("/140800857/Endeavour_320x50");
         AdSize adSize = new AdSize();
         adSize.setWidth(320);
         adSize.setHeight(50);
-        adUnit.setSize(adSize);
-        adUnits.add(adUnit);
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, adUnits);
+        cacheAdUnit.setSize(adSize);
+        cacheAdUnits.add(cacheAdUnit);
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, cacheAdUnits);
         List<Slot> slots = new ArrayList<>();
         Slot slot1 = new Slot();
         slot1.setPlacementId("/140800857/Endeavour_320x50");
@@ -103,10 +103,10 @@ public class BidManagerTest {
         slot1.setTimeOfDownload(System.currentTimeMillis());
         slot1.setTtl(10);
         slots.add(slot1);
-        manager.setAdUnits(slots);
+        manager.setCacheAdUnits(slots);
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-        manager.enrichBid(builder, adUnit);
-        manager.enrichBid(builder, adUnit);
+        manager.enrichBid(builder, cacheAdUnit);
+        manager.enrichBid(builder, cacheAdUnit);
         PublisherAdRequest request = builder.build();
         assertNull(request.getCustomTargeting().getString("crt_displayUrl"));
         try {
@@ -114,7 +114,7 @@ public class BidManagerTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        manager.enrichBid(builder, adUnit);
+        manager.enrichBid(builder, cacheAdUnit);
         request = builder.build();
         assertNotNull(request.getCustomTargeting().getString("crt_displayUrl"));
     }
@@ -122,15 +122,15 @@ public class BidManagerTest {
     @Test
     @UiThreadTest
     public void testPrefetch() {
-        List<AdUnit> adUnits = new ArrayList<>();
-        AdUnit adUnit = new AdUnit();
-        adUnit.setPlacementId("/140800857/Endeavour_320x50");
+        List<CacheAdUnit> cacheAdUnits = new ArrayList<>();
+        CacheAdUnit cacheAdUnit = new CacheAdUnit();
+        cacheAdUnit.setPlacementId("/140800857/Endeavour_320x50");
         AdSize adSize = new AdSize();
         adSize.setWidth(320);
         adSize.setHeight(50);
-        adUnit.setSize(adSize);
-        adUnits.add(adUnit);
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, adUnits);
+        cacheAdUnit.setSize(adSize);
+        cacheAdUnits.add(cacheAdUnit);
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, cacheAdUnits);
         List<Slot> slots = new ArrayList<>();
         Slot slot1 = new Slot();
         slot1.setPlacementId("/140800857/Endeavour_320x50");
@@ -141,9 +141,9 @@ public class BidManagerTest {
         slot1.setTimeOfDownload(System.currentTimeMillis());
         slot1.setTtl(0);
         slots.add(slot1);
-        manager.setAdUnits(slots);
+        manager.setCacheAdUnits(slots);
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-        manager.enrichBid(builder, adUnit);
+        manager.enrichBid(builder, cacheAdUnit);
         PublisherAdRequest request =builder.build();
         assertNull(request.getCustomTargeting().getString("crt_displayUrl"));
         try {
@@ -162,8 +162,8 @@ public class BidManagerTest {
         slot2.setTimeOfDownload(System.currentTimeMillis());
         slot2.setTtl(0);
         slots.add(slot2);
-        manager.setAdUnits(slots);
-        manager.enrichBid(builder, adUnit);
+        manager.setCacheAdUnits(slots);
+        manager.enrichBid(builder, cacheAdUnit);
         request =builder.build();
         assertNotNull(request.getCustomTargeting().getString("crt_displayUrl"));
 
@@ -173,14 +173,14 @@ public class BidManagerTest {
     @Test
     @UiThreadTest
     public void testBidNoSilentMode() {
-        List<AdUnit> adUnits = new ArrayList<>();
-        AdUnit adUnit = new AdUnit();
-        adUnit.setPlacementId("/140800857/Endeavour_320x50");
+        List<CacheAdUnit> cacheAdUnits = new ArrayList<>();
+        CacheAdUnit cacheAdUnit = new CacheAdUnit();
+        cacheAdUnit.setPlacementId("/140800857/Endeavour_320x50");
         AdSize adSize = new AdSize();
         adSize.setWidth(320);
         adSize.setHeight(50);
-        adUnit.setSize(adSize);
-        adUnits.add(adUnit);
+        cacheAdUnit.setSize(adSize);
+        cacheAdUnits.add(cacheAdUnit);
         //mocking request
         Slot bannerSlot = new Slot();
         bannerSlot.setPlacementId("/140800857/Endeavour_320x50");
@@ -192,9 +192,9 @@ public class BidManagerTest {
         List<Slot> slots = new ArrayList<>();
         slots.add(bannerSlot);
 
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, adUnits);
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, cacheAdUnits);
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-        manager.enrichBid(builder, adUnit);
+        manager.enrichBid(builder, cacheAdUnit);
         PublisherAdRequest request = builder.build();
         assertNull(request.getCustomTargeting().getString("crt_displayUrl"));
     }
@@ -202,14 +202,14 @@ public class BidManagerTest {
     //TODO test for getBidForAdUnitAndPrefetch , clear the cache and check whats happening
 
     private BidManager getInitManager() {
-        List<AdUnit> adUnits = new ArrayList<>();
-        AdUnit adUnit = new AdUnit();
-        adUnit.setPlacementId("/140800857/Endeavour_320x50");
+        List<CacheAdUnit> cacheAdUnits = new ArrayList<>();
+        CacheAdUnit cacheAdUnit = new CacheAdUnit();
+        cacheAdUnit.setPlacementId("/140800857/Endeavour_320x50");
         AdSize adSize = new AdSize();
         adSize.setWidth(320);
         adSize.setHeight(50);
-        adUnit.setSize(adSize);
-        adUnits.add(adUnit);
+        cacheAdUnit.setSize(adSize);
+        cacheAdUnits.add(cacheAdUnit);
         Slot bannerSlot = new Slot();
         bannerSlot.setPlacementId("/140800857/Endeavour_320x50");
         bannerSlot.setHeight(50);
@@ -218,13 +218,13 @@ public class BidManagerTest {
         bannerSlot.setDisplayUrl(TEST_CREATIVE);
         bannerSlot.setTtl(0);
 
-        AdUnit interstitialAdUnit = new AdUnit();
-        interstitialAdUnit.setPlacementId("/140800857/Endeavour_Interstitial_320x480");
+        CacheAdUnit interstitialCacheAdUnit = new CacheAdUnit();
+        interstitialCacheAdUnit.setPlacementId("/140800857/Endeavour_Interstitial_320x480");
         AdSize adSizeInterstitial = new AdSize();
         adSizeInterstitial.setWidth(320);
         adSizeInterstitial.setHeight(480);
-        interstitialAdUnit.setSize(adSizeInterstitial);
-        adUnits.add(interstitialAdUnit);
+        interstitialCacheAdUnit.setSize(adSizeInterstitial);
+        cacheAdUnits.add(interstitialCacheAdUnit);
 
         Slot interstitialSlot = new Slot();
         interstitialSlot.setPlacementId("/140800857/Endeavour_Interstitial_320x480");
@@ -239,9 +239,9 @@ public class BidManagerTest {
         slots.add(interstitialSlot);
 
         //initializing with adunits
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, adUnits);
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, cacheAdUnits);
         //mocking response by setting slots
-        manager.setAdUnits(slots);
+        manager.setCacheAdUnits(slots);
         return manager;
     }
 

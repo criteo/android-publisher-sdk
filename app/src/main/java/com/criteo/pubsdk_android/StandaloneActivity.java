@@ -10,10 +10,11 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import com.criteo.mediation.listener.CriteoBannerEventListenerImpl;
 import com.criteo.mediation.listener.CriteoInterstitialEventListenerImpl;
+import com.criteo.publisher.Util.BannerAdUnit;
+import com.criteo.publisher.Util.InterstitialAdUnit;
 import com.criteo.publisher.mediation.view.CriteoBannerView;
 import com.criteo.publisher.mediation.view.CriteoInterstitialView;
 import com.criteo.publisher.model.AdSize;
-import com.criteo.publisher.model.AdUnit;
 import com.google.android.gms.ads.mediation.customevent.CustomEventBannerListener;
 import com.google.android.gms.ads.mediation.customevent.CustomEventInterstitialListener;
 
@@ -45,10 +46,8 @@ public class StandaloneActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 adLayout.removeAllViews();
-                AdUnit adUnit = new AdUnit();
-                adUnit.setPlacementId("/140800857/Endeavour_320x50");
-                adUnit.setSize(new AdSize(50, 320));
-                criteoBannerView = new CriteoBannerView(context, adUnit);
+                BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(50, 320));
+                criteoBannerView = new CriteoBannerView(context, bannerAdUnit);
                 CriteoBannerEventListenerImpl criteoBannerEventListener = new CriteoBannerEventListenerImpl(
                         customEventBannerListener,
                         criteoBannerView);
@@ -76,10 +75,8 @@ public class StandaloneActivity extends AppCompatActivity {
     }
 
     private void interstitialAdLoad() {
-        AdUnit adUnit = new AdUnit();
-        adUnit.setPlacementId("/140800857/Endeavour_Interstitial_320x480");
-
-        criteoInterstitialView = new CriteoInterstitialView(context, adUnit);
+        InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit("/140800857/Endeavour_Interstitial_320x480");
+        criteoInterstitialView = new CriteoInterstitialView(context, interstitialAdUnit);
 
         CriteoInterstitialEventListenerImpl criteoInterstitialEventListener = new CriteoInterstitialEventListenerImpl(
                 customEventInterstitialListener, criteoInterstitialView);

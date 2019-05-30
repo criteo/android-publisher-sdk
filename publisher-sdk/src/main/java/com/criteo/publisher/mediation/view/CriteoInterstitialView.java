@@ -6,15 +6,17 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import com.criteo.publisher.Util.CriteoResultReceiver;
+import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.Util.InterstitialAdUnit;
 import com.criteo.publisher.mediation.controller.CriteoInterstitialEventController;
 import com.criteo.publisher.mediation.controller.WebViewDownloader;
 import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
-import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.WebViewData;
 
 public class CriteoInterstitialView {
 
-    private AdUnit adUnit;
+    private InterstitialAdUnit interstitialAdUnit;
 
     private Context context;
 
@@ -22,12 +24,10 @@ public class CriteoInterstitialView {
 
     private CriteoInterstitialEventController criteoInterstitialEventController;
 
-    private int orientation = Configuration.ORIENTATION_PORTRAIT;
 
-
-    public CriteoInterstitialView(Context context, AdUnit adUnit) {
+    public CriteoInterstitialView(Context context, InterstitialAdUnit interstitialAdUnit) {
         this.context = context;
-        this.adUnit = adUnit;
+        this.interstitialAdUnit = interstitialAdUnit;
     }
 
     public void setCriteoInterstitialAdListener(CriteoInterstitialAdListener criteoInterstitialAdListener) {
@@ -40,10 +40,8 @@ public class CriteoInterstitialView {
             criteoInterstitialEventController = new CriteoInterstitialEventController(
                     criteoInterstitialAdListener, new WebViewDownloader(new WebViewData()));
         }
-        orientation = context.getResources().getConfiguration().orientation;
-        adUnit.setSizeGivenOrientation(orientation);
 
-        criteoInterstitialEventController.fetchAdAsync(adUnit);
+        criteoInterstitialEventController.fetchAdAsync(interstitialAdUnit);
     }
 
     public boolean isAdLoaded() {

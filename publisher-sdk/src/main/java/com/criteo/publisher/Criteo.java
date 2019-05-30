@@ -1,13 +1,19 @@
 package com.criteo.publisher;
 
 import android.app.Application;
+import android.content.Context;
 import android.text.TextUtils;
-
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.Util.AppLifecycleUtil;
+import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.AdUnitHelper;
+import com.criteo.publisher.model.CacheAdUnit;
+import com.criteo.publisher.model.ScreenSize;
 import com.criteo.publisher.model.Slot;
-
+import java.util.ArrayList;
 import java.util.List;
 
 public final class Criteo {
@@ -37,16 +43,21 @@ public final class Criteo {
         if (adUnits == null || adUnits.size() == 0) {
             throw new IllegalArgumentException("AdUnits are required.");
         }
-        for (AdUnit adUnit : adUnits) {
-            if (TextUtils.isEmpty(adUnit.getPlacementId()) || adUnit.getSize() == null
-                    || adUnit.getSize().getWidth() <= 0 || adUnit.getSize().getHeight() <= 0) {
-                throw new IllegalArgumentException("Found an invalid adUnit: " + adUnit);
+
+        createSupportedScreenSizes(application);
+        List<CacheAdUnit> cacheAdUnits = AdUnitHelper.convertAdUnits(adUnits);
+
+        for (CacheAdUnit cacheAdUnit : cacheAdUnits) {
+            if (TextUtils.isEmpty(cacheAdUnit.getPlacementId()) || cacheAdUnit.getSize() == null
+                    || cacheAdUnit.getSize().getWidth() <= 0 || cacheAdUnit.getSize().getHeight() <= 0) {
+                throw new IllegalArgumentException("Found an invalid AdUnit: " + cacheAdUnit);
             }
         }
         if (TextUtils.isEmpty(criteoPublisherId)) {
             throw new IllegalArgumentException("Criteo Publisher Id is required.");
         }
-        this.bidManager = new BidManager(application.getApplicationContext(), criteoPublisherId, adUnits);
+
+        this.bidManager = new BidManager(application.getApplicationContext(), criteoPublisherId, cacheAdUnits);
         this.appEvents = new AppEvents(application.getApplicationContext());
         this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
         bidManager.prefetch();
@@ -61,6 +72,28 @@ public final class Criteo {
      */
     public Slot getBidForAdUnit(AdUnit adUnit) {
         return bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    }
+
+    private void createSupportedScreenSizes(Application application) {
+
+        ArrayList<ScreenSize> screenSizesPortrait = new ArrayList<>();
+        screenSizesPortrait.add(new ScreenSize(320, 480));
+        screenSizesPortrait.add(new ScreenSize(360, 640));
+
+        ArrayList<ScreenSize> screenSizesLandscape = new ArrayList<>();
+        screenSizesLandscape.add(new ScreenSize(480, 320));
+        screenSizesLandscape.add(new ScreenSize(640, 360));
+
+        try {
+            DisplayMetrics metrics = new DisplayMetrics();
+            ((WindowManager) application.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()
+                    .getMetrics(metrics);
+            DeviceUtil.setScreenSize(Math.round(metrics.widthPixels / metrics.density),
+                    Math.round(metrics.heightPixels / metrics.density), screenSizesPortrait,
+                    screenSizesLandscape);
+        } catch (Exception e) {
+            throw new Error("Screen parameters can not be empty or null");
+        }
     }
 
 }
