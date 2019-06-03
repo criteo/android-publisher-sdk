@@ -34,21 +34,4 @@ public class AdUnitTest {
         assertEquals(adSize.getFormattedSize(), adUnitSizes.getString(0));
     }
 
-    @Test
-    public void testAdUnitJsonObjectWhenParametersAreNull() throws JSONException {
-        CacheAdUnit cacheAdUnit = new CacheAdUnit();
-        JSONObject adUnitJson = cacheAdUnit.toJson();
-        assertFalse(adUnitJson.has(PLACEMENT_ID));
-        assertFalse(adUnitJson.has(SIZES));
-    }
-
-    @Test
-    public void testAdUnitParcelable() {
-        Parcel parcel = Parcel.obtain();
-        cacheAdUnit.writeToParcel(parcel, cacheAdUnit.describeContents());
-        parcel.setDataPosition(0);
-        CacheAdUnit cacheAdUnitFromParcel = CacheAdUnit.CREATOR.createFromParcel(parcel);
-        assertEquals(cacheAdUnit, cacheAdUnitFromParcel);
-    }
-
 }

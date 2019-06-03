@@ -4,9 +4,11 @@ import android.app.Application;
 import android.support.test.InstrumentationRegistry;
 import android.test.UiThreadTest;
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.Util.InterstitialAdUnit;
 import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
 import com.criteo.publisher.mediation.utils.CriteoErrorCode;
 import com.criteo.publisher.model.AdSize;
+import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CacheAdUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,17 +29,15 @@ public class CriteoInterstitialViewTest {
     @UiThreadTest
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        CacheAdUnit cacheAdUnit = new CacheAdUnit();
-        cacheAdUnit.setPlacementId("/140800857/None");
-        cacheAdUnit.setSize(new AdSize(480, 320));
-        List<CacheAdUnit> cacheAdUnits = new ArrayList<>();
-        cacheAdUnits.add(cacheAdUnit);
+        InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit("/140800857/None");
+        List<AdUnit> cacheAdUnits = new ArrayList<>();
+        cacheAdUnits.add(interstitialAdUnit);
         Application app =
                 (Application) InstrumentationRegistry
                         .getTargetContext()
                         .getApplicationContext();
         Criteo.init(app, cacheAdUnits, "4916");
-        criteoInterstitialView = new CriteoInterstitialView(InstrumentationRegistry.getContext(), cacheAdUnit);
+        criteoInterstitialView = new CriteoInterstitialView(InstrumentationRegistry.getContext(), interstitialAdUnit);
         criteoInterstitialView.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
     }
 
