@@ -2,16 +2,13 @@ package com.criteo.publisher.mediation.view;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import com.criteo.publisher.Util.CriteoResultReceiver;
-import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.InterstitialAdUnit;
+import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.mediation.controller.CriteoInterstitialEventController;
 import com.criteo.publisher.mediation.controller.WebViewDownloader;
 import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
-import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.WebViewData;
 
 public class CriteoInterstitialView {

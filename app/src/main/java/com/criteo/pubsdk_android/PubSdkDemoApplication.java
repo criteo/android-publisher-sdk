@@ -2,8 +2,8 @@ package com.criteo.pubsdk_android;
 
 import android.app.Application;
 import com.criteo.publisher.Criteo;
-import com.criteo.publisher.Util.BannerAdUnit;
-import com.criteo.publisher.Util.InterstitialAdUnit;
+import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import java.util.ArrayList;

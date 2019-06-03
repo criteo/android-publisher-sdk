@@ -1,7 +1,7 @@
-package com.criteo.publisher.Util;
+package com.criteo.publisher.model;
 
 
-import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.Util.AdUnitType;
 
 public final class InterstitialAdUnit extends AdUnit {
 

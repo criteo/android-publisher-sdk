@@ -10,8 +10,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import com.criteo.mediation.listener.CriteoBannerEventListenerImpl;
 import com.criteo.mediation.listener.CriteoInterstitialEventListenerImpl;
-import com.criteo.publisher.Util.BannerAdUnit;
-import com.criteo.publisher.Util.InterstitialAdUnit;
+import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.mediation.view.CriteoBannerView;
 import com.criteo.publisher.mediation.view.CriteoInterstitialView;
 import com.criteo.publisher.model.AdSize;
@@ -75,6 +75,8 @@ public class StandaloneActivity extends AppCompatActivity {
     }
 
     private void interstitialAdLoad() {
+
+
         InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit("/140800857/Endeavour_Interstitial_320x480");
         criteoInterstitialView = new CriteoInterstitialView(context, interstitialAdUnit);
 

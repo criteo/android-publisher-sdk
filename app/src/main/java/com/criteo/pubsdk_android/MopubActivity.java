@@ -10,7 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import com.criteo.publisher.Criteo;
-import com.criteo.publisher.Util.BannerAdUnit;
+import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.AdSize;
 import com.mopub.common.MoPub;
 import com.mopub.common.SdkConfiguration;

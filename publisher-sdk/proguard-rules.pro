@@ -45,12 +45,29 @@
 -keepclassmembers class com.criteo.publisher.Criteo {
    public *;
 }
+
+-keep public class com.criteo.publisher.mediation.view.CriteoBannerView
+-keepclassmembers class com.criteo.publisher.mediation.view.CriteoBannerView {
+   public *;
+}
+
+-keep public class com.criteo.publisher.mediation.view.CriteoInterstitialView
+-keepclassmembers class com.criteo.publisher.mediation.view.CriteoInterstitialView {
+   public *;
+}
+
 -keep public class com.criteo.publisher.model.AdSize
 -keepclassmembers class com.criteo.publisher.model.AdSize {
    public *;
 }
--keep public class com.criteo.publisher.model.CacheAdUnit
--keepclassmembers class com.criteo.publisher.model.CacheAdUnit {
+
+-keep public class com.criteo.publisher.model.BannerAdUnit
+-keepclassmembers class com.criteo.publisher.model.BannerAdUnit {
+   public *;
+}
+
+-keep public class com.criteo.publisher.model.InterstitialAdUnit
+-keepclassmembers class com.criteo.publisher.model.InterstitialAdUnit {
    public *;
 }
 

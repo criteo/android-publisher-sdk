@@ -1,9 +1,7 @@
 package com.criteo.publisher.model;
 
 import android.content.res.Configuration;
-import com.criteo.publisher.Util.BannerAdUnit;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.InterstitialAdUnit;
 import java.util.ArrayList;
 import java.util.List;
 
