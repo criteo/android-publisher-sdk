@@ -54,6 +54,8 @@ public class CriteoInterstitialView {
                     criteoInterstitialAdListener);
             bundle.putParcelable("resultreceiver", criteoResultReceiver);
             intent.putExtras(bundle);
+
+            criteoInterstitialAdListener.onAdFullScreen();
             context.startActivity(intent);
         }
     }
