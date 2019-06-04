@@ -1,11 +1,11 @@
-package com.criteo.publisher.mediation.listeners;
+package com.criteo.publisher.listener;
 
 public interface CriteoInterstitialAdListener extends CriteoAdListener {
 
     /**
      * Called when an ad is successfully fetched.
      */
-    public void onAdFetchSucceededForInterstitial();
+    public void onAdFetchSucceeded();
 
 }
 

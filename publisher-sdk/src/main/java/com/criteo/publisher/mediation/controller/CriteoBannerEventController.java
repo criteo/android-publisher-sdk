@@ -6,7 +6,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.mediation.listeners.CriteoBannerAdListener;
+import com.criteo.publisher.listener.CriteoBannerAdListener;
 import com.criteo.publisher.mediation.tasks.CriteoBannerListenerCallTask;
 import com.criteo.publisher.mediation.view.CriteoBannerView;
 import com.criteo.publisher.model.Config;

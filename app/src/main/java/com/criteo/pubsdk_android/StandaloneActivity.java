@@ -8,23 +8,23 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import com.criteo.mediation.listener.CriteoBannerEventListenerImpl;
-import com.criteo.mediation.listener.CriteoInterstitialEventListenerImpl;
+import com.criteo.publisher.Util.CriteoErrorCode;
+import com.criteo.publisher.listener.CriteoBannerAdListener;
+import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.mediation.view.CriteoBannerView;
 import com.criteo.publisher.mediation.view.CriteoInterstitialView;
 import com.criteo.publisher.model.AdSize;
-import com.google.android.gms.ads.mediation.customevent.CustomEventBannerListener;
-import com.google.android.gms.ads.mediation.customevent.CustomEventInterstitialListener;
+
 
 public class StandaloneActivity extends AppCompatActivity {
 
     private static final String TAG = StandaloneActivity.class.getSimpleName();
 
     private Context context;
-    private CustomEventBannerListener customEventBannerListener;
-    private CustomEventInterstitialListener customEventInterstitialListener;
+    private CriteoBannerAdListener criteoBannerAdListener;
+    private CriteoInterstitialAdListener criteoInterstitialAdListener;
     private LinearLayout adLayout;
     private CriteoBannerView criteoBannerView;
     private CriteoInterstitialView criteoInterstitialView;
@@ -48,10 +48,8 @@ public class StandaloneActivity extends AppCompatActivity {
                 adLayout.removeAllViews();
                 BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(50, 320));
                 criteoBannerView = new CriteoBannerView(context, bannerAdUnit);
-                CriteoBannerEventListenerImpl criteoBannerEventListener = new CriteoBannerEventListenerImpl(
-                        customEventBannerListener,
-                        criteoBannerView);
-                criteoBannerView.setCriteoBannerAdListener(criteoBannerEventListener);
+
+                criteoBannerView.setCriteoBannerAdListener(criteoBannerAdListener);
                 criteoBannerView.loadAd();
                 adLayout.addView(criteoBannerView);
             }
@@ -75,34 +73,23 @@ public class StandaloneActivity extends AppCompatActivity {
     }
 
     private void interstitialAdLoad() {
-
-
         InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit("/140800857/Endeavour_Interstitial_320x480");
         criteoInterstitialView = new CriteoInterstitialView(context, interstitialAdUnit);
-
-        CriteoInterstitialEventListenerImpl criteoInterstitialEventListener = new CriteoInterstitialEventListenerImpl(
-                customEventInterstitialListener, criteoInterstitialView);
-
-        criteoInterstitialView.setCriteoInterstitialAdListener(criteoInterstitialEventListener);
-
+        criteoInterstitialView.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
         criteoInterstitialView.loadAd();
     }
 
     private void createAdListener() {
-        customEventBannerListener = new CustomEventBannerListener() {
+        criteoBannerAdListener = new CriteoBannerAdListener() {
+
             @Override
-            public void onAdLoaded(View view) {
-                Log.d(TAG, "Banner ad loaded");
+            public void onAdFullScreen() {
+                Log.d(TAG, "Banner ad fullscreen");
             }
 
             @Override
-            public void onAdFailedToLoad(int i) {
-                Log.d(TAG, "Banner ad failed");
-            }
-
-            @Override
-            public void onAdOpened() {
-
+            public void onAdClosed() {
+                Log.d(TAG, "Banner ad closed");
             }
 
             @Override
@@ -111,31 +98,26 @@ public class StandaloneActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onAdClosed() {
-
+            public void onAdFetchFailed(CriteoErrorCode code) {
+                Log.d(TAG, "Banner ad failed, reason : "+code.toString());
             }
 
             @Override
-            public void onAdLeftApplication() {
-
+            public void onAdFetchSucceeded(View view) {
+                Log.d(TAG, "Banner ad loaded");
             }
         };
 
-        customEventInterstitialListener = new CustomEventInterstitialListener() {
+        criteoInterstitialAdListener = new CriteoInterstitialAdListener() {
             @Override
-            public void onAdLoaded() {
+            public void onAdFetchSucceeded() {
                 buttonStandAloneInterstitial.setEnabled(true);
                 Log.d(TAG, "Interstitial ad loaded");
             }
 
             @Override
-            public void onAdFailedToLoad(int i) {
+            public void onAdFetchFailed(CriteoErrorCode code) {
                 Log.d(TAG, "Interstitial ad failed");
-            }
-
-            @Override
-            public void onAdOpened() {
-                Log.d(TAG, "Interstitial ad opened");
             }
 
             @Override
@@ -144,13 +126,13 @@ public class StandaloneActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onAdClosed() {
-                Log.d(TAG, "Interstitial ad closed");
+            public void onAdFullScreen() {
+                Log.d(TAG, "Interstitial ad full screen");
             }
 
             @Override
-            public void onAdLeftApplication() {
-
+            public void onAdClosed() {
+                Log.d(TAG, "Interstitial ad closed");
             }
         };
 

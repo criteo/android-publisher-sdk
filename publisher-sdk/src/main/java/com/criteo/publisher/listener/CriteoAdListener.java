@@ -1,6 +1,6 @@
-package com.criteo.publisher.mediation.listeners;
+package com.criteo.publisher.listener;
 
-import com.criteo.publisher.mediation.utils.CriteoErrorCode;
+import com.criteo.publisher.Util.CriteoErrorCode;
 
 public interface CriteoAdListener {
 

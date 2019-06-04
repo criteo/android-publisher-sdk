@@ -1,13 +1,11 @@
 package com.criteo.publisher.mediation.controller;
 
-import android.content.Context;
 import android.text.TextUtils;
 import android.webkit.URLUtil;
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
 import com.criteo.publisher.mediation.tasks.CriteoInterstitialListenerCallTask;
-import com.criteo.publisher.mediation.view.CriteoInterstitialView;
 import com.criteo.publisher.model.Slot;
 
 

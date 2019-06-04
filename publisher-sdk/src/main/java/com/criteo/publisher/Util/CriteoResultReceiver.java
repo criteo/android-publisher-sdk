@@ -3,7 +3,7 @@ package com.criteo.publisher.Util;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
-import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
+import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 
 public class CriteoResultReceiver extends ResultReceiver {
 

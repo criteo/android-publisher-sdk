@@ -5,8 +5,8 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.webkit.URLUtil;
 import com.criteo.publisher.Util.StreamUtil;
-import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
-import com.criteo.publisher.mediation.utils.CriteoErrorCode;
+import com.criteo.publisher.listener.CriteoInterstitialAdListener;
+import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.model.WebViewData;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -72,7 +72,7 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
             criteoInterstitialAdListener.onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
             return;
         } else {
-            criteoInterstitialAdListener.onAdFetchSucceededForInterstitial();
+            criteoInterstitialAdListener.onAdFetchSucceeded();
         }
 
         webviewData.setContent(data, criteoInterstitialAdListener);

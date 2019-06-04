@@ -1,8 +1,8 @@
 package com.criteo.mediation.listener;
 
 
-import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
-import com.criteo.publisher.mediation.utils.CriteoErrorCode;
+import com.criteo.publisher.listener.CriteoInterstitialAdListener;
+import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.mediation.view.CriteoInterstitialView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.mediation.customevent.CustomEventInterstitialListener;
@@ -19,7 +19,7 @@ public class CriteoInterstitialEventListenerImpl implements CriteoInterstitialAd
     }
 
     @Override
-    public void onAdFetchSucceededForInterstitial() {
+    public void onAdFetchSucceeded() {
         customEventInterstitialListener.onAdLoaded();
     }
 
