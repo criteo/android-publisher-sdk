@@ -61,6 +61,11 @@
    public *;
 }
 
+-keep public class com.criteo.publisher.model.AdUnit
+-keepclassmembers class com.criteo.publisher.model.AdUnit {
+   public *;
+}
+
 -keep public class com.criteo.publisher.model.BannerAdUnit
 -keepclassmembers class com.criteo.publisher.model.BannerAdUnit {
    public *;
@@ -71,25 +76,16 @@
    public *;
 }
 
--keep public class com.criteo.publisher.mediation.Utils.CriteoErrorCode
--keepclassmembers class com.criteo.publisher.mediation.Utils.CriteoErrorCode {
+-keep public class com.criteo.publisher.mediation.utils.CriteoErrorCode
+-keepclassmembers class com.criteo.publisher.mediation.utils.CriteoErrorCode {
    public *;
 }
 
--keep public class com.criteo.publisher.mediation.Listeners.CriteoAdListener
--keepclassmembers class com.criteo.publisher.mediation.Listeners.CriteoAdListener {
-   public *;
-}
+-keep public interface com.criteo.publisher.mediation.listeners.CriteoAdListener {*;}
 
--keep public class com.criteo.publisher.mediation.Listeners.CriteoBannerAdListener
--keepclassmembers class com.criteo.publisher.mediation.Listeners.CriteoBannerAdListener {
-   public *;
-}
+-keep public interface com.criteo.publisher.mediation.listeners.CriteoBannerAdListener {*;}
 
--keep public class com.criteo.publisher.mediation.Listeners.CriteoInterstitialAdListener
--keepclassmembers class com.criteo.publisher.mediation.Listeners.CriteoInterstitialAdListener {
-   public *;
-}
+-keep public interface com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener {*;}
 
 
 
