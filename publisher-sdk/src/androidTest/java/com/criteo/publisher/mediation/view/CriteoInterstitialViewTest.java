@@ -4,7 +4,7 @@ import android.app.Application;
 import android.support.test.InstrumentationRegistry;
 import android.test.UiThreadTest;
 import com.criteo.publisher.Criteo;
-import com.criteo.publisher.Util.InterstitialAdUnit;
+import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
 import com.criteo.publisher.mediation.utils.CriteoErrorCode;
 import com.criteo.publisher.model.AdSize;

@@ -4,7 +4,7 @@ import android.app.Application;
 import android.support.test.InstrumentationRegistry;
 import android.test.UiThreadTest;
 import com.criteo.publisher.Criteo;
-import com.criteo.publisher.Util.BannerAdUnit;
+import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.mediation.listeners.CriteoBannerAdListener;
 import com.criteo.publisher.mediation.utils.CriteoErrorCode;
 import com.criteo.publisher.model.AdSize;
