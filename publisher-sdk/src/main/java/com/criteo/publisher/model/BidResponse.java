@@ -1,26 +1,26 @@
 package com.criteo.publisher.model;
 
-public class BidResponse {
+class BidResponse {
 
     private double price;
-    private String token;
-    private boolean success;
+    private BidToken token;
+    private boolean valid;
 
-    public BidResponse(double price, String token, boolean success) {
+    BidResponse(double price, BidToken token, boolean valid) {
         this.price = price;
         this.token = token;
-        this.success = success;
+        this.valid = valid;
     }
 
     public double getPrice() {
         return price;
     }
 
-    public String getToken() {
+    public BidToken getToken() {
         return token;
     }
 
-    public boolean isSuccess() {
-        return success;
+    public boolean isValid() {
+        return valid;
     }
 }
