@@ -88,7 +88,7 @@ public class BidManagerTest {
         slot1.setDisplayUrl(TEST_CREATIVE);
         slot1.setCpm("0.0");
         slot1.setTimeOfDownload(System.currentTimeMillis());
-        slot1.setTtl(10);
+        slot1.setTtl(3);
         slots.add(slot1);
         manager.setCacheAdUnits(slots);
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
@@ -97,7 +97,7 @@ public class BidManagerTest {
         PublisherAdRequest request = builder.build();
         assertNull(request.getCustomTargeting().getString("crt_displayUrl"));
         try {
-            Thread.sleep(150000L);
+            Thread.sleep(5000L);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
