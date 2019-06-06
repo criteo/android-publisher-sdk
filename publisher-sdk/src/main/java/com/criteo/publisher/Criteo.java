@@ -13,6 +13,7 @@ import com.criteo.publisher.model.AdUnitHelper;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.ScreenSize;
 import com.criteo.publisher.model.Slot;
+import com.criteo.publisher.model.TokenCache;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +58,8 @@ public final class Criteo {
             throw new IllegalArgumentException("Criteo Publisher Id is required.");
         }
 
-        this.bidManager = new BidManager(application.getApplicationContext(), criteoPublisherId, cacheAdUnits);
+        this.bidManager = new BidManager(application.getApplicationContext(), criteoPublisherId, cacheAdUnits,
+                new TokenCache());
         this.appEvents = new AppEvents(application.getApplicationContext());
         this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
         bidManager.prefetch();

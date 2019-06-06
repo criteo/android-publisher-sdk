@@ -19,6 +19,7 @@ import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
+import com.criteo.publisher.model.TokenCache;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.CdbDownloadTask;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private final List<CacheAdUnit> cacheAdUnits;
     private final Context mContext;
     private final SdkCache cache;
+    private final TokenCache tokenCache;
     private final Publisher publisher;
     private final User user;
     private CdbDownloadTask cdbDownloadTask;
@@ -43,10 +45,11 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private Config config;
     private String userAgent;
 
-    BidManager(Context context, String criteoPublisherId, List<CacheAdUnit> cacheAdUnits) {
+    BidManager(Context context, String criteoPublisherId, List<CacheAdUnit> cacheAdUnits, TokenCache tokenCache) {
         this.mContext = context;
         this.cacheAdUnits = cacheAdUnits;
         this.cache = new SdkCache();
+        this.tokenCache = tokenCache;
         publisher = new Publisher(mContext);
         publisher.setCriteoPublisherId(criteoPublisherId);
         user = new User();
@@ -200,4 +203,5 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         mainHandler.post(setUserAgentTask);
 
     }
+
 }

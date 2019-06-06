@@ -2,13 +2,13 @@ package com.criteo.publisher.model;
 
 import com.criteo.publisher.Util.AdUnitType;
 
-class TokenValue {
+public class TokenValue {
 
     private long tokenExpirationTime;
     private String displayUrl;
     private AdUnitType adUnitType;
 
-    TokenValue(long bidTime, int bidTtl, String displayUrl, AdUnitType adUnitType) {
+    public TokenValue(long bidTime, int bidTtl, String displayUrl, AdUnitType adUnitType) {
         this.tokenExpirationTime = bidTime + bidTtl;
         this.displayUrl = displayUrl;
         this.adUnitType = adUnitType;
