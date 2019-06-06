@@ -6,15 +6,12 @@ import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 import android.webkit.WebView;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.ScreenSize;
-import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -24,6 +21,7 @@ import java.util.Collections;
 public final class DeviceUtil {
 
     private static final String CRITEO_LOGGING = "CRITEO_LOGGING";
+    private static final String DEVICE_ID_LIMITED = "00000000-0000-0000-0000-000000000000";
 
     private static AdSize sizePortrait;
     private static AdSize sizeLandscape;
@@ -120,26 +118,14 @@ public final class DeviceUtil {
     }
 
     public static String getAdvertisingId(Context context) {
-        AdvertisingIdClient.Info adInfo = null;
-        try {
-            adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
-            return adInfo.getId();
-        } catch (IOException | GooglePlayServicesNotAvailableException | IllegalStateException
-                | GooglePlayServicesRepairableException e) {
-            e.printStackTrace();
+        if (AdvertisingInfo.getInstance().isLimitAdTrackingEnabled(context)) {
+            return DEVICE_ID_LIMITED;
         }
-        return null;
+        return AdvertisingInfo.getInstance().getAdvertisingId(context);
     }
 
     public static int isLimitAdTrackingEnabled(Context context) {
-        try {
-            AdvertisingIdClient.Info adInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
-            return adInfo.isLimitAdTrackingEnabled() ? 1 : 0;
-        } catch (IOException | GooglePlayServicesNotAvailableException
-                | GooglePlayServicesRepairableException e) {
-            e.printStackTrace();
-        }
-        return 0;
+        return AdvertisingInfo.getInstance().isLimitAdTrackingEnabled(context) ? 1 : 0;
     }
 
     public static String createDfpCompatibleDisplayUrl(String displayUrl) {

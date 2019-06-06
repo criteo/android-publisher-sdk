@@ -1,47 +1,35 @@
-package com.criteo.publisher;
+package com.criteo.publisher.Util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.ScreenSize;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 @RunWith(AndroidJUnit4.class)
 public class DeviceUtilTest {
 
-    private Context context;
-
-    private AdSize adSizeForTest = new AdSize(360, 480);
-
-    @Mock
-    private DisplayMetrics metrics;
+    private static final String DEVICE_ID_LIMITED = "00000000-0000-0000-0000-000000000000";
 
     private ArrayList<ScreenSize> screenSizesPortrait;
 
     private ArrayList<ScreenSize> screenSizesLandscape;
 
-
-    private List<ScreenSize> screenSizes;
+    private Context context;
 
     @Before
     public void setup() {
         context = InstrumentationRegistry.getContext();
-        MockitoAnnotations.initMocks(this);
-
         screenSizesPortrait = new ArrayList<>();
         screenSizesPortrait.add(new ScreenSize(360, 540));
         screenSizesPortrait.add(new ScreenSize(100, 200));
@@ -58,7 +46,6 @@ public class DeviceUtilTest {
         screenSizesLandscape.add(new ScreenSize(540, 360));
         screenSizesLandscape.add(new ScreenSize(960, 640));
 
-
     }
 
     @Test
@@ -69,15 +56,44 @@ public class DeviceUtilTest {
     }
 
     @Test
-    public void getAdvertisingIdTest() {
+    public void getAdvertisingIdAndLimitedTest() {
         assertNotNull(DeviceUtil.getAdvertisingId(context));
+        assertNotNull(DeviceUtil.isLimitAdTrackingEnabled(context));
     }
+
+    @Test
+    public void getAdvertisingIdAdLimited() {
+        AdvertisingInfo info = mock(AdvertisingInfo.class);
+        setMock(info);
+        when(info.isLimitAdTrackingEnabled(context)).thenReturn(true);
+        Assert.assertTrue(info.isLimitAdTrackingEnabled(context));
+        Assert.assertEquals(DEVICE_ID_LIMITED, DeviceUtil.getAdvertisingId(context));
+    }
+
+    private void setMock(AdvertisingInfo mock) {
+        try {
+            Field instance = AdvertisingInfo.class.getDeclaredField("advertisingInfo");
+            instance.setAccessible(true);
+            instance.set(instance, mock);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    @Test
+    public void getDeviceIdForAppEventTest() {
+        Assert.assertNotEquals(DEVICE_ID_LIMITED,
+                DeviceUtil.getAdvertisingId(context));
+    }
+
+    //TODO Create Intrumentation Test , change settings as Limited and test
+
 
     @Test
     public void getDeviceModelTest() {
         assertNotNull(DeviceUtil.getDeviceModel());
     }
-
 
     @Test
     public void testgetNearestAdSizeLandscape() {
@@ -98,6 +114,6 @@ public class DeviceUtilTest {
         Assert.assertEquals(DeviceUtil.getSizePortrait().getHeight(), 540);
         Assert.assertEquals(DeviceUtil.getSizeLandscape().getWidth(), 600);
         Assert.assertEquals(DeviceUtil.getSizeLandscape().getHeight(), 320);
-
     }
 }
+

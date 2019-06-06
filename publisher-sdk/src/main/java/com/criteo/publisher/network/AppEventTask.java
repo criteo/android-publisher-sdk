@@ -3,12 +3,12 @@ package com.criteo.publisher.network;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-
-import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.AppEventResponseListener;
+import com.criteo.publisher.Util.DeviceUtil;
 import org.json.JSONObject;
 
 public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
+
     private static final String TAG = AppEventTask.class.getSimpleName();
     private static final int SENDER_ID = 2379;
     private static final String THROTTLE = "throttleSec";
@@ -28,7 +28,6 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
         if (DeviceUtil.hasPlayServices(mContext)) {
             limitedAdTracking = DeviceUtil.isLimitAdTrackingEnabled(mContext);
             gaid = DeviceUtil.getAdvertisingId(mContext);
-
         }
         String appId = mContext.getApplicationContext().getPackageName();
         JSONObject response = PubSdkNetwork.postEvent(mContext, SENDER_ID, appId, gaid, eventType, limitedAdTracking);
