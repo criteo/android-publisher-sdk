@@ -1,5 +1,8 @@
 package com.criteo.publisher.mediation.tasks;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
 import com.criteo.publisher.mediation.utils.CriteoErrorCode;
 import com.criteo.publisher.model.Slot;
@@ -38,14 +41,15 @@ public class CriteoInterstitialFetchTaskTest {
     }
 
     @Test
-    public void testNotifyListenerAsyncWitSlot() throws InterruptedException {
-        Slot slot = new Slot();
+    public void testNotifyListenerAsyncWitSlotAndInvalidUrl() throws InterruptedException {
+        Slot slot =mock(Slot.class);
+        when(slot.getDisplayUrl()).thenReturn("!?+##!?");
+
         criteoInterstitialFetchTask.execute(slot);
 
         Thread.sleep(100);
 
-        Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdFetchSucceededForInterstitial();
-        Mockito.verify(criteoInterstitialAdListener, Mockito.times(0))
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(1))
                 .onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NO_FILL);
     }
 }
