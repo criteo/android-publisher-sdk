@@ -12,7 +12,7 @@ public abstract class AdUnit {
         this.adUnitType = adUnitType;
     }
 
-    protected String getAdUnitId() {
+    public String getAdUnitId() {
         return adUnitId;
     }
 

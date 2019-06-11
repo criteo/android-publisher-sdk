@@ -9,9 +9,4 @@ public final class InterstitialAdUnit extends AdUnit {
         super(adUnitId, AdUnitType.CRITEO_INTERSTITIAL);
     }
 
-    public String getInterstitialAdUnitId() {
-        return getAdUnitId();
-    }
-
-
 }

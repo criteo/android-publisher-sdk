@@ -8,16 +8,12 @@ public final class BannerAdUnit extends AdUnit {
 
     private final AdSize adSize;
 
-    public BannerAdUnit(String adUnitId, AdSize adSize) {
+    public BannerAdUnit(String adUnitId, AdSize size) {
         super(adUnitId, AdUnitType.CRITEO_BANNER);
-        this.adSize = adSize;
+        this.adSize = size;
     }
 
-    public AdSize getAdSize() {
+    public AdSize getSize() {
         return adSize;
-    }
-
-    public String getBannerAdUnitId() {
-        return getAdUnitId();
     }
 }

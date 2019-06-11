@@ -36,7 +36,7 @@ public class CriteoInterstitialViewTest {
                 (Application) InstrumentationRegistry
                         .getTargetContext()
                         .getApplicationContext();
-        Criteo.init(app, cacheAdUnits, "B-056946");
+        Criteo.init(app, "B-056946", cacheAdUnits);
         criteoInterstitialView = new CriteoInterstitialView(InstrumentationRegistry.getContext(), interstitialAdUnit);
         criteoInterstitialView.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
     }

@@ -23,7 +23,7 @@ public final class Criteo {
     private AppEvents appEvents;
     private AppLifecycleUtil appLifecycleUtil;
 
-    public static Criteo init(Application application, List<AdUnit> adUnits, String criteoPublisherId) {
+    public static Criteo init(Application application, String criteoPublisherId, List<AdUnit> adUnits) {
         synchronized (Criteo.class) {
             if (criteo == null) {
                 criteo = new Criteo(application, adUnits, criteoPublisherId);
