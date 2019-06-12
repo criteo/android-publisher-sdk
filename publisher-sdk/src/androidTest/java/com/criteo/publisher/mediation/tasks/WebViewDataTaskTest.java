@@ -1,8 +1,8 @@
 package com.criteo.publisher.mediation.tasks;
 
 import android.test.UiThreadTest;
-import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
-import com.criteo.publisher.mediation.utils.CriteoErrorCode;
+import com.criteo.publisher.listener.CriteoInterstitialAdListener;
+import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.model.WebViewData;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class WebViewDataTaskTest {
     public void testWithData() {
         webViewDataTask.onPostExecute("<html></html>");
 
-        Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdFetchSucceededForInterstitial();
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdFetchSucceeded();
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
     }
 
@@ -49,7 +49,7 @@ public class WebViewDataTaskTest {
             e.printStackTrace();
         }
 
-        Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdFetchSucceededForInterstitial();
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdFetchSucceeded();
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
     }
 

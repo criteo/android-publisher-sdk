@@ -5,8 +5,8 @@ import android.support.test.InstrumentationRegistry;
 import android.test.UiThreadTest;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.model.BannerAdUnit;
-import com.criteo.publisher.mediation.listeners.CriteoBannerAdListener;
-import com.criteo.publisher.mediation.utils.CriteoErrorCode;
+import com.criteo.publisher.listener.CriteoBannerAdListener;
+import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CacheAdUnit;
@@ -51,7 +51,7 @@ public class CriteoBannerViewTest {
         Thread.sleep(500);
 
         //Expected result , found no slot and called criteoBannerAdListener.onAdFetchFailed
-        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdFetchSucceededForBanner(criteoBannerView);
+        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdFetchSucceeded(criteoBannerView);
         Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NO_FILL);
     }
 

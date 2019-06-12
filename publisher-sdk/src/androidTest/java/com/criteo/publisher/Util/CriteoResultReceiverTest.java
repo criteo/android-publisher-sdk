@@ -7,7 +7,7 @@ import static com.criteo.publisher.Util.CriteoResultReceiver.RESULT_CODE_SUCCESS
 
 import android.os.Bundle;
 import android.os.Handler;
-import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
+import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

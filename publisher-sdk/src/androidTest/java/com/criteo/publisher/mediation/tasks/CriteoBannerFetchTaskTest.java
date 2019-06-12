@@ -1,7 +1,7 @@
 package com.criteo.publisher.mediation.tasks;
 
-import com.criteo.publisher.mediation.listeners.CriteoBannerAdListener;
-import com.criteo.publisher.mediation.utils.CriteoErrorCode;
+import com.criteo.publisher.listener.CriteoBannerAdListener;
+import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.mediation.view.CriteoBannerView;
 import com.criteo.publisher.model.Slot;
 import org.junit.Before;
@@ -36,7 +36,7 @@ public class CriteoBannerFetchTaskTest {
 
         Thread.sleep(100);
 
-        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdFetchSucceededForBanner(criteoBannerView);
+        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdFetchSucceeded(criteoBannerView);
         Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NO_FILL);
     }
 
@@ -47,7 +47,7 @@ public class CriteoBannerFetchTaskTest {
 
         Thread.sleep(100);
 
-        Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdFetchSucceededForBanner(criteoBannerView);
+        Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdFetchSucceeded(criteoBannerView);
         Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NO_FILL);
     }
 }

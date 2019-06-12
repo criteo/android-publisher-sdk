@@ -3,7 +3,7 @@ package com.criteo.publisher.model;
 import static com.criteo.publisher.model.Config.WEBVIEW_DATA_MACRO;
 
 import android.text.TextUtils;
-import com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener;
+import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
