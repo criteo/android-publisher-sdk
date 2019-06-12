@@ -85,9 +85,7 @@ public final class DeviceUtil {
     }
 
     private static AdSize useThisSize(ScreenSize screenSize) {
-        AdSize adSize = new AdSize();
-        adSize.setWidth(screenSize.getWidth());
-        adSize.setHeight(screenSize.getHeight());
+        AdSize adSize = new AdSize(screenSize.getHeight(), screenSize.getWidth());
         return adSize;
     }
 
