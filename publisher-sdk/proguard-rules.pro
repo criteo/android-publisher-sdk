@@ -41,6 +41,7 @@
 -dontwarn retrofit2.-KotlinExtensions
 
 # Leaving Criteo SDK models.
+-keepparameternames
 -keep public class com.criteo.publisher.Criteo
 -keepclassmembers class com.criteo.publisher.Criteo {
    public *;
