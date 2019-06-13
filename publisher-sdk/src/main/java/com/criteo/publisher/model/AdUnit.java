@@ -16,7 +16,7 @@ public abstract class AdUnit {
         return adUnitId;
     }
 
-    AdUnitType getAdUnitType() {
+    public AdUnitType getAdUnitType() {
         return adUnitType;
     }
 }

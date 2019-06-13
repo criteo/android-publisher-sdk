@@ -11,12 +11,16 @@ import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitHelper;
 import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.model.BidResponse;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenCache;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import java.util.ArrayList;
 import java.util.List;
+import junit.framework.Assert;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -215,6 +219,62 @@ public class BidManagerTest {
         //mocking response by setting slots
         manager.setCacheAdUnits(slots);
         return manager;
+    }
+
+    @Test
+    public void getBidForInhouseMediationWithNullSlot() {
+        List<AdUnit> adUnits = new ArrayList<>();
+        BannerAdUnit adUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(50, 320));
+        adUnits.add(adUnit);
+        Slot slot1 = new Slot();
+        List<Slot> slots = new ArrayList<>();
+        slots.add(slot1);
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(adUnits),
+                new TokenCache());
+        manager.setCacheAdUnits(slots);
+        BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
+        Assert.assertFalse(bidResponse.isValid());
+    }
+
+    @Test
+    public void getBidForInhouseMediationWithInvalidSlot() throws JSONException {
+        List<AdUnit> adUnits = new ArrayList<>();
+        BannerAdUnit adUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(50, 320));
+        adUnits.add(adUnit);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("cpm", "-10.0");
+        Slot slot1 = new Slot(jsonObject);
+        List<Slot> slots = new ArrayList<>();
+        slots.add(slot1);
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(adUnits),
+                new TokenCache());
+        manager.setCacheAdUnits(slots);
+        BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
+        Assert.assertFalse(bidResponse.isValid());
+    }
+
+
+    @Test
+    public void getBidForInhouseMediationWithSlot() {
+        List<AdUnit> adUnits = new ArrayList<>();
+        BannerAdUnit adUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(50, 320));
+        adUnits.add(adUnit);
+        Slot slot1 = new Slot();
+        slot1.setPlacementId("/140800857/Endeavour_320x50");
+        slot1.setHeight(50);
+        slot1.setWidth(320);
+        slot1.setCpm("10.0");
+        slot1.setTimeOfDownload(5);
+        slot1.setTtl(1);
+        slot1.setDisplayUrl(TEST_CREATIVE);
+        List<Slot> slots = new ArrayList<>();
+        slots.add(slot1);
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(adUnits),
+                new TokenCache());
+        manager.setCacheAdUnits(slots);
+        BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
+        Assert.assertTrue(bidResponse.isValid());
+        Assert.assertEquals(10.0d, bidResponse.getPrice(), 0.0);
     }
 
 }

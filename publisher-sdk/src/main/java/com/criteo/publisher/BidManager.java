@@ -15,11 +15,13 @@ import com.criteo.publisher.Util.UserAgentHandler;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitHelper;
+import com.criteo.publisher.model.BidResponse;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenCache;
+import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.CdbDownloadTask;
 import java.util.ArrayList;
@@ -168,6 +170,22 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         if (cdbDownloadTask != null && cdbDownloadTask.getStatus() == AsyncTask.Status.RUNNING) {
             cdbDownloadTask.cancel(true);
         }
+    }
+
+    public BidResponse getBidForInhouseMediation(AdUnit adUnit) {
+        BidResponse bidResponse = new BidResponse(0, null, false);
+        Slot slot = this.getBidForAdUnitAndPrefetch(adUnit);
+        if (slot != null && slot.isValid()) {
+
+            TokenValue tokenValue = new TokenValue(slot.getTimeOfDownload(), slot.getTtl(), slot.getDisplayUrl(),
+                    adUnit.getAdUnitType());
+
+            double price = slot.getCpmAsNumber();
+
+            bidResponse = new BidResponse(price, tokenCache.add(tokenValue), true);
+        }
+
+        return bidResponse;
     }
 
 

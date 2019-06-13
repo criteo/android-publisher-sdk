@@ -10,6 +10,7 @@ import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitHelper;
+import com.criteo.publisher.model.BidResponse;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.ScreenSize;
 import com.criteo.publisher.model.Slot;
@@ -96,6 +97,10 @@ public final class Criteo {
         } catch (Exception e) {
             throw new Error("Screen parameters can not be empty or null");
         }
+    }
+
+    public BidResponse getBidForInhouseMediation(AdUnit adUnit) {
+        return bidManager.getBidForInhouseMediation(adUnit);
     }
 
 }
