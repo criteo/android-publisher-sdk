@@ -12,7 +12,12 @@ public class ReflectionUtil {
         }
         return null;
     }
+
     public static Object callMethodOnObject(Object object, String methodName, Object... params) {
+        if (object == null || methodName == null || params == null) {
+            return null;
+        }
+
         try {
             int len = params.length;
             Class<?>[] classes = new Class[len];

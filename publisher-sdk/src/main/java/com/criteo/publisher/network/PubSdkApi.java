@@ -107,10 +107,15 @@ final class PubSdkApi {
         if (!TextUtils.isEmpty(userAgent)) {
             urlConnection.setRequestProperty("User-Agent", userAgent);
         }
-        OutputStream outputStream = urlConnection.getOutputStream();
-        outputStream.write(requestJson.toString().getBytes(StandardCharsets.UTF_8));
-        outputStream.flush();
-        outputStream.close();
+        try {
+            OutputStream outputStream = urlConnection.getOutputStream();
+            outputStream.write(requestJson.toString().getBytes(StandardCharsets.UTF_8));
+            outputStream.flush();
+            outputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
 
         JSONObject result = new JSONObject();
         if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {

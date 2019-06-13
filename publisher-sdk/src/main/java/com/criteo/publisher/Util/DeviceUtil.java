@@ -6,7 +6,6 @@ import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Log;
 import android.webkit.WebView;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.ScreenSize;
@@ -127,10 +126,11 @@ public final class DeviceUtil {
     }
 
     public static String createDfpCompatibleDisplayUrl(String displayUrl) {
-        byte[] byteUrl = displayUrl.getBytes(StandardCharsets.UTF_8);
-        String base64Url = Base64.encodeToString(byteUrl, Base64.NO_WRAP);
-        String utf8 = StandardCharsets.UTF_8.name();
+        if (TextUtils.isEmpty(displayUrl)) return null;
         try {
+            byte[] byteUrl = displayUrl.getBytes(StandardCharsets.UTF_8);
+            String base64Url = Base64.encodeToString(byteUrl, Base64.NO_WRAP);
+            String utf8 = StandardCharsets.UTF_8.name();
             return URLEncoder.encode(URLEncoder.encode(base64Url, utf8), utf8).toString();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
