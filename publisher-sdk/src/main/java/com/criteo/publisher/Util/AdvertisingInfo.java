@@ -43,6 +43,6 @@ public class AdvertisingInfo {
         } catch (GooglePlayServicesRepairableException e) {
             e.printStackTrace();
         }
-        return true;
+        return false;
     }
 }
