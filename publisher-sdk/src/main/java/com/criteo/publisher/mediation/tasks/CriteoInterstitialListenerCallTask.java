@@ -26,7 +26,7 @@ public class CriteoInterstitialListenerCallTask extends AsyncTask<Slot, Void, Sl
     @Override
     protected void onPostExecute(Slot slot) {
         super.onPostExecute(slot);
-        if (slot == null || !URLUtil
+        if (slot == null || !slot.isValid() || !URLUtil
                 .isValidUrl(slot.getDisplayUrl())) {
             criteoInterstitialAdListener.onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NO_FILL);
         }

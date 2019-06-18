@@ -31,7 +31,7 @@ public class CriteoBannerEventController {
         criteoBannerFetchTask = new CriteoBannerListenerCallTask(criteoBannerView, criteoBannerAdListener);
         criteoBannerFetchTask.execute(slot);
 
-        if (slot != null) {
+        if (slot != null && slot.isValid()) {
             criteoBannerView.getSettings().setJavaScriptEnabled(true);
             criteoBannerView.setWebViewClient(new WebViewClient() {
                 @Override

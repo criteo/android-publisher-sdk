@@ -93,7 +93,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
     private void enrichMoPubBid(Object object, AdUnit adUnit) {
         Slot slot = getBidForAdUnitAndPrefetch(adUnit);
-        if (slot != null) {
+        if (slot != null && slot.isValid()) {
             StringBuilder keywords = new StringBuilder();
             keywords.append(CRT_CPM + ":" + slot.getCpm());
             keywords.append(",");
@@ -105,7 +105,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
     private void enrichDfpBid(Object object, AdUnit adUnit) {
         Slot slot = getBidForAdUnitAndPrefetch(adUnit);
-        if (slot != null) {
+        if (slot != null && slot.isValid()) {
             ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", CRT_CPM, slot.getCpm());
             ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", CRT_DISPLAY_URL,
                     DeviceUtil.createDfpCompatibleDisplayUrl(slot.getDisplayUrl()));
@@ -121,7 +121,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             prefetch(false, userAgent, cacheAdUnit);
             return null;
         }
-        float cpm = Float.valueOf(peekSlot.getCpm());
+        double cpm = (peekSlot.getCpmAsNumber() == null ? 0.0 : peekSlot.getCpmAsNumber());
         long ttl = peekSlot.getTtl();
         long expiryTimeMillis = ttl * SECOND_TO_MILLI + peekSlot.getTimeOfDownload();
         //If cpm and ttl in slot are 0:

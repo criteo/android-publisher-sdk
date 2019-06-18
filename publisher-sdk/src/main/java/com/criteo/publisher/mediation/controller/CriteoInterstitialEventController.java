@@ -34,7 +34,7 @@ public class CriteoInterstitialEventController {
         criteoInterstitialListenerCallTask = new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener);
         criteoInterstitialListenerCallTask.execute(slot);
 
-        if (slot != null) {
+        if (slot != null && slot.isValid()) {
             //gets Webview data from Criteo before showing Interstitialview Activity
             getWebviewDataAsync(slot.getDisplayUrl(), criteoInterstitialAdListener);
         }
