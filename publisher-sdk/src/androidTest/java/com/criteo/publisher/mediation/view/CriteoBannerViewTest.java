@@ -37,7 +37,7 @@ public class CriteoBannerViewTest {
                 (Application) InstrumentationRegistry
                         .getTargetContext()
                         .getApplicationContext();
-        Criteo.init(app,"4916", AdUnits);
+        Criteo.init(app,"9138", AdUnits);
         criteoBannerView = new CriteoBannerView(InstrumentationRegistry.getContext(), bannerAdUnit);
         criteoBannerView.setCriteoBannerAdListener(criteoBannerAdListener);
     }
