@@ -16,6 +16,7 @@ import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitHelper;
 import com.criteo.publisher.model.BidResponse;
+import com.criteo.publisher.model.BidToken;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Publisher;
@@ -222,4 +223,10 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
     }
 
+    public TokenValue getTokenValue(BidToken bidToken) {
+        if (bidToken != null) {
+            return tokenCache.getTokenValue(bidToken);
+        }
+        return null;
+    }
 }

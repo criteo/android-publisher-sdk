@@ -5,6 +5,7 @@ import android.webkit.WebView;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.mediation.controller.CriteoBannerEventController;
 import com.criteo.publisher.listener.CriteoBannerAdListener;
+import com.criteo.publisher.model.BidToken;
 import java.lang.ref.WeakReference;
 
 public class CriteoBannerView extends WebView {
@@ -36,5 +37,13 @@ public class CriteoBannerView extends WebView {
         }
         criteoBannerEventController.fetchAdAsync(bannerAdUnit);
     }
+
+    public void loadAd(BidToken bidToken) {
+        if (criteoBannerEventController == null) {
+            criteoBannerEventController = new CriteoBannerEventController(this, criteoBannerAdListener);
+        }
+        criteoBannerEventController.fetchAdAsync(bidToken);
+    }
+
 
 }
