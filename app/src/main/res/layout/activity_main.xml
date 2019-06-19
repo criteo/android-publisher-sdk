@@ -44,6 +44,14 @@
           android:background="#81C784"
           android:text="Standalone"/>
         <Button
+          android:id="@+id/buttoninHouse"
+          style="@style/Widget.AppCompat.Button.Colored"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="20dp"
+          android:background="#81C784"
+          android:text="In-house Mediation"/>
+        <Button
             android:id="@+id/buttonMopubCall"
             android:layout_marginTop="20dp"
             style="@style/Widget.AppCompat.Button.Colored"

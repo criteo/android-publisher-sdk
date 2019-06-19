@@ -13,10 +13,10 @@
     android:supportsRtl="true"
     android:theme="@style/AppTheme">
     <activity
-      android:name=".StandaloneActivity"
       android:label="@string/title_activity_standalone"
-      android:theme="@style/AppTheme"
-      android:parentActivityName=".MainActivity">
+      android:name=".StandaloneActivity"
+      android:parentActivityName=".MainActivity"
+      android:theme="@style/AppTheme">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
         android:value="com.criteo.pubsdk_android.MainActivity"/>
@@ -69,15 +69,22 @@
         android:value="com.criteo.pubsdk_android.MainActivity"/>
     </activity>
     <activity
-        android:name=".MopubActivity"
-        android:label="@string/title_activity_mopub"
-        android:theme="@style/AppTheme"></activity>
+      android:name=".InHouseActivity"
+      android:theme="@style/AppTheme">
+      <meta-data
+        android:name="android.support.PARENT_ACTIVITY"
+        android:value="com.criteo.pubsdk_android.MainActivity"/>
+    </activity>
     <activity
-        android:name="com.mopub.common.MoPubBrowser"
-        android:configChanges="keyboardHidden|orientation|screenSize" />
-    <activity android:name="com.mopub.mobileads.MraidVideoPlayerActivity"
-        android:configChanges="keyboardHidden|orientation|screenSize"/>
+      android:label="@string/title_activity_mopub"
+      android:name=".MopubActivity"
+      android:theme="@style/AppTheme"/>
+    <activity
+      android:configChanges="keyboardHidden|orientation|screenSize"
+      android:name="com.mopub.common.MoPubBrowser"/>
+    <activity
+      android:configChanges="keyboardHidden|orientation|screenSize"
+      android:name="com.mopub.mobileads.MraidVideoPlayerActivity"/>
   </application>
-
 
 </manifest>
