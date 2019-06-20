@@ -6,6 +6,8 @@ import static org.mockito.Mockito.when;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.model.Slot;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -30,6 +32,25 @@ public class CriteoInterstitialFetchTaskTest {
     @Test
     public void testNotifyListenerAsyncWithNullSlot() throws InterruptedException {
         Slot slot = null;
+
+        criteoInterstitialFetchTask.execute(slot);
+
+        Thread.sleep(100);
+
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdFetchSucceeded();
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(1))
+                .onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NO_FILL);
+    }
+
+    @Test
+    public void testNotifyListenerAsyncWithInvalidSlot() throws InterruptedException {
+        JSONObject response = new JSONObject();
+        try {
+            response.put("cpm", "abc");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Slot slot = new Slot(response);
 
         criteoInterstitialFetchTask.execute(slot);
 

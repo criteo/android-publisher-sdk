@@ -1,8 +1,8 @@
 package com.criteo.publisher.mediation.tasks;
 
 import android.os.AsyncTask;
-import com.criteo.publisher.listener.CriteoBannerAdListener;
 import com.criteo.publisher.Util.CriteoErrorCode;
+import com.criteo.publisher.listener.CriteoBannerAdListener;
 import com.criteo.publisher.mediation.view.CriteoBannerView;
 import com.criteo.publisher.model.Slot;
 
@@ -29,7 +29,7 @@ public class CriteoBannerListenerCallTask extends AsyncTask<Slot, Void, Slot> {
     @Override
     protected void onPostExecute(Slot slot) {
         super.onPostExecute(slot);
-        if (slot == null) {
+        if (slot == null || !slot.isValid()) {
             criteoBannerAdListener.onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NO_FILL);
         } else {
             criteoBannerAdListener.onAdFetchSucceeded(criteoBannerView);

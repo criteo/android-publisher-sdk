@@ -4,6 +4,8 @@ import com.criteo.publisher.listener.CriteoBannerAdListener;
 import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.mediation.view.CriteoBannerView;
 import com.criteo.publisher.model.Slot;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -39,6 +41,25 @@ public class CriteoBannerFetchTaskTest {
         Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdFetchSucceeded(criteoBannerView);
         Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NO_FILL);
     }
+
+    @Test
+    public void testNotifyListenerAsyncWithInvalidSlot() throws InterruptedException {
+        JSONObject response = new JSONObject();
+        try {
+            response.put("cpm", "abc");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Slot slot = new Slot(response);
+
+        criteoBannerFetchTask.execute(slot);
+
+        Thread.sleep(100);
+
+        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdFetchSucceeded(criteoBannerView);
+        Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NO_FILL);
+    }
+
 
     @Test
     public void testNotifyListenerAsyncWitSlot() throws InterruptedException {
