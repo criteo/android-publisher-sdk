@@ -4,9 +4,11 @@ import android.text.TextUtils;
 import android.webkit.URLUtil;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
-import com.criteo.publisher.mediation.tasks.CriteoInterstitialListenerCallTask;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.mediation.tasks.CriteoInterstitialListenerCallTask;
+import com.criteo.publisher.model.BidToken;
 import com.criteo.publisher.model.Slot;
+import com.criteo.publisher.model.TokenValue;
 
 
 public class CriteoInterstitialEventController {
@@ -31,12 +33,12 @@ public class CriteoInterstitialEventController {
 
         Slot slot = Criteo.getInstance().getBidForAdUnit(adUnit);
 
+        criteoInterstitialListenerCallTask = new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener);
+        criteoInterstitialListenerCallTask.execute(slot);
+
         if (slot != null && slot.isValid()) {
             //gets Webview data from Criteo before showing Interstitialview Activity
             getWebviewDataAsync(slot.getDisplayUrl(), criteoInterstitialAdListener);
-        } else {
-            criteoInterstitialListenerCallTask = new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener);
-            criteoInterstitialListenerCallTask.execute(slot);
         }
     }
 
@@ -49,10 +51,16 @@ public class CriteoInterstitialEventController {
         }
 
         webViewDownloader.fillWebViewHtmlContent(displayUrl, listener);
-
     }
 
     public String getWebViewDataContent() {
         return webViewDownloader.getWebViewData().getContent();
+    }
+
+    public void fetchAdAsync(BidToken bidToken) {
+        TokenValue tokenValue = Criteo.getInstance().getTokenValue(bidToken);
+        if (tokenValue != null) {
+            getWebviewDataAsync(tokenValue.getDisplayUrl(), criteoInterstitialAdListener);
+        }
     }
 }
