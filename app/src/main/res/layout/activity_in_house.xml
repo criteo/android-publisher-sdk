@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <Button
-          android:id="@+id/buttonStandAloneInterstitial"
+          android:id="@+id/buttonInhouseInterstitial"
           style="@style/Widget.AppCompat.Button.Colored"
           android:layout_width="0dp"
           android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
           android:enabled="false"
           android:text="Interstitial"/>
         <Button
-          android:id="@+id/buttonStandAloneBanner"
+          android:id="@+id/buttonInhouseBanner"
           style="@style/Widget.AppCompat.Button.Colored"
           android:layout_width="0dp"
           android:layout_height="wrap_content"
