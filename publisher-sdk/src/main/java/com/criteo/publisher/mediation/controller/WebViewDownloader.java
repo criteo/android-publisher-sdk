@@ -10,17 +10,29 @@ public class WebViewDownloader {
 
     public WebViewDownloader(WebViewData webviewData) {
         this.webViewData = webviewData;
-
     }
 
+    public boolean isLoading() {
+        return webViewData.isLoading();
+    }
 
     public void fillWebViewHtmlContent(String displayUrl, CriteoInterstitialAdListener listener) {
-
-        webViewData.refresh();
         new WebViewDataTask(webViewData, listener).execute(displayUrl);
     }
 
     public WebViewData getWebViewData() {
         return webViewData;
+    }
+
+    public void refresh() {
+        webViewData.refresh();
+    }
+
+    public void downloadFailed() {
+        webViewData.downloadFailed();
+    }
+
+    public void loading() {
+        webViewData.downloadloading();
     }
 }

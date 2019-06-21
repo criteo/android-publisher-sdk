@@ -2,11 +2,10 @@ package com.criteo.publisher;
 
 import android.text.TextUtils;
 import android.webkit.URLUtil;
-import com.criteo.publisher.Criteo;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import com.criteo.publisher.mediation.controller.WebViewDownloader;
-import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.mediation.tasks.CriteoInterstitialListenerCallTask;
+import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BidToken;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
@@ -30,28 +29,38 @@ public class CriteoInterstitialEventController {
         return webViewDownloader.getWebViewData().isLoaded();
     }
 
+    public void refresh() {
+        webViewDownloader.refresh();
+    }
+
     public void fetchAdAsync(AdUnit adUnit) {
+        if (!webViewDownloader.isLoading()) {
+            webViewDownloader.loading();
 
-        Slot slot = Criteo.getInstance().getBidForAdUnit(adUnit);
+            Slot slot = Criteo.getInstance().getBidForAdUnit(adUnit);
 
-        criteoInterstitialListenerCallTask = new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener);
-        criteoInterstitialListenerCallTask.execute(slot);
-
-        if (slot != null && slot.isValid()) {
-            //gets Webview data from Criteo before showing Interstitialview Activity
-            getWebviewDataAsync(slot.getDisplayUrl(), criteoInterstitialAdListener);
+            if (slot != null && slot.isValid()) {
+                //gets Webview data from Criteo before showing Interstitialview Activity
+                getWebviewDataAsync(slot.getDisplayUrl(), criteoInterstitialAdListener);
+            } else {
+                criteoInterstitialListenerCallTask = new CriteoInterstitialListenerCallTask(
+                        criteoInterstitialAdListener);
+                criteoInterstitialListenerCallTask.execute(slot);
+            }
         }
     }
 
     protected void getWebviewDataAsync(String displayUrl, CriteoInterstitialAdListener listener) {
         if (TextUtils.isEmpty(displayUrl) || (!URLUtil.isValidUrl(String.valueOf(displayUrl)))) {
             Slot slot = null;
+            webViewDownloader.downloadFailed();
             criteoInterstitialListenerCallTask = new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener);
             criteoInterstitialListenerCallTask.execute(slot);
             return;
         }
 
         webViewDownloader.fillWebViewHtmlContent(displayUrl, listener);
+
     }
 
     public String getWebViewDataContent() {

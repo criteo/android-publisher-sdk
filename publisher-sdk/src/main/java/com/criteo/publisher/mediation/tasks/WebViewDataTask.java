@@ -1,12 +1,11 @@
 package com.criteo.publisher.mediation.tasks;
 
-
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.webkit.URLUtil;
+import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.Util.StreamUtil;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
-import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.model.WebViewData;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -70,9 +69,11 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String data) {
         if (TextUtils.isEmpty(data)) {
             criteoInterstitialAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
+            webviewData.downloadFailed();
             return;
         } else {
             criteoInterstitialAdListener.onAdFetchSucceeded();
+            webviewData.downloadSucceeeded();
         }
 
         webviewData.setContent(data, criteoInterstitialAdListener);

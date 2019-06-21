@@ -4,12 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import com.criteo.publisher.CriteoInterstitialEventController;
 import com.criteo.publisher.Util.CriteoResultReceiver;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
+import com.criteo.publisher.mediation.controller.WebViewDownloader;
 import com.criteo.publisher.model.BidToken;
 import com.criteo.publisher.model.InterstitialAdUnit;
-import com.criteo.publisher.CriteoInterstitialEventController;
-import com.criteo.publisher.mediation.controller.WebViewDownloader;
 import com.criteo.publisher.model.WebViewData;
 
 public class CriteoInterstitialView {
@@ -38,7 +38,6 @@ public class CriteoInterstitialView {
             criteoInterstitialEventController = new CriteoInterstitialEventController(
                     criteoInterstitialAdListener, new WebViewDownloader(new WebViewData()));
         }
-
         criteoInterstitialEventController.fetchAdAsync(interstitialAdUnit);
     }
 
@@ -66,6 +65,9 @@ public class CriteoInterstitialView {
             intent.putExtras(bundle);
 
             criteoInterstitialAdListener.onAdOpened();
+            if (criteoInterstitialEventController != null) {
+                criteoInterstitialEventController.refresh();
+            }
             context.startActivity(intent);
         }
     }

@@ -3,25 +3,21 @@ package com.criteo.publisher.model;
 import static com.criteo.publisher.model.Config.WEBVIEW_DATA_MACRO;
 
 import android.text.TextUtils;
+import com.criteo.publisher.Util.WebViewLoadStatus;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 
 public class WebViewData {
 
     private String content;
-    private Boolean loaded;
-
-    public WebViewData(String content, Boolean loaded) {
-        this.content = content;
-        this.loaded = loaded;
-    }
+    private WebViewLoadStatus webViewLoadStatus;
 
     public WebViewData() {
         this.content = "";
-        this.loaded = false;
+        this.webViewLoadStatus = WebViewLoadStatus.NONE;
     }
 
     public boolean isLoaded() {
-        return loaded;
+        return (webViewLoadStatus == WebViewLoadStatus.LOADED);
     }
 
     public void setContent(String data, CriteoInterstitialAdListener criteoInterstitialAdListener) {
@@ -30,15 +26,13 @@ public class WebViewData {
         if (!TextUtils.isEmpty(data)) {
             dataWithTag = Config.MEDIATION_AD_TAG_DATA;
             dataWithTag = dataWithTag.replace(WEBVIEW_DATA_MACRO, data);
-
         }
 
-        this.loaded = !TextUtils.isEmpty(data);
         this.content = dataWithTag;
     }
 
-    public void setLoaded(boolean loaded) {
-        this.loaded = loaded;
+    public boolean isLoading() {
+        return webViewLoadStatus == WebViewLoadStatus.LOADING;
     }
 
     public String getContent() {
@@ -46,7 +40,19 @@ public class WebViewData {
     }
 
     public void refresh() {
-        loaded = false;
+        webViewLoadStatus = WebViewLoadStatus.NONE;
         content = "";
+    }
+
+    public void downloadFailed() {
+        this.webViewLoadStatus = WebViewLoadStatus.FAILED;
+    }
+
+    public void downloadSucceeeded() {
+        this.webViewLoadStatus = WebViewLoadStatus.LOADED;
+    }
+
+    public void downloadloading() {
+        this.webViewLoadStatus = WebViewLoadStatus.LOADING;
     }
 }

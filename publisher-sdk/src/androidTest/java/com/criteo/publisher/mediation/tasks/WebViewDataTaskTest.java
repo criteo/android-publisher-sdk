@@ -1,9 +1,11 @@
 package com.criteo.publisher.mediation.tasks;
 
 import android.test.UiThreadTest;
+import com.criteo.publisher.Util.WebViewLoadStatus;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.model.WebViewData;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -17,8 +19,7 @@ public class WebViewDataTaskTest {
     @Mock
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
-    @Mock
-    private WebViewData webViewData = new WebViewData("", false);
+    private WebViewData webViewData = new WebViewData("", false , WebViewLoadStatus.STATUS_NONE );
 
     private WebViewDataTask webViewDataTask;
     ;
@@ -35,6 +36,7 @@ public class WebViewDataTaskTest {
     public void testWithData() {
         webViewDataTask.onPostExecute("<html></html>");
 
+        Assert.assertEquals(WebViewLoadStatus.STATUS_LOADED , webViewData.getWebViewLoadStatus() );
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdFetchSucceeded();
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
     }
@@ -49,6 +51,7 @@ public class WebViewDataTaskTest {
             e.printStackTrace();
         }
 
+        Assert.assertEquals(WebViewLoadStatus.STATUS_FAILED , webViewData.getWebViewLoadStatus() );
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdFetchSucceeded();
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
     }
