@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.ResultReceiver;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,6 +19,8 @@ import android.widget.ImageButton;
 import com.criteo.publisher.R;
 
 public class CriteoInterstitialActivity extends Activity {
+
+    private static final int DISMISS_TIME = 7;
 
     private WebView webView;
     private ResultReceiver resultReceiver;
@@ -33,24 +36,26 @@ public class CriteoInterstitialActivity extends Activity {
         prepareWebView();
 
         Bundle bundle = getIntent().getExtras();
-        String webViewData = bundle.getString("webviewdata");
-        resultReceiver = bundle.getParcelable("resultreceiver");
-
-        if (webViewData != null) {
+        if (bundle != null && bundle.getString("webviewdata") != null) {
+            String webViewData = bundle.getString("webviewdata");
+            resultReceiver = bundle.getParcelable("resultreceiver");
             displayWebView(webViewData);
         }
 
         closeButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putInt(INTERSTITIAL_ACTION, ACTION_CLOSED);
-                resultReceiver.send(RESULT_CODE_SUCCESSFUL, bundle);
-                finish();
+                close();
             }
         });
 
+    }
 
+    private void close() {
+        Bundle bundle = new Bundle();
+        bundle.putInt(INTERSTITIAL_ACTION, ACTION_CLOSED);
+        resultReceiver.send(RESULT_CODE_SUCCESSFUL, bundle);
+        finish();
     }
 
     @Override
@@ -61,7 +66,19 @@ public class CriteoInterstitialActivity extends Activity {
     }
 
     private void displayWebView(String webViewData) {
+        waitAndDismiss();
         webView.loadDataWithBaseURL("about:blank", webViewData, "text/html", "UTF-8", "about:blank");
+    }
+
+    private void waitAndDismiss() {
+        Handler handler = new Handler();
+        Runnable runnableCode = new Runnable() {
+            @Override
+            public void run() {
+                close();
+            }
+        };
+        handler.postDelayed(runnableCode, DISMISS_TIME * 1000);
     }
 
     private void prepareWebView() {
