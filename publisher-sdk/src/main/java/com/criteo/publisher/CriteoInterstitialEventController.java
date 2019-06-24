@@ -2,6 +2,7 @@ package com.criteo.publisher;
 
 import android.text.TextUtils;
 import android.webkit.URLUtil;
+import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import com.criteo.publisher.mediation.controller.WebViewDownloader;
 import com.criteo.publisher.mediation.tasks.CriteoInterstitialListenerCallTask;
@@ -68,7 +69,11 @@ public class CriteoInterstitialEventController {
     }
 
     public void fetchAdAsync(BidToken bidToken) {
-        TokenValue tokenValue = Criteo.getInstance().getTokenValue(bidToken);
+        TokenValue tokenValue = Criteo.getInstance().getTokenValue(bidToken, AdUnitType.CRITEO_INTERSTITIAL);
+
+        criteoInterstitialListenerCallTask = new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener);
+        criteoInterstitialListenerCallTask.execute(tokenValue);
+
         if (tokenValue != null) {
             getWebviewDataAsync(tokenValue.getDisplayUrl(), criteoInterstitialAdListener);
         }

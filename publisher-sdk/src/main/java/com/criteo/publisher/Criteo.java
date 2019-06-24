@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 import com.criteo.publisher.AppEvents.AppEvents;
+import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.model.AdUnit;
@@ -75,7 +76,7 @@ public final class Criteo {
     /**
      * Method to start new CdbDownload Asynctask
      */
-    Slot getBidForAdUnit(AdUnit adUnit) {
+    public Slot getBidForAdUnit(AdUnit adUnit) {
         return bidManager.getBidForAdUnitAndPrefetch(adUnit);
     }
 
@@ -105,8 +106,8 @@ public final class Criteo {
         return bidManager.getBidForInhouseMediation(adUnit);
     }
 
-    TokenValue getTokenValue(BidToken bidToken) {
-        return bidManager.getTokenValue(bidToken);
+    public TokenValue getTokenValue(BidToken bidToken, AdUnitType adUnitType) {
+        return bidManager.getTokenValue(bidToken, adUnitType);
     }
 
 }

@@ -25,4 +25,8 @@ public class TokenValue {
     public String getDisplayUrl() {
         return displayUrl;
     }
+
+    public boolean isExpired() {
+        return gettokenExpirationTime() < System.currentTimeMillis();
+    }
 }

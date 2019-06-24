@@ -19,55 +19,82 @@ public class TokenCacheTest {
 
     @Test
     public void testGetTokenForBidAndGetValueForToken() {
-        TokenValue tokenForBanner1 = new TokenValue(100, 10, TEST_CREATIVE, AdUnitType.CRITEO_BANNER);
-        TokenValue tokenForBanner2 = new TokenValue(200, 5, TEST_CREATIVE, AdUnitType.CRITEO_BANNER);
-        TokenValue tokenForInterstitial1 = new TokenValue(100, 10, TEST_CREATIVE, AdUnitType.CRITEO_INTERSTITIAL);
-        TokenValue tokenForInterstitial2 = new TokenValue(100, 10, TEST_CREATIVE, AdUnitType.CRITEO_INTERSTITIAL);
+        TokenValue tokenForBanner1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE, AdUnitType.CRITEO_BANNER);
+        TokenValue tokenForBanner2 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE, AdUnitType.CRITEO_BANNER);
+        TokenValue tokenForInterstitial1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE, AdUnitType.CRITEO_INTERSTITIAL);
+        TokenValue tokenForInterstitial2 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE, AdUnitType.CRITEO_INTERSTITIAL);
 
         BidToken bidTokenForBanner1 = tokenCache.add(tokenForBanner1);
         BidToken bidTokenForBanner2 = tokenCache.add(tokenForBanner2);
         BidToken bidTokenForInterstitial1 = tokenCache.add(tokenForInterstitial1);
         BidToken bidTokenForInterstitial2 = tokenCache.add(tokenForInterstitial2);
 
-        Assert.assertEquals(tokenForBanner1, tokenCache.getTokenValue(bidTokenForBanner1));
-        Assert.assertEquals(tokenForBanner2, tokenCache.getTokenValue(bidTokenForBanner2));
-        Assert.assertEquals(tokenForInterstitial1, tokenCache.getTokenValue(bidTokenForInterstitial1));
-        Assert.assertEquals(tokenForInterstitial2, tokenCache.getTokenValue(bidTokenForInterstitial2));
+        Assert.assertEquals(tokenForBanner1, tokenCache.getTokenValue(bidTokenForBanner1, AdUnitType.CRITEO_BANNER));
+        Assert.assertEquals(tokenForBanner2, tokenCache.getTokenValue(bidTokenForBanner2, AdUnitType.CRITEO_BANNER));
+        Assert.assertEquals(tokenForInterstitial1,
+                tokenCache.getTokenValue(bidTokenForInterstitial1, AdUnitType.CRITEO_INTERSTITIAL));
+        Assert.assertEquals(tokenForInterstitial2,
+                tokenCache.getTokenValue(bidTokenForInterstitial2, AdUnitType.CRITEO_INTERSTITIAL));
+    }
+
+    @Test
+    public void testReturnNullWhenTokenExpired() {
+        TokenValue tokenForBanner1 = new TokenValue(System.currentTimeMillis(), -1, TEST_CREATIVE, AdUnitType.CRITEO_BANNER);
+        TokenValue tokenForInterstitial1 = new TokenValue(System.currentTimeMillis(), -1, TEST_CREATIVE, AdUnitType.CRITEO_INTERSTITIAL);
+
+        BidToken bidTokenForBanner1 = tokenCache.add(tokenForBanner1);
+        BidToken bidTokenForInterstitial1 = tokenCache.add(tokenForInterstitial1);
+
+        Assert.assertNull(tokenCache.getTokenValue(bidTokenForBanner1, AdUnitType.CRITEO_BANNER));
+        Assert.assertNull(tokenCache.getTokenValue(bidTokenForInterstitial1, AdUnitType.CRITEO_INTERSTITIAL));
+    }
+
+    @Test
+    public void testReturnNullWhenWrongAdUnitType() {
+        TokenValue tokenForBanner1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE, AdUnitType.CRITEO_BANNER);
+        TokenValue tokenForInterstitial1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE, AdUnitType.CRITEO_INTERSTITIAL);
+
+        BidToken bidTokenForBanner1 = tokenCache.add(tokenForBanner1);
+        BidToken bidTokenForInterstitial1 = tokenCache.add(tokenForInterstitial1);
+
+        Assert.assertNull(tokenCache.getTokenValue(bidTokenForBanner1, AdUnitType.CRITEO_INTERSTITIAL));
+        Assert.assertNull(tokenCache.getTokenValue(bidTokenForInterstitial1, AdUnitType.CRITEO_BANNER));
     }
 
     @Test
     public void testGetTokenForBidAndGetValueForTokenNotEquals() {
-        TokenValue tokenForBanner1 = new TokenValue(100, 10, TEST_CREATIVE, AdUnitType.CRITEO_BANNER);
-        TokenValue tokenForBanner2 = new TokenValue(200, 5, TEST_CREATIVE, AdUnitType.CRITEO_BANNER);
-        TokenValue tokenForInterstitial1 = new TokenValue(100, 10, TEST_CREATIVE, AdUnitType.CRITEO_INTERSTITIAL);
-        TokenValue tokenForInterstitial2 = new TokenValue(100, 10, TEST_CREATIVE, AdUnitType.CRITEO_INTERSTITIAL);
+        TokenValue tokenForBanner1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE, AdUnitType.CRITEO_BANNER);
+        TokenValue tokenForBanner2 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE, AdUnitType.CRITEO_BANNER);
+        TokenValue tokenForInterstitial1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE, AdUnitType.CRITEO_INTERSTITIAL);
+        TokenValue tokenForInterstitial2 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE, AdUnitType.CRITEO_INTERSTITIAL);
 
         BidToken bidTokenForBanner2 = tokenCache.add(tokenForBanner2);
         BidToken bidTokenForInterstitial2 = tokenCache.add(tokenForInterstitial2);
-        Assert.assertNotEquals(tokenForBanner1, tokenCache.getTokenValue(bidTokenForBanner2));
-        Assert.assertNotEquals(tokenForInterstitial1, tokenCache.getTokenValue(bidTokenForInterstitial2));
+        Assert.assertNotEquals(tokenForBanner1, tokenCache.getTokenValue(bidTokenForBanner2, AdUnitType.CRITEO_BANNER));
+        Assert.assertNotEquals(tokenForInterstitial1,
+                tokenCache.getTokenValue(bidTokenForInterstitial2, AdUnitType.CRITEO_INTERSTITIAL));
     }
 
     //Checks TokenCache removes token after call getTokenValue
     @Test
     public void testGetTokenForBidAndGetValueForTokenCheckNull() {
-        TokenValue tokenForBanner1 = new TokenValue(100, 10, TEST_CREATIVE, AdUnitType.CRITEO_BANNER);
-        TokenValue tokenForInterstitial1 = new TokenValue(100, 10, TEST_CREATIVE, AdUnitType.CRITEO_INTERSTITIAL);
+        TokenValue tokenForBanner1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE, AdUnitType.CRITEO_BANNER);
+        TokenValue tokenForInterstitial1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE, AdUnitType.CRITEO_INTERSTITIAL);
 
         BidToken bidTokenForBanner1 = tokenCache.add(tokenForBanner1);
         BidToken bidTokenForInterstitial1 = tokenCache.add(tokenForInterstitial1);
-        tokenCache.getTokenValue(bidTokenForBanner1);
-        tokenCache.getTokenValue(bidTokenForInterstitial1);
-        Assert.assertNull(tokenCache.getTokenValue(bidTokenForBanner1));
-        Assert.assertNull(tokenCache.getTokenValue(bidTokenForInterstitial1));
+        tokenCache.getTokenValue(bidTokenForBanner1, AdUnitType.CRITEO_BANNER);
+        tokenCache.getTokenValue(bidTokenForInterstitial1, AdUnitType.CRITEO_INTERSTITIAL);
+        Assert.assertNull(tokenCache.getTokenValue(bidTokenForBanner1, AdUnitType.CRITEO_BANNER));
+        Assert.assertNull(tokenCache.getTokenValue(bidTokenForInterstitial1, AdUnitType.CRITEO_INTERSTITIAL));
     }
 
     @Test
     public void testGetUncachedTokenAndNullToken() {
         BidToken unChachedToken = new BidToken(UUID.randomUUID());
         BidToken nullToken = null;
-        Assert.assertNull(tokenCache.getTokenValue(unChachedToken));
-        Assert.assertNull(tokenCache.getTokenValue(nullToken));
+        Assert.assertNull(tokenCache.getTokenValue(unChachedToken, AdUnitType.CRITEO_BANNER));
+        Assert.assertNull(tokenCache.getTokenValue(nullToken, AdUnitType.CRITEO_BANNER));
     }
 
 }

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.listener.CriteoBannerAdListener;
 import com.criteo.publisher.mediation.tasks.CriteoBannerListenerCallTask;
 import com.criteo.publisher.mediation.view.CriteoBannerView;
@@ -17,7 +18,7 @@ import com.criteo.publisher.model.TokenValue;
 public class CriteoBannerEventController {
 
     private CriteoBannerView criteoBannerView;
-    private CriteoBannerListenerCallTask criteoBannerFetchTask;
+    private CriteoBannerListenerCallTask criteoBannerListenerCallTask;
     private CriteoBannerAdListener criteoBannerAdListener;
 
     public CriteoBannerEventController(CriteoBannerView bannerView, CriteoBannerAdListener listener) {
@@ -47,8 +48,8 @@ public class CriteoBannerEventController {
     public void fetchAdAsync(AdUnit adUnit) {
         Slot slot = Criteo.getInstance().getBidForAdUnit(adUnit);
 
-        criteoBannerFetchTask = new CriteoBannerListenerCallTask(criteoBannerView, criteoBannerAdListener);
-        criteoBannerFetchTask.execute(slot);
+        criteoBannerListenerCallTask = new CriteoBannerListenerCallTask(criteoBannerView, criteoBannerAdListener);
+        criteoBannerListenerCallTask.execute(slot);
 
         if (slot != null && slot.isValid()) {
             loadWebview(slot.getDisplayUrl());
@@ -62,7 +63,11 @@ public class CriteoBannerEventController {
     }
 
     public void fetchAdAsync(BidToken bidToken) {
-        TokenValue tokenValue = Criteo.getInstance().getTokenValue(bidToken);
+        TokenValue tokenValue = Criteo.getInstance().getTokenValue(bidToken, AdUnitType.CRITEO_BANNER);
+
+        criteoBannerListenerCallTask = new CriteoBannerListenerCallTask(criteoBannerView, criteoBannerAdListener);
+        criteoBannerListenerCallTask.execute(tokenValue);
+
         if (tokenValue != null) {
             loadWebview(tokenValue.getDisplayUrl());
         }

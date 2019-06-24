@@ -2,11 +2,12 @@ package com.criteo.publisher.mediation.tasks;
 
 import android.os.AsyncTask;
 import android.webkit.URLUtil;
-import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import com.criteo.publisher.Util.CriteoErrorCode;
+import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import com.criteo.publisher.model.Slot;
+import com.criteo.publisher.model.TokenValue;
 
-public class CriteoInterstitialListenerCallTask extends AsyncTask<Slot, Void, Slot> {
+public class CriteoInterstitialListenerCallTask extends AsyncTask<Object, Void, Object> {
 
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
@@ -15,20 +16,35 @@ public class CriteoInterstitialListenerCallTask extends AsyncTask<Slot, Void, Sl
     }
 
     @Override
-    protected Slot doInBackground(Slot... slots) {
-        if (slots == null || slots.length == 0) {
+    protected Object doInBackground(Object... objects) {
+        if (objects == null || objects.length == 0) {
             return null;
         }
-        Slot slot = slots[0];
-        return slot;
+        Object object = objects[0];
+        return object;
     }
 
     @Override
-    protected void onPostExecute(Slot slot) {
-        super.onPostExecute(slot);
-        if (slot == null || !slot.isValid() || !URLUtil
-                .isValidUrl(slot.getDisplayUrl())) {
+    protected void onPostExecute(Object object) {
+        super.onPostExecute(object);
+        if (object == null) {
             criteoInterstitialAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
+            return;
         }
+
+        if (object instanceof Slot) {
+            Slot slot = (Slot) object;
+            if (!slot.isValid() || !URLUtil
+                    .isValidUrl(slot.getDisplayUrl())) {
+                criteoInterstitialAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
+            }
+        } else if (object instanceof TokenValue) {
+            TokenValue tokenValue = (TokenValue) object;
+            if (tokenValue == null) {
+                criteoInterstitialAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
+            }
+        }
+
+
     }
 }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
@@ -223,9 +224,9 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
     }
 
-    public TokenValue getTokenValue(BidToken bidToken) {
+    public TokenValue getTokenValue(BidToken bidToken, AdUnitType adUnitType) {
         if (bidToken != null) {
-            return tokenCache.getTokenValue(bidToken);
+            return tokenCache.getTokenValue(bidToken, adUnitType);
         }
         return null;
     }

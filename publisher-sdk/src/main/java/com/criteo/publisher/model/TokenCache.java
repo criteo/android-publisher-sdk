@@ -1,5 +1,6 @@
 package com.criteo.publisher.model;
 
+import com.criteo.publisher.Util.AdUnitType;
 import java.util.Hashtable;
 import java.util.UUID;
 
@@ -17,13 +18,20 @@ public class TokenCache {
         return bidToken;
     }
 
-    public TokenValue getTokenValue(BidToken bidToken) {
+    public TokenValue getTokenValue(BidToken bidToken, AdUnitType adUnitType) {
         if (bidToken == null) {
             return null;
         }
 
         if (tokenMap.containsKey(bidToken)) {
             TokenValue tokenValue = tokenMap.get(bidToken);
+            if (tokenValue.isExpired()) {
+                tokenMap.remove(bidToken);
+                return null;
+            }
+            if (tokenValue.getAdUnitType() != adUnitType) {
+                return null;
+            }
             tokenMap.remove(bidToken);
             return tokenValue;
         } else {
