@@ -77,16 +77,16 @@
    public *;
 }
 
--keep public class com.criteo.publisher.mediation.utils.CriteoErrorCode
--keepclassmembers class com.criteo.publisher.mediation.utils.CriteoErrorCode {
+-keep public class com.criteo.publisher.Util.CriteoErrorCode
+-keepclassmembers class com.criteo.publisher.Util.CriteoErrorCode {
    public *;
 }
 
--keep public interface com.criteo.publisher.mediation.listeners.CriteoAdListener {*;}
+-keep public interface com.criteo.publisher.listener.CriteoAdListener {*;}
 
--keep public interface com.criteo.publisher.mediation.listeners.CriteoBannerAdListener {*;}
+-keep public interface com.criteo.publisher.listener.CriteoBannerAdListener {*;}
 
--keep public interface com.criteo.publisher.mediation.listeners.CriteoInterstitialAdListener {*;}
+-keep public interface com.criteo.publisher.listener.CriteoInterstitialAdListener {*;}
 
 
 
