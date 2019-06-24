@@ -81,7 +81,13 @@ public class InHouseActivity extends AppCompatActivity {
         InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit("/140800857/Endeavour_Interstitial_320x480");
         criteoInterstitialView = new CriteoInterstitialView(context, interstitialAdUnit);
         criteoInterstitialView.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
-        criteoInterstitialView.loadAd();
+        BidResponse bidResponse = Criteo.getInstance().getBidForInhouseMediation(interstitialAdUnit);
+
+        if (bidResponse.isValid()) {
+            criteoInterstitialView = new CriteoInterstitialView(context, interstitialAdUnit);
+            criteoInterstitialView.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
+            criteoInterstitialView.loadAd(bidResponse.getToken());
+        }
     }
 
 
