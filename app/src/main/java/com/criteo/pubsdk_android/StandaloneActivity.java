@@ -83,7 +83,7 @@ public class StandaloneActivity extends AppCompatActivity {
         criteoBannerAdListener = new CriteoBannerAdListener() {
 
             @Override
-            public void onAdFullScreen() {
+            public void onAdOpened() {
                 Log.d(TAG, "Banner ad fullscreen");
             }
 
@@ -93,17 +93,17 @@ public class StandaloneActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onAdClicked() {
+            public void onAdLeftApplication() {
                 Log.d(TAG, "Banner ad clicked");
             }
 
             @Override
-            public void onAdFetchFailed(CriteoErrorCode code) {
+            public void onAdFailedToLoad(CriteoErrorCode code) {
                 Log.d(TAG, "Banner ad failed, reason : "+code.toString());
             }
 
             @Override
-            public void onAdFetchSucceeded(View view) {
+            public void onAdLoaded(View view) {
                 Log.d(TAG, "Banner ad loaded");
             }
         };
@@ -116,17 +116,17 @@ public class StandaloneActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onAdFetchFailed(CriteoErrorCode code) {
+            public void onAdFailedToLoad(CriteoErrorCode code) {
                 Log.d(TAG, "Interstitial ad failed");
             }
 
             @Override
-            public void onAdClicked() {
+            public void onAdLeftApplication() {
                 Log.d(TAG, "Interstitial ad clicked");
             }
 
             @Override
-            public void onAdFullScreen() {
+            public void onAdOpened() {
                 Log.d(TAG, "Interstitial ad full screen");
             }
 

@@ -16,11 +16,11 @@ public class BidResponse {
         return price;
     }
 
-    public BidToken getToken() {
+    public BidToken getBidToken() {
         return token;
     }
 
-    public boolean isValid() {
+    public boolean isBidSuccess() {
         return valid;
     }
 }

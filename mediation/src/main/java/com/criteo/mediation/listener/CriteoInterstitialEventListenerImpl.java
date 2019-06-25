@@ -24,7 +24,7 @@ public class CriteoInterstitialEventListenerImpl implements CriteoInterstitialAd
     }
 
     @Override
-    public void onAdFetchFailed(CriteoErrorCode code) {
+    public void onAdFailedToLoad(CriteoErrorCode code) {
         switch (code) {
             case ERROR_CODE_INTERNAL_ERROR:
                 customEventInterstitialListener.onAdFailedToLoad(AdRequest.ERROR_CODE_INTERNAL_ERROR);
@@ -42,7 +42,7 @@ public class CriteoInterstitialEventListenerImpl implements CriteoInterstitialAd
     }
 
     @Override
-    public void onAdFullScreen() {
+    public void onAdOpened() {
         customEventInterstitialListener.onAdOpened();
     }
 
@@ -52,8 +52,8 @@ public class CriteoInterstitialEventListenerImpl implements CriteoInterstitialAd
     }
 
     @Override
-    public void onAdClicked() {
-        customEventInterstitialListener.onAdClicked();
+    public void onAdLeftApplication() {
+        customEventInterstitialListener.onAdLeftApplication();
     }
 
 }

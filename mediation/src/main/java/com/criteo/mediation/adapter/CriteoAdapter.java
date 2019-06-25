@@ -1,12 +1,11 @@
 package com.criteo.mediation.adapter;
 
-import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import com.criteo.publisher.Criteo;
-import com.criteo.publisher.mediation.controller.CriteoBannerEventController;
-import com.criteo.publisher.mediation.controller.CriteoInterstitialEventController;
+import com.criteo.publisher.CriteoBannerEventController;
+import com.criteo.publisher.CriteoInterstitialEventController;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;

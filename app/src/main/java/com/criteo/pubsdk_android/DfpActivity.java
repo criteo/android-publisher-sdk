@@ -106,6 +106,16 @@ public class DfpActivity extends AppCompatActivity {
             }
 
             @Override
+            public void onAdImpression() {
+                super.onAdImpression();
+            }
+
+            @Override
+            public void onAdClicked() {
+                super.onAdClicked();
+            }
+
+            @Override
             public void onAdClosed() {
                 // Code to be executed when when the interstitial ad is closed.
             }

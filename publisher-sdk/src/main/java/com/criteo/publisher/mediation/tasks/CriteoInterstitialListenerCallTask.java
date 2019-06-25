@@ -28,7 +28,7 @@ public class CriteoInterstitialListenerCallTask extends AsyncTask<Slot, Void, Sl
         super.onPostExecute(slot);
         if (slot == null || !slot.isValid() || !URLUtil
                 .isValidUrl(slot.getDisplayUrl())) {
-            criteoInterstitialAdListener.onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NO_FILL);
+            criteoInterstitialAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
         }
     }
 }

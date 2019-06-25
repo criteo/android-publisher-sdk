@@ -21,7 +21,7 @@ public class BidResponseTest {
 
         bidResponse1 = new BidResponse(PRICE, token1, VALID);
         Assert.assertEquals(PRICE, bidResponse1.getPrice(), 0);
-        Assert.assertEquals(VALID, bidResponse1.isValid());
+        Assert.assertEquals(VALID, bidResponse1.isBidSuccess());
     }
 
     @Test
@@ -33,7 +33,7 @@ public class BidResponseTest {
 
         bidResponse1 = new BidResponse(PRICE, token1, VALID);
         Assert.assertEquals(PRICE, bidResponse1.getPrice(), 0);
-        Assert.assertEquals(VALID, bidResponse1.isValid());
+        Assert.assertEquals(VALID, bidResponse1.isBidSuccess());
     }
 
 }

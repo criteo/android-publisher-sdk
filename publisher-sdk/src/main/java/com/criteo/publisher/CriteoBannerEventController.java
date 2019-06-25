@@ -1,10 +1,9 @@
-package com.criteo.publisher.mediation.controller;
+package com.criteo.publisher;
 
 import android.content.Intent;
 import android.net.Uri;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import com.criteo.publisher.Criteo;
 import com.criteo.publisher.listener.CriteoBannerAdListener;
 import com.criteo.publisher.mediation.tasks.CriteoBannerListenerCallTask;
 import com.criteo.publisher.mediation.view.CriteoBannerView;
@@ -35,7 +34,7 @@ public class CriteoBannerEventController {
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 view.getContext().startActivity(
                         new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                criteoBannerAdListener.onAdClicked();
+                criteoBannerAdListener.onAdLeftApplication();
                 return true;
             }
 

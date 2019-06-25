@@ -48,12 +48,12 @@ public class InHouseActivity extends AppCompatActivity {
                 adLayout.removeAllViews();
                 BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(50, 320));
 
-                BidResponse bidResponse = Criteo.getInstance().getBidForInhouseMediation(bannerAdUnit);
+                BidResponse bidResponse = Criteo.getInstance().getBidResponse(bannerAdUnit);
 
-                if (bidResponse.isValid()) {
+                if (bidResponse.isBidSuccess()) {
                     criteoBannerView = new CriteoBannerView(context, bannerAdUnit);
                     criteoBannerView.setCriteoBannerAdListener(criteoBannerAdListener);
-                    criteoBannerView.loadAd(bidResponse.getToken());
+                    criteoBannerView.loadAd(bidResponse.getBidToken());
                     adLayout.addView(criteoBannerView);
                 }
             }
@@ -81,12 +81,12 @@ public class InHouseActivity extends AppCompatActivity {
         InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit("/140800857/Endeavour_Interstitial_320x480");
         criteoInterstitialView = new CriteoInterstitialView(context, interstitialAdUnit);
         criteoInterstitialView.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
-        BidResponse bidResponse = Criteo.getInstance().getBidForInhouseMediation(interstitialAdUnit);
+        BidResponse bidResponse = Criteo.getInstance().getBidResponse(interstitialAdUnit);
 
-        if (bidResponse.isValid()) {
+        if (bidResponse.isBidSuccess()) {
             criteoInterstitialView = new CriteoInterstitialView(context, interstitialAdUnit);
             criteoInterstitialView.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
-            criteoInterstitialView.loadAd(bidResponse.getToken());
+            criteoInterstitialView.loadAd(bidResponse.getBidToken());
         }
     }
 
@@ -95,7 +95,7 @@ public class InHouseActivity extends AppCompatActivity {
         criteoBannerAdListener = new CriteoBannerAdListener() {
 
             @Override
-            public void onAdFullScreen() {
+            public void onAdOpened() {
                 Log.d(TAG, "Banner ad fullscreen");
             }
 
@@ -105,17 +105,17 @@ public class InHouseActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onAdClicked() {
+            public void onAdLeftApplication() {
                 Log.d(TAG, "Banner ad clicked");
             }
 
             @Override
-            public void onAdFetchFailed(CriteoErrorCode code) {
+            public void onAdFailedToLoad(CriteoErrorCode code) {
                 Log.d(TAG, "Banner ad failed, reason : " + code.toString());
             }
 
             @Override
-            public void onAdFetchSucceeded(View view) {
+            public void onAdLoaded(View view) {
                 Log.d(TAG, "Banner ad loaded");
             }
         };
@@ -128,17 +128,17 @@ public class InHouseActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onAdFetchFailed(CriteoErrorCode code) {
+            public void onAdFailedToLoad(CriteoErrorCode code) {
                 Log.d(TAG, "Interstitial ad failed");
             }
 
             @Override
-            public void onAdClicked() {
+            public void onAdLeftApplication() {
                 Log.d(TAG, "Interstitial ad clicked");
             }
 
             @Override
-            public void onAdFullScreen() {
+            public void onAdOpened() {
                 Log.d(TAG, "Interstitial ad full screen");
             }
 

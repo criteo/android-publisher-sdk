@@ -1,9 +1,10 @@
-package com.criteo.publisher.mediation.controller;
+package com.criteo.publisher;
 
 import android.text.TextUtils;
 import android.webkit.URLUtil;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
+import com.criteo.publisher.mediation.controller.WebViewDownloader;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.mediation.tasks.CriteoInterstitialListenerCallTask;
 import com.criteo.publisher.model.BidToken;

@@ -33,7 +33,7 @@ public class CriteoResultReceiver extends ResultReceiver {
 
             switch (action) {
                 case ACTION_CLICKED:
-                    criteoInterstitialAdListener.onAdClicked();
+                    criteoInterstitialAdListener.onAdLeftApplication();
                     break;
 
                 case ACTION_CLOSED:

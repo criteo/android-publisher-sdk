@@ -69,7 +69,7 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String data) {
         if (TextUtils.isEmpty(data)) {
-            criteoInterstitialAdListener.onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
+            criteoInterstitialAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
             return;
         } else {
             criteoInterstitialAdListener.onAdFetchSucceeded();

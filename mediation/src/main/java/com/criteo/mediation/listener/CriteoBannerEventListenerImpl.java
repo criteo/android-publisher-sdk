@@ -19,12 +19,12 @@ public class CriteoBannerEventListenerImpl implements CriteoBannerAdListener {
     }
 
     @Override
-    public void onAdFetchSucceeded(View view) {
+    public void onAdLoaded(View view) {
         customEventBannerListener.onAdLoaded(view);
     }
 
     @Override
-    public void onAdFetchFailed(CriteoErrorCode code) {
+    public void onAdFailedToLoad(CriteoErrorCode code) {
         switch (code) {
             case ERROR_CODE_INTERNAL_ERROR:
                 customEventBannerListener.onAdFailedToLoad(AdRequest.ERROR_CODE_INTERNAL_ERROR);
@@ -42,7 +42,7 @@ public class CriteoBannerEventListenerImpl implements CriteoBannerAdListener {
     }
 
     @Override
-    public void onAdFullScreen() {
+    public void onAdOpened() {
 
     }
 
@@ -52,8 +52,8 @@ public class CriteoBannerEventListenerImpl implements CriteoBannerAdListener {
     }
 
     @Override
-    public void onAdClicked() {
-        customEventBannerListener.onAdClicked();
+    public void onAdLeftApplication() {
+        customEventBannerListener.onAdLeftApplication();
     }
 
 }

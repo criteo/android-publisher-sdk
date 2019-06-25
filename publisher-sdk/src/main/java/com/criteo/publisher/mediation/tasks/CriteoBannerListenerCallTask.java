@@ -30,9 +30,9 @@ public class CriteoBannerListenerCallTask extends AsyncTask<Slot, Void, Slot> {
     protected void onPostExecute(Slot slot) {
         super.onPostExecute(slot);
         if (slot == null || !slot.isValid()) {
-            criteoBannerAdListener.onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NO_FILL);
+            criteoBannerAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
         } else {
-            criteoBannerAdListener.onAdFetchSucceeded(criteoBannerView);
+            criteoBannerAdListener.onAdLoaded(criteoBannerView);
         }
     }
 }
