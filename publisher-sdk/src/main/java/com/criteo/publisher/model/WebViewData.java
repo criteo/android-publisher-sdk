@@ -1,7 +1,5 @@
 package com.criteo.publisher.model;
 
-import static com.criteo.publisher.model.Config.WEBVIEW_DATA_MACRO;
-
 import android.text.TextUtils;
 import com.criteo.publisher.Util.WebViewLoadStatus;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
@@ -24,8 +22,8 @@ public class WebViewData {
         String dataWithTag = "";
 
         if (!TextUtils.isEmpty(data)) {
-            dataWithTag = Config.MEDIATION_AD_TAG_DATA;
-            dataWithTag = dataWithTag.replace(WEBVIEW_DATA_MACRO, data);
+            dataWithTag = Config.getAdTagDataMode();
+            dataWithTag = dataWithTag.replace(Config.getAdTagDataMacro(), data);
         }
 
         this.content = dataWithTag;

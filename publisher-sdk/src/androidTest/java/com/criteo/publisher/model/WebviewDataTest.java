@@ -1,9 +1,6 @@
 package com.criteo.publisher.model;
 
-import static com.criteo.publisher.model.Config.WEBVIEW_DATA_MACRO;
-
 import android.text.TextUtils;
-import com.criteo.publisher.Util.WebViewLoadStatus;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import org.junit.Assert;
 import org.junit.Before;
@@ -32,7 +29,8 @@ public class WebviewDataTest {
         webviewData.setContent(data, criteoInterstitialAdListener);
 
         Assert.assertTrue(!TextUtils.isEmpty(webviewData.getContent()));
-        Assert.assertFalse(webviewData.getContent().contains(WEBVIEW_DATA_MACRO));
+        Assert.assertFalse(webviewData.getContent().contains(Config.getAdTagDataMode()));
+        Assert.assertTrue(webviewData.isLoaded());
 
     }
 }

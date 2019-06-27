@@ -57,8 +57,8 @@ public class CriteoBannerEventController {
     }
 
     private void loadWebview(String url) {
-        String displayUrlWithTag = Config.MEDIATION_AD_TAG_URL;
-        String displayUrl = displayUrlWithTag.replace(Config.DISPLAY_URL_MACRO, url);
+        String displayUrlWithTag = Config.getAdTagUrlMode();
+        String displayUrl = displayUrlWithTag.replace(Config.getDisplayUrlMacro(), url);
         criteoBannerView.loadDataWithBaseURL("", displayUrl, "text/html", "UTF-8", "");
     }
 
