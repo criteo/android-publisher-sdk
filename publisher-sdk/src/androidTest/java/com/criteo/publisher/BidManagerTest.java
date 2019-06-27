@@ -233,7 +233,7 @@ public class BidManagerTest {
                 new TokenCache());
         manager.setCacheAdUnits(slots);
         BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
-        Assert.assertFalse(bidResponse.isValid());
+        Assert.assertFalse(bidResponse.isBidSuccess());
     }
 
     @Test
@@ -250,7 +250,7 @@ public class BidManagerTest {
                 new TokenCache());
         manager.setCacheAdUnits(slots);
         BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
-        Assert.assertFalse(bidResponse.isValid());
+        Assert.assertFalse(bidResponse.isBidSuccess());
     }
 
 
@@ -273,7 +273,7 @@ public class BidManagerTest {
                 new TokenCache());
         manager.setCacheAdUnits(slots);
         BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
-        Assert.assertTrue(bidResponse.isValid());
+        Assert.assertTrue(bidResponse.isBidSuccess());
         Assert.assertEquals(10.0d, bidResponse.getPrice(), 0.0);
     }
 

@@ -41,7 +41,7 @@ public class CriteoInterstitialListenerCallTaskTest {
 
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdFetchSucceeded();
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(1))
-                .onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NO_FILL);
+                .onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
     }
 
     @Test
@@ -60,7 +60,7 @@ public class CriteoInterstitialListenerCallTaskTest {
 
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdFetchSucceeded();
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(1))
-                .onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NO_FILL);
+                .onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
     }
 
     @Test
@@ -73,7 +73,7 @@ public class CriteoInterstitialListenerCallTaskTest {
         Thread.sleep(100);
 
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(1))
-                .onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NO_FILL);
+                .onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
     }
 
 

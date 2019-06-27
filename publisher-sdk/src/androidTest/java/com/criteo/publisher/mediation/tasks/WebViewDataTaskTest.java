@@ -1,5 +1,7 @@
 package com.criteo.publisher.mediation.tasks;
 
+import static org.mockito.Mockito.mock;
+
 import android.test.UiThreadTest;
 import com.criteo.publisher.Util.WebViewLoadStatus;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
@@ -50,10 +52,11 @@ public class WebViewDataTaskTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-        Assert.assertEquals(WebViewLoadStatus.STATUS_FAILED , webViewData.getWebViewLoadStatus() );
+        Assert.assertFalse(webViewData.isLoaded());
+        Mockito.verify(webViewData, Mockito.times(0)).downloadSucceeeded();
+        Mockito.verify(webViewData, Mockito.times(1)).downloadFailed();
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdFetchSucceeded();
-        Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
     }
 
 }

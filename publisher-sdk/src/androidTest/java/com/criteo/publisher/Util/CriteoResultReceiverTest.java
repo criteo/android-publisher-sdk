@@ -39,7 +39,7 @@ public class CriteoResultReceiverTest {
         bundle.putInt(INTERSTITIAL_ACTION, ACTION_CLICKED);
         criteoResultReceiver.onReceiveResult(RESULT_CODE_SUCCESSFUL, bundle);
 
-        Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdClicked();
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdLeftApplication();
     }
 
     @Test

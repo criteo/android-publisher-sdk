@@ -1,7 +1,6 @@
 package com.criteo.publisher.mediation.controller;
 
-import static org.mockito.Mockito.when;
-
+import com.criteo.publisher.CriteoInterstitialEventController;
 import com.criteo.publisher.Util.WebViewLoadStatus;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import com.criteo.publisher.model.InterstitialAdUnit;
@@ -10,7 +9,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class CriteoInterstitialEventControllerTest {
