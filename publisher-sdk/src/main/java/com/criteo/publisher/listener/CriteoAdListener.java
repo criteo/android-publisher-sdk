@@ -9,21 +9,21 @@ public interface CriteoAdListener {
      *
      * @param code The reason the fetch failed.
      */
-    public void onAdFailedToLoad(CriteoErrorCode code);
+    void onAdFailedToLoad(CriteoErrorCode code);
 
     /**
      * Called when an ad goes full screen.
      */
-    public void onAdOpened();
+    void onAdOpened();
 
     /**
      * Called when an ad is closed.
      */
-    public void onAdClosed();
+    void onAdClosed();
 
     /**
      * Called when an ad is clicked.
      */
-    public void onAdLeftApplication();
+    void onAdLeftApplication();
 
 }

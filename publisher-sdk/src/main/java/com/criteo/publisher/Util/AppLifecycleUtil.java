@@ -1,18 +1,19 @@
 package com.criteo.publisher.Util;
 
-import android.app.Application;
 import android.app.Activity;
+import android.app.Application;
 import android.os.Bundle;
-
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.BidManager;
 
 public class AppLifecycleUtil implements Application.ActivityLifecycleCallbacks {
+
     private final AppEvents appEvents;
     private final BidManager bidManager;
     private int started;
     private int resumed;
     private boolean transitionPossible;
+
     public AppLifecycleUtil(Application application, AppEvents appEvents, BidManager bidmanager) {
         this.appEvents = appEvents;
         this.bidManager = bidmanager;
@@ -37,7 +38,7 @@ public class AppLifecycleUtil implements Application.ActivityLifecycleCallbacks 
 
     @Override
     public void onActivityResumed(Activity activity) {
-        if(resumed == 0 && !transitionPossible) {
+        if (resumed == 0 && !transitionPossible) {
             appEvents.sendActiveEvent();
         }
         transitionPossible = false;
@@ -52,9 +53,9 @@ public class AppLifecycleUtil implements Application.ActivityLifecycleCallbacks 
 
     @Override
     public void onActivityStopped(Activity activity) {
-        if(started == 1) {
+        if (started == 1) {
             // All transitions pause and stop activities
-            if(transitionPossible && resumed == 0) {
+            if (transitionPossible && resumed == 0) {
                 appEvents.sendInactiveEvent();
             }
             appEvents.onApplicationStopped();

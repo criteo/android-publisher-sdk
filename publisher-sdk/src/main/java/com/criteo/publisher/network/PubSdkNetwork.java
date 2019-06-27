@@ -1,10 +1,8 @@
 package com.criteo.publisher.network;
 
 import android.content.Context;
-
 import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.model.Config;
-
 import org.json.JSONObject;
 
 public final class PubSdkNetwork {
@@ -21,7 +19,7 @@ public final class PubSdkNetwork {
     }
 
     public static JSONObject postEvent(Context context, int senderId,
-                                       String appId, String gaid, String eventType, int limitedAdTracking) {
+            String appId, String gaid, String eventType, int limitedAdTracking) {
         return PubSdkApi.postAppEvent(context, senderId, appId, gaid, eventType, limitedAdTracking);
     }
 }

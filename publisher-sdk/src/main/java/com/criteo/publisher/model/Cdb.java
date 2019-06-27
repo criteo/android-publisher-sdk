@@ -3,15 +3,14 @@ package com.criteo.publisher.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Cdb implements Parcelable {
+
     private static final String TAG = Cdb.class.getSimpleName();
     private static final String PUBLISHER = "publisher";
     private static final String USER = "user";
@@ -54,16 +53,8 @@ public class Cdb implements Parcelable {
         }
     }
 
-    public JSONObject getGdprConsent() {
-        return gdprConsent;
-    }
-
     public void setGdprConsent(JSONObject gdprConsent) {
         this.gdprConsent = gdprConsent;
-    }
-
-    public void addSlot(Slot slot) {
-        this.slots.add(slot);
     }
 
     public List<Slot> getSlots() {
@@ -72,10 +63,6 @@ public class Cdb implements Parcelable {
 
     public void setSlots(ArrayList<Slot> slots) {
         this.slots = slots;
-    }
-
-    public List<CacheAdUnit> getCacheAdUnits() {
-        return cacheAdUnits;
     }
 
     public void setCacheAdUnits(ArrayList<CacheAdUnit> cacheAdUnits) {
@@ -90,37 +77,20 @@ public class Cdb implements Parcelable {
         this.publisher = publisher;
     }
 
-    public User getUser() {
-        return user;
-    }
-
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public String getSdkVersion() {
-        return sdkVersion;
     }
 
     public void setSdkVersion(String sdkVersion) {
         this.sdkVersion = sdkVersion;
     }
 
-    public int getProfileId() {
-        return profileId;
-    }
-
     public void setProfileId(int profileId) {
         this.profileId = profileId;
     }
 
-
     public int getTimeToNextCall() {
         return timeToNextCall;
-    }
-
-    public void setTimeToNextCall(int timeToNextCall) {
-        this.timeToNextCall = timeToNextCall;
     }
 
 

@@ -8,8 +8,6 @@ public interface UserAgentCallback {
 
     /**
      * Callback to notify handler that useragent is received
-     *
-     * @param userAgent
      */
     void done(String userAgent);
 

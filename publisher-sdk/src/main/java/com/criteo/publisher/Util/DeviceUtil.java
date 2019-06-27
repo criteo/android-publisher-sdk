@@ -126,7 +126,9 @@ public final class DeviceUtil {
     }
 
     public static String createDfpCompatibleDisplayUrl(String displayUrl) {
-        if (TextUtils.isEmpty(displayUrl)) return null;
+        if (TextUtils.isEmpty(displayUrl)) {
+            return null;
+        }
         try {
             byte[] byteUrl = displayUrl.getBytes(StandardCharsets.UTF_8);
             String base64Url = Base64.encodeToString(byteUrl, Base64.NO_WRAP);

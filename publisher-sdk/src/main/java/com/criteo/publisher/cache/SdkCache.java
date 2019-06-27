@@ -1,13 +1,12 @@
 package com.criteo.publisher.cache;
 
 import android.util.Pair;
-
 import com.criteo.publisher.model.Slot;
-
 import java.util.HashMap;
 import java.util.List;
 
 public class SdkCache {
+
     private HashMap<Pair<String, String>, Slot> slotMap;
 
     public SdkCache() {
@@ -26,11 +25,6 @@ public class SdkCache {
         for (Slot slot : slots) {
             this.add(slot);
         }
-    }
-
-    public void setAdUnits(List<Slot> slots) {
-        this.slotMap.clear();
-        addAll(slots);
     }
 
     public Slot peekAdUnit(String placement, String formattedSize) {

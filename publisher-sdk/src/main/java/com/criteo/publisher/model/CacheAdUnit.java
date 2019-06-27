@@ -16,10 +16,6 @@ public class CacheAdUnit {
         return adUnitId;
     }
 
-    public void setPlacementId(String placementId) {
-        this.adUnitId = placementId;
-    }
-
     public AdSize getSize() {
         return adSize;
     }

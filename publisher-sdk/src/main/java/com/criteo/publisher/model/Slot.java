@@ -82,20 +82,12 @@ public class Slot implements Parcelable {
         return placementId;
     }
 
-    public boolean isNativeImpression() {
-        return nativeImpression;
-    }
-
     public void setNativeImpression(boolean nativeImpression) {
         this.nativeImpression = nativeImpression;
     }
 
     public void setPlacementId(String placementId) {
         this.placementId = placementId;
-    }
-
-    public String getImpId() {
-        return impId;
     }
 
     public void setImpId(String impId) {
@@ -110,16 +102,8 @@ public class Slot implements Parcelable {
         this.cpm = cpm;
     }
 
-    public int getWidth() {
-        return width;
-    }
-
     public void setWidth(int width) {
         this.width = width;
-    }
-
-    public int getHeight() {
-        return height;
     }
 
     public void setHeight(int height) {
@@ -128,42 +112,6 @@ public class Slot implements Parcelable {
 
     public String getFormattedSize() {
         return width + "x" + height;
-    }
-
-    public List<String> getSizes() {
-        return sizes;
-    }
-
-    public void setSizes(List<String> sizes) {
-        this.sizes = sizes;
-    }
-
-    public void addSize(String size) {
-        this.sizes.add(size);
-    }
-
-    public String getSlotId() {
-        return slotId;
-    }
-
-    public void setSlotId(String slotId) {
-        this.slotId = slotId;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-
-    public String getCreative() {
-        return creative;
-    }
-
-    public void setCreative(String creative) {
-        this.creative = creative;
     }
 
     public int getTtl() {

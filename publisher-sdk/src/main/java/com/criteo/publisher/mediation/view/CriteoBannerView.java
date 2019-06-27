@@ -2,9 +2,9 @@ package com.criteo.publisher.mediation.view;
 
 import android.content.Context;
 import android.webkit.WebView;
-import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.CriteoBannerEventController;
 import com.criteo.publisher.listener.CriteoBannerAdListener;
+import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.BidToken;
 import java.lang.ref.WeakReference;
 

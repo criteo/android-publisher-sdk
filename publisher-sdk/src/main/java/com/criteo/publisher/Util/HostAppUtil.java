@@ -4,12 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 
 public final class HostAppUtil {
+
     private static final String CONSENT_STRING = "IABConsent_ConsentString";
     private static final String SUBJECT_TO_GDPR = "IABConsent_SubjectToGDPR";
     private static final String VENDORS = "IABConsent_ParsedVendorConsents";

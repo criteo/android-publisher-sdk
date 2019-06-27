@@ -2,14 +2,13 @@ package com.criteo.publisher.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import com.criteo.publisher.BuildConfig;
 import com.criteo.publisher.Util.DeviceUtil;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class User implements Parcelable {
+
     //TODO: Rename to advertisingId
     private static final String DEVICE_ID = "deviceId";
     private static final String DEVICE_ID_TYPE = "deviceIdType";
@@ -39,61 +38,12 @@ public class User implements Parcelable {
         limit = LMT_VAL;
     }
 
-
-    public String getDeviceId() {
-        return deviceId;
-    }
-
     public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;
     }
 
-    public String getDeviceIdType() {
-        return deviceIdType;
-    }
-
-    public void setDeviceIdType(String deviceIdType) {
-        this.deviceIdType = deviceIdType;
-    }
-
-    public String getDeviceModel() {
-        return deviceModel;
-    }
-
-    public void setDeviceModel(String deviceModel) {
-        this.deviceModel = deviceModel;
-    }
-
-    public String getDeviceOs() {
-        return deviceOs;
-    }
-
-    public void setDeviceOs(String deviceOs) {
-        this.deviceOs = deviceOs;
-    }
-
     public String getSdkVer() {
         return sdkVer;
-    }
-
-    public void setSdkVer(String sdkVer) {
-        this.sdkVer = sdkVer;
-    }
-
-    public int getLimit() {
-        return limit;
-    }
-
-    public void setLimit(int limit) {
-        this.limit = limit;
-    }
-
-    public String getConnection() {
-        return connection;
-    }
-
-    public void setConnection(String connection) {
-        this.connection = connection;
     }
 
     public JSONObject toJson() throws JSONException {

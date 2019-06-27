@@ -2,12 +2,12 @@ package com.criteo.publisher.AppEvents;
 
 import android.content.Context;
 import android.os.AsyncTask;
-
 import com.criteo.publisher.Util.AppEventResponseListener;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.network.AppEventTask;
 
 public class AppEvents implements AppEventResponseListener, ApplicationStoppedListener {
+
     private static final String EVENT_INACTIVE = "Inactive";
     private static final String EVENT_ACTIVE = "Active";
     private static final String EVENT_LAUNCH = "Launch";
@@ -17,7 +17,7 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
     private int appEventThrottle = -1;
     private long throttleSetTime = 0;
 
-    public AppEvents (Context context) {
+    public AppEvents(Context context) {
         this.mContext = context;
         this.eventTask = new AppEventTask(mContext, this);
     }

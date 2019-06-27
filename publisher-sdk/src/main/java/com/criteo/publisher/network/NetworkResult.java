@@ -4,6 +4,7 @@ import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.model.Config;
 
 public class NetworkResult {
+
     private Cdb cdb;
     private Config config;
 

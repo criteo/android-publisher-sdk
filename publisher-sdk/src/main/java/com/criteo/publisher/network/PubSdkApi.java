@@ -9,7 +9,6 @@ import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.model.Config;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -144,8 +143,7 @@ final class PubSdkApi {
     }
 
 
-    protected static String getParamsString(Map<String, String> params)
-            throws UnsupportedEncodingException {
+    protected static String getParamsString(Map<String, String> params) {
 
         StringBuilder queryString = new StringBuilder();
         try {
