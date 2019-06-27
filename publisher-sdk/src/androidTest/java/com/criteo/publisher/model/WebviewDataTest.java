@@ -23,7 +23,7 @@ public class WebviewDataTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        webviewData = new WebViewData(WebViewLoadStatus.STATUS_NONE);
+        webviewData = new WebViewData();
     }
 
     @Test
@@ -33,7 +33,6 @@ public class WebviewDataTest {
 
         Assert.assertTrue(!TextUtils.isEmpty(webviewData.getContent()));
         Assert.assertFalse(webviewData.getContent().contains(WEBVIEW_DATA_MACRO));
-        Assert.assertTrue(webviewData.isLoaded());
 
     }
 }

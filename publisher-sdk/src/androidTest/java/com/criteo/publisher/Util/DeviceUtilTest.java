@@ -28,9 +28,13 @@ public class DeviceUtilTest {
 
     private Context context;
 
+    @Mock
+    AdvertisingInfo info;
+
     @Before
     public void setup() {
         context = InstrumentationRegistry.getContext();
+        MockitoAnnotations.initMocks(this);
         screenSizesPortrait = new ArrayList<>();
         screenSizesPortrait.add(new ScreenSize(360, 540));
         screenSizesPortrait.add(new ScreenSize(100, 200));
@@ -64,7 +68,6 @@ public class DeviceUtilTest {
 
     @Test
     public void getAdvertisingIdAdLimited() {
-        AdvertisingInfo info = mock(AdvertisingInfo.class);
         setMock(info);
         when(info.isLimitAdTrackingEnabled(context)).thenReturn(true);
         Assert.assertTrue(info.isLimitAdTrackingEnabled(context));
@@ -79,13 +82,6 @@ public class DeviceUtilTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-
-    @Test
-    public void getDeviceIdForAppEventTest() {
-        Assert.assertNotEquals(DEVICE_ID_LIMITED,
-                DeviceUtil.getAdvertisingId(context));
     }
 
     //TODO Create Intrumentation Test , change settings as Limited and test

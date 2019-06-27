@@ -21,7 +21,8 @@ public class WebViewDataTaskTest {
     @Mock
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
-    private WebViewData webViewData = new WebViewData("", false , WebViewLoadStatus.STATUS_NONE );
+    @Mock
+    private  WebViewData webViewData;
 
     private WebViewDataTask webViewDataTask;
     ;
@@ -38,9 +39,10 @@ public class WebViewDataTaskTest {
     public void testWithData() {
         webViewDataTask.onPostExecute("<html></html>");
 
-        Assert.assertEquals(WebViewLoadStatus.STATUS_LOADED , webViewData.getWebViewLoadStatus() );
+        Mockito.verify(webViewData, Mockito.times(1)).downloadSucceeeded();
+        Mockito.verify(webViewData, Mockito.times(0)).downloadFailed();
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdFetchSucceeded();
-        Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdFetchFailed(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
     }
 
     @Test

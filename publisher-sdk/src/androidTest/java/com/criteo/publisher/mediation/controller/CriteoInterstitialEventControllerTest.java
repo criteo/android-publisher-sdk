@@ -31,14 +31,14 @@ public class CriteoInterstitialEventControllerTest {
 
     @Test
     public void testUnload() {
-        WebViewData webViewData = new WebViewData("html content", true, WebViewLoadStatus.STATUS_LOADED);
+        WebViewData webViewData = new WebViewData();
+        webViewData.setContent("html content", criteoInterstitialAdListener);
         WebViewDownloader webViewDownloader = new WebViewDownloader(webViewData);
         criteoInterstitialEventController = new CriteoInterstitialEventController(criteoInterstitialAdListener,
                 webViewDownloader);
-        criteoInterstitialEventController.unLoad();
+        criteoInterstitialEventController.refresh();
         Assert.assertEquals("", webViewData.getContent());
         Assert.assertEquals(false, webViewData.isLoaded());
-        Assert.assertEquals(WebViewLoadStatus.STATUS_NONE, webViewData.getWebViewLoadStatus());
     }
 
 }
