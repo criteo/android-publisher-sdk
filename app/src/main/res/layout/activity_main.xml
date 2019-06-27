@@ -14,13 +14,6 @@
         android:orientation="vertical">
         <Button
             style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="match_parent"
-            android:id="@+id/buttonCdbCall"
-            android:background="#81C784"
-            android:text="Cdb Call Test"
-            android:layout_height="wrap_content" />
-        <Button
-            style="@style/Widget.AppCompat.Button.Colored"
             android:layout_marginTop="20dp"
             android:id="@+id/buttonDfpCall"
             android:layout_width="match_parent"

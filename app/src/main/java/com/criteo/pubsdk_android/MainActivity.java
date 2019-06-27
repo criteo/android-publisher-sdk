@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import com.criteo.pubsdk_android.cdb.CdbCallActivity;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
@@ -22,10 +21,6 @@ public class MainActivity extends AppCompatActivity {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
-        findViewById(R.id.buttonCdbCall).setOnClickListener((View v) -> {
-            Intent intent = new Intent(getApplicationContext(), CdbCallActivity.class);
-            startActivity(intent);
-        });
         findViewById(R.id.buttonDfpCall).setOnClickListener((View v) -> {
             Intent intent = new Intent(getApplicationContext(), DfpActivity.class);
             startActivity(intent);
