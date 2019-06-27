@@ -33,6 +33,13 @@ public class Cdb implements Parcelable {
     }
 
     public Cdb(JSONObject json) {
+        if(json != null && json.has(TIME_TO_NEXT_CALL)) {
+            try {
+                this.setTimeToNextCall(json.getInt(TIME_TO_NEXT_CALL));
+            }  catch (JSONException ex) {
+                Log.d(TAG, "Exception while reading cdb time to next call" + ex.getMessage());
+            }
+        }
         if (json != null && json.has(SLOTS)) {
             JSONArray array = new JSONArray();
             try {
@@ -116,6 +123,10 @@ public class Cdb implements Parcelable {
             json.put(GDPR_CONSENT, gdprConsent);
         }
         return json;
+    }
+
+    public void setTimeToNextCall(int timeToNextCall) {
+        this.timeToNextCall = timeToNextCall;
     }
 
     @Override

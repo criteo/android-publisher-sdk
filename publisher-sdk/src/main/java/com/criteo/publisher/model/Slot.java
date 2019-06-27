@@ -102,8 +102,16 @@ public class Slot implements Parcelable {
         this.cpm = cpm;
     }
 
+    public int getWidth() {
+        return width;
+    }
+
     public void setWidth(int width) {
         this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 
     public void setHeight(int height) {
@@ -112,6 +120,10 @@ public class Slot implements Parcelable {
 
     public String getFormattedSize() {
         return width + "x" + height;
+    }
+
+    public String getCurrency() {
+        return currency;
     }
 
     public int getTtl() {
