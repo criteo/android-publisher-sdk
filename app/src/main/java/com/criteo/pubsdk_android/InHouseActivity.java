@@ -122,7 +122,7 @@ public class InHouseActivity extends AppCompatActivity {
 
         criteoInterstitialAdListener = new CriteoInterstitialAdListener() {
             @Override
-            public void onAdFetchSucceeded() {
+            public void onAdLoaded() {
                 buttonInhouseInterstitial.setEnabled(true);
                 Log.d(TAG, "Interstitial ad loaded");
             }

@@ -76,7 +76,7 @@ public final class Criteo {
     /**
      * Method to start new CdbDownload Asynctask
      */
-    public Slot getBidForAdUnit(AdUnit adUnit) {
+    Slot getBidForAdUnit(AdUnit adUnit) {
         return bidManager.getBidForAdUnitAndPrefetch(adUnit);
     }
 
@@ -106,7 +106,7 @@ public final class Criteo {
         return bidManager.getBidForInhouseMediation(adUnit);
     }
 
-    public TokenValue getTokenValue(BidToken bidToken, AdUnitType adUnitType) {
+    TokenValue getTokenValue(BidToken bidToken, AdUnitType adUnitType) {
         return bidManager.getTokenValue(bidToken, adUnitType);
     }
 

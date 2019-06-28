@@ -110,7 +110,7 @@ public class StandaloneActivity extends AppCompatActivity {
 
         criteoInterstitialAdListener = new CriteoInterstitialAdListener() {
             @Override
-            public void onAdFetchSucceeded() {
+            public void onAdLoaded() {
                 buttonStandAloneInterstitial.setEnabled(true);
                 Log.d(TAG, "Interstitial ad loaded");
             }

@@ -41,7 +41,7 @@ public class WebViewDataTaskTest {
 
         Mockito.verify(webViewData, Mockito.times(1)).downloadSucceeeded();
         Mockito.verify(webViewData, Mockito.times(0)).downloadFailed();
-        Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdFetchSucceeded();
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdLoaded();
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
     }
 
@@ -57,7 +57,7 @@ public class WebViewDataTaskTest {
         Assert.assertFalse(webViewData.isLoaded());
         Mockito.verify(webViewData, Mockito.times(0)).downloadSucceeeded();
         Mockito.verify(webViewData, Mockito.times(1)).downloadFailed();
-        Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdFetchSucceeded();
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdLoaded();
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
     }
 

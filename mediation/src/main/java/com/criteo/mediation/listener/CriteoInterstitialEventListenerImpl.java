@@ -19,7 +19,7 @@ public class CriteoInterstitialEventListenerImpl implements CriteoInterstitialAd
     }
 
     @Override
-    public void onAdFetchSucceeded() {
+    public void onAdLoaded() {
         customEventInterstitialListener.onAdLoaded();
     }
 
