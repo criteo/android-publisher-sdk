@@ -25,6 +25,7 @@ public class CriteoInterstitialActivity extends Activity {
     private WebView webView;
     private ResultReceiver resultReceiver;
     private ImageButton closeButton;
+    private  Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,8 +71,14 @@ public class CriteoInterstitialActivity extends Activity {
         webView.loadDataWithBaseURL("about:blank", webViewData, "text/html", "UTF-8", "about:blank");
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        handler.removeCallbacksAndMessages(null);
+    }
+
     private void waitAndDismiss() {
-        Handler handler = new Handler();
+        handler = new Handler();
         Runnable runnableCode = new Runnable() {
             @Override
             public void run() {
