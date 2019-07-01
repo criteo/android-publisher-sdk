@@ -96,6 +96,11 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         Slot slot = getBidForAdUnitAndPrefetch(adUnit);
         if (slot != null && slot.isValid()) {
             StringBuilder keywords = new StringBuilder();
+            Object existingKeywords = ReflectionUtil.callMethodOnObject(object, "getKeywords");
+            if (existingKeywords != null) {
+                keywords.append(existingKeywords);
+                keywords.append(",");
+            }
             keywords.append(CRT_CPM + ":" + slot.getCpm());
             keywords.append(",");
             keywords.append(CRT_DISPLAY_URL + ":" + slot.getDisplayUrl());

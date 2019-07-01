@@ -61,6 +61,7 @@ public class MopubActivity extends AppCompatActivity {
         linearLayout.removeAllViews();
         linearLayout.setVisibility(View.VISIBLE);
         publisherAdView = new MoPubView(this);
+        publisherAdView.setKeywords("key1:value1,key2:value2");
         criteo.setBidsForAdUnit(publisherAdView, moPub);
         publisherAdView.setAdUnitId(AD_UNIT);
 
