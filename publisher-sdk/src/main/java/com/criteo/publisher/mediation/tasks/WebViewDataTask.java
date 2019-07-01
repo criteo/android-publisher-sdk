@@ -71,12 +71,10 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
             criteoInterstitialAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
             webviewData.downloadFailed();
             return;
-        } else {
-            criteoInterstitialAdListener.onAdLoaded();
-            webviewData.downloadSucceeeded();
         }
-
         webviewData.setContent(data, criteoInterstitialAdListener);
+        webviewData.downloadSucceeeded();
+        criteoInterstitialAdListener.onAdLoaded();
 
     }
 
