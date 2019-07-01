@@ -71,6 +71,14 @@ public class InHouseActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (criteoBannerView != null) {
+            criteoBannerView.destroy();
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         buttonInhouseInterstitial.setEnabled(false);

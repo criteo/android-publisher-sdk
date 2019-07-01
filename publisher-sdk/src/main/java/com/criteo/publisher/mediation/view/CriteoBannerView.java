@@ -45,5 +45,9 @@ public class CriteoBannerView extends WebView {
         criteoBannerEventController.fetchAdAsync(bidToken);
     }
 
+    public void destroy() {
+        super.destroy();
+    }
+
 
 }

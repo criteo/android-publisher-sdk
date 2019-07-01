@@ -11,11 +11,11 @@ import android.widget.LinearLayout;
 import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.listener.CriteoBannerAdListener;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
-import com.criteo.publisher.model.BannerAdUnit;
-import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.mediation.view.CriteoBannerView;
 import com.criteo.publisher.mediation.view.CriteoInterstitialView;
 import com.criteo.publisher.model.AdSize;
+import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.model.InterstitialAdUnit;
 
 
 public class StandaloneActivity extends AppCompatActivity {
@@ -66,6 +66,14 @@ public class StandaloneActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (criteoBannerView != null) {
+            criteoBannerView.destroy();
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         buttonStandAloneInterstitial.setEnabled(false);
@@ -99,7 +107,7 @@ public class StandaloneActivity extends AppCompatActivity {
 
             @Override
             public void onAdFailedToLoad(CriteoErrorCode code) {
-                Log.d(TAG, "Banner ad failed, reason : "+code.toString());
+                Log.d(TAG, "Banner ad failed, reason : " + code.toString());
             }
 
             @Override
