@@ -49,7 +49,7 @@ public class CriteoInterstitialViewTest {
         Thread.sleep(1000);
 
         //Expected result , found no slot and called criteoBannerAdListener.onAdFetchFailed
-        Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdFetchSucceeded();
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdLoaded();
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(1))
                 .onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
     }
