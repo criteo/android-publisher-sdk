@@ -1,10 +1,13 @@
 package com.criteo.publisher.mediation.controller;
 
+import android.content.Context;
 import com.criteo.publisher.CriteoInterstitialEventController;
 import com.criteo.publisher.Util.WebViewLoadStatus;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
+import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.WebViewData;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +34,9 @@ public class CriteoInterstitialEventControllerTest {
 
     @Test
     public void testUnload() {
+       //TODO change code later, Config creation
+        JSONObject configJson = new JSONObject();
+        Config config = new Config(configJson);
         WebViewData webViewData = new WebViewData();
         webViewData.setContent("html content", criteoInterstitialAdListener);
         WebViewDownloader webViewDownloader = new WebViewDownloader(webViewData);

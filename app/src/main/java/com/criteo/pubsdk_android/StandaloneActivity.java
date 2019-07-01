@@ -1,6 +1,8 @@
 package com.criteo.pubsdk_android;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -45,13 +47,13 @@ public class StandaloneActivity extends AppCompatActivity {
         findViewById(R.id.buttonStandAloneBanner).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                adLayout.removeAllViews();
-                BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
+                BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/Endeavour_320x50",
+                        new AdSize(50, 320));
                 criteoBannerView = new CriteoBannerView(context, bannerAdUnit);
-
                 criteoBannerView.setCriteoBannerAdListener(criteoBannerAdListener);
-                criteoBannerView.loadAd();
-                adLayout.addView(criteoBannerView);
+                Bannerasync bannerasync = new Bannerasync(criteoBannerView);
+                bannerasync.execute();
+
             }
         });
 
@@ -144,5 +146,28 @@ public class StandaloneActivity extends AppCompatActivity {
             }
         };
 
+    }
+
+    private class Bannerasync extends AsyncTask {
+
+        private CriteoBannerView bannerView;
+
+        Bannerasync(CriteoBannerView bannerView) {
+            this.bannerView = bannerView;
+        }
+
+        @SuppressLint("WrongThread")
+        @Override
+        protected Object doInBackground(Object[] objects) {
+            bannerView.loadAd();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+            adLayout.removeAllViews();
+            adLayout.addView(bannerView);
+        }
     }
 }

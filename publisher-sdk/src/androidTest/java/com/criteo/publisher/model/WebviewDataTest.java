@@ -2,6 +2,7 @@ package com.criteo.publisher.model;
 
 import android.text.TextUtils;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,12 +26,15 @@ public class WebviewDataTest {
 
     @Test
     public void testSetContentWithData() {
+        //TODO change code later, Config creation
+        JSONObject configJson = new JSONObject();
+        Config config = new Config(configJson);
+
         data = "html";
         webviewData.setContent(data, criteoInterstitialAdListener);
 
         Assert.assertTrue(!TextUtils.isEmpty(webviewData.getContent()));
         Assert.assertFalse(webviewData.getContent().contains(Config.getAdTagDataMode()));
-        Assert.assertTrue(webviewData.isLoaded());
 
     }
 }
