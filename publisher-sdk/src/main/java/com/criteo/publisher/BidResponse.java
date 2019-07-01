@@ -1,4 +1,4 @@
-package com.criteo.publisher.model;
+package com.criteo.publisher;
 
 public class BidResponse {
 
@@ -6,7 +6,7 @@ public class BidResponse {
     private BidToken token;
     private boolean valid;
 
-    public BidResponse(double price, BidToken token, boolean valid) {
+    protected BidResponse(double price, BidToken token, boolean valid) {
         this.price = price;
         this.token = token;
         this.valid = valid;

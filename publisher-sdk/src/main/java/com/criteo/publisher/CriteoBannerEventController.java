@@ -9,7 +9,6 @@ import com.criteo.publisher.listener.CriteoBannerAdListener;
 import com.criteo.publisher.mediation.tasks.CriteoBannerListenerCallTask;
 import com.criteo.publisher.mediation.view.CriteoBannerView;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.BidToken;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;

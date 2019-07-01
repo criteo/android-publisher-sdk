@@ -1,4 +1,4 @@
-package com.criteo.publisher.model;
+package com.criteo.publisher;
 
 import java.util.UUID;
 import org.junit.Assert;

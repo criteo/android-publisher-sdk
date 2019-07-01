@@ -5,7 +5,7 @@ import android.webkit.WebView;
 import com.criteo.publisher.CriteoBannerEventController;
 import com.criteo.publisher.listener.CriteoBannerAdListener;
 import com.criteo.publisher.model.BannerAdUnit;
-import com.criteo.publisher.model.BidToken;
+import com.criteo.publisher.BidToken;
 import java.lang.ref.WeakReference;
 
 public class CriteoBannerView extends WebView {

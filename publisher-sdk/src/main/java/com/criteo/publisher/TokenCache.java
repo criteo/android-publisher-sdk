@@ -1,6 +1,8 @@
-package com.criteo.publisher.model;
+package com.criteo.publisher;
 
 import com.criteo.publisher.Util.AdUnitType;
+import com.criteo.publisher.model.TokenValue;
+
 import java.util.Hashtable;
 import java.util.UUID;
 

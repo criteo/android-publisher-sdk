@@ -8,7 +8,7 @@ import com.criteo.publisher.CriteoInterstitialEventController;
 import com.criteo.publisher.Util.CriteoResultReceiver;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import com.criteo.publisher.mediation.controller.WebViewDownloader;
-import com.criteo.publisher.model.BidToken;
+import com.criteo.publisher.BidToken;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.WebViewData;
 

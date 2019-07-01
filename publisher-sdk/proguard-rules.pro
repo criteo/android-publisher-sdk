@@ -82,6 +82,13 @@
    public *;
 }
 
+-keep public class com.criteo.publisher.BidResponse
+-keepclassmembers class com.criteo.publisher.BidResponse {
+   public *;
+}
+
+-keep public class com.criteo.publisher.BidToken
+
 -keep public interface com.criteo.publisher.listener.CriteoAdListener {*;}
 
 -keep public interface com.criteo.publisher.listener.CriteoBannerAdListener {*;}

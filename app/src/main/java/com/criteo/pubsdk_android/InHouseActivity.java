@@ -16,7 +16,7 @@ import com.criteo.publisher.mediation.view.CriteoBannerView;
 import com.criteo.publisher.mediation.view.CriteoInterstitialView;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
-import com.criteo.publisher.model.BidResponse;
+import com.criteo.publisher.BidResponse;
 import com.criteo.publisher.model.InterstitialAdUnit;
 
 public class InHouseActivity extends AppCompatActivity {
