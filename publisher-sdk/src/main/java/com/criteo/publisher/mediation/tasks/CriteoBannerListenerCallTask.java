@@ -30,23 +30,25 @@ public class CriteoBannerListenerCallTask extends AsyncTask<Object, Void, Object
     @Override
     protected void onPostExecute(Object object) {
         super.onPostExecute(object);
-        if (object == null) {
-            criteoBannerAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
-            return;
-        }
-        if (object instanceof Slot) {
-            Slot slot = (Slot) object;
-            if (!slot.isValid()) {
+        if(criteoBannerAdListener != null) {
+            if (object == null) {
                 criteoBannerAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
-            } else {
-                criteoBannerAdListener.onAdLoaded(criteoBannerView);
+                return;
             }
-        } else if (object instanceof TokenValue) {
-            TokenValue tokenValue = (TokenValue) object;
-            if (tokenValue == null) {
-                criteoBannerAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
-            } else {
-                criteoBannerAdListener.onAdLoaded(criteoBannerView);
+            if (object instanceof Slot) {
+                Slot slot = (Slot) object;
+                if (!slot.isValid()) {
+                    criteoBannerAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
+                } else {
+                    criteoBannerAdListener.onAdLoaded(criteoBannerView);
+                }
+            } else if (object instanceof TokenValue) {
+                TokenValue tokenValue = (TokenValue) object;
+                if (tokenValue == null) {
+                    criteoBannerAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
+                } else {
+                    criteoBannerAdListener.onAdLoaded(criteoBannerView);
+                }
             }
         }
     }

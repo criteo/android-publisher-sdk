@@ -27,24 +27,24 @@ public class CriteoInterstitialListenerCallTask extends AsyncTask<Object, Void, 
     @Override
     protected void onPostExecute(Object object) {
         super.onPostExecute(object);
-        if (object == null) {
-            criteoInterstitialAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
-            return;
-        }
-
-        if (object instanceof Slot) {
-            Slot slot = (Slot) object;
-            if (!slot.isValid() || !URLUtil
-                    .isValidUrl(slot.getDisplayUrl())) {
+        if(criteoInterstitialAdListener != null) {
+            if (object == null) {
                 criteoInterstitialAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
+                return;
             }
-        } else if (object instanceof TokenValue) {
-            TokenValue tokenValue = (TokenValue) object;
-            if (tokenValue == null) {
-                criteoInterstitialAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
+
+            if (object instanceof Slot) {
+                Slot slot = (Slot) object;
+                if (!slot.isValid() || !URLUtil
+                        .isValidUrl(slot.getDisplayUrl())) {
+                    criteoInterstitialAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
+                }
+            } else if (object instanceof TokenValue) {
+                TokenValue tokenValue = (TokenValue) object;
+                if (tokenValue == null) {
+                    criteoInterstitialAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
+                }
             }
         }
-
-
     }
 }

@@ -34,7 +34,9 @@ public class CriteoBannerEventController {
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 view.getContext().startActivity(
                         new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                criteoBannerAdListener.onAdLeftApplication();
+                if(criteoBannerAdListener != null) {
+                    criteoBannerAdListener.onAdLeftApplication();
+                }
                 return true;
             }
 

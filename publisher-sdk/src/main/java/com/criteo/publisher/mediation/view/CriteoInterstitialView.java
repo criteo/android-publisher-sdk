@@ -63,8 +63,9 @@ public class CriteoInterstitialView {
                     criteoInterstitialAdListener);
             bundle.putParcelable("resultreceiver", criteoResultReceiver);
             intent.putExtras(bundle);
-
-            criteoInterstitialAdListener.onAdOpened();
+            if(criteoInterstitialAdListener != null) {
+                criteoInterstitialAdListener.onAdOpened();
+            }
             if (criteoInterstitialEventController != null) {
                 criteoInterstitialEventController.refresh();
             }
