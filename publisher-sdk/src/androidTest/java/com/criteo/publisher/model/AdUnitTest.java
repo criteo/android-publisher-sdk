@@ -1,7 +1,5 @@
 package com.criteo.publisher.model;
 
-import android.os.Parcel;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,7 +20,7 @@ public class AdUnitTest {
 
     @Before
     public void initialize() {
-        adSize = new AdSize(HEIGHT, WIDTH);
+        adSize = new AdSize(WIDTH, HEIGHT);
         cacheAdUnit = new CacheAdUnit(adSize, PLACEMENT_ID_VALUE);
     }
 

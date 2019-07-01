@@ -9,7 +9,7 @@ import com.criteo.publisher.listener.CriteoBannerAdListener;
 import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.CacheAdUnit;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -30,7 +30,7 @@ public class CriteoBannerViewTest {
     @UiThreadTest
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/None", new AdSize(50, 320));
+        BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/None", new AdSize(320, 50));
         List<AdUnit> AdUnits = new ArrayList<>();
         AdUnits.add(bannerAdUnit);
         Application app =

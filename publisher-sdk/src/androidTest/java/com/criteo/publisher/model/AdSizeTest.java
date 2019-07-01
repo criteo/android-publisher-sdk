@@ -15,7 +15,7 @@ public class AdSizeTest {
 
     @Before
     public void initialize() {
-        adSize = new AdSize(HEIGHT, WIDTH);
+        adSize = new AdSize(WIDTH, HEIGHT);
     }
 
     @Test

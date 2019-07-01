@@ -16,7 +16,7 @@ public class PubSdkDemoApplication extends Application {
         super.onCreate();
         List<AdUnit> adUnits = new ArrayList<>();
 
-        BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(50, 320));
+        BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
         adUnits.add(bannerAdUnit);
 
 //        BannerAdUnit moPubAdUnit = new BannerAdUnit("b5acf501d2354859941b13030d2d848a");

@@ -56,7 +56,7 @@ public class MopubActivity extends AppCompatActivity {
     }
 
     private void onBannerClick() {
-        BannerAdUnit moPub = new BannerAdUnit("b5acf501d2354859941b13030d2d848a", new AdSize(50, 320));
+        BannerAdUnit moPub = new BannerAdUnit("b5acf501d2354859941b13030d2d848a", new AdSize(320, 50));
         linearLayout.setBackgroundColor(Color.RED);
         linearLayout.removeAllViews();
         linearLayout.setVisibility(View.VISIBLE);

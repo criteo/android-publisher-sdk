@@ -51,7 +51,7 @@ public class DfpActivity extends AppCompatActivity {
         publisherAdView.setAdUnitId("/140800857/Endeavour_320x50");
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-        BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/Endeavour_320x50" , new AdSize(50, 320));
+        BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/Endeavour_320x50" , new AdSize(320, 50));
         publisherAdView.setAdListener(new AdListener() {
             @Override
             public void onAdFailedToLoad(int i) {

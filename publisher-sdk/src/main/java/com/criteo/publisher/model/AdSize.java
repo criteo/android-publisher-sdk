@@ -6,8 +6,8 @@ import java.util.Objects;
 
 public class AdSize implements Parcelable {
 
-    private int height;
     private int width;
+    private int height;
 
     public int getHeight() {
         return height;
@@ -29,26 +29,26 @@ public class AdSize implements Parcelable {
     @Override
     public String toString() {
         return "AdSize{" +
-                "height=" + height +
-                ", width=" + width +
+                "width=" + width +
+                ", height=" + height +
                 '}';
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(this.height);
         dest.writeInt(this.width);
+        dest.writeInt(this.height);
     }
 
     public AdSize() {
     }
 
     protected AdSize(Parcel in) {
-        this.height = in.readInt();
         this.width = in.readInt();
+        this.height = in.readInt();
     }
 
-    public AdSize(int height, int width) {
+    public AdSize(int width, int height) {
         this.height = height;
         this.width = width;
     }

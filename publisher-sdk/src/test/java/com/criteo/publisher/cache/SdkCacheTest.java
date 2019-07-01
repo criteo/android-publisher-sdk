@@ -30,7 +30,7 @@ public class SdkCacheTest {
             e.printStackTrace();
         }
         String placement = slots.getJSONObject(0).getString("placementId");
-        AdSize adSize = new AdSize(slots.getJSONObject(0).getInt("height"), slots.getJSONObject(0).getInt("width"));
+        AdSize adSize = new AdSize(slots.getJSONObject(0).getInt("width"), slots.getJSONObject(0).getInt("height"));
         assertNull(cache.getAdUnit(placement, adSize.getFormattedSize()));
     }
 
@@ -38,7 +38,7 @@ public class SdkCacheTest {
     public void getOneAdUnitTest() throws JSONException {
         initializeCache();
         String placement = slots.getJSONObject(0).getString("placementId");
-        AdSize adSize = new AdSize(slots.getJSONObject(0).getInt("height"), slots.getJSONObject(0).getInt("width"));
+        AdSize adSize = new AdSize(slots.getJSONObject(0).getInt("width"), slots.getJSONObject(0).getInt("height"));
         assertNull(cache.getAdUnit(placement, adSize.getFormattedSize()));
 
     }

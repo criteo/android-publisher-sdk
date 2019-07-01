@@ -40,7 +40,7 @@ public class BidManagerTest {
     @Test
     @UiThreadTest
     public void testSilentMode() {
-        BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(50, 320));
+        BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
 
         BidManager manager = getInitManager();
         manager.setTimeToNextCall(1000);
@@ -57,7 +57,7 @@ public class BidManagerTest {
     @UiThreadTest
     public void testSilentModeSlotZeroTtlZeroCPM() {
         List<AdUnit> adUnits = new ArrayList<>();
-        BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(50, 320));
+        BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
         adUnits.add(AdUnit);
         Slot slot1 = new Slot();
         slot1.setPlacementId("/140800857/Endeavour_320x50");
@@ -82,7 +82,7 @@ public class BidManagerTest {
     @UiThreadTest
     public void testSilentModeSlotZeroCpmNonZeroTtl() {
         List<AdUnit> adUnits = new ArrayList<>();
-        BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(50, 320));
+        BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
         adUnits.add(AdUnit);
         BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(adUnits),
                 new TokenCache());
@@ -116,7 +116,7 @@ public class BidManagerTest {
     @UiThreadTest
     public void testPrefetch() {
         List<AdUnit> adUnits = new ArrayList<>();
-        BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(50, 320));
+        BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
         adUnits.add(AdUnit);
         BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(adUnits),
                 new TokenCache());
@@ -163,7 +163,7 @@ public class BidManagerTest {
     @UiThreadTest
     public void testBidNoSilentMode() {
         List<AdUnit> adUnits = new ArrayList<>();
-        BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(50, 320));
+        BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
         adUnits.add(AdUnit);
         //mocking request
         Slot bannerSlot = new Slot();
@@ -188,7 +188,7 @@ public class BidManagerTest {
 
     private BidManager getInitManager() {
         List<AdUnit> adUnits = new ArrayList<>();
-        BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(50, 320));
+        BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
         adUnits.add(AdUnit);
         Slot bannerSlot = new Slot();
         bannerSlot.setPlacementId("/140800857/Endeavour_320x50");
@@ -224,7 +224,7 @@ public class BidManagerTest {
     @Test
     public void getBidForInhouseMediationWithNullSlot() {
         List<AdUnit> adUnits = new ArrayList<>();
-        BannerAdUnit adUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(50, 320));
+        BannerAdUnit adUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
         adUnits.add(adUnit);
         Slot slot1 = new Slot();
         List<Slot> slots = new ArrayList<>();
@@ -239,7 +239,7 @@ public class BidManagerTest {
     @Test
     public void getBidForInhouseMediationWithInvalidSlot() throws JSONException {
         List<AdUnit> adUnits = new ArrayList<>();
-        BannerAdUnit adUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(50, 320));
+        BannerAdUnit adUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
         adUnits.add(adUnit);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("cpm", "-10.0");
@@ -257,7 +257,7 @@ public class BidManagerTest {
     @Test
     public void getBidForInhouseMediationWithSlot() {
         List<AdUnit> adUnits = new ArrayList<>();
-        BannerAdUnit adUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(50, 320));
+        BannerAdUnit adUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
         adUnits.add(adUnit);
         Slot slot1 = new Slot();
         slot1.setPlacementId("/140800857/Endeavour_320x50");

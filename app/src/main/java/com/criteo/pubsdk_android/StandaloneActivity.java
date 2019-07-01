@@ -46,7 +46,7 @@ public class StandaloneActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 adLayout.removeAllViews();
-                BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(50, 320));
+                BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
                 criteoBannerView = new CriteoBannerView(context, bannerAdUnit);
 
                 criteoBannerView.setCriteoBannerAdListener(criteoBannerAdListener);
