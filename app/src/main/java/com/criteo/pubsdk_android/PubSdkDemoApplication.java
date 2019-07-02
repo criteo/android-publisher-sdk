@@ -1,6 +1,8 @@
 package com.criteo.pubsdk_android;
 
 import android.app.Application;
+import android.net.TrafficStats;
+import android.os.StrictMode;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
@@ -14,6 +16,15 @@ public class PubSdkDemoApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .detectAll()
+                .penaltyLog()
+                .penaltyDialog()
+                .build());
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll()
+                .penaltyLog()
+                .build());
+
         List<AdUnit> adUnits = new ArrayList<>();
 
         BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
