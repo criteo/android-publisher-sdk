@@ -1,5 +1,6 @@
 package com.criteo.publisher.model;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import com.criteo.publisher.Util.DeviceUtil;
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ public final class AdUnitHelper {
 
     }
 
-    public static List<CacheAdUnit> convertAdUnits(List<AdUnit> adUnits) {
+    public static List<CacheAdUnit> convertAdUnits(Context context, List<AdUnit> adUnits) {
         List<CacheAdUnit> cacheAdUnits = new ArrayList<>();
         for (AdUnit adUnit : adUnits) {
             switch (adUnit.getAdUnitType()) {
@@ -21,7 +22,7 @@ public final class AdUnitHelper {
                     break;
                 case CRITEO_INTERSTITIAL:
                     InterstitialAdUnit interstitialAdUnit = (InterstitialAdUnit) adUnit;
-                    cacheAdUnits.addAll(createInterstitialAdUnits(interstitialAdUnit.getAdUnitId()));
+                    cacheAdUnits.addAll(createInterstitialAdUnits(context, interstitialAdUnit.getAdUnitId()));
                     break;
                 default:
                     throw new IllegalArgumentException("Found an invalid AdUnit");
@@ -30,15 +31,16 @@ public final class AdUnitHelper {
         return cacheAdUnits;
     }
 
-    private static List<CacheAdUnit> createInterstitialAdUnits(String placementId) {
+    private static List<CacheAdUnit> createInterstitialAdUnits(Context context, String placementId) {
         List<CacheAdUnit> retCacheAdUnits = new ArrayList<>();
-
-        CacheAdUnit interstitialCacheAdUnitPortrait = new CacheAdUnit(DeviceUtil.getSizePortrait(), placementId);
-        retCacheAdUnits.add(interstitialCacheAdUnitPortrait);
-
-        CacheAdUnit interstitialCacheAdUnitLandscape = new CacheAdUnit(DeviceUtil.getSizeLandscape(), placementId);
-        retCacheAdUnits.add(interstitialCacheAdUnitLandscape);
-
+        int orientation = context.getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            CacheAdUnit interstitialCacheAdUnitPortrait = new CacheAdUnit(DeviceUtil.getSizePortrait(), placementId);
+            retCacheAdUnits.add(interstitialCacheAdUnitPortrait);
+        } else {
+            CacheAdUnit interstitialCacheAdUnitLandscape = new CacheAdUnit(DeviceUtil.getSizeLandscape(), placementId);
+            retCacheAdUnits.add(interstitialCacheAdUnitLandscape);
+        }
         return retCacheAdUnits;
     }
 

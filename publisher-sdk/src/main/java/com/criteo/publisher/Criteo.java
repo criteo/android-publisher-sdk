@@ -46,8 +46,9 @@ public final class Criteo {
             throw new IllegalArgumentException("AdUnits are required.");
         }
 
+        Context context = application.getApplicationContext();
         createSupportedScreenSizes(application);
-        List<CacheAdUnit> cacheAdUnits = AdUnitHelper.convertAdUnits(adUnits);
+        List<CacheAdUnit> cacheAdUnits = AdUnitHelper.convertAdUnits(context, adUnits);
 
         for (CacheAdUnit cacheAdUnit : cacheAdUnits) {
             if (TextUtils.isEmpty(cacheAdUnit.getPlacementId()) || cacheAdUnit.getSize() == null
@@ -59,9 +60,9 @@ public final class Criteo {
             throw new IllegalArgumentException("Criteo Publisher Id is required.");
         }
 
-        this.bidManager = new BidManager(application.getApplicationContext(), criteoPublisherId, cacheAdUnits,
+        this.bidManager = new BidManager(context, criteoPublisherId, cacheAdUnits,
                 new TokenCache());
-        this.appEvents = new AppEvents(application.getApplicationContext());
+        this.appEvents = new AppEvents(context);
         this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
         bidManager.prefetch();
     }
