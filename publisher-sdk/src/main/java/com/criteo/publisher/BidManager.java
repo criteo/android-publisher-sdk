@@ -1,11 +1,14 @@
 package com.criteo.publisher;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.DeviceUtil;
@@ -119,6 +122,10 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     }
 
     Slot getBidForAdUnitAndPrefetch(AdUnit adUnit) {
+        if (adUnit == null) {
+            Log.e(TAG, "AdUnit is required.");
+            return null;
+        }
         CacheAdUnit cacheAdUnit = AdUnitHelper
                 .convertoCacheAdUnit(adUnit, mContext.getResources().getConfiguration().orientation);
 

@@ -34,10 +34,13 @@ public class CriteoInterstitialEventController {
     }
 
     public void fetchAdAsync(AdUnit adUnit) {
+        Slot slot = null;
         if (!webViewDownloader.isLoading()) {
             webViewDownloader.loading();
 
-            Slot slot = Criteo.getInstance().getBidForAdUnit(adUnit);
+            if (adUnit != null) {
+                slot = Criteo.getInstance().getBidForAdUnit(adUnit);
+            }
 
             if (slot != null && slot.isValid()) {
                 //gets Webview data from Criteo before showing Interstitialview Activity

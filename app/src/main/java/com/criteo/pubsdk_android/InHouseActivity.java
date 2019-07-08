@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import com.criteo.publisher.BidResponse;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.listener.CriteoBannerAdListener;
@@ -16,7 +17,6 @@ import com.criteo.publisher.mediation.view.CriteoBannerView;
 import com.criteo.publisher.mediation.view.CriteoInterstitialView;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
-import com.criteo.publisher.BidResponse;
 import com.criteo.publisher.model.InterstitialAdUnit;
 
 public class InHouseActivity extends AppCompatActivity {
@@ -50,7 +50,7 @@ public class InHouseActivity extends AppCompatActivity {
 
                 BidResponse bidResponse = Criteo.getInstance().getBidResponse(bannerAdUnit);
 
-                if (bidResponse.isBidSuccess()) {
+                if (bidResponse != null && bidResponse.isBidSuccess()) {
                     criteoBannerView = new CriteoBannerView(context, bannerAdUnit);
                     criteoBannerView.setCriteoBannerAdListener(criteoBannerAdListener);
                     criteoBannerView.loadAd(bidResponse.getBidToken());
@@ -91,7 +91,7 @@ public class InHouseActivity extends AppCompatActivity {
         criteoInterstitialView.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
         BidResponse bidResponse = Criteo.getInstance().getBidResponse(interstitialAdUnit);
 
-        if (bidResponse.isBidSuccess()) {
+        if (bidResponse != null && bidResponse.isBidSuccess()) {
             criteoInterstitialView = new CriteoInterstitialView(context, interstitialAdUnit);
             criteoInterstitialView.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
             criteoInterstitialView.loadAd(bidResponse.getBidToken());

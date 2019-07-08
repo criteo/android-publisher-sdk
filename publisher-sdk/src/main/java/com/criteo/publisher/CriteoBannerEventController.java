@@ -25,7 +25,10 @@ public class CriteoBannerEventController {
 
 
     public void fetchAdAsync(AdUnit adUnit) {
-        Slot slot = Criteo.getInstance().getBidForAdUnit(adUnit);
+        Slot slot = null;
+        if (adUnit != null) {
+            slot = Criteo.getInstance().getBidForAdUnit(adUnit);
+        }
 
         criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener,
                 webViewClient);

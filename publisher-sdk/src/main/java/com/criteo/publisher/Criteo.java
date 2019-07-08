@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.WindowManager;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.Util.AdUnitType;
@@ -19,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class Criteo {
+
+    private static final String TAG = Criteo.class.getSimpleName();
 
     private static Criteo criteo;
     private BidManager bidManager;
@@ -42,6 +45,11 @@ public final class Criteo {
         if (application == null) {
             throw new IllegalArgumentException("Application reference is required.");
         }
+
+        if (TextUtils.isEmpty(criteoPublisherId)) {
+            throw new IllegalArgumentException("Criteo Publisher Id is required.");
+        }
+
         if (adUnits == null || adUnits.size() == 0) {
             throw new IllegalArgumentException("AdUnits are required.");
         }
@@ -53,11 +61,9 @@ public final class Criteo {
         for (CacheAdUnit cacheAdUnit : cacheAdUnits) {
             if (TextUtils.isEmpty(cacheAdUnit.getPlacementId()) || cacheAdUnit.getSize() == null
                     || cacheAdUnit.getSize().getWidth() <= 0 || cacheAdUnit.getSize().getHeight() <= 0) {
-                throw new IllegalArgumentException("Found an invalid AdUnit: " + cacheAdUnit);
+                Log.e(TAG, "Found an invalid AdUnit: " + cacheAdUnit);
+                return;
             }
-        }
-        if (TextUtils.isEmpty(criteoPublisherId)) {
-            throw new IllegalArgumentException("Criteo Publisher Id is required.");
         }
 
         this.bidManager = new BidManager(context, criteoPublisherId, cacheAdUnits,
@@ -68,6 +74,9 @@ public final class Criteo {
     }
 
     public void setBidsForAdUnit(Object object, AdUnit adUnit) {
+        if (bidManager == null) {
+            return;
+        }
         bidManager.enrichBid(object, adUnit);
     }
 
@@ -75,6 +84,9 @@ public final class Criteo {
      * Method to start new CdbDownload Asynctask
      */
     Slot getBidForAdUnit(AdUnit adUnit) {
+        if (bidManager == null) {
+            return null;
+        }
         return bidManager.getBidForAdUnitAndPrefetch(adUnit);
     }
 
@@ -101,10 +113,16 @@ public final class Criteo {
     }
 
     public BidResponse getBidResponse(AdUnit adUnit) {
+        if (bidManager == null) {
+            return null;
+        }
         return bidManager.getBidForInhouseMediation(adUnit);
     }
 
     TokenValue getTokenValue(BidToken bidToken, AdUnitType adUnitType) {
+        if (bidManager == null) {
+            return null;
+        }
         return bidManager.getTokenValue(bidToken, adUnitType);
     }
 
