@@ -1,14 +1,13 @@
 package com.criteo.publisher.Util;
 
 import android.content.Context;
-import com.google.android.gms.ads.identifier.AdvertisingIdClient;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import java.io.IOException;
+import android.util.Log;
 
 public class AdvertisingInfo {
 
     private static AdvertisingInfo advertisingInfo;
+    private static final String GET_ADVERTISING_ID = "getId";
+    private static final String IS_LIMIT_AD_TRACKING_ENABLED = "isLimitAdTrackingEnabled";
 
     private AdvertisingInfo() {
     }
@@ -22,26 +21,19 @@ public class AdvertisingInfo {
 
     public String getAdvertisingId(Context context) {
         try {
-            return AdvertisingIdClient.getAdvertisingIdInfo(context).getId();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (GooglePlayServicesNotAvailableException e) {
-            e.printStackTrace();
-        } catch (GooglePlayServicesRepairableException e) {
-            e.printStackTrace();
+            return (String) ReflectionUtil.callAdvertisingIdInfo(GET_ADVERTISING_ID, context);
+        } catch (Exception e) {
+            Log.e("AdvertisingInfo", "Error getting advertising id: " + e.getMessage());
         }
         return null;
     }
 
     public boolean isLimitAdTrackingEnabled(Context context) {
         try {
-            return AdvertisingIdClient.getAdvertisingIdInfo(context).isLimitAdTrackingEnabled();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (GooglePlayServicesNotAvailableException e) {
-            e.printStackTrace();
-        } catch (GooglePlayServicesRepairableException e) {
-            e.printStackTrace();
+            Object isLimitAdTrackingEnabled = ReflectionUtil.callAdvertisingIdInfo(IS_LIMIT_AD_TRACKING_ENABLED, context);
+            return (boolean) isLimitAdTrackingEnabled;
+        } catch (Exception e) {
+            Log.e("AdvertisingInfo", "Error checking if ad tracking is limited: " + e.getMessage());
         }
         return false;
     }

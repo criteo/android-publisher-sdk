@@ -6,11 +6,11 @@ import android.os.Build;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 import android.webkit.WebView;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.ScreenSize;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +21,9 @@ public final class DeviceUtil {
 
     private static final String CRITEO_LOGGING = "CRITEO_LOGGING";
     private static final String DEVICE_ID_LIMITED = "00000000-0000-0000-0000-000000000000";
+    private static final String IS_GOOGLE_PLAY_SERVICES_AVAILABLE = "isGooglePlayServicesAvailable";
+
+    private final static int GOOGLE_PLAY_SUCCESS_CODE = 0;
 
     private static AdSize sizePortrait;
     private static AdSize sizeLandscape;
@@ -109,20 +112,37 @@ public final class DeviceUtil {
     }
 
     public static boolean hasPlayServices(Context context) {
-        GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
-        int status = googleApiAvailability.isGooglePlayServicesAvailable(context);
-        return status == ConnectionResult.SUCCESS;
+        try {
+            Object status = ReflectionUtil.callGoogleApiAvailability
+                    (IS_GOOGLE_PLAY_SERVICES_AVAILABLE, context);
+            return GOOGLE_PLAY_SUCCESS_CODE == (int) status;
+        }
+        catch (Exception e) {
+            Log.e("DeviceUtil", "Error trying to find play services: " + e.getMessage());
+        }
+        return false;
     }
 
     public static String getAdvertisingId(Context context) {
-        if (AdvertisingInfo.getInstance().isLimitAdTrackingEnabled(context)) {
-            return DEVICE_ID_LIMITED;
+        try {
+            if (AdvertisingInfo.getInstance().isLimitAdTrackingEnabled(context)) {
+                return DEVICE_ID_LIMITED;
+            }
+            return AdvertisingInfo.getInstance().getAdvertisingId(context);
+        } catch (Exception e) {
+            Log.e("DeviceUtil", "Error trying to get Advertising id: " + e.getMessage());
         }
-        return AdvertisingInfo.getInstance().getAdvertisingId(context);
+        return null;
     }
 
     public static int isLimitAdTrackingEnabled(Context context) {
-        return AdvertisingInfo.getInstance().isLimitAdTrackingEnabled(context) ? 1 : 0;
+        try {
+            return AdvertisingInfo.getInstance().isLimitAdTrackingEnabled(context) ? 1 : 0;
+        }
+        catch (Exception e) {
+            Log.e("DeviceUtil", "Error trying to check limited ad tracking: " + e.getMessage());
+        }
+        return 0;
     }
 
     public static String createDfpCompatibleDisplayUrl(String displayUrl) {
