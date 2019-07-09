@@ -57,6 +57,7 @@ public class CriteoInterstitialView {
     public void show() {
         if (isAdLoaded()) {
             Intent intent = new Intent(context, CriteoInterstitialActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             Bundle bundle = new Bundle();
             bundle.putString("webviewdata", criteoInterstitialEventController.getWebViewDataContent());
             CriteoResultReceiver criteoResultReceiver = new CriteoResultReceiver(new Handler(),
