@@ -32,7 +32,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         this.callConfig = callConfig;
         this.userAgent = userAgent;
     }
-
+    @SuppressWarnings("unchecked")
     @Override
     protected NetworkResult doInBackground(Object... objects) {
         if (objects.length < 4) {

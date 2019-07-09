@@ -148,7 +148,7 @@ public class StandaloneActivity extends AppCompatActivity {
 
     }
 
-    private class Bannerasync extends AsyncTask {
+    private class Bannerasync extends AsyncTask<Void, Void, Void> {
 
         private CriteoBannerView bannerView;
 
@@ -158,14 +158,14 @@ public class StandaloneActivity extends AppCompatActivity {
 
         @SuppressLint("WrongThread")
         @Override
-        protected Object doInBackground(Object[] objects) {
+        protected Void doInBackground(Void... voids) {
             bannerView.loadAd();
             return null;
         }
 
         @Override
-        protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
             adLayout.removeAllViews();
             adLayout.addView(bannerView);
         }
