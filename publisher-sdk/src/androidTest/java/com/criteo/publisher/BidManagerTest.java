@@ -66,7 +66,7 @@ public class BidManagerTest {
         slot1.setTtl(0);
         List<Slot> slots = new ArrayList<>();
         slots.add(slot1);
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(adUnits),
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(context, adUnits),
                 new TokenCache());
         manager.setCacheAdUnits(slots);
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
@@ -82,7 +82,7 @@ public class BidManagerTest {
         List<AdUnit> adUnits = new ArrayList<>();
         BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
         adUnits.add(AdUnit);
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(adUnits),
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(context, adUnits),
                 new TokenCache());
         List<Slot> slots = new ArrayList<>();
         Slot slot1 = new Slot();
@@ -116,7 +116,7 @@ public class BidManagerTest {
         List<AdUnit> adUnits = new ArrayList<>();
         BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
         adUnits.add(AdUnit);
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(adUnits),
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(context, adUnits),
                 new TokenCache());
         List<Slot> slots = new ArrayList<>();
         Slot slot1 = new Slot();
@@ -174,7 +174,7 @@ public class BidManagerTest {
         List<Slot> slots = new ArrayList<>();
         slots.add(bannerSlot);
 
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(adUnits),
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(context, adUnits),
                 new TokenCache());
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         manager.enrichBid(builder, AdUnit);
@@ -212,7 +212,7 @@ public class BidManagerTest {
         slots.add(interstitialSlot);
 
         //initializing with adunits
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(adUnits),
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(context, adUnits),
                 new TokenCache());
         //mocking response by setting slots
         manager.setCacheAdUnits(slots);
@@ -227,7 +227,7 @@ public class BidManagerTest {
         Slot slot1 = new Slot();
         List<Slot> slots = new ArrayList<>();
         slots.add(slot1);
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(adUnits),
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(context, adUnits),
                 new TokenCache());
         manager.setCacheAdUnits(slots);
         BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
@@ -244,7 +244,7 @@ public class BidManagerTest {
         Slot slot1 = new Slot(jsonObject);
         List<Slot> slots = new ArrayList<>();
         slots.add(slot1);
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(adUnits),
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(context, adUnits),
                 new TokenCache());
         manager.setCacheAdUnits(slots);
         BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
@@ -267,7 +267,7 @@ public class BidManagerTest {
         slot1.setDisplayUrl(TEST_CREATIVE);
         List<Slot> slots = new ArrayList<>();
         slots.add(slot1);
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(adUnits),
+        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(context, adUnits),
                 new TokenCache());
         manager.setCacheAdUnits(slots);
         BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
