@@ -42,7 +42,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         User user = (User) objects[1];
         Publisher publisher = (Publisher) objects[2];
         ArrayList<CacheAdUnit> cacheAdUnits = (ArrayList<CacheAdUnit>) objects[3];
-        if (profile <= 0 || cacheAdUnits.size() == 0) {
+        if (profile <= 0) {
             return null;
         }
         if (DeviceUtil.hasPlayServices(mContext)) {

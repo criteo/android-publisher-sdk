@@ -51,7 +51,7 @@ public final class Criteo {
         }
 
         if (adUnits == null || adUnits.size() == 0) {
-            throw new IllegalArgumentException("AdUnits are required.");
+            adUnits = new ArrayList<>();
         }
 
         Context context = application.getApplicationContext();
