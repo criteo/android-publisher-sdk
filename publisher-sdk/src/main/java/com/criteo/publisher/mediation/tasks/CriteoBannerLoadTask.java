@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.criteo.publisher.Util.CriteoErrorCode;
@@ -15,6 +16,7 @@ import com.criteo.publisher.model.TokenValue;
 
 
 public class CriteoBannerLoadTask extends AsyncTask<Object, Void, Object> {
+    private static final String TAG = "Criteo.BLT";
 
     private CriteoBannerView criteoBannerView;
     private CriteoBannerAdListener criteoBannerAdListener;
@@ -26,6 +28,18 @@ public class CriteoBannerLoadTask extends AsyncTask<Object, Void, Object> {
 
     @Override
     protected Object doInBackground(Object... objects) {
+        Object result = null;
+
+        try {
+            result = doBannerLoadTask(objects);
+        } catch (Throwable tr) {
+            Log.e(TAG, "Internal BLT exec error.", tr);
+        }
+
+        return result;
+    }
+
+    private Object doBannerLoadTask(Object[] objects) {
         if (objects == null || objects.length == 0) {
             return null;
         }
@@ -35,6 +49,14 @@ public class CriteoBannerLoadTask extends AsyncTask<Object, Void, Object> {
 
     @Override
     protected void onPostExecute(Object object) {
+        try {
+            doOnPostExecute(object);
+        } catch (Throwable tr) {
+            Log.e(TAG, "Internal BLT PostExec error.", tr);
+        }
+    }
+
+    private void doOnPostExecute(Object object) {
         super.onPostExecute(object);
         if (object == null) {
             if (criteoBannerAdListener != null) {

@@ -1,6 +1,7 @@
 package com.criteo.publisher.mediation.tasks;
 
 import android.os.AsyncTask;
+import android.util.Log;
 import android.webkit.URLUtil;
 import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
@@ -8,6 +9,7 @@ import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 
 public class CriteoInterstitialListenerCallTask extends AsyncTask<Object, Void, Object> {
+    private static final String TAG = "Criteo.ILCT";
 
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
@@ -17,6 +19,18 @@ public class CriteoInterstitialListenerCallTask extends AsyncTask<Object, Void, 
 
     @Override
     protected Object doInBackground(Object... objects) {
+        Object result = null;
+
+        try {
+            result = doInterstitialListenerCallTask(objects);
+        } catch (Throwable tr) {
+            Log.e(TAG, "Internal ILCT exec error.", tr);
+        }
+
+        return result;
+    }
+
+    private Object doInterstitialListenerCallTask(Object... objects) {
         if (objects == null || objects.length == 0) {
             return null;
         }
@@ -26,6 +40,14 @@ public class CriteoInterstitialListenerCallTask extends AsyncTask<Object, Void, 
 
     @Override
     protected void onPostExecute(Object object) {
+        try {
+            doOnPostExecute(object);
+        } catch (Throwable tr) {
+            Log.e(TAG, "Internal ILCT PostExec error.", tr);
+        }
+    }
+
+    private void doOnPostExecute(Object object) {
         super.onPostExecute(object);
         if(criteoInterstitialAdListener != null) {
             if (object == null) {

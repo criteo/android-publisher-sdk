@@ -2,6 +2,7 @@ package com.criteo.publisher.mediation.tasks;
 
 import android.os.AsyncTask;
 import android.text.TextUtils;
+import android.util.Log;
 import android.webkit.URLUtil;
 import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.Util.StreamUtil;
@@ -14,6 +15,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 
 public class WebViewDataTask extends AsyncTask<String, Void, String> {
+    private static final String TAG = "Criteo.WVDT";
 
     private WebViewData webviewData;
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
@@ -26,6 +28,18 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... urls) {
+        String result = null;
+
+        try {
+            result = doWebViewDataTask(urls);
+        } catch (Throwable tr) {
+            Log.e(TAG, "Internal WVDT exec error.", tr);
+        }
+
+        return result;
+    }
+
+    private String doWebViewDataTask(String[] urls) {
         String result = "";
         URL url = null;
         try {
@@ -67,6 +81,14 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String data) {
+        try {
+            doOnPostExecute(data);
+        } catch (Throwable tr) {
+            Log.e(TAG, "Internal WVDT PostExec error.", tr);
+        }
+    }
+
+    private void doOnPostExecute(String data) {
         if (TextUtils.isEmpty(data)) {
             if(criteoInterstitialAdListener != null) {
                 criteoInterstitialAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
