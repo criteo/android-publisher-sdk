@@ -10,7 +10,6 @@ import android.util.Log;
 import android.webkit.WebView;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.ScreenSize;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -101,23 +100,12 @@ public final class DeviceUtil {
         }
     }
 
-    public static boolean isAeroplaneModeOn(Context context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            return Settings.System.getInt(context.getContentResolver(),
-                    Settings.System.AIRPLANE_MODE_ON, 0) != 0;
-        } else {
-            return Settings.Global.getInt(context.getContentResolver(),
-                    Settings.Global.AIRPLANE_MODE_ON, 0) != 0;
-        }
-    }
-
     public static boolean hasPlayServices(Context context) {
         try {
             Object status = ReflectionUtil.callGoogleApiAvailability
                     (IS_GOOGLE_PLAY_SERVICES_AVAILABLE, context);
             return GOOGLE_PLAY_SUCCESS_CODE == (int) status;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.e("DeviceUtil", "Error trying to find play services: " + e.getMessage());
         }
         return false;
@@ -138,8 +126,7 @@ public final class DeviceUtil {
     public static int isLimitAdTrackingEnabled(Context context) {
         try {
             return AdvertisingInfo.getInstance().isLimitAdTrackingEnabled(context) ? 1 : 0;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.e("DeviceUtil", "Error trying to check limited ad tracking: " + e.getMessage());
         }
         return 0;
