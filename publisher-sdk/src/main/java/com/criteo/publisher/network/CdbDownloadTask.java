@@ -32,20 +32,21 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         this.callConfig = callConfig;
         this.userAgent = userAgent;
     }
-    @SuppressWarnings("unchecked")
+
     @Override
     protected NetworkResult doInBackground(Object... objects) {
         NetworkResult result = null;
 
         try {
             result = doCdbDownloadTask(objects);
-        } catch (Throwable tr){
+        } catch (Throwable tr) {
             Log.e(TAG, "Internal CDT exec error.", tr);
         }
 
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     private NetworkResult doCdbDownloadTask(Object[] objects) {
         if (objects.length < 4) {
             return null;
