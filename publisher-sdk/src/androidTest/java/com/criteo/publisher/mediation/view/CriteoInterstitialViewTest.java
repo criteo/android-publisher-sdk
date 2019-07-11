@@ -4,6 +4,7 @@ import android.app.Application;
 import android.support.test.InstrumentationRegistry;
 import android.test.UiThreadTest;
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import com.criteo.publisher.Util.CriteoErrorCode;
@@ -27,7 +28,7 @@ public class CriteoInterstitialViewTest {
 
     @Before
     @UiThreadTest
-    public void setup() {
+    public void setup() throws CriteoInitException {
         MockitoAnnotations.initMocks(this);
         InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit("/140800857/None");
         List<AdUnit> cacheAdUnits = new ArrayList<>();

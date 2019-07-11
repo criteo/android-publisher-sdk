@@ -4,6 +4,7 @@ import android.app.Application;
 import android.support.test.InstrumentationRegistry;
 import android.test.UiThreadTest;
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.listener.CriteoBannerAdListener;
 import com.criteo.publisher.Util.CriteoErrorCode;
@@ -28,7 +29,7 @@ public class CriteoBannerViewTest {
 
     @Before
     @UiThreadTest
-    public void setup() {
+    public void setup() throws CriteoInitException {
         MockitoAnnotations.initMocks(this);
         BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/None", new AdSize(320, 50));
         List<AdUnit> AdUnits = new ArrayList<>();

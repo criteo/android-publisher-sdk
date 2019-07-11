@@ -3,6 +3,7 @@ package com.criteo.pubsdk_android;
 import android.app.Application;
 import android.net.TrafficStats;
 import android.os.StrictMode;
+import android.util.Log;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PubSdkDemoApplication extends Application {
+    private static final String TAG = PubSdkDemoApplication.class.getSimpleName();
 
     @Override
     public void onCreate() {
@@ -35,6 +37,12 @@ public class PubSdkDemoApplication extends Application {
 
         InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit("/140800857/Endeavour_Interstitial_320x480");
         adUnits.add(interstitialAdUnit);
-        Criteo.init(this,"B-056946", adUnits);
+
+        try {
+            Criteo.init(this, "B-056946", adUnits);
+        } catch (Throwable tr) {
+            Log.e(TAG, "FAILED TO INIT SDK!!!!", tr);
+            throw new IllegalStateException("Criteo SDK is not initialized. You may not proceed.", tr);
+        }
     }
 }

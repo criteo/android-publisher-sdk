@@ -28,10 +28,18 @@ public final class Criteo {
     private AppEvents appEvents;
     private AppLifecycleUtil appLifecycleUtil;
 
-    public static Criteo init(Application application, String criteoPublisherId, List<AdUnit> adUnits) {
+    public static Criteo init(Application application, String criteoPublisherId, List<AdUnit> adUnits) throws CriteoInitException {
         synchronized (Criteo.class) {
             if (criteo == null) {
-                criteo = new Criteo(application, adUnits, criteoPublisherId);
+                try {
+                    criteo = new Criteo(application, adUnits, criteoPublisherId);
+                } catch (IllegalArgumentException iae) {
+                    throw iae;
+                }
+                catch (Throwable tr) {
+                    Log.e(TAG, "Internal error initializing Criteo instance.", tr);
+                    throw new CriteoInitException("Internal error initializing Criteo instance.", tr);
+                }
             }
         }
         return criteo;
