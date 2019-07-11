@@ -18,13 +18,10 @@ public class CriteoBannerLoadTask extends AsyncTask<Object, Void, Object> {
 
     private CriteoBannerView criteoBannerView;
     private CriteoBannerAdListener criteoBannerAdListener;
-    private WebViewClient webViewClient;
 
-    public CriteoBannerLoadTask(CriteoBannerView bannerView, CriteoBannerAdListener listener,
-            WebViewClient webViewClient) {
+    public CriteoBannerLoadTask(CriteoBannerView bannerView, CriteoBannerAdListener listener) {
         this.criteoBannerView = bannerView;
         this.criteoBannerAdListener = listener;
-        this.webViewClient = webViewClient;
     }
 
     @Override
@@ -45,9 +42,9 @@ public class CriteoBannerLoadTask extends AsyncTask<Object, Void, Object> {
             }
             return;
         }
-        if (webViewClient == null) {
-            createViewClient();
-        }
+
+        createWebViewClient();
+
         if (object instanceof Slot) {
             Slot slot = (Slot) object;
             if (!slot.isValid()) {
@@ -81,9 +78,9 @@ public class CriteoBannerLoadTask extends AsyncTask<Object, Void, Object> {
         criteoBannerView.loadDataWithBaseURL("", displayUrl, "text/html", "UTF-8", "");
     }
 
-    private void createViewClient() {
+    private void createWebViewClient() {
         criteoBannerView.getSettings().setJavaScriptEnabled(true);
-        webViewClient = new WebViewClient() {
+        WebViewClient webViewClient = new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 view.getContext().startActivity(

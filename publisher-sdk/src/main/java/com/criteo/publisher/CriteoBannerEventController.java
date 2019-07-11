@@ -15,7 +15,6 @@ public class CriteoBannerEventController {
     private CriteoBannerView criteoBannerView;
     private CriteoBannerLoadTask criteoBannerLoadTask;
     private CriteoBannerAdListener criteoBannerAdListener;
-    private WebViewClient webViewClient;
 
     public CriteoBannerEventController(CriteoBannerView bannerView, CriteoBannerAdListener listener) {
         this.criteoBannerView = bannerView;
@@ -30,16 +29,14 @@ public class CriteoBannerEventController {
             slot = Criteo.getInstance().getBidForAdUnit(adUnit);
         }
 
-        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener,
-                webViewClient);
+        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener);
         criteoBannerLoadTask.execute(slot);
     }
 
     public void fetchAdAsync(BidToken bidToken) {
         TokenValue tokenValue = Criteo.getInstance().getTokenValue(bidToken, AdUnitType.CRITEO_BANNER);
 
-        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener,
-                webViewClient);
+        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener);
         criteoBannerLoadTask.execute(tokenValue);
     }
 
