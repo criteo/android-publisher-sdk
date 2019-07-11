@@ -51,6 +51,9 @@ public class InHouseActivity extends AppCompatActivity {
                 BidResponse bidResponse = Criteo.getInstance().getBidResponse(bannerAdUnit);
 
                 if (bidResponse != null && bidResponse.isBidSuccess()) {
+                    if (criteoBannerView != null) {
+                        criteoBannerView.destroy();
+                    }
                     criteoBannerView = new CriteoBannerView(context, bannerAdUnit);
                     criteoBannerView.setCriteoBannerAdListener(criteoBannerAdListener);
                     criteoBannerView.loadAd(bidResponse.getBidToken());

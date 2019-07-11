@@ -49,6 +49,9 @@ public class StandaloneActivity extends AppCompatActivity {
             public void onClick(View v) {
                 BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/Endeavour_320x50",
                         new AdSize(50, 320));
+                if (criteoBannerView != null) {
+                    criteoBannerView.destroy();
+                }
                 criteoBannerView = new CriteoBannerView(context, bannerAdUnit);
                 criteoBannerView.setCriteoBannerAdListener(criteoBannerAdListener);
                 Bannerasync bannerasync = new Bannerasync(criteoBannerView);
