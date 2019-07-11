@@ -40,8 +40,7 @@ public class CriteoBannerLoadTaskTest {
     @Test
     public void testWithNullSlot() throws InterruptedException {
         Slot slot = null;
-        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener,
-                new WebViewClient());
+        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener);
         criteoBannerLoadTask.execute(slot);
 
         Thread.sleep(100);
@@ -61,8 +60,7 @@ public class CriteoBannerLoadTaskTest {
         }
         Slot slot = new Slot(response);
 
-        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener,
-                new WebViewClient());
+        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener);
         criteoBannerLoadTask.execute(slot);
 
         Thread.sleep(100);
@@ -78,8 +76,7 @@ public class CriteoBannerLoadTaskTest {
         response.put(CPM, "10.0");
         response.put(DISPLAY_URL, "https://www.criteo.com");
         Slot slot = new Slot(response);
-        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener,
-                new WebViewClient());
+        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener);
         criteoBannerLoadTask.execute(slot);
 
         Thread.sleep(100);
@@ -93,8 +90,7 @@ public class CriteoBannerLoadTaskTest {
     public void testWithValidTokenValue() throws InterruptedException {
         TokenValue tokenValue = new TokenValue(System.currentTimeMillis(), 500, "https://www.criteo.com",
                 AdUnitType.CRITEO_BANNER);
-        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener,
-                new WebViewClient());
+        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener);
         criteoBannerLoadTask.execute(tokenValue);
 
         Thread.sleep(100);
@@ -110,8 +106,7 @@ public class CriteoBannerLoadTaskTest {
     @Test
     public void testWithNullTokenValue() throws InterruptedException {
         TokenValue tokenValue = null;
-        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener,
-                new WebViewClient());
+        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener);
         criteoBannerLoadTask.execute(tokenValue);
 
         Thread.sleep(100);
