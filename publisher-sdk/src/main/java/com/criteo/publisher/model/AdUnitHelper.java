@@ -2,11 +2,15 @@ package com.criteo.publisher.model;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.text.TextUtils;
+import android.util.Log;
+
 import com.criteo.publisher.Util.DeviceUtil;
 import java.util.ArrayList;
 import java.util.List;
 
 public final class AdUnitHelper {
+    private static final String TAG = AdUnitHelper.class.getSimpleName();
 
     private AdUnitHelper() {
 
@@ -61,6 +65,21 @@ public final class AdUnitHelper {
             default:
                 throw new IllegalArgumentException("Found an invalid AdUnit");
         }
+    }
+
+    public static List<CacheAdUnit> filterInvalidCacheAdUnits(List<CacheAdUnit> cacheAdUnits) {
+        List<CacheAdUnit> validatedCacheAdUnits = new ArrayList<CacheAdUnit>();
+
+        for (CacheAdUnit cacheAdUnit : cacheAdUnits) {
+            if (TextUtils.isEmpty(cacheAdUnit.getPlacementId()) || cacheAdUnit.getSize() == null
+                    || cacheAdUnit.getSize().getWidth() <= 0 || cacheAdUnit.getSize().getHeight() <= 0) {
+                Log.e(TAG, "Found an invalid AdUnit: " + cacheAdUnit);
+                continue;
+            }
+            validatedCacheAdUnits.add(cacheAdUnit);
+        }
+
+        return validatedCacheAdUnits;
     }
 
 }

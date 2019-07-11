@@ -61,16 +61,9 @@ public final class Criteo {
         Context context = application.getApplicationContext();
         createSupportedScreenSizes(application);
         List<CacheAdUnit> cacheAdUnits = AdUnitHelper.convertAdUnits(context, adUnits);
+        List<CacheAdUnit> validatedCacheAdUnits = AdUnitHelper.filterInvalidCacheAdUnits(cacheAdUnits);
 
-        for (CacheAdUnit cacheAdUnit : cacheAdUnits) {
-            if (TextUtils.isEmpty(cacheAdUnit.getPlacementId()) || cacheAdUnit.getSize() == null
-                    || cacheAdUnit.getSize().getWidth() <= 0 || cacheAdUnit.getSize().getHeight() <= 0) {
-                Log.e(TAG, "Found an invalid AdUnit: " + cacheAdUnit);
-                return;
-            }
-        }
-
-        this.bidManager = new BidManager(context, criteoPublisherId, cacheAdUnits,
+        this.bidManager = new BidManager(context, criteoPublisherId, validatedCacheAdUnits,
                 new TokenCache());
         this.appEvents = new AppEvents(context);
         this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
