@@ -74,6 +74,15 @@ public final class Criteo {
     }
 
     public void setBidsForAdUnit(Object object, AdUnit adUnit) {
+        try {
+            doSetBidsForAdUnit(object, adUnit);
+        }
+        catch (Throwable e) {
+            Log.e(TAG, "Internal error while setting bids for adUnit.", e);
+        }
+    }
+
+    private void doSetBidsForAdUnit(Object object, AdUnit adUnit) {
         if (bidManager == null) {
             return;
         }
@@ -113,6 +122,19 @@ public final class Criteo {
     }
 
     public BidResponse getBidResponse(AdUnit adUnit) {
+        BidResponse response;
+
+        try {
+            response = doGetBidResponse(adUnit);
+        } catch (Throwable e) {
+            response = new BidResponse(0.0, null, false);
+            Log.e(TAG, "Internal error while getting Bid Response.", e);
+        }
+
+        return response;
+    }
+
+    private BidResponse doGetBidResponse(AdUnit adUnit) {
         if (bidManager == null) {
             return null;
         }

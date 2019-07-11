@@ -19,7 +19,7 @@ import org.json.JSONObject;
 
 public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
 
-    private static final String TAG = CdbDownloadTask.class.getSimpleName();
+    private static final String TAG = "Criteo.CDT";
     private final Context mContext;
     private final boolean callConfig;
     private final String userAgent;
@@ -35,6 +35,18 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     @SuppressWarnings("unchecked")
     @Override
     protected NetworkResult doInBackground(Object... objects) {
+        NetworkResult result = null;
+
+        try {
+            result = doCdbDownloadTask(objects);
+        } catch (Throwable tr){
+            Log.e(TAG, "Internal CDT exec error.", tr);
+        }
+
+        return result;
+    }
+
+    private NetworkResult doCdbDownloadTask(Object[] objects) {
         if (objects.length < 4) {
             return null;
         }
@@ -87,6 +99,14 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
 
     @Override
     protected void onPostExecute(NetworkResult networkResult) {
+        try {
+            doOnPostExecute(networkResult);
+        } catch (Throwable tr) {
+            Log.e(TAG, "Internal CDT PostExec error.", tr);
+        }
+    }
+
+    private void doOnPostExecute(NetworkResult networkResult) {
         super.onPostExecute(networkResult);
         if (responseListener != null && networkResult != null) {
             if (networkResult.getCdb() != null) {
