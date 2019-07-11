@@ -38,6 +38,10 @@ public final class Criteo {
     }
 
     public static Criteo getInstance() {
+        if(criteo == null) {
+            throw new IllegalStateException("You must call Criteo.Init() before calling Criteo.getInstance()");
+        }
+
         return criteo;
     }
 
