@@ -50,7 +50,7 @@ public final class Criteo {
             throw new IllegalArgumentException("Criteo Publisher Id is required.");
         }
 
-        if (adUnits == null || adUnits.size() == 0) {
+        if (adUnits == null) {
             adUnits = new ArrayList<>();
         }
 
