@@ -1,8 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
-def support_version = "27.0.1"
-
 android {
     buildToolsVersion '27.0.3'
     compileSdkVersion 27
@@ -37,15 +35,6 @@ android {
         unitTests.returnDefaultValues = true
     }
 
-}
-
-configurations.all {
-    resolutionStrategy {
-        force "com.android.support:support-annotations:$support_version"
-        force "com.android.support:support-v4:$support_version"
-        force "com.android.support:asynclayoutinflater:$support_version"
-        force "com.android.support:customtabs:$support_version"
-    }
 }
 
 dependencies {
