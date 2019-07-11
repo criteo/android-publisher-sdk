@@ -218,6 +218,14 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         final Runnable setUserAgentTask = new Runnable() {
             @Override
             public void run() {
+                try {
+                    doSetUserAgentTask();
+                } catch (Throwable tr) {
+                    Log.e(TAG, "Internal error while setting user-agent.", tr);
+                }
+            }
+
+            private void doSetUserAgentTask() {
 
                 String taskUserAgent = DeviceUtil.getUserAgent(mContext);
                 Message msg = mainHandler.obtainMessage();
