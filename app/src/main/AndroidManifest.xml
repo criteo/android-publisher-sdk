@@ -86,6 +86,10 @@
     <activity
       android:configChanges="keyboardHidden|orientation|screenSize"
       android:name="com.mopub.mobileads.MraidVideoPlayerActivity"/>
+
+    <activity android:name="com.mopub.mobileads.MoPubActivity" android:configChanges="keyboardHidden|orientation|screenSize"/>
+    <activity android:name="com.mopub.mobileads.MraidActivity" android:configChanges="keyboardHidden|orientation|screenSize"/>
+
   </application>
 
 </manifest>
