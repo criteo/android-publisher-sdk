@@ -16,6 +16,8 @@ import android.view.View.OnClickListener;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
+import android.widget.RelativeLayout;
+
 import com.criteo.publisher.R;
 
 public class CriteoInterstitialActivity extends Activity {
@@ -25,12 +27,14 @@ public class CriteoInterstitialActivity extends Activity {
     private WebView webView;
     private ResultReceiver resultReceiver;
     private ImageButton closeButton;
-    private  Handler handler;
+    private Handler handler;
+    private RelativeLayout adLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_criteo_interstitial);
+        adLayout = findViewById(R.id.AdLayout);
         webView = findViewById(R.id.webview);
         closeButton = findViewById(R.id.closeButton);
 
@@ -62,6 +66,7 @@ public class CriteoInterstitialActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        adLayout.removeAllViews();
         webView.destroy();
         webView = null;
     }
