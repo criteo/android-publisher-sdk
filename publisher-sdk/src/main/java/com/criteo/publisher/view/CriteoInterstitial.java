@@ -14,8 +14,8 @@ import com.criteo.publisher.controller.WebViewDownloader;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.WebViewData;
 
-public class CriteoInterstitialView {
-    private static final String TAG = CriteoInterstitialView.class.getSimpleName();
+public class CriteoInterstitial {
+    private static final String TAG = CriteoInterstitial.class.getSimpleName();
 
     private InterstitialAdUnit interstitialAdUnit;
 
@@ -26,7 +26,7 @@ public class CriteoInterstitialView {
     private CriteoInterstitialEventController criteoInterstitialEventController;
 
 
-    public CriteoInterstitialView(Context context, InterstitialAdUnit interstitialAdUnit) {
+    public CriteoInterstitial(Context context, InterstitialAdUnit interstitialAdUnit) {
         this.context = context;
         this.interstitialAdUnit = interstitialAdUnit;
     }

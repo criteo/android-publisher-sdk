@@ -3,19 +3,19 @@ package com.criteo.mediation.listener;
 
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import com.criteo.publisher.Util.CriteoErrorCode;
-import com.criteo.publisher.view.CriteoInterstitialView;
+import com.criteo.publisher.view.CriteoInterstitial;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.mediation.customevent.CustomEventInterstitialListener;
 
 public class CriteoInterstitialEventListenerImpl implements CriteoInterstitialAdListener {
 
     private CustomEventInterstitialListener customEventInterstitialListener;
-    private CriteoInterstitialView criteoInterstitialView;
+    private CriteoInterstitial criteoInterstitial;
 
     public CriteoInterstitialEventListenerImpl(CustomEventInterstitialListener listener,
-            CriteoInterstitialView interstitialView) {
+            CriteoInterstitial interstitialView) {
         customEventInterstitialListener = listener;
-        criteoInterstitialView = interstitialView;
+        criteoInterstitial = interstitialView;
     }
 
     @Override

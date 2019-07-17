@@ -14,7 +14,7 @@ import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.listener.CriteoBannerAdListener;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import com.criteo.publisher.view.CriteoBannerView;
-import com.criteo.publisher.view.CriteoInterstitialView;
+import com.criteo.publisher.view.CriteoInterstitial;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
@@ -27,7 +27,7 @@ public class InHouseActivity extends AppCompatActivity {
     private LinearLayout adLayout;
     private CriteoBannerAdListener criteoBannerAdListener;
     private CriteoBannerView criteoBannerView;
-    private CriteoInterstitialView criteoInterstitialView;
+    private CriteoInterstitial criteoInterstitial;
     private Button buttonInhouseInterstitial;
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
@@ -65,8 +65,8 @@ public class InHouseActivity extends AppCompatActivity {
         buttonInhouseInterstitial.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (criteoInterstitialView.isAdLoaded()) {
-                    criteoInterstitialView.show();
+                if (criteoInterstitial.isAdLoaded()) {
+                    criteoInterstitial.show();
                 }
             }
         });
@@ -90,14 +90,14 @@ public class InHouseActivity extends AppCompatActivity {
 
     private void interstitialAdLoad() {
         InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit("/140800857/Endeavour_Interstitial_320x480");
-        criteoInterstitialView = new CriteoInterstitialView(context, interstitialAdUnit);
-        criteoInterstitialView.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
+        criteoInterstitial = new CriteoInterstitial(context, interstitialAdUnit);
+        criteoInterstitial.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
         BidResponse bidResponse = Criteo.getInstance().getBidResponse(interstitialAdUnit);
 
         if (bidResponse != null && bidResponse.isBidSuccess()) {
-            criteoInterstitialView = new CriteoInterstitialView(context, interstitialAdUnit);
-            criteoInterstitialView.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
-            criteoInterstitialView.loadAd(bidResponse.getBidToken());
+            criteoInterstitial = new CriteoInterstitial(context, interstitialAdUnit);
+            criteoInterstitial.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
+            criteoInterstitial.loadAd(bidResponse.getBidToken());
         }
     }
 

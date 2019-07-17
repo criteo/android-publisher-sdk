@@ -18,12 +18,12 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-public class CriteoInterstitialViewTest {
+public class CriteoInterstitialTest {
 
     @Mock
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
-    private CriteoInterstitialView criteoInterstitialView;
+    private CriteoInterstitial criteoInterstitial;
 
     @Before
     @UiThreadTest
@@ -37,13 +37,13 @@ public class CriteoInterstitialViewTest {
                         .getTargetContext()
                         .getApplicationContext();
         Criteo.init(app, "B-056946", cacheAdUnits);
-        criteoInterstitialView = new CriteoInterstitialView(InstrumentationRegistry.getContext(), interstitialAdUnit);
-        criteoInterstitialView.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
+        criteoInterstitial = new CriteoInterstitial(InstrumentationRegistry.getContext(), interstitialAdUnit);
+        criteoInterstitial.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
     }
 
     @Test
     public void testNotifyListenerAsyncWithNullSlot() throws InterruptedException {
-        criteoInterstitialView.loadAd();
+        criteoInterstitial.loadAd();
 
         //wait for the loadAd process to be completed
         Thread.sleep(1000);

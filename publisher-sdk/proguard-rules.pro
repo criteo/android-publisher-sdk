@@ -52,8 +52,8 @@
    public *;
 }
 
--keep public class com.criteo.publisher.view.CriteoInterstitialView
--keepclassmembers class com.criteo.publisher.view.CriteoInterstitialView {
+-keep public class com.criteo.publisher.view.CriteoInterstitial
+-keepclassmembers class com.criteo.publisher.view.CriteoInterstitial {
    public *;
 }
 
