@@ -93,6 +93,11 @@ public class CriteoInterstitialActivity extends Activity {
         webView.setWebViewClient(new InterstitialWebViewClient());
     }
 
+    @Override
+    public void onBackPressed() {
+        close();
+    }
+
     private class InterstitialWebViewClient extends WebViewClient {
 
         @Override

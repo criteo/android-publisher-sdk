@@ -27,7 +27,7 @@ public class CriteoResultReceiver extends ResultReceiver {
     //...
     @Override
     protected void onReceiveResult(int resultCode, Bundle resultData) {
-        int a = resultCode;
+
         if (resultCode == RESULT_CODE_SUCCESSFUL && criteoInterstitialAdListener != null) {
             int action = resultData.getInt(INTERSTITIAL_ACTION);
 
@@ -43,8 +43,6 @@ public class CriteoResultReceiver extends ResultReceiver {
                 default:
                     break;
             }
-
-
         }
     }
 }
