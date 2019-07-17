@@ -1,7 +1,7 @@
-package com.criteo.publisher.mediation.controller;
+package com.criteo.publisher.controller;
 
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
-import com.criteo.publisher.mediation.tasks.WebViewDataTask;
+import com.criteo.publisher.tasks.WebViewDataTask;
 import com.criteo.publisher.model.WebViewData;
 
 public class WebViewDownloader {

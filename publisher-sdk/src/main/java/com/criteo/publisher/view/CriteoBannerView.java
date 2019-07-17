@@ -1,4 +1,4 @@
-package com.criteo.publisher.mediation.view;
+package com.criteo.publisher.view;
 
 import android.content.Context;
 import android.util.Log;

@@ -2,7 +2,7 @@ package com.criteo.publisher;
 
 import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.listener.CriteoBannerAdListener;
-import com.criteo.publisher.mediation.view.CriteoBannerView;
+import com.criteo.publisher.view.CriteoBannerView;
 import com.criteo.publisher.model.AdUnit;
 import org.junit.Before;
 import org.junit.Test;

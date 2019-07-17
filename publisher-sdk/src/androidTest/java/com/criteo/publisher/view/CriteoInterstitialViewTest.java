@@ -1,4 +1,4 @@
-package com.criteo.publisher.mediation.view;
+package com.criteo.publisher.view;
 
 import android.app.Application;
 import android.support.test.InstrumentationRegistry;
@@ -8,9 +8,8 @@ import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import com.criteo.publisher.Util.CriteoErrorCode;
-import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.CacheAdUnit;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;

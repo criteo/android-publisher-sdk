@@ -4,7 +4,7 @@ package com.criteo.mediation.listener;
 import android.view.View;
 import com.criteo.publisher.listener.CriteoBannerAdListener;
 import com.criteo.publisher.Util.CriteoErrorCode;
-import com.criteo.publisher.mediation.view.CriteoBannerView;
+import com.criteo.publisher.view.CriteoBannerView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.mediation.customevent.CustomEventBannerListener;
 

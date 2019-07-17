@@ -5,7 +5,7 @@
   <uses-permission android:name="android.permission.INTERNET"/>
 
   <application>
-    <activity android:name=".mediation.view.CriteoInterstitialActivity"></activity>
+    <activity android:name=".view.CriteoInterstitialActivity"></activity>
   </application>
 
 </manifest>

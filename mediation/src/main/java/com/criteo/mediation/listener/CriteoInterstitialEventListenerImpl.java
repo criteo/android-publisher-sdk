@@ -3,7 +3,7 @@ package com.criteo.mediation.listener;
 
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import com.criteo.publisher.Util.CriteoErrorCode;
-import com.criteo.publisher.mediation.view.CriteoInterstitialView;
+import com.criteo.publisher.view.CriteoInterstitialView;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.mediation.customevent.CustomEventInterstitialListener;
 

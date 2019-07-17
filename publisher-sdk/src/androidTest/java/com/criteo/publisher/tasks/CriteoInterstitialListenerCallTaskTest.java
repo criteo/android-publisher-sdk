@@ -1,9 +1,8 @@
-package com.criteo.publisher.mediation.tasks;
+package com.criteo.publisher.tasks;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import com.criteo.publisher.model.Slot;

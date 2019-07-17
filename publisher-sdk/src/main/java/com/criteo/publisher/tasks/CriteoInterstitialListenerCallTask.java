@@ -1,4 +1,4 @@
-package com.criteo.publisher.mediation.tasks;
+package com.criteo.publisher.tasks;
 
 import android.os.AsyncTask;
 import android.util.Log;

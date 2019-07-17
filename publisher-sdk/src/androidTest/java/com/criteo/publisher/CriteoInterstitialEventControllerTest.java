@@ -1,7 +1,7 @@
-package com.criteo.publisher.mediation.controller;
+package com.criteo.publisher;
 
-import com.criteo.publisher.CriteoInterstitialEventController;
 import com.criteo.publisher.Util.CriteoErrorCode;
+import com.criteo.publisher.controller.WebViewDownloader;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;

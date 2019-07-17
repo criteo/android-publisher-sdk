@@ -1,4 +1,4 @@
-package com.criteo.publisher.mediation.tasks;
+package com.criteo.publisher.tasks;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -9,7 +9,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.listener.CriteoBannerAdListener;
-import com.criteo.publisher.mediation.view.CriteoBannerView;
+import com.criteo.publisher.view.CriteoBannerView;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;

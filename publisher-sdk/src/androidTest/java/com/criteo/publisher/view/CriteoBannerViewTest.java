@@ -1,4 +1,4 @@
-package com.criteo.publisher.mediation.view;
+package com.criteo.publisher.view;
 
 import android.app.Application;
 import android.support.test.InstrumentationRegistry;
