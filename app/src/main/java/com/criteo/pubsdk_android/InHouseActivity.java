@@ -13,11 +13,11 @@ import com.criteo.publisher.Criteo;
 import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.listener.CriteoBannerAdListener;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
-import com.criteo.publisher.view.CriteoBannerView;
-import com.criteo.publisher.view.CriteoInterstitial;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import com.criteo.publisher.view.CriteoBannerView;
+import com.criteo.publisher.view.CriteoInterstitial;
 
 public class InHouseActivity extends AppCompatActivity {
 
@@ -30,6 +30,7 @@ public class InHouseActivity extends AppCompatActivity {
     private CriteoInterstitial criteoInterstitial;
     private Button buttonInhouseInterstitial;
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
+    private InterstitialAdUnit interstitialAdUnit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,23 +42,22 @@ public class InHouseActivity extends AppCompatActivity {
         context = getApplicationContext();
 
         createAdListener();
+        BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
+        criteoBannerView = new CriteoBannerView(context, bannerAdUnit);
+        criteoBannerView.setCriteoBannerAdListener(criteoBannerAdListener);
+
+        interstitialAdUnit = new InterstitialAdUnit("/140800857/Endeavour_Interstitial_320x480");
+        criteoInterstitial = new CriteoInterstitial(context, interstitialAdUnit);
+        criteoInterstitial.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
 
         findViewById(R.id.buttonInhouseBanner).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                adLayout.removeAllViews();
-                BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
-
                 BidResponse bidResponse = Criteo.getInstance().getBidResponse(bannerAdUnit);
 
                 if (bidResponse != null && bidResponse.isBidSuccess()) {
-                    if (criteoBannerView != null) {
-                        criteoBannerView.destroy();
-                    }
-                    criteoBannerView = new CriteoBannerView(context, bannerAdUnit);
-                    criteoBannerView.setCriteoBannerAdListener(criteoBannerAdListener);
+
                     criteoBannerView.loadAd(bidResponse.getBidToken());
-                    adLayout.addView(criteoBannerView);
                 }
             }
         });
@@ -89,9 +89,6 @@ public class InHouseActivity extends AppCompatActivity {
     }
 
     private void interstitialAdLoad() {
-        InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit("/140800857/Endeavour_Interstitial_320x480");
-        criteoInterstitial = new CriteoInterstitial(context, interstitialAdUnit);
-        criteoInterstitial.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
         BidResponse bidResponse = Criteo.getInstance().getBidResponse(interstitialAdUnit);
 
         if (bidResponse != null && bidResponse.isBidSuccess()) {
@@ -117,6 +114,8 @@ public class InHouseActivity extends AppCompatActivity {
             @Override
             public void onAdLoaded(View view) {
                 Log.d(TAG, "Banner ad loaded");
+                adLayout.removeAllViews();
+                adLayout.addView(criteoBannerView);
             }
         };
 
