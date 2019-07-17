@@ -104,17 +104,6 @@ public class InHouseActivity extends AppCompatActivity {
 
     private void createAdListener() {
         criteoBannerAdListener = new CriteoBannerAdListener() {
-
-            @Override
-            public void onAdOpened() {
-                Log.d(TAG, "Banner ad fullscreen");
-            }
-
-            @Override
-            public void onAdClosed() {
-                Log.d(TAG, "Banner ad closed");
-            }
-
             @Override
             public void onAdLeftApplication() {
                 Log.d(TAG, "Banner ad clicked");

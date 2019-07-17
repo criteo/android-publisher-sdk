@@ -12,16 +12,6 @@ public interface CriteoAdListener {
     void onAdFailedToLoad(CriteoErrorCode code);
 
     /**
-     * Called when an ad goes full screen.
-     */
-    void onAdOpened();
-
-    /**
-     * Called when an ad is closed.
-     */
-    void onAdClosed();
-
-    /**
      * Called when an ad is clicked.
      */
     void onAdLeftApplication();
