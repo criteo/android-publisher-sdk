@@ -1,4 +1,4 @@
-package com.criteo.publisher.view;
+package com.criteo.publisher;
 
 import static android.support.test.runner.lifecycle.Stage.DESTROYED;
 import static android.support.test.runner.lifecycle.Stage.RESUMED;

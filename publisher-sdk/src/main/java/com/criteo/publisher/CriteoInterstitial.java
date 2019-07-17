@@ -1,4 +1,4 @@
-package com.criteo.publisher.view;
+package com.criteo.publisher;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 
-import com.criteo.publisher.BidToken;
-import com.criteo.publisher.CriteoInterstitialEventController;
 import com.criteo.publisher.Util.CriteoResultReceiver;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import com.criteo.publisher.controller.WebViewDownloader;

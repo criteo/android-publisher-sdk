@@ -7,7 +7,7 @@ import android.webkit.WebSettings;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.listener.CriteoBannerAdListener;
-import com.criteo.publisher.view.CriteoBannerView;
+import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;

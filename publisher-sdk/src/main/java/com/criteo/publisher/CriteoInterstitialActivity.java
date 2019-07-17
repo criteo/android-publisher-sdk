@@ -1,4 +1,4 @@
-package com.criteo.publisher.view;
+package com.criteo.publisher;
 
 import static com.criteo.publisher.Util.CriteoResultReceiver.ACTION_CLICKED;
 import static com.criteo.publisher.Util.CriteoResultReceiver.ACTION_CLOSED;

@@ -1,10 +1,9 @@
-package com.criteo.publisher.view;
+package com.criteo.publisher;
 
 import android.content.Context;
 import android.util.Log;
 import android.webkit.WebView;
-import com.criteo.publisher.BidToken;
-import com.criteo.publisher.CriteoBannerEventController;
+
 import com.criteo.publisher.listener.CriteoBannerAdListener;
 import com.criteo.publisher.model.BannerAdUnit;
 

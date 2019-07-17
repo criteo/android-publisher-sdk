@@ -1,10 +1,8 @@
-package com.criteo.publisher.view;
+package com.criteo.publisher;
 
 import android.app.Application;
 import android.support.test.InstrumentationRegistry;
 import android.test.UiThreadTest;
-import com.criteo.publisher.Criteo;
-import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.listener.CriteoBannerAdListener;
 import com.criteo.publisher.Util.CriteoErrorCode;

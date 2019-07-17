@@ -3,7 +3,6 @@ package com.criteo.publisher;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.listener.CriteoBannerAdListener;
 import com.criteo.publisher.tasks.CriteoBannerLoadTask;
-import com.criteo.publisher.view.CriteoBannerView;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;

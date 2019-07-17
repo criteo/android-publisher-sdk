@@ -47,13 +47,13 @@
    public *;
 }
 
--keep public class com.criteo.publisher.view.CriteoBannerView
--keepclassmembers class com.criteo.publisher.view.CriteoBannerView {
+-keep public class com.criteo.publisher.CriteoBannerView
+-keepclassmembers class com.criteo.publisher.CriteoBannerView {
    public *;
 }
 
--keep public class com.criteo.publisher.view.CriteoInterstitial
--keepclassmembers class com.criteo.publisher.view.CriteoInterstitial {
+-keep public class com.criteo.publisher.CriteoInterstitial
+-keepclassmembers class com.criteo.publisher.CriteoInterstitial {
    public *;
 }
 

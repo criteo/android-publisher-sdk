@@ -13,11 +13,11 @@ import com.criteo.publisher.Criteo;
 import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.listener.CriteoBannerAdListener;
 import com.criteo.publisher.listener.CriteoInterstitialAdListener;
+import com.criteo.publisher.CriteoBannerView;
+import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
-import com.criteo.publisher.view.CriteoBannerView;
-import com.criteo.publisher.view.CriteoInterstitial;
 
 public class InHouseActivity extends AppCompatActivity {
 
