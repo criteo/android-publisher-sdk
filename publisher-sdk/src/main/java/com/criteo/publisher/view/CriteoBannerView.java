@@ -7,16 +7,16 @@ import com.criteo.publisher.BidToken;
 import com.criteo.publisher.CriteoBannerEventController;
 import com.criteo.publisher.listener.CriteoBannerAdListener;
 import com.criteo.publisher.model.BannerAdUnit;
-import java.lang.ref.WeakReference;
 
 public class CriteoBannerView extends WebView {
+
     private static final String TAG = CriteoBannerView.class.getSimpleName();
 
     private BannerAdUnit bannerAdUnit;
 
     private CriteoBannerAdListener criteoBannerAdListener;
 
-    private WeakReference<CriteoBannerEventController> criteoBannerEventController;
+    private CriteoBannerEventController criteoBannerEventController;
 
 
     public CriteoBannerView(Context context, BannerAdUnit bannerAdUnit) {
@@ -41,10 +41,10 @@ public class CriteoBannerView extends WebView {
 
     private void doLoadAd() {
         if (criteoBannerEventController == null) {
-            criteoBannerEventController = new WeakReference<>(
-                    new CriteoBannerEventController(this, criteoBannerAdListener));
+            criteoBannerEventController =
+                    new CriteoBannerEventController(this, criteoBannerAdListener);
         }
-        criteoBannerEventController.get().fetchAdAsync(bannerAdUnit);
+        criteoBannerEventController.fetchAdAsync(bannerAdUnit);
     }
 
     public void loadAd(BidToken bidToken) {
@@ -57,10 +57,10 @@ public class CriteoBannerView extends WebView {
 
     private void doLoadAd(BidToken bidToken) {
         if (criteoBannerEventController == null) {
-            criteoBannerEventController = new WeakReference<>(
-                    new CriteoBannerEventController(this, criteoBannerAdListener));
+            criteoBannerEventController =
+                    new CriteoBannerEventController(this, criteoBannerAdListener);
         }
-        criteoBannerEventController.get().fetchAdAsync(bidToken);
+        criteoBannerEventController.fetchAdAsync(bidToken);
     }
 
     public void destroy() {
