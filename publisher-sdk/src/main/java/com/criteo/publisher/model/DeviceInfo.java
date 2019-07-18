@@ -59,7 +59,7 @@ public class DeviceInfo {
     }
 
     public String getWebViewUserAgent() {
-        return getWebViewUserAgent();
+        return webViewUserAgent;
     }
 }
 
