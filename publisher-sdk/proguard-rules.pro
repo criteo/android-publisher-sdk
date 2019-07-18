@@ -77,8 +77,8 @@
    public *;
 }
 
--keep public class com.criteo.publisher.Util.CriteoErrorCode
--keepclassmembers class com.criteo.publisher.Util.CriteoErrorCode {
+-keep public class com.criteo.publisher.CriteoErrorCode
+-keepclassmembers class com.criteo.publisher.CriteoErrorCode {
    public *;
 }
 
@@ -89,11 +89,11 @@
 
 -keep public class com.criteo.publisher.BidToken
 
--keep public interface com.criteo.publisher.listener.CriteoAdListener {*;}
+-keep public interface com.criteo.publisher.CriteoAdListener {*;}
 
--keep public interface com.criteo.publisher.listener.CriteoBannerAdListener {*;}
+-keep public interface com.criteo.publisher.CriteoBannerAdListener {*;}
 
--keep public interface com.criteo.publisher.listener.CriteoInterstitialAdListener {*;}
+-keep public interface com.criteo.publisher.CriteoInterstitialAdListener {*;}
 
 
 

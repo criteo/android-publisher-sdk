@@ -2,7 +2,7 @@ package com.criteo.publisher.model;
 
 import android.text.TextUtils;
 import com.criteo.publisher.Util.WebViewLoadStatus;
-import com.criteo.publisher.listener.CriteoInterstitialAdListener;
+import com.criteo.publisher.CriteoInterstitialAdListener;
 
 public class WebViewData {
 

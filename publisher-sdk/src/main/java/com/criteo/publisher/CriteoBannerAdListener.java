@@ -1,4 +1,4 @@
-package com.criteo.publisher.listener;
+package com.criteo.publisher;
 
 import android.view.View;
 

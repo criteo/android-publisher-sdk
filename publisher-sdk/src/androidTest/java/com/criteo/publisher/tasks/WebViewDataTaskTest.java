@@ -4,8 +4,8 @@ import static org.mockito.Mockito.mock;
 
 import android.test.UiThreadTest;
 
-import com.criteo.publisher.listener.CriteoInterstitialAdListener;
-import com.criteo.publisher.Util.CriteoErrorCode;
+import com.criteo.publisher.CriteoInterstitialAdListener;
+import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.model.WebViewData;
 import org.junit.Assert;
 import org.junit.Before;

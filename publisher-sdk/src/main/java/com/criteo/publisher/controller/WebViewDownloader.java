@@ -1,6 +1,6 @@
 package com.criteo.publisher.controller;
 
-import com.criteo.publisher.listener.CriteoInterstitialAdListener;
+import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.tasks.WebViewDataTask;
 import com.criteo.publisher.model.WebViewData;
 

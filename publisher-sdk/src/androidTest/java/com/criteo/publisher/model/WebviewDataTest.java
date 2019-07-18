@@ -1,7 +1,7 @@
 package com.criteo.publisher.model;
 
 import android.text.TextUtils;
-import com.criteo.publisher.listener.CriteoInterstitialAdListener;
+import com.criteo.publisher.CriteoInterstitialAdListener;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;

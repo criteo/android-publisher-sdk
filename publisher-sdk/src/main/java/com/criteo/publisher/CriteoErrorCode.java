@@ -1,4 +1,4 @@
-package com.criteo.publisher.Util;
+package com.criteo.publisher;
 
 /**
  * Error codes for reasons why an ad request may fail.

@@ -3,8 +3,8 @@ package com.criteo.publisher.tasks;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.webkit.URLUtil;
-import com.criteo.publisher.Util.CriteoErrorCode;
-import com.criteo.publisher.listener.CriteoInterstitialAdListener;
+import com.criteo.publisher.CriteoErrorCode;
+import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 

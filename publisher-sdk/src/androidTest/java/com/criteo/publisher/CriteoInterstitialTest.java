@@ -4,8 +4,6 @@ import android.app.Application;
 import android.support.test.InstrumentationRegistry;
 import android.test.UiThreadTest;
 import com.criteo.publisher.model.InterstitialAdUnit;
-import com.criteo.publisher.listener.CriteoInterstitialAdListener;
-import com.criteo.publisher.Util.CriteoErrorCode;
 import com.criteo.publisher.model.AdUnit;
 
 import java.util.ArrayList;

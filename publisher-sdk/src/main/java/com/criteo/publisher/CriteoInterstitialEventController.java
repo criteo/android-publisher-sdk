@@ -3,7 +3,6 @@ package com.criteo.publisher;
 import android.text.TextUtils;
 import android.webkit.URLUtil;
 import com.criteo.publisher.Util.AdUnitType;
-import com.criteo.publisher.listener.CriteoInterstitialAdListener;
 import com.criteo.publisher.controller.WebViewDownloader;
 import com.criteo.publisher.tasks.CriteoInterstitialListenerCallTask;
 import com.criteo.publisher.model.AdUnit;
