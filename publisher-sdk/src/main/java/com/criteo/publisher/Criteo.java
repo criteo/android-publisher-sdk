@@ -13,6 +13,7 @@ import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitHelper;
 import com.criteo.publisher.model.CacheAdUnit;
+import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.ScreenSize;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
@@ -27,16 +28,17 @@ public final class Criteo {
     private BidManager bidManager;
     private AppEvents appEvents;
     private AppLifecycleUtil appLifecycleUtil;
+    private DeviceInfo deviceInfo;
 
-    public static Criteo init(Application application, String criteoPublisherId, List<AdUnit> adUnits) throws CriteoInitException {
+    public static Criteo init(Application application, String criteoPublisherId, List<AdUnit> adUnits)
+            throws CriteoInitException {
         synchronized (Criteo.class) {
             if (criteo == null) {
                 try {
                     criteo = new Criteo(application, adUnits, criteoPublisherId);
                 } catch (IllegalArgumentException iae) {
                     throw iae;
-                }
-                catch (Throwable tr) {
+                } catch (Throwable tr) {
                     Log.e(TAG, "Internal error initializing Criteo instance.", tr);
                     throw new CriteoInitException("Internal error initializing Criteo instance.", tr);
                 }
@@ -46,7 +48,7 @@ public final class Criteo {
     }
 
     public static Criteo getInstance() {
-        if(criteo == null) {
+        if (criteo == null) {
             throw new IllegalStateException("You must call Criteo.Init() before calling Criteo.getInstance()");
         }
 
@@ -70,9 +72,9 @@ public final class Criteo {
         createSupportedScreenSizes(application);
         List<CacheAdUnit> cacheAdUnits = AdUnitHelper.convertAdUnits(context, adUnits);
         List<CacheAdUnit> validatedCacheAdUnits = AdUnitHelper.filterInvalidCacheAdUnits(cacheAdUnits);
-
+        this.deviceInfo = new DeviceInfo(context);
         this.bidManager = new BidManager(context, criteoPublisherId, validatedCacheAdUnits,
-                new TokenCache());
+                new TokenCache(), deviceInfo);
         this.appEvents = new AppEvents(context);
         this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
         bidManager.prefetch();
@@ -81,8 +83,7 @@ public final class Criteo {
     public void setBidsForAdUnit(Object object, AdUnit adUnit) {
         try {
             doSetBidsForAdUnit(object, adUnit);
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             Log.e(TAG, "Internal error while setting bids for adUnit.", e);
         }
     }
@@ -153,4 +154,7 @@ public final class Criteo {
         return bidManager.getTokenValue(bidToken, adUnitType);
     }
 
+    DeviceInfo getDeviceInfo() {
+        return deviceInfo;
+    }
 }

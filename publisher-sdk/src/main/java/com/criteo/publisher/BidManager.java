@@ -4,23 +4,18 @@ import static android.content.ContentValues.TAG;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.Util.ReflectionUtil;
-import com.criteo.publisher.Util.UserAgentCallback;
-import com.criteo.publisher.Util.UserAgentHandler;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitHelper;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Config;
+import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
@@ -47,9 +42,11 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private CdbDownloadTask cdbDownloadTask;
     private long cdbTimeToNextCall = 0;
     private Config config;
-    private String userAgent;
+    private DeviceInfo deviceInfo;
 
-    BidManager(Context context, String criteoPublisherId, List<CacheAdUnit> cacheAdUnits, TokenCache tokenCache) {
+
+    BidManager(Context context, String criteoPublisherId, List<CacheAdUnit> cacheAdUnits, TokenCache tokenCache,
+            DeviceInfo deviceInfo) {
         this.mContext = context;
         this.cacheAdUnits = cacheAdUnits;
         this.cache = new SdkCache();
@@ -57,7 +54,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         publisher = new Publisher(mContext);
         publisher.setCriteoPublisherId(criteoPublisherId);
         user = new User();
-        userAgent = "";
+        this.deviceInfo = deviceInfo;
     }
 
     /**
@@ -76,7 +73,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
      * Method to start new CdbDownload Asynctask
      */
     void startCdbDownloadTask(boolean callConfig, List<CacheAdUnit> prefetchCacheAdUnits) {
-        cdbDownloadTask = new CdbDownloadTask(mContext, this, callConfig, userAgent);
+        cdbDownloadTask = new CdbDownloadTask(mContext, this, callConfig, deviceInfo.getWebViewUserAgent());
         cdbDownloadTask.execute(PROFILE_ID, user, publisher, prefetchCacheAdUnits);
     }
 
@@ -131,7 +128,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
         Slot peekSlot = cache.peekAdUnit(cacheAdUnit.getPlacementId(), cacheAdUnit.getSize().getFormattedSize());
         if (peekSlot == null) {
-            prefetch(false, userAgent, cacheAdUnit);
+            prefetch(false, deviceInfo.getWebViewUserAgent(), cacheAdUnit);
             return null;
         }
         double cpm = (peekSlot.getCpmAsNumber() == null ? 0.0 : peekSlot.getCpmAsNumber());
@@ -142,7 +139,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         if (cpm == 0 && ttl == 0) {
             cache.remove(cacheAdUnit.getPlacementId(),
                     cacheAdUnit.getSize().getFormattedSize());
-            prefetch(false, userAgent, cacheAdUnit);
+            prefetch(false, deviceInfo.getWebViewUserAgent(), cacheAdUnit);
             return null;
         }
         //If cpm is 0, ttl in slot > 0
@@ -154,7 +151,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             //If cpm > 0, ttl > 0 but we are done staying silent
             Slot slot = cache.getAdUnit(cacheAdUnit.getPlacementId(),
                     cacheAdUnit.getSize().getFormattedSize());
-            prefetch(false, userAgent, cacheAdUnit);
+            prefetch(false, deviceInfo.getWebViewUserAgent(), cacheAdUnit);
             return slot;
         }
 
@@ -206,38 +203,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
      */
     protected void prefetch() {
 
-        final Handler mainHandler = new UserAgentHandler(Looper.getMainLooper(), new UserAgentCallback() {
-            @Override
-            public void done(String useragent) {
-                userAgent = useragent;
-                startCdbDownloadTask(true, cacheAdUnits);
-
-            }
-        });
-
-        final Runnable setUserAgentTask = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    doSetUserAgentTask();
-                } catch (Throwable tr) {
-                    Log.e(TAG, "Internal error while setting user-agent.", tr);
-                }
-            }
-
-            private void doSetUserAgentTask() {
-
-                String taskUserAgent = DeviceUtil.getUserAgent(mContext);
-                Message msg = mainHandler.obtainMessage();
-                Bundle bundle = new Bundle();
-                bundle.putString("userAgent", taskUserAgent);
-                msg.setData(bundle);
-                mainHandler.sendMessage(msg);
-
-            }
-
-        };
-        mainHandler.post(setUserAgentTask);
+        startCdbDownloadTask(true, cacheAdUnits);
 
     }
 
@@ -247,4 +213,5 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         }
         return null;
     }
+
 }

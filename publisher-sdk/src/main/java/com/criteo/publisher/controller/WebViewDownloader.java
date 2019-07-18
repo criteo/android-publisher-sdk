@@ -16,8 +16,9 @@ public class WebViewDownloader {
         return webViewData.isLoading();
     }
 
-    public void fillWebViewHtmlContent(String displayUrl, CriteoInterstitialAdListener listener) {
-        new WebViewDataTask(webViewData, listener).execute(displayUrl);
+    public void fillWebViewHtmlContent(String displayUrl, CriteoInterstitialAdListener listener,
+            String webViewUserAgent) {
+        new WebViewDataTask(webViewData, listener).execute(displayUrl, webViewUserAgent);
     }
 
     public WebViewData getWebViewData() {

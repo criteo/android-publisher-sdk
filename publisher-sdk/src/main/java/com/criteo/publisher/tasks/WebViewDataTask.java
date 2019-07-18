@@ -15,6 +15,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 
 public class WebViewDataTask extends AsyncTask<String, Void, String> {
+
     private static final String TAG = "Criteo.WVDT";
 
     private WebViewData webviewData;
@@ -27,11 +28,11 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
 
 
     @Override
-    protected String doInBackground(String... urls) {
+    protected String doInBackground(String... args) {
         String result = null;
 
         try {
-            result = doWebViewDataTask(urls);
+            result = doWebViewDataTask(args);
         } catch (Throwable tr) {
             Log.e(TAG, "Internal WVDT exec error.", tr);
         }
@@ -39,19 +40,20 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
         return result;
     }
 
-    private String doWebViewDataTask(String[] urls) {
+    private String doWebViewDataTask(String[] args) {
         String result = "";
         URL url = null;
         try {
-            if (urls.length > 0 && !URLUtil.isValidUrl(urls[0])) {
+            if (args.length > 0 && !URLUtil.isValidUrl(args[0])) {
                 return "";
             }
-            url = new URL(urls[0]);
+            url = new URL(args[0]);
 
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
 
+        String webViewUserAgent = args[1];
         HttpURLConnection urlConnection = null;
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -64,6 +66,9 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
             e.printStackTrace();
         }
         urlConnection.setRequestProperty("Content-Type", "text/plain");
+        if (!TextUtils.isEmpty(webViewUserAgent)) {
+            urlConnection.setRequestProperty("User-Agent", webViewUserAgent);
+        }
 
         try {
             if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
@@ -90,7 +95,7 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
 
     private void doOnPostExecute(String data) {
         if (TextUtils.isEmpty(data)) {
-            if(criteoInterstitialAdListener != null) {
+            if (criteoInterstitialAdListener != null) {
                 criteoInterstitialAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
             }
             webviewData.downloadFailed();
@@ -98,7 +103,7 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
         }
         webviewData.setContent(data, criteoInterstitialAdListener);
         webviewData.downloadSucceeeded();
-        if(criteoInterstitialAdListener != null) {
+        if (criteoInterstitialAdListener != null) {
             criteoInterstitialAdListener.onAdLoaded();
         }
     }

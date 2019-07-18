@@ -4,10 +4,11 @@ import android.text.TextUtils;
 import android.webkit.URLUtil;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.controller.WebViewDownloader;
-import com.criteo.publisher.tasks.CriteoInterstitialListenerCallTask;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
+import com.criteo.publisher.tasks.CriteoInterstitialListenerCallTask;
 
 
 public class CriteoInterstitialEventController {
@@ -18,10 +19,14 @@ public class CriteoInterstitialEventController {
 
     private WebViewDownloader webViewDownloader;
 
+    private DeviceInfo deviceInfo;
+
     public CriteoInterstitialEventController(
             CriteoInterstitialAdListener listener, WebViewDownloader webViewDownloader) {
         this.criteoInterstitialAdListener = listener;
         this.webViewDownloader = webViewDownloader;
+        this.deviceInfo = Criteo.getInstance().getDeviceInfo();
+
     }
 
     public boolean isAdLoaded() {
@@ -61,7 +66,7 @@ public class CriteoInterstitialEventController {
             return;
         }
 
-        webViewDownloader.fillWebViewHtmlContent(displayUrl, listener);
+        webViewDownloader.fillWebViewHtmlContent(displayUrl, listener, deviceInfo.getWebViewUserAgent());
 
     }
 
