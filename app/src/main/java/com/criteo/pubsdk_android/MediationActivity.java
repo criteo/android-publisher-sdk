@@ -2,6 +2,7 @@ package com.criteo.pubsdk_android;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import com.google.android.gms.ads.AdListener;
@@ -12,12 +13,14 @@ import com.google.android.gms.ads.MobileAds;
 
 public class MediationActivity extends AppCompatActivity {
 
+    private static final String TAG = MediationActivity.class.getSimpleName();
+
     private static final String INTERSTITIAL_ADUNIT_ID = "ca-app-pub-2995206374493561/4891139268";
     private static final String APP_ID = "ca-app-pub-2995206374493561~8272596058";
-    private static final String BANNER_ADUNIT_ID = "ca-app-pub-2995206374493561/3020269370";
+    private static final String BANNER_ADUNIT_ID = "ca-app-pub-2995206374493561/3062725613";
     private static final String TESTDEVICE_ID = "B86644E365C34D02597C12ED444E060A";
 
-    private InterstitialAd adapterInterstitial;
+    private InterstitialAd interstitialAd;
     private AdView bannerview;
     private LinearLayout layout;
     private AdListener adListener;
@@ -62,11 +65,16 @@ public class MediationActivity extends AppCompatActivity {
 
             @Override
             public void onAdFailedToLoad(int errorCode) {
+                Log.d(TAG, "Mediation - Interstitial ad failed");
 
             }
 
             @Override
             public void onAdLoaded() {
+                Log.d(TAG, "Mediation - Interstitial ad loaded");
+                if (interstitialAd != null) {
+                    interstitialAd.show();
+                }
             }
 
             @Override
@@ -75,22 +83,22 @@ public class MediationActivity extends AppCompatActivity {
 
             @Override
             public void onAdClosed() {
-                adapterInterstitial.loadAd(new AdRequest.Builder().build());
+                interstitialAd.loadAd(new AdRequest.Builder().build());
             }
         };
 
     }
 
     private void loadInterstitialAd() {
-        adapterInterstitial = new InterstitialAd(MediationActivity.this);
-        adapterInterstitial.setAdUnitId(
+        interstitialAd = new InterstitialAd(MediationActivity.this);
+        interstitialAd.setAdUnitId(
                 INTERSTITIAL_ADUNIT_ID);
-        adapterInterstitial.setAdListener(adListener);
+        interstitialAd.setAdListener(adListener);
 
         AdRequest interstitialAdRequest = new AdRequest.Builder()
                 .addTestDevice(TESTDEVICE_ID)
                 .build();
-        adapterInterstitial.loadAd(interstitialAdRequest);
+        interstitialAd.loadAd(interstitialAdRequest);
     }
 
     private void loadBannerAd() {

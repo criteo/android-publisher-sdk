@@ -1,12 +1,20 @@
 package com.criteo.mediation.adapter;
 
+import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
+import com.criteo.mediation.listener.CriteoInterstitialEventListenerImpl;
+import com.criteo.mediation.model.FormatType;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoBannerEventController;
+import com.criteo.publisher.CriteoInitException;
+import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialEventController;
-import com.criteo.publisher.model.CacheAdUnit;
+import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.model.InterstitialAdUnit;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.mediation.MediationAdRequest;
@@ -14,7 +22,6 @@ import com.google.android.gms.ads.mediation.customevent.CustomEventBanner;
 import com.google.android.gms.ads.mediation.customevent.CustomEventBannerListener;
 import com.google.android.gms.ads.mediation.customevent.CustomEventInterstitial;
 import com.google.android.gms.ads.mediation.customevent.CustomEventInterstitialListener;
-import com.google.android.gms.ads.mediation.customevent.CustomEventListener;
 import java.util.ArrayList;
 import java.util.List;
 import org.json.JSONException;
@@ -24,15 +31,14 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
 
     protected static final String TAG = CriteoAdapter.class.getSimpleName();
 
-    protected static final String CRITEO_PUBLISHER_ID = "CriteoPublisherId";
-    protected static final String ADUNIT = "adUnit";
-    protected static final String PLACEMENTID = "placementid";
-    protected static final String WIDTH = "width";
-    protected static final String HEIGHT = "height";
+    protected static final String CRITEO_PUBLISHER_ID = "cpid";
+    protected static final String ADUNITID = "adUnitId";
 
     private CriteoBannerEventController bannerEventController;
     private CriteoInterstitialEventController interstitialEventController;
-    private List<CacheAdUnit> cacheAdUnits;
+    private CriteoInterstitial criteoInterstitial;
+    private BannerAdUnit bannerAdUnit;
+    private InterstitialAdUnit interstitialAdUnit;
 
 
     /**
@@ -67,25 +73,10 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
             AdSize size,
             MediationAdRequest mediationAdRequest,
             Bundle customEventExtras) {
-        /*
-         * 1. Initialize Criteo
-         * 2. Create your banner view.
-         * 3. Set your ad network's listener.
-         * 4. Make an ad request.
-         *
-         * When setting your ad network's listener, don't forget to send the following callbacks:
-         *
-         * listener.onAdLoaded(this);
-         * listener.onAdFailedToLoad(this, AdRequest.ERROR_CODE_*);
-         * listener.onAdClicked(this);
-         * listener.onAdOpened(this);
-         * listener.onAdLeftApplication(this);
-         * listener.onAdClosed(this);
-         */
 
         // Initialize Criteo
-        if (serverParameter != null) {
-            initialize(serverParameter, context, listener);
+        if (serverParameter == null) {
+            //  initialize(serverParameter, context, listener);
         } else {
             listener.onAdFailedToLoad(AdRequest.ERROR_CODE_INTERNAL_ERROR);
         }
@@ -99,75 +90,63 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
             String serverParameter,
             MediationAdRequest mediationAdRequest,
             Bundle customEventExtras) {
-        /*
-         * In this method, you should:
-         *
-         * 1. Create your interstitial ad.
-         * 2. Set your ad network's listener.
-         * 3. Make an ad request.
-         *
-         * When setting your ad network's listener, don't forget to send the following callbacks:
-         *
-         * listener.onAdLoaded(this);
-         * listener.onAdFailedToLoad(this, AdRequest.ERROR_CODE_*);
-         * listener.onAdOpened(this);
-         * listener.onAdLeftApplication(this);
-         * listener.onAdClosed(this);
-         */
 
-        // Initialize Criteo
-        if (serverParameter != null) {
-            initialize(serverParameter, context, listener);
-        } else {
+        if (TextUtils.isEmpty(serverParameter)) {
             listener.onAdFailedToLoad(AdRequest.ERROR_CODE_INTERNAL_ERROR);
+            return;
         }
+
+        try {
+
+            if (initialize(context, serverParameter, null, FormatType.BANNER)) {
+                criteoInterstitial = new CriteoInterstitial(context, interstitialAdUnit);
+                CriteoInterstitialEventListenerImpl criteoInterstitialEventListener = new CriteoInterstitialEventListenerImpl(
+                        listener, criteoInterstitial);
+                criteoInterstitial.setCriteoInterstitialAdListener(criteoInterstitialEventListener);
+
+                criteoInterstitial.loadAd();
+            } else {
+                listener.onAdFailedToLoad(AdRequest.ERROR_CODE_INTERNAL_ERROR);
+            }
+
+        } catch (JSONException | CriteoInitException e) {
+            listener.onAdFailedToLoad(AdRequest.ERROR_CODE_INTERNAL_ERROR);
+            Log.e(TAG, "Adapter initialization error");
+        }
+
     }
 
-    private void initialize(String serverParameter, Context context, CustomEventListener listener) {
-        String criteoPublisherId = "";
-        String placementId = "";
-        int width = 0;
-        int height = 0;
-        JSONObject parameters = new JSONObject();
-        if (!TextUtils.isEmpty(serverParameter)) {
-            try {
-                parameters = new JSONObject(serverParameter);
-                if (parameters.get(CRITEO_PUBLISHER_ID) != null) {
-                    criteoPublisherId = parameters.getString(CRITEO_PUBLISHER_ID);
-                }
-                if (parameters.get(ADUNIT) != null) {
-                    JSONObject adUnit = parameters.getJSONObject(ADUNIT);
-                    placementId = adUnit.getString(PLACEMENTID);
-                    width = adUnit.getInt(WIDTH);
-                    height = adUnit.getInt(HEIGHT);
-                }
-
-                com.criteo.publisher.model.AdSize adSize = new com.criteo.publisher.model.AdSize(width, height);
-                CacheAdUnit cacheAdUnit = new CacheAdUnit(adSize, placementId);
-
-                cacheAdUnits = new ArrayList<>();
-                cacheAdUnits.add(cacheAdUnit);
-
-                if (Criteo.getInstance() == null) {
-                    //TODO: We will pass the context
-                 //   Criteo.init((Application) (context.getApplicationContext()), cacheAdUnits, criteoPublisherId);
-                } else {
-                 //   Criteo.getInstance().getBidForAdUnit(cacheAdUnit);
-                }
-
-
-            } catch (JSONException e) {
-                listener.onAdFailedToLoad(AdRequest.ERROR_CODE_INTERNAL_ERROR);
-                e.printStackTrace();
-            }
+    private boolean initialize(Context context, String serverParameter, AdSize size,
+            FormatType formatType)
+            throws JSONException, CriteoInitException {
+        JSONObject parameters = new JSONObject(serverParameter);
+        String criteoPublisherId = parameters.getString(CRITEO_PUBLISHER_ID);
+        String adUnitId = parameters.getString(ADUNITID);
+        List<AdUnit> adUnits = new ArrayList<>();
+        if (formatType == FormatType.BANNER) {
+            bannerAdUnit = new BannerAdUnit(adUnitId,
+                    new com.criteo.publisher.model.AdSize(size.getWidth(), size.getHeight()));
+            adUnits.add(bannerAdUnit);
+        } else if (formatType == FormatType.INTERSTITIAL) {
+            interstitialAdUnit = new InterstitialAdUnit(adUnitId);
+            adUnits.add(interstitialAdUnit);
         }
 
+        try {
+            Criteo.getInstance();
+            return true;
+        } catch (Exception ex) {
+            Criteo.init((Application) context, criteoPublisherId, adUnits);
+            return false;
+        }
     }
 
     @Override
     public void showInterstitial() {
-        // Show your interstitial ad.
-        // interstitialEventController.show();
+        // Show your interstitial ad
+        if (criteoInterstitial != null && criteoInterstitial.isAdLoaded()) {
+            criteoInterstitial.show();
+        }
     }
 
 }
