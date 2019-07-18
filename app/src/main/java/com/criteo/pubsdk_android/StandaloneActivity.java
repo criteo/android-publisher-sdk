@@ -54,6 +54,7 @@ public class StandaloneActivity extends AppCompatActivity {
                 }
                 criteoBannerView = new CriteoBannerView(context, bannerAdUnit);
                 criteoBannerView.setCriteoBannerAdListener(criteoBannerAdListener);
+                Log.d(TAG, "Banner Requested");
                 Bannerasync bannerasync = new Bannerasync(criteoBannerView);
                 bannerasync.execute();
 

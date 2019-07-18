@@ -73,7 +73,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
      */
     private void startCdbDownloadTask(boolean callConfig, List<CacheAdUnit> prefetchCacheAdUnits) {
         cdbDownloadTask = new CdbDownloadTask(mContext, this, callConfig, deviceInfo.getWebViewUserAgent());
-        cdbDownloadTask.execute(PROFILE_ID, user, publisher, prefetchCacheAdUnits);
+        cdbDownloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, PROFILE_ID, user, publisher, prefetchCacheAdUnits);
     }
 
 

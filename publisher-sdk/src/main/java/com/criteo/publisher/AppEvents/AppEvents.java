@@ -31,7 +31,7 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
             eventTask = new AppEventTask(mContext, this);
         }
         if (eventTask.getStatus() != AsyncTask.Status.RUNNING) {
-            eventTask.execute(eventType);
+            eventTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, eventType);
         }
     }
 

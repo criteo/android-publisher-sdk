@@ -1,5 +1,6 @@
 package com.criteo.publisher;
 
+import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.webkit.URLUtil;
 import com.criteo.publisher.Util.AdUnitType;
@@ -62,7 +63,7 @@ public class CriteoInterstitialEventController {
             Slot slot = null;
             webViewDownloader.downloadFailed();
             criteoInterstitialListenerCallTask = new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener);
-            criteoInterstitialListenerCallTask.execute(slot);
+            criteoInterstitialListenerCallTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, slot);
             return;
         }
 
@@ -78,7 +79,7 @@ public class CriteoInterstitialEventController {
         TokenValue tokenValue = Criteo.getInstance().getTokenValue(bidToken, AdUnitType.CRITEO_INTERSTITIAL);
 
         criteoInterstitialListenerCallTask = new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener);
-        criteoInterstitialListenerCallTask.execute(tokenValue);
+        criteoInterstitialListenerCallTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, tokenValue);
 
         if (tokenValue != null) {
             getWebviewDataAsync(tokenValue.getDisplayUrl());

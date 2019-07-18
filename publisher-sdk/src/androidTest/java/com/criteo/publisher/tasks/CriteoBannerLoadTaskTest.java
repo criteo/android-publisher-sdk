@@ -4,6 +4,8 @@ import static org.mockito.Mockito.when;
 
 import android.support.annotation.Nullable;
 import android.webkit.WebSettings;
+import android.webkit.WebViewClient;
+
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
@@ -49,14 +51,16 @@ public class CriteoBannerLoadTaskTest {
     @Test
     public void testWithNullSlot() throws InterruptedException {
         Slot slot = null;
-        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener);
+        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, new WebViewClient());
         criteoBannerLoadTask.execute(slot);
 
         Thread.sleep(100);
 
         Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdReceived(criteoBannerView);
-        Mockito.verify(criteoBannerAdListener, Mockito.times(1))
+        Mockito.verify(criteoBannerAdListener, Mockito.times(0))
                 .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+        Mockito.verify(criteoBannerView, Mockito.times(0))
+                .loadDataWithBaseURL("", displayUrl, "text/html", "UTF-8", "");
     }
 
     @Test
@@ -69,13 +73,15 @@ public class CriteoBannerLoadTaskTest {
         }
         Slot slot = new Slot(response);
 
-        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener);
+        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, new WebViewClient());
         criteoBannerLoadTask.execute(slot);
 
         Thread.sleep(100);
 
         Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdReceived(criteoBannerView);
-        Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+        Mockito.verify(criteoBannerView, Mockito.times(0))
+                .loadDataWithBaseURL("", displayUrl, "text/html", "UTF-8", "");
     }
 
     @Test
@@ -85,12 +91,12 @@ public class CriteoBannerLoadTaskTest {
         response.put(CPM, "10.0");
         response.put(DISPLAY_URL, "https://www.criteo.com");
         Slot slot = new Slot(response);
-        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener);
+        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, new WebViewClient());
         criteoBannerLoadTask.execute(slot);
 
         Thread.sleep(100);
 
-        Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdReceived(criteoBannerView);
+        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdReceived(criteoBannerView);
         Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
         Mockito.verify(criteoBannerView, Mockito.times(1))
                 .loadDataWithBaseURL("", displayUrl, "text/html", "UTF-8", "");
@@ -100,12 +106,12 @@ public class CriteoBannerLoadTaskTest {
     public void testWithValidTokenValue() throws InterruptedException {
         TokenValue tokenValue = new TokenValue(System.currentTimeMillis(), 500, "https://www.criteo.com",
                 AdUnitType.CRITEO_BANNER);
-        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener);
+        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, new WebViewClient());
         criteoBannerLoadTask.execute(tokenValue);
 
         Thread.sleep(100);
 
-        Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdReceived(criteoBannerView);
+        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdReceived(criteoBannerView);
         Mockito.verify(criteoBannerAdListener, Mockito.times(0))
                 .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
         Mockito.verify(criteoBannerView, Mockito.times(1))
@@ -117,14 +123,16 @@ public class CriteoBannerLoadTaskTest {
     @Test
     public void testWithNullTokenValue() throws InterruptedException {
         TokenValue tokenValue = null;
-        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, criteoBannerAdListener);
+        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, new WebViewClient());
         criteoBannerLoadTask.execute(tokenValue);
 
         Thread.sleep(100);
 
         Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdReceived(criteoBannerView);
-        Mockito.verify(criteoBannerAdListener, Mockito.times(1))
+        Mockito.verify(criteoBannerAdListener, Mockito.times(0))
                 .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+        Mockito.verify(criteoBannerView, Mockito.times(0))
+                .loadDataWithBaseURL("", displayUrl, "text/html", "UTF-8", "");
     }
 
 

@@ -1,7 +1,8 @@
 package com.criteo.publisher.controller;
 
-import com.criteo.publisher.model.WebViewData;
+import android.os.AsyncTask;
 import com.criteo.publisher.tasks.WebViewDataTask;
+import com.criteo.publisher.model.WebViewData;
 
 public class WebViewDownloader {
 
@@ -16,7 +17,7 @@ public class WebViewDownloader {
     }
 
     public void fillWebViewHtmlContent(String displayUrl, String webViewUserAgent) {
-        new WebViewDataTask(webViewData).execute(displayUrl, webViewUserAgent);
+        new WebViewDataTask(webViewData).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, displayUrl, webViewUserAgent);
     }
 
     public WebViewData getWebViewData() {
