@@ -7,15 +7,16 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
+import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 
 
 public class CriteoBannerLoadTask extends AsyncTask<Object, Void, Object> {
+
     private static final String TAG = "Criteo.BLT";
 
     private CriteoBannerView criteoBannerView;
@@ -60,7 +61,7 @@ public class CriteoBannerLoadTask extends AsyncTask<Object, Void, Object> {
         super.onPostExecute(object);
         if (object == null) {
             if (criteoBannerAdListener != null) {
-                criteoBannerAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
+                criteoBannerAdListener.onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
             }
             return;
         }
@@ -71,24 +72,24 @@ public class CriteoBannerLoadTask extends AsyncTask<Object, Void, Object> {
             Slot slot = (Slot) object;
             if (!slot.isValid()) {
                 if (criteoBannerAdListener != null) {
-                    criteoBannerAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
+                    criteoBannerAdListener.onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
                 }
             } else {
                 loadWebview(slot.getDisplayUrl());
                 if (criteoBannerAdListener != null) {
-                    criteoBannerAdListener.onAdLoaded(criteoBannerView);
+                    criteoBannerAdListener.onAdReceived(criteoBannerView);
                 }
             }
         } else if (object instanceof TokenValue) {
             TokenValue tokenValue = (TokenValue) object;
             if (tokenValue == null || TextUtils.isEmpty(tokenValue.getDisplayUrl())) {
                 if (criteoBannerAdListener != null) {
-                    criteoBannerAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
+                    criteoBannerAdListener.onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
                 }
             } else {
                 loadWebview(tokenValue.getDisplayUrl());
                 if (criteoBannerAdListener != null) {
-                    criteoBannerAdListener.onAdLoaded(criteoBannerView);
+                    criteoBannerAdListener.onAdReceived(criteoBannerView);
                 }
             }
         }

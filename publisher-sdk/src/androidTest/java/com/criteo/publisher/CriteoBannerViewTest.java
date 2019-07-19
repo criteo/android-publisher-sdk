@@ -3,10 +3,9 @@ package com.criteo.publisher;
 import android.app.Application;
 import android.support.test.InstrumentationRegistry;
 import android.test.UiThreadTest;
-import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
-
+import com.criteo.publisher.model.BannerAdUnit;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -34,7 +33,7 @@ public class CriteoBannerViewTest {
                 (Application) InstrumentationRegistry
                         .getTargetContext()
                         .getApplicationContext();
-        Criteo.init(app,"9138", AdUnits);
+        Criteo.init(app, "9138", AdUnits);
         criteoBannerView = new CriteoBannerView(InstrumentationRegistry.getContext(), bannerAdUnit);
         criteoBannerView.setCriteoBannerAdListener(criteoBannerAdListener);
     }
@@ -48,8 +47,9 @@ public class CriteoBannerViewTest {
         Thread.sleep(500);
 
         //Expected result , found no slot and called criteoBannerAdListener.onAdFetchFailed
-        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdLoaded(criteoBannerView);
-        Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
+        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdReceived(criteoBannerView);
+        Mockito.verify(criteoBannerAdListener, Mockito.times(1))
+                .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
     }
 
 }

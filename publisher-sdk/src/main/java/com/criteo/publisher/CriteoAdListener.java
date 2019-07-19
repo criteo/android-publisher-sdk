@@ -1,7 +1,5 @@
 package com.criteo.publisher;
 
-import com.criteo.publisher.CriteoErrorCode;
-
 public interface CriteoAdListener {
 
     /**
@@ -9,7 +7,7 @@ public interface CriteoAdListener {
      *
      * @param code The reason the fetch failed.
      */
-    void onAdFailedToLoad(CriteoErrorCode code);
+    void onAdFailedToReceive(CriteoErrorCode code);
 
     /**
      * Called when an ad is clicked.

@@ -96,7 +96,7 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
     private void doOnPostExecute(String data) {
         if (TextUtils.isEmpty(data)) {
             if (criteoInterstitialAdListener != null) {
-                criteoInterstitialAdListener.onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
+                criteoInterstitialAdListener.onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
             }
             webviewData.downloadFailed();
             return;
@@ -104,7 +104,7 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
         webviewData.setContent(data, criteoInterstitialAdListener);
         webviewData.downloadSucceeeded();
         if (criteoInterstitialAdListener != null) {
-            criteoInterstitialAdListener.onAdLoaded();
+            criteoInterstitialAdListener.onAdReceived();
         }
     }
 

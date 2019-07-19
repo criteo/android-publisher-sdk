@@ -4,10 +4,10 @@ import static org.mockito.Mockito.when;
 
 import android.support.annotation.Nullable;
 import android.webkit.WebSettings;
-import com.criteo.publisher.Util.AdUnitType;
-import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
+import com.criteo.publisher.CriteoErrorCode;
+import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
@@ -54,9 +54,9 @@ public class CriteoBannerLoadTaskTest {
 
         Thread.sleep(100);
 
-        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdLoaded(criteoBannerView);
+        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdReceived(criteoBannerView);
         Mockito.verify(criteoBannerAdListener, Mockito.times(1))
-                .onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
+                .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
     }
 
     @Test
@@ -74,8 +74,8 @@ public class CriteoBannerLoadTaskTest {
 
         Thread.sleep(100);
 
-        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdLoaded(criteoBannerView);
-        Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
+        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdReceived(criteoBannerView);
+        Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
     }
 
     @Test
@@ -90,8 +90,8 @@ public class CriteoBannerLoadTaskTest {
 
         Thread.sleep(100);
 
-        Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdLoaded(criteoBannerView);
-        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
+        Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdReceived(criteoBannerView);
+        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
         Mockito.verify(criteoBannerView, Mockito.times(1))
                 .loadDataWithBaseURL("", displayUrl, "text/html", "UTF-8", "");
     }
@@ -105,9 +105,9 @@ public class CriteoBannerLoadTaskTest {
 
         Thread.sleep(100);
 
-        Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdLoaded(criteoBannerView);
+        Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdReceived(criteoBannerView);
         Mockito.verify(criteoBannerAdListener, Mockito.times(0))
-                .onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
+                .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
         Mockito.verify(criteoBannerView, Mockito.times(1))
                 .loadDataWithBaseURL("", displayUrl, "text/html", "UTF-8", "");
 
@@ -122,9 +122,9 @@ public class CriteoBannerLoadTaskTest {
 
         Thread.sleep(100);
 
-        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdLoaded(criteoBannerView);
+        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdReceived(criteoBannerView);
         Mockito.verify(criteoBannerAdListener, Mockito.times(1))
-                .onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
+                .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
     }
 
 

@@ -10,11 +10,11 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import com.criteo.publisher.BidResponse;
 import com.criteo.publisher.Criteo;
-import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoBannerAdListener;
-import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.CriteoBannerView;
+import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
+import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
@@ -107,12 +107,12 @@ public class InHouseActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onAdFailedToLoad(CriteoErrorCode code) {
+            public void onAdFailedToReceive(CriteoErrorCode code) {
                 Log.d(TAG, "Banner ad failed, reason : " + code.toString());
             }
 
             @Override
-            public void onAdLoaded(View view) {
+            public void onAdReceived(View view) {
                 Log.d(TAG, "Banner ad loaded");
                 adLayout.removeAllViews();
                 adLayout.addView(criteoBannerView);
@@ -121,13 +121,13 @@ public class InHouseActivity extends AppCompatActivity {
 
         criteoInterstitialAdListener = new CriteoInterstitialAdListener() {
             @Override
-            public void onAdLoaded() {
+            public void onAdReceived() {
                 buttonInhouseInterstitial.setEnabled(true);
                 Log.d(TAG, "Interstitial ad loaded");
             }
 
             @Override
-            public void onAdFailedToLoad(CriteoErrorCode code) {
+            public void onAdFailedToReceive(CriteoErrorCode code) {
                 Log.d(TAG, "Interstitial ad failed");
             }
 

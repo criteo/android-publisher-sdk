@@ -30,9 +30,9 @@ public class CriteoBannerEventControllerTest {
 
         Thread.sleep(100);
 
-        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdLoaded(criteoBannerView);
+        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdReceived(criteoBannerView);
         Mockito.verify(criteoBannerAdListener, Mockito.times(1))
-                .onAdFailedToLoad(CriteoErrorCode.ERROR_CODE_NO_FILL);
+                .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
     }
 
 }

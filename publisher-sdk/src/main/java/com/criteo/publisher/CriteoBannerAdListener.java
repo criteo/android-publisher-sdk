@@ -7,5 +7,5 @@ public interface CriteoBannerAdListener extends CriteoAdListener {
     /**
      * Called when an ad is successfully fetched.
      */
-    void onAdLoaded(View view);
+    void onAdReceived(View view);
 }
