@@ -54,11 +54,7 @@ public class InHouseActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 BidResponse bidResponse = Criteo.getInstance().getBidResponse(bannerAdUnit);
-
-                if (bidResponse != null && bidResponse.isBidSuccess()) {
-
-                    criteoBannerView.loadAd(bidResponse.getBidToken());
-                }
+                criteoBannerView.loadAd(bidResponse.getBidToken());
             }
         });
 
