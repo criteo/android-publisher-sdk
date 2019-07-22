@@ -1,8 +1,7 @@
 package com.criteo.publisher.controller;
 
-import com.criteo.publisher.CriteoInterstitialAdListener;
-import com.criteo.publisher.tasks.WebViewDataTask;
 import com.criteo.publisher.model.WebViewData;
+import com.criteo.publisher.tasks.WebViewDataTask;
 
 public class WebViewDownloader {
 
@@ -16,9 +15,8 @@ public class WebViewDownloader {
         return webViewData.isLoading();
     }
 
-    public void fillWebViewHtmlContent(String displayUrl, CriteoInterstitialAdListener listener,
-            String webViewUserAgent) {
-        new WebViewDataTask(webViewData, listener).execute(displayUrl, webViewUserAgent);
+    public void fillWebViewHtmlContent(String displayUrl, String webViewUserAgent) {
+        new WebViewDataTask(webViewData).execute(displayUrl, webViewUserAgent);
     }
 
     public WebViewData getWebViewData() {

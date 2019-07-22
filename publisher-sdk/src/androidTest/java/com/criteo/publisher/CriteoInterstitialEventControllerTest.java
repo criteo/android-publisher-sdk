@@ -34,7 +34,7 @@ public class CriteoInterstitialEventControllerTest {
         JSONObject configJson = new JSONObject();
         Config config = new Config(configJson);
         webViewData = new WebViewData();
-        webViewData.setContent("html content", criteoInterstitialAdListener);
+        webViewData.setContent("html content");
         WebViewDownloader webViewDownloader = new WebViewDownloader(webViewData);
         criteoInterstitialEventController = new CriteoInterstitialEventController(criteoInterstitialAdListener,
                 webViewDownloader);

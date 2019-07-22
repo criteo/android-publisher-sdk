@@ -31,7 +31,7 @@ public class WebviewDataTest {
         Config config = new Config(configJson);
 
         data = "html";
-        webviewData.setContent(data, criteoInterstitialAdListener);
+        webviewData.setContent(data);
 
         Assert.assertTrue(!TextUtils.isEmpty(webviewData.getContent()));
         Assert.assertFalse(webviewData.getContent().contains(Config.getAdTagDataMode()));

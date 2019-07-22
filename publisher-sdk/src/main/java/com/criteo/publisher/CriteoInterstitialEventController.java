@@ -46,18 +46,18 @@ public class CriteoInterstitialEventController {
                 slot = Criteo.getInstance().getBidForAdUnit(adUnit);
             }
 
-            if (slot != null && slot.isValid()) {
+            criteoInterstitialListenerCallTask = new CriteoInterstitialListenerCallTask(
+                    criteoInterstitialAdListener);
+            criteoInterstitialListenerCallTask.execute(slot);
+
+            if (slot != null && slot.isValid() && URLUtil.isValidUrl(String.valueOf(slot.getDisplayUrl()))) {
                 //gets Webview data from Criteo before showing Interstitialview Activity
-                getWebviewDataAsync(slot.getDisplayUrl(), criteoInterstitialAdListener);
-            } else {
-                criteoInterstitialListenerCallTask = new CriteoInterstitialListenerCallTask(
-                        criteoInterstitialAdListener);
-                criteoInterstitialListenerCallTask.execute(slot);
+                getWebviewDataAsync(slot.getDisplayUrl());
             }
         }
     }
 
-    protected void getWebviewDataAsync(String displayUrl, CriteoInterstitialAdListener listener) {
+    protected void getWebviewDataAsync(String displayUrl) {
         if (TextUtils.isEmpty(displayUrl) || (!URLUtil.isValidUrl(String.valueOf(displayUrl)))) {
             Slot slot = null;
             webViewDownloader.downloadFailed();
@@ -66,7 +66,7 @@ public class CriteoInterstitialEventController {
             return;
         }
 
-        webViewDownloader.fillWebViewHtmlContent(displayUrl, listener, deviceInfo.getWebViewUserAgent());
+        webViewDownloader.fillWebViewHtmlContent(displayUrl, deviceInfo.getWebViewUserAgent());
 
     }
 
@@ -81,7 +81,7 @@ public class CriteoInterstitialEventController {
         criteoInterstitialListenerCallTask.execute(tokenValue);
 
         if (tokenValue != null) {
-            getWebviewDataAsync(tokenValue.getDisplayUrl(), criteoInterstitialAdListener);
+            getWebviewDataAsync(tokenValue.getDisplayUrl());
         }
     }
 }

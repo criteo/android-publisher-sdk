@@ -2,7 +2,6 @@ package com.criteo.publisher.model;
 
 import android.text.TextUtils;
 import com.criteo.publisher.Util.WebViewLoadStatus;
-import com.criteo.publisher.CriteoInterstitialAdListener;
 
 public class WebViewData {
 
@@ -18,7 +17,7 @@ public class WebViewData {
         return (webViewLoadStatus == WebViewLoadStatus.LOADED);
     }
 
-    public void setContent(String data, CriteoInterstitialAdListener criteoInterstitialAdListener) {
+    public void setContent(String data) {
         String dataWithTag = "";
 
         if (!TextUtils.isEmpty(data)) {

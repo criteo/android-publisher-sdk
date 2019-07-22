@@ -1,11 +1,7 @@
 package com.criteo.publisher.tasks;
 
-import static org.mockito.Mockito.mock;
-
 import android.test.UiThreadTest;
-
 import com.criteo.publisher.CriteoInterstitialAdListener;
-import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.model.WebViewData;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,7 +18,7 @@ public class WebViewDataTaskTest {
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
     @Mock
-    private  WebViewData webViewData;
+    private WebViewData webViewData;
 
     private WebViewDataTask webViewDataTask;
     ;
@@ -31,8 +27,7 @@ public class WebViewDataTaskTest {
     @UiThreadTest
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        webViewDataTask = new WebViewDataTask(webViewData,
-                criteoInterstitialAdListener);
+        webViewDataTask = new WebViewDataTask(webViewData);
     }
 
     @Test
@@ -41,8 +36,6 @@ public class WebViewDataTaskTest {
 
         Mockito.verify(webViewData, Mockito.times(1)).downloadSucceeeded();
         Mockito.verify(webViewData, Mockito.times(0)).downloadFailed();
-        Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdReceived();
-        Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
     }
 
     @Test
@@ -57,8 +50,6 @@ public class WebViewDataTaskTest {
         Assert.assertFalse(webViewData.isLoaded());
         Mockito.verify(webViewData, Mockito.times(0)).downloadSucceeeded();
         Mockito.verify(webViewData, Mockito.times(1)).downloadFailed();
-        Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdReceived();
-        Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
     }
 
 }

@@ -4,9 +4,7 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.URLUtil;
-import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.Util.StreamUtil;
-import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.model.WebViewData;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -19,11 +17,9 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
     private static final String TAG = "Criteo.WVDT";
 
     private WebViewData webviewData;
-    private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
-    public WebViewDataTask(WebViewData webviewData, CriteoInterstitialAdListener listener) {
+    public WebViewDataTask(WebViewData webviewData) {
         this.webviewData = webviewData;
-        this.criteoInterstitialAdListener = listener;
     }
 
 
@@ -95,17 +91,12 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
 
     private void doOnPostExecute(String data) {
         if (TextUtils.isEmpty(data)) {
-            if (criteoInterstitialAdListener != null) {
-                criteoInterstitialAdListener.onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
-            }
             webviewData.downloadFailed();
             return;
         }
-        webviewData.setContent(data, criteoInterstitialAdListener);
+        webviewData.setContent(data);
         webviewData.downloadSucceeeded();
-        if (criteoInterstitialAdListener != null) {
-            criteoInterstitialAdListener.onAdReceived();
-        }
+
     }
 
 }
