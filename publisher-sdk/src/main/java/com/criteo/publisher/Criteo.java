@@ -10,6 +10,7 @@ import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.Util.UserAgentCallback;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitHelper;
 import com.criteo.publisher.model.CacheAdUnit;
@@ -72,12 +73,18 @@ public final class Criteo {
         createSupportedScreenSizes(application);
         List<CacheAdUnit> cacheAdUnits = AdUnitHelper.convertAdUnits(context, adUnits);
         List<CacheAdUnit> validatedCacheAdUnits = AdUnitHelper.filterInvalidCacheAdUnits(cacheAdUnits);
-        this.deviceInfo = new DeviceInfo(context);
+        this.deviceInfo = new DeviceInfo();
         this.bidManager = new BidManager(context, criteoPublisherId, validatedCacheAdUnits,
                 new TokenCache(), deviceInfo);
         this.appEvents = new AppEvents(context);
         this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
-        bidManager.prefetch();
+        deviceInfo.initialize(context, new UserAgentCallback() {
+            @Override
+            public void done(String useragent) {
+                deviceInfo.setUserAgent(useragent);
+                bidManager.prefetch();
+            }
+        });
     }
 
     public void setBidsForAdUnit(Object object, AdUnit adUnit) {

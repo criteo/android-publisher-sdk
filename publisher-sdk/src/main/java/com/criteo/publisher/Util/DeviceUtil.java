@@ -30,14 +30,6 @@ public final class DeviceUtil {
     private DeviceUtil() {
     }
 
-    public static String getUserAgent(Context context) {
-        WebView webView = new WebView(context);
-        String userAgent = webView.getSettings().getUserAgentString();
-        webView.destroy();
-        webView = null;
-        return userAgent;
-    }
-
     public static void setScreenSize(int screenWidth, int screenHeight,
             ArrayList<ScreenSize> supportedPortraitScreenSizes,
             ArrayList<ScreenSize> supportedLandscapeScreenSizes) {

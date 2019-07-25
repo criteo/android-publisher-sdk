@@ -8,29 +8,20 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
-import com.criteo.publisher.Util.DeviceUtil;
+import android.webkit.WebView;
 import com.criteo.publisher.Util.UserAgentCallback;
 import com.criteo.publisher.Util.UserAgentHandler;
 
 public class DeviceInfo {
 
     private String webViewUserAgent;
-    private final Context context;
 
-    public DeviceInfo(final Context context) {
-        this.context = context;
-        initialize();
+    public DeviceInfo() {
     }
 
-    private void initialize() {
+    public void initialize(final Context context, UserAgentCallback userAgentCallback) {
 
-        final Handler mainHandler = new UserAgentHandler(Looper.getMainLooper(), new UserAgentCallback() {
-            @Override
-            public void done(String useragent) {
-                webViewUserAgent = useragent;
-
-            }
-        });
+        final Handler mainHandler = new UserAgentHandler(Looper.getMainLooper(), userAgentCallback);
 
         final Runnable setUserAgentTask = new Runnable() {
             @Override
@@ -44,7 +35,7 @@ public class DeviceInfo {
 
             private void doSetUserAgentTask() {
 
-                String taskUserAgent = DeviceUtil.getUserAgent(context);
+                String taskUserAgent = getUserAgent(context);
                 Message msg = mainHandler.obtainMessage();
                 Bundle bundle = new Bundle();
                 bundle.putString("userAgent", taskUserAgent);
@@ -58,8 +49,19 @@ public class DeviceInfo {
 
     }
 
+    private String getUserAgent(Context context) {
+        WebView webView = new WebView(context);
+        String userAgent = webView.getSettings().getUserAgentString();
+        webView.destroy();
+        return userAgent;
+    }
+
     public String getWebViewUserAgent() {
         return webViewUserAgent;
+    }
+
+    public void setUserAgent(String useragent) {
+        this.webViewUserAgent = useragent;
     }
 }
 
