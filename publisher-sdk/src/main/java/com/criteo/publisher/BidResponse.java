@@ -12,6 +12,12 @@ public class BidResponse {
         this.valid = valid;
     }
 
+    protected  BidResponse() {
+        this.price = 0;
+        this.token = null;
+        this.valid = false;
+    }
+
     public double getPrice() {
         return price;
     }

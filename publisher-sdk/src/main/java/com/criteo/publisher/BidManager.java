@@ -45,15 +45,14 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private DeviceInfo deviceInfo;
 
 
-    BidManager(Context context, String criteoPublisherId, List<CacheAdUnit> cacheAdUnits, TokenCache tokenCache,
-            DeviceInfo deviceInfo) {
+    BidManager(Context context, Publisher publisher, List<CacheAdUnit> cacheAdUnits, TokenCache tokenCache,
+            DeviceInfo deviceInfo, User user, SdkCache sdkCache) {
         this.mContext = context;
         this.cacheAdUnits = cacheAdUnits;
-        this.cache = new SdkCache();
+        this.cache = sdkCache;
         this.tokenCache = tokenCache;
-        publisher = new Publisher(mContext);
-        publisher.setCriteoPublisherId(criteoPublisherId);
-        user = new User();
+        this.publisher = publisher;
+        this.user = user;
         this.deviceInfo = deviceInfo;
     }
 
@@ -79,7 +78,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
 
     public void enrichBid(Object object, AdUnit adUnit) {
-        if (config != null && config.isKillSwitch()) {
+        if (killSwitchEngaged()) {
             return;
         }
         if (object != null) {
@@ -121,6 +120,9 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     Slot getBidForAdUnitAndPrefetch(AdUnit adUnit) {
         if (adUnit == null) {
             Log.e(TAG, "AdUnit is required.");
+            return null;
+        }
+        if (killSwitchEngaged()) {
             return null;
         }
         CacheAdUnit cacheAdUnit = AdUnitHelper
@@ -181,7 +183,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     }
 
     public BidResponse getBidForInhouseMediation(AdUnit adUnit) {
-        BidResponse bidResponse = new BidResponse(0, null, false);
+        BidResponse bidResponse = new BidResponse();
         Slot slot = this.getBidForAdUnitAndPrefetch(adUnit);
         if (slot != null && slot.isValid()) {
 
@@ -212,6 +214,10 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             return tokenCache.getTokenValue(bidToken, adUnitType);
         }
         return null;
+    }
+
+    private boolean killSwitchEngaged() {
+        return (config != null && config.isKillSwitch());
     }
 
 }

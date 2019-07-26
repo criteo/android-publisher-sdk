@@ -263,4 +263,20 @@ public class Slot implements Parcelable {
         }
         return this.cpmValue;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Slot) {
+            Slot other = (Slot) obj;
+            return ((this.placementId == other.placementId || this.placementId.equals(other.placementId)) &&
+                    (this.cpm == other.cpm || this.cpm.equals(other.cpm)) &&
+                    (this.currency == other.currency || this.currency.equals(other.currency)) &&
+                    this.width == other.width &&
+                    this.height == other.height &&
+                    this.ttl == other.ttl &&
+                    (this.displayUrl == other.displayUrl || this.displayUrl.equals(other.displayUrl)) &&
+                    this.nativeImpression == other.nativeImpression);
+        }
+        return false;
+    }
 }

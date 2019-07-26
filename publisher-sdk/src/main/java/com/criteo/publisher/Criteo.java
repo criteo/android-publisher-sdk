@@ -11,13 +11,17 @@ import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.UserAgentCallback;
+import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitHelper;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.DeviceInfo;
+import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.ScreenSize;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
+import com.criteo.publisher.model.User;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,8 +78,12 @@ public final class Criteo {
         List<CacheAdUnit> cacheAdUnits = AdUnitHelper.convertAdUnits(context, adUnits);
         List<CacheAdUnit> validatedCacheAdUnits = AdUnitHelper.filterInvalidCacheAdUnits(cacheAdUnits);
         this.deviceInfo = new DeviceInfo();
-        this.bidManager = new BidManager(context, criteoPublisherId, validatedCacheAdUnits,
-                new TokenCache(), deviceInfo);
+        Publisher publisher = new Publisher(context, criteoPublisherId);
+        User user = new User();
+        SdkCache sdkCache = new SdkCache();
+        this.bidManager = new BidManager(context, publisher, validatedCacheAdUnits,
+                new TokenCache(), deviceInfo, user, sdkCache);
+
         this.appEvents = new AppEvents(context);
         this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
         deviceInfo.initialize(context, new UserAgentCallback() {

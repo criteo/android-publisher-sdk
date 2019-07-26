@@ -14,8 +14,9 @@ public class Publisher implements Parcelable {
     private String bundleId;
     private String criteoPublisherId;
 
-    public Publisher(Context context) {
-        bundleId = context.getApplicationContext().getPackageName();
+    public Publisher(Context context, String criteoPublisherId) {
+        this.bundleId = context.getPackageName();
+        this.criteoPublisherId = criteoPublisherId;
     }
 
     public String getBundleId() {

@@ -7,13 +7,17 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.UiThreadTest;
+
+import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitHelper;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
+import com.criteo.publisher.model.User;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +34,16 @@ public class BidManagerTest {
     private static final String TEST_CREATIVE = "https://rdi.us.criteo.com/delivery/r/ajs.php?did=5c87fcdb7cc0d71b24ee2ee6454eb810&u=%7CvsLBMQ0Ek4IxXQb0B5n7RyCAQymjqwh29YhNM9EzK9Q%3D%7C&c1=fYGSyyN4O4mkT2ynhzfwbdpiG7v0SMGpms6Tk24GWc957HzbzgL1jw-HVL5D0BjRx5ef3wBVfDXXmh9StLy8pf5kDJtrQLTLQrexjq5CZt9tEDx9mY8Y-eTV19PWOQoNjXkJ4_mhKqV0IfwHDIfLVDBWmsizVCoAtU1brQ2weeEkUU5-mDfn3qzTX3jPXszef5bC3pbiLJAK3QamQlglD1dkWYOkUwLAXxMjr2MXeBQk2YK-_qYz0fMVJG0xWJ-jVmsqdOw9A9rkGIgToRoUewB0VAu5eSkjSBoGs4yEbsnJ5Ssq5fquJMNvm6T77b8fzQI-eXgwoEfKkdAuCbj3gNrPBgzGZAJPGO-TYvJgs22Bljy-hNCk1E0E030zLtKo-XvAVRvZ5PswtwoccPSl6u1wiV8fMCXHx9QW9-fdXaVxzZe9AZB6w7pHxKUwiRK9";
     private static final String CRITEO_PUBLISHER_ID = "1000";
     private Context context;
+    private Publisher publisher;
+    private User user;
+    private SdkCache sdkCache;
 
     @Before
     public void setup() {
         context = InstrumentationRegistry.getContext();
+        publisher = new Publisher(context, CRITEO_PUBLISHER_ID);
+        user = new User();
+        sdkCache = new SdkCache();
     }
 
     @Test
@@ -67,8 +77,9 @@ public class BidManagerTest {
         slot1.setTtl(0);
         List<Slot> slots = new ArrayList<>();
         slots.add(slot1);
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(context));
+
+        BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
+                new TokenCache(), new DeviceInfo(context), user, sdkCache);
         manager.setCacheAdUnits(slots);
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         manager.enrichBid(builder, AdUnit);
@@ -83,8 +94,8 @@ public class BidManagerTest {
         List<AdUnit> adUnits = new ArrayList<>();
         BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
         adUnits.add(AdUnit);
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(context));
+        BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
+                new TokenCache(), new DeviceInfo(context), user, sdkCache);
         List<Slot> slots = new ArrayList<>();
         Slot slot1 = new Slot();
         slot1.setPlacementId("/140800857/Endeavour_320x50");
@@ -117,8 +128,8 @@ public class BidManagerTest {
         List<AdUnit> adUnits = new ArrayList<>();
         BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
         adUnits.add(AdUnit);
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(context));
+        BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
+                new TokenCache(), new DeviceInfo(context), user, sdkCache);
         List<Slot> slots = new ArrayList<>();
         Slot slot1 = new Slot();
         slot1.setPlacementId("/140800857/Endeavour_320x50");
@@ -175,8 +186,8 @@ public class BidManagerTest {
         List<Slot> slots = new ArrayList<>();
         slots.add(bannerSlot);
 
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(context));
+        BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
+                new TokenCache(), new DeviceInfo(context), user, sdkCache);
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         manager.enrichBid(builder, AdUnit);
         PublisherAdRequest request = builder.build();
@@ -213,8 +224,8 @@ public class BidManagerTest {
         slots.add(interstitialSlot);
 
         //initializing with adunits
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(context));
+        BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
+                new TokenCache(), new DeviceInfo(context), user, sdkCache);
         //mocking response by setting slots
         manager.setCacheAdUnits(slots);
         return manager;
@@ -228,8 +239,8 @@ public class BidManagerTest {
         Slot slot1 = new Slot();
         List<Slot> slots = new ArrayList<>();
         slots.add(slot1);
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(context));
+        BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
+                new TokenCache(), new DeviceInfo(context), user, sdkCache);
         manager.setCacheAdUnits(slots);
         BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
         Assert.assertFalse(bidResponse.isBidSuccess());
@@ -245,8 +256,8 @@ public class BidManagerTest {
         Slot slot1 = new Slot(jsonObject);
         List<Slot> slots = new ArrayList<>();
         slots.add(slot1);
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(context));
+        BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
+                new TokenCache(), new DeviceInfo(context), user, sdkCache);
         manager.setCacheAdUnits(slots);
         BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
         Assert.assertFalse(bidResponse.isBidSuccess());
@@ -268,8 +279,8 @@ public class BidManagerTest {
         slot1.setDisplayUrl(TEST_CREATIVE);
         List<Slot> slots = new ArrayList<>();
         slots.add(slot1);
-        BidManager manager = new BidManager(context, CRITEO_PUBLISHER_ID, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(context));
+        BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
+                new TokenCache(), new DeviceInfo(context), user, sdkCache);
         manager.setCacheAdUnits(slots);
         BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
         Assert.assertTrue(bidResponse.isBidSuccess());
