@@ -35,13 +35,17 @@ public class DeviceInfo {
 
             private void doSetUserAgentTask() {
 
-                String taskUserAgent = getUserAgent(context);
+                String userAgent = getUserAgent(context);
+
+                // Capture the user-agent for internal use inside DeviceInfo
+                webViewUserAgent = userAgent;
+
+                // Send the user-agent string forward to the userAgentCallback
                 Message msg = mainHandler.obtainMessage();
                 Bundle bundle = new Bundle();
-                bundle.putString("userAgent", taskUserAgent);
+                bundle.putString("userAgent", userAgent);
                 msg.setData(bundle);
                 mainHandler.sendMessage(msg);
-
             }
 
         };
@@ -59,10 +63,4 @@ public class DeviceInfo {
     public String getWebViewUserAgent() {
         return webViewUserAgent;
     }
-
-    public void setUserAgent(String useragent) {
-        this.webViewUserAgent = useragent;
-    }
 }
-
-

@@ -81,7 +81,6 @@ public final class Criteo {
         deviceInfo.initialize(context, new UserAgentCallback() {
             @Override
             public void done(String useragent) {
-                deviceInfo.setUserAgent(useragent);
                 bidManager.prefetch();
             }
         });
