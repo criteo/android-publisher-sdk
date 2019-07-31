@@ -59,19 +59,19 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     /**
      * load data for next time
      */
-    private void prefetch(boolean callConfig, String userAgent, CacheAdUnit cacheAdUnit) {
-        List<CacheAdUnit> prefetchCacheAdUnits = new ArrayList<CacheAdUnit>();
+    private void fetch(CacheAdUnit cacheAdUnit) {
+        List<CacheAdUnit> prefetchCacheAdUnits = new ArrayList<>();
         prefetchCacheAdUnits.add(cacheAdUnit);
         if (cdbDownloadTask != null && cdbDownloadTask.getStatus() != AsyncTask.Status.RUNNING &&
                 cdbTimeToNextCall < System.currentTimeMillis()) {
-            startCdbDownloadTask(callConfig, prefetchCacheAdUnits);
+            startCdbDownloadTask(false, prefetchCacheAdUnits);
         }
     }
 
     /**
      * Method to start new CdbDownload Asynctask
      */
-    void startCdbDownloadTask(boolean callConfig, List<CacheAdUnit> prefetchCacheAdUnits) {
+    private void startCdbDownloadTask(boolean callConfig, List<CacheAdUnit> prefetchCacheAdUnits) {
         cdbDownloadTask = new CdbDownloadTask(mContext, this, callConfig, deviceInfo.getWebViewUserAgent());
         cdbDownloadTask.execute(PROFILE_ID, user, publisher, prefetchCacheAdUnits);
     }
@@ -100,9 +100,13 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
                 keywords.append(existingKeywords);
                 keywords.append(",");
             }
-            keywords.append(CRT_CPM + ":" + slot.getCpm());
+            keywords.append(CRT_CPM);
+            keywords.append(":");
+            keywords.append(slot.getCpm());
             keywords.append(",");
-            keywords.append(CRT_DISPLAY_URL + ":" + slot.getDisplayUrl());
+            keywords.append(CRT_DISPLAY_URL);
+            keywords.append(":");
+            keywords.append(slot.getDisplayUrl());
             ReflectionUtil.callMethodOnObject(object, "setKeywords", keywords.toString());
         }
     }
@@ -130,7 +134,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
         Slot peekSlot = cache.peekAdUnit(cacheAdUnit.getPlacementId(), cacheAdUnit.getSize().getFormattedSize());
         if (peekSlot == null) {
-            prefetch(false, deviceInfo.getWebViewUserAgent(), cacheAdUnit);
+            fetch(cacheAdUnit);
             return null;
         }
         double cpm = (peekSlot.getCpmAsNumber() == null ? 0.0 : peekSlot.getCpmAsNumber());
@@ -141,7 +145,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         if (cpm == 0 && ttl == 0) {
             cache.remove(cacheAdUnit.getPlacementId(),
                     cacheAdUnit.getSize().getFormattedSize());
-            prefetch(false, deviceInfo.getWebViewUserAgent(), cacheAdUnit);
+            fetch(cacheAdUnit);
             return null;
         }
         //If cpm is 0, ttl in slot > 0
@@ -153,7 +157,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             //If cpm > 0, ttl > 0 but we are done staying silent
             Slot slot = cache.getAdUnit(cacheAdUnit.getPlacementId(),
                     cacheAdUnit.getSize().getFormattedSize());
-            prefetch(false, deviceInfo.getWebViewUserAgent(), cacheAdUnit);
+            fetch(cacheAdUnit);
             return slot;
         }
 
@@ -204,9 +208,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
      * Asynctask to get Cdb and Config
      */
     protected void prefetch() {
-
         startCdbDownloadTask(true, cacheAdUnits);
-
     }
 
     public TokenValue getTokenValue(BidToken bidToken, AdUnitType adUnitType) {

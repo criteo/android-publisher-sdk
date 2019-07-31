@@ -79,7 +79,7 @@ public class BidManagerTest {
         slots.add(slot1);
 
         BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(context), user, sdkCache);
+                new TokenCache(), new DeviceInfo(), user, sdkCache);
         manager.setCacheAdUnits(slots);
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         manager.enrichBid(builder, AdUnit);
@@ -95,7 +95,7 @@ public class BidManagerTest {
         BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
         adUnits.add(AdUnit);
         BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(context), user, sdkCache);
+                new TokenCache(), new DeviceInfo(), user, sdkCache);
         List<Slot> slots = new ArrayList<>();
         Slot slot1 = new Slot();
         slot1.setPlacementId("/140800857/Endeavour_320x50");
@@ -129,7 +129,7 @@ public class BidManagerTest {
         BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
         adUnits.add(AdUnit);
         BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(context), user, sdkCache);
+                new TokenCache(), new DeviceInfo(), user, sdkCache);
         List<Slot> slots = new ArrayList<>();
         Slot slot1 = new Slot();
         slot1.setPlacementId("/140800857/Endeavour_320x50");
@@ -187,7 +187,7 @@ public class BidManagerTest {
         slots.add(bannerSlot);
 
         BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(context), user, sdkCache);
+                new TokenCache(), new DeviceInfo(), user, sdkCache);
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         manager.enrichBid(builder, AdUnit);
         PublisherAdRequest request = builder.build();
@@ -225,7 +225,7 @@ public class BidManagerTest {
 
         //initializing with adunits
         BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(context), user, sdkCache);
+                new TokenCache(), new DeviceInfo(), user, sdkCache);
         //mocking response by setting slots
         manager.setCacheAdUnits(slots);
         return manager;
@@ -240,7 +240,7 @@ public class BidManagerTest {
         List<Slot> slots = new ArrayList<>();
         slots.add(slot1);
         BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(context), user, sdkCache);
+                new TokenCache(), new DeviceInfo(), user, sdkCache);
         manager.setCacheAdUnits(slots);
         BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
         Assert.assertFalse(bidResponse.isBidSuccess());
@@ -257,7 +257,7 @@ public class BidManagerTest {
         List<Slot> slots = new ArrayList<>();
         slots.add(slot1);
         BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(context), user, sdkCache);
+                new TokenCache(), new DeviceInfo(), user, sdkCache);
         manager.setCacheAdUnits(slots);
         BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
         Assert.assertFalse(bidResponse.isBidSuccess());
@@ -280,7 +280,7 @@ public class BidManagerTest {
         List<Slot> slots = new ArrayList<>();
         slots.add(slot1);
         BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(context), user, sdkCache);
+                new TokenCache(), new DeviceInfo(), user, sdkCache);
         manager.setCacheAdUnits(slots);
         BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
         Assert.assertTrue(bidResponse.isBidSuccess());
