@@ -10,7 +10,6 @@ import com.criteo.publisher.Util.HostAppUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Cdb;
-import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
@@ -66,13 +65,12 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
             }
         }
         NetworkResult result = new NetworkResult();
-        Config configResult = null;
+        JSONObject configResult = null;
         if (callConfig) {
             configResult = PubSdkNetwork.loadConfig(mContext, publisher.getCriteoPublisherId(),
                     publisher.getBundleId(), user.getSdkVer());
-            if (configResult != null && configResult.isKillSwitch()) {
+            if (configResult != null) {
                 result.setConfig(configResult);
-                return result;
             }
         }
         Cdb cdbRequest = new Cdb();
@@ -115,9 +113,8 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
                 responseListener.setTimeToNextCall(networkResult.getCdb().getTimeToNextCall());
             }
             if (networkResult.getConfig() != null) {
-                responseListener.setConfig(networkResult.getConfig());
+                responseListener.refreshConfig(networkResult.getConfig());
             }
-
         }
     }
 }

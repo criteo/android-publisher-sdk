@@ -1,14 +1,15 @@
 package com.criteo.publisher.network;
 
 import com.criteo.publisher.model.Cdb;
-import com.criteo.publisher.model.Config;
+
+import org.json.JSONObject;
 
 public class NetworkResult {
 
     private Cdb cdb;
-    private Config config;
+    private JSONObject config;
 
-    NetworkResult(Cdb cdb, Config config) {
+    NetworkResult(Cdb cdb, JSONObject config) {
         this.cdb = cdb;
         this.config = config;
     }
@@ -24,11 +25,11 @@ public class NetworkResult {
         this.cdb = cdb;
     }
 
-    public Config getConfig() {
+    public JSONObject getConfig() {
         return config;
     }
 
-    public void setConfig(Config config) {
+    public void setConfig(JSONObject config) {
         this.config = config;
     }
 }

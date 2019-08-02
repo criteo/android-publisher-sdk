@@ -15,6 +15,7 @@ import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitHelper;
 import com.criteo.publisher.model.CacheAdUnit;
+import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.ScreenSize;
@@ -81,8 +82,9 @@ public final class Criteo {
         Publisher publisher = new Publisher(context, criteoPublisherId);
         User user = new User();
         SdkCache sdkCache = new SdkCache();
+        Config config = new Config(context);
         this.bidManager = new BidManager(context, publisher, validatedCacheAdUnits,
-                new TokenCache(), deviceInfo, user, sdkCache);
+                new TokenCache(), deviceInfo, user, sdkCache, config);
 
         this.appEvents = new AppEvents(context);
         this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);

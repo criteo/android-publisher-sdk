@@ -6,7 +6,6 @@ import android.util.Log;
 import com.criteo.publisher.R;
 import com.criteo.publisher.Util.StreamUtil;
 import com.criteo.publisher.model.Cdb;
-import com.criteo.publisher.model.Config;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -33,19 +32,18 @@ final class PubSdkApi {
     private PubSdkApi() {
     }
 
-    static Config loadConfig(Context context, String criteoPublisherId, String appId, String sdkVersion) {
+    static JSONObject loadConfig(Context context, String criteoPublisherId, String appId, String sdkVersion) {
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put(CRITEO_PUBLISHER_ID, criteoPublisherId);
         parameters.put(APP_ID, appId);
         parameters.put(SDK_VERSION, sdkVersion);
 
-        Config configResult = null;
+        JSONObject configResult = null;
         try {
             URL url = new URL(
                     context.getString(R.string.config_url) + "/v2.0/api/config" + "?" + getParamsString(parameters));
-            JSONObject result = executeGet(url);
-            configResult = new Config(result);
+            configResult = executeGet(url);
         } catch (IOException | JSONException e) {
             Log.d(TAG, "Unable to process request to remote config TLA:" + e.getMessage());
             e.printStackTrace();

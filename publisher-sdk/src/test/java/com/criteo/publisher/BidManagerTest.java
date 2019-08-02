@@ -96,8 +96,7 @@ public class BidManagerTest {
         when(config.isKillSwitch()).thenReturn(true);
 
         BidManager bidManager = new BidManager(context, publisher, cacheAdUnits
-                , tokenCache, deviceInfo, user, sdkCache);
-        bidManager.setConfig(config);
+                , tokenCache, deviceInfo, user, sdkCache, config);
 
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         bidManager.enrichBid(builder, adUnit);
@@ -114,8 +113,7 @@ public class BidManagerTest {
         when(config.isKillSwitch()).thenReturn(false);
 
         BidManager bidManager = new BidManager(context, publisher, cacheAdUnits
-                , tokenCache, deviceInfo, user, sdkCache);
-        bidManager.setConfig(config);
+                , tokenCache, deviceInfo, user, sdkCache, config);
 
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         bidManager.enrichBid(builder, adUnit);
@@ -132,8 +130,7 @@ public class BidManagerTest {
         when(config.isKillSwitch()).thenReturn(true);
 
         BidManager bidManager = new BidManager(context, publisher, cacheAdUnits
-                , tokenCache, deviceInfo, user, sdkCache);
-        bidManager.setConfig(config);
+                , tokenCache, deviceInfo, user, sdkCache, config);
 
         //test
         Slot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
@@ -147,8 +144,7 @@ public class BidManagerTest {
         when(config.isKillSwitch()).thenReturn(false);
 
         BidManager bidManager = new BidManager(context, publisher, cacheAdUnits
-                , tokenCache, deviceInfo, user, sdkCache);
-        bidManager.setConfig(config);
+                , tokenCache, deviceInfo, user, sdkCache, config);
 
         //test
         Slot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
@@ -163,8 +159,7 @@ public class BidManagerTest {
         when(config.isKillSwitch()).thenReturn(true);
 
         BidManager bidManager = new BidManager(context, publisher, cacheAdUnits
-                , tokenCache, deviceInfo, user, sdkCache);
-        bidManager.setConfig(config);
+                , tokenCache, deviceInfo, user, sdkCache, config);
 
         BidResponse expectedResponse = new BidResponse();
 
@@ -186,8 +181,7 @@ public class BidManagerTest {
         when(this.sdkCache.getAdUnit(adUnitId, adSize.getFormattedSize())).thenReturn(testSlot);
 
         BidManager bidManager = new BidManager(context, publisher, cacheAdUnits
-                , tokenCache, deviceInfo, user, sdkCache);
-        bidManager.setConfig(config);
+                , tokenCache, deviceInfo, user, sdkCache, config);
 
         BidResponse expectedResponse = new BidResponse(0.10d, new BidToken(UUID.randomUUID()), true);
 

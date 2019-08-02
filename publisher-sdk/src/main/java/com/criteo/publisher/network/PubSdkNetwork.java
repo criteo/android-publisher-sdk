@@ -2,7 +2,6 @@ package com.criteo.publisher.network;
 
 import android.content.Context;
 import com.criteo.publisher.model.Cdb;
-import com.criteo.publisher.model.Config;
 import org.json.JSONObject;
 
 public final class PubSdkNetwork {
@@ -10,7 +9,7 @@ public final class PubSdkNetwork {
     private PubSdkNetwork() {
     }
 
-    public static Config loadConfig(Context context, String criteoPublisherId, String appId, String sdkVersion) {
+    public static JSONObject loadConfig(Context context, String criteoPublisherId, String appId, String sdkVersion) {
         return PubSdkApi.loadConfig(context, criteoPublisherId, appId, sdkVersion);
     }
 

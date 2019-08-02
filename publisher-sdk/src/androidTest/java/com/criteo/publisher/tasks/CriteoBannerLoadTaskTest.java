@@ -42,8 +42,6 @@ public class CriteoBannerLoadTaskTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        JSONObject configJson = new JSONObject();
-        Config config = new Config(configJson);
         when(criteoBannerView.getSettings()).thenReturn(new TestWebSettings());
     }
 

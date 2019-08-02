@@ -3,4 +3,5 @@
   <string name="config_url">https://pub-sdk-cfg.criteo.com</string>
   <string name="event_url">https://gum.criteo.com</string>
   <string name="close_button">Close Button</string>
+  <string name="shared_preferences">com.criteo.publisher.sdkSharedPreferences</string>
 </resources>

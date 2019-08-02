@@ -21,6 +21,9 @@ import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.CdbDownloadTask;
+
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +49,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
 
     BidManager(Context context, Publisher publisher, List<CacheAdUnit> cacheAdUnits, TokenCache tokenCache,
-            DeviceInfo deviceInfo, User user, SdkCache sdkCache) {
+            DeviceInfo deviceInfo, User user, SdkCache sdkCache, Config config) {
         this.mContext = context;
         this.cacheAdUnits = cacheAdUnits;
         this.cache = sdkCache;
@@ -54,6 +57,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         this.publisher = publisher;
         this.user = user;
         this.deviceInfo = deviceInfo;
+        this.config = config;
     }
 
     /**
@@ -170,8 +174,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     }
 
     @Override
-    public void setConfig(Config config) {
-        this.config = config;
+    public void refreshConfig(JSONObject config) {
+        this.config.refreshConfig(config, this.mContext);
     }
 
     @Override

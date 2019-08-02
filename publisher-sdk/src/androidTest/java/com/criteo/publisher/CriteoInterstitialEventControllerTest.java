@@ -2,10 +2,7 @@ package com.criteo.publisher;
 
 import com.criteo.publisher.controller.WebViewDownloader;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.Config;
-import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.WebViewData;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,8 +13,6 @@ import org.mockito.MockitoAnnotations;
 public class CriteoInterstitialEventControllerTest {
 
     private CriteoInterstitialEventController criteoInterstitialEventController;
-
-    private InterstitialAdUnit interstitialAdUnit;
 
     private WebViewData webViewData;
 
@@ -30,9 +25,6 @@ public class CriteoInterstitialEventControllerTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        interstitialAdUnit = new InterstitialAdUnit("/140800857/Endeavour_320x50");
-        JSONObject configJson = new JSONObject();
-        Config config = new Config(configJson);
         webViewData = new WebViewData();
         webViewData.setContent("html content");
         WebViewDownloader webViewDownloader = new WebViewDownloader(webViewData);
