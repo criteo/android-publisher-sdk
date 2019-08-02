@@ -11,7 +11,7 @@ android {
         minSdkVersion 19
         targetSdkVersion 27
         versionCode 1
-        versionName "3.0.0"
+        versionName "1.0.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -39,6 +39,12 @@ android {
 
 }
 
+repositories {
+    jcenter() // includes the MoPub SDK and AVID library
+    maven { url "https://s3.amazonaws.com/moat-sdk-builds" }
+}
+
+
 configurations.all {
     resolutionStrategy {
         force "com.android.support:support-annotations:$support_version"
@@ -56,6 +62,14 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads:15.0.0'
     androidTestCompile 'org.mockito:mockito-android:2.7.22'
     implementation project(path: ':publisher-sdk')
+    implementation('com.mopub:mopub-sdk-banner:5.6.0@aar') {
+        transitive = true
+    }
+
+    // For interstitials
+    implementation('com.mopub:mopub-sdk-interstitial:5.6.0@aar') {
+        transitive = true
+    }
 }
 
 
