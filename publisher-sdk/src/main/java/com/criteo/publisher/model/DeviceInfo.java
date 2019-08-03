@@ -1,7 +1,5 @@
 package com.criteo.publisher.model;
 
-import static android.content.ContentValues.TAG;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
