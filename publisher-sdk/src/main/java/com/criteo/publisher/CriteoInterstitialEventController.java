@@ -67,7 +67,7 @@ public class CriteoInterstitialEventController {
             return;
         }
 
-        webViewDownloader.fillWebViewHtmlContent(displayUrl, deviceInfo.getWebViewUserAgent());
+        webViewDownloader.fillWebViewHtmlContent(displayUrl, deviceInfo.getUserAgent());
 
     }
 

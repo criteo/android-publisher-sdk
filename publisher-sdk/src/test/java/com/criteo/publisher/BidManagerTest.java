@@ -63,7 +63,7 @@ public class BidManagerTest {
         sdkCache = mock(SdkCache.class);
 
         deviceInfo = mock(DeviceInfo.class);
-        when(deviceInfo.getWebViewUserAgent()).thenReturn("Some fun user-agent that is probably webkit based 10.3");
+        when(deviceInfo.getUserAgent()).thenReturn("Some fun user-agent that is probably webkit based 10.3");
 
         JSONObject slotJson = null;
         try {

@@ -96,7 +96,7 @@ public class DeviceInfo {
         return userAgent;
     }
 
-    public String getWebViewUserAgent() {
+    public String getUserAgent() {
         return resolvedUserAgent;
     }
 }
