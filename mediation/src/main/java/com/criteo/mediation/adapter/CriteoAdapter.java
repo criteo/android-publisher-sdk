@@ -31,11 +31,9 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
 
     protected static final String TAG = CriteoAdapter.class.getSimpleName();
 
-    protected static final String CRITEO_PUBLISHER_ID = "cpid";
-    protected static final String ADUNITID = "adUnitId";
+    protected static final String CRITEO_PUBLISHER_ID = "cpId";
+    protected static final String AD_UNIT_ID = "adUnitId";
 
-    private CriteoBannerEventController bannerEventController;
-    private CriteoInterstitialEventController interstitialEventController;
     private CriteoInterstitial criteoInterstitial;
     private BannerAdUnit bannerAdUnit;
     private InterstitialAdUnit interstitialAdUnit;
@@ -66,7 +64,8 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
             Bundle customEventExtras) {
 
         if (TextUtils.isEmpty(serverParameter)) {
-            listener.onAdFailedToLoad(AdRequest.ERROR_CODE_INTERNAL_ERROR);
+            listener.onAdFailedToLoad(AdRequest.ERROR_CODE_INVALID_REQUEST);
+            Log.e(TAG, "Server parameter was empty.");
             return;
         }
 
@@ -80,12 +79,12 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
 
                 criteoInterstitial.loadAd();
             } else {
-                listener.onAdFailedToLoad(AdRequest.ERROR_CODE_INTERNAL_ERROR);
+                listener.onAdFailedToLoad(AdRequest.ERROR_CODE_NO_FILL);
             }
 
         } catch (JSONException | CriteoInitException e) {
             listener.onAdFailedToLoad(AdRequest.ERROR_CODE_INTERNAL_ERROR);
-            Log.e(TAG, "Adapter initialization error");
+            Log.e(TAG, "Adapter failed to initialize: " + e.getMessage());
         }
 
     }
@@ -103,7 +102,7 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
             throws JSONException, CriteoInitException {
         JSONObject parameters = new JSONObject(serverParameter);
         String criteoPublisherId = parameters.getString(CRITEO_PUBLISHER_ID);
-        String adUnitId = parameters.getString(ADUNITID);
+        String adUnitId = parameters.getString(AD_UNIT_ID);
         List<AdUnit> adUnits = new ArrayList<>();
         if (formatType == FormatType.BANNER) {
             bannerAdUnit = new BannerAdUnit(adUnitId,
