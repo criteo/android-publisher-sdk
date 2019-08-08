@@ -5,13 +5,14 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import com.criteo.mediation.listener.CriteoBannerEventListenerImpl;
 import com.criteo.mediation.listener.CriteoInterstitialEventListenerImpl;
 import com.criteo.mediation.model.FormatType;
 import com.criteo.publisher.Criteo;
-import com.criteo.publisher.CriteoBannerEventController;
+import com.criteo.publisher.CriteoBannerAdListener;
+import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.CriteoInterstitial;
-import com.criteo.publisher.CriteoInterstitialEventController;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
@@ -35,6 +36,7 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
     protected static final String AD_UNIT_ID = "adUnitId";
 
     private CriteoInterstitial criteoInterstitial;
+    private CriteoBannerView criteoBanner;
     private BannerAdUnit bannerAdUnit;
     private InterstitialAdUnit interstitialAdUnit;
 
@@ -46,11 +48,26 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
             MediationAdRequest mediationAdRequest,
             Bundle customEventExtras) {
 
-        // Initialize Criteo
-        if (serverParameter == null) {
-            //  initialize(serverParameter, context, listener);
-        } else {
+        if (TextUtils.isEmpty(serverParameter)) {
+            listener.onAdFailedToLoad(AdRequest.ERROR_CODE_INVALID_REQUEST);
+            Log.e(TAG, "Server parameter was empty.");
+            return;
+        }
+
+        try {
+
+            if (initialize(context, serverParameter, size, FormatType.BANNER)) {
+                criteoBanner = new CriteoBannerView(context, bannerAdUnit);
+                CriteoBannerAdListener criteoBannerAdListener = new CriteoBannerEventListenerImpl(listener);
+                criteoBanner.setCriteoBannerAdListener(criteoBannerAdListener);
+                criteoBanner.loadAd();
+            } else {
+                listener.onAdFailedToLoad(AdRequest.ERROR_CODE_NO_FILL);
+            }
+
+        } catch (JSONException | CriteoInitException e) {
             listener.onAdFailedToLoad(AdRequest.ERROR_CODE_INTERNAL_ERROR);
+            Log.e(TAG, "Adapter failed to initialize: " + e.getMessage());
         }
 
 

@@ -3,7 +3,6 @@ package com.criteo.mediation.listener;
 
 import android.view.View;
 import com.criteo.publisher.CriteoBannerAdListener;
-import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.mediation.customevent.CustomEventBannerListener;
@@ -11,11 +10,9 @@ import com.google.android.gms.ads.mediation.customevent.CustomEventBannerListene
 public class CriteoBannerEventListenerImpl implements CriteoBannerAdListener {
 
     private CustomEventBannerListener customEventBannerListener;
-    private CriteoBannerView criteoBannerView;
 
-    public CriteoBannerEventListenerImpl(CustomEventBannerListener listener, CriteoBannerView bannerView) {
+    public CriteoBannerEventListenerImpl(CustomEventBannerListener listener) {
         customEventBannerListener = listener;
-        criteoBannerView = bannerView;
     }
 
     @Override
