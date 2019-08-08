@@ -15,11 +15,10 @@ public class MediationActivity extends AppCompatActivity {
 
     private static final String TAG = MediationActivity.class.getSimpleName();
 
-    private static final String INTERSTITIAL_ADUNIT_ID = "ca-app-pub-2995206374493561/4891139268";
-    private static final String APP_ID = "ca-app-pub-2995206374493561~8272596058";
-    private static final String BANNER_ADUNIT_ID = "ca-app-pub-2995206374493561/3062725613";
-    private static final String TESTDEVICE_ID = "B86644E365C34D02597C12ED444E060A";
-
+    private static final String APP_ID = "ca-app-pub-8459323526901202~2792049297";
+    private static final String BANNER_ADUNIT_ID = "ca-app-pub-8459323526901202/2832836926";
+    private static final String INTERSTITIAL_ADUNIT_ID = "ca-app-pub-8459323526901202/6462812944";
+    private static final String TESTDEVICE_ID = "3D7BB698B9A4CAA9F0D8878A5A5E7B27";
     private InterstitialAd interstitialAd;
     private AdView bannerview;
     private LinearLayout layout;
