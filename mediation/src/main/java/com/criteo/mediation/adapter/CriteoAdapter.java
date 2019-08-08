@@ -40,32 +40,6 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
     private BannerAdUnit bannerAdUnit;
     private InterstitialAdUnit interstitialAdUnit;
 
-
-    /**
-     * The event is being destroyed. Perform any necessary cleanup here.
-     */
-    @Override
-    public void onDestroy() {
-    }
-
-    /**
-     * The app is being paused. This call will only be forwarded to the adapter if the developer notifies mediation that
-     * the app is being paused.
-     */
-    @Override
-    public void onPause() {
-        // The sample ad network doesn't have an onPause method, so it does nothing.
-    }
-
-    /**
-     * The app is being resumed. This call will only be forwarded to the adapter if the developer notifies mediation
-     * that the app is being resumed.
-     */
-    @Override
-    public void onResume() {
-        // The sample ad network doesn't have an onResume method, so it does nothing.
-    }
-
     @Override
     public void requestBannerAd(Context context,
             CustomEventBannerListener listener,
@@ -116,6 +90,14 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
 
     }
 
+    @Override
+    public void showInterstitial() {
+        // Show your interstitial ad
+        if (criteoInterstitial != null && criteoInterstitial.isAdLoaded()) {
+            criteoInterstitial.show();
+        }
+    }
+
     private boolean initialize(Context context, String serverParameter, AdSize size,
             FormatType formatType)
             throws JSONException, CriteoInitException {
@@ -141,12 +123,28 @@ public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial
         }
     }
 
+    /**
+     * The event is being destroyed. Perform any necessary cleanup here.
+     */
     @Override
-    public void showInterstitial() {
-        // Show your interstitial ad
-        if (criteoInterstitial != null && criteoInterstitial.isAdLoaded()) {
-            criteoInterstitial.show();
-        }
+    public void onDestroy() {
     }
 
+    /**
+     * The app is being paused. This call will only be forwarded to the adapter if the developer notifies mediation that
+     * the app is being paused.
+     */
+    @Override
+    public void onPause() {
+        // The sample ad network doesn't have an onPause method, so it does nothing.
+    }
+
+    /**
+     * The app is being resumed. This call will only be forwarded to the adapter if the developer notifies mediation
+     * that the app is being resumed.
+     */
+    @Override
+    public void onResume() {
+        // The sample ad network doesn't have an onResume method, so it does nothing.
+    }
 }
