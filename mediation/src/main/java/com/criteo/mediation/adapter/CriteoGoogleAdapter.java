@@ -88,7 +88,7 @@ public class CriteoGoogleAdapter implements CustomEventBanner, CustomEventInters
 
         try {
 
-            if (initialize(context, serverParameter, null, FormatType.BANNER)) {
+            if (initialize(context, serverParameter, null, FormatType.INTERSTITIAL)) {
                 criteoInterstitial = new CriteoInterstitial(context, interstitialAdUnit);
                 CriteoInterstitialEventListenerImpl criteoInterstitialEventListener = new CriteoInterstitialEventListenerImpl(
                         listener, criteoInterstitial);
