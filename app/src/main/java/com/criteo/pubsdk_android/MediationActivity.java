@@ -20,9 +20,10 @@ public class MediationActivity extends AppCompatActivity {
     private static final String INTERSTITIAL_ADUNIT_ID = "ca-app-pub-8459323526901202/6462812944";
     private static final String TESTDEVICE_ID = "3D7BB698B9A4CAA9F0D8878A5A5E7B27";
     private InterstitialAd interstitialAd;
-    private AdView bannerview;
+    private AdView bannerView;
     private LinearLayout layout;
-    private AdListener adListener;
+    private AdListener bannerAdListener;
+    private AdListener interstitialAdListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +32,7 @@ public class MediationActivity extends AppCompatActivity {
         layout = findViewById(R.id.adViewHolder);
 
         MobileAds.initialize(this, APP_ID);
+        initListeners();
 
         findViewById(R.id.buttonMediationBanner).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,7 +48,78 @@ public class MediationActivity extends AppCompatActivity {
             }
         });
 
-        adListener = new AdListener() {
+
+    }
+
+    private void loadInterstitialAd() {
+        interstitialAd = new InterstitialAd(MediationActivity.this);
+        interstitialAd.setAdUnitId(
+                INTERSTITIAL_ADUNIT_ID);
+        interstitialAd.setAdListener(interstitialAdListener);
+
+        AdRequest interstitialAdRequest = new AdRequest.Builder()
+                .addTestDevice(TESTDEVICE_ID)
+                .build();
+        interstitialAd.loadAd(interstitialAdRequest);
+    }
+
+    private void loadBannerAd() {
+
+        bannerView = new AdView(MediationActivity.this);
+        bannerView.setAdUnitId(BANNER_ADUNIT_ID);
+        bannerView.setAdSize(com.google.android.gms.ads.AdSize.BANNER);
+        bannerView.setAdListener(bannerAdListener);
+
+        AdRequest bannerAdRequest = new AdRequest.Builder()
+                .addTestDevice(TESTDEVICE_ID)
+                .build();
+        bannerView.loadAd(bannerAdRequest);
+
+    }
+
+    private void initListeners() {
+
+        bannerAdListener = new AdListener() {
+            @Override
+            public void onAdClicked() {
+                super.onAdClicked();
+            }
+
+            @Override
+            public void onAdImpression() {
+                super.onAdImpression();
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+                super.onAdLeftApplication();
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                Log.d(TAG, "Mediation - Banner ad failed");
+
+            }
+
+            @Override
+            public void onAdLoaded() {
+                Log.d(TAG, "Mediation - Banner ad loaded");
+
+                layout.addView(bannerView);
+
+            }
+
+            @Override
+            public void onAdOpened() {
+            }
+
+            @Override
+            public void onAdClosed() {
+                bannerView.loadAd(new AdRequest.Builder().build());
+            }
+        };
+
+        interstitialAdListener = new AdListener() {
             @Override
             public void onAdClicked() {
                 super.onAdClicked();
@@ -85,32 +158,6 @@ public class MediationActivity extends AppCompatActivity {
                 interstitialAd.loadAd(new AdRequest.Builder().build());
             }
         };
-
-    }
-
-    private void loadInterstitialAd() {
-        interstitialAd = new InterstitialAd(MediationActivity.this);
-        interstitialAd.setAdUnitId(
-                INTERSTITIAL_ADUNIT_ID);
-        interstitialAd.setAdListener(adListener);
-
-        AdRequest interstitialAdRequest = new AdRequest.Builder()
-                .addTestDevice(TESTDEVICE_ID)
-                .build();
-        interstitialAd.loadAd(interstitialAdRequest);
-    }
-
-    private void loadBannerAd() {
-        bannerview = new AdView(MediationActivity.this);
-        bannerview.setAdUnitId(BANNER_ADUNIT_ID);
-        bannerview.setAdSize(com.google.android.gms.ads.AdSize.BANNER);
-        bannerview.setAdListener(adListener);
-
-        AdRequest bannerAdRequest = new AdRequest.Builder()
-                .addTestDevice(TESTDEVICE_ID)
-                .build();
-        bannerview.loadAd(bannerAdRequest);
-        layout.addView(bannerview);
     }
 
 }

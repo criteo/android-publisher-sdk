@@ -1,51 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+  <LinearLayout
+    android:id="@+id/linearLayout"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:layout_marginTop="6dp"
+    android:layout_marginStart="10dp"
+    android:layout_marginEnd="10dp"
+    android:orientation="vertical"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
 
     <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="0dp"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:orientation="vertical">
+      <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="6dp"
-        android:layout_marginEnd="10dp"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
+        android:orientation="horizontal">
         <Button
-            android:id="@+id/buttonMediationBanner"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight=".5"
-            android:background="@color/colorAccent"
-            android:text="Banner" />
-
+          android:id="@+id/buttonMediationInterstitial"
+          style="@style/Widget.AppCompat.Button.Colored"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight=".5"
+          android:background="@android:color/holo_red_dark"
+          android:enabled="true"
+          android:text="Interstitial"/>
         <Button
-            android:id="@+id/buttonMediationInterstitial"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_weight=".5"
-            android:background="@color/colorAccent"
-            android:text="Interstitial" />
-    </LinearLayout>
-
-    <LinearLayout
+          android:id="@+id/buttonMediationBanner"
+          style="@style/Widget.AppCompat.Button.Colored"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight=".5"
+          android:layout_marginLeft="5dp"
+          android:background="@android:color/holo_red_dark"
+          android:text="Banner"/>
+      </LinearLayout>
+      <LinearLayout
         android:id="@+id/adViewHolder"
-        android:layout_width="320dp"
-        android:layout_height="50dp"
-        android:background="@android:color/holo_red_dark"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical">
+      </LinearLayout>
+    </LinearLayout>
+  </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
