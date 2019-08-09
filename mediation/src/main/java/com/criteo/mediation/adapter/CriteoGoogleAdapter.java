@@ -134,7 +134,7 @@ public class CriteoGoogleAdapter implements CustomEventBanner, CustomEventInters
             Criteo.getInstance();
             return true;
         } catch (Exception ex) {
-            Criteo.init((Application) context, criteoPublisherId, adUnits);
+            Criteo.init((Application) context.getApplicationContext(), criteoPublisherId, adUnits);
             return false;
         }
     }
