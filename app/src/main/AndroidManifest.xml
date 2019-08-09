@@ -13,6 +13,8 @@
     android:roundIcon="@mipmap/ic_launcher_round"
     android:supportsRtl="true"
     android:theme="@style/AppTheme">
+    <activity android:name=".MopubMediationActivity">
+    </activity>
     <activity
       android:label="@string/title_activity_standalone"
       android:name=".StandaloneActivity"
@@ -86,10 +88,12 @@
     <activity
       android:configChanges="keyboardHidden|orientation|screenSize"
       android:name="com.mopub.mobileads.MraidVideoPlayerActivity"/>
-
-    <activity android:name="com.mopub.mobileads.MoPubActivity" android:configChanges="keyboardHidden|orientation|screenSize"/>
-    <activity android:name="com.mopub.mobileads.MraidActivity" android:configChanges="keyboardHidden|orientation|screenSize"/>
-
+    <activity
+      android:configChanges="keyboardHidden|orientation|screenSize"
+      android:name="com.mopub.mobileads.MoPubActivity"/>
+    <activity
+      android:configChanges="keyboardHidden|orientation|screenSize"
+      android:name="com.mopub.mobileads.MraidActivity"/>
   </application>
 
 </manifest>

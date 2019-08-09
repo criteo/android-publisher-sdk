@@ -42,6 +42,11 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        findViewById(R.id.buttonMopubMediation).setOnClickListener((View v) -> {
+            Intent intent = new Intent(getApplicationContext(), MopubMediationActivity.class);
+            startActivity(intent);
+        });
+
         Log.d(TAG, "onCreate:" + calendar.getTimeInMillis());
 
     }
