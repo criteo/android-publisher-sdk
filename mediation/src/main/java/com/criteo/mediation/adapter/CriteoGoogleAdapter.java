@@ -28,9 +28,9 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial {
+public class CriteoGoogleAdapter implements CustomEventBanner, CustomEventInterstitial {
 
-    protected static final String TAG = CriteoAdapter.class.getSimpleName();
+    protected static final String TAG = CriteoGoogleAdapter.class.getSimpleName();
 
     protected static final String CRITEO_PUBLISHER_ID = "cpId";
     protected static final String AD_UNIT_ID = "adUnitId";

@@ -16,7 +16,7 @@ import org.mockito.MockitoAnnotations;
 
 
 @RunWith(AndroidJUnit4.class)
-public class CriteoAdapterTest {
+public class CriteoGoogleAdapterTest {
 
     private static final String CRITEO_PUBLISHER_ID_KEY = "cpid";
     private static final String ADUNITID_KEY = "adUnitId";
@@ -43,19 +43,21 @@ public class CriteoAdapterTest {
 
     @Test
     public void requestInterstitialAdWithEmptyServerParams() {
-        CriteoAdapter criteoAdapter = new CriteoAdapter();
+        CriteoGoogleAdapter criteoGoogleAdapter = new CriteoGoogleAdapter();
         String serverParameter = "";
-        criteoAdapter.requestInterstitialAd(context, listener, serverParameter, mediationAdRequest, customEventExtras);
+        criteoGoogleAdapter
+                .requestInterstitialAd(context, listener, serverParameter, mediationAdRequest, customEventExtras);
         Mockito.verify(listener, Mockito.times(1)).onAdFailedToLoad(AdRequest.ERROR_CODE_INTERNAL_ERROR);
 
     }
 
     @Test
     public void requestInterstitialAdWithNullCriteo() {
-        CriteoAdapter criteoAdapter = new CriteoAdapter();
+        CriteoGoogleAdapter criteoGoogleAdapter = new CriteoGoogleAdapter();
         String serverParameter = "{   \"" + CRITEO_PUBLISHER_ID_KEY + "\":" + PUBLISHER_ID + ",   \" " + ADUNITID_KEY
                 + "\":\" " + ADUNITID + "  \" }";
-        criteoAdapter.requestInterstitialAd(context, listener, serverParameter, mediationAdRequest, customEventExtras);
+        criteoGoogleAdapter
+                .requestInterstitialAd(context, listener, serverParameter, mediationAdRequest, customEventExtras);
         Mockito.verify(listener, Mockito.times(1)).onAdFailedToLoad(AdRequest.ERROR_CODE_INTERNAL_ERROR);
 
     }
