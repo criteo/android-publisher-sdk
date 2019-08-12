@@ -4,9 +4,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+import com.criteo.publisher.CriteoBannerView;
 import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.mediation.MediationAdRequest;
+import com.google.android.gms.ads.mediation.customevent.CustomEventBannerListener;
 import com.google.android.gms.ads.mediation.customevent.CustomEventInterstitialListener;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,39 +30,71 @@ public class CriteoGoogleAdapterTest {
     private Context context;
 
     @Mock
-    private CustomEventInterstitialListener listener;
+    private CustomEventInterstitialListener interstitialListener;
+
+    @Mock
+    private CustomEventBannerListener bannerAdlistener;
 
     @Mock
     private MediationAdRequest mediationAdRequest;
 
     private Bundle customEventExtras;
+    private CriteoGoogleAdapter criteoGoogleAdapter;
 
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         context = InstrumentationRegistry.getContext();
+        criteoGoogleAdapter = new CriteoGoogleAdapter();
         MockitoAnnotations.initMocks(this);
         customEventExtras = new Bundle();
     }
 
+    @After
+    public void tearDown() {
+        context = null;
+        criteoGoogleAdapter = null;
+        customEventExtras = null;
+    }
+
     @Test
-    public void requestInterstitialAdWithEmptyServerParams() {
-        CriteoGoogleAdapter criteoGoogleAdapter = new CriteoGoogleAdapter();
+    public void requestBannerAdWithEmptyServerParams() {
         String serverParameter = "";
         criteoGoogleAdapter
-                .requestInterstitialAd(context, listener, serverParameter, mediationAdRequest, customEventExtras);
-        Mockito.verify(listener, Mockito.times(1)).onAdFailedToLoad(AdRequest.ERROR_CODE_INTERNAL_ERROR);
+                .requestBannerAd(context, bannerAdlistener, serverParameter, new AdSize(320, 480), mediationAdRequest,
+                        customEventExtras);
+        Mockito.verify(bannerAdlistener, Mockito.times(1)).onAdFailedToLoad(AdRequest.ERROR_CODE_INVALID_REQUEST);
+    }
+
+    @Test
+    public void requestBannerAdWithNullCriteo() {
+        String serverParameter = "{   \"" + CRITEO_PUBLISHER_ID_KEY + "\":" + PUBLISHER_ID + ",   \" " + ADUNITID_KEY
+                + "\":\" " + ADUNITID + "  \" }";
+        criteoGoogleAdapter
+                .requestBannerAd(context, bannerAdlistener, serverParameter, new AdSize(320, 480), mediationAdRequest,
+                        customEventExtras);
+        Mockito.verify(bannerAdlistener, Mockito.times(1)).onAdFailedToLoad(AdRequest.ERROR_CODE_INTERNAL_ERROR);
+
+    }
+
+    @Test
+    public void requestInterstitialAdWithEmptyServerParams() {
+        String serverParameter = "";
+        criteoGoogleAdapter
+                .requestInterstitialAd(context, interstitialListener, serverParameter, mediationAdRequest,
+                        customEventExtras);
+        Mockito.verify(interstitialListener, Mockito.times(1)).onAdFailedToLoad(AdRequest.ERROR_CODE_INVALID_REQUEST);
 
     }
 
     @Test
     public void requestInterstitialAdWithNullCriteo() {
-        CriteoGoogleAdapter criteoGoogleAdapter = new CriteoGoogleAdapter();
         String serverParameter = "{   \"" + CRITEO_PUBLISHER_ID_KEY + "\":" + PUBLISHER_ID + ",   \" " + ADUNITID_KEY
                 + "\":\" " + ADUNITID + "  \" }";
         criteoGoogleAdapter
-                .requestInterstitialAd(context, listener, serverParameter, mediationAdRequest, customEventExtras);
-        Mockito.verify(listener, Mockito.times(1)).onAdFailedToLoad(AdRequest.ERROR_CODE_INTERNAL_ERROR);
+                .requestInterstitialAd(context, interstitialListener, serverParameter, mediationAdRequest,
+                        customEventExtras);
+        Mockito.verify(interstitialListener, Mockito.times(1)).onAdFailedToLoad(AdRequest.ERROR_CODE_INTERNAL_ERROR);
 
     }
 }
