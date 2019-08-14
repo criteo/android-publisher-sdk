@@ -109,7 +109,7 @@ public class CriteoGoogleAdapter implements CustomEventBanner, CustomEventInters
     @Override
     public void showInterstitial() {
         // Show your interstitial ad
-        if (criteoInterstitial != null && criteoInterstitial.isAdLoaded()) {
+        if (criteoInterstitial != null) {
             criteoInterstitial.show();
         }
     }
