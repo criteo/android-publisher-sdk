@@ -20,6 +20,9 @@ public class CriteoInterstitialEventControllerTest {
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
     @Mock
+    private CriteoInterstitialAdDisplayListener adDisplayListener;
+
+    @Mock
     private WebViewDownloader mockWebViewDownloader;
 
     @Before
@@ -28,7 +31,7 @@ public class CriteoInterstitialEventControllerTest {
         webViewData = new WebViewData();
         webViewData.setContent("html content");
         WebViewDownloader webViewDownloader = new WebViewDownloader(webViewData);
-        criteoInterstitialEventController = new CriteoInterstitialEventController(criteoInterstitialAdListener,
+        criteoInterstitialEventController = new CriteoInterstitialEventController(criteoInterstitialAdListener,adDisplayListener,
                 webViewDownloader);
     }
 

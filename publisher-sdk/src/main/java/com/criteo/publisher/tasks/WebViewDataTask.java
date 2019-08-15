@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.URLUtil;
+import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.Util.StreamUtil;
 import com.criteo.publisher.model.WebViewData;
 import java.io.IOException;
@@ -18,8 +19,11 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
 
     private WebViewData webviewData;
 
-    public WebViewDataTask(WebViewData webviewData) {
+    private CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
+
+    public WebViewDataTask(WebViewData webviewData, CriteoInterstitialAdDisplayListener adDisplayListener) {
         this.webviewData = webviewData;
+        this.criteoInterstitialAdDisplayListener = adDisplayListener;
     }
 
 
@@ -92,11 +96,16 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
     private void doOnPostExecute(String data) {
         if (TextUtils.isEmpty(data)) {
             webviewData.downloadFailed();
+            if (criteoInterstitialAdDisplayListener != null) {
+                criteoInterstitialAdDisplayListener.onAdFailedToDisplay();
+            }
             return;
         }
         webviewData.setContent(data);
         webviewData.downloadSucceeeded();
-
+        if (criteoInterstitialAdDisplayListener != null) {
+            criteoInterstitialAdDisplayListener.onAdReadyToDisplay();
+        }
     }
 
 }

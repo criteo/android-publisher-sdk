@@ -16,6 +16,8 @@ public class CriteoInterstitialEventController {
 
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
+    private CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
+
     private CriteoInterstitialListenerCallTask criteoInterstitialListenerCallTask;
 
     private WebViewDownloader webViewDownloader;
@@ -23,8 +25,10 @@ public class CriteoInterstitialEventController {
     private DeviceInfo deviceInfo;
 
     public CriteoInterstitialEventController(
-            CriteoInterstitialAdListener listener, WebViewDownloader webViewDownloader) {
+            CriteoInterstitialAdListener listener, CriteoInterstitialAdDisplayListener adDisplayListener,
+            WebViewDownloader webViewDownloader) {
         this.criteoInterstitialAdListener = listener;
+        this.criteoInterstitialAdDisplayListener = adDisplayListener;
         this.webViewDownloader = webViewDownloader;
         this.deviceInfo = Criteo.getInstance().getDeviceInfo();
 
@@ -67,7 +71,8 @@ public class CriteoInterstitialEventController {
             return;
         }
 
-        webViewDownloader.fillWebViewHtmlContent(displayUrl, deviceInfo.getUserAgent());
+        webViewDownloader
+                .fillWebViewHtmlContent(displayUrl, deviceInfo.getUserAgent(), criteoInterstitialAdDisplayListener);
 
     }
 

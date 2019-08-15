@@ -14,6 +14,7 @@ import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
+import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
@@ -27,6 +28,7 @@ public class StandaloneActivity extends AppCompatActivity {
     private Context context;
     private CriteoBannerAdListener criteoBannerAdListener;
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
+    private CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
     private LinearLayout adLayout;
     private CriteoBannerView criteoBannerView;
     private CriteoInterstitial criteoInterstitial;
@@ -90,6 +92,7 @@ public class StandaloneActivity extends AppCompatActivity {
         InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit("/140800857/Endeavour_Interstitial_320x480");
         criteoInterstitial = new CriteoInterstitial(context, interstitialAdUnit);
         criteoInterstitial.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
+        criteoInterstitial.setCriteoInterstitialAdDisplayListener(criteoInterstitialAdDisplayListener);
         criteoInterstitial.loadAd();
     }
 
@@ -136,6 +139,18 @@ public class StandaloneActivity extends AppCompatActivity {
             @Override
             public void onAdClosed() {
                 Log.d(TAG, "Interstitial ad closed");
+            }
+        };
+
+        criteoInterstitialAdDisplayListener = new CriteoInterstitialAdDisplayListener() {
+            @Override
+            public void onAdReadyToDisplay() {
+                Log.d(TAG, "Interstitial ad called onAdReadyToDisplay");
+            }
+
+            @Override
+            public void onAdFailedToDisplay() {
+                Log.d(TAG, "Interstitial ad called onAdFailedToDisplay");
             }
         };
 

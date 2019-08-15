@@ -1,6 +1,7 @@
 package com.criteo.publisher.tasks;
 
 import android.test.UiThreadTest;
+import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.model.WebViewData;
 import org.junit.Assert;
@@ -20,6 +21,9 @@ public class WebViewDataTaskTest {
     @Mock
     private WebViewData webViewData;
 
+    @Mock
+    private CriteoInterstitialAdDisplayListener adDisplayListener;
+
     private WebViewDataTask webViewDataTask;
     ;
 
@@ -27,7 +31,7 @@ public class WebViewDataTaskTest {
     @UiThreadTest
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        webViewDataTask = new WebViewDataTask(webViewData);
+        webViewDataTask = new WebViewDataTask(webViewData , adDisplayListener);
     }
 
     @Test

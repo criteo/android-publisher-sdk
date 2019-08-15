@@ -22,6 +22,8 @@ public class CriteoInterstitial {
 
     private CriteoInterstitialEventController criteoInterstitialEventController;
 
+    private CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
+
 
     public CriteoInterstitial(Context context, InterstitialAdUnit interstitialAdUnit) {
         this.context = context;
@@ -30,6 +32,11 @@ public class CriteoInterstitial {
 
     public void setCriteoInterstitialAdListener(CriteoInterstitialAdListener criteoInterstitialAdListener) {
         this.criteoInterstitialAdListener = criteoInterstitialAdListener;
+
+    }
+
+    public void setCriteoInterstitialAdDisplayListener(CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener) {
+        this.criteoInterstitialAdDisplayListener = criteoInterstitialAdDisplayListener;
 
     }
 
@@ -44,7 +51,7 @@ public class CriteoInterstitial {
     private void doLoadAd() {
         if (criteoInterstitialEventController == null) {
             criteoInterstitialEventController = new CriteoInterstitialEventController(
-                    criteoInterstitialAdListener, new WebViewDownloader(new WebViewData()));
+                    criteoInterstitialAdListener,criteoInterstitialAdDisplayListener, new WebViewDownloader(new WebViewData()));
         }
         criteoInterstitialEventController.fetchAdAsync(interstitialAdUnit);
     }
@@ -60,7 +67,7 @@ public class CriteoInterstitial {
     private void doLoadAd(BidToken bidToken) {
         if (criteoInterstitialEventController == null) {
             criteoInterstitialEventController = new CriteoInterstitialEventController(
-                    criteoInterstitialAdListener, new WebViewDownloader(new WebViewData()));
+                    criteoInterstitialAdListener,criteoInterstitialAdDisplayListener,  new WebViewDownloader(new WebViewData()));
         }
         criteoInterstitialEventController.fetchAdAsync(bidToken);
     }
