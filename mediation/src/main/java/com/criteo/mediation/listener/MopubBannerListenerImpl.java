@@ -10,11 +10,9 @@ import com.mopub.mobileads.MoPubErrorCode;
 public class MopubBannerListenerImpl implements CriteoBannerAdListener {
 
     private CustomEventBannerListener customEventBannerListener;
-    private CriteoBannerView criteoBannerView;
 
-    public MopubBannerListenerImpl(CustomEventBannerListener listener, CriteoBannerView bannerView) {
+    public MopubBannerListenerImpl(CustomEventBannerListener listener) {
         customEventBannerListener = listener;
-        criteoBannerView = bannerView;
     }
 
     @Override

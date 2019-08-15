@@ -1,7 +1,6 @@
 package com.criteo.mediation.mopubadapter;
 
 
-import static com.mopub.common.logging.MoPubLog.AdLogEvent.CUSTOM;
 import static com.mopub.common.logging.MoPubLog.AdapterLogEvent.LOAD_ATTEMPTED;
 import static com.mopub.common.logging.MoPubLog.AdapterLogEvent.LOAD_FAILED;
 
@@ -60,6 +59,7 @@ public class CriteoMopubInterstitialAdapter extends CustomEventInterstitial {
             criteoInterstitial = new CriteoInterstitial(context, interstitialAdUnit);
             MopubInterstitialListenerImpl listener = new MopubInterstitialListenerImpl(customEventInterstitialListener);
             criteoInterstitial.setCriteoInterstitialAdListener(listener);
+            criteoInterstitial.setCriteoInterstitialAdDisplayListener(listener);
             criteoInterstitial.loadAd();
             MoPubLog.log(LOAD_ATTEMPTED, TAG, "Criteo Interstitial is loading");
         } catch (Exception e) {

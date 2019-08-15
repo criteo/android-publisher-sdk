@@ -2,15 +2,15 @@ package com.criteo.mediation.listener;
 
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
+import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.CriteoInterstitialAdListener;
-import com.google.android.gms.ads.AdRequest;
 import com.mopub.mobileads.CustomEventInterstitial.CustomEventInterstitialListener;
 import com.mopub.mobileads.MoPubErrorCode;
 
-public class MopubInterstitialListenerImpl implements CriteoInterstitialAdListener {
+public class MopubInterstitialListenerImpl implements CriteoInterstitialAdListener ,
+        CriteoInterstitialAdDisplayListener {
 
     private CustomEventInterstitialListener customEventInterstitialListener;
-    private CriteoInterstitial criteoInterstitial;
 
     public MopubInterstitialListenerImpl(CustomEventInterstitialListener listener) {
         customEventInterstitialListener = listener;
@@ -28,7 +28,7 @@ public class MopubInterstitialListenerImpl implements CriteoInterstitialAdListen
 
     @Override
     public void onAdReceived() {
-        customEventInterstitialListener.onInterstitialLoaded();
+
     }
 
     @Override
@@ -52,5 +52,15 @@ public class MopubInterstitialListenerImpl implements CriteoInterstitialAdListen
     @Override
     public void onAdLeftApplication() {
         customEventInterstitialListener.onLeaveApplication();
+    }
+
+    @Override
+    public void onAdReadyToDisplay() {
+        customEventInterstitialListener.onInterstitialLoaded();
+    }
+
+    @Override
+    public void onAdFailedToDisplay(CriteoErrorCode code) {
+        customEventInterstitialListener.onInterstitialFailed(MoPubErrorCode.NETWORK_TIMEOUT);
     }
 }

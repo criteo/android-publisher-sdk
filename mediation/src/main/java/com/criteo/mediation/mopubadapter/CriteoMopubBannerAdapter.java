@@ -61,7 +61,7 @@ public class CriteoMopubBannerAdapter extends CustomEventBanner {
             Criteo.getInstance();
             BannerAdUnit bannerAdUnit = new BannerAdUnit(adUnitId, adSize);
             bannerView = new CriteoBannerView(context, bannerAdUnit);
-            MopubBannerListenerImpl listener = new MopubBannerListenerImpl(customEventBannerListener, bannerView);
+            MopubBannerListenerImpl listener = new MopubBannerListenerImpl(customEventBannerListener);
             bannerView.setCriteoBannerAdListener(listener);
             bannerView.loadAd();
             MoPubLog.log(LOAD_ATTEMPTED, TAG, "Bannerview loading");
