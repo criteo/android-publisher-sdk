@@ -2,25 +2,23 @@ package com.criteo.mediation.listener;
 
 
 import com.criteo.publisher.CriteoErrorCode;
-import com.criteo.publisher.CriteoInterstitial;
+import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.mediation.customevent.CustomEventInterstitialListener;
 
-public class CriteoInterstitialEventListenerImpl implements CriteoInterstitialAdListener {
+public class CriteoInterstitialEventListenerImpl implements CriteoInterstitialAdListener,
+        CriteoInterstitialAdDisplayListener {
 
     private CustomEventInterstitialListener customEventInterstitialListener;
-    private CriteoInterstitial criteoInterstitial;
 
-    public CriteoInterstitialEventListenerImpl(CustomEventInterstitialListener listener,
-            CriteoInterstitial interstitialView) {
+    public CriteoInterstitialEventListenerImpl(CustomEventInterstitialListener listener) {
         customEventInterstitialListener = listener;
-        criteoInterstitial = interstitialView;
     }
 
     @Override
     public void onAdReceived() {
-        customEventInterstitialListener.onAdLoaded();
+
     }
 
     @Override
@@ -56,4 +54,13 @@ public class CriteoInterstitialEventListenerImpl implements CriteoInterstitialAd
         customEventInterstitialListener.onAdLeftApplication();
     }
 
+    @Override
+    public void onAdReadyToDisplay() {
+        customEventInterstitialListener.onAdLoaded();
+    }
+
+    @Override
+    public void onAdFailedToDisplay(CriteoErrorCode code) {
+        customEventInterstitialListener.onAdFailedToLoad(AdRequest.ERROR_CODE_NETWORK_ERROR);
+    }
 }
