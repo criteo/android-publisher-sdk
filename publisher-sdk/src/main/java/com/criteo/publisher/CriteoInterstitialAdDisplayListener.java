@@ -4,6 +4,6 @@ public interface CriteoInterstitialAdDisplayListener {
 
     void onAdReadyToDisplay();
 
-    void onAdFailedToDisplay();
+    void onAdFailedToDisplay(CriteoErrorCode error);
 
 }

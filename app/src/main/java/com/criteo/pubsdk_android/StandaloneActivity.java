@@ -149,7 +149,7 @@ public class StandaloneActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onAdFailedToDisplay() {
+            public void onAdFailedToDisplay(CriteoErrorCode code) {
                 Log.d(TAG, "Interstitial ad called onAdFailedToDisplay");
             }
         };
