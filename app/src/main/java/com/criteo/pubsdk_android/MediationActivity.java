@@ -1,5 +1,6 @@
 package com.criteo.pubsdk_android;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -49,6 +50,11 @@ public class MediationActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 
     private void loadInterstitialAd() {

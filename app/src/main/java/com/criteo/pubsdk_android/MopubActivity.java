@@ -5,6 +5,7 @@ import static com.criteo.pubsdk_android.PubSdkDemoApplication.MOPUB_INTERSTITIAL
 import static com.mopub.common.logging.MoPubLog.LogLevel.DEBUG;
 import static com.mopub.common.logging.MoPubLog.LogLevel.INFO;
 
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -61,6 +62,11 @@ public class MopubActivity extends AppCompatActivity {
         findViewById(R.id.buttonInterstitial).setOnClickListener((View v) -> {
             onInterstitialClick();
         });
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 
     private void createInterstitialAdListener() {
