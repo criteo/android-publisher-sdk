@@ -115,7 +115,6 @@ public class MediationActivity extends AppCompatActivity {
 
             @Override
             public void onAdClosed() {
-                bannerView.loadAd(new AdRequest.Builder().build());
             }
         };
 
@@ -155,7 +154,6 @@ public class MediationActivity extends AppCompatActivity {
 
             @Override
             public void onAdClosed() {
-                interstitialAd.loadAd(new AdRequest.Builder().build());
             }
         };
     }
