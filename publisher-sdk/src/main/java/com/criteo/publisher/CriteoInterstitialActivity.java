@@ -7,6 +7,7 @@ import static com.criteo.publisher.Util.CriteoResultReceiver.RESULT_CODE_SUCCESS
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -96,6 +97,11 @@ public class CriteoInterstitialActivity extends Activity {
     private void prepareWebView() {
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setWebViewClient(new InterstitialWebViewClient());
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 
     @Override
