@@ -1,7 +1,10 @@
 package com.criteo.publisher;
 
+import android.app.Application;
+import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.controller.WebViewDownloader;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.WebViewData;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,6 +19,8 @@ public class CriteoInterstitialEventControllerTest {
 
     private WebViewData webViewData;
 
+    private Config config;
+
     @Mock
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
@@ -26,12 +31,19 @@ public class CriteoInterstitialEventControllerTest {
     private WebViewDownloader mockWebViewDownloader;
 
     @Before
-    public void setup() {
+    public void setup() throws CriteoInitException {
         MockitoAnnotations.initMocks(this);
         webViewData = new WebViewData();
+        config = new Config(InstrumentationRegistry.getContext());
         webViewData.setContent("html content");
+        Application app =
+                (Application) InstrumentationRegistry
+                        .getTargetContext()
+                        .getApplicationContext();
+        Criteo.init(app, "B-056946", null);
         WebViewDownloader webViewDownloader = new WebViewDownloader(webViewData);
-        criteoInterstitialEventController = new CriteoInterstitialEventController(criteoInterstitialAdListener,adDisplayListener,
+        criteoInterstitialEventController = new CriteoInterstitialEventController(criteoInterstitialAdListener,
+                adDisplayListener,
                 webViewDownloader);
     }
 
@@ -48,11 +60,15 @@ public class CriteoInterstitialEventControllerTest {
         AdUnit adUnit = null;
         criteoInterstitialEventController.fetchAdAsync(adUnit);
 
-        Thread.sleep(100);
+        Thread.sleep(500);
 
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdReceived();
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(1))
                 .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+        Mockito.verify(adDisplayListener, Mockito.times(0))
+                .onAdFailedToDisplay((CriteoErrorCode.ERROR_CODE_NO_FILL));
+        Mockito.verify(adDisplayListener, Mockito.times(0))
+                .onAdReadyToDisplay();
     }
 
 }
