@@ -21,7 +21,7 @@
 #-renamesourcefileattribute SourceFile
 # Retrofit does reflection on generic parameters. InnerClasses is required to use Signature and
 # EnclosingMethod is required to use InnerClasses.
--keepattributes Signature, InnerClasses, EnclosingMethod, Exception
+-keepattributes Signature, InnerClasses, EnclosingMethod, Exceptions
 
 # Retain service method parameters when optimizing.
 -keepclassmembers,allowshrinking,allowobfuscation interface * {
