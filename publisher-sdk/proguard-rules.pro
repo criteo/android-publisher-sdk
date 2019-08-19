@@ -89,6 +89,8 @@
 
 -keep public class com.criteo.publisher.BidToken
 
+-keep public class com.criteo.publisher.CriteoInitException
+
 -keep public interface com.criteo.publisher.CriteoAdListener {*;}
 
 -keep public interface com.criteo.publisher.CriteoBannerAdListener {*;}
