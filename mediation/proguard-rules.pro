@@ -46,8 +46,6 @@
     public *;
 }
 
--keep public enum com.criteo.mediation.model.FormatType { *; }
-
 -keep public class com.criteo.mediation.mopubadapter.CriteoMopubBannerAdapter
 -keepclassmembers class com.criteo.mediation.mopubadapter.CriteoMopubBannerAdapter {
     public *;

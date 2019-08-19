@@ -1,17 +1,16 @@
-package com.criteo.mediation.listener;
+package com.criteo.mediation.mopub;
 
 import android.view.View;
 import com.criteo.publisher.CriteoBannerAdListener;
-import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.mopub.mobileads.CustomEventBanner.CustomEventBannerListener;
 import com.mopub.mobileads.MoPubErrorCode;
 
-public class MopubBannerListenerImpl implements CriteoBannerAdListener {
+public class CriteoBannerEventListener implements CriteoBannerAdListener {
 
     private CustomEventBannerListener customEventBannerListener;
 
-    public MopubBannerListenerImpl(CustomEventBannerListener listener) {
+    public CriteoBannerEventListener(CustomEventBannerListener listener) {
         customEventBannerListener = listener;
     }
 

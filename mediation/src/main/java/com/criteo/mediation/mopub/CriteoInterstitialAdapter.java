@@ -1,4 +1,4 @@
-package com.criteo.mediation.mopubadapter;
+package com.criteo.mediation.mopub;
 
 
 import static com.mopub.common.logging.MoPubLog.AdapterLogEvent.LOAD_ATTEMPTED;
@@ -7,7 +7,6 @@ import static com.mopub.common.logging.MoPubLog.AdapterLogEvent.LOAD_FAILED;
 import android.app.Application;
 import android.content.Context;
 import android.text.TextUtils;
-import com.criteo.mediation.listener.MopubInterstitialListenerImpl;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.CriteoInterstitial;
@@ -20,9 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class CriteoMopubInterstitialAdapter extends CustomEventInterstitial {
+public class CriteoInterstitialAdapter extends CustomEventInterstitial {
 
-    private static final String TAG = CriteoMopubInterstitialAdapter.class.getSimpleName();
+    private static final String TAG = CriteoInterstitialAdapter.class.getSimpleName();
     protected static final String ADUNIT_ID = "adUnitId";
     protected static final String CRITEO_PUBLISHER_ID = "cpId";
     private CriteoInterstitial criteoInterstitial;
@@ -57,7 +56,7 @@ public class CriteoMopubInterstitialAdapter extends CustomEventInterstitial {
             Criteo.getInstance();
             InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit(adUnitId);
             criteoInterstitial = new CriteoInterstitial(context, interstitialAdUnit);
-            MopubInterstitialListenerImpl listener = new MopubInterstitialListenerImpl(customEventInterstitialListener);
+            CriteoInterstitialEventListener listener = new CriteoInterstitialEventListener(customEventInterstitialListener);
             criteoInterstitial.setCriteoInterstitialAdListener(listener);
             criteoInterstitial.setCriteoInterstitialAdDisplayListener(listener);
             criteoInterstitial.loadAd();

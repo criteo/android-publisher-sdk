@@ -1,8 +1,10 @@
-package com.criteo.mediation.mopubadapter;
+package com.criteo.mediation.mopub;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+
+import com.criteo.mediation.mopub.CriteoInterstitialAdapter;
 import com.mopub.mobileads.CustomEventBanner;
 import com.mopub.mobileads.CustomEventInterstitial;
 import com.mopub.mobileads.MoPubErrorCode;
@@ -27,7 +29,7 @@ public class CriteoMopubInterstitialAdapterTest {
     private Context context;
     private Map<String, Object> localExtras;
     private Map<String, String> serverExtras;
-    private CriteoMopubInterstitialAdapter criteoMopubInterstitialAdapter;
+    private CriteoInterstitialAdapter criteoMopubInterstitialAdapter;
 
     @Mock
     private CustomEventInterstitial.CustomEventInterstitialListener customEventInterstitialListener;
@@ -38,7 +40,7 @@ public class CriteoMopubInterstitialAdapterTest {
         MockitoAnnotations.initMocks(this);
         localExtras = new HashMap<String, Object>();
         serverExtras = new HashMap<String, String>();
-        criteoMopubInterstitialAdapter = new CriteoMopubInterstitialAdapter();
+        criteoMopubInterstitialAdapter = new CriteoInterstitialAdapter();
     }
 
     // serverExtras and localExtras are empty

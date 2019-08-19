@@ -1,4 +1,4 @@
-package com.criteo.mediation.mopubadapter;
+package com.criteo.mediation.mopub;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -8,7 +8,7 @@ import com.mopub.common.OnNetworkInitializationFinishedListener;
 import com.mopub.mobileads.MoPubErrorCode;
 import java.util.Map;
 
-public class CriteoMopubBaseAdapterConfiguration extends BaseAdapterConfiguration {
+public class CriteoBaseAdapterConfiguration extends BaseAdapterConfiguration {
 
     private String adapterVersion;
     private String networkSdkVersion;
@@ -47,7 +47,7 @@ public class CriteoMopubBaseAdapterConfiguration extends BaseAdapterConfiguratio
         this.adapterVersion = "3.0.0.1";
         this.moPubNetworkName = "Criteo";
 
-        listener.onNetworkInitializationFinished(CriteoMopubBaseAdapterConfiguration.class,
+        listener.onNetworkInitializationFinished(CriteoBaseAdapterConfiguration.class,
                 MoPubErrorCode.ADAPTER_INITIALIZATION_SUCCESS);
     }
 }

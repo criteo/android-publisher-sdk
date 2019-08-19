@@ -1,13 +1,10 @@
-package com.criteo.mediation.adapter;
+package com.criteo.mediation.google;
 
 import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import com.criteo.mediation.listener.CriteoBannerEventListenerImpl;
-import com.criteo.mediation.listener.CriteoInterstitialEventListenerImpl;
-import com.criteo.mediation.model.FormatType;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
@@ -28,9 +25,9 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class CriteoGoogleAdapter implements CustomEventBanner, CustomEventInterstitial {
+public class CriteoAdapter implements CustomEventBanner, CustomEventInterstitial {
 
-    protected static final String TAG = CriteoGoogleAdapter.class.getSimpleName();
+    protected static final String TAG = CriteoAdapter.class.getSimpleName();
 
     protected static final String CRITEO_PUBLISHER_ID = "cpId";
     protected static final String AD_UNIT_ID = "adUnitId";
@@ -39,6 +36,11 @@ public class CriteoGoogleAdapter implements CustomEventBanner, CustomEventInters
     private CriteoBannerView criteoBanner;
     private BannerAdUnit bannerAdUnit;
     private InterstitialAdUnit interstitialAdUnit;
+
+    private enum FormatType {
+        BANNER,
+        INTERSTITIAL
+    }
 
     @Override
     public void requestBannerAd(Context context,
@@ -58,7 +60,7 @@ public class CriteoGoogleAdapter implements CustomEventBanner, CustomEventInters
 
             if (initialize(context, serverParameter, size, FormatType.BANNER)) {
                 criteoBanner = new CriteoBannerView(context, bannerAdUnit);
-                CriteoBannerAdListener criteoBannerAdListener = new CriteoBannerEventListenerImpl(listener);
+                CriteoBannerAdListener criteoBannerAdListener = new CriteoBannerEventListener(listener);
                 criteoBanner.setCriteoBannerAdListener(criteoBannerAdListener);
                 criteoBanner.loadAd();
             } else {
@@ -90,7 +92,7 @@ public class CriteoGoogleAdapter implements CustomEventBanner, CustomEventInters
 
             if (initialize(context, serverParameter, null, FormatType.INTERSTITIAL)) {
                 criteoInterstitial = new CriteoInterstitial(context, interstitialAdUnit);
-                CriteoInterstitialEventListenerImpl criteoInterstitialEventListener = new CriteoInterstitialEventListenerImpl(
+                CriteoInterstitialEventListener criteoInterstitialEventListener = new CriteoInterstitialEventListener(
                         listener);
                 criteoInterstitial.setCriteoInterstitialAdListener(criteoInterstitialEventListener);
                 criteoInterstitial.setCriteoInterstitialAdDisplayListener(criteoInterstitialEventListener);

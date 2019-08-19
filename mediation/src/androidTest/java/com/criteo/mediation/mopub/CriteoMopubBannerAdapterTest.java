@@ -1,8 +1,9 @@
-package com.criteo.mediation.mopubadapter;
+package com.criteo.mediation.mopub;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+
 import com.mopub.mobileads.CustomEventBanner;
 import com.mopub.mobileads.MoPubErrorCode;
 import java.util.HashMap;
@@ -26,7 +27,7 @@ public class CriteoMopubBannerAdapterTest {
     private Context context;
     private Map<String, Object> localExtras;
     private Map<String, String> serverExtras;
-    private CriteoMopubBannerAdapter criteoMopubBannerAdapter;
+    private CriteoBannerAdapter criteoMopubBannerAdapter;
 
     @Mock
     private CustomEventBanner.CustomEventBannerListener customEventBannerListener;
@@ -43,7 +44,7 @@ public class CriteoMopubBannerAdapterTest {
     // serverExtras and localExtras are empty
     @Test
     public void requestBannerAdWithEmptyParameters() {
-        criteoMopubBannerAdapter = new CriteoMopubBannerAdapter();
+        criteoMopubBannerAdapter = new CriteoBannerAdapter();
         criteoMopubBannerAdapter.loadBanner(context, customEventBannerListener, localExtras, serverExtras);
 
         Mockito.verify(customEventBannerListener, Mockito.times(1))
@@ -54,7 +55,7 @@ public class CriteoMopubBannerAdapterTest {
 
     @Test
     public void requestBannerAdWithNullAdSize() {
-        criteoMopubBannerAdapter = new CriteoMopubBannerAdapter();
+        criteoMopubBannerAdapter = new CriteoBannerAdapter();
         serverExtras.put(ADUNIT_ID, BANNER_ADUNIT_ID);
         serverExtras.put(CRITEO_PUBLISHER_ID, "123");
         localExtras.put("Test", "local extras shouldnt be empty");
@@ -68,7 +69,7 @@ public class CriteoMopubBannerAdapterTest {
 
     @Test
     public void requestBannerAdWithNullPublisherId() {
-        criteoMopubBannerAdapter = new CriteoMopubBannerAdapter();
+        criteoMopubBannerAdapter = new CriteoBannerAdapter();
         serverExtras.put(ADUNIT_ID, BANNER_ADUNIT_ID);
         localExtras.put(MOPUB_WIDTH, 320);
         localExtras.put(MOPUB_HEIGHT, 50);
@@ -82,7 +83,7 @@ public class CriteoMopubBannerAdapterTest {
 
     @Test
     public void requestBannerAdWithNullAdUnitId() {
-        criteoMopubBannerAdapter = new CriteoMopubBannerAdapter();
+        criteoMopubBannerAdapter = new CriteoBannerAdapter();
         serverExtras.put(CRITEO_PUBLISHER_ID, "123");
         localExtras.put(MOPUB_WIDTH, 320);
         localExtras.put(MOPUB_HEIGHT, 50);
@@ -96,7 +97,7 @@ public class CriteoMopubBannerAdapterTest {
 
     @Test
     public void requestBannerAdWithNullCriteo() {
-        criteoMopubBannerAdapter = new CriteoMopubBannerAdapter();
+        criteoMopubBannerAdapter = new CriteoBannerAdapter();
         serverExtras.put(CRITEO_PUBLISHER_ID, "123");
         serverExtras.put(ADUNIT_ID, BANNER_ADUNIT_ID);
         localExtras.put(MOPUB_WIDTH, 320);

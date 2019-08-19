@@ -1,13 +1,11 @@
-package com.criteo.mediation.mopubadapter;
+package com.criteo.mediation.mopub;
 
-import static com.mopub.common.logging.MoPubLog.AdapterLogEvent.CUSTOM;
 import static com.mopub.common.logging.MoPubLog.AdapterLogEvent.LOAD_ATTEMPTED;
 import static com.mopub.common.logging.MoPubLog.AdapterLogEvent.LOAD_FAILED;
 
 import android.app.Application;
 import android.content.Context;
 import android.text.TextUtils;
-import com.criteo.mediation.listener.MopubBannerListenerImpl;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoInitException;
@@ -21,9 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class CriteoMopubBannerAdapter extends CustomEventBanner {
+public class CriteoBannerAdapter extends CustomEventBanner {
 
-    private static final String TAG = CriteoMopubBannerAdapter.class.getSimpleName();
+    private static final String TAG = CriteoBannerAdapter.class.getSimpleName();
     protected static final String ADUNIT_ID = "adUnitId";
     protected static final String CRITEO_PUBLISHER_ID = "cpId";
     protected static final String MOPUB_WIDTH = "com_mopub_ad_width";
@@ -61,7 +59,7 @@ public class CriteoMopubBannerAdapter extends CustomEventBanner {
             Criteo.getInstance();
             BannerAdUnit bannerAdUnit = new BannerAdUnit(adUnitId, adSize);
             bannerView = new CriteoBannerView(context, bannerAdUnit);
-            MopubBannerListenerImpl listener = new MopubBannerListenerImpl(customEventBannerListener);
+            CriteoBannerEventListener listener = new CriteoBannerEventListener(customEventBannerListener);
             bannerView.setCriteoBannerAdListener(listener);
             bannerView.loadAd();
             MoPubLog.log(LOAD_ATTEMPTED, TAG, "Bannerview loading");

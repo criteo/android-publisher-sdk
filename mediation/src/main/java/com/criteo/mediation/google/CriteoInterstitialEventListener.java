@@ -1,4 +1,4 @@
-package com.criteo.mediation.listener;
+package com.criteo.mediation.google;
 
 
 import com.criteo.publisher.CriteoErrorCode;
@@ -7,12 +7,12 @@ import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.mediation.customevent.CustomEventInterstitialListener;
 
-public class CriteoInterstitialEventListenerImpl implements CriteoInterstitialAdListener,
+public class CriteoInterstitialEventListener implements CriteoInterstitialAdListener,
         CriteoInterstitialAdDisplayListener {
 
     private CustomEventInterstitialListener customEventInterstitialListener;
 
-    public CriteoInterstitialEventListenerImpl(CustomEventInterstitialListener listener) {
+    public CriteoInterstitialEventListener(CustomEventInterstitialListener listener) {
         customEventInterstitialListener = listener;
     }
 

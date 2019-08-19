@@ -1,18 +1,17 @@
-package com.criteo.mediation.listener;
+package com.criteo.mediation.mopub;
 
 import com.criteo.publisher.CriteoErrorCode;
-import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.mopub.mobileads.CustomEventInterstitial.CustomEventInterstitialListener;
 import com.mopub.mobileads.MoPubErrorCode;
 
-public class MopubInterstitialListenerImpl implements CriteoInterstitialAdListener ,
+public class CriteoInterstitialEventListener implements CriteoInterstitialAdListener ,
         CriteoInterstitialAdDisplayListener {
 
     private CustomEventInterstitialListener customEventInterstitialListener;
 
-    public MopubInterstitialListenerImpl(CustomEventInterstitialListener listener) {
+    public CriteoInterstitialEventListener(CustomEventInterstitialListener listener) {
         customEventInterstitialListener = listener;
     }
 

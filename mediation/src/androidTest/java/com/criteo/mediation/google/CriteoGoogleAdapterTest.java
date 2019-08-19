@@ -1,10 +1,10 @@
-package com.criteo.mediation.adapter;
+package com.criteo.mediation.google;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
-import com.criteo.publisher.CriteoBannerView;
+
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.mediation.MediationAdRequest;
@@ -39,13 +39,13 @@ public class CriteoGoogleAdapterTest {
     private MediationAdRequest mediationAdRequest;
 
     private Bundle customEventExtras;
-    private CriteoGoogleAdapter criteoGoogleAdapter;
+    private CriteoAdapter criteoGoogleAdapter;
 
 
     @Before
     public void setUp() {
         context = InstrumentationRegistry.getContext();
-        criteoGoogleAdapter = new CriteoGoogleAdapter();
+        criteoGoogleAdapter = new CriteoAdapter();
         MockitoAnnotations.initMocks(this);
         customEventExtras = new Bundle();
     }
