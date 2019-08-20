@@ -31,8 +31,8 @@
     public *;
 }
 
--keep public class com.criteo.mediation.listener.CriteoInterstitialEventListenerImpl
--keepclassmembers class com.criteo.mediation.adapter.CriteoInterstitialEventListenerImpl {
+-keep public class com.criteo.mediation.listener.CriteoInterstitialEventListener
+-keepclassmembers class com.criteo.mediation.adapter.CriteoInterstitialEventListener {
     public *;
 }
 

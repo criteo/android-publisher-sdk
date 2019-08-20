@@ -42,7 +42,7 @@ public class MopubMediationActivity extends AppCompatActivity {
         createInterstitialAdListener();
 
         final SdkConfiguration.Builder configBuilder = new SdkConfiguration.Builder(SDK_BUILD_ID)
-                .withAdditionalNetwork("com.criteo.mediation.mopubadapter.CriteoMopubBaseAdapterConfiguration");
+                .withAdditionalNetwork("com.criteo.mediation.mopub.CriteoBaseAdapterConfiguration");
 
         if (BuildConfig.DEBUG) {
             configBuilder.withLogLevel(DEBUG);
@@ -118,8 +118,7 @@ public class MopubMediationActivity extends AppCompatActivity {
     }
 
     private void onInterstitialClick() {
-        InterstitialAdUnit moPubInterstitialAdUnit = new InterstitialAdUnit(
-                MOPUB_INTERSTITIAL_ADUNIT_ID);
+        InterstitialAdUnit moPubInterstitialAdUnit = new InterstitialAdUnit(MOPUB_INTERSTITIAL_ADUNIT_ID);
         mInterstitial = new MoPubInterstitial(this, MOPUB_INTERSTITIAL_ADUNIT_ID);
         criteo.setBidsForAdUnit(mInterstitial, moPubInterstitialAdUnit);
         mInterstitial.setInterstitialAdListener(interstitialAdListener);
