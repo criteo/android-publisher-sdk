@@ -43,4 +43,9 @@ public class CriteoBannerEventListener implements CriteoBannerAdListener {
         customEventBannerListener.onAdLeftApplication();
     }
 
+    @Override
+    public void onAdClicked() {
+
+    }
+
 }

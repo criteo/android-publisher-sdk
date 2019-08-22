@@ -14,4 +14,6 @@ public interface CriteoAdListener {
      */
     void onAdLeftApplication();
 
+    void onAdClicked();
+
 }

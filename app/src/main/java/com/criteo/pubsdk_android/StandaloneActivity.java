@@ -110,6 +110,11 @@ public class StandaloneActivity extends AppCompatActivity {
             }
 
             @Override
+            public void onAdClicked() {
+
+            }
+
+            @Override
             public void onAdFailedToReceive(CriteoErrorCode code) {
                 Log.d(TAG, "Banner ad failed, reason : " + code.toString());
             }
@@ -135,6 +140,11 @@ public class StandaloneActivity extends AppCompatActivity {
             @Override
             public void onAdLeftApplication() {
                 Log.d(TAG, "Interstitial ad clicked");
+            }
+
+            @Override
+            public void onAdClicked() {
+
             }
 
             @Override
