@@ -1,7 +1,7 @@
 package com.criteo.publisher.Util;
 
-import static com.criteo.publisher.Util.CriteoResultReceiver.ACTION_CLICKED;
 import static com.criteo.publisher.Util.CriteoResultReceiver.ACTION_CLOSED;
+import static com.criteo.publisher.Util.CriteoResultReceiver.ACTION_LEFT_CLICKED;
 import static com.criteo.publisher.Util.CriteoResultReceiver.INTERSTITIAL_ACTION;
 import static com.criteo.publisher.Util.CriteoResultReceiver.RESULT_CODE_SUCCESSFUL;
 
@@ -36,7 +36,7 @@ public class CriteoResultReceiverTest {
     @Test
     public void sendOnClick() {
         bundle = new Bundle();
-        bundle.putInt(INTERSTITIAL_ACTION, ACTION_CLICKED);
+        bundle.putInt(INTERSTITIAL_ACTION, ACTION_LEFT_CLICKED);
         criteoResultReceiver.onReceiveResult(RESULT_CODE_SUCCESSFUL, bundle);
 
         Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdLeftApplication();

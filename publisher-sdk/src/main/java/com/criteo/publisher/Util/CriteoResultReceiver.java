@@ -9,8 +9,9 @@ public class CriteoResultReceiver extends ResultReceiver {
 
     public static final String INTERSTITIAL_ACTION = "Action";
     public static final int RESULT_CODE_SUCCESSFUL = 100;
-    public static final int ACTION_CLICKED = 200;
     public static final int ACTION_CLOSED = 201;
+    public static final int ACTION_LEFT_CLICKED = 202;
+
 
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
@@ -32,12 +33,13 @@ public class CriteoResultReceiver extends ResultReceiver {
             int action = resultData.getInt(INTERSTITIAL_ACTION);
 
             switch (action) {
-                case ACTION_CLICKED:
-                    criteoInterstitialAdListener.onAdLeftApplication();
-                    break;
 
                 case ACTION_CLOSED:
                     criteoInterstitialAdListener.onAdClosed();
+                    break;
+                case ACTION_LEFT_CLICKED:
+                    criteoInterstitialAdListener.onAdClicked();
+                    criteoInterstitialAdListener.onAdLeftApplication();
                     break;
 
                 default:

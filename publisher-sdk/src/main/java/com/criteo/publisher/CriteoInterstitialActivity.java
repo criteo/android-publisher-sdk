@@ -1,7 +1,7 @@
 package com.criteo.publisher;
 
-import static com.criteo.publisher.Util.CriteoResultReceiver.ACTION_CLICKED;
 import static com.criteo.publisher.Util.CriteoResultReceiver.ACTION_CLOSED;
+import static com.criteo.publisher.Util.CriteoResultReceiver.ACTION_LEFT_CLICKED;
 import static com.criteo.publisher.Util.CriteoResultReceiver.INTERSTITIAL_ACTION;
 import static com.criteo.publisher.Util.CriteoResultReceiver.RESULT_CODE_SUCCESSFUL;
 
@@ -18,8 +18,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
-
-import com.criteo.publisher.R;
 
 public class CriteoInterstitialActivity extends Activity {
 
@@ -116,7 +114,7 @@ public class CriteoInterstitialActivity extends Activity {
             view.getContext().startActivity(
                     new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
             Bundle bundle = new Bundle();
-            bundle.putInt(INTERSTITIAL_ACTION, ACTION_CLICKED);
+            bundle.putInt(INTERSTITIAL_ACTION, ACTION_LEFT_CLICKED);
             resultReceiver.send(RESULT_CODE_SUCCESSFUL, bundle);
             finish();
             return true;
