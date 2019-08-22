@@ -21,42 +21,42 @@
 #-renamesourcefileattribute SourceFile
 -keepparameternames
 
--keep public class com.criteo.mediation.adapter.CriteoGoogleAdapter
--keepclassmembers class com.criteo.mediation.adapter.CriteoGoogleAdapter {
+-keep public class com.criteo.mediation.google.CriteoAdapter
+-keepclassmembers class com.criteo.mediation.google.CriteoAdapter {
     public *;
 }
 
--keep public class com.criteo.mediation.listener.CriteoBannerEventListenerImpl
--keepclassmembers class com.criteo.mediation.adapter.CriteoBannerEventListenerImpl {
+-keep public class com.criteo.mediation.google.CriteoBannerEventListener
+-keepclassmembers class com.criteo.mediation.google.CriteoBannerEventListener {
     public *;
 }
 
--keep public class com.criteo.mediation.listener.CriteoInterstitialEventListener
--keepclassmembers class com.criteo.mediation.adapter.CriteoInterstitialEventListener {
+-keep public class com.criteo.mediation.google.CriteoInterstitialEventListener
+-keepclassmembers class com.criteo.mediation.google.CriteoInterstitialEventListener {
     public *;
 }
 
--keep public class com.criteo.mediation.listener.MopubBannerListenerImpl
--keepclassmembers class com.criteo.mediation.adapter.MopubBannerListenerImpl {
+-keep public class com.criteo.mediation.mopub.CriteoBannerEventListener
+-keepclassmembers class com.criteo.mediation.mopub.CriteoBannerEventListener {
     public *;
 }
 
--keep public class com.criteo.mediation.listener.MopubInterstitialListenerImpl
--keepclassmembers class com.criteo.mediation.adapter.MopubInterstitialListenerImpl {
+-keep public class com.criteo.mediation.mopub.CriteoInterstitialEventListener
+-keepclassmembers class com.criteo.mediation.mopub.CriteoInterstitialEventListener {
     public *;
 }
 
--keep public class com.criteo.mediation.mopubadapter.CriteoMopubBannerAdapter
--keepclassmembers class com.criteo.mediation.mopubadapter.CriteoMopubBannerAdapter {
+-keep public class com.criteo.mediation.mopub.CriteoBannerAdapter
+-keepclassmembers class com.criteo.mediation.mopub.CriteoBannerAdapter {
     public *;
 }
 
--keep public class com.criteo.mediation.mopubadapter.CriteoMopubBaseAdapterConfiguration
--keepclassmembers class com.criteo.mediation.mopubadapter.CriteoMopubBaseAdapterConfiguration {
+-keep public class com.criteo.mediation.mopub.CriteoBaseAdapterConfiguration
+-keepclassmembers class com.criteo.mediation.mopub.CriteoBaseAdapterConfiguration {
     public *;
 }
 
--keep public class com.criteo.mediation.mopubadapter.CriteoMopubInterstitialAdapter
--keepclassmembers class com.criteo.mediation.mopubadapter.CriteoMopubInterstitialAdapter {
+-keep public class com.criteo.mediation.mopub.CriteoInterstitialAdapter
+-keepclassmembers class com.criteo.mediation.mopub.CriteoInterstitialAdapter {
     public *;
 }
