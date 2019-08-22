@@ -43,8 +43,8 @@ public class CriteoBaseAdapterConfiguration extends BaseAdapterConfiguration {
     public void initializeNetwork(@NonNull Context context, @Nullable Map<String, String> configuration,
             @NonNull OnNetworkInitializationFinishedListener listener) {
 
-        this.networkSdkVersion = "3.0.0";
-        this.adapterVersion = "3.0.0.1";
+        this.networkSdkVersion = "3.1.0";
+        this.adapterVersion = "3.1.0.1";
         this.moPubNetworkName = "Criteo";
 
         listener.onNetworkInitializationFinished(CriteoBaseAdapterConfiguration.class,
