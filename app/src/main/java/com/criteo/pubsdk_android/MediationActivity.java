@@ -89,27 +89,25 @@ public class MediationActivity extends AppCompatActivity {
             @Override
             public void onAdClicked() {
                 super.onAdClicked();
+                Log.d(TAG, "Mediation - Banner onAdClicked");
             }
 
-            @Override
-            public void onAdImpression() {
-                super.onAdImpression();
-            }
 
             @Override
             public void onAdLeftApplication() {
                 super.onAdLeftApplication();
+                Log.d(TAG, "Mediation - Banner onAdClicked");
             }
 
             @Override
             public void onAdFailedToLoad(int errorCode) {
-                Log.d(TAG, "Mediation - Banner ad failed");
+                Log.d(TAG, "Mediation - Banner onAdFailedToLoad");
 
             }
 
             @Override
             public void onAdLoaded() {
-                Log.d(TAG, "Mediation - Banner ad loaded");
+                Log.d(TAG, "Mediation - Banner onAdLoaded");
 
                 layout.addView(bannerView);
 
@@ -117,10 +115,12 @@ public class MediationActivity extends AppCompatActivity {
 
             @Override
             public void onAdOpened() {
+                Log.d(TAG, "Mediation - Banner onAdOpened");
             }
 
             @Override
             public void onAdClosed() {
+                Log.d(TAG, "Mediation - Banner onAdClosed");
             }
         };
 
@@ -128,27 +128,24 @@ public class MediationActivity extends AppCompatActivity {
             @Override
             public void onAdClicked() {
                 super.onAdClicked();
-            }
-
-            @Override
-            public void onAdImpression() {
-                super.onAdImpression();
+                Log.d(TAG, "Mediation - Interstitial onAdClicked");
             }
 
             @Override
             public void onAdLeftApplication() {
                 super.onAdLeftApplication();
+                Log.d(TAG, "Mediation - Interstitial onAdLeftApplication");
             }
 
             @Override
             public void onAdFailedToLoad(int errorCode) {
-                Log.d(TAG, "Mediation - Interstitial ad failed");
+                Log.d(TAG, "Mediation - Interstitial onAdFailedToLoad");
 
             }
 
             @Override
             public void onAdLoaded() {
-                Log.d(TAG, "Mediation - Interstitial ad loaded");
+                Log.d(TAG, "Mediation - Interstitial onAdLoaded");
                 if (interstitialAd != null) {
                     interstitialAd.show();
                 }
@@ -156,10 +153,12 @@ public class MediationActivity extends AppCompatActivity {
 
             @Override
             public void onAdOpened() {
+                Log.d(TAG, "Mediation - Interstitial onAdOpened");
             }
 
             @Override
             public void onAdClosed() {
+                Log.d(TAG, "Mediation - Interstitial onAdClosed");
             }
         };
     }
