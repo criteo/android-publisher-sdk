@@ -5,18 +5,17 @@ import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoListenerCode;
-
 import java.lang.ref.WeakReference;
 
 public class CriteoBannerListenerCallTask extends AsyncTask<Object, Void, Object> {
+
     private CriteoBannerAdListener adListener;
     private WeakReference<CriteoBannerView> view;
 
     /**
-     * Task that calls the relevant callback in the criteoBannerAdListener
-     * based on the CriteoListenerCode passed to execute.
-     * Passes the criteoBannerView as a parameter to the onAdReceived callback if
-     * the CriteoListenerCode is valid
+     * Task that calls the relevant callback in the criteoBannerAdListener based on the CriteoListenerCode passed to
+     * execute. Passes the criteoBannerView as a parameter to the onAdReceived callback if the CriteoListenerCode is
+     * valid
      */
     public CriteoBannerListenerCallTask(CriteoBannerAdListener criteoBannerAdListener
             , CriteoBannerView criteoBannerView) {
@@ -34,7 +33,7 @@ public class CriteoBannerListenerCallTask extends AsyncTask<Object, Void, Object
 
     @Override
     protected void onPostExecute(Object object) {
-        if(adListener != null) {
+        if (adListener != null) {
             if (object == null) {
                 adListener.onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
             } else {
@@ -48,6 +47,7 @@ public class CriteoBannerListenerCallTask extends AsyncTask<Object, Void, Object
                         break;
                     case CLICK:
                         adListener.onAdLeftApplication();
+                        adListener.onAdOpened();
                         break;
                 }
             }
