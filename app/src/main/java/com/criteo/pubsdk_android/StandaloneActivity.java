@@ -106,55 +106,66 @@ public class StandaloneActivity extends AppCompatActivity {
         criteoBannerAdListener = new CriteoBannerAdListener() {
             @Override
             public void onAdLeftApplication() {
-                Log.d(TAG, "Banner ad clicked");
+                Log.d(TAG, "Standalone - Banner onAdLeftApplication");
             }
 
             @Override
             public void onAdClicked() {
+                Log.d(TAG, "Standalone - Banner onAdClicked");
+            }
 
+            @Override
+            public void onAdOpened() {
+                Log.d(TAG, "Standalone - Banner onAdOpened");
+            }
+
+            @Override
+            public void onAdClosed() {
+                Log.d(TAG, "Standalone - Banner onAdClosed");
             }
 
             @Override
             public void onAdFailedToReceive(CriteoErrorCode code) {
-                Log.d(TAG, "Banner ad failed, reason : " + code.toString());
+                Log.d(TAG, "Standalone - Banner onAdClicked, reason : " + code.toString());
             }
 
             @Override
             public void onAdReceived(View view) {
-                Log.d(TAG, "Banner ad loaded");
+                Log.d(TAG, "Standalone - Banner onAdReceived");
             }
+
         };
 
         criteoInterstitialAdListener = new CriteoInterstitialAdListener() {
             @Override
             public void onAdReceived() {
                 buttonStandAloneInterstitial.setEnabled(true);
-                Log.d(TAG, "Interstitial ad loaded");
+                Log.d(TAG, "Standalone - Interstitial onAdReceived");
             }
 
             @Override
             public void onAdFailedToReceive(CriteoErrorCode code) {
-                Log.d(TAG, "Interstitial ad failed");
+                Log.d(TAG, "Standalone - Interstitial onAdFailedToReceive");
             }
 
             @Override
             public void onAdLeftApplication() {
-                Log.d(TAG, "Interstitial ad clicked");
+                Log.d(TAG, "Standalone - Interstitial onAdLeftApplication");
             }
 
             @Override
             public void onAdClicked() {
-
+                Log.d(TAG, "Standalone - Interstitial onAdClicked");
             }
 
             @Override
             public void onAdOpened() {
-                Log.d(TAG, "Interstitial ad full screen");
+                Log.d(TAG, "Standalone - Interstitial onAdOpened");
             }
 
             @Override
             public void onAdClosed() {
-                Log.d(TAG, "Interstitial ad closed");
+                Log.d(TAG, "Standalone - Interstitial onAdClosed");
             }
         };
 

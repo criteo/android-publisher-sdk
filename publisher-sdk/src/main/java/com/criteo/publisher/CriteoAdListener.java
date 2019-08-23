@@ -14,6 +14,19 @@ public interface CriteoAdListener {
      */
     void onAdLeftApplication();
 
+    /**
+     * Called when Ad link clicked.
+     */
     void onAdClicked();
+
+    /**
+     * Called when browser opened
+     */
+    void onAdOpened();
+
+    /**
+     * Called when browser closed
+     */
+    void onAdClosed();
 
 }

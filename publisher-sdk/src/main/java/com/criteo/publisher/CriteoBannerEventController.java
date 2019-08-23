@@ -6,13 +6,12 @@ import android.os.AsyncTask;
 import android.webkit.URLUtil;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
 import com.criteo.publisher.Util.AdUnitType;
-import com.criteo.publisher.tasks.CriteoBannerListenerCallTask;
-import com.criteo.publisher.tasks.CriteoBannerLoadTask;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
+import com.criteo.publisher.tasks.CriteoBannerListenerCallTask;
+import com.criteo.publisher.tasks.CriteoBannerLoadTask;
 import java.lang.ref.WeakReference;
 
 
@@ -36,14 +35,14 @@ public class CriteoBannerEventController {
         }
 
         CriteoListenerCode code = CriteoListenerCode.INVALID;
-        if(slot != null && slot.isValid() && URLUtil.isValidUrl(slot.getDisplayUrl())) {
+        if (slot != null && slot.isValid() && URLUtil.isValidUrl(slot.getDisplayUrl())) {
             code = CriteoListenerCode.VALID;
         }
 
         listenerCallTask = new CriteoBannerListenerCallTask(this.adListener, view.get());
         listenerCallTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, code);
 
-        if(CriteoListenerCode.VALID == code) {
+        if (CriteoListenerCode.VALID == code) {
             loadTask = new CriteoBannerLoadTask(view.get(), createWebViewClient());
             // Must run on UI thread as it is displaying the fetched ad
             loadTask.execute(slot);
@@ -54,14 +53,14 @@ public class CriteoBannerEventController {
         TokenValue tokenValue = Criteo.getInstance().getTokenValue(bidToken, AdUnitType.CRITEO_BANNER);
 
         CriteoListenerCode code = CriteoListenerCode.INVALID;
-        if(tokenValue != null && URLUtil.isValidUrl(tokenValue.getDisplayUrl())) {
+        if (tokenValue != null && URLUtil.isValidUrl(tokenValue.getDisplayUrl())) {
             code = CriteoListenerCode.VALID;
         }
 
         listenerCallTask = new CriteoBannerListenerCallTask(this.adListener, view.get());
         listenerCallTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, code);
 
-        if(CriteoListenerCode.VALID == code) {
+        if (CriteoListenerCode.VALID == code) {
             loadTask = new CriteoBannerLoadTask(view.get(), createWebViewClient());
             // Must run on UI thread as it is displaying the fetched ad
             loadTask.execute(tokenValue);

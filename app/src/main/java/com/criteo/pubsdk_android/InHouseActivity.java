@@ -105,17 +105,27 @@ public class InHouseActivity extends AppCompatActivity {
         criteoBannerAdListener = new CriteoBannerAdListener() {
             @Override
             public void onAdLeftApplication() {
-                Log.d(TAG, "Banner ad clicked");
+                Log.d(TAG, "Inhouse - Banner onAdLeftApplication");
             }
 
             @Override
             public void onAdClicked() {
+                Log.d(TAG, "Inhouse - Banner onAdClicked");
+            }
 
+            @Override
+            public void onAdOpened() {
+                Log.d(TAG, "Inhouse - Banner onAdOpened");
+            }
+
+            @Override
+            public void onAdClosed() {
+                Log.d(TAG, "Inhouse - Banner onAdClosed");
             }
 
             @Override
             public void onAdFailedToReceive(CriteoErrorCode code) {
-                Log.d(TAG, "Banner ad failed, reason : " + code.toString());
+                Log.d(TAG, "Inhouse - Banner onAdFailedToReceive, reason : " + code.toString());
             }
 
             @Override
@@ -130,32 +140,32 @@ public class InHouseActivity extends AppCompatActivity {
             @Override
             public void onAdReceived() {
                 buttonInhouseInterstitial.setEnabled(true);
-                Log.d(TAG, "Interstitial ad loaded");
+                Log.d(TAG, "Inhouse - Interstitial onAdReceived");
             }
 
             @Override
             public void onAdFailedToReceive(CriteoErrorCode code) {
-                Log.d(TAG, "Interstitial ad failed");
+                Log.d(TAG, "Inhouse - Interstitial onAdFailedToReceive, reason: " + code.toString());
             }
 
             @Override
             public void onAdLeftApplication() {
-                Log.d(TAG, "Interstitial ad clicked");
+                Log.d(TAG, "Inhouse - Interstitial onAdLeftApplication");
             }
 
             @Override
             public void onAdClicked() {
-
+                Log.d(TAG, "Inhouse - Interstitial onAdClicked");
             }
 
             @Override
             public void onAdOpened() {
-                Log.d(TAG, "Interstitial ad full screen");
+                Log.d(TAG, "Inhouse - Interstitial onAdOpened");
             }
 
             @Override
             public void onAdClosed() {
-                Log.d(TAG, "Interstitial ad closed");
+                Log.d(TAG, "Inhouse - Interstitial onAdClosed");
             }
         };
     }
