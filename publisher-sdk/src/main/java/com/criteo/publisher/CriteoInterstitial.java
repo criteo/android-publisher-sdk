@@ -5,14 +5,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-
 import com.criteo.publisher.Util.CriteoResultReceiver;
 import com.criteo.publisher.controller.WebViewDownloader;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.WebViewData;
 
 public class CriteoInterstitial {
+
     private static final String TAG = CriteoInterstitial.class.getSimpleName();
+    protected static final String WEB_VIEW_DATA = "webviewdata";
+    protected static final String RESULT_RECEIVER = "resultreceiver";
 
     private InterstitialAdUnit interstitialAdUnit;
 
@@ -35,7 +37,8 @@ public class CriteoInterstitial {
 
     }
 
-    public void setCriteoInterstitialAdDisplayListener(CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener) {
+    public void setCriteoInterstitialAdDisplayListener(
+            CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener) {
         this.criteoInterstitialAdDisplayListener = criteoInterstitialAdDisplayListener;
 
     }
@@ -51,7 +54,8 @@ public class CriteoInterstitial {
     private void doLoadAd() {
         if (criteoInterstitialEventController == null) {
             criteoInterstitialEventController = new CriteoInterstitialEventController(
-                    criteoInterstitialAdListener,criteoInterstitialAdDisplayListener, new WebViewDownloader(new WebViewData()));
+                    criteoInterstitialAdListener, criteoInterstitialAdDisplayListener,
+                    new WebViewDownloader(new WebViewData()));
         }
         criteoInterstitialEventController.fetchAdAsync(interstitialAdUnit);
     }
@@ -67,7 +71,8 @@ public class CriteoInterstitial {
     private void doLoadAd(BidToken bidToken) {
         if (criteoInterstitialEventController == null) {
             criteoInterstitialEventController = new CriteoInterstitialEventController(
-                    criteoInterstitialAdListener,criteoInterstitialAdDisplayListener,  new WebViewDownloader(new WebViewData()));
+                    criteoInterstitialAdListener, criteoInterstitialAdDisplayListener,
+                    new WebViewDownloader(new WebViewData()));
         }
         criteoInterstitialEventController.fetchAdAsync(bidToken);
     }
@@ -97,10 +102,10 @@ public class CriteoInterstitial {
             Intent intent = new Intent(context, CriteoInterstitialActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             Bundle bundle = new Bundle();
-            bundle.putString("webviewdata", criteoInterstitialEventController.getWebViewDataContent());
+            bundle.putString(WEB_VIEW_DATA, criteoInterstitialEventController.getWebViewDataContent());
             CriteoResultReceiver criteoResultReceiver = new CriteoResultReceiver(new Handler(),
                     criteoInterstitialAdListener);
-            bundle.putParcelable("resultreceiver", criteoResultReceiver);
+            bundle.putParcelable(RESULT_RECEIVER, criteoResultReceiver);
             intent.putExtras(bundle);
             if (criteoInterstitialAdListener != null) {
                 criteoInterstitialAdListener.onAdOpened();

@@ -1,5 +1,7 @@
 package com.criteo.publisher;
 
+import static com.criteo.publisher.CriteoInterstitial.RESULT_RECEIVER;
+import static com.criteo.publisher.CriteoInterstitial.WEB_VIEW_DATA;
 import static com.criteo.publisher.Util.CriteoResultReceiver.ACTION_CLOSED;
 import static com.criteo.publisher.Util.CriteoResultReceiver.ACTION_LEFT_CLICKED;
 import static com.criteo.publisher.Util.CriteoResultReceiver.INTERSTITIAL_ACTION;
@@ -40,9 +42,9 @@ public class CriteoInterstitialActivity extends Activity {
         prepareWebView();
 
         Bundle bundle = getIntent().getExtras();
-        if (bundle != null && bundle.getString("webviewdata") != null) {
-            String webViewData = bundle.getString("webviewdata");
-            resultReceiver = bundle.getParcelable("resultreceiver");
+        if (bundle != null && bundle.getString(WEB_VIEW_DATA) != null) {
+            String webViewData = bundle.getString(WEB_VIEW_DATA);
+            resultReceiver = bundle.getParcelable(RESULT_RECEIVER);
             displayWebView(webViewData);
         }
 

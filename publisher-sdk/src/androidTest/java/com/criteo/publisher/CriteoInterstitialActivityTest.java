@@ -2,6 +2,8 @@ package com.criteo.publisher;
 
 import static android.support.test.runner.lifecycle.Stage.DESTROYED;
 import static android.support.test.runner.lifecycle.Stage.RESUMED;
+import static com.criteo.publisher.CriteoInterstitial.RESULT_RECEIVER;
+import static com.criteo.publisher.CriteoInterstitial.WEB_VIEW_DATA;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -32,8 +34,8 @@ public class CriteoInterstitialActivityTest {
         CriteoResultReceiver criteoResultReceiver = mock(CriteoResultReceiver.class);
         Intent intent = new Intent();
         Bundle bundle = new Bundle();
-        bundle.putString("webviewdata", "html content");
-        bundle.putParcelable("resultreceiver", criteoResultReceiver);
+        bundle.putString(WEB_VIEW_DATA, "html content");
+        bundle.putParcelable(RESULT_RECEIVER, criteoResultReceiver);
         intent.putExtras(bundle);
         activityRule.launchActivity(intent);
 
