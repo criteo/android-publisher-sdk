@@ -35,6 +35,7 @@ public final class Criteo {
     private AppEvents appEvents;
     private AppLifecycleUtil appLifecycleUtil;
     private DeviceInfo deviceInfo;
+    private Config config;
 
     public static Criteo init(Application application, String criteoPublisherId, List<AdUnit> adUnits)
             throws CriteoInitException {
@@ -82,7 +83,7 @@ public final class Criteo {
         Publisher publisher = new Publisher(context, criteoPublisherId);
         User user = new User();
         SdkCache sdkCache = new SdkCache();
-        Config config = new Config(context);
+        config = new Config(context);
         this.bidManager = new BidManager(context, publisher, validatedCacheAdUnits,
                 new TokenCache(), deviceInfo, user, sdkCache, config);
 
