@@ -89,4 +89,10 @@ public class CriteoBannerEventController {
         };
         return webViewClient;
     }
+
+    protected void destroy() {
+        if (loadTask != null) {
+            loadTask.cancel(true);
+        }
+    }
 }

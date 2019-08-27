@@ -63,6 +63,10 @@ public class CriteoBannerView extends WebView {
 
     public void destroy() {
         super.destroy();
+        if (criteoBannerEventController != null) {
+            criteoBannerEventController.destroy();
+        }
+
     }
 
 
