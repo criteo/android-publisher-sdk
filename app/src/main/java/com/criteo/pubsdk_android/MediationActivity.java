@@ -12,6 +12,8 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 
+
+// TODO: Move this class to the test app repo
 public class MediationActivity extends AppCompatActivity {
 
     private static final String TAG = MediationActivity.class.getSimpleName();

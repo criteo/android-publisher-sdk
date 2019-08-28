@@ -7,8 +7,8 @@ import static com.mopub.common.logging.MoPubLog.LogLevel.INFO;
 
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -24,6 +24,7 @@ import com.mopub.mobileads.MoPubInterstitial;
 import com.mopub.mobileads.MoPubInterstitial.InterstitialAdListener;
 import com.mopub.mobileads.MoPubView;
 
+// TODO: Move this class to the test app repo
 public class MopubMediationActivity extends AppCompatActivity {
 
     private static final String TAG = MopubActivity.class.getSimpleName();

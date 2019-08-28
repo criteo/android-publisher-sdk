@@ -1,1 +1,1 @@
-include ':app', ':publisher-sdk', ':mediation'
+include ':app', ':publisher-sdk'
