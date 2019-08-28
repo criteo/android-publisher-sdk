@@ -74,7 +74,7 @@ public class CriteoInterstitialActivity extends Activity {
 
     private void displayWebView(String webViewData) {
         waitAndDismiss();
-        webView.loadDataWithBaseURL("about:blank", webViewData, "text/html", "UTF-8", "about:blank");
+        webView.loadDataWithBaseURL("https://criteo.com", webViewData, "text/html", "UTF-8", "about:blank");
     }
 
     @Override
