@@ -112,7 +112,6 @@ public class MopubMediationActivity extends AppCompatActivity {
         linearLayout.removeAllViews();
         linearLayout.setVisibility(View.VISIBLE);
         publisherAdView = new MoPubView(this);
-        criteo.setBidsForAdUnit(publisherAdView, moPub);
         publisherAdView.setAdUnitId(MOPUB_BANNER_ADUNIT_ID);
         publisherAdView.loadAd();
         linearLayout.addView(publisherAdView);
@@ -121,7 +120,6 @@ public class MopubMediationActivity extends AppCompatActivity {
     private void onInterstitialClick() {
         InterstitialAdUnit moPubInterstitialAdUnit = new InterstitialAdUnit(MOPUB_INTERSTITIAL_ADUNIT_ID);
         mInterstitial = new MoPubInterstitial(this, MOPUB_INTERSTITIAL_ADUNIT_ID);
-        criteo.setBidsForAdUnit(mInterstitial, moPubInterstitialAdUnit);
         mInterstitial.setInterstitialAdListener(interstitialAdListener);
         mInterstitial.load();
     }
