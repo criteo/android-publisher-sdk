@@ -72,7 +72,7 @@ public class Cdb implements Parcelable {
         this.slots = slots;
     }
 
-    public void setCacheAdUnits(ArrayList<CacheAdUnit> cacheAdUnits) {
+    public void setCacheAdUnits(List<CacheAdUnit> cacheAdUnits) {
         this.cacheAdUnits = cacheAdUnits;
     }
 

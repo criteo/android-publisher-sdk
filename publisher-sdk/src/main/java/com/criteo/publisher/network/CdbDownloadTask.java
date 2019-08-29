@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 import com.criteo.publisher.BuildConfig;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.HostAppUtil;
@@ -13,7 +14,8 @@ import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
-import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
 import org.json.JSONObject;
 
 public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
@@ -23,13 +25,17 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     private final boolean callConfig;
     private final String userAgent;
     private final NetworkResponseListener responseListener;
+    private final List<CacheAdUnit> cacheAdUnits;
+    private Hashtable<Pair<String, String>, Boolean> bidsInCdbTask;
 
     public CdbDownloadTask(Context context, NetworkResponseListener responseListener, boolean callConfig,
-            String userAgent) {
+            String userAgent, List<CacheAdUnit> adUnits, Hashtable<Pair<String, String>, Boolean> bidsInMap) {
         this.mContext = context.getApplicationContext();
         this.responseListener = responseListener;
         this.callConfig = callConfig;
         this.userAgent = userAgent;
+        this.cacheAdUnits = adUnits;
+        this.bidsInCdbTask = bidsInMap;
     }
 
     @Override
@@ -45,15 +51,13 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         return result;
     }
 
-    @SuppressWarnings("unchecked")
     private NetworkResult doCdbDownloadTask(Object[] objects) {
-        if (objects.length < 4) {
+        if (objects.length < 3) {
             return null;
         }
         int profile = (Integer) objects[0];
         User user = (User) objects[1];
         Publisher publisher = (Publisher) objects[2];
-        ArrayList<CacheAdUnit> cacheAdUnits = (ArrayList<CacheAdUnit>) objects[3];
         if (profile <= 0) {
             return null;
         }
@@ -73,6 +77,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
                 result.setConfig(configResult);
             }
         }
+
         Cdb cdbRequest = new Cdb();
         cdbRequest.setCacheAdUnits(cacheAdUnits);
         cdbRequest.setUser(user);
@@ -107,6 +112,13 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
 
     private void doOnPostExecute(NetworkResult networkResult) {
         super.onPostExecute(networkResult);
+
+        for (CacheAdUnit cacheAdUnit : cacheAdUnits) {
+            String formattedSize = cacheAdUnit.getFormattedSize();
+            bidsInCdbTask.remove(new Pair<>(cacheAdUnit.getPlacementId(),
+                    formattedSize));
+        }
+
         if (responseListener != null && networkResult != null) {
             if (networkResult.getCdb() != null) {
                 responseListener.setCacheAdUnits(networkResult.getCdb().getSlots());

@@ -4,15 +4,17 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.UiThreadTest;
-
+import android.util.Pair;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitHelper;
 import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.InterstitialAdUnit;
@@ -21,6 +23,7 @@ import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 import junit.framework.Assert;
 import org.json.JSONException;
@@ -28,6 +31,9 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 @RunWith(AndroidJUnit4.class)
 public class BidManagerTest {
@@ -40,13 +46,25 @@ public class BidManagerTest {
     private SdkCache sdkCache;
     private Config config;
 
+    @Mock
+    private List<CacheAdUnit> mockCacheAdUnits;
+
+    @Mock
+    private Hashtable<Pair<String, String>, Boolean> placementsWithCdbTasks;
+
     @Before
     public void setup() {
         context = InstrumentationRegistry.getContext();
+        SharedPreferences sharedPref = context.getSharedPreferences(
+                context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putBoolean("CriteoCachedKillSwitch", false);
+        editor.apply();
         publisher = new Publisher(context, CRITEO_PUBLISHER_ID);
         user = new User();
         sdkCache = new SdkCache();
         config = new Config(context);
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
@@ -67,6 +85,43 @@ public class BidManagerTest {
 
     @Test
     @UiThreadTest
+    public void testPlacementAdditionInFetch() {
+        BidManager manager = new BidManager(context, publisher, mockCacheAdUnits,
+                new TokenCache(), new DeviceInfo(), user, sdkCache, config, placementsWithCdbTasks);
+        BannerAdUnit bannerAdUnit = new BannerAdUnit("UniqueId", new AdSize(320, 50));
+        String formattedSize = "320x50";
+        Pair<String, String> placementKey = new Pair<>(bannerAdUnit.getAdUnitId(),
+                formattedSize);
+        manager.getBidForAdUnitAndPrefetch(bannerAdUnit);
+        Mockito.verify(placementsWithCdbTasks, Mockito.times(1)).put(placementKey, true);
+    }
+
+    @Test
+    @UiThreadTest
+    public void testPlacementAdditionInPrefetch() {
+        List<CacheAdUnit> cacheAdUnits = new ArrayList();
+        CacheAdUnit cacheAdUnit1 = new CacheAdUnit(new AdSize(320, 50), "SampleBannerAdUnitId1");
+        CacheAdUnit cacheAdUnit2 = new CacheAdUnit(new AdSize(300, 250), "SampleBannerAdUnitId2");
+        cacheAdUnits.add(cacheAdUnit1);
+        cacheAdUnits.add(cacheAdUnit2);
+
+        BidManager manager = new BidManager(context, publisher, cacheAdUnits,
+                new TokenCache(), new DeviceInfo(), user, sdkCache, config, placementsWithCdbTasks);
+
+        String formattedSize1 = "320x50";
+        Pair<String, String> placementKey1 = new Pair<>(cacheAdUnit1.getPlacementId(),
+                formattedSize1);
+        String formattedSize2 = "300x250";
+        Pair<String, String> placementKey2 = new Pair<>(cacheAdUnit2.getPlacementId(),
+                formattedSize2);
+
+        manager.prefetch();
+        Mockito.verify(placementsWithCdbTasks, Mockito.times(1)).put(placementKey1, true);
+        Mockito.verify(placementsWithCdbTasks, Mockito.times(1)).put(placementKey2, true);
+    }
+
+    @Test
+    @UiThreadTest
     public void testSilentModeSlotZeroTtlZeroCPM() {
         List<AdUnit> adUnits = new ArrayList<>();
         BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
@@ -82,7 +137,7 @@ public class BidManagerTest {
         slots.add(slot1);
 
         BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(), user, sdkCache, config);
+                new TokenCache(), new DeviceInfo(), user, sdkCache, config, placementsWithCdbTasks);
         manager.setCacheAdUnits(slots);
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         manager.enrichBid(builder, AdUnit);
@@ -98,7 +153,7 @@ public class BidManagerTest {
         BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
         adUnits.add(AdUnit);
         BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(), user, sdkCache, config);
+                new TokenCache(), new DeviceInfo(), user, sdkCache, config, placementsWithCdbTasks);
         List<Slot> slots = new ArrayList<>();
         Slot slot1 = new Slot();
         slot1.setPlacementId("/140800857/Endeavour_320x50");
@@ -132,7 +187,7 @@ public class BidManagerTest {
         BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
         adUnits.add(AdUnit);
         BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(), user, sdkCache, config);
+                new TokenCache(), new DeviceInfo(), user, sdkCache, config, placementsWithCdbTasks);
         List<Slot> slots = new ArrayList<>();
         Slot slot1 = new Slot();
         slot1.setPlacementId("/140800857/Endeavour_320x50");
@@ -190,7 +245,7 @@ public class BidManagerTest {
         slots.add(bannerSlot);
 
         BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(), user, sdkCache, config);
+                new TokenCache(), new DeviceInfo(), user, sdkCache, config, placementsWithCdbTasks);
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         manager.enrichBid(builder, AdUnit);
         PublisherAdRequest request = builder.build();
@@ -228,7 +283,7 @@ public class BidManagerTest {
 
         //initializing with adunits
         BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(), user, sdkCache, config);
+                new TokenCache(), new DeviceInfo(), user, sdkCache, config, placementsWithCdbTasks);
         //mocking response by setting slots
         manager.setCacheAdUnits(slots);
         return manager;
@@ -243,7 +298,7 @@ public class BidManagerTest {
         List<Slot> slots = new ArrayList<>();
         slots.add(slot1);
         BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(), user, sdkCache, config);
+                new TokenCache(), new DeviceInfo(), user, sdkCache, config, placementsWithCdbTasks);
         manager.setCacheAdUnits(slots);
         BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
         Assert.assertFalse(bidResponse.isBidSuccess());
@@ -260,7 +315,7 @@ public class BidManagerTest {
         List<Slot> slots = new ArrayList<>();
         slots.add(slot1);
         BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(), user, sdkCache, config);
+                new TokenCache(), new DeviceInfo(), user, sdkCache, config, placementsWithCdbTasks);
         manager.setCacheAdUnits(slots);
         BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
         Assert.assertFalse(bidResponse.isBidSuccess());
@@ -283,7 +338,7 @@ public class BidManagerTest {
         List<Slot> slots = new ArrayList<>();
         slots.add(slot1);
         BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
-                new TokenCache(), new DeviceInfo(), user, sdkCache, config);
+                new TokenCache(), new DeviceInfo(), user, sdkCache, config, placementsWithCdbTasks);
         manager.setCacheAdUnits(slots);
         BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
         Assert.assertTrue(bidResponse.isBidSuccess());

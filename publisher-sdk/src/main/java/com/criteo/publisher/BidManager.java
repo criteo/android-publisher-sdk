@@ -5,6 +5,7 @@ import static android.content.ContentValues.TAG;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.util.Pair;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.DeviceUtil;
@@ -21,11 +22,10 @@ import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.CdbDownloadTask;
-
-import org.json.JSONObject;
-
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
+import org.json.JSONObject;
 
 public class BidManager implements NetworkResponseListener, ApplicationStoppedListener {
 
@@ -46,10 +46,12 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private long cdbTimeToNextCall = 0;
     private Config config;
     private DeviceInfo deviceInfo;
+    private Hashtable<Pair<String, String>, Boolean> placementsWithCdbTasks;
 
 
     BidManager(Context context, Publisher publisher, List<CacheAdUnit> cacheAdUnits, TokenCache tokenCache,
-            DeviceInfo deviceInfo, User user, SdkCache sdkCache, Config config) {
+            DeviceInfo deviceInfo, User user, SdkCache sdkCache, Config config,
+            Hashtable<Pair<String, String>, Boolean> placementsWithCdbTasks) {
         this.mContext = context;
         this.cacheAdUnits = cacheAdUnits;
         this.cache = sdkCache;
@@ -58,17 +60,26 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         this.user = user;
         this.deviceInfo = deviceInfo;
         this.config = config;
+        this.placementsWithCdbTasks = placementsWithCdbTasks;
     }
 
     /**
      * load data for next time
      */
     private void fetch(CacheAdUnit cacheAdUnit) {
-        List<CacheAdUnit> prefetchCacheAdUnits = new ArrayList<>();
-        prefetchCacheAdUnits.add(cacheAdUnit);
-        if (cdbDownloadTask != null && cdbDownloadTask.getStatus() != AsyncTask.Status.RUNNING &&
-                cdbTimeToNextCall < System.currentTimeMillis()) {
-            startCdbDownloadTask(false, prefetchCacheAdUnits);
+        String formattedSize = cacheAdUnit.getFormattedSize();
+        Pair<String, String> placementKey = new Pair<>(cacheAdUnit.getPlacementId(),
+                formattedSize);
+        if (placementsWithCdbTasks.containsKey(placementKey)) {
+            return;
+        }
+
+        if (cdbTimeToNextCall < System.currentTimeMillis()) {
+            ArrayList<CacheAdUnit> cacheAdUnitsForPrefetch = new ArrayList<>();
+            cacheAdUnitsForPrefetch.add(cacheAdUnit);
+
+            placementsWithCdbTasks.put(placementKey, true);
+            startCdbDownloadTask(false, cacheAdUnitsForPrefetch);
         }
     }
 
@@ -76,8 +87,10 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
      * Method to start new CdbDownload Asynctask
      */
     private void startCdbDownloadTask(boolean callConfig, List<CacheAdUnit> prefetchCacheAdUnits) {
-        cdbDownloadTask = new CdbDownloadTask(mContext, this, callConfig, deviceInfo.getUserAgent());
-        cdbDownloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, PROFILE_ID, user, publisher, prefetchCacheAdUnits);
+        cdbDownloadTask = new CdbDownloadTask(mContext, this, callConfig, deviceInfo.getUserAgent(),
+                prefetchCacheAdUnits, placementsWithCdbTasks);
+        cdbDownloadTask
+                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, PROFILE_ID, user, publisher);
     }
 
 
@@ -212,6 +225,11 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
      * Asynctask to get Cdb and Config
      */
     protected void prefetch() {
+        for (CacheAdUnit cacheAdUnit : cacheAdUnits) {
+            String formattedSize = cacheAdUnit.getFormattedSize();
+            placementsWithCdbTasks.put(new Pair<>(cacheAdUnit.getPlacementId(),
+                    formattedSize), true);
+        }
         startCdbDownloadTask(true, cacheAdUnits);
     }
 

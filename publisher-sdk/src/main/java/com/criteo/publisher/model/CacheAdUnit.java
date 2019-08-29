@@ -65,4 +65,8 @@ public class CacheAdUnit {
     public int hashCode() {
         return Objects.hash(adUnitId, adSize);
     }
+
+    public String getFormattedSize() {
+        return adSize.getWidth() + "x" + adSize.getHeight();
+    }
 }
