@@ -19,6 +19,9 @@ public final class AdUnitHelper {
     public static List<CacheAdUnit> convertAdUnits(Context context, List<AdUnit> adUnits) {
         List<CacheAdUnit> cacheAdUnits = new ArrayList<>();
         for (AdUnit adUnit : adUnits) {
+            if (adUnit == null) {
+                continue;
+            }
             switch (adUnit.getAdUnitType()) {
                 case CRITEO_BANNER:
                     BannerAdUnit bannerAdUnit = (BannerAdUnit) adUnit;
