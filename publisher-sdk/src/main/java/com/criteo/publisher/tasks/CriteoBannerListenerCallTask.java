@@ -46,6 +46,7 @@ public class CriteoBannerListenerCallTask extends AsyncTask<Object, Void, Object
                         adListener.onAdReceived(view.get());
                         break;
                     case CLICK:
+                        adListener.onAdClicked();
                         adListener.onAdLeftApplication();
                         adListener.onAdOpened();
                         break;
