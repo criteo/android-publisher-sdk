@@ -32,14 +32,12 @@ public class MopubMediationActivity extends AppCompatActivity {
     private MoPubView publisherAdView;
     private MoPubInterstitial mInterstitial;
     private LinearLayout linearLayout;
-    private Criteo criteo;
     private InterstitialAdListener interstitialAdListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mopub_mediation);
-        criteo = Criteo.getInstance();
         createInterstitialAdListener();
 
         final SdkConfiguration.Builder configBuilder = new SdkConfiguration.Builder(SDK_BUILD_ID)
@@ -107,7 +105,6 @@ public class MopubMediationActivity extends AppCompatActivity {
     }
 
     private void onBannerClick() {
-        BannerAdUnit moPub = new BannerAdUnit(MOPUB_BANNER_ADUNIT_ID, new AdSize(320, 50));
         linearLayout.setBackgroundColor(Color.RED);
         linearLayout.removeAllViews();
         linearLayout.setVisibility(View.VISIBLE);
@@ -118,7 +115,6 @@ public class MopubMediationActivity extends AppCompatActivity {
     }
 
     private void onInterstitialClick() {
-        InterstitialAdUnit moPubInterstitialAdUnit = new InterstitialAdUnit(MOPUB_INTERSTITIAL_ADUNIT_ID);
         mInterstitial = new MoPubInterstitial(this, MOPUB_INTERSTITIAL_ADUNIT_ID);
         mInterstitial.setInterstitialAdListener(interstitialAdListener);
         mInterstitial.load();
