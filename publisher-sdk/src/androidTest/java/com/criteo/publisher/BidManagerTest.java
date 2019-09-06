@@ -5,6 +5,7 @@ import static junit.framework.Assert.assertNull;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.UiThreadTest;
@@ -15,12 +16,14 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitHelper;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CacheAdUnit;
+import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
+import com.criteo.publisher.network.CdbDownloadTask;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -49,8 +52,7 @@ public class BidManagerTest {
     @Mock
     private List<CacheAdUnit> mockCacheAdUnits;
 
-    @Mock
-    private Hashtable<Pair<String, String>, Boolean> placementsWithCdbTasks;
+    private Hashtable<Pair<String, String>, CdbDownloadTask> placementsWithCdbTasks;
 
     @Before
     public void setup() {
@@ -64,6 +66,7 @@ public class BidManagerTest {
         user = new User();
         sdkCache = new SdkCache();
         config = new Config(context);
+        placementsWithCdbTasks = new Hashtable<>();
         MockitoAnnotations.initMocks(this);
     }
 
@@ -93,12 +96,14 @@ public class BidManagerTest {
         Pair<String, String> placementKey = new Pair<>(bannerAdUnit.getAdUnitId(),
                 formattedSize);
         manager.getBidForAdUnitAndPrefetch(bannerAdUnit);
-        Mockito.verify(placementsWithCdbTasks, Mockito.times(1)).put(placementKey, true);
+        CdbDownloadTask cdbDownloadTask = placementsWithCdbTasks.get(placementKey);
+        assertNotNull(cdbDownloadTask);
+        Assert.assertEquals(AsyncTask.Status.RUNNING , cdbDownloadTask.getStatus());
     }
 
     @Test
     @UiThreadTest
-    public void testPlacementAdditionInPrefetch() {
+    public void testPlacementAdditionInPrefetch() throws InterruptedException {
         List<CacheAdUnit> cacheAdUnits = new ArrayList();
         CacheAdUnit cacheAdUnit1 = new CacheAdUnit(new AdSize(320, 50), "SampleBannerAdUnitId1");
         CacheAdUnit cacheAdUnit2 = new CacheAdUnit(new AdSize(300, 250), "SampleBannerAdUnitId2");
@@ -116,8 +121,13 @@ public class BidManagerTest {
                 formattedSize2);
 
         manager.prefetch();
-        Mockito.verify(placementsWithCdbTasks, Mockito.times(1)).put(placementKey1, true);
-        Mockito.verify(placementsWithCdbTasks, Mockito.times(1)).put(placementKey2, true);
+        CdbDownloadTask cdbDownloadTask1 = placementsWithCdbTasks.get(placementKey1);
+        CdbDownloadTask cdbDownloadTask2 = placementsWithCdbTasks.get(placementKey2);
+        assertNotNull(cdbDownloadTask1);
+        assertNotNull(cdbDownloadTask2);
+        Assert.assertEquals(AsyncTask.Status.RUNNING , cdbDownloadTask1.getStatus());
+        Assert.assertEquals(AsyncTask.Status.RUNNING , cdbDownloadTask2.getStatus());
+
     }
 
     @Test

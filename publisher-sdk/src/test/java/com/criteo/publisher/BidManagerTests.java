@@ -12,11 +12,13 @@ import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CacheAdUnit;
+import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
+import com.criteo.publisher.network.CdbDownloadTask;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -43,7 +45,7 @@ public class BidManagerTests {
     private TokenCache tokenCache = null;
     private Slot testSlot;
     @Mock
-    private Hashtable<Pair<String, String>, Boolean> placementsWithCdbTasks;
+    private Hashtable<Pair<String, String>, CdbDownloadTask> placementsWithCdbTasks;
 
     @Before
     public void setup() {

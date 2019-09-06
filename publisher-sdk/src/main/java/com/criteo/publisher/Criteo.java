@@ -23,6 +23,7 @@ import com.criteo.publisher.model.ScreenSize;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.model.User;
+import com.criteo.publisher.network.CdbDownloadTask;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -37,7 +38,7 @@ public final class Criteo {
     private AppLifecycleUtil appLifecycleUtil;
     private DeviceInfo deviceInfo;
     private Config config;
-    private Hashtable<Pair<String, String>, Boolean> placementsWithCdbTasks;
+    private Hashtable<Pair<String, String>, CdbDownloadTask> placementsWithCdbTasks;
 
     public static Criteo init(Application application, String criteoPublisherId, List<AdUnit> adUnits)
             throws CriteoInitException {

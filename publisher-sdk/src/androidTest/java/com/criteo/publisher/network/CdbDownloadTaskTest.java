@@ -5,6 +5,7 @@ import android.util.Pair;
 import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.CacheAdUnit;
+import com.criteo.publisher.model.Cdb;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -26,7 +27,7 @@ public class CdbDownloadTaskTest {
     private NetworkResponseListener responseListener;
 
     @Mock
-    private Hashtable<Pair<String, String>, Boolean> bidsInCdbTask;
+    private Hashtable<Pair<String, String>, CdbDownloadTask> bidsInCdbTask;
 
     @Test
     public void checkCacheRemove() {

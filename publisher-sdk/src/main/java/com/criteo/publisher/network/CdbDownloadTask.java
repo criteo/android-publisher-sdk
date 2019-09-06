@@ -26,10 +26,10 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     private final String userAgent;
     private final NetworkResponseListener responseListener;
     private final List<CacheAdUnit> cacheAdUnits;
-    private Hashtable<Pair<String, String>, Boolean> bidsInCdbTask;
+    private Hashtable<Pair<String, String>, CdbDownloadTask> bidsInCdbTask;
 
     public CdbDownloadTask(Context context, NetworkResponseListener responseListener, boolean callConfig,
-            String userAgent, List<CacheAdUnit> adUnits, Hashtable<Pair<String, String>, Boolean> bidsInMap) {
+            String userAgent, List<CacheAdUnit> adUnits, Hashtable<Pair<String, String>, CdbDownloadTask> bidsInMap) {
         this.mContext = context.getApplicationContext();
         this.responseListener = responseListener;
         this.callConfig = callConfig;

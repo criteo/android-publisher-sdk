@@ -42,16 +42,15 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private final TokenCache tokenCache;
     private final Publisher publisher;
     private final User user;
-    private CdbDownloadTask cdbDownloadTask;
     private long cdbTimeToNextCall = 0;
     private Config config;
     private DeviceInfo deviceInfo;
-    private Hashtable<Pair<String, String>, Boolean> placementsWithCdbTasks;
+    private Hashtable<Pair<String, String>, CdbDownloadTask> placementsWithCdbTasks;
 
 
     BidManager(Context context, Publisher publisher, List<CacheAdUnit> cacheAdUnits, TokenCache tokenCache,
             DeviceInfo deviceInfo, User user, SdkCache sdkCache, Config config,
-            Hashtable<Pair<String, String>, Boolean> placementsWithCdbTasks) {
+            Hashtable<Pair<String, String>, CdbDownloadTask> placementsWithCdbTasks) {
         this.mContext = context;
         this.cacheAdUnits = cacheAdUnits;
         this.cache = sdkCache;
@@ -77,8 +76,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         if (cdbTimeToNextCall < System.currentTimeMillis()) {
             ArrayList<CacheAdUnit> cacheAdUnitsForPrefetch = new ArrayList<>();
             cacheAdUnitsForPrefetch.add(cacheAdUnit);
-
-            placementsWithCdbTasks.put(placementKey, true);
             startCdbDownloadTask(false, cacheAdUnitsForPrefetch);
         }
     }
@@ -87,10 +84,15 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
      * Method to start new CdbDownload Asynctask
      */
     private void startCdbDownloadTask(boolean callConfig, List<CacheAdUnit> prefetchCacheAdUnits) {
-        cdbDownloadTask = new CdbDownloadTask(mContext, this, callConfig, deviceInfo.getUserAgent(),
-                prefetchCacheAdUnits, placementsWithCdbTasks);
-        cdbDownloadTask
-                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, PROFILE_ID, user, publisher);
+        for (CacheAdUnit cacheAdUnit : prefetchCacheAdUnits) {
+            String formattedSize = cacheAdUnit.getFormattedSize();
+            CdbDownloadTask cdbDownloadTask = new CdbDownloadTask(mContext, this, callConfig, deviceInfo.getUserAgent(),
+                    prefetchCacheAdUnits, placementsWithCdbTasks);
+            cdbDownloadTask
+                    .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, PROFILE_ID, user, publisher);
+            placementsWithCdbTasks.put(new Pair<>(cacheAdUnit.getPlacementId(),
+                    formattedSize), cdbDownloadTask);
+        }
     }
 
 
@@ -198,8 +200,11 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
     @Override
     public void onApplicationStopped() {
-        if (cdbDownloadTask != null && cdbDownloadTask.getStatus() == AsyncTask.Status.RUNNING) {
-            cdbDownloadTask.cancel(true);
+        for (Pair<String, String> key : placementsWithCdbTasks.keySet()) {
+            if (placementsWithCdbTasks.get(key) != null
+                    && placementsWithCdbTasks.get(key).getStatus() == AsyncTask.Status.RUNNING) {
+                (placementsWithCdbTasks.get(key)).cancel(true);
+            }
         }
     }
 
@@ -225,11 +230,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
      * Asynctask to get Cdb and Config
      */
     protected void prefetch() {
-        for (CacheAdUnit cacheAdUnit : cacheAdUnits) {
-            String formattedSize = cacheAdUnit.getFormattedSize();
-            placementsWithCdbTasks.put(new Pair<>(cacheAdUnit.getPlacementId(),
-                    formattedSize), true);
-        }
         startCdbDownloadTask(true, cacheAdUnits);
     }
 
