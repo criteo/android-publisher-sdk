@@ -13,6 +13,7 @@ public class AppLifecycleUtil implements Application.ActivityLifecycleCallbacks 
     private int started;
     private int resumed;
     private boolean transitionPossible;
+    private boolean created;
 
     public AppLifecycleUtil(Application application, AppEvents appEvents, BidManager bidmanager) {
         this.appEvents = appEvents;
@@ -21,18 +22,20 @@ public class AppLifecycleUtil implements Application.ActivityLifecycleCallbacks 
         started = 0;
         resumed = 0;
         transitionPossible = false;
+        created = false;
     }
 
     @Override
     public void onActivityCreated(Activity activity, Bundle bundle) {
-        // intentionally left blank
+        if (!created) {
+            created = true;
+            appEvents.sendLaunchEvent();
+        }
+
     }
 
     @Override
     public void onActivityStarted(Activity activity) {
-        if (started == 0) {
-            appEvents.sendLaunchEvent();
-        }
         started += 1;
     }
 

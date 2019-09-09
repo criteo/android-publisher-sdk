@@ -11,7 +11,7 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
 
     private static final String TAG = "Criteo.AET";
     private static final int SENDER_ID = 2379;
-    private static final String THROTTLE = "throttleSec";
+    protected static final String THROTTLE = "throttleSec";
     private final Context mContext;
     private final AppEventResponseListener responseListener;
 
@@ -33,8 +33,7 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
         return jsonObject;
     }
 
-    private JSONObject doAppEventTask(Object[] objects)
-    {
+    private JSONObject doAppEventTask(Object[] objects) {
         String eventType = (String) objects[0];
         int limitedAdTracking = 0;
         String gaid = null;

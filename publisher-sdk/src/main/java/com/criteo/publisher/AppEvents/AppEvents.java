@@ -55,8 +55,5 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
 
     @Override
     public void onApplicationStopped() {
-        if (eventTask.getStatus() == AsyncTask.Status.RUNNING) {
-            eventTask.cancel(false);
-        }
     }
 }
