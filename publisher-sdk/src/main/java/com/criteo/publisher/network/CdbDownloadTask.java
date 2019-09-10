@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.Pair;
 import com.criteo.publisher.BuildConfig;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.HostAppUtil;
@@ -16,6 +15,7 @@ import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
 import java.util.Hashtable;
 import java.util.List;
+
 import org.json.JSONObject;
 
 public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
@@ -26,10 +26,10 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     private final String userAgent;
     private final NetworkResponseListener responseListener;
     private final List<CacheAdUnit> cacheAdUnits;
-    private Hashtable<Pair<String, String>, CdbDownloadTask> bidsInCdbTask;
+    private Hashtable<CacheAdUnit, CdbDownloadTask> bidsInCdbTask;
 
     public CdbDownloadTask(Context context, NetworkResponseListener responseListener, boolean callConfig,
-            String userAgent, List<CacheAdUnit> adUnits, Hashtable<Pair<String, String>, CdbDownloadTask> bidsInMap) {
+            String userAgent, List<CacheAdUnit> adUnits, Hashtable<CacheAdUnit, CdbDownloadTask> bidsInMap) {
         this.mContext = context.getApplicationContext();
         this.responseListener = responseListener;
         this.callConfig = callConfig;
@@ -114,9 +114,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         super.onPostExecute(networkResult);
 
         for (CacheAdUnit cacheAdUnit : cacheAdUnits) {
-            String formattedSize = cacheAdUnit.getFormattedSize();
-            bidsInCdbTask.remove(new Pair<>(cacheAdUnit.getPlacementId(),
-                    formattedSize));
+            bidsInCdbTask.remove(cacheAdUnit);
         }
 
         if (responseListener != null && networkResult != null) {

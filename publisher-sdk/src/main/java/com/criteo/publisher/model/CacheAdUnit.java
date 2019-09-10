@@ -11,6 +11,7 @@ public class CacheAdUnit {
     private static final String SIZES = "sizes";
     private String adUnitId;
     private AdSize adSize;
+    private boolean isNative;
 
     public String getPlacementId() {
         return adUnitId;
@@ -22,6 +23,10 @@ public class CacheAdUnit {
 
     public void setSize(AdSize size) {
         this.adSize = size;
+    }
+
+    public boolean isNative() {
+        return this.isNative;
     }
 
     public JSONObject toJson() throws JSONException {
@@ -40,12 +45,14 @@ public class CacheAdUnit {
         return "CacheAdUnit{" +
                 "placementId='" + adUnitId + '\'' +
                 ", adSize=" + adSize +
+                ", isNative= " + isNative +
                 '}';
     }
 
-    public CacheAdUnit(AdSize adSize, String adUnitId) {
+    public CacheAdUnit(AdSize adSize, String adUnitId, boolean isNative) {
         this.adSize = adSize;
         this.adUnitId = adUnitId;
+        this.isNative = isNative;
     }
 
     @Override
@@ -58,15 +65,13 @@ public class CacheAdUnit {
         }
         CacheAdUnit cacheAdUnit = (CacheAdUnit) o;
         return Objects.equals(adUnitId, cacheAdUnit.adUnitId) &&
-                Objects.equals(adSize, cacheAdUnit.adSize);
+                Objects.equals(adSize, cacheAdUnit.adSize) &&
+                Objects.equals(isNative, cacheAdUnit.isNative);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(adUnitId, adSize);
+        return Objects.hash(adUnitId, adSize, isNative);
     }
 
-    public String getFormattedSize() {
-        return adSize.getWidth() + "x" + adSize.getHeight();
-    }
 }

@@ -1,21 +1,24 @@
 package com.criteo.publisher.cache;
 
-import android.util.Pair;
+import com.criteo.publisher.model.AdSize;
+import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Slot;
+
 import java.util.HashMap;
 import java.util.List;
 
 public class SdkCache {
 
-    private HashMap<Pair<String, String>, Slot> slotMap;
+    private HashMap<CacheAdUnit, Slot> slotMap;
 
     public SdkCache() {
         slotMap = new HashMap<>();
     }
 
     public void add(Slot slot) {
-        slotMap.put(new Pair<>(slot.getPlacementId(),
-                slot.getFormattedSize()), slot);
+        CacheAdUnit key = new CacheAdUnit(new AdSize(slot.getWidth(), slot.getHeight())
+                        , slot.getPlacementId(), slot.isNative());
+        slotMap.put(key, slot);
     }
 
     public void addAll(List<Slot> slots) {
@@ -27,27 +30,24 @@ public class SdkCache {
         }
     }
 
-    public Slot peekAdUnit(String placement, String formattedSize) {
-        Pair<String, String> placementKey = new Pair<String, String>(placement, formattedSize);
-        if (!slotMap.containsKey(placementKey)) {
+    public Slot peekAdUnit(CacheAdUnit key) {
+        if (!slotMap.containsKey(key)) {
             return null;
         }
-        return slotMap.get(placementKey);
+        return slotMap.get(key);
     }
 
-    public Slot getAdUnit(String placement, String formattedSize) {
-        Pair<String, String> placementKey = new Pair<String, String>(placement, formattedSize);
-        if (!slotMap.containsKey(placementKey)) {
+    public Slot getAdUnit(CacheAdUnit key) {
+        if (!slotMap.containsKey(key)) {
             return null;
         }
-        Slot slot = slotMap.get(placementKey);
-        slotMap.remove(placementKey);
+        Slot slot = slotMap.get(key);
+        slotMap.remove(key);
         return slot;
     }
 
-    public void remove(String placement, String formattedSize) {
-        Pair<String, String> placementKey = new Pair<String, String>(placement, formattedSize);
-        slotMap.remove(placementKey);
+    public void remove(CacheAdUnit key) {
+        slotMap.remove(key);
     }
 
     public int getItemCount() {

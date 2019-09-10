@@ -5,7 +5,6 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.Pair;
 import android.view.WindowManager;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.Util.AdUnitType;
@@ -38,7 +37,7 @@ public final class Criteo {
     private AppLifecycleUtil appLifecycleUtil;
     private DeviceInfo deviceInfo;
     private Config config;
-    private Hashtable<Pair<String, String>, CdbDownloadTask> placementsWithCdbTasks;
+    private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
 
     public static Criteo init(Application application, String criteoPublisherId, List<AdUnit> adUnits)
             throws CriteoInitException {
@@ -87,7 +86,7 @@ public final class Criteo {
         User user = new User();
         SdkCache sdkCache = new SdkCache();
         config = new Config(context);
-        placementsWithCdbTasks = new Hashtable();
+        placementsWithCdbTasks = new Hashtable<>();
         this.bidManager = new BidManager(context, publisher, validatedCacheAdUnits,
                 new TokenCache(), deviceInfo, user, sdkCache, config, placementsWithCdbTasks);
 

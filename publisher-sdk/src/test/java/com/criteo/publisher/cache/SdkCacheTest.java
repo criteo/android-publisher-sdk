@@ -1,6 +1,7 @@
 package com.criteo.publisher.cache;
 
 import com.criteo.publisher.model.AdSize;
+import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Slot;
 
 import junit.framework.Assert;
@@ -24,25 +25,96 @@ public class SdkCacheTest {
     }
 
     @Test
-    public void ttlTest() throws JSONException {
+    public void getAdUnitFromCacheTest() throws JSONException {
         initializeCache();
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+
+        for(int i=slots.length() -1; i >=0 ;i--) {
+            String placement = slots.getJSONObject(i).getString("placementId");
+            AdSize adSize = new AdSize(slots.getJSONObject(i).getInt("width"), slots.getJSONObject(i).getInt("height"));
+            CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, false);
+            Slot cachedSlot = cache.getAdUnit(testAdUnit);
+            assertEquals(placement, cachedSlot.getPlacementId());
+            assertEquals(slots.getJSONObject(i).getString("currency"), cachedSlot.getCurrency());
+            assertEquals(slots.getJSONObject(i).getString("cpm"), cachedSlot.getCpm());
+            assertEquals(slots.getJSONObject(i).getString("displayUrl"), cachedSlot.getDisplayUrl());
+            assertEquals(slots.getJSONObject(i).getInt("width"), cachedSlot.getWidth());
+            assertEquals(slots.getJSONObject(i).getInt("height"), cachedSlot.getHeight());
         }
-        String placement = slots.getJSONObject(0).getString("placementId");
-        AdSize adSize = new AdSize(slots.getJSONObject(0).getInt("width"), slots.getJSONObject(0).getInt("height"));
-        assertNull(cache.getAdUnit(placement, adSize.getFormattedSize()));
     }
 
     @Test
-    public void getOneAdUnitTest() throws JSONException {
+    public void getNotCachedAdUnitFromCacheTest() throws JSONException {
         initializeCache();
-        String placement = slots.getJSONObject(0).getString("placementId");
-        AdSize adSize = new AdSize(slots.getJSONObject(0).getInt("width"), slots.getJSONObject(0).getInt("height"));
-        assertNull(cache.getAdUnit(placement, adSize.getFormattedSize()));
 
+        String placement = "this/isnt/in/the/cache";
+        AdSize adSize = new AdSize(320, 50);
+        CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, false);
+        Slot cachedSlot = cache.getAdUnit(testAdUnit);
+        assertNull(cachedSlot);
+    }
+
+    @Test
+    public void peekAdUnitFromCacheTest() throws JSONException {
+        initializeCache();
+
+        for(int i=slots.length() -1; i >=0 ;i--) {
+            String placement = slots.getJSONObject(i).getString("placementId");
+            AdSize adSize = new AdSize(slots.getJSONObject(i).getInt("width"), slots.getJSONObject(i).getInt("height"));
+            CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, false);
+            Slot cachedSlot = cache.peekAdUnit(testAdUnit);
+            assertEquals(placement, cachedSlot.getPlacementId());
+            assertEquals(slots.getJSONObject(i).getString("currency"), cachedSlot.getCurrency());
+            assertEquals(slots.getJSONObject(i).getString("cpm"), cachedSlot.getCpm());
+            assertEquals(slots.getJSONObject(i).getString("displayUrl"), cachedSlot.getDisplayUrl());
+            assertEquals(slots.getJSONObject(i).getInt("width"), cachedSlot.getWidth());
+            assertEquals(slots.getJSONObject(i).getInt("height"), cachedSlot.getHeight());
+        }
+    }
+
+    @Test
+    public void peekNotCachedAdUnitFromCacheTest() throws JSONException {
+        initializeCache();
+
+        String placement = "this/isnt/in/the/cache";
+        AdSize adSize = new AdSize(320, 50);
+        CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, false);
+        Slot cachedSlot = cache.peekAdUnit(testAdUnit);
+        assertNull(cachedSlot);
+    }
+
+    @Test
+    public void removeAdUnitFromCacheTest() throws JSONException {
+        initializeCache();
+
+        for(int i=slots.length() -1; i >=0 ;i--) {
+            String placement = slots.getJSONObject(i).getString("placementId");
+            AdSize adSize = new AdSize(slots.getJSONObject(i).getInt("width"), slots.getJSONObject(i).getInt("height"));
+            CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, false);
+            Slot cachedSlot = cache.peekAdUnit(testAdUnit);
+            assertEquals(placement, cachedSlot.getPlacementId());
+            assertEquals(slots.getJSONObject(i).getString("currency"), cachedSlot.getCurrency());
+            assertEquals(slots.getJSONObject(i).getString("cpm"), cachedSlot.getCpm());
+            assertEquals(slots.getJSONObject(i).getString("displayUrl"), cachedSlot.getDisplayUrl());
+            assertEquals(slots.getJSONObject(i).getInt("width"), cachedSlot.getWidth());
+            assertEquals(slots.getJSONObject(i).getInt("height"), cachedSlot.getHeight());
+
+            cache.remove(testAdUnit);
+            assertNull(cache.peekAdUnit(testAdUnit));
+            assertNull(cache.getAdUnit(testAdUnit));
+            assertEquals(i, cache.getItemCount());
+        }
+    }
+
+    @Test
+    public void removeNotCachedAdUnitFromCacheTest() throws JSONException {
+        initializeCache();
+
+        String placement = "this/isnt/in/the/cache";
+        AdSize adSize = new AdSize(320, 50);
+        CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, false);
+        int cacheSize = cache.getItemCount();
+        cache.remove(testAdUnit);
+        assertEquals(cacheSize, cache.getItemCount());
     }
 
     private void initializeCache() throws JSONException {

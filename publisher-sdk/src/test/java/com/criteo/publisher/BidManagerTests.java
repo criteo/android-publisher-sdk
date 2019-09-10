@@ -6,13 +6,11 @@ import static org.mockito.Mockito.when;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.util.Pair;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CacheAdUnit;
-import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
@@ -45,7 +43,7 @@ public class BidManagerTests {
     private TokenCache tokenCache = null;
     private Slot testSlot;
     @Mock
-    private Hashtable<Pair<String, String>, CdbDownloadTask> placementsWithCdbTasks;
+    private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
 
     @Before
     public void setup() {
@@ -53,7 +51,7 @@ public class BidManagerTests {
         adUnit = new BannerAdUnit(adUnitId, adSize);
 
         cacheAdUnits = new ArrayList<>();
-        CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId);
+        CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, false);
         cacheAdUnits.add(cAdUnit);
 
         context = mock(Context.class);
@@ -90,8 +88,8 @@ public class BidManagerTests {
         Assert.assertNotNull(slotJson);
 
         testSlot = new Slot(slotJson);
-        when(this.sdkCache.peekAdUnit(adUnitId, adSize.getFormattedSize())).thenReturn(testSlot);
-        when(this.sdkCache.getAdUnit(adUnitId, adSize.getFormattedSize())).thenReturn(testSlot);
+        when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
+        when(this.sdkCache.getAdUnit(cAdUnit)).thenReturn(testSlot);
 
         tokenCache = mock(TokenCache.class);
     }
@@ -184,8 +182,9 @@ public class BidManagerTests {
         Config config = mock(Config.class);
         when(config.isKillSwitch()).thenReturn(false);
 
-        when(this.sdkCache.peekAdUnit(adUnitId, adSize.getFormattedSize())).thenReturn(testSlot);
-        when(this.sdkCache.getAdUnit(adUnitId, adSize.getFormattedSize())).thenReturn(testSlot);
+        CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, false);
+        when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
+        when(this.sdkCache.getAdUnit(cAdUnit)).thenReturn(testSlot);
 
         BidManager bidManager = new BidManager(context, publisher, cacheAdUnits
                 , tokenCache, deviceInfo, user, sdkCache, config, placementsWithCdbTasks);

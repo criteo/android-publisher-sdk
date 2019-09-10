@@ -9,14 +9,12 @@ import android.os.AsyncTask;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.UiThreadTest;
-import android.util.Pair;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitHelper;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CacheAdUnit;
-import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.InterstitialAdUnit;
@@ -35,7 +33,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(AndroidJUnit4.class)
@@ -52,7 +49,7 @@ public class BidManagerTest {
     @Mock
     private List<CacheAdUnit> mockCacheAdUnits;
 
-    private Hashtable<Pair<String, String>, CdbDownloadTask> placementsWithCdbTasks;
+    private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
 
     @Before
     public void setup() {
@@ -91,10 +88,9 @@ public class BidManagerTest {
     public void testPlacementAdditionInFetch() {
         BidManager manager = new BidManager(context, publisher, mockCacheAdUnits,
                 new TokenCache(), new DeviceInfo(), user, sdkCache, config, placementsWithCdbTasks);
-        BannerAdUnit bannerAdUnit = new BannerAdUnit("UniqueId", new AdSize(320, 50));
-        String formattedSize = "320x50";
-        Pair<String, String> placementKey = new Pair<>(bannerAdUnit.getAdUnitId(),
-                formattedSize);
+        AdSize adSize = new AdSize(320, 50);
+        BannerAdUnit bannerAdUnit = new BannerAdUnit("UniqueId", adSize);
+        CacheAdUnit placementKey = new CacheAdUnit(adSize, bannerAdUnit.getAdUnitId(), false);
         manager.getBidForAdUnitAndPrefetch(bannerAdUnit);
         CdbDownloadTask cdbDownloadTask = placementsWithCdbTasks.get(placementKey);
         assertNotNull(cdbDownloadTask);
@@ -104,25 +100,20 @@ public class BidManagerTest {
     @Test
     @UiThreadTest
     public void testPlacementAdditionInPrefetch() throws InterruptedException {
-        List<CacheAdUnit> cacheAdUnits = new ArrayList();
-        CacheAdUnit cacheAdUnit1 = new CacheAdUnit(new AdSize(320, 50), "SampleBannerAdUnitId1");
-        CacheAdUnit cacheAdUnit2 = new CacheAdUnit(new AdSize(300, 250), "SampleBannerAdUnitId2");
+        List<CacheAdUnit> cacheAdUnits = new ArrayList<>();
+        AdSize adSize = new AdSize(320, 50);
+        CacheAdUnit cacheAdUnit1 = new CacheAdUnit(adSize, "SampleBannerAdUnitId1", false);
+        AdSize adSize_2 = new AdSize(300, 250);
+        CacheAdUnit cacheAdUnit2 = new CacheAdUnit(adSize_2, "SampleBannerAdUnitId2", false);
         cacheAdUnits.add(cacheAdUnit1);
         cacheAdUnits.add(cacheAdUnit2);
 
         BidManager manager = new BidManager(context, publisher, cacheAdUnits,
                 new TokenCache(), new DeviceInfo(), user, sdkCache, config, placementsWithCdbTasks);
 
-        String formattedSize1 = "320x50";
-        Pair<String, String> placementKey1 = new Pair<>(cacheAdUnit1.getPlacementId(),
-                formattedSize1);
-        String formattedSize2 = "300x250";
-        Pair<String, String> placementKey2 = new Pair<>(cacheAdUnit2.getPlacementId(),
-                formattedSize2);
-
         manager.prefetch();
-        CdbDownloadTask cdbDownloadTask1 = placementsWithCdbTasks.get(placementKey1);
-        CdbDownloadTask cdbDownloadTask2 = placementsWithCdbTasks.get(placementKey2);
+        CdbDownloadTask cdbDownloadTask1 = placementsWithCdbTasks.get(cacheAdUnit1);
+        CdbDownloadTask cdbDownloadTask2 = placementsWithCdbTasks.get(cacheAdUnit2);
         assertNotNull(cdbDownloadTask1);
         assertNotNull(cdbDownloadTask2);
         Assert.assertEquals(AsyncTask.Status.RUNNING , cdbDownloadTask1.getStatus());
@@ -251,8 +242,6 @@ public class BidManagerTest {
         bannerSlot.setCpm("1.2");
         bannerSlot.setDisplayUrl(TEST_CREATIVE);
         bannerSlot.setTtl(0);
-        List<Slot> slots = new ArrayList<>();
-        slots.add(bannerSlot);
 
         BidManager manager = new BidManager(context, publisher, AdUnitHelper.convertAdUnits(context, adUnits),
                 new TokenCache(), new DeviceInfo(), user, sdkCache, config, placementsWithCdbTasks);

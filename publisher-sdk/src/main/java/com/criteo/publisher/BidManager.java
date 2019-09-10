@@ -5,13 +5,13 @@ import static android.content.ContentValues.TAG;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.util.Pair;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.Util.ReflectionUtil;
 import com.criteo.publisher.cache.SdkCache;
+import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitHelper;
 import com.criteo.publisher.model.CacheAdUnit;
@@ -25,6 +25,7 @@ import com.criteo.publisher.network.CdbDownloadTask;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+
 import org.json.JSONObject;
 
 public class BidManager implements NetworkResponseListener, ApplicationStoppedListener {
@@ -45,12 +46,12 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private long cdbTimeToNextCall = 0;
     private Config config;
     private DeviceInfo deviceInfo;
-    private Hashtable<Pair<String, String>, CdbDownloadTask> placementsWithCdbTasks;
+    private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
 
 
     BidManager(Context context, Publisher publisher, List<CacheAdUnit> cacheAdUnits, TokenCache tokenCache,
             DeviceInfo deviceInfo, User user, SdkCache sdkCache, Config config,
-            Hashtable<Pair<String, String>, CdbDownloadTask> placementsWithCdbTasks) {
+            Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks) {
         this.mContext = context;
         this.cacheAdUnits = cacheAdUnits;
         this.cache = sdkCache;
@@ -66,10 +67,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
      * load data for next time
      */
     private void fetch(CacheAdUnit cacheAdUnit) {
-        String formattedSize = cacheAdUnit.getFormattedSize();
-        Pair<String, String> placementKey = new Pair<>(cacheAdUnit.getPlacementId(),
-                formattedSize);
-        if (placementsWithCdbTasks.containsKey(placementKey)) {
+        if (placementsWithCdbTasks.containsKey(cacheAdUnit)) {
             return;
         }
 
@@ -87,12 +85,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         CdbDownloadTask cdbDownloadTask = new CdbDownloadTask(mContext, this, callConfig, deviceInfo.getUserAgent(),
                 prefetchCacheAdUnits, placementsWithCdbTasks);
         for (CacheAdUnit cacheAdUnit : prefetchCacheAdUnits) {
-            String formattedSize = cacheAdUnit.getFormattedSize();
-
-            placementsWithCdbTasks.put(new Pair<>(cacheAdUnit.getPlacementId(),
-                    formattedSize), cdbDownloadTask);
+            placementsWithCdbTasks.put(cacheAdUnit, cdbDownloadTask);
         }
-
         cdbDownloadTask
                 .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, PROFILE_ID, user, publisher);
     }
@@ -153,7 +147,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         CacheAdUnit cacheAdUnit = AdUnitHelper
                 .convertoCacheAdUnit(adUnit, mContext.getResources().getConfiguration().orientation);
 
-        Slot peekSlot = cache.peekAdUnit(cacheAdUnit.getPlacementId(), cacheAdUnit.getSize().getFormattedSize());
+        Slot peekSlot = cache.peekAdUnit(cacheAdUnit);
         if (peekSlot == null) {
             fetch(cacheAdUnit);
             return null;
@@ -164,8 +158,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         //If cpm and ttl in slot are 0:
         // Prefetch from CDB and do not update request;
         if (cpm == 0 && ttl == 0) {
-            cache.remove(cacheAdUnit.getPlacementId(),
-                    cacheAdUnit.getSize().getFormattedSize());
+            cache.remove(cacheAdUnit);
             fetch(cacheAdUnit);
             return null;
         }
@@ -176,8 +169,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             return null;
         } else {
             //If cpm > 0, ttl > 0 but we are done staying silent
-            Slot slot = cache.getAdUnit(cacheAdUnit.getPlacementId(),
-                    cacheAdUnit.getSize().getFormattedSize());
+            Slot slot = cache.getAdUnit(cacheAdUnit);
             fetch(cacheAdUnit);
             return slot;
         }
@@ -202,7 +194,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
     @Override
     public void onApplicationStopped() {
-        for (Pair<String, String> key : placementsWithCdbTasks.keySet()) {
+        for (CacheAdUnit key : placementsWithCdbTasks.keySet()) {
             if (placementsWithCdbTasks.get(key) != null
                     && placementsWithCdbTasks.get(key).getStatus() == AsyncTask.Status.RUNNING) {
                 (placementsWithCdbTasks.get(key)).cancel(true);

@@ -21,7 +21,7 @@ public class AdUnitTest {
     @Before
     public void initialize() {
         adSize = new AdSize(WIDTH, HEIGHT);
-        cacheAdUnit = new CacheAdUnit(adSize, PLACEMENT_ID_VALUE);
+        cacheAdUnit = new CacheAdUnit(adSize, PLACEMENT_ID_VALUE, false);
     }
 
     @Test
