@@ -84,15 +84,17 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
      * Method to start new CdbDownload Asynctask
      */
     private void startCdbDownloadTask(boolean callConfig, List<CacheAdUnit> prefetchCacheAdUnits) {
+        CdbDownloadTask cdbDownloadTask = new CdbDownloadTask(mContext, this, callConfig, deviceInfo.getUserAgent(),
+                prefetchCacheAdUnits, placementsWithCdbTasks);
         for (CacheAdUnit cacheAdUnit : prefetchCacheAdUnits) {
             String formattedSize = cacheAdUnit.getFormattedSize();
-            CdbDownloadTask cdbDownloadTask = new CdbDownloadTask(mContext, this, callConfig, deviceInfo.getUserAgent(),
-                    prefetchCacheAdUnits, placementsWithCdbTasks);
-            cdbDownloadTask
-                    .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, PROFILE_ID, user, publisher);
+
             placementsWithCdbTasks.put(new Pair<>(cacheAdUnit.getPlacementId(),
                     formattedSize), cdbDownloadTask);
         }
+
+        cdbDownloadTask
+                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, PROFILE_ID, user, publisher);
     }
 
 
