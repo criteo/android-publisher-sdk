@@ -136,7 +136,6 @@ public class Cdb implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeTypedList(this.slots);
         dest.writeParcelable(this.publisher, flags);
         dest.writeParcelable(this.user, flags);
         dest.writeString(this.sdkVersion);
@@ -144,7 +143,6 @@ public class Cdb implements Parcelable {
     }
 
     protected Cdb(Parcel in) {
-        this.slots = in.createTypedArrayList(Slot.CREATOR);
         this.publisher = in.readParcelable(Publisher.class.getClassLoader());
         this.user = in.readParcelable(User.class.getClassLoader());
         this.sdkVersion = in.readString();
