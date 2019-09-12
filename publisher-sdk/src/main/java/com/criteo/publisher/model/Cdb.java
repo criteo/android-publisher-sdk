@@ -52,9 +52,8 @@ public class Cdb implements Parcelable {
                 try {
                     JSONObject slotStr = array.getJSONObject(i);
                     slots.add(new Slot(slotStr));
-                } catch (JSONException ex) {
+                } catch (Exception ex) {
                     Log.d(TAG, "Exception while reading slot from slots array" + ex.getMessage());
-                    ex.printStackTrace();
                 }
             }
         }

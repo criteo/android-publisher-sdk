@@ -65,7 +65,6 @@ public class Slot {
                 JSONObject jsonNative = json.getJSONObject(NATIVE);
                 this.nativeAssets = new NativeAssets(jsonNative);
             } catch (Exception ex) {
-                //doing nothing for now
                 Log.d(TAG, "exception when parsing json" + ex.getLocalizedMessage());
                 this.nativeAssets = null;
             }
