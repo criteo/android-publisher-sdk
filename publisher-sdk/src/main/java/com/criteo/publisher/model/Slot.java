@@ -160,14 +160,14 @@ public class Slot {
     /// Checks if displayUrl is not null/empty
     /// and if cpm is a valid number > 0
     public boolean isValid() {
-        // Check display Url
-        if (this.displayUrl == null || (this.displayUrl.length() == 0)) {
-            return false;
-        }
-
         //check cpm
         Double testCpm = this.getCpmAsNumber();
         if (testCpm == null || testCpm < 0.0d) {
+            return false;
+        }
+
+        // Check display Url
+        if (!isNative && (this.displayUrl == null || (this.displayUrl.length() == 0))) {
             return false;
         }
         return true;

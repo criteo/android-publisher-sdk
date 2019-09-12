@@ -124,12 +124,12 @@ public final class DeviceUtil {
         return 0;
     }
 
-    public static String createDfpCompatibleDisplayUrl(String displayUrl) {
-        if (TextUtils.isEmpty(displayUrl)) {
+    public static String createDfpCompatibleString(String stringToEncode) {
+        if (TextUtils.isEmpty(stringToEncode)) {
             return null;
         }
         try {
-            byte[] byteUrl = displayUrl.getBytes(StandardCharsets.UTF_8);
+            byte[] byteUrl = stringToEncode.getBytes(StandardCharsets.UTF_8);
             String base64Url = Base64.encodeToString(byteUrl, Base64.NO_WRAP);
             String utf8 = StandardCharsets.UTF_8.name();
             return URLEncoder.encode(URLEncoder.encode(base64Url, utf8), utf8).toString();
