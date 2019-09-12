@@ -77,6 +77,11 @@
    public *;
 }
 
+-keep public class com.criteo.publisher.model.NativeAdUnit
+-keepclassmembers class com.criteo.publisher.model.NativeAdUnit {
+   public *;
+}
+
 -keep public class com.criteo.publisher.CriteoErrorCode
 -keepclassmembers class com.criteo.publisher.CriteoErrorCode {
    public *;
