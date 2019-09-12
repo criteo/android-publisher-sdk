@@ -7,7 +7,7 @@ public class NativeAdUnit extends AdUnit {
 
     private AdSize adSize;
 
-    protected NativeAdUnit(String adUnitId) {
+    public NativeAdUnit(String adUnitId) {
         super(adUnitId, CRITEO_CUSTOM_NATIVE);
         this.adSize = new AdSize(2, 2);
     }

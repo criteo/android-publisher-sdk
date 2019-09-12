@@ -9,6 +9,7 @@ public class CacheAdUnit {
 
     private static final String PLACEMENT_ID = "placementId";
     private static final String SIZES = "sizes";
+    private static final String IS_NATIVE = "isNative";
     private String adUnitId;
     private AdSize adSize;
     private boolean isNative;
@@ -37,6 +38,9 @@ public class CacheAdUnit {
             adUnitJson.put(SIZES, adUnitSizes);
         }
         adUnitJson.put(PLACEMENT_ID, adUnitId);
+        if(this.isNative) {
+            adUnitJson.put(IS_NATIVE, this.isNative);
+        }
         return adUnitJson;
     }
 
