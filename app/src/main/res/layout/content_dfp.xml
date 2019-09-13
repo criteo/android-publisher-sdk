@@ -47,7 +47,7 @@
                   android:background="#81C784"
                   android:text="Interstitial"/>
                 <Button
-                  android:id="@+id/buttonBannerCustomNative"
+                  android:id="@+id/buttonCustomNative"
                   style="@style/Widget.AppCompat.Button.Colored"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"

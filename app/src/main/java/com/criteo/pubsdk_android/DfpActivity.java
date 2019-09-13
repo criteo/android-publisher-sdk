@@ -3,18 +3,16 @@ package com.criteo.pubsdk_android;
 import static com.criteo.pubsdk_android.PubSdkDemoApplication.NATIVE_AD_UNIT_ID;
 
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
-import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.NativeAdUnit;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -37,6 +35,7 @@ public class DfpActivity extends AppCompatActivity {
         editor.putString("IABConsent_SubjectToGDPR", "1");
         editor.putString("IABConsent_ConsentString", "1");
         editor.apply();
+
         linearLayout = ((LinearLayout) findViewById(R.id.adViewHolder));
         findViewById(R.id.buttonBanner).setOnClickListener((View v) -> {
             onBannerClick();
@@ -44,22 +43,65 @@ public class DfpActivity extends AppCompatActivity {
         findViewById(R.id.buttonInterstitial).setOnClickListener((View v) -> {
             onInterstitialClick();
         });
-        findViewById(R.id.buttonBannerCustomNative).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PublisherAdView publisherAdView = new PublisherAdView(DfpActivity.this);
-                publisherAdView.setAdSizes(com.google.android.gms.ads.AdSize.FLUID);
-                publisherAdView.setAdUnitId(NATIVE_AD_UNIT_ID);
-                PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-                builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-                NativeAdUnit nativeAdUnit = new NativeAdUnit(NATIVE_AD_UNIT_ID);
-                Criteo.getInstance().setBidsForAdUnit(builder, nativeAdUnit);
-                PublisherAdRequest request = builder.build();
-                publisherAdView.loadAd(request);
-                linearLayout.addView(publisherAdView);
-            }
+
+        findViewById(R.id.buttonCustomNative).setOnClickListener((View v) -> {
+            onNativeClick();
         });
     }
+
+    private void onNativeClick() {
+        PublisherAdView publisherAdView = new PublisherAdView(DfpActivity.this);
+        publisherAdView.setAdSizes(com.google.android.gms.ads.AdSize.FLUID);
+        publisherAdView.setAdUnitId(NATIVE_AD_UNIT_ID);
+        PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
+        builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
+        NativeAdUnit nativeAdUnit = new NativeAdUnit(NATIVE_AD_UNIT_ID);
+
+        Criteo.getInstance().setBidsForAdUnit(builder, nativeAdUnit);
+        PublisherAdRequest request = builder.build();
+
+        publisherAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                Log.d("TAG", "Custom NativeAd called: " + "onAdClosed");
+            }
+
+            @Override
+            public void onAdFailedToLoad(int var1) {
+                Log.d("TAG", "Custom NativeAd called: " + "onAdFailedToLoad");
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+                Log.d("TAG", "Custom NativeAd called: " + "onAdLeftApplication");
+            }
+
+            @Override
+            public void onAdOpened() {
+                Log.d("TAG", "Custom NativeAd called: " + "onAdOpened");
+            }
+
+            @Override
+            public void onAdLoaded() {
+                Log.d("TAG", "Custom NativeAd called: " + "onAdLoaded");
+            }
+
+            @Override
+            public void onAdClicked() {
+                Log.d("TAG", "Custom NativeAd called: " + "onAdClicked");
+            }
+
+            @Override
+            public void onAdImpression() {
+                Log.d("TAG", "Custom NativeAd called: " + "onAdImpression");
+            }
+
+        });
+        publisherAdView.setManualImpressionsEnabled(true);
+        publisherAdView.loadAd(request);
+        linearLayout.addView(publisherAdView);
+    }
+
 
     private void onBannerClick() {
         PublisherAdView publisherAdView = new PublisherAdView(this);
@@ -67,7 +109,7 @@ public class DfpActivity extends AppCompatActivity {
         publisherAdView.setAdUnitId("/140800857/Endeavour_320x50");
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-        BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/Endeavour_320x50" , new AdSize(320, 50));
+        BannerAdUnit bannerAdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
         publisherAdView.setAdListener(new AdListener() {
             @Override
             public void onAdFailedToLoad(int i) {
