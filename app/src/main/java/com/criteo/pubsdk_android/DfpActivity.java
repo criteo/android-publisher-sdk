@@ -1,5 +1,7 @@
 package com.criteo.pubsdk_android;
 
+import static com.criteo.pubsdk_android.PubSdkDemoApplication.NATIVE_AD_UNIT_ID;
+
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -7,11 +9,13 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.AdSize;
+import com.criteo.publisher.model.NativeAdUnit;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
@@ -40,12 +44,24 @@ public class DfpActivity extends AppCompatActivity {
         findViewById(R.id.buttonInterstitial).setOnClickListener((View v) -> {
             onInterstitialClick();
         });
+        findViewById(R.id.buttonBannerCustomNative).setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PublisherAdView publisherAdView = new PublisherAdView(DfpActivity.this);
+                publisherAdView.setAdSizes(com.google.android.gms.ads.AdSize.FLUID);
+                publisherAdView.setAdUnitId(NATIVE_AD_UNIT_ID);
+                PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
+                builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
+                NativeAdUnit nativeAdUnit = new NativeAdUnit(NATIVE_AD_UNIT_ID);
+                Criteo.getInstance().setBidsForAdUnit(builder, nativeAdUnit);
+                PublisherAdRequest request = builder.build();
+                publisherAdView.loadAd(request);
+                linearLayout.addView(publisherAdView);
+            }
+        });
     }
 
     private void onBannerClick() {
-        linearLayout.setBackgroundColor(Color.RED);
-        linearLayout.removeAllViews();
-        linearLayout.setVisibility(View.VISIBLE);
         PublisherAdView publisherAdView = new PublisherAdView(this);
         publisherAdView.setAdSizes(com.google.android.gms.ads.AdSize.BANNER);
         publisherAdView.setAdUnitId("/140800857/Endeavour_320x50");
@@ -56,7 +72,6 @@ public class DfpActivity extends AppCompatActivity {
             @Override
             public void onAdFailedToLoad(int i) {
                 super.onAdFailedToLoad(i);
-                linearLayout.setBackgroundColor(Color.TRANSPARENT);
             }
         });
         Criteo.getInstance().setBidsForAdUnit(builder, bannerAdUnit);
