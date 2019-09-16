@@ -295,7 +295,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
             double price = slot.getCpmAsNumber();
 
-            bidResponse = new BidResponse(price, tokenCache.add(tokenValue), true);
+            bidResponse = new BidResponse(price, tokenCache.add(tokenValue, adUnit), true);
         }
 
         return bidResponse;

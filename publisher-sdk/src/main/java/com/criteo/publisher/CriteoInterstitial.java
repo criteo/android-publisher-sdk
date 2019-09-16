@@ -61,6 +61,9 @@ public class CriteoInterstitial {
     }
 
     public void loadAd(BidToken bidToken) {
+        if (bidToken != null && interstitialAdUnit != bidToken.getAdUnit()) {
+            return;
+        }
         try {
             doLoadAd(bidToken);
         } catch (Throwable tr) {

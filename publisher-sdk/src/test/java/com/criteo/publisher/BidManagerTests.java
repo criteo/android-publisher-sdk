@@ -189,7 +189,8 @@ public class BidManagerTests {
         BidManager bidManager = new BidManager(context, publisher, cacheAdUnits
                 , tokenCache, deviceInfo, user, sdkCache, config, placementsWithCdbTasks);
 
-        BidResponse expectedResponse = new BidResponse(0.10d, new BidToken(UUID.randomUUID()), true);
+        BidResponse expectedResponse = new BidResponse(0.10d,
+                new BidToken(UUID.randomUUID(), new BannerAdUnit("banneradUnitId1", new AdSize(320, 50))), true);
 
         //test
         BidResponse bidResponse = bidManager.getBidForInhouseMediation(adUnit);

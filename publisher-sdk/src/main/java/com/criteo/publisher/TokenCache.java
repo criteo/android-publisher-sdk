@@ -1,8 +1,8 @@
 package com.criteo.publisher;
 
 import com.criteo.publisher.Util.AdUnitType;
+import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.TokenValue;
-
 import java.util.Hashtable;
 import java.util.UUID;
 
@@ -14,8 +14,8 @@ public class TokenCache {
         tokenMap = new Hashtable<>();
     }
 
-    public BidToken add(TokenValue tokenValue) {
-        BidToken bidToken = new BidToken(UUID.randomUUID());
+    public BidToken add(TokenValue tokenValue, AdUnit adUnit) {
+        BidToken bidToken = new BidToken(UUID.randomUUID(), adUnit);
         tokenMap.put(bidToken, tokenValue);
         return bidToken;
     }
