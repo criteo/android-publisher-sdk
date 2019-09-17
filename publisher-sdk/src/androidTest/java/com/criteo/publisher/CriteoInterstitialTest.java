@@ -8,6 +8,7 @@ import com.criteo.publisher.model.AdUnit;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -20,12 +21,13 @@ public class CriteoInterstitialTest {
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
     private CriteoInterstitial criteoInterstitial;
+    private InterstitialAdUnit interstitialAdUnit;
 
     @Before
     @UiThreadTest
     public void setup() throws CriteoInitException {
         MockitoAnnotations.initMocks(this);
-        InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit("/140800857/None");
+        interstitialAdUnit = new InterstitialAdUnit("/140800857/None");
         List<AdUnit> cacheAdUnits = new ArrayList<>();
         cacheAdUnits.add(interstitialAdUnit);
         Application app =
@@ -35,6 +37,37 @@ public class CriteoInterstitialTest {
         Criteo.init(app, "B-056946", cacheAdUnits);
         criteoInterstitial = new CriteoInterstitial(InstrumentationRegistry.getContext(), interstitialAdUnit);
         criteoInterstitial.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
+    }
+
+    @Test
+    public void testInHouseLoadAdWithSameAdUnit() throws InterruptedException {
+        UUID uuid1 = UUID.nameUUIDFromBytes("TEST_STRING1".getBytes());
+        BidToken token1 = new BidToken(uuid1, interstitialAdUnit);
+        criteoInterstitial.loadAd(token1);
+
+        //wait for the loadAd process to be completed
+        Thread.sleep(500);
+
+        //Expected result , found no slot and called criteoBannerAdListener.onAdFetchFailed
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdReceived();
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(1))
+                .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+    }
+
+    @Test
+    public void testInHouseLoadAdWithDifferentAdUnit() throws InterruptedException {
+        UUID uuid1 = UUID.nameUUIDFromBytes("TEST_STRING1".getBytes());
+        InterstitialAdUnit interstitialAdUnit2 = new InterstitialAdUnit("/140800857/None2");
+        BidToken token1 = new BidToken(uuid1, interstitialAdUnit2);
+        criteoInterstitial.loadAd(token1);
+
+        //wait for the loadAd process to be completed
+        Thread.sleep(500);
+
+        //Expected result , found no slot and called criteoBannerAdListener.onAdFetchFailed
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(0)).onAdReceived();
+        Mockito.verify(criteoInterstitialAdListener, Mockito.times(0))
+                .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
     }
 
     @Test
