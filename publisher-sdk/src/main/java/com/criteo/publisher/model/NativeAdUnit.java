@@ -12,10 +12,6 @@ public class NativeAdUnit extends AdUnit {
         this.adSize = new AdSize(2, 2);
     }
 
-    public void setAdSize(AdSize size) {
-        this.adSize = size;
-    }
-
     public AdSize getAdSize() {
         return this.adSize;
     }
