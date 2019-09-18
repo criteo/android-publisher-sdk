@@ -129,6 +129,83 @@ public class SdkCacheTest {
     }
 
     @Test
+    public void testAdditionOfInvalidSlot() {
+        // One is missing a displayUrl and the other has a negative cpm
+        // Neither bid should be added to the cache
+        String json = "{\"slots\":[{\"placementId\":\"/140800857/Endeavour_320x50\",\"cpm\":\"0.00\",\"currency\":\"EUR\",\"width\":320,\"height\":50,\"ttl\":0,\"displayUrl\":\"\"},{\"placementId\":\"/140800857/Endeavour_Interstitial_320x480\",\"cpm\":\"-1.00\",\"currency\":\"EUR\",\"width\":320,\"height\":480,\"ttl\":0,\"displayUrl\":\"https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js\"}]}";
+        try {
+            JSONObject element = new JSONObject(json);
+            slots = element.getJSONArray("slots");
+            cache = new SdkCache();
+            for (int i = 0; i < slots.length(); i++) {
+                Slot slot = new Slot(slots.getJSONObject(i));
+                cache.add(slot);
+            }
+            Assert.assertEquals(0, cache.getItemCount());
+        } catch (Exception ex) {
+            Assert.fail("json parsing failed " + ex.getLocalizedMessage());
+        }
+    }
+
+    @Test
+    public void testAdditionOfInvalidNativeSlot() {
+        String cdbStringResponse = "{\n" +
+                "    \"slots\": [{\n" +
+                "        \"placementId\": \"/140800857/Endeavour_Native\",\n" +
+                "        \"cpm\": \"0.04\",\n" +
+                "        \"currency\": \"USD\",\n" +
+                "        \"width\": 2,\n" +
+                "        \"height\": 2,\n" +
+                "        \"ttl\": 3600,\n" +
+                "        \"native\": {\n" +
+                "            \"products\": [{\n" +
+                "                \"title\": \"\\\"Stripe Pima Dress\\\" - $99\",\n" +
+                "                \"description\": \"We're All About Comfort.\",\n" +
+                "                \"price\": \"$99\",\n" +
+                "                \"clickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\",\n" +
+                "                \"callToAction\": \"\",\n" +
+                "                \"image\": {\n" +
+                "                    \"url\": \"https://pix.us.criteo.net/img/img?\",\n" +
+                "                    \"height\": 400,\n" +
+                "                    \"width\": 400\n" +
+                "                }\n" +
+                "            }],\n" +
+                "            \"advertiser\": {\n" +
+                "                \"description\": \"The Company Store\",\n" +
+                "                \"domain\": \"thecompanystore.com\",\n" +
+                "                \"logo\": {\n" +
+                "                    \"url\": \"https://pix.us.criteo.net/img/img\",\n" +
+                "                    \"height\": 200,\n" +
+                "                    \"width\": 200\n" +
+                "                },\n" +
+                "                \"logoClickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\"\n" +
+                "            },\n" +
+                "            \"privacy\": {\n" +
+                "                \"optoutClickUrl\": \"\",\n" +
+                "                \"optoutImageUrl\": \"https://static.criteo.net/flash/icon/nai_small.png\",\n" +
+                "                \"longLegalText\": \"\"\n" +
+                "            },\n" +
+                "            \"impressionPixels\": [{\n" +
+                "                \"url\": \"https://cat.sv.us.criteo.com/delivery/lgn.php?\"},{\n" +
+                "                \"url\": \"https://dog.da.us.criteo.com/delivery/lgn.php?\"\n" +
+                "            }]\n" +
+                "        }\n" +
+                "    }]\n" +
+                "}";
+
+        try {
+            JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+            JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
+            Slot slot = new Slot(cdbSlot);
+            cache = new SdkCache();
+            cache.add(slot);
+            assertEquals(0, cache.getItemCount());
+        } catch (Exception ex) {
+            Assert.fail("Json exception in test data : "+ ex.getLocalizedMessage());
+        }
+    }
+
+    @Test
     public void testCacheWithNativeSlot() {
         String cdbStringResponse = "{\n" +
                 "    \"slots\": [{\n" +

@@ -170,6 +170,21 @@ public class Slot {
         if (!isNative && (this.displayUrl == null || (this.displayUrl.length() == 0))) {
             return false;
         }
+
+        // if a slot is for Native but the required native assets are missing then mark the
+        // bid invalid
+        if (this.isNative) {
+            if (this.nativeAssets == null) {
+                return false;
+            } else {
+                return this.nativeAssets.nativeProducts != null
+                        && this.nativeAssets.nativeProducts.size() != 0
+                        && !this.nativeAssets.privacyOptOutImageUrl.equals("")
+                        && !this.nativeAssets.privacyOptOutClickUrl.equals("")
+                        && this.nativeAssets.impressionPixels != null
+                        && this.nativeAssets.impressionPixels.size() != 0;
+            }
+        }
         return true;
     }
 

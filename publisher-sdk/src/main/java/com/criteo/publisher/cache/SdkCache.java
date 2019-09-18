@@ -16,9 +16,11 @@ public class SdkCache {
     }
 
     public void add(Slot slot) {
-        CacheAdUnit key = new CacheAdUnit(new AdSize(slot.getWidth(), slot.getHeight())
-                        , slot.getPlacementId(), slot.isNative());
-        slotMap.put(key, slot);
+        if(slot != null && slot.isValid()) {
+            CacheAdUnit key = new CacheAdUnit(new AdSize(slot.getWidth(), slot.getHeight())
+                    , slot.getPlacementId(), slot.isNative());
+            slotMap.put(key, slot);
+        }
     }
 
     public void addAll(List<Slot> slots) {

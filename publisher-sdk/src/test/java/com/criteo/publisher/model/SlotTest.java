@@ -178,6 +178,7 @@ public class SlotTest {
             JSONObject cdbResponse = new JSONObject(cdbStringResponse);
             JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
             Slot slot = new Slot(cdbSlot);
+            Assert.assertNotNull(slot.getNativeAssets());
             Assert.assertEquals("\"Stripe Pima Dress\" - $99", slot.getNativeAssets().nativeProducts.get(0).title);
             Assert.assertEquals("We're All About Comfort.", slot.getNativeAssets().nativeProducts.get(0).description);
             Assert.assertEquals("$99", slot.getNativeAssets().nativeProducts.get(0).price);
@@ -188,6 +189,7 @@ public class SlotTest {
             Assert.assertEquals("https://cat.sv.us.criteo.com/delivery/lgn.php?", slot.getNativeAssets().impressionPixels.get(0));
             Assert.assertEquals("https://dog.da.us.criteo.com/delivery/lgn.php?", slot.getNativeAssets().impressionPixels.get(1));
             Assert.assertTrue(slot.isNative());
+            Assert.assertTrue(slot.isValid());
         } catch (Exception ex) {
             Assert.fail("Json exception in test data : "+ ex.getLocalizedMessage());
         }
@@ -208,6 +210,8 @@ public class SlotTest {
             Assert.assertEquals(555, slot.getTtl());
             Assert.assertEquals("https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js", slot.getDisplayUrl());
             Assert.assertFalse(slot.isNative());
+            Assert.assertNull(slot.getNativeAssets());
+            Assert.assertTrue(slot.isValid());
         } catch (Exception ex) {
             Assert.fail("Json exception in test data : "+ ex.getLocalizedMessage());
         }
@@ -265,6 +269,278 @@ public class SlotTest {
             Slot slot = new Slot(cdbSlot);
             Slot expectedSlot = new Slot(cdbSlot);
             assertEquals(expectedSlot, slot);
+        } catch (Exception ex) {
+            Assert.fail("Json exception in test data : "+ ex.getLocalizedMessage());
+        }
+    }
+
+    @Test
+    public void testJsonParsingForNativeWithoutImpressionPixels() {
+        String cdbStringResponse = "{\n" +
+                "    \"slots\": [{\n" +
+                "        \"placementId\": \"/140800857/Endeavour_Native\",\n" +
+                "        \"cpm\": \"0.04\",\n" +
+                "        \"currency\": \"USD\",\n" +
+                "        \"width\": 2,\n" +
+                "        \"height\": 2,\n" +
+                "        \"ttl\": 3600,\n" +
+                "        \"native\": {\n" +
+                "            \"products\": [{\n" +
+                "                \"title\": \"\\\"Stripe Pima Dress\\\" - $99\",\n" +
+                "                \"description\": \"We're All About Comfort.\",\n" +
+                "                \"price\": \"$99\",\n" +
+                "                \"clickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\",\n" +
+                "                \"callToAction\": \"\",\n" +
+                "                \"image\": {\n" +
+                "                    \"url\": \"https://pix.us.criteo.net/img/img?\",\n" +
+                "                    \"height\": 400,\n" +
+                "                    \"width\": 400\n" +
+                "                }\n" +
+                "            }],\n" +
+                "            \"advertiser\": {\n" +
+                "                \"description\": \"The Company Store\",\n" +
+                "                \"domain\": \"thecompanystore.com\",\n" +
+                "                \"logo\": {\n" +
+                "                    \"url\": \"https://pix.us.criteo.net/img/img\",\n" +
+                "                    \"height\": 200,\n" +
+                "                    \"width\": 200\n" +
+                "                },\n" +
+                "                \"logoClickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\"\n" +
+                "            },\n" +
+                "            \"privacy\": {\n" +
+                "                \"optoutClickUrl\": \"https://privacy.us.criteo.com/adcenter\",\n" +
+                "                \"optoutImageUrl\": \"https://static.criteo.net/flash/icon/nai_small.png\",\n" +
+                "                \"longLegalText\": \"\"\n" +
+                "            },\n" +
+                "            \"impressionPixels\": []\n" +
+                "        }\n" +
+                "    }]\n" +
+                "}";
+
+        try {
+            JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+            JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
+            Slot slot = new Slot(cdbSlot);
+            Assert.assertTrue(slot.isNative());
+            Assert.assertNotNull(slot.getNativeAssets());
+            Assert.assertEquals(3600, slot.getTtl());
+            Assert.assertEquals("/140800857/Endeavour_Native", slot.getPlacementId());
+            Assert.assertFalse(slot.isValid());
+        } catch (Exception ex) {
+            Assert.fail("Json exception in test data : "+ ex.getLocalizedMessage());
+        }
+    }
+
+    @Test
+    public void testJsonParsingForNativeWithZeroProducts() {
+        String cdbStringResponse = "{\n" +
+                "    \"slots\": [{\n" +
+                "        \"placementId\": \"/140800857/Endeavour_Native\",\n" +
+                "        \"cpm\": \"0.04\",\n" +
+                "        \"currency\": \"USD\",\n" +
+                "        \"width\": 2,\n" +
+                "        \"height\": 2,\n" +
+                "        \"ttl\": 3600,\n" +
+                "        \"native\": {\n" +
+                "            \"products\": [],\n" +
+                "            \"advertiser\": {\n" +
+                "                \"description\": \"The Company Store\",\n" +
+                "                \"domain\": \"thecompanystore.com\",\n" +
+                "                \"logo\": {\n" +
+                "                    \"url\": \"https://pix.us.criteo.net/img/img\",\n" +
+                "                    \"height\": 200,\n" +
+                "                    \"width\": 200\n" +
+                "                },\n" +
+                "                \"logoClickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\"\n" +
+                "            },\n" +
+                "            \"privacy\": {\n" +
+                "                \"optoutClickUrl\": \"https://privacy.us.criteo.com/adcenter\",\n" +
+                "                \"optoutImageUrl\": \"https://static.criteo.net/flash/icon/nai_small.png\",\n" +
+                "                \"longLegalText\": \"\"\n" +
+                "            },\n" +
+                "            \"impressionPixels\": [{\n" +
+                "                \"url\": \"https://cat.sv.us.criteo.com/delivery/lgn.php?\"},{\n" +
+                "                \"url\": \"https://dog.da.us.criteo.com/delivery/lgn.php?\"\n" +
+                "            }]\n" +
+                "        }\n" +
+                "    }]\n" +
+                "}";
+
+        try {
+            JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+            JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
+            Slot slot = new Slot(cdbSlot);
+            Assert.assertTrue(slot.isNative());
+            Assert.assertNotNull(slot.getNativeAssets());
+            Assert.assertEquals(3600, slot.getTtl());
+            Assert.assertEquals("/140800857/Endeavour_Native", slot.getPlacementId());
+            Assert.assertEquals("The Company Store", slot.getNativeAssets().advertiserDescription);
+            Assert.assertFalse(slot.isValid());
+        } catch (Exception ex) {
+            Assert.fail("Json exception in test data : "+ ex.getLocalizedMessage());
+        }
+    }
+
+    @Test
+    public void testJsonParsingForNativeWithoutProducts() {
+        String cdbStringResponse = "{\n" +
+                "    \"slots\": [{\n" +
+                "        \"placementId\": \"/140800857/Endeavour_Native\",\n" +
+                "        \"cpm\": \"0.04\",\n" +
+                "        \"currency\": \"USD\",\n" +
+                "        \"width\": 2,\n" +
+                "        \"height\": 2,\n" +
+                "        \"ttl\": 3600,\n" +
+                "        \"native\": {\n" +
+                "            \"advertiser\": {\n" +
+                "                \"description\": \"The Company Store\",\n" +
+                "                \"domain\": \"thecompanystore.com\",\n" +
+                "                \"logo\": {\n" +
+                "                    \"url\": \"https://pix.us.criteo.net/img/img\",\n" +
+                "                    \"height\": 200,\n" +
+                "                    \"width\": 200\n" +
+                "                },\n" +
+                "                \"logoClickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\"\n" +
+                "            },\n" +
+                "            \"privacy\": {\n" +
+                "                \"optoutClickUrl\": \"https://privacy.us.criteo.com/adcenter\",\n" +
+                "                \"optoutImageUrl\": \"https://static.criteo.net/flash/icon/nai_small.png\",\n" +
+                "                \"longLegalText\": \"\"\n" +
+                "            },\n" +
+                "            \"impressionPixels\": [{\n" +
+                "                \"url\": \"https://cat.sv.us.criteo.com/delivery/lgn.php?\"},{\n" +
+                "                \"url\": \"https://dog.da.us.criteo.com/delivery/lgn.php?\"\n" +
+                "            }]\n" +
+                "        }\n" +
+                "    }]\n" +
+                "}";
+
+        try {
+            JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+            JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
+            Slot slot = new Slot(cdbSlot);
+            Assert.assertTrue(slot.isNative());
+            Assert.assertNotNull(slot.getNativeAssets());
+            Assert.assertEquals(3600, slot.getTtl());
+            Assert.assertEquals("/140800857/Endeavour_Native", slot.getPlacementId());
+            Assert.assertEquals("The Company Store", slot.getNativeAssets().advertiserDescription);
+            Assert.assertFalse(slot.isValid());
+        } catch (Exception ex) {
+            Assert.fail("Json exception in test data : "+ ex.getLocalizedMessage());
+        }
+    }
+
+    @Test
+    public void testJsonParsingForNativeWithoutPrivacyLogo() {
+        String cdbStringResponse = "{\n" +
+                "    \"slots\": [{\n" +
+                "        \"placementId\": \"/140800857/Endeavour_Native\",\n" +
+                "        \"cpm\": \"0.04\",\n" +
+                "        \"currency\": \"USD\",\n" +
+                "        \"width\": 2,\n" +
+                "        \"height\": 2,\n" +
+                "        \"ttl\": 3600,\n" +
+                "        \"native\": {\n" +
+                "            \"products\": [{\n" +
+                "                \"title\": \"\\\"Stripe Pima Dress\\\" - $99\",\n" +
+                "                \"description\": \"We're All About Comfort.\",\n" +
+                "                \"price\": \"$99\",\n" +
+                "                \"clickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\",\n" +
+                "                \"callToAction\": \"\",\n" +
+                "                \"image\": {\n" +
+                "                    \"url\": \"https://pix.us.criteo.net/img/img?\",\n" +
+                "                    \"height\": 400,\n" +
+                "                    \"width\": 400\n" +
+                "                }\n" +
+                "            }],\n" +
+                "            \"advertiser\": {\n" +
+                "                \"description\": \"The Company Store\",\n" +
+                "                \"domain\": \"thecompanystore.com\",\n" +
+                "                \"logo\": {\n" +
+                "                    \"url\": \"https://pix.us.criteo.net/img/img\",\n" +
+                "                    \"height\": 200,\n" +
+                "                    \"width\": 200\n" +
+                "                },\n" +
+                "                \"logoClickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\"\n" +
+                "            },\n" +
+                "            \"privacy\": {\n" +
+                "                \"optoutClickUrl\": \"https://privacy.us.criteo.com/adcenter\",\n" +
+                "                \"longLegalText\": \"\"\n" +
+                "            },\n" +
+                "            \"impressionPixels\": [{\n" +
+                "                \"url\": \"https://cat.sv.us.criteo.com/delivery/lgn.php?\"},{\n" +
+                "                \"url\": \"https://dog.da.us.criteo.com/delivery/lgn.php?\"\n" +
+                "            }]\n" +
+                "        }\n" +
+                "    }]\n" +
+                "}";
+
+        try {
+            JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+            JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
+            Slot slot = new Slot(cdbSlot);
+            Assert.assertTrue(slot.isNative());
+            Assert.assertNotNull(slot.getNativeAssets());
+            Assert.assertEquals(3600, slot.getTtl());
+            Assert.assertEquals("/140800857/Endeavour_Native", slot.getPlacementId());
+            Assert.assertEquals("The Company Store", slot.getNativeAssets().advertiserDescription);
+            Assert.assertFalse(slot.isValid());
+        } catch (Exception ex) {
+            Assert.fail("Json exception in test data : "+ ex.getLocalizedMessage());
+        }
+    }
+
+    @Test
+    public void testJsonParsingForNativeWithoutImpressionPixelsAndPrivacyLogo() {
+        String cdbStringResponse = "{\n" +
+                "    \"slots\": [{\n" +
+                "        \"placementId\": \"/140800857/Endeavour_Native\",\n" +
+                "        \"cpm\": \"0.04\",\n" +
+                "        \"currency\": \"USD\",\n" +
+                "        \"width\": 2,\n" +
+                "        \"height\": 2,\n" +
+                "        \"ttl\": 3600,\n" +
+                "        \"native\": {\n" +
+                "            \"products\": [{\n" +
+                "                \"title\": \"\\\"Stripe Pima Dress\\\" - $99\",\n" +
+                "                \"description\": \"We're All About Comfort.\",\n" +
+                "                \"price\": \"$99\",\n" +
+                "                \"clickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\",\n" +
+                "                \"callToAction\": \"\",\n" +
+                "                \"image\": {\n" +
+                "                    \"url\": \"https://pix.us.criteo.net/img/img?\",\n" +
+                "                    \"height\": 400,\n" +
+                "                    \"width\": 400\n" +
+                "                }\n" +
+                "            }],\n" +
+                "            \"advertiser\": {\n" +
+                "                \"description\": \"The Company Store\",\n" +
+                "                \"domain\": \"thecompanystore.com\",\n" +
+                "                \"logo\": {\n" +
+                "                    \"url\": \"https://pix.us.criteo.net/img/img\",\n" +
+                "                    \"height\": 200,\n" +
+                "                    \"width\": 200\n" +
+                "                },\n" +
+                "                \"logoClickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\"\n" +
+                "            },\n" +
+                "            \"privacy\": {\n" +
+                "                \"optoutClickUrl\": \"https://privacy.us.criteo.com/adcenter\",\n" +
+                "                \"longLegalText\": \"\"\n" +
+                "            }" +
+                "        }\n" +
+                "    }]\n" +
+                "}";
+
+        try {
+            JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+            JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
+            Slot slot = new Slot(cdbSlot);
+            Assert.assertTrue(slot.isNative());
+            Assert.assertNotNull(slot.getNativeAssets());
+            Assert.assertEquals(3600, slot.getTtl());
+            Assert.assertEquals("/140800857/Endeavour_Native", slot.getPlacementId());
+            Assert.assertEquals("The Company Store", slot.getNativeAssets().advertiserDescription);
+            Assert.assertFalse(slot.isValid());
         } catch (Exception ex) {
             Assert.fail("Json exception in test data : "+ ex.getLocalizedMessage());
         }

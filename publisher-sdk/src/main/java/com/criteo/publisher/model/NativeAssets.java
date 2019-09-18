@@ -50,9 +50,11 @@ public class NativeAssets {
             JSONObject advertiser = jsonNative.getJSONObject(ADVERTISER);
             this.advertiserDescription = advertiser.optString(DESCRIPTION);
             this.advertiserDomain = advertiser.optString(DOMAIN);
-            this.advertiserLogoUrl = advertiser.getJSONObject(LOGO).optString(NATIVE_URL);
-            this.advertiserLogoHeight = advertiser.getJSONObject(LOGO).optInt(HEIGHT);
-            this.advertiserLogoWidth = advertiser.getJSONObject(LOGO).optInt(WIDTH);
+            if(advertiser.has(LOGO)) {
+                this.advertiserLogoUrl = advertiser.getJSONObject(LOGO).optString(NATIVE_URL);
+                this.advertiserLogoHeight = advertiser.getJSONObject(LOGO).optInt(HEIGHT);
+                this.advertiserLogoWidth = advertiser.getJSONObject(LOGO).optInt(WIDTH);
+            }
             this.advertiserLogoClickUrl = advertiser.optString(LOGO_CLICK_URL);
         }
 
@@ -65,14 +67,12 @@ public class NativeAssets {
         }
 
         // impression pixels
-        // are compulsory
-        JSONArray impressionPixels = jsonNative.getJSONArray(IMPRESSION_PIXELS);
-        if(impressionPixels.length() == 0) {
-            throw new JSONException("Native ads must have at least one impression pixel");
-        }
-        this.impressionPixels = new ArrayList<>();
-        for (int i = 0; i < impressionPixels.length(); i++) {
-            this.impressionPixels.add(impressionPixels.getJSONObject(i).optString(NATIVE_URL));
+        if(jsonNative.has(IMPRESSION_PIXELS)) {
+            JSONArray impressionPixels = jsonNative.getJSONArray(IMPRESSION_PIXELS);
+            this.impressionPixels = new ArrayList<>();
+            for (int i = 0; i < impressionPixels.length(); i++) {
+                this.impressionPixels.add(impressionPixels.getJSONObject(i).optString(NATIVE_URL));
+            }
         }
     }
 
