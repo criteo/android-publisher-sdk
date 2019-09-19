@@ -545,4 +545,114 @@ public class SlotTest {
             Assert.fail("Json exception in test data : "+ ex.getLocalizedMessage());
         }
     }
+
+    @Test
+    public void testValidityWhenSlotIsNative() {
+        Slot slot = new Slot(getNativeJSONSlot());
+        Assert.assertTrue(slot.isValid());
+        Assert.assertTrue(slot.isNative());
+        // if a slot claims it is native and valid then all the following conditions have to be met
+        // it contains a cpm
+        Assert.assertNotNull(slot.getCpm());
+        Assert.assertTrue(slot.getCpm().length() > 0);
+        Assert.assertTrue(slot.getCpmAsNumber() >= 0.0d);
+        Assert.assertNotNull(slot.getNativeAssets());
+        // it contains at least one product
+        Assert.assertNotNull(slot.getNativeAssets().nativeProducts);
+        Assert.assertTrue(slot.getNativeAssets().nativeProducts.size() > 0);
+        // it contains at least one impression pixel
+        Assert.assertNotNull(slot.getNativeAssets().impressionPixels);
+        Assert.assertTrue(slot.getNativeAssets().impressionPixels.size() > 0);
+        // it contains the opt out click url and an opt out image
+        // checking if the string is a valid url or not is beyond the scope of the SDK for now
+        Assert.assertNotNull(slot.getNativeAssets().privacyOptOutClickUrl);
+        Assert.assertTrue(slot.getNativeAssets().privacyOptOutClickUrl.length() > 0);
+        Assert.assertFalse("".equals(slot.getNativeAssets().privacyOptOutClickUrl));
+        Assert.assertNotNull(slot.getNativeAssets().privacyOptOutImageUrl);
+        Assert.assertTrue(slot.getNativeAssets().privacyOptOutImageUrl.length() > 0);
+        Assert.assertFalse("".equals(slot.getNativeAssets().privacyOptOutImageUrl));
+    }
+
+    @Test
+    public void testValidity() {
+        Slot slot = new Slot(getJSONSlot());
+        Assert.assertTrue(slot.isValid());
+        Assert.assertFalse(slot.isNative());
+        // if a slot claims it is NOT native and valid then all the following conditions have to be met
+        // it contains a cpm
+        Assert.assertNotNull(slot.getCpm());
+        Assert.assertTrue(slot.getCpm().length() > 0);
+        Assert.assertTrue(slot.getCpmAsNumber() >= 0.0d);
+        Assert.assertNull(slot.getNativeAssets());
+        // it contains a displayUrl
+        Assert.assertNotNull(slot.getDisplayUrl());
+        Assert.assertTrue(slot.getDisplayUrl().length() > 0);
+        Assert.assertFalse("".equals(slot.getDisplayUrl()));
+    }
+
+    private JSONObject getNativeJSONSlot() {
+        String cdbStringResponse = "{\n" +
+                "    \"slots\": [{\n" +
+                "        \"placementId\": \"/140800857/Endeavour_Native\",\n" +
+                "        \"cpm\": \"0.04\",\n" +
+                "        \"currency\": \"USD\",\n" +
+                "        \"width\": 2,\n" +
+                "        \"height\": 2,\n" +
+                "        \"ttl\": 3600,\n" +
+                "        \"native\": {\n" +
+                "            \"products\": [{\n" +
+                "                \"title\": \"\\\"Stripe Pima Dress\\\" - $99\",\n" +
+                "                \"description\": \"We're All About Comfort.\",\n" +
+                "                \"price\": \"$99\",\n" +
+                "                \"clickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\",\n" +
+                "                \"callToAction\": \"\",\n" +
+                "                \"image\": {\n" +
+                "                    \"url\": \"https://pix.us.criteo.net/img/img?\",\n" +
+                "                    \"height\": 400,\n" +
+                "                    \"width\": 400\n" +
+                "                }\n" +
+                "            }],\n" +
+                "            \"advertiser\": {\n" +
+                "                \"description\": \"The Company Store\",\n" +
+                "                \"domain\": \"thecompanystore.com\",\n" +
+                "                \"logo\": {\n" +
+                "                    \"url\": \"https://pix.us.criteo.net/img/img\",\n" +
+                "                    \"height\": 200,\n" +
+                "                    \"width\": 200\n" +
+                "                },\n" +
+                "                \"logoClickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\"\n" +
+                "            },\n" +
+                "            \"privacy\": {\n" +
+                "                \"optoutClickUrl\": \"https://privacy.us.criteo.com/adcenter\",\n" +
+                "                \"optoutImageUrl\": \"https://static.criteo.net/flash/icon/nai_small.png\",\n" +
+                "                \"longLegalText\": \"\"\n" +
+                "            },\n" +
+                "            \"impressionPixels\": [{\n" +
+                "                \"url\": \"https://cat.sv.us.criteo.com/delivery/lgn.php?\"},{\n" +
+                "                \"url\": \"https://dog.da.us.criteo.com/delivery/lgn.php?\"\n" +
+                "            }]\n" +
+                "        }\n" +
+                "    }]\n" +
+                "}";
+        try {
+            JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+            JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
+            return cdbSlot;
+        } catch (Exception ex) {
+            Assert.fail("Json exception in test data : "+ ex.getLocalizedMessage());
+        }
+        return null;
+    }
+
+    private JSONObject getJSONSlot() {
+        try {
+            String cdbStringResponse = "{\"slots\":[{\"placementId\":\"/140800857/Endeavour_320x50\",\"cpm\":\"1.12\",\"currency\":\"EUR\",\"width\":320,\"height\":50,\"ttl\":555,\"displayUrl\":\"https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js\"}]}";
+            JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+            JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
+            return cdbSlot;
+        } catch (Exception ex) {
+            Assert.fail("Json exception in test data : "+ ex.getLocalizedMessage());
+        }
+        return null;
+    }
 }
