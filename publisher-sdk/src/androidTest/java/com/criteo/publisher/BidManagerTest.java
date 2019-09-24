@@ -14,6 +14,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.UiThreadTest;
 import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.Util.ReflectionUtil;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
@@ -24,6 +25,7 @@ import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.NativeAdUnit;
+import com.criteo.publisher.model.NativeAssets;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
@@ -552,15 +554,47 @@ public class BidManagerTest {
 
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_NATIVE_PIXEL_URL + "0"));
         assertEquals(DeviceUtil.createDfpCompatibleString("https://cat.sv.us.criteo.com/delivery/lgn.php?"),
-                adRequest.getCustomTargeting().get(CRT_NATIVE_PIXEL_URL+"0"));
+                adRequest.getCustomTargeting().get(CRT_NATIVE_PIXEL_URL + "0"));
 
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_NATIVE_PIXEL_URL + "1"));
         assertEquals(DeviceUtil.createDfpCompatibleString("https://dog.da.us.criteo.com/delivery/lgn.php?"),
-                adRequest.getCustomTargeting().get(CRT_NATIVE_PIXEL_URL+"1"));
+                adRequest.getCustomTargeting().get(CRT_NATIVE_PIXEL_URL + "1"));
 
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_NATIVE_PIXEL_COUNT));
         assertEquals(("2"),
                 adRequest.getCustomTargeting().get(CRT_NATIVE_PIXEL_COUNT));
+    }
+
+    /* This test is for https://jira.criteois.com/browse/EE-516
+       when NativeAssets.products is null or NativeAssets.impressionpixels is null application was crashing.
+       With this test . checking nativeProducts is null , impressionPixels is null and application not crashing.
+       In prod slot.isValid() will reject the bids as it's value is checked upstream. This is to test the code that populates the keys.
+    */
+    @Test
+    public void testEnrichNativeRequestWithNullProducts() {
+        BannerAdUnit bannerAdUnit = new BannerAdUnit("BannerAdUnitId", new AdSize(320, 50));
+        List<CacheAdUnit> adUnits = new ArrayList<>();
+        CacheAdUnit cacheAdUnit = AdUnitHelper
+                .convertoCacheAdUnit(bannerAdUnit, context.getResources().getConfiguration().orientation);
+        adUnits.add(cacheAdUnit);
+
+        BidManager bidManager = new BidManager(context, publisher,adUnits
+                , tokenCache, deviceInfo, user, mockSdkCache, config, placementsWithCdbTasks);
+        PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
+        Object object = builder;
+        Slot slot = mock(Slot.class);
+        NativeAssets nativeAssets = mock(NativeAssets.class);
+        when(mockSdkCache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
+        when(mockSdkCache.getAdUnit(cacheAdUnit)).thenReturn(slot);
+        when(slot.isValid()).thenReturn(true);
+        when(slot.isNative()).thenReturn(true);
+        when(slot.getCpmAsNumber()).thenReturn(2.2);
+        when(slot.getTtl()).thenReturn(10000);
+        bidManager.enrichBid(object, bannerAdUnit);
+        when(slot.getNativeAssets()).thenReturn(nativeAssets);
+        Assert.assertNotNull(nativeAssets);
+        Assert.assertNull(nativeAssets.nativeProducts);
+        Assert.assertNull(nativeAssets.impressionPixels);
     }
 
 }

@@ -178,7 +178,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         }
 
         //reflect first product fields
-        if (nativeAssets.nativeProducts.size() > 0) {
+        if (nativeAssets.nativeProducts != null && nativeAssets.nativeProducts.size() > 0) {
             NativeProduct product = nativeAssets.nativeProducts.get(0);
 
             checkAndReflect(object, product.title, CRT_NATIVE_TITLE);
@@ -201,7 +201,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         checkAndReflect(object, nativeAssets.privacyLongLegalText, CRT_NATIVE_PR_TEXT);
 
         //reflect impression pixels
-        if (nativeAssets.impressionPixels.size() > 0) {
+        if (nativeAssets.impressionPixels != null && nativeAssets.impressionPixels.size() > 0) {
             for (int i = 0; i < nativeAssets.impressionPixels.size(); i++) {
                 checkAndReflect(object, nativeAssets.impressionPixels.get(i), CRT_NATIVE_PIXEL_URL + i);
             }
