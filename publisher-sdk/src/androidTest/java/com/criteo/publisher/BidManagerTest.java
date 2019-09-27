@@ -13,6 +13,7 @@ import android.os.AsyncTask;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.UiThreadTest;
+import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.ReflectionUtil;
 import com.criteo.publisher.cache.SdkCache;
@@ -125,7 +126,7 @@ public class BidManagerTest {
                 new TokenCache(), new DeviceInfo(), user, sdkCache, config, placementsWithCdbTasks);
         AdSize adSize = new AdSize(320, 50);
         BannerAdUnit bannerAdUnit = new BannerAdUnit("UniqueId", adSize);
-        CacheAdUnit placementKey = new CacheAdUnit(adSize, bannerAdUnit.getAdUnitId(), false);
+        CacheAdUnit placementKey = new CacheAdUnit(adSize, bannerAdUnit.getAdUnitId(), AdUnitType.CRITEO_BANNER);
         manager.getBidForAdUnitAndPrefetch(bannerAdUnit);
         CdbDownloadTask cdbDownloadTask = placementsWithCdbTasks.get(placementKey);
         assertNotNull(cdbDownloadTask);
@@ -137,9 +138,9 @@ public class BidManagerTest {
     public void testPlacementAdditionInPrefetch() throws InterruptedException {
         List<CacheAdUnit> cacheAdUnits = new ArrayList<>();
         AdSize adSize = new AdSize(320, 50);
-        CacheAdUnit cacheAdUnit1 = new CacheAdUnit(adSize, "SampleBannerAdUnitId1", false);
+        CacheAdUnit cacheAdUnit1 = new CacheAdUnit(adSize, "SampleBannerAdUnitId1", AdUnitType.CRITEO_BANNER);
         AdSize adSize_2 = new AdSize(300, 250);
-        CacheAdUnit cacheAdUnit2 = new CacheAdUnit(adSize_2, "SampleBannerAdUnitId2", false);
+        CacheAdUnit cacheAdUnit2 = new CacheAdUnit(adSize_2, "SampleBannerAdUnitId2", AdUnitType.CRITEO_BANNER);
         cacheAdUnits.add(cacheAdUnit1);
         cacheAdUnits.add(cacheAdUnit2);
 
@@ -386,7 +387,7 @@ public class BidManagerTest {
         Config config = mock(Config.class);
         when(config.isKillSwitch()).thenReturn(false);
         List<CacheAdUnit> cacheAdUnits = new ArrayList<>();
-        CacheAdUnit cAdUnit = new CacheAdUnit(new AdSize(320, 50), "bannerAdunitId", false);
+        CacheAdUnit cAdUnit = new CacheAdUnit(new AdSize(320, 50), "bannerAdunitId", AdUnitType.CRITEO_BANNER);
         cacheAdUnits.add(cAdUnit);
 
         JSONObject slotJson = null;
@@ -432,7 +433,7 @@ public class BidManagerTest {
         Config config = mock(Config.class);
         when(config.isKillSwitch()).thenReturn(false);
         List<CacheAdUnit> cacheAdUnits = new ArrayList<>();
-        CacheAdUnit cAdUnit = new CacheAdUnit(new AdSize(2, 2), "nativeAdunitId", true);
+        CacheAdUnit cAdUnit = new CacheAdUnit(new AdSize(2, 2), "nativeAdunitId", AdUnitType.CRITEO_CUSTOM_NATIVE);
         cacheAdUnits.add(cAdUnit);
 
         JSONObject slotJson = null;

@@ -18,7 +18,6 @@ import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
-import com.criteo.publisher.model.ScreenSize;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.model.User;
@@ -127,21 +126,12 @@ public final class Criteo {
 
     private void createSupportedScreenSizes(Application application) {
 
-        ArrayList<ScreenSize> screenSizesPortrait = new ArrayList<>();
-        screenSizesPortrait.add(new ScreenSize(320, 480));
-        screenSizesPortrait.add(new ScreenSize(360, 640));
-
-        ArrayList<ScreenSize> screenSizesLandscape = new ArrayList<>();
-        screenSizesLandscape.add(new ScreenSize(480, 320));
-        screenSizesLandscape.add(new ScreenSize(640, 360));
-
         try {
             DisplayMetrics metrics = new DisplayMetrics();
             ((WindowManager) application.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()
                     .getMetrics(metrics);
             DeviceUtil.setScreenSize(Math.round(metrics.widthPixels / metrics.density),
-                    Math.round(metrics.heightPixels / metrics.density), screenSizesPortrait,
-                    screenSizesLandscape);
+                    Math.round(metrics.heightPixels / metrics.density));
         } catch (Exception e) {
             throw new Error("Screen parameters can not be empty or null");
         }

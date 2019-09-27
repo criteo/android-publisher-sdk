@@ -1,5 +1,6 @@
 package com.criteo.publisher;
 
+import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -51,7 +52,7 @@ public class BidManagerTests {
         adUnit = new BannerAdUnit(adUnitId, adSize);
 
         cacheAdUnits = new ArrayList<>();
-        CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, false);
+        CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
         cacheAdUnits.add(cAdUnit);
 
         context = mock(Context.class);
@@ -182,7 +183,7 @@ public class BidManagerTests {
         Config config = mock(Config.class);
         when(config.isKillSwitch()).thenReturn(false);
 
-        CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, false);
+        CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
         when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
         when(this.sdkCache.getAdUnit(cAdUnit)).thenReturn(testSlot);
 

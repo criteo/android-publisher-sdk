@@ -93,27 +93,6 @@ public class DeviceUtilTest {
     }
 
     @Test
-    public void testgetNearestAdSizeLandscape() {
-        DeviceUtil.setScreenSize(360, 692, screenSizesPortrait, screenSizesLandscape);
-        assertEquals(DeviceUtil.getSizePortrait().getWidth(), 360);
-        assertEquals(DeviceUtil.getSizePortrait().getHeight(), 540);
-        assertEquals(DeviceUtil.getSizeLandscape().getWidth(), 600);
-        assertEquals(DeviceUtil.getSizeLandscape().getHeight(), 320);
-
-        DeviceUtil.setScreenSize(120, 350, screenSizesPortrait, screenSizesLandscape);
-        assertEquals(DeviceUtil.getSizePortrait().getWidth(), 100);
-        assertEquals(DeviceUtil.getSizePortrait().getHeight(), 200);
-        assertEquals(DeviceUtil.getSizeLandscape().getWidth(), 350);
-        assertEquals(DeviceUtil.getSizeLandscape().getHeight(), 200);
-
-        DeviceUtil.setScreenSize(600, 900, screenSizesPortrait, screenSizesLandscape);
-        assertEquals(DeviceUtil.getSizePortrait().getWidth(), 360);
-        assertEquals(DeviceUtil.getSizePortrait().getHeight(), 540);
-        assertEquals(DeviceUtil.getSizeLandscape().getWidth(), 600);
-        assertEquals(DeviceUtil.getSizeLandscape().getHeight(), 320);
-    }
-
-    @Test
     public void testCreateDfpCompatibleWithNullDisplayUrl() {
         String displayUrl = null;
         Assert.assertNull(DeviceUtil.createDfpCompatibleString(displayUrl));

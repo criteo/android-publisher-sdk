@@ -1,5 +1,6 @@
 package com.criteo.publisher.cache;
 
+import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Slot;
@@ -11,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 
+import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -31,7 +33,7 @@ public class SdkCacheTest {
         for(int i=slots.length() -1; i >=0 ;i--) {
             String placement = slots.getJSONObject(i).getString("placementId");
             AdSize adSize = new AdSize(slots.getJSONObject(i).getInt("width"), slots.getJSONObject(i).getInt("height"));
-            CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, false);
+            CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
             Slot cachedSlot = cache.getAdUnit(testAdUnit);
             assertEquals(placement, cachedSlot.getPlacementId());
             assertEquals(slots.getJSONObject(i).getString("currency"), cachedSlot.getCurrency());
@@ -48,7 +50,7 @@ public class SdkCacheTest {
 
         String placement = "this/isnt/in/the/cache";
         AdSize adSize = new AdSize(320, 50);
-        CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, false);
+        CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
         Slot cachedSlot = cache.getAdUnit(testAdUnit);
         assertNull(cachedSlot);
     }
@@ -60,7 +62,7 @@ public class SdkCacheTest {
         for(int i=slots.length() -1; i >=0 ;i--) {
             String placement = slots.getJSONObject(i).getString("placementId");
             AdSize adSize = new AdSize(slots.getJSONObject(i).getInt("width"), slots.getJSONObject(i).getInt("height"));
-            CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, false);
+            CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
             Slot cachedSlot = cache.peekAdUnit(testAdUnit);
             assertEquals(placement, cachedSlot.getPlacementId());
             assertEquals(slots.getJSONObject(i).getString("currency"), cachedSlot.getCurrency());
@@ -77,7 +79,7 @@ public class SdkCacheTest {
 
         String placement = "this/isnt/in/the/cache";
         AdSize adSize = new AdSize(320, 50);
-        CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, false);
+        CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
         Slot cachedSlot = cache.peekAdUnit(testAdUnit);
         assertNull(cachedSlot);
     }
@@ -89,7 +91,7 @@ public class SdkCacheTest {
         for(int i=slots.length() -1; i >=0 ;i--) {
             String placement = slots.getJSONObject(i).getString("placementId");
             AdSize adSize = new AdSize(slots.getJSONObject(i).getInt("width"), slots.getJSONObject(i).getInt("height"));
-            CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, false);
+            CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
             Slot cachedSlot = cache.peekAdUnit(testAdUnit);
             assertEquals(placement, cachedSlot.getPlacementId());
             assertEquals(slots.getJSONObject(i).getString("currency"), cachedSlot.getCurrency());
@@ -111,7 +113,7 @@ public class SdkCacheTest {
 
         String placement = "this/isnt/in/the/cache";
         AdSize adSize = new AdSize(320, 50);
-        CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, false);
+        CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
         int cacheSize = cache.getItemCount();
         cache.remove(testAdUnit);
         assertEquals(cacheSize, cache.getItemCount());

@@ -1,5 +1,6 @@
 package com.criteo.publisher.model;
 
+import com.criteo.publisher.Util.AdUnitType;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,7 +22,7 @@ public class AdUnitTest {
     @Before
     public void initialize() {
         adSize = new AdSize(WIDTH, HEIGHT);
-        cacheAdUnit = new CacheAdUnit(adSize, PLACEMENT_ID_VALUE, false);
+        cacheAdUnit = new CacheAdUnit(adSize, PLACEMENT_ID_VALUE, AdUnitType.CRITEO_BANNER);
     }
 
     @Test

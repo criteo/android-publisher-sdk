@@ -1,5 +1,6 @@
 package com.criteo.publisher.model;
 
+import com.criteo.publisher.Util.AdUnitType;
 import java.util.Objects;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,9 +11,10 @@ public class CacheAdUnit {
     private static final String PLACEMENT_ID = "placementId";
     private static final String SIZES = "sizes";
     private static final String IS_NATIVE = "isNative";
+    private static final String IS_INTERSTITIAL = "interstitial";
     private String adUnitId;
     private AdSize adSize;
-    private boolean isNative;
+    private AdUnitType adUnitType;
 
     public String getPlacementId() {
         return adUnitId;
@@ -26,10 +28,6 @@ public class CacheAdUnit {
         this.adSize = size;
     }
 
-    public boolean isNative() {
-        return this.isNative;
-    }
-
     public JSONObject toJson() throws JSONException {
         JSONObject adUnitJson = new JSONObject();
         JSONArray adUnitSizes = new JSONArray();
@@ -38,9 +36,16 @@ public class CacheAdUnit {
             adUnitJson.put(SIZES, adUnitSizes);
         }
         adUnitJson.put(PLACEMENT_ID, adUnitId);
-        if(this.isNative) {
-            adUnitJson.put(IS_NATIVE, this.isNative);
+
+        switch (adUnitType) {
+            case CRITEO_INTERSTITIAL:
+                adUnitJson.put(IS_INTERSTITIAL, true);
+                break;
+            case CRITEO_CUSTOM_NATIVE:
+                adUnitJson.put(IS_NATIVE, true);
+                break;
         }
+
         return adUnitJson;
     }
 
@@ -49,14 +54,14 @@ public class CacheAdUnit {
         return "CacheAdUnit{" +
                 "placementId='" + adUnitId + '\'' +
                 ", adSize=" + adSize +
-                ", isNative= " + isNative +
+                ", adUnitType= " + adUnitType +
                 '}';
     }
 
-    public CacheAdUnit(AdSize adSize, String adUnitId, boolean isNative) {
+    public CacheAdUnit(AdSize adSize, String adUnitId, AdUnitType adUnitType) {
         this.adSize = adSize;
         this.adUnitId = adUnitId;
-        this.isNative = isNative;
+        this.adUnitType = adUnitType;
     }
 
     @Override
@@ -70,12 +75,12 @@ public class CacheAdUnit {
         CacheAdUnit cacheAdUnit = (CacheAdUnit) o;
         return Objects.equals(adUnitId, cacheAdUnit.adUnitId) &&
                 Objects.equals(adSize, cacheAdUnit.adSize) &&
-                Objects.equals(isNative, cacheAdUnit.isNative);
+                Objects.equals(adUnitType, cacheAdUnit.adUnitType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(adUnitId, adSize, isNative);
+        return Objects.hash(adUnitId, adSize, adUnitType);
     }
 
 }
