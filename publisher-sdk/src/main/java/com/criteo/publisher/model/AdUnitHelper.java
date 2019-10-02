@@ -1,7 +1,7 @@
 package com.criteo.publisher.model;
 
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_CUSTOM_NATIVE;
+import static com.criteo.publisher.Util.AdUnitType.CRITEO_NATIVE;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_INTERSTITIAL;
 
 import android.content.Context;
@@ -37,9 +37,9 @@ public final class AdUnitHelper {
                     cacheAdUnits.addAll(createInterstitialAdUnits(context, interstitialAdUnit.getAdUnitId()));
                     break;
 
-                case CRITEO_CUSTOM_NATIVE:
+                case CRITEO_NATIVE:
                     NativeAdUnit nativeAdUnit = (NativeAdUnit) adUnit;
-                    cacheAdUnits.add(new CacheAdUnit(nativeAdUnit.getAdSize(), nativeAdUnit.getAdUnitId(), CRITEO_CUSTOM_NATIVE));
+                    cacheAdUnits.add(new CacheAdUnit(nativeAdUnit.getAdSize(), nativeAdUnit.getAdUnitId(), CRITEO_NATIVE));
                     break;
 
                 default:
@@ -78,9 +78,9 @@ public final class AdUnitHelper {
                 }
                 return new CacheAdUnit(adSize, interstitialAdUnit.getAdUnitId(), CRITEO_INTERSTITIAL);
 
-            case CRITEO_CUSTOM_NATIVE:
+            case CRITEO_NATIVE:
                 NativeAdUnit nativeAdUnit = (NativeAdUnit) adUnit;
-                return new CacheAdUnit(nativeAdUnit.getAdSize(), nativeAdUnit.getAdUnitId(), CRITEO_CUSTOM_NATIVE);
+                return new CacheAdUnit(nativeAdUnit.getAdSize(), nativeAdUnit.getAdUnitId(), CRITEO_NATIVE);
 
             default:
                 throw new IllegalArgumentException("Found an invalid AdUnit");

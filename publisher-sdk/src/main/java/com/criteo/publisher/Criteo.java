@@ -17,6 +17,7 @@ import com.criteo.publisher.model.AdUnitHelper;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
+import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
@@ -25,6 +26,8 @@ import com.criteo.publisher.network.CdbDownloadTask;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+
+import static android.content.ContentValues.TAG;
 
 public final class Criteo {
 
@@ -155,6 +158,21 @@ public final class Criteo {
             return null;
         }
         return bidManager.getBidForInhouseMediation(adUnit);
+    }
+
+    public void loadNativeAd(NativeAdUnit nativeAdUnit, CriteoNativeAdListener nativeAdListener) {
+        try {
+            if (bidManager == null) {
+                return;
+            }
+            if (nativeAdUnit == null || nativeAdListener == null) {
+                Log.d(TAG, nativeAdUnit == null ? "NativeAdUnit" : "CriteoNativeAdListener" + " cannot be null");
+                return;
+            }
+            bidManager.loadNativeAd(nativeAdUnit, nativeAdListener);
+        } catch (Exception ex) {
+            Log.e(TAG, "Internal error when loading native ad.", ex);
+        }
     }
 
     TokenValue getTokenValue(BidToken bidToken, AdUnitType adUnitType) {

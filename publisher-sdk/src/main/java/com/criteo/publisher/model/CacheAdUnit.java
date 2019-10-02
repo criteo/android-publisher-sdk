@@ -41,7 +41,7 @@ public class CacheAdUnit {
             case CRITEO_INTERSTITIAL:
                 adUnitJson.put(IS_INTERSTITIAL, true);
                 break;
-            case CRITEO_CUSTOM_NATIVE:
+            case CRITEO_NATIVE:
                 adUnitJson.put(IS_NATIVE, true);
                 break;
         }

@@ -1,9 +1,12 @@
 package com.criteo.publisher;
 
+import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
+import static com.criteo.publisher.Util.AdUnitType.CRITEO_NATIVE;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -42,6 +45,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(AndroidJUnit4.class)
@@ -433,7 +437,7 @@ public class BidManagerTest {
         Config config = mock(Config.class);
         when(config.isKillSwitch()).thenReturn(false);
         List<CacheAdUnit> cacheAdUnits = new ArrayList<>();
-        CacheAdUnit cAdUnit = new CacheAdUnit(new AdSize(2, 2), "nativeAdunitId", AdUnitType.CRITEO_CUSTOM_NATIVE);
+        CacheAdUnit cAdUnit = new CacheAdUnit(new AdSize(2, 2), "nativeAdunitId", AdUnitType.CRITEO_NATIVE);
         cacheAdUnits.add(cAdUnit);
 
         JSONObject slotJson = null;
@@ -596,6 +600,159 @@ public class BidManagerTest {
         Assert.assertNotNull(nativeAssets);
         Assert.assertNull(nativeAssets.nativeProducts);
         Assert.assertNull(nativeAssets.impressionPixels);
+    }
+
+    @Test
+    public void testLoadNativeAd() {
+        String adUnitId = "someNativeAdUnit";
+        ArrayList<CacheAdUnit> cacheAdUnits = new ArrayList<>();
+        CacheAdUnit cAdUnit = new CacheAdUnit(new AdSize(2, 2), adUnitId, CRITEO_NATIVE);
+        cacheAdUnits.add(cAdUnit);
+        SdkCache mockSdkCache = mock(SdkCache.class);
+
+        String cdbStringResponse = "{\n" +
+                "    \"slots\": [{\n" +
+                "        \"placementId\": \"/140800857/Endeavour_Native\",\n" +
+                "        \"cpm\": \"0.04\",\n" +
+                "        \"currency\": \"USD\",\n" +
+                "        \"width\": 2,\n" +
+                "        \"height\": 2,\n" +
+                "        \"ttl\": 3600,\n" +
+                "        \"native\": {\n" +
+                "            \"products\": [{\n" +
+                "                \"title\": \"\\\"Stripe Pima Dress\\\" - $99\",\n" +
+                "                \"description\": \"We're All About Comfort.\",\n" +
+                "                \"price\": \"$99\",\n" +
+                "                \"clickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\",\n" +
+                "                \"callToAction\": \"\",\n" +
+                "                \"image\": {\n" +
+                "                    \"url\": \"https://pix.us.criteo.net/img/img?\",\n" +
+                "                    \"height\": 400,\n" +
+                "                    \"width\": 400\n" +
+                "                }\n" +
+                "            }],\n" +
+                "            \"advertiser\": {\n" +
+                "                \"description\": \"The Company Store\",\n" +
+                "                \"domain\": \"thecompanystore.com\",\n" +
+                "                \"logo\": {\n" +
+                "                    \"url\": \"https://pix.us.criteo.net/img/img\",\n" +
+                "                    \"height\": 200,\n" +
+                "                    \"width\": 200\n" +
+                "                },\n" +
+                "                \"logoClickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\"\n" +
+                "            },\n" +
+                "            \"privacy\": {\n" +
+                "                \"optoutClickUrl\": \"https://privacy.us.criteo.com/adcenter\",\n" +
+                "                \"optoutImageUrl\": \"https://static.criteo.net/flash/icon/nai_small.png\",\n" +
+                "                \"longLegalText\": \"\"\n" +
+                "            },\n" +
+                "            \"impressionPixels\": [{\n" +
+                "                \"url\": \"https://cat.sv.us.criteo.com/delivery/lgn.php?\"},{\n" +
+                "                \"url\": \"https://dog.da.us.criteo.com/delivery/lgn.php?\"\n" +
+                "            }]\n" +
+                "        }\n" +
+                "    }]\n" +
+                "}";
+        try {
+            JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+            JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
+            org.junit.Assert.assertNotNull(cdbSlot);
+
+            Slot testSlot = new Slot(cdbSlot);
+            when(mockSdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
+            when(mockSdkCache.getAdUnit(cAdUnit)).thenReturn(testSlot);
+
+            BidManager bidManager = new BidManager(context, publisher, cacheAdUnits
+                    , tokenCache, deviceInfo, user, mockSdkCache, config, placementsWithCdbTasks);
+
+            NativeAdUnit nativeAdUnit = new NativeAdUnit(adUnitId);
+            CriteoNativeAdListener listener = mock(CriteoNativeAdListener.class);
+
+            bidManager.loadNativeAd(nativeAdUnit, listener);
+
+            Thread.sleep(100);
+
+            Mockito.verify(listener, Mockito.times(1)).onAdReceived(any());
+            Mockito.verify(listener, Mockito.times(0)).onAdFailedToReceive(any());
+        } catch (Exception ex) {
+            Assert.fail("Exception in test " + ex.getLocalizedMessage());
+        }
+    }
+
+    @Test
+    public void testLoadNativeAdWhenAdunitIsNotInCache() {
+        String adUnitId = "someNativeAdUnit";
+        ArrayList<CacheAdUnit> cacheAdUnits = new ArrayList<>();
+        CacheAdUnit cAdUnit = new CacheAdUnit(new AdSize(2, 2), adUnitId, CRITEO_NATIVE);
+        cacheAdUnits.add(cAdUnit);
+        SdkCache mockSdkCache = mock(SdkCache.class);
+
+        try {
+            when(mockSdkCache.peekAdUnit(cAdUnit)).thenReturn(null);
+            when(mockSdkCache.getAdUnit(cAdUnit)).thenReturn(null);
+
+            BidManager bidManager = new BidManager(context, publisher, cacheAdUnits
+                    , tokenCache, deviceInfo, user, mockSdkCache, config, placementsWithCdbTasks);
+
+            NativeAdUnit nativeAdUnit = new NativeAdUnit(adUnitId);
+            CriteoNativeAdListener listener = mock(CriteoNativeAdListener.class);
+
+            bidManager.loadNativeAd(nativeAdUnit, listener);
+
+            Thread.sleep(100);
+
+            Mockito.verify(listener, Mockito.times(0)).onAdReceived(any());
+            Mockito.verify(listener, Mockito.times(1)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+        } catch (Exception ex) {
+            Assert.fail("Exception in test " + ex.getLocalizedMessage());
+        }
+    }
+
+    @Test
+    public void testLoadNativeAdWhenAdunitInCacheIsNotNative() {
+        String adUnitId = "someNativeAdUnit";
+        ArrayList<CacheAdUnit> cacheAdUnits = new ArrayList<>();
+        CacheAdUnit cAdUnit = new CacheAdUnit(new AdSize(320, 50), adUnitId, CRITEO_BANNER);
+        cacheAdUnits.add(cAdUnit);
+        SdkCache mockSdkCache = mock(SdkCache.class);
+
+        JSONObject slotJson = null;
+        try {
+            slotJson = new JSONObject("{\n" +
+                    "            \"placementId\": \"" + adUnitId + "\",\n" +
+                    "            \"cpm\": \"0.10\",\n" +
+                    "            \"currency\": \"USD\",\n" +
+                    "            \"width\": 320,\n" +
+                    "            \"height\": 50,\n" +
+                    "            \"ttl\": 3600,\n" +
+                    "            \"displayUrl\": \"https://www.example.com/lone?par1=abcd\"\n" +
+                    "        }");
+        } catch (Exception ex) {
+            Assert.fail("Invalid json");
+        }
+
+        org.junit.Assert.assertNotNull(slotJson);
+        Slot testSlot = new Slot(slotJson);
+
+        try {
+            when(mockSdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
+            when(mockSdkCache.getAdUnit(cAdUnit)).thenReturn(testSlot);
+
+            BidManager bidManager = new BidManager(context, publisher, cacheAdUnits
+                    , tokenCache, deviceInfo, user, mockSdkCache, config, placementsWithCdbTasks);
+
+            NativeAdUnit nativeAdUnit = new NativeAdUnit(adUnitId);
+            CriteoNativeAdListener listener = mock(CriteoNativeAdListener.class);
+
+            bidManager.loadNativeAd(nativeAdUnit, listener);
+
+            Thread.sleep(100);
+
+            Mockito.verify(listener, Mockito.times(0)).onAdReceived(any());
+            Mockito.verify(listener, Mockito.times(1)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+        } catch (Exception ex) {
+            Assert.fail("Exception in test " + ex.getLocalizedMessage());
+        }
     }
 
 }
