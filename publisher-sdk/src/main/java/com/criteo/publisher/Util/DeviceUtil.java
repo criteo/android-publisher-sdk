@@ -14,9 +14,6 @@ public final class DeviceUtil {
 
     private static final String CRITEO_LOGGING = "CRITEO_LOGGING";
     private static final String DEVICE_ID_LIMITED = "00000000-0000-0000-0000-000000000000";
-    private static final String IS_GOOGLE_PLAY_SERVICES_AVAILABLE = "isGooglePlayServicesAvailable";
-
-    private final static int GOOGLE_PLAY_SUCCESS_CODE = 0;
 
     private static AdSize sizePortrait = new AdSize(0, 0);
     private static AdSize sizeLandscape = new AdSize(0, 0);
@@ -45,17 +42,6 @@ public final class DeviceUtil {
         } else {
             return manufacturer + " " + model;
         }
-    }
-
-    public static boolean hasPlayServices(Context context) {
-        try {
-            Object status = ReflectionUtil.callGoogleApiAvailability
-                    (IS_GOOGLE_PLAY_SERVICES_AVAILABLE, context);
-            return GOOGLE_PLAY_SUCCESS_CODE == (int) status;
-        } catch (Exception e) {
-            Log.e("DeviceUtil", "Error trying to find play services: " + e.getMessage());
-        }
-        return false;
     }
 
     public static String getAdvertisingId(Context context) {

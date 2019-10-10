@@ -15,7 +15,6 @@ import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
 import java.util.Hashtable;
 import java.util.List;
-
 import org.json.JSONObject;
 
 public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
@@ -61,13 +60,12 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         if (profile <= 0) {
             return null;
         }
-        if (DeviceUtil.hasPlayServices(mContext)) {
-            String advertisingId = DeviceUtil.getAdvertisingId(mContext);
 
-            if (!TextUtils.isEmpty(advertisingId)) {
-                user.setDeviceId(advertisingId);
-            }
+        String advertisingId = DeviceUtil.getAdvertisingId(mContext);
+        if (!TextUtils.isEmpty(advertisingId)) {
+            user.setDeviceId(advertisingId);
         }
+
         NetworkResult result = new NetworkResult();
         JSONObject configResult = null;
         if (callConfig) {
