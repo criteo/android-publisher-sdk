@@ -29,6 +29,8 @@ import com.criteo.publisher.tasks.CriteoAdvancedNativeListenerCallTask;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+
 import org.json.JSONObject;
 
 public class BidManager implements NetworkResponseListener, ApplicationStoppedListener {
@@ -123,7 +125,19 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
                 enrichMoPubBid(object, adUnit);
             } else if (object.getClass() == ReflectionUtil.getClassFromString(DFP_ADREQUEST_CLASS)) {
                 enrichDfpBid(object, adUnit);
+            } else if (object instanceof Map) {
+                enrichMapBid((Map)object, adUnit);
             }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void enrichMapBid(Map map, AdUnit adUnit)
+    {
+        Slot slot = getBidForAdUnitAndPrefetch(adUnit);
+        if (slot != null && slot.isValid()) {
+            map.put(CRT_DISPLAY_URL, slot.getDisplayUrl());
+            map.put(CRT_CPM, slot.getCpm());
         }
     }
 
