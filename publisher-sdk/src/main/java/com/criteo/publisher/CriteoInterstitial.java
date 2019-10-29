@@ -10,6 +10,8 @@ import com.criteo.publisher.controller.WebViewDownloader;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.WebViewData;
 
+import java.util.Objects;
+
 public class CriteoInterstitial {
 
     private static final String TAG = CriteoInterstitial.class.getSimpleName();
@@ -61,7 +63,7 @@ public class CriteoInterstitial {
     }
 
     public void loadAd(BidToken bidToken) {
-        if (bidToken != null && interstitialAdUnit != bidToken.getAdUnit()) {
+        if (bidToken != null && !Objects.equals(interstitialAdUnit, bidToken.getAdUnit())) {
             return;
         }
         try {
