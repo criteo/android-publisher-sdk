@@ -60,7 +60,7 @@ public class CriteoBannerViewTest {
     @Test
     public void testInHouseLoadAdWithDifferentAdUnit() throws InterruptedException {
         UUID uuid1 = UUID.nameUUIDFromBytes("TEST_STRING1".getBytes());
-        BannerAdUnit bannerAdUnit2 = new BannerAdUnit("/140800857/None", new AdSize(320, 50));
+        BannerAdUnit bannerAdUnit2 = new BannerAdUnit("/140800857/None2", new AdSize(320, 50));
         BidToken token1 = new BidToken(uuid1, bannerAdUnit2);
         criteoBannerView.loadAd(token1);
 
