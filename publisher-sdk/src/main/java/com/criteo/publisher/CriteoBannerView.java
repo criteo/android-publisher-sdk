@@ -5,6 +5,8 @@ import android.util.Log;
 import android.webkit.WebView;
 import com.criteo.publisher.model.BannerAdUnit;
 
+import java.util.Objects;
+
 public class CriteoBannerView extends WebView {
 
     private static final String TAG = CriteoBannerView.class.getSimpleName();
@@ -53,7 +55,7 @@ public class CriteoBannerView extends WebView {
     }
 
     private void doLoadAd(BidToken bidToken) {
-        if (bidToken != null && bannerAdUnit != bidToken.getAdUnit()) {
+        if (bidToken != null && !Objects.equals(bannerAdUnit, bidToken.getAdUnit())) {
             return;
         }
         if (criteoBannerEventController == null) {

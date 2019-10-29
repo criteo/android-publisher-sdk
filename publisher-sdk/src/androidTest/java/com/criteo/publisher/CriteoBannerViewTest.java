@@ -9,12 +9,12 @@ import com.criteo.publisher.model.BannerAdUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+
+import static org.mockito.Mockito.*;
 
 public class CriteoBannerViewTest {
 
@@ -52,8 +52,8 @@ public class CriteoBannerViewTest {
         Thread.sleep(500);
 
         //Expected result , found no slot and called criteoBannerAdListener.onAdFetchFailed
-        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdReceived(criteoBannerView);
-        Mockito.verify(criteoBannerAdListener, Mockito.times(1))
+        verify(criteoBannerAdListener, never()).onAdReceived(criteoBannerView);
+        verify(criteoBannerAdListener, times(1))
                 .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
     }
 
@@ -68,9 +68,25 @@ public class CriteoBannerViewTest {
         Thread.sleep(500);
 
         //Expected result , not calling criteoBannerAdListener.onAdReceived and criteoBannerAdListener.onAdFetchFailed
-        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdReceived(criteoBannerView);
-        Mockito.verify(criteoBannerAdListener, Mockito.times(0))
+        verify(criteoBannerAdListener, never()).onAdReceived(criteoBannerView);
+        verify(criteoBannerAdListener, never())
                 .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+    }
+
+    @Test
+    public void testInHouseLoadAdWithEqualAdUnitButDifferentInstance() throws InterruptedException {
+        UUID uuid = UUID.nameUUIDFromBytes("TEST_STRING1".getBytes());
+        BannerAdUnit equalAdUnit = new BannerAdUnit("/140800857/None", new AdSize(320, 50));
+        BidToken bidToken = new BidToken(uuid, equalAdUnit);
+
+        criteoBannerView.loadAd(bidToken);
+
+        //wait for the loadAd process to be completed
+        Thread.sleep(500);
+
+        //Expected result , found no slot and called criteoBannerAdListener.onAdFetchFailed
+        verify(criteoBannerAdListener, never()).onAdReceived(criteoBannerView);
+        verify(criteoBannerAdListener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
     }
 
 
@@ -82,8 +98,8 @@ public class CriteoBannerViewTest {
         Thread.sleep(500);
 
         //Expected result , found no slot and called criteoBannerAdListener.onAdFetchFailed
-        Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdReceived(criteoBannerView);
-        Mockito.verify(criteoBannerAdListener, Mockito.times(1))
+        verify(criteoBannerAdListener, never()).onAdReceived(criteoBannerView);
+        verify(criteoBannerAdListener, times(1))
                 .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
     }
 
