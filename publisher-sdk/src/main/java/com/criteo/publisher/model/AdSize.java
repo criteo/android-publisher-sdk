@@ -80,6 +80,8 @@ public class AdSize implements Parcelable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(height, width);
+        int result = width;
+        result = 31 * result + height;
+        return result;
     }
 }

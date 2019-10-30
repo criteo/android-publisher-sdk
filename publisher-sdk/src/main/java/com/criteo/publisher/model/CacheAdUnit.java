@@ -1,7 +1,6 @@
 package com.criteo.publisher.model;
 
 import com.criteo.publisher.Util.AdUnitType;
-import java.util.Objects;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -72,15 +71,23 @@ public class CacheAdUnit {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        CacheAdUnit cacheAdUnit = (CacheAdUnit) o;
-        return Objects.equals(adUnitId, cacheAdUnit.adUnitId) &&
-                Objects.equals(adSize, cacheAdUnit.adSize) &&
-                Objects.equals(adUnitType, cacheAdUnit.adUnitType);
+
+        CacheAdUnit that = (CacheAdUnit) o;
+
+        if (adUnitId != null ? !adUnitId.equals(that.adUnitId) : that.adUnitId != null) {
+            return false;
+        }
+        if (adSize != null ? !adSize.equals(that.adSize) : that.adSize != null) {
+            return false;
+        }
+        return adUnitType == that.adUnitType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(adUnitId, adSize, adUnitType);
+        int result = adUnitId != null ? adUnitId.hashCode() : 0;
+        result = 31 * result + (adSize != null ? adSize.hashCode() : 0);
+        result = 31 * result + (adUnitType != null ? adUnitType.hashCode() : 0);
+        return result;
     }
-
 }

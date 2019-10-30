@@ -25,6 +25,13 @@ public class CacheAdUnitTest {
     }
 
     @Test
+    public void checkEquals() {
+        CacheAdUnit cacheAdUnit = new CacheAdUnit(new AdSize(320, 50), "AdUnitId", CRITEO_NATIVE);
+        CacheAdUnit anotherCacheAdUnit = new CacheAdUnit(new AdSize(320, 50), "AdUnitId", CRITEO_NATIVE);
+        Assert.assertEquals(cacheAdUnit, anotherCacheAdUnit);
+    }
+
+    @Test
     public void checkHashCodeWithSameId() {
         CacheAdUnit cacheAdUnit = new CacheAdUnit(new AdSize(320, 480), "AdUnitId", CRITEO_BANNER);
         CacheAdUnit anotherCacheAdUnit = new CacheAdUnit(new AdSize(320, 480), "AdUnitId", CRITEO_INTERSTITIAL);

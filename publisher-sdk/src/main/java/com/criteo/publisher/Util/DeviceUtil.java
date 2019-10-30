@@ -1,5 +1,7 @@
 package com.criteo.publisher.Util;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Context;
 import android.os.Build;
 import android.text.TextUtils;
@@ -66,7 +68,8 @@ public final class DeviceUtil {
     }
 
     public static String createDfpCompatibleString(String stringToEncode) {
-        if (TextUtils.isEmpty(stringToEncode)) {
+
+        if (TextUtils.isEmpty(stringToEncode) || DeviceUtil.isVersionNotSupported()) {
             return null;
         }
         try {
@@ -78,6 +81,15 @@ public final class DeviceUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static boolean isVersionNotSupported() {
+        if (android.os.Build.VERSION.SDK_INT < 19) {
+            Log.e(TAG, "Unsupported Android version");
+            return true;
+        }
+
+        return false;
     }
 
     public static boolean isLoggingEnabled() {
