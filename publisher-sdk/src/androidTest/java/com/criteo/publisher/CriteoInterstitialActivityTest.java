@@ -30,7 +30,7 @@ public class CriteoInterstitialActivityTest {
             CriteoInterstitialActivity.class, true, false);
 
     @Test
-    public void testAppearAndDissmiss() {
+    public void testAppearAndDoNotDismiss() {
         CriteoResultReceiver criteoResultReceiver = mock(CriteoResultReceiver.class);
         Intent intent = new Intent();
         Bundle bundle = new Bundle();
@@ -65,7 +65,7 @@ public class CriteoInterstitialActivityTest {
             public void run() {
                 Collection closedActivities = ActivityLifecycleMonitorRegistry.getInstance()
                         .getActivitiesInStage(DESTROYED);
-                assertTrue(closedActivities.contains(activityRule.getActivity()));
+                assertFalse(closedActivities.contains(activityRule.getActivity()));
             }
         });
 

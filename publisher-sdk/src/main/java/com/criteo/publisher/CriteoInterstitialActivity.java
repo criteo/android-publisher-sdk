@@ -23,8 +23,6 @@ import android.widget.RelativeLayout;
 
 public class CriteoInterstitialActivity extends Activity {
 
-    private static final int DISMISS_TIME = 7;
-
     private WebView webView;
     private ResultReceiver resultReceiver;
     private ImageButton closeButton;
@@ -38,6 +36,8 @@ public class CriteoInterstitialActivity extends Activity {
         adLayout = findViewById(R.id.AdLayout);
         webView = findViewById(R.id.webview);
         closeButton = findViewById(R.id.closeButton);
+
+        handler = new Handler();
 
         prepareWebView();
 
@@ -73,7 +73,6 @@ public class CriteoInterstitialActivity extends Activity {
     }
 
     private void displayWebView(String webViewData) {
-        waitAndDismiss();
         webView.loadDataWithBaseURL("https://criteo.com", webViewData, "text/html", "UTF-8", "about:blank");
     }
 
@@ -81,17 +80,6 @@ public class CriteoInterstitialActivity extends Activity {
     protected void onPause() {
         super.onPause();
         handler.removeCallbacksAndMessages(null);
-    }
-
-    private void waitAndDismiss() {
-        handler = new Handler();
-        Runnable runnableCode = new Runnable() {
-            @Override
-            public void run() {
-                close();
-            }
-        };
-        handler.postDelayed(runnableCode, DISMISS_TIME * 1000);
     }
 
     private void prepareWebView() {
