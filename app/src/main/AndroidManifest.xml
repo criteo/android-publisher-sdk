@@ -49,14 +49,6 @@
         android:value="com.criteo.pubsdk_android.MainActivity"/>
     </activity>
     <activity
-      android:label="@string/title_activity_cdb_call"
-      android:name=".cdb.CdbCallActivity"
-      android:theme="@style/AppTheme">
-      <meta-data
-        android:name="android.support.PARENT_ACTIVITY"
-        android:value="com.criteo.pubsdk_android.MainActivity"/>
-    </activity>
-    <activity
       android:label="@string/title_activity_dfp"
       android:name=".DfpActivity"
       android:configChanges="orientation|screenSize"
