@@ -26,7 +26,7 @@ public class CriteoInterstitialActivity extends Activity {
     private WebView webView;
     private ResultReceiver resultReceiver;
     private ImageButton closeButton;
-    private Handler handler;
+    private Handler handler = new Handler();
     private RelativeLayout adLayout;
 
     @Override
@@ -36,8 +36,6 @@ public class CriteoInterstitialActivity extends Activity {
         adLayout = findViewById(R.id.AdLayout);
         webView = findViewById(R.id.webview);
         closeButton = findViewById(R.id.closeButton);
-
-        handler = new Handler();
 
         prepareWebView();
 
