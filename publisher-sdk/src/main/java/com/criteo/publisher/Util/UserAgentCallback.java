@@ -9,6 +9,6 @@ public interface UserAgentCallback {
     /**
      * Callback to notify handler that useragent is received
      */
-    void done(String userAgent);
+    void done();
 
 }

@@ -25,7 +25,7 @@ public class UserAgentHandler extends Handler {
         Bundle bundle = msg.getData();
         String userAgent = bundle.getString("userAgent");
         if (userAgent != null) {
-            userAgentCallback.done(userAgent);
+            userAgentCallback.done();
         }
     }
 }

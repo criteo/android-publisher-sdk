@@ -38,7 +38,7 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
         int limitedAdTracking = DeviceUtil.isLimitAdTrackingEnabled(mContext);
         String gaid = DeviceUtil.getAdvertisingId(mContext);
         String appId = mContext.getApplicationContext().getPackageName();
-        JSONObject response = PubSdkNetwork.postEvent(mContext, SENDER_ID, appId, gaid, eventType, limitedAdTracking);
+        JSONObject response = PubSdkApi.postAppEvent(mContext, SENDER_ID, appId, gaid, eventType, limitedAdTracking);
         if (response != null) {
             Log.d(TAG, response.toString());
         }

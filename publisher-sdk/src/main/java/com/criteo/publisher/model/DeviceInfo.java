@@ -16,7 +16,7 @@ public class DeviceInfo {
 
     private static final String DEFAULT_USER_AGENT;
 
-    private String resolvedUserAgent;
+    private volatile String resolvedUserAgent;
 
     static {
         DEFAULT_USER_AGENT = getDefaultUserAgent();
@@ -47,10 +47,9 @@ public class DeviceInfo {
                 msg.setData(bundle);
                 mainHandler.sendMessage(msg);
             }
-
         };
-        mainHandler.post(setUserAgentTask);
 
+        mainHandler.post(setUserAgentTask);
     }
 
     private static String getDefaultUserAgent()

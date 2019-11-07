@@ -348,8 +348,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
 
     /**
-     * Method to post new Handler to the Main Thread When we get "useragent" from the Listener we start new CdbDownload
-     * Asynctask to get Cdb and Config
+     * This method is called back after the "useragent" is fetched
      */
     protected void prefetch() {
         startCdbDownloadTask(true, cacheAdUnits);

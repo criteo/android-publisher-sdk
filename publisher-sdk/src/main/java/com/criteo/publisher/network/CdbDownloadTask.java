@@ -69,7 +69,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         NetworkResult result = new NetworkResult();
         JSONObject configResult = null;
         if (callConfig) {
-            configResult = PubSdkNetwork.loadConfig(mContext, publisher.getCriteoPublisherId(),
+            configResult = PubSdkApi.loadConfig(mContext, publisher.getCriteoPublisherId(),
                     publisher.getBundleId(), user.getSdkVer());
             if (configResult != null) {
                 result.setConfig(configResult);
@@ -80,13 +80,13 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         cdbRequest.setCacheAdUnits(cacheAdUnits);
         cdbRequest.setUser(user);
         cdbRequest.setPublisher(publisher);
-        cdbRequest.setSdkVersion(String.valueOf(BuildConfig.VERSION_NAME));
+        cdbRequest.setSdkVersion(BuildConfig.VERSION_NAME);
         cdbRequest.setProfileId(profile);
         JSONObject gdpr = HostAppUtil.gdpr(mContext.getApplicationContext());
         if (gdpr != null) {
             cdbRequest.setGdprConsent(gdpr);
         }
-        Cdb cdbResult = PubSdkNetwork.loadCdb(mContext, cdbRequest, userAgent);
+        Cdb cdbResult = PubSdkApi.loadCdb(mContext, cdbRequest, userAgent);
         if (DeviceUtil.isLoggingEnabled() && cdbResult != null && cdbResult.getSlots() != null
                 && cdbResult.getSlots().size() > 0) {
             StringBuilder builder = new StringBuilder();
