@@ -11,21 +11,15 @@ import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.UserAgentCallback;
-import com.criteo.publisher.cache.SdkCache;
+
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitHelper;
 import com.criteo.publisher.model.CacheAdUnit;
-import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.NativeAdUnit;
-import com.criteo.publisher.model.Publisher;
-import com.criteo.publisher.model.ScreenSize;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
-import com.criteo.publisher.model.User;
-import com.criteo.publisher.network.CdbDownloadTask;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
 
 final class CriteoInternal extends Criteo {
@@ -36,8 +30,6 @@ final class CriteoInternal extends Criteo {
     private AppEvents appEvents;
     private AppLifecycleUtil appLifecycleUtil;
     private DeviceInfo deviceInfo;
-    private Config config;
-    private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
 
     CriteoInternal(Application application, List<AdUnit> adUnits, String criteoPublisherId) {
         if (application == null) {
@@ -54,16 +46,12 @@ final class CriteoInternal extends Criteo {
 
         Context context = application.getApplicationContext();
         createSupportedScreenSizes(application);
+
         List<CacheAdUnit> cacheAdUnits = AdUnitHelper.convertAdUnits(context, adUnits);
         List<CacheAdUnit> validatedCacheAdUnits = AdUnitHelper.filterInvalidCacheAdUnits(cacheAdUnits);
+
         this.deviceInfo = new DeviceInfo();
-        Publisher publisher = new Publisher(context, criteoPublisherId);
-        User user = new User();
-        SdkCache sdkCache = new SdkCache();
-        config = new Config(context);
-        placementsWithCdbTasks = new Hashtable<>();
-        this.bidManager = new BidManager(context, publisher, validatedCacheAdUnits,
-                new TokenCache(), deviceInfo, user, sdkCache, config, placementsWithCdbTasks);
+        this.bidManager = new BidManager(context, criteoPublisherId, validatedCacheAdUnits, deviceInfo);
 
         this.appEvents = new AppEvents(context);
         this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);

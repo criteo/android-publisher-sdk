@@ -88,7 +88,7 @@ public final class AdUnitHelper {
     }
 
     public static List<CacheAdUnit> filterInvalidCacheAdUnits(List<CacheAdUnit> cacheAdUnits) {
-        List<CacheAdUnit> validatedCacheAdUnits = new ArrayList<CacheAdUnit>();
+        List<CacheAdUnit> validatedCacheAdUnits = new ArrayList<>();
 
         for (CacheAdUnit cacheAdUnit : cacheAdUnits) {
             if (TextUtils.isEmpty(cacheAdUnit.getPlacementId()) || cacheAdUnit.getSize() == null

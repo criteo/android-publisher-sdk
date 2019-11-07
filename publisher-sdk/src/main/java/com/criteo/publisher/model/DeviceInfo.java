@@ -22,9 +22,6 @@ public class DeviceInfo {
         DEFAULT_USER_AGENT = getDefaultUserAgent();
     }
 
-    public DeviceInfo() {
-    }
-
     public void initialize(final Context context, UserAgentCallback userAgentCallback) {
 
         final Handler mainHandler = new UserAgentHandler(Looper.getMainLooper(), userAgentCallback);

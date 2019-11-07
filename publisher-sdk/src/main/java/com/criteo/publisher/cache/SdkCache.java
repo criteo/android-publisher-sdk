@@ -11,10 +11,11 @@ import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Slot;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SdkCache {
 
-    private HashMap<CacheAdUnit, Slot> slotMap;
+    private final Map<CacheAdUnit, Slot> slotMap;
 
     public SdkCache() {
         slotMap = new HashMap<>();

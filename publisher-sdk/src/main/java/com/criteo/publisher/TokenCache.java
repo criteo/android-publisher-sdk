@@ -4,11 +4,12 @@ import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.TokenValue;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.UUID;
 
 public class TokenCache {
 
-    private Hashtable<BidToken, TokenValue> tokenMap;
+    private final Map<BidToken, TokenValue> tokenMap;
 
     public TokenCache() {
         tokenMap = new Hashtable<>();

@@ -4,6 +4,7 @@ import static android.content.ContentValues.TAG;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.Util.AdUnitType;
@@ -72,16 +73,44 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
 
 
-    BidManager(Context context, Publisher publisher, List<CacheAdUnit> cacheAdUnits, TokenCache tokenCache,
-            DeviceInfo deviceInfo, User user, SdkCache sdkCache, Config config,
-            Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks) {
+    BidManager(
+        Context context,
+        String criteoPublisherId,
+        List<CacheAdUnit> cacheAdUnits,
+        DeviceInfo deviceInfo
+    ) {
+        this(
+            context,
+            new Publisher(context, criteoPublisherId),
+            cacheAdUnits,
+            new TokenCache(),
+            deviceInfo,
+            new User(),
+            new SdkCache(),
+            new Config(context),
+            new Hashtable<>()
+        );
+    }
+
+    @VisibleForTesting
+    BidManager(
+        Context context,
+        Publisher publisher,
+        List<CacheAdUnit> cacheAdUnits,
+        TokenCache tokenCache,
+        DeviceInfo deviceInfo,
+        User user,
+        SdkCache sdkCache,
+        Config config,
+        Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks
+    ) {
         this.mContext = context;
-        this.cacheAdUnits = cacheAdUnits;
-        this.cache = sdkCache;
-        this.tokenCache = tokenCache;
         this.publisher = publisher;
-        this.user = user;
+        this.cacheAdUnits = cacheAdUnits;
+        this.tokenCache = tokenCache;
         this.deviceInfo = deviceInfo;
+        this.user = user;
+        this.cache = sdkCache;
         this.config = config;
         this.placementsWithCdbTasks = placementsWithCdbTasks;
     }
