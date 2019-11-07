@@ -16,7 +16,8 @@ android {
     }
 
     lintOptions {
-        abortOnError false
+        abortOnError true
+        lintConfig file('lint.xml')
     }
 
     buildTypes {
@@ -47,7 +48,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.json:json:20140107'
-    testImplementation 'org.mockito:mockito-core:2.7.22'
+    testImplementation 'org.mockito:mockito-core:2.7.0'
     testImplementation 'com.google.android.gms:play-services-ads:15.0.1'
     testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.1.10'
     testImplementation 'org.assertj:assertj-core:3.11.1'

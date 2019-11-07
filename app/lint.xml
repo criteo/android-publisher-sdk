@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+  <issue id="UnusedAttribute" severity="ignore">
+    <ignore path="src/main/res/xml/network_security_config.xml" />
+  </issue>
+
+  <issue id="AllowBackup" severity="ignore">
+    <ignore path="src/main/AndroidManifest.xml" />
+  </issue>
+
+  <!-- https://jira.criteois.com/browse/EE-579 -->
+  <issue id="StaticFieldLeak" severity="ignore">
+    <ignore path="src/main/java/com/criteo/pubsdk_android/StandaloneActivity.java" />
+  </issue>
+
+  <issue id="GoogleAppIndexingWarning" severity="ignore">
+    <ignore path="src/main/AndroidManifest.xml" />
+  </issue>
+
+  <issue id="UseCompoundDrawables" severity="ignore">
+    <ignore path="src/main/res/layout/content_splash.xml" />
+  </issue>
+
+  <issue id="UselessParent" severity="ignore">
+    <ignore path="src/main/res/layout/activity_in_house.xml" />
+    <ignore path="src/main/res/layout/activity_main.xml" />
+    <ignore path="src/main/res/layout/activity_mediation.xml" />
+    <ignore path="src/main/res/layout/activity_mopub_mediation.xml" />
+    <ignore path="src/main/res/layout/activity_stand_alone.xml" />
+    <ignore path="src/main/res/layout/content_dfp.xml" />
+  </issue>
+</lint>

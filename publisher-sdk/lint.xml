@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+  <!-- https://jira.criteois.com/browse/EE-569 -->
+  <issue id="IconLocation" severity="ignore">
+    <ignore path="src/main/res/drawable/adchoice.png" />
+    <ignore path="src/main/res/drawable/closebtn.png" />
+  </issue>
+
+  <!-- https://jira.criteois.com/browse/EE-586 -->
+  <issue id="OldTargetApi" severity="ignore">
+    <ignore path="build.gradle" />
+  </issue>
+
+  <!-- https://jira.criteois.com/browse/EE-587 -->
+  <issue id="GradleDependency" severity="ignore">
+    <ignore path="build.gradle" />
+  </issue>
+
+  <issue id="SetJavaScriptEnabled" severity="ignore">
+    <ignore path="src/main/java/com/criteo/publisher/tasks/CriteoBannerLoaderTask.java" />
+    <ignore path="src/main/java/com/criteo/publisher/CriteoInterstitialActivity.java" />
+  </issue>
+
+  <issue id="ViewConstructor" severity="ignore">
+    <ignore path="src/main/java/com/criteo/publisher/CriteoBannerView.java" />
+  </issue>
+
+  <!-- https://jira.criteois.com/browse/EE-579 -->
+  <issue id="StaticFieldLeak" severity="ignore">
+    <ignore path="src/main/java/com/criteo/publisher/network/AppEventTask.java" />
+    <ignore path="src/main/java/com/criteo/publisher/network/CdbDownloadTask.java" />
+  </issue>
+</lint>

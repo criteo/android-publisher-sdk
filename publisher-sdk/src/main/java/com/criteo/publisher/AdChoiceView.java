@@ -23,7 +23,7 @@ public class AdChoiceView extends ImageView implements OnClickListener {
         super(context);
         mContext = context;
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FRAME_WIDTH, FRAME_HEIGHT);
-        params.gravity = Gravity.RIGHT;
+        params.gravity = Gravity.END;
         setLayoutParams(params);
         setImageResource(R.drawable.adchoice);
         setScaleType(ScaleType.FIT_CENTER);

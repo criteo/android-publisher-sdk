@@ -20,6 +20,7 @@ import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import java.lang.ref.WeakReference;
 
 
 public class StandaloneActivity extends AppCompatActivity {
@@ -180,29 +181,34 @@ public class StandaloneActivity extends AppCompatActivity {
                 Log.d(TAG, "Interstitial ad called onAdFailedToDisplay");
             }
         };
-
     }
 
     private class Bannerasync extends AsyncTask<Void, Void, Void> {
 
-        private CriteoBannerView bannerView;
+        private WeakReference<CriteoBannerView> bannerViewWeakReference;
 
         Bannerasync(CriteoBannerView bannerView) {
-            this.bannerView = bannerView;
+            this.bannerViewWeakReference = new WeakReference<>(bannerView);
         }
 
         @SuppressLint("WrongThread")
         @Override
         protected Void doInBackground(Void... voids) {
-            bannerView.loadAd();
+            CriteoBannerView bannerView = bannerViewWeakReference.get();
+            if (bannerView != null) {
+                bannerView.loadAd();
+            }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            adLayout.removeAllViews();
-            adLayout.addView(bannerView);
+            CriteoBannerView bannerView = bannerViewWeakReference.get();
+
+            if (bannerView != null) {
+                adLayout.removeAllViews();
+                adLayout.addView(bannerView);
+            }
         }
     }
 }

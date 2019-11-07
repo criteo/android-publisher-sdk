@@ -35,7 +35,7 @@
                   android:layout_height="wrap_content"
                   android:layout_weight=".5"
                   android:background="#81C784"
-                  android:text="Banner"/>
+                  android:text="@string/btn_banner"/>
 
                 <Button
                   android:id="@+id/buttonInterstitial"
@@ -43,18 +43,20 @@
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:layout_weight=".5"
+                  android:layout_marginStart="10dp"
                   android:layout_marginLeft="10dp"
                   android:background="#81C784"
-                  android:text="Interstitial"/>
+                  android:text="@string/btn_interstitial"/>
                 <Button
                   android:id="@+id/buttonCustomNative"
                   style="@style/Widget.AppCompat.Button.Colored"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
                   android:layout_weight=".5"
+                  android:layout_marginStart="10dp"
                   android:layout_marginLeft="10dp"
                   android:background="#81C784"
-                  android:text="Custom Native"/>
+                  android:text="@string/btn_custom_native"/>
             </LinearLayout>
         </LinearLayout>
         <LinearLayout

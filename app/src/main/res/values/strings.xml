@@ -1,10 +1,23 @@
 <resources>
   <string name="app_name">Criteo Pub SDK Demo</string>
+  <string name="demo_app_title">Publisher SDK \nDemo App</string>
+  <string name="sdk_version">1.1.2</string>
+  <string name="sdk_version_label">Publisher SDK:</string>
+  <string name="demo_app_version">1.1.2</string>
+  <string name="demo_app_version_label">Demo App version:</string>
+  <string name="criteo_logo_content_description">Criteo Logo</string>
   <string name="title_activity_standalone">Standalone</string>
   <string name="title_activity_splash">Splash Ui</string>
-  <string name="criteo_publisher_id">PUB-X23-TEST</string>
-  <string name="title_activity_cdb_call">Cdb Call Test</string>
   <string name="title_activity_dfp">Google DFP</string>
   <string name="title_activity_mediation">Mediation</string>
   <string name="title_activity_mopub">Mopub</string>
+  <string name="btn_interstitial">Interstitial</string>
+  <string name="btn_banner">Banner</string>
+  <string name="btn_google_dfp_with_version">Google DFP \n v4.5.1</string>
+  <string name="btn_mediation">Mediation</string>
+  <string name="btn_standalone">Standalone</string>
+  <string name="btn_custom_native">Custom Native</string>
+  <string name="btn_in_house_mediation">In-house Mediation</string>
+  <string name="btn_mopub">Mopub</string>
+  <string name="btn_mopub_mediation">Mopub-Mediation</string>
 </resources>

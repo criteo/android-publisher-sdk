@@ -27,17 +27,18 @@
             android:layout_height="wrap_content"
             android:layout_weight=".5"
             android:background="#81C784"
-            android:text="Banner" />
+            android:text="@string/btn_banner" />
 
         <Button
             android:id="@+id/buttonInterstitial"
             style="@style/Widget.AppCompat.Button.Colored"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:layout_marginLeft="10dp"
             android:layout_weight=".5"
             android:background="#81C784"
-            android:text="Interstitial" />
+            android:text="@string/btn_interstitial" />
     </LinearLayout>
 
     <LinearLayout

@@ -20,13 +20,10 @@ public class CriteoBannerView extends WebView {
     public CriteoBannerView(Context context, BannerAdUnit bannerAdUnit) {
         super(context);
         this.bannerAdUnit = bannerAdUnit;
-
-
     }
 
     public void setCriteoBannerAdListener(CriteoBannerAdListener criteoBannerAdListener) {
         this.criteoBannerAdListener = criteoBannerAdListener;
-
     }
 
     public void loadAd() {

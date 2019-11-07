@@ -11,6 +11,7 @@ import com.criteo.publisher.model.AdSize;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.util.Locale;
 
 public final class DeviceUtil {
 
@@ -39,7 +40,7 @@ public final class DeviceUtil {
     public static String getDeviceModel() {
         String manufacturer = Build.MANUFACTURER;
         String model = Build.MODEL;
-        if (model.toLowerCase().startsWith(manufacturer.toLowerCase())) {
+        if (model.toLowerCase(Locale.ROOT).startsWith(manufacturer.toLowerCase(Locale.ROOT))) {
             return model;
         } else {
             return manufacturer + " " + model;

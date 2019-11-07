@@ -32,7 +32,8 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
     lintOptions {
-        abortOnError false
+        abortOnError true
+        lintConfig file('lint.xml')
     }
 }
 configurations.all {

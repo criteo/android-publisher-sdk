@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  tools:context=".MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:layout_marginStart="25dp"
         android:layout_marginLeft="25dp"
         android:orientation="vertical">
         <Button
@@ -18,7 +18,7 @@
             android:id="@+id/buttonDfpCall"
             android:layout_width="match_parent"
             android:background="#81C784"
-            android:text="Google DFP \n v4.5.1"
+            android:text="@string/btn_google_dfp_with_version"
             android:layout_height="wrap_content" />
         <Button
             android:id="@+id/buttonMediationCall"
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:background="#81C784"
-            android:text="Mediation" />
+            android:text="@string/btn_mediation" />
         <Button
           android:id="@+id/buttonStandalone"
           style="@style/Widget.AppCompat.Button.Colored"
@@ -35,7 +35,7 @@
           android:layout_height="wrap_content"
           android:layout_marginTop="20dp"
           android:background="#81C784"
-          android:text="Standalone"/>
+          android:text="@string/btn_standalone"/>
         <Button
           android:id="@+id/buttoninHouse"
           style="@style/Widget.AppCompat.Button.Colored"
@@ -43,13 +43,13 @@
           android:layout_height="wrap_content"
           android:layout_marginTop="20dp"
           android:background="#81C784"
-          android:text="In-house Mediation"/>
+          android:text="@string/btn_in_house_mediation"/>
         <Button
             android:id="@+id/buttonMopubCall"
             android:layout_marginTop="20dp"
             style="@style/Widget.AppCompat.Button.Colored"
             android:background="#81D4FA"
-            android:text="Mopub"
+            android:text="@string/btn_mopub"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <Button
@@ -59,7 +59,7 @@
           android:layout_height="wrap_content"
           android:layout_marginTop="20dp"
           android:background="#81D4FA"
-          android:text="Mopub-Mediation"/>
+          android:text="@string/btn_mopub_mediation"/>
 
     </LinearLayout>
 
