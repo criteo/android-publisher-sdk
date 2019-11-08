@@ -6,11 +6,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import com.criteo.publisher.Util.CriteoResultReceiver;
+import com.criteo.publisher.Util.ObjectsUtil;
 import com.criteo.publisher.controller.WebViewDownloader;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.WebViewData;
-
-import java.util.Objects;
 
 public class CriteoInterstitial {
 
@@ -63,7 +62,7 @@ public class CriteoInterstitial {
     }
 
     public void loadAd(BidToken bidToken) {
-        if (bidToken != null && !Objects.equals(interstitialAdUnit, bidToken.getAdUnit())) {
+        if (bidToken != null && !ObjectsUtil.equals(interstitialAdUnit, bidToken.getAdUnit())) {
             return;
         }
         try {

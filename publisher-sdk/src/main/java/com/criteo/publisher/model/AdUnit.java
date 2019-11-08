@@ -1,8 +1,7 @@
 package com.criteo.publisher.model;
 
 import com.criteo.publisher.Util.AdUnitType;
-
-import java.util.Objects;
+import com.criteo.publisher.Util.ObjectsUtil;
 
 public abstract class AdUnit {
 
@@ -31,12 +30,12 @@ public abstract class AdUnit {
             return false;
         }
         AdUnit adUnit = (AdUnit) o;
-        return Objects.equals(adUnitId, adUnit.adUnitId) &&
+        return ObjectsUtil.equals(adUnitId, adUnit.adUnitId) &&
                 adUnitType == adUnit.adUnitType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(adUnitId, adUnitType);
+        return ObjectsUtil.hash(adUnitId, adUnitType);
     }
 }

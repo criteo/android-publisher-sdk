@@ -3,9 +3,8 @@ package com.criteo.publisher;
 import android.content.Context;
 import android.util.Log;
 import android.webkit.WebView;
+import com.criteo.publisher.Util.ObjectsUtil;
 import com.criteo.publisher.model.BannerAdUnit;
-
-import java.util.Objects;
 
 public class CriteoBannerView extends WebView {
 
@@ -55,7 +54,7 @@ public class CriteoBannerView extends WebView {
     }
 
     private void doLoadAd(BidToken bidToken) {
-        if (bidToken != null && !Objects.equals(bannerAdUnit, bidToken.getAdUnit())) {
+        if (bidToken != null && !ObjectsUtil.equals(bannerAdUnit, bidToken.getAdUnit())) {
             return;
         }
         if (criteoBannerEventController == null) {
@@ -72,6 +71,4 @@ public class CriteoBannerView extends WebView {
         }
 
     }
-
-
 }

@@ -10,7 +10,7 @@ import android.util.Log;
 import com.criteo.publisher.model.AdSize;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 
 public final class DeviceUtil {
 
@@ -69,14 +69,15 @@ public final class DeviceUtil {
 
     public static String createDfpCompatibleString(String stringToEncode) {
 
-        if (TextUtils.isEmpty(stringToEncode) || DeviceUtil.isVersionNotSupported()) {
+        if (TextUtils.isEmpty(stringToEncode)) {
             return null;
         }
+
         try {
-            byte[] byteUrl = stringToEncode.getBytes(StandardCharsets.UTF_8);
+            byte[] byteUrl = stringToEncode.getBytes(Charset.forName("UTF-8"));
             String base64Url = Base64.encodeToString(byteUrl, Base64.NO_WRAP);
-            String utf8 = StandardCharsets.UTF_8.name();
-            return URLEncoder.encode(URLEncoder.encode(base64Url, utf8), utf8).toString();
+            String utf8 = Charset.forName("UTF-8").name();
+            return URLEncoder.encode(URLEncoder.encode(base64Url, utf8), utf8);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

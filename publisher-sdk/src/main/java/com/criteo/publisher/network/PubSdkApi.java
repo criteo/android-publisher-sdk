@@ -1,7 +1,6 @@
 package com.criteo.publisher.network;
 
 import android.content.Context;
-import android.support.annotation.GuardedBy;
 import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.R;
@@ -12,7 +11,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import org.json.JSONException;
@@ -21,7 +20,7 @@ import org.json.JSONObject;
 //TODO: Add unit tests
 public class PubSdkApi {
 
-    private static final int TIMEOUT = 60 * 1000;
+    private static final int TIMEOUT_IN_MILLIS = 60 * 1000;
     private static final String TAG = PubSdkApi.class.getSimpleName();
     private static final String CRITEO_PUBLISHER_ID = "cpId";
     private static final String APP_ID = "appId";
@@ -97,21 +96,20 @@ public class PubSdkApi {
         }
     }
 
-
     private static JSONObject executePost(URL url, JSONObject requestJson, String userAgent)
             throws IOException, JSONException {
 
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestMethod("POST");
-        urlConnection.setReadTimeout(TIMEOUT);
-        urlConnection.setConnectTimeout(TIMEOUT);
+        urlConnection.setReadTimeout(TIMEOUT_IN_MILLIS);
+        urlConnection.setConnectTimeout(TIMEOUT_IN_MILLIS);
         urlConnection.setRequestProperty("Content-Type", "text/plain");
         if (!TextUtils.isEmpty(userAgent)) {
             urlConnection.setRequestProperty("User-Agent", userAgent);
         }
         try {
             OutputStream outputStream = urlConnection.getOutputStream();
-            outputStream.write(requestJson.toString().getBytes(StandardCharsets.UTF_8));
+            outputStream.write(requestJson.toString().getBytes(Charset.forName("UTF-8")));
             outputStream.flush();
             outputStream.close();
         } catch (Exception e) {
@@ -133,8 +131,8 @@ public class PubSdkApi {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestMethod("GET");
         urlConnection.setRequestProperty("Content-Type", "text/plain");
-        urlConnection.setReadTimeout(TIMEOUT);
-        urlConnection.setConnectTimeout(TIMEOUT);
+        urlConnection.setReadTimeout(TIMEOUT_IN_MILLIS);
+        urlConnection.setConnectTimeout(TIMEOUT_IN_MILLIS);
         JSONObject result = new JSONObject();
         if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
             String response = StreamUtil.readStream(urlConnection.getInputStream());
@@ -145,15 +143,13 @@ public class PubSdkApi {
         return result;
     }
 
-
     private static String getParamsString(Map<String, String> params) {
-
         StringBuilder queryString = new StringBuilder();
         try {
             for (Map.Entry<String, String> entry : params.entrySet()) {
-                queryString.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8.name()));
+                queryString.append(URLEncoder.encode(entry.getKey(), Charset.forName("UTF-8").name()));
                 queryString.append("=");
-                queryString.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8.name()));
+                queryString.append(URLEncoder.encode(entry.getValue(), Charset.forName("UTF-8").name()));
                 queryString.append("&");
             }
         } catch (Exception e) {
