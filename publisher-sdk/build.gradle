@@ -50,6 +50,7 @@ dependencies {
     testImplementation 'org.mockito:mockito-core:2.7.22'
     testImplementation 'com.google.android.gms:play-services-ads:15.0.1'
     testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.1.10'
+    testImplementation 'org.assertj:assertj-core:3.11.1'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'

@@ -3,6 +3,7 @@ package com.criteo.publisher;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import java.util.UUID;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +21,7 @@ public class BidTokenTest {
         bannerAdUnit2 = new BannerAdUnit("banneradUnitId1", new AdSize(320, 50));
     }
 
+    // FIXME This test seems useless with equalsContract
     @Test
     public void testTokensWithDifferentUUID() {
         UUID uuid1 = UUID.nameUUIDFromBytes("TEST_STRING1".getBytes());
@@ -30,6 +32,7 @@ public class BidTokenTest {
         Assert.assertNotEquals(token1, token2);
     }
 
+    // FIXME This test seems useless with equalsContract
     @Test
     public void testTokensWithNullUUID() {
         UUID uuid1 = UUID.nameUUIDFromBytes("TEST_STRING1".getBytes());
@@ -40,6 +43,7 @@ public class BidTokenTest {
         Assert.assertNotEquals(token1, token2);
     }
 
+    // FIXME This test seems useless with equalsContract
     @Test
     public void testTokensWithSameUUID() {
         UUID uuid1 = UUID.nameUUIDFromBytes("TEST_STRING".getBytes());
@@ -48,6 +52,12 @@ public class BidTokenTest {
         token2 = new BidToken(uuid2, bannerAdUnit1);
 
         Assert.assertEquals(token1, token2);
+    }
+
+    @Test
+    public void equalsContract() throws Exception {
+        EqualsVerifier.forClass(BidToken.class)
+            .verify();
     }
 
 }

@@ -24,6 +24,7 @@ public class DeviceInfo {
 
     public void initialize(final Context context, UserAgentCallback userAgentCallback) {
 
+        // FIXME why should the user agent callback should be called from main thread ?
         final Handler mainHandler = new UserAgentHandler(Looper.getMainLooper(), userAgentCallback);
 
         final Runnable setUserAgentTask = new Runnable() {
@@ -73,6 +74,8 @@ public class DeviceInfo {
         try {
             userAgent = getWebViewUserAgent(context);
         } catch (Throwable ignore) {
+            // FIXME this is not a RuntimeException, this is a throwable that should not be
+            //  catch and ignore so easily.
         }
 
         // If we failed to get a WebView UA, try to fall back to a system UA, instead
@@ -90,6 +93,9 @@ public class DeviceInfo {
         return userAgent;
     }
 
+    // FIXME nothing prevent the user agent to not be null.
+    //  But after an initialization, the empty string seems to represent that there is no user
+    //  agent.
     public String getUserAgent() {
         return resolvedUserAgent;
     }

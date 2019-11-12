@@ -1,32 +1,50 @@
 package com.criteo.publisher;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.criteo.publisher.model.AdUnit;
 import java.util.UUID;
 
-public class BidToken {
+public final class BidToken {
 
-    private UUID tokenId;
-    private AdUnit adUnit;
+    @NonNull
+    private final UUID tokenId;
 
-    BidToken(UUID uuid, AdUnit adUnit) {
+    @Nullable
+    private final AdUnit adUnit;
+
+    BidToken(UUID uuid, @Nullable AdUnit adUnit) {
         this.tokenId = uuid != null ? uuid : UUID.randomUUID();
         this.adUnit = adUnit;
     }
 
-    @Override
-    public int hashCode() {
-        return tokenId.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        if (other instanceof BidToken) {
-            return this.tokenId.equals(((BidToken) other).tokenId);
-        }
-        return false;
-    }
-
+    @Nullable
     public AdUnit getAdUnit() {
         return adUnit;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        BidToken bidToken = (BidToken) o;
+
+        if (!tokenId.equals(bidToken.tokenId)) {
+            return false;
+        }
+        return adUnit != null ? adUnit.equals(bidToken.adUnit) : bidToken.adUnit == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = tokenId.hashCode();
+        result = 31 * result + (adUnit != null ? adUnit.hashCode() : 0);
+        return result;
+    }
+
 }

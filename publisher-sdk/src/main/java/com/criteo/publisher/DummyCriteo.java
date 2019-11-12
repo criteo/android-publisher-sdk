@@ -1,6 +1,7 @@
 package com.criteo.publisher;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.UserAgentCallback;
 import com.criteo.publisher.model.AdUnit;
@@ -16,6 +17,7 @@ public class DummyCriteo extends Criteo {
     // Nothing
   }
 
+  @Nullable
   @Override
   Slot getBidForAdUnit(AdUnit adUnit) {
     return null;
@@ -26,6 +28,7 @@ public class DummyCriteo extends Criteo {
     return new BidResponse();
   }
 
+  @Nullable
   @Override
   TokenValue getTokenValue(BidToken bidToken, AdUnitType adUnitType) {
     return null;
@@ -45,11 +48,12 @@ public class DummyCriteo extends Criteo {
 
     @Override
     public String getUserAgent() {
-      return "dummy";
+      return "";
     }
 
     @Override
     public void initialize(Context context, UserAgentCallback userAgentCallback) {
+      userAgentCallback.done();
     }
 
   }

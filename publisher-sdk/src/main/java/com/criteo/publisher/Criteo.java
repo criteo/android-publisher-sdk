@@ -1,6 +1,7 @@
 package com.criteo.publisher;
 
 import android.app.Application;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.DeviceUtil;
@@ -47,10 +48,12 @@ public abstract class Criteo {
 
   public abstract void setBidsForAdUnit(Object object, AdUnit adUnit);
 
+  @Nullable
   abstract Slot getBidForAdUnit(AdUnit adUnit);
 
   public abstract BidResponse getBidResponse(AdUnit adUnit);
 
+  @Nullable
   abstract TokenValue getTokenValue(BidToken bidToken, AdUnitType adUnitType);
 
   abstract DeviceInfo getDeviceInfo();
