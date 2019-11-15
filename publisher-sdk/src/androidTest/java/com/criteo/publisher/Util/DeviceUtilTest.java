@@ -1,16 +1,19 @@
 package com.criteo.publisher.Util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
+import android.os.Build.VERSION;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import com.criteo.publisher.model.ScreenSize;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import org.junit.Assert;
+import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -96,6 +99,17 @@ public class DeviceUtilTest {
     public void testCreateDfpCompatibleWithNullDisplayUrl() {
         String displayUrl = null;
         Assert.assertNull(DeviceUtil.createDfpCompatibleString(displayUrl));
+    }
+
+    @Test
+    public void isVersionNotSupported_GivenDeviceAboveOrEqual19_ReturnsFalse() {
+        if (VERSION.SDK_INT < 19) {
+            throw new AssumptionViolatedException("Version of device should be >= 19");
+        }
+
+        boolean versionNotSupported = DeviceUtil.isVersionNotSupported();
+
+        assertFalse(versionNotSupported);
     }
 }
 

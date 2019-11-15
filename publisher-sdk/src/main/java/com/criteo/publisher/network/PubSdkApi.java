@@ -1,6 +1,7 @@
 package com.criteo.publisher.network;
 
 import android.content.Context;
+import android.support.annotation.GuardedBy;
 import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.R;
@@ -18,7 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 //TODO: Add unit tests
-final class PubSdkApi {
+public class PubSdkApi {
 
     private static final int TIMEOUT = 60 * 1000;
     private static final String TAG = PubSdkApi.class.getSimpleName();
@@ -32,7 +33,11 @@ final class PubSdkApi {
     private PubSdkApi() {
     }
 
-    static JSONObject loadConfig(Context context, String criteoPublisherId, String appId, String sdkVersion) {
+    public static PubSdkApi getInstance() {
+        return PubSdkApiHolder.instance;
+    }
+
+    JSONObject loadConfig(Context context, String criteoPublisherId, String appId, String sdkVersion) {
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put(CRITEO_PUBLISHER_ID, criteoPublisherId);
@@ -51,7 +56,7 @@ final class PubSdkApi {
         return configResult;
     }
 
-    static Cdb loadCdb(Context context, Cdb cdbRequest, String userAgent) {
+    Cdb loadCdb(Context context, Cdb cdbRequest, String userAgent) {
         Cdb cdbResult = null;
         try {
             URL url = new URL(context.getString(R.string.cdb_url) + "/inapp/v2");
@@ -65,7 +70,7 @@ final class PubSdkApi {
         return cdbResult;
     }
 
-    static JSONObject postAppEvent(Context context, int senderId,
+    JSONObject postAppEvent(Context context, int senderId,
             String appId, String gaid, String eventType,
             int limitedAdTracking) {
 
@@ -124,7 +129,7 @@ final class PubSdkApi {
         return result;
     }
 
-    protected static JSONObject executeGet(URL url) throws IOException, JSONException {
+    private static JSONObject executeGet(URL url) throws IOException, JSONException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestMethod("GET");
         urlConnection.setRequestProperty("Content-Type", "text/plain");
@@ -141,7 +146,7 @@ final class PubSdkApi {
     }
 
 
-    protected static String getParamsString(Map<String, String> params) {
+    private static String getParamsString(Map<String, String> params) {
 
         StringBuilder queryString = new StringBuilder();
         try {
@@ -159,5 +164,9 @@ final class PubSdkApi {
         return queryString.length() > 0
                 ? queryString.substring(0, queryString.length() - 1)
                 : queryString.toString();
+    }
+
+    static final class PubSdkApiHolder {
+        static volatile PubSdkApi instance = new PubSdkApi();
     }
 }

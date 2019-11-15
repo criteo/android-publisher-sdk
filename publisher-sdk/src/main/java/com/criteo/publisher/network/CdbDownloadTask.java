@@ -25,6 +25,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     private final String userAgent;
     private final NetworkResponseListener responseListener;
     private final List<CacheAdUnit> cacheAdUnits;
+    private final PubSdkApi api;
     private Hashtable<CacheAdUnit, CdbDownloadTask> bidsInCdbTask;
 
     public CdbDownloadTask(Context context, NetworkResponseListener responseListener, boolean callConfig,
@@ -35,6 +36,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         this.userAgent = userAgent;
         this.cacheAdUnits = adUnits;
         this.bidsInCdbTask = bidsInMap;
+        this.api = PubSdkApi.getInstance();
     }
 
     @Override
@@ -69,7 +71,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         NetworkResult result = new NetworkResult();
         JSONObject configResult = null;
         if (callConfig) {
-            configResult = PubSdkApi.loadConfig(mContext, publisher.getCriteoPublisherId(),
+            configResult = api.loadConfig(mContext, publisher.getCriteoPublisherId(),
                     publisher.getBundleId(), user.getSdkVer());
             if (configResult != null) {
                 result.setConfig(configResult);
@@ -86,7 +88,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         if (gdpr != null) {
             cdbRequest.setGdprConsent(gdpr);
         }
-        Cdb cdbResult = PubSdkApi.loadCdb(mContext, cdbRequest, userAgent);
+        Cdb cdbResult = api.loadCdb(mContext, cdbRequest, userAgent);
         if (DeviceUtil.isLoggingEnabled() && cdbResult != null && cdbResult.getSlots() != null
                 && cdbResult.getSlots().size() > 0) {
             StringBuilder builder = new StringBuilder();
