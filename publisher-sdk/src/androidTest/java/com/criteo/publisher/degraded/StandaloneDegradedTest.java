@@ -9,21 +9,19 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import android.app.Application;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
-import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdListener;
+import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.network.PubSdkApiHelper;
-import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Before;
 import org.junit.Test;
@@ -48,10 +46,7 @@ public class StandaloneDegradedTest {
 
     context = InstrumentationRegistry.getContext();
 
-    Application app = (Application) InstrumentationRegistry.getTargetContext()
-        .getApplicationContext();
-
-    Criteo.init(app, "B-056946", Collections.emptyList());
+    CriteoUtil.givenInitializedCriteo();
   }
 
   @Test

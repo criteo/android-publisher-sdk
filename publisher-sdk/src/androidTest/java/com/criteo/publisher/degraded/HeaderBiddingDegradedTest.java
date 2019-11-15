@@ -1,23 +1,23 @@
 package com.criteo.publisher.degraded;
 
 import static com.criteo.publisher.ThreadingUtil.waitForMockedBid;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import com.criteo.publisher.BidResponse;
+import android.app.Application;
+import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.network.PubSdkApiHelper;
+import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class InHouseDegradedTest {
+public class HeaderBiddingDegradedTest {
 
   @Mock
   private AdUnit adUnit;
@@ -37,9 +37,11 @@ public class InHouseDegradedTest {
   }
 
   @Test
-  public void whenGettingABidResponse_ShouldNotDoAnyCallToCdb() throws Exception {
+  public void whenSettingABids_ShouldNotDoAnyCallToCdb() throws Exception {
+    Object builder = mock(Object.class);
+
     PubSdkApiHelper.withApi(api, () -> {
-      criteo.getBidResponse(adUnit);
+      criteo.setBidsForAdUnit(builder, adUnit);
     });
 
     waitForMockedBid();
@@ -48,22 +50,13 @@ public class InHouseDegradedTest {
   }
 
   @Test
-  public void whenGettingABidResponseTwice_ShouldReturnANoBid() throws Exception {
-    BidResponse bidResponse = criteo.getBidResponse(adUnit);
+  public void whenSettingABids_ShouldNotEnrichGivenBuilder() throws Exception {
+    Object builder = mock(Object.class);
+    criteo.setBidsForAdUnit(builder, adUnit);
+
     waitForMockedBid();
 
-    assertIsNoBid(bidResponse);
-
-    bidResponse = criteo.getBidResponse(adUnit);
-    waitForMockedBid();
-
-    assertIsNoBid(bidResponse);
-  }
-
-  private void assertIsNoBid(BidResponse bidResponse) {
-    assertFalse(bidResponse.isBidSuccess());
-    assertEquals(0.0, bidResponse.getPrice(), 0.0);
-    assertNull(bidResponse.getBidToken());
+    verifyZeroInteractions(builder);
   }
 
 }
