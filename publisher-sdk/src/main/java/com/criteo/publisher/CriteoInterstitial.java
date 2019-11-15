@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import com.criteo.publisher.Util.CriteoResultReceiver;
 import com.criteo.publisher.Util.ObjectsUtil;
@@ -27,10 +29,28 @@ public class CriteoInterstitial {
 
     private CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
 
+    // FIXME Use a nullable there so that calling the main constructor does not call directly
+    //  the Criteo.getInstance method. It may throw an exception, if not call before the
+    //  Criteo.init. And, as this class is part of the public API, we should not (yet) break any
+    //  integration.
+    @Nullable
+    private final Criteo criteo;
 
     public CriteoInterstitial(Context context, InterstitialAdUnit interstitialAdUnit) {
+        this(context, interstitialAdUnit, null);
+    }
+
+    @VisibleForTesting
+    CriteoInterstitial(Context context,
+        InterstitialAdUnit interstitialAdUnit,
+        Criteo criteo) {
         this.context = context;
         this.interstitialAdUnit = interstitialAdUnit;
+        this.criteo = criteo;
+    }
+
+    private Criteo getCriteo() {
+        return criteo == null ? Criteo.getInstance() : criteo;
     }
 
     public void setCriteoInterstitialAdListener(CriteoInterstitialAdListener criteoInterstitialAdListener) {
@@ -56,7 +76,8 @@ public class CriteoInterstitial {
         if (criteoInterstitialEventController == null) {
             criteoInterstitialEventController = new CriteoInterstitialEventController(
                     criteoInterstitialAdListener, criteoInterstitialAdDisplayListener,
-                    new WebViewDownloader(new WebViewData()));
+                    new WebViewDownloader(new WebViewData()),
+                    getCriteo());
         }
         criteoInterstitialEventController.fetchAdAsync(interstitialAdUnit);
     }
@@ -76,7 +97,8 @@ public class CriteoInterstitial {
         if (criteoInterstitialEventController == null) {
             criteoInterstitialEventController = new CriteoInterstitialEventController(
                     criteoInterstitialAdListener, criteoInterstitialAdDisplayListener,
-                    new WebViewDownloader(new WebViewData()));
+                    new WebViewDownloader(new WebViewData()),
+                    getCriteo());
         }
         criteoInterstitialEventController.fetchAdAsync(bidToken);
     }

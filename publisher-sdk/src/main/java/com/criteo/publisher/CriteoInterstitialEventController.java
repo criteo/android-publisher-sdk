@@ -24,14 +24,17 @@ public class CriteoInterstitialEventController {
 
     private DeviceInfo deviceInfo;
 
+    private final Criteo criteo;
+
     public CriteoInterstitialEventController(
             CriteoInterstitialAdListener listener, CriteoInterstitialAdDisplayListener adDisplayListener,
-            WebViewDownloader webViewDownloader) {
+            WebViewDownloader webViewDownloader,
+            Criteo criteo) {
         this.criteoInterstitialAdListener = listener;
         this.criteoInterstitialAdDisplayListener = adDisplayListener;
         this.webViewDownloader = webViewDownloader;
-        this.deviceInfo = Criteo.getInstance().getDeviceInfo();
-
+        this.deviceInfo = criteo.getDeviceInfo();
+        this.criteo = criteo;
     }
 
     public boolean isAdLoaded() {
@@ -48,22 +51,24 @@ public class CriteoInterstitialEventController {
             webViewDownloader.loading();
 
             if (adUnit != null) {
-                slot = Criteo.getInstance().getBidForAdUnit(adUnit);
+                slot = criteo.getBidForAdUnit(adUnit);
             }
 
             criteoInterstitialListenerCallTask = new CriteoInterstitialListenerCallTask(
                     criteoInterstitialAdListener);
             criteoInterstitialListenerCallTask.execute(slot);
 
-            if (slot != null && slot.isValid() && URLUtil.isValidUrl(String.valueOf(slot.getDisplayUrl()))) {
+            if (slot != null && slot.isValid() && URLUtil.isValidUrl(slot.getDisplayUrl())) {
                 //gets Webview data from Criteo before showing Interstitialview Activity
                 getWebviewDataAsync(slot.getDisplayUrl());
+            } else {
+                webViewDownloader.downloadFailed();
             }
         }
     }
 
-    protected void getWebviewDataAsync(String displayUrl) {
-        if (TextUtils.isEmpty(displayUrl) || (!URLUtil.isValidUrl(String.valueOf(displayUrl)))) {
+    private void getWebviewDataAsync(String displayUrl) {
+        if (TextUtils.isEmpty(displayUrl) || (!URLUtil.isValidUrl(displayUrl))) {
             Slot slot = null;
             webViewDownloader.downloadFailed();
             criteoInterstitialListenerCallTask = new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener);
@@ -81,7 +86,7 @@ public class CriteoInterstitialEventController {
     }
 
     public void fetchAdAsync(BidToken bidToken) {
-        TokenValue tokenValue = Criteo.getInstance().getTokenValue(bidToken, AdUnitType.CRITEO_INTERSTITIAL);
+        TokenValue tokenValue = criteo.getTokenValue(bidToken, AdUnitType.CRITEO_INTERSTITIAL);
 
         criteoInterstitialListenerCallTask = new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener);
         criteoInterstitialListenerCallTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, tokenValue);

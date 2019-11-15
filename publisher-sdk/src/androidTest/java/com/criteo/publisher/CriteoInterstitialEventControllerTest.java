@@ -44,7 +44,8 @@ public class CriteoInterstitialEventControllerTest {
         WebViewDownloader webViewDownloader = new WebViewDownloader(webViewData);
         criteoInterstitialEventController = new CriteoInterstitialEventController(criteoInterstitialAdListener,
                 adDisplayListener,
-                webViewDownloader);
+                webViewDownloader,
+                Criteo.getInstance());
     }
 
     @Test
