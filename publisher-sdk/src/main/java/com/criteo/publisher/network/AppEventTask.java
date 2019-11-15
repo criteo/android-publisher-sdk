@@ -3,6 +3,7 @@ package com.criteo.publisher.network;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.Util.AppEventResponseListener;
 import com.criteo.publisher.Util.DeviceUtil;
 import org.json.JSONObject;
@@ -38,7 +39,9 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
         int limitedAdTracking = DeviceUtil.isLimitAdTrackingEnabled(mContext);
         String gaid = DeviceUtil.getAdvertisingId(mContext);
         String appId = mContext.getApplicationContext().getPackageName();
-        JSONObject response = PubSdkApi.getInstance().postAppEvent(mContext, SENDER_ID, appId, gaid, eventType, limitedAdTracking);
+
+        PubSdkApi pubSdkApi = DependencyProvider.getInstance().providePubSdkApi();
+        JSONObject response = pubSdkApi.postAppEvent(mContext, SENDER_ID, appId, gaid, eventType, limitedAdTracking);
         if (response != null) {
             Log.d(TAG, response.toString());
         }

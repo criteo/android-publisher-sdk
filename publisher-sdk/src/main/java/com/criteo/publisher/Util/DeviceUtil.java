@@ -7,6 +7,7 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
+import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.model.AdSize;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -48,11 +49,13 @@ public final class DeviceUtil {
     }
 
     public static String getAdvertisingId(Context context) {
+        AdvertisingInfo advertisingInfo = DependencyProvider.getInstance().provideAdvertisingInfo();
+
         try {
-            if (AdvertisingInfo.getInstance().isLimitAdTrackingEnabled(context)) {
+            if (advertisingInfo.isLimitAdTrackingEnabled(context)) {
                 return DEVICE_ID_LIMITED;
             }
-            return AdvertisingInfo.getInstance().getAdvertisingId(context);
+            return advertisingInfo.getAdvertisingId(context);
         } catch (Exception e) {
             Log.e("DeviceUtil", "Error trying to get Advertising id: " + e.getMessage());
         }
@@ -60,8 +63,10 @@ public final class DeviceUtil {
     }
 
     public static int isLimitAdTrackingEnabled(Context context) {
+        AdvertisingInfo advertisingInfo = DependencyProvider.getInstance().provideAdvertisingInfo();
+
         try {
-            return AdvertisingInfo.getInstance().isLimitAdTrackingEnabled(context) ? 1 : 0;
+            return advertisingInfo.isLimitAdTrackingEnabled(context) ? 1 : 0;
         } catch (Exception e) {
             Log.e("DeviceUtil", "Error trying to check limited ad tracking: " + e.getMessage());
         }

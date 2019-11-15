@@ -5,19 +5,24 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import com.criteo.publisher.BidResponse;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoUtil;
+import com.criteo.publisher.DependencyProvider;
+import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.network.PubSdkApi;
-import com.criteo.publisher.network.PubSdkApiHelper;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class InHouseDegradedTest {
+  @Rule
+  public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
 
   @Mock
   private AdUnit adUnit;
@@ -31,6 +36,9 @@ public class InHouseDegradedTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
+    DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
+    when(dependencyProvider.providePubSdkApi()).thenReturn(api);
+
     DegradedUtil.assumeIsDegraded();
 
     criteo = CriteoUtil.givenInitializedCriteo();
@@ -38,12 +46,7 @@ public class InHouseDegradedTest {
 
   @Test
   public void whenGettingABidResponse_ShouldNotDoAnyCallToCdb() throws Exception {
-    PubSdkApiHelper.withApi(api, () -> {
-      criteo.getBidResponse(adUnit);
-    });
-
     waitForMockedBid();
-
     verifyZeroInteractions(api);
   }
 

@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.BuildConfig;
+import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.HostAppUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
@@ -36,7 +37,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         this.userAgent = userAgent;
         this.cacheAdUnits = adUnits;
         this.bidsInCdbTask = bidsInMap;
-        this.api = PubSdkApi.getInstance();
+        this.api = DependencyProvider.getInstance().providePubSdkApi();
     }
 
     @Override

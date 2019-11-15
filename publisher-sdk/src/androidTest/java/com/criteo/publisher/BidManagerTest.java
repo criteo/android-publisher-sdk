@@ -15,7 +15,6 @@ import android.support.test.runner.AndroidJUnit4;
 import android.test.UiThreadTest;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.ReflectionUtil;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;

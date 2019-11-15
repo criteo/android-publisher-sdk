@@ -3,21 +3,23 @@ package com.criteo.publisher.degraded;
 import static com.criteo.publisher.ThreadingUtil.waitForMockedBid;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
-import android.app.Application;
-import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoUtil;
+import com.criteo.publisher.DependencyProvider;
+import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.network.PubSdkApi;
-import com.criteo.publisher.network.PubSdkApiHelper;
-import java.util.Collections;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class HeaderBiddingDegradedTest {
+  @Rule
+  public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
 
   @Mock
   private AdUnit adUnit;
@@ -31,6 +33,9 @@ public class HeaderBiddingDegradedTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
+    DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
+    when(dependencyProvider.providePubSdkApi()).thenReturn(api);
+
     DegradedUtil.assumeIsDegraded();
 
     criteo = CriteoUtil.givenInitializedCriteo();
@@ -38,14 +43,7 @@ public class HeaderBiddingDegradedTest {
 
   @Test
   public void whenSettingABids_ShouldNotDoAnyCallToCdb() throws Exception {
-    Object builder = mock(Object.class);
-
-    PubSdkApiHelper.withApi(api, () -> {
-      criteo.setBidsForAdUnit(builder, adUnit);
-    });
-
     waitForMockedBid();
-
     verifyZeroInteractions(api);
   }
 
@@ -58,5 +56,4 @@ public class HeaderBiddingDegradedTest {
 
     verifyZeroInteractions(builder);
   }
-
 }
