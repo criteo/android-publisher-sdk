@@ -16,8 +16,11 @@ import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
+import com.criteo.publisher.CriteoInterstitial;
+import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.network.PubSdkApiHelper;
 import java.util.Collections;
@@ -30,6 +33,7 @@ import org.mockito.MockitoAnnotations;
 public class StandaloneDegradedTest {
 
   private final BannerAdUnit bannerAdUnit = new BannerAdUnit("banner", new AdSize(1, 2));
+  private final InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit("interstitial");
 
   private Context context;
 
@@ -84,6 +88,43 @@ public class StandaloneDegradedTest {
     waitForMockedBid();
 
     verify(listener, never()).onAdReceived(any());
+    verify(listener, times(2)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+  }
+
+  @Test
+  public void whenLoadingAnInterstitial_ShouldNotDoAnyCallToCdb() throws Exception {
+    PubSdkApiHelper.withApi(api, () -> {
+      runOnMainThreadAndWait(() -> {
+        CriteoInterstitial interstitial = new CriteoInterstitial(context, interstitialAdUnit);
+
+        interstitial.loadAd();
+      });
+    });
+
+    waitForMockedBid();
+
+    verifyZeroInteractions(api);
+  }
+
+  @Test
+  public void whenLoadingTwiceAnInterstitial_ShouldCallBackListenerWithErrorNoFill() throws Exception {
+    CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
+    AtomicReference<CriteoInterstitial> interstitial = new AtomicReference<>();
+
+    runOnMainThreadAndWait(() -> {
+      interstitial.set(new CriteoInterstitial(context, interstitialAdUnit));
+    });
+
+    interstitial.get().setCriteoInterstitialAdListener(listener);
+
+    runOnMainThreadAndWait(interstitial.get()::loadAd);
+    waitForMockedBid();
+
+    // Load twice, because first one is a cache miss
+    runOnMainThreadAndWait(interstitial.get()::loadAd);
+    waitForMockedBid();
+
+    verify(listener, never()).onAdReceived();
     verify(listener, times(2)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
   }
 
