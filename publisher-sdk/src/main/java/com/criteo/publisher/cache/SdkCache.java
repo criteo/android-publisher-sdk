@@ -1,7 +1,7 @@
 package com.criteo.publisher.cache;
 
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_NATIVE;
+import static com.criteo.publisher.Util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_INTERSTITIAL;
 
 import com.criteo.publisher.Util.AdUnitType;
@@ -32,7 +32,7 @@ public class SdkCache {
 
     private AdUnitType findAdUnitType(Slot slot) {
         if (slot.isNative()) {
-            return CRITEO_NATIVE;
+            return CRITEO_CUSTOM_NATIVE;
         }
 
         if ((DeviceUtil.getSizePortrait().getHeight() == slot.getHeight()

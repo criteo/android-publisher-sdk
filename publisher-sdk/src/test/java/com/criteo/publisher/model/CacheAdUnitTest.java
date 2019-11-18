@@ -1,7 +1,7 @@
 package com.criteo.publisher.model;
 
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_NATIVE;
+import static com.criteo.publisher.Util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_INTERSTITIAL;
 
 import org.json.JSONObject;
@@ -26,8 +26,8 @@ public class CacheAdUnitTest {
 
     @Test
     public void checkEquals() {
-        CacheAdUnit cacheAdUnit = new CacheAdUnit(new AdSize(320, 50), "AdUnitId", CRITEO_NATIVE);
-        CacheAdUnit anotherCacheAdUnit = new CacheAdUnit(new AdSize(320, 50), "AdUnitId", CRITEO_NATIVE);
+        CacheAdUnit cacheAdUnit = new CacheAdUnit(new AdSize(320, 50), "AdUnitId", CRITEO_CUSTOM_NATIVE);
+        CacheAdUnit anotherCacheAdUnit = new CacheAdUnit(new AdSize(320, 50), "AdUnitId", CRITEO_CUSTOM_NATIVE);
         Assert.assertEquals(cacheAdUnit, anotherCacheAdUnit);
     }
 
@@ -62,7 +62,7 @@ public class CacheAdUnitTest {
     public void testNativeToJson() {
         try {
             AdSize adSize = new AdSize(2, 2);
-            CacheAdUnit nativeCacheAdUnit = new CacheAdUnit(adSize, "AdUnitId", CRITEO_NATIVE);
+            CacheAdUnit nativeCacheAdUnit = new CacheAdUnit(adSize, "AdUnitId", CRITEO_CUSTOM_NATIVE);
             JSONObject nativeJson = nativeCacheAdUnit.toJson();
             Assert.assertTrue(nativeJson.has("placementId"));
             Assert.assertEquals("AdUnitId", nativeJson.getString("placementId"));

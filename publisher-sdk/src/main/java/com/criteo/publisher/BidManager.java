@@ -25,8 +25,6 @@ import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.CdbDownloadTask;
-import com.criteo.publisher.tasks.CriteoAdvancedNativeListenerCallTask;
-
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -363,13 +361,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
     private boolean killSwitchEngaged() {
         return (config != null && config.isKillSwitch());
-    }
-
-    void loadNativeAd(AdUnit nativeAdUnit, CriteoNativeAdListener nativeAdListener) {
-        CriteoAdvancedNativeListenerCallTask nativeCallTask = new CriteoAdvancedNativeListenerCallTask(nativeAdListener);
-        Slot slot = this.getBidForAdUnitAndPrefetch(nativeAdUnit);
-        CriteoNativeAd nativeAd = slot != null ? new CriteoNativeAd(slot.getNativeAssets()) : null;
-        nativeCallTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, slot, nativeAd);
     }
 
 }

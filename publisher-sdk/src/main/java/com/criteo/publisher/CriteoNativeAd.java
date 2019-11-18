@@ -9,24 +9,6 @@ public class CriteoNativeAd {
 
     CriteoNativeAd(NativeAssets nativeAssets) {
         this.nativeAssets = nativeAssets;
-        startImageDownloads();
-    }
-
-    private void startImageDownloads() {
-        if(productExists(this.nativeAssets)) {
-            if(this.nativeAssets.nativeProducts.get(0).imageUrl != null
-                    && this.nativeAssets.nativeProducts.get(0).imageUrl.length() >0) {
-                // TODO : Start product image download here
-            }
-        }
-        if (nativeAssets != null && nativeAssets.advertiserLogoUrl != null
-                && nativeAssets.advertiserLogoUrl.length() > 0) {
-            // TODO : Start advertiser logo image download here
-        }
-        if (nativeAssets != null && nativeAssets.privacyOptOutImageUrl != null
-                && nativeAssets.privacyOptOutImageUrl.length() > 0) {
-            // TODO : Start ad choices logo image download here
-        }
     }
 
     public String getTitle() {

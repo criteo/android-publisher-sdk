@@ -58,5 +58,4 @@ public abstract class Criteo {
 
   abstract DeviceInfo getDeviceInfo();
 
-  public abstract void loadNativeAd(NativeAdUnit nativeAdUnit, CriteoNativeAdListener nativeAdListener);
 }

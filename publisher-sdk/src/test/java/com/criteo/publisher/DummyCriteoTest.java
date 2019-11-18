@@ -76,7 +76,7 @@ public class DummyCriteoTest {
     assertThat(criteo.getTokenValue(null, null)).isNull();
     assertThat(criteo.getTokenValue(bannerToken, AdUnitType.CRITEO_BANNER)).isNull();
     assertThat(criteo.getTokenValue(interstitialToken, AdUnitType.CRITEO_INTERSTITIAL)).isNull();
-    assertThat(criteo.getTokenValue(nativeToken, AdUnitType.CRITEO_NATIVE)).isNull();
+    assertThat(criteo.getTokenValue(nativeToken, AdUnitType.CRITEO_CUSTOM_NATIVE)).isNull();
     assertThat(criteo.getTokenValue(bannerToken, AdUnitType.CRITEO_INTERSTITIAL)).isNull();
   }
 

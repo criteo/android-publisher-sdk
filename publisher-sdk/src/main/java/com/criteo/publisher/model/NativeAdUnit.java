@@ -2,14 +2,14 @@ package com.criteo.publisher.model;
 
 import com.criteo.publisher.Util.ObjectsUtil;
 
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_NATIVE;
+import static com.criteo.publisher.Util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 
 public final class NativeAdUnit extends AdUnit {
 
     private final AdSize adSize;
 
     public NativeAdUnit(String adUnitId) {
-        super(adUnitId, CRITEO_NATIVE);
+        super(adUnitId, CRITEO_CUSTOM_NATIVE);
         this.adSize = new AdSize(2, 2);
     }
 

@@ -103,22 +103,6 @@ final class CriteoInternal extends Criteo {
     }
   }
 
-  @Override
-  public void loadNativeAd(NativeAdUnit nativeAdUnit, CriteoNativeAdListener nativeAdListener) {
-    try {
-      if (bidManager == null) {
-        return;
-      }
-      if (nativeAdUnit == null || nativeAdListener == null) {
-        Log.d(TAG, nativeAdUnit == null ? "NativeAdUnit" : "CriteoNativeAdListener" + " cannot be null");
-        return;
-      }
-      bidManager.loadNativeAd(nativeAdUnit, nativeAdListener);
-    } catch (Exception ex) {
-      Log.e(TAG, "Internal error when loading native ad.", ex);
-    }
-  }
-
     @Override
     public BidResponse getBidResponse(AdUnit adUnit) {
         BidResponse response;

@@ -39,11 +39,6 @@ public class DummyCriteo extends Criteo {
     return new DummyDeviceInfo();
   }
 
-  @Override
-  public void loadNativeAd(NativeAdUnit nativeAdUnit, CriteoNativeAdListener nativeAdListener) {
-    // Nothing
-  }
-
   private static class DummyDeviceInfo extends DeviceInfo {
 
     @Override
