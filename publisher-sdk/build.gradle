@@ -46,19 +46,19 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'com.android.support:support-core-utils:27.0.1'
+
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.json:json:20140107'
     testImplementation 'org.mockito:mockito-core:2.7.0'
     testImplementation 'com.google.android.gms:play-services-ads:15.0.1'
     testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.1.10'
     testImplementation 'org.assertj:assertj-core:3.11.1'
+
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     androidTestImplementation 'org.mockito:mockito-android:2.7.22'
     androidTestImplementation 'com.google.android.gms:play-services-ads:15.0.1'
-    androidTestImplementation 'com.google.android.gms:play-services-base:15.0.1'
-    implementation 'com.android.support:support-core-utils:27.0.1'
 }
 
 // Define artifacts to publish to Nexus
