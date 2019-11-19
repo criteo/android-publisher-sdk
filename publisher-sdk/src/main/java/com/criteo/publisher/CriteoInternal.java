@@ -16,7 +16,6 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitHelper;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.DeviceInfo;
-import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 import java.util.ArrayList;
@@ -58,7 +57,7 @@ final class CriteoInternal extends Criteo {
         deviceInfo.initialize(context, new UserAgentCallback() {
             @Override
             public void done() {
-                bidManager.prefetch();
+              bidManager.prefetch();
             }
         });
     }

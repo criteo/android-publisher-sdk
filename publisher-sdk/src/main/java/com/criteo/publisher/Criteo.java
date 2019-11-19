@@ -2,12 +2,12 @@ package com.criteo.publisher;
 
 import android.app.Application;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.DeviceInfo;
-import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 import java.util.List;
@@ -44,6 +44,11 @@ public abstract class Criteo {
       }
 
       return criteo;
+  }
+
+  @VisibleForTesting
+  static void setInstance(@Nullable Criteo instance) {
+      criteo = instance;
   }
 
   public abstract void setBidsForAdUnit(Object object, AdUnit adUnit);

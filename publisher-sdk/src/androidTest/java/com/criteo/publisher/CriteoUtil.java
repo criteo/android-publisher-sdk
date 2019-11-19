@@ -10,6 +10,9 @@ public class CriteoUtil {
     Application app = (Application) InstrumentationRegistry.getTargetContext()
         .getApplicationContext();
 
+    // clears any side effects from previous calls
+    Criteo.setInstance(null);
+
     return Criteo.init(app, "B-056946", Collections.emptyList());
   }
 
