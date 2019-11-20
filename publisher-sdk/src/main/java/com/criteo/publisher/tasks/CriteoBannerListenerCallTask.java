@@ -7,6 +7,43 @@ import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoListenerCode;
 import java.lang.ref.WeakReference;
 
+/**
+ * /!\ Don't remove this class unless you know what you are doing. /!\
+ *
+ * <p>
+ *   Although no long running task is being run, this AsyncTask is still necessary to prevent
+ *   deadlocks when invoking callbacks registered by the downstream application. This can happen
+ *   when non-reentrant locks are used.
+ *
+ *   <pre>
+ *     <code>
+ *       private Mutex _lock = new Lock();
+ *
+ *       public void callCriteoSDK() {
+ *          _lock.lock();
+ *          sdk.callSdk(this);  //SDK immediately calls back with status
+ *          _lock.unlock();
+ *       }
+ *
+ *       public void onSuccess(Status status) {
+ *          _lock.lock();
+ *          handleSuccessCallback(status);
+ *          _lock.unlock();
+ *      }
+ *
+ *      // Discussion:
+ *      //
+ *      // If the onSuccess callback is invoked from
+ *      // the same callstack as callCriteoSDK(), _lock
+ *      // will not be released.  The subsequent call to
+ *      // lock() may block depending on the lock's
+ *      // implementation.
+ *     </code>
+ *   </pre>
+ *
+ *   More information can be found on @see <a href=https://jira.criteois.com/browse/EE-574">EE-574</a>
+ * </p>
+ */
 public class CriteoBannerListenerCallTask extends AsyncTask<Object, Void, Object> {
 
     private CriteoBannerAdListener adListener;
