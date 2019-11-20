@@ -1,6 +1,5 @@
 package com.criteo.publisher;
 
-import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.webkit.URLUtil;
 import com.criteo.publisher.Util.AdUnitType;
@@ -10,6 +9,7 @@ import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.tasks.CriteoInterstitialListenerCallTask;
+import java.util.concurrent.Executor;
 
 
 public class CriteoInterstitialEventController {
@@ -54,9 +54,10 @@ public class CriteoInterstitialEventController {
                 slot = criteo.getBidForAdUnit(adUnit);
             }
 
+            Executor serialExecutor = DependencyProvider.getInstance().provideSerialExecutor();
             criteoInterstitialListenerCallTask = new CriteoInterstitialListenerCallTask(
                     criteoInterstitialAdListener);
-            criteoInterstitialListenerCallTask.execute(slot);
+            criteoInterstitialListenerCallTask.executeOnExecutor(serialExecutor, slot);
 
             if (slot != null && slot.isValid() && URLUtil.isValidUrl(slot.getDisplayUrl())) {
                 //gets Webview data from Criteo before showing Interstitialview Activity
@@ -72,7 +73,8 @@ public class CriteoInterstitialEventController {
             Slot slot = null;
             webViewDownloader.downloadFailed();
             criteoInterstitialListenerCallTask = new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener);
-            criteoInterstitialListenerCallTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, slot);
+            Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
+            criteoInterstitialListenerCallTask.executeOnExecutor(threadPoolExecutor, slot);
             return;
         }
 
@@ -89,7 +91,8 @@ public class CriteoInterstitialEventController {
         TokenValue tokenValue = criteo.getTokenValue(bidToken, AdUnitType.CRITEO_INTERSTITIAL);
 
         criteoInterstitialListenerCallTask = new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener);
-        criteoInterstitialListenerCallTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, tokenValue);
+        Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
+        criteoInterstitialListenerCallTask.executeOnExecutor(threadPoolExecutor, tokenValue);
 
         if (tokenValue != null) {
             getWebviewDataAsync(tokenValue.getDisplayUrl());

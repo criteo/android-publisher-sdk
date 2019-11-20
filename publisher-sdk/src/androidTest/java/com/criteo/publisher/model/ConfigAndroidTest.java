@@ -9,6 +9,7 @@ import com.criteo.publisher.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,12 +23,12 @@ public class ConfigAndroidTest {
     @Before
     public void setup() {
         context = InstrumentationRegistry.getTargetContext();
-        //clear the sharedPrefs
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.remove(CACHED_KILL_SWITCH);
-        editor.commit();
+        clearSharedPrefs();
+    }
+
+    @After
+    public void tearDown() {
+       clearSharedPrefs();
     }
 
     @Test
@@ -127,5 +128,15 @@ public class ConfigAndroidTest {
         // this should not flip from the explicitly set value
         // as the json doesn't have a kill switch value to overwrite
         Assert.assertTrue(sharedPref.getBoolean(CACHED_KILL_SWITCH, false));
+    }
+
+    private void clearSharedPrefs() {
+        //clear the sharedPrefs
+        SharedPreferences sharedPref = context.getSharedPreferences(
+            context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.remove(CACHED_KILL_SWITCH);
+        editor.commit();
     }
 }

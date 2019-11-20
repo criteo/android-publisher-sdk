@@ -54,6 +54,7 @@ final class CriteoInternal extends Criteo {
 
         this.appEvents = new AppEvents(context);
         this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
+
         deviceInfo.initialize(context, new UserAgentCallback() {
             @Override
             public void done() {

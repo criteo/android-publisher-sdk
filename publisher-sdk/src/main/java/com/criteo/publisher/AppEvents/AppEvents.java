@@ -2,9 +2,11 @@ package com.criteo.publisher.AppEvents;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.Util.AppEventResponseListener;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.network.AppEventTask;
+import java.util.concurrent.Executor;
 
 public class AppEvents implements AppEventResponseListener, ApplicationStoppedListener {
 
@@ -31,7 +33,8 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
             eventTask = new AppEventTask(mContext, this);
         }
         if (eventTask.getStatus() != AsyncTask.Status.RUNNING) {
-            eventTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, eventType);
+            Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
+            eventTask.executeOnExecutor(threadPoolExecutor, eventType);
         }
     }
 

@@ -1,11 +1,12 @@
 package com.criteo.publisher.degraded;
 
-import static com.criteo.publisher.ThreadingUtil.waitForMockedBid;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+
 
 import com.criteo.publisher.BidResponse;
 import com.criteo.publisher.Criteo;
@@ -38,7 +39,6 @@ public class InHouseDegradedTest {
 
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
     when(dependencyProvider.providePubSdkApi()).thenReturn(api);
-
     DegradedUtil.assumeIsDegraded();
 
     criteo = CriteoUtil.givenInitializedCriteo();
@@ -46,20 +46,19 @@ public class InHouseDegradedTest {
 
   @Test
   public void whenGettingABidResponse_ShouldNotDoAnyCallToCdb() throws Exception {
-    waitForMockedBid();
+    criteo.getBidResponse(adUnit);
+    mockedDependenciesRule.getTrackingCommandsExecutor().waitCommands();
     verifyZeroInteractions(api);
   }
 
   @Test
   public void whenGettingABidResponseTwice_ShouldReturnANoBid() throws Exception {
     BidResponse bidResponse = criteo.getBidResponse(adUnit);
-    waitForMockedBid();
 
     assertIsNoBid(bidResponse);
 
     bidResponse = criteo.getBidResponse(adUnit);
-    waitForMockedBid();
-
+    mockedDependenciesRule.getTrackingCommandsExecutor().waitCommands();
     assertIsNoBid(bidResponse);
   }
 
@@ -68,5 +67,4 @@ public class InHouseDegradedTest {
     assertEquals(0.0, bidResponse.getPrice(), 0.0);
     assertNull(bidResponse.getBidToken());
   }
-
 }

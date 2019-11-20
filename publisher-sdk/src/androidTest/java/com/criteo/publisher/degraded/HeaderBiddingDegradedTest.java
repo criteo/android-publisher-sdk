@@ -1,6 +1,5 @@
 package com.criteo.publisher.degraded;
 
-import static com.criteo.publisher.ThreadingUtil.waitForMockedBid;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -43,7 +42,9 @@ public class HeaderBiddingDegradedTest {
 
   @Test
   public void whenSettingABids_ShouldNotDoAnyCallToCdb() throws Exception {
-    waitForMockedBid();
+    Object builder = mock(Object.class);
+    criteo.setBidsForAdUnit(builder, adUnit);
+    mockedDependenciesRule.getTrackingCommandsExecutor().waitCommands();
     verifyZeroInteractions(api);
   }
 
@@ -51,9 +52,7 @@ public class HeaderBiddingDegradedTest {
   public void whenSettingABids_ShouldNotEnrichGivenBuilder() throws Exception {
     Object builder = mock(Object.class);
     criteo.setBidsForAdUnit(builder, adUnit);
-
-    waitForMockedBid();
-
+    mockedDependenciesRule.getTrackingCommandsExecutor().waitCommands();
     verifyZeroInteractions(builder);
   }
 }

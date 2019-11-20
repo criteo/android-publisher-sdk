@@ -1,8 +1,10 @@
 package com.criteo.publisher;
 
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.network.PubSdkApi;
+import java.util.concurrent.Executor;
 
 /**
  * Provides global dependencies to the rest of the codebase
@@ -37,5 +39,15 @@ public class DependencyProvider {
   @NonNull
   public AdvertisingInfo provideAdvertisingInfo() {
     return AdvertisingInfo.getInstance();
+  }
+
+  @NonNull
+  public Executor provideThreadPoolExecutor() {
+    return AsyncTask.THREAD_POOL_EXECUTOR;
+  }
+
+  @NonNull
+  public Executor provideSerialExecutor() {
+    return AsyncTask.SERIAL_EXECUTOR;
   }
 }

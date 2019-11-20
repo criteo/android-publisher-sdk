@@ -30,6 +30,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import java.util.concurrent.Executor;
 import org.json.JSONObject;
 
 public class BidManager implements NetworkResponseListener, ApplicationStoppedListener {
@@ -137,8 +138,9 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         for (CacheAdUnit cacheAdUnit : prefetchCacheAdUnits) {
             placementsWithCdbTasks.put(cacheAdUnit, cdbDownloadTask);
         }
-        cdbDownloadTask
-                .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, PROFILE_ID, user, publisher);
+
+        Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
+        cdbDownloadTask.executeOnExecutor(threadPoolExecutor, PROFILE_ID, user, publisher);
     }
 
 

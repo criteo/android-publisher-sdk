@@ -2,7 +2,6 @@ package com.criteo.publisher;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.webkit.URLUtil;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -13,6 +12,7 @@ import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.tasks.CriteoBannerListenerCallTask;
 import com.criteo.publisher.tasks.CriteoBannerLoadTask;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.Executor;
 
 
 public class CriteoBannerEventController {
@@ -39,13 +39,15 @@ public class CriteoBannerEventController {
             code = CriteoListenerCode.VALID;
         }
 
+        Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
         listenerCallTask = new CriteoBannerListenerCallTask(this.adListener, view.get());
-        listenerCallTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, code);
+        listenerCallTask.executeOnExecutor(threadPoolExecutor, code);
 
         if (CriteoListenerCode.VALID == code) {
             loadTask = new CriteoBannerLoadTask(view.get(), createWebViewClient());
             // Must run on UI thread as it is displaying the fetched ad
-            loadTask.execute(slot);
+            Executor serialExecutor = DependencyProvider.getInstance().provideSerialExecutor();
+            loadTask.executeOnExecutor(serialExecutor, slot);
         }
     }
 
@@ -57,13 +59,15 @@ public class CriteoBannerEventController {
             code = CriteoListenerCode.VALID;
         }
 
+        Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
         listenerCallTask = new CriteoBannerListenerCallTask(this.adListener, view.get());
-        listenerCallTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, code);
+        listenerCallTask.executeOnExecutor(threadPoolExecutor, code);
 
         if (CriteoListenerCode.VALID == code) {
             loadTask = new CriteoBannerLoadTask(view.get(), createWebViewClient());
             // Must run on UI thread as it is displaying the fetched ad
-            loadTask.execute(tokenValue);
+            Executor serialExecutor = DependencyProvider.getInstance().provideSerialExecutor();
+            loadTask.executeOnExecutor(serialExecutor, tokenValue);
         }
     }
 
@@ -77,8 +81,9 @@ public class CriteoBannerEventController {
                 view.getContext().startActivity(
                         new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 if (adListener != null) {
+                    Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
                     CriteoBannerListenerCallTask listenerCallTask = new CriteoBannerListenerCallTask(adListener, null);
-                    listenerCallTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, CriteoListenerCode.CLICK);
+                    listenerCallTask.executeOnExecutor(threadPoolExecutor, CriteoListenerCode.CLICK);
                 }
                 return true;
             }

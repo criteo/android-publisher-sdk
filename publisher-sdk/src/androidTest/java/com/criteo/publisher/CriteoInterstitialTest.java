@@ -1,12 +1,15 @@
 package com.criteo.publisher;
 
 import android.app.Application;
+import android.os.Looper;
 import android.support.test.InstrumentationRegistry;
 import android.test.UiThreadTest;
+import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -16,10 +19,12 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
-import static com.criteo.publisher.ThreadingUtil.waitForMockedBid;
+import static com.criteo.publisher.ThreadingUtil.waitForMessageQueueToBeIdle;
 import static org.mockito.Mockito.*;
 
 public class CriteoInterstitialTest {
+    @Rule
+    public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
 
     @Mock
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
@@ -31,6 +36,7 @@ public class CriteoInterstitialTest {
     @UiThreadTest
     public void setup() throws CriteoInitException {
         MockitoAnnotations.initMocks(this);
+
         List<AdUnit> cacheAdUnits = new ArrayList<>();
         cacheAdUnits.add(interstitialAdUnit);
         Application app =
@@ -121,10 +127,10 @@ public class CriteoInterstitialTest {
         });
 
         runOnMainThreadAndWait(interstitial.get()::loadAd);
-        waitForMockedBid();
+        ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
         runOnMainThreadAndWait(interstitial.get()::loadAd);
-        waitForMockedBid();
+        ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
         verify(listener, times(2)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
     }

@@ -2,8 +2,10 @@ package com.criteo.publisher.controller;
 
 import android.os.AsyncTask;
 import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
+import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.tasks.WebViewDataTask;
 import com.criteo.publisher.model.WebViewData;
+import java.util.concurrent.Executor;
 
 public class WebViewDownloader {
 
@@ -18,7 +20,8 @@ public class WebViewDownloader {
     }
 
     public void fillWebViewHtmlContent(String displayUrl, String webViewUserAgent ,CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener) {
-        new WebViewDataTask(webViewData,criteoInterstitialAdDisplayListener ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, displayUrl, webViewUserAgent);
+        Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
+        new WebViewDataTask(webViewData,criteoInterstitialAdDisplayListener ).executeOnExecutor(threadPoolExecutor, displayUrl, webViewUserAgent);
     }
 
     public WebViewData getWebViewData() {
