@@ -22,11 +22,11 @@ public abstract class Criteo {
       synchronized (Criteo.class) {
           if (criteo == null) {
               try {
-                  if (DeviceUtil.isVersionNotSupported()) {
-                    criteo = new DummyCriteo();
-                  } else {
-                    criteo = new CriteoInternal(application, adUnits, criteoPublisherId);
-                  }
+                if (DeviceUtil.isVersionSupported()) {
+                  criteo = new CriteoInternal(application, adUnits, criteoPublisherId);
+                } else {
+                  criteo = new DummyCriteo();
+                }
               } catch (IllegalArgumentException iae) {
                   throw iae;
               } catch (Throwable tr) {

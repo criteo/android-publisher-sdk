@@ -90,13 +90,13 @@ public final class DeviceUtil {
         return null;
     }
 
-    public static boolean isVersionNotSupported() {
+    public static boolean isVersionSupported() {
         if (android.os.Build.VERSION.SDK_INT < 19) {
             Log.e(TAG, "Unsupported Android version");
-            return true;
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     public static boolean isLoggingEnabled() {

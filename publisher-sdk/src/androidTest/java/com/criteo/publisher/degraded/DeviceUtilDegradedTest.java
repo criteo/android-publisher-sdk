@@ -1,6 +1,6 @@
 package com.criteo.publisher.degraded;
 
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.assertFalse;
 
 import com.criteo.publisher.Util.DeviceUtil;
 import org.junit.Before;
@@ -14,10 +14,10 @@ public class DeviceUtilDegradedTest {
   }
 
   @Test
-  public void isVersionNotSupported_GivenDegradedFunctionality_ReturnsTrue() throws Exception {
-    boolean versionNotSupported = DeviceUtil.isVersionNotSupported();
+  public void isVersionSupported_GivenDegradedFunctionality_ReturnsFalse() throws Exception {
+    boolean versionSupported = DeviceUtil.isVersionSupported();
 
-    assertTrue(versionNotSupported);
+    assertFalse(versionSupported);
   }
 
 }

@@ -1,8 +1,8 @@
 package com.criteo.publisher.Util;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
@@ -102,14 +102,14 @@ public class DeviceUtilTest {
     }
 
     @Test
-    public void isVersionNotSupported_GivenDeviceAboveOrEqual19_ReturnsFalse() {
+    public void isVersionSupported_GivenDeviceAboveOrEqual19_ReturnsTrue() {
         if (VERSION.SDK_INT < 19) {
             throw new AssumptionViolatedException("Version of device should be >= 19");
         }
 
-        boolean versionNotSupported = DeviceUtil.isVersionNotSupported();
+        boolean versionSupported = DeviceUtil.isVersionSupported();
 
-        assertFalse(versionNotSupported);
+        assertTrue(versionSupported);
     }
 }
 
