@@ -67,10 +67,6 @@ public class Cdb implements Parcelable {
         return slots;
     }
 
-    public void setSlots(ArrayList<Slot> slots) {
-        this.slots = slots;
-    }
-
     public void setCacheAdUnits(List<CacheAdUnit> cacheAdUnits) {
         this.cacheAdUnits = cacheAdUnits;
     }

@@ -1,24 +1,36 @@
 package com.criteo.publisher.cache;
 
-import com.criteo.publisher.Util.AdUnitType;
+import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
+import static com.criteo.publisher.Util.AdUnitType.CRITEO_CUSTOM_NATIVE;
+import static com.criteo.publisher.Util.AdUnitType.CRITEO_INTERSTITIAL;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Slot;
-
+import java.util.Arrays;
 import junit.framework.Assert;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
-
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 public class SdkCacheTest {
     private SdkCache cache;
     private JSONArray slots;
+
+    @Before
+    public void setUp() throws Exception {
+        cache = new SdkCache();
+    }
 
     @Test
     public void cacheSize() throws JSONException {
@@ -263,5 +275,181 @@ public class SdkCacheTest {
         } catch (Exception ex) {
             Assert.fail("Json exception in test data : "+ ex.getLocalizedMessage());
         }
+    }
+
+    @Test
+    public void add_GivenNullSlot_DoesNotAddSlot() throws Exception {
+        cache.add(null);
+
+        assertThat(cache.getItemCount()).isZero();
+    }
+
+    @Test
+    public void add_GivenInvalidSlot_DoesNotAddSlot() throws Exception {
+        Slot slot = mock(Slot.class);
+        when(slot.isValid()).thenReturn(false);
+
+        cache.add(slot);
+
+        assertThat(cache.getItemCount()).isZero();
+    }
+
+    @Test
+    public void add_GivenValidNativeSlot_AddItInCache() {
+        AdSize size = new AdSize(1, 2);
+        Slot slot = givenNativeSlot(size, "myAdUnit");
+
+        CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_CUSTOM_NATIVE);
+
+        cache.add(slot);
+        Slot adUnit = cache.getAdUnit(expectedKey);
+
+        assertThat(adUnit).isSameAs(slot);
+    }
+
+    @Test
+    public void add_GivenValidBannerSlot_AddItInCache() {
+        AdSize size = new AdSize(1, 2);
+
+        Slot slot = mock(Slot.class);
+        when(slot.isValid()).thenReturn(true);
+        when(slot.isNative()).thenReturn(false);
+        when(slot.getWidth()).thenReturn(size.getWidth());
+        when(slot.getHeight()).thenReturn(size.getHeight());
+        when(slot.getPlacementId()).thenReturn("myAdUnit");
+
+        CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_BANNER);
+
+        cache.add(slot);
+        Slot adUnit = cache.getAdUnit(expectedKey);
+
+        assertThat(adUnit).isSameAs(slot);
+    }
+
+    @Test
+    public void add_GivenValidInterstitialSlotInPortrait_AddItInCache() {
+        AdSize size = new AdSize(300, 400);
+
+        Slot slot = mock(Slot.class);
+        when(slot.isValid()).thenReturn(true);
+        when(slot.isNative()).thenReturn(false);
+        when(slot.getWidth()).thenReturn(size.getWidth());
+        when(slot.getHeight()).thenReturn(size.getHeight());
+        when(slot.getPlacementId()).thenReturn("myAdUnit");
+
+        // FIXME this has side-effect. After fixing EE-608, this will have no meaning.
+        DeviceUtil.setScreenSize(size.getWidth(), size.getHeight());
+
+        CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_INTERSTITIAL);
+
+        cache.add(slot);
+        Slot adUnit = cache.getAdUnit(expectedKey);
+
+        assertThat(adUnit).isSameAs(slot);
+    }
+
+    @Test
+    public void add_GivenValidInterstitialSlotInLandscape_AddItInCache() {
+        AdSize size = new AdSize(400, 300);
+
+        Slot slot = mock(Slot.class);
+        when(slot.isValid()).thenReturn(true);
+        when(slot.isNative()).thenReturn(false);
+        when(slot.getWidth()).thenReturn(size.getWidth());
+        when(slot.getHeight()).thenReturn(size.getHeight());
+        when(slot.getPlacementId()).thenReturn("myAdUnit");
+
+        // FIXME this has side-effect. After fixing EE-608, this will have no meaning.
+        DeviceUtil.setScreenSize(size.getHeight(), size.getWidth());
+
+        CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_INTERSTITIAL);
+
+        cache.add(slot);
+        Slot adUnit = cache.getAdUnit(expectedKey);
+
+        assertThat(adUnit).isSameAs(slot);
+    }
+
+    @Test
+    public void addAll_GivenNull_DoesNothing() throws Exception {
+        cache.addAll(null);
+
+        assertThat(cache.getItemCount()).isEqualTo(0);
+    }
+
+    @Test
+    public void addAll_GivenSomeSlots_AddThemAll() throws Exception {
+        Slot slot1 = mock(Slot.class);
+        Slot slot2 = mock(Slot.class);
+        Slot slot3 = mock(Slot.class);
+
+        cache = spy(cache);
+
+        cache.addAll(Arrays.asList(slot1, slot2, slot3));
+
+        verify(cache).add(slot1);
+        verify(cache).add(slot2);
+        verify(cache).add(slot3);
+    }
+
+    @Test
+    public void peekAdUnit_PeekingTwiceExistingSlot_ReturnTwiceTheSameSlotWithoutRemovingIt() throws Exception {
+        AdSize size = new AdSize(1, 2);
+        Slot slot = givenNativeSlot(size, "myAdUnit");
+        CacheAdUnit key = new CacheAdUnit(size, "myAdUnit", CRITEO_CUSTOM_NATIVE);
+
+        cache.add(slot);
+        Slot slot1 = cache.peekAdUnit(key);
+        Slot slot2 = cache.peekAdUnit(key);
+
+        assertThat(cache.getItemCount()).isEqualTo(1);
+        assertThat(slot1).isSameAs(slot);
+        assertThat(slot2).isSameAs(slot);
+    }
+
+    @Test
+    public void peekAdUnit_PeekingNonExistingSlot_ReturnNull() throws Exception {
+        AdSize size = new AdSize(1, 2);
+        CacheAdUnit key = new CacheAdUnit(size, "myAdUnit", CRITEO_CUSTOM_NATIVE);
+
+        Slot slot = cache.peekAdUnit(key);
+
+        assertThat(slot).isNull();
+    }
+
+    @Test
+    public void getAdUnit_GettingTwiceExistingSlot_ReturnFirstTheSameSlotThenReturnNull() throws Exception {
+        AdSize size = new AdSize(1, 2);
+        Slot slot = givenNativeSlot(size, "myAdUnit");
+        CacheAdUnit key = new CacheAdUnit(size, "myAdUnit", CRITEO_CUSTOM_NATIVE);
+
+        cache.add(slot);
+        Slot slot1 = cache.getAdUnit(key);
+        Slot slot2 = cache.getAdUnit(key);
+
+        assertThat(cache.getItemCount()).isEqualTo(0);
+        assertThat(slot1).isSameAs(slot);
+        assertThat(slot2).isNull();
+    }
+
+    @Test
+    public void getAdUnit_GettingNonExistingSlot_ReturnNull() throws Exception {
+        AdSize size = new AdSize(1, 2);
+        CacheAdUnit key = new CacheAdUnit(size, "myAdUnit", CRITEO_CUSTOM_NATIVE);
+
+        Slot slot = cache.getAdUnit(key);
+
+        assertThat(slot).isNull();
+    }
+
+    private static Slot givenNativeSlot(AdSize size, String placementId) {
+        Slot slot = mock(Slot.class);
+        when(slot.isValid()).thenReturn(true);
+        when(slot.isNative()).thenReturn(true);
+        when(slot.getWidth()).thenReturn(size.getWidth());
+        when(slot.getHeight()).thenReturn(size.getHeight());
+        when(slot.getPlacementId()).thenReturn(placementId);
+
+        return slot;
     }
 }
