@@ -4,6 +4,7 @@ import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_INTERSTITIAL;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
@@ -11,31 +12,16 @@ import org.junit.Test;
 public class CacheAdUnitTest {
 
     @Test
+    public void equalsContract() throws Exception {
+        EqualsVerifier.forClass(CacheAdUnit.class)
+            .verify();
+    }
+
+    @Test
     public void checkFormattedSize() {
         CacheAdUnit cacheAdUnit = new CacheAdUnit(new AdSize(320, 50), "AdUnitId", CRITEO_BANNER);
         Assert.assertEquals(cacheAdUnit.getSize().getWidth(), 320);
         Assert.assertEquals(cacheAdUnit.getSize().getHeight(), 50);
-    }
-
-    @Test
-    public void checkHashCode() {
-        CacheAdUnit cacheAdUnit = new CacheAdUnit(new AdSize(320, 50), "AdUnitId", CRITEO_BANNER);
-        CacheAdUnit anotherCacheAdUnit = new CacheAdUnit(new AdSize(320, 50), "AdUnitId", CRITEO_BANNER);
-        Assert.assertEquals(cacheAdUnit.hashCode(), anotherCacheAdUnit.hashCode());
-    }
-
-    @Test
-    public void checkEquals() {
-        CacheAdUnit cacheAdUnit = new CacheAdUnit(new AdSize(320, 50), "AdUnitId", CRITEO_CUSTOM_NATIVE);
-        CacheAdUnit anotherCacheAdUnit = new CacheAdUnit(new AdSize(320, 50), "AdUnitId", CRITEO_CUSTOM_NATIVE);
-        Assert.assertEquals(cacheAdUnit, anotherCacheAdUnit);
-    }
-
-    @Test
-    public void checkHashCodeWithSameId() {
-        CacheAdUnit cacheAdUnit = new CacheAdUnit(new AdSize(320, 480), "AdUnitId", CRITEO_BANNER);
-        CacheAdUnit anotherCacheAdUnit = new CacheAdUnit(new AdSize(320, 480), "AdUnitId", CRITEO_INTERSTITIAL);
-        Assert.assertNotEquals(cacheAdUnit.hashCode(), anotherCacheAdUnit.hashCode());
     }
 
     @Test

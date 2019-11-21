@@ -5,15 +5,22 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class CacheAdUnit {
+public final class CacheAdUnit {
 
     private static final String PLACEMENT_ID = "placementId";
     private static final String SIZES = "sizes";
     private static final String IS_NATIVE = "isNative";
     private static final String IS_INTERSTITIAL = "interstitial";
-    private String adUnitId;
-    private AdSize adSize;
-    private AdUnitType adUnitType;
+
+    private final String adUnitId;
+    private final AdSize adSize;
+    private final AdUnitType adUnitType;
+
+    public CacheAdUnit(AdSize adSize, String adUnitId, AdUnitType adUnitType) {
+        this.adSize = adSize;
+        this.adUnitId = adUnitId;
+        this.adUnitType = adUnitType;
+    }
 
     public String getPlacementId() {
         return adUnitId;
@@ -21,10 +28,6 @@ public class CacheAdUnit {
 
     public AdSize getSize() {
         return adSize;
-    }
-
-    public void setSize(AdSize size) {
-        this.adSize = size;
     }
 
     public JSONObject toJson() throws JSONException {
@@ -51,16 +54,10 @@ public class CacheAdUnit {
     @Override
     public String toString() {
         return "CacheAdUnit{" +
-                "placementId='" + adUnitId + '\'' +
-                ", adSize=" + adSize +
-                ", adUnitType= " + adUnitType +
-                '}';
-    }
-
-    public CacheAdUnit(AdSize adSize, String adUnitId, AdUnitType adUnitType) {
-        this.adSize = adSize;
-        this.adUnitId = adUnitId;
-        this.adUnitType = adUnitType;
+            "placementId='" + adUnitId + '\'' +
+            ", adSize=" + adSize +
+            ", adUnitType= " + adUnitType +
+            '}';
     }
 
     @Override
