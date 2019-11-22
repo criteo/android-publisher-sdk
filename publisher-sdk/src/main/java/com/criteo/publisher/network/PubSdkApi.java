@@ -55,7 +55,7 @@ public class PubSdkApi {
         return configResult;
     }
 
-    Cdb loadCdb(Context context, Cdb cdbRequest, String userAgent) {
+    public Cdb loadCdb(Context context, Cdb cdbRequest, String userAgent) {
         Cdb cdbResult = null;
         try {
             URL url = new URL(context.getString(R.string.cdb_url) + "/inapp/v2");
