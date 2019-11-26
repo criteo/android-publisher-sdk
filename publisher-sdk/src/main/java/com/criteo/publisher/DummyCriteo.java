@@ -1,10 +1,12 @@
 package com.criteo.publisher;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.UserAgentCallback;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.Slot;
@@ -37,6 +39,11 @@ public class DummyCriteo extends Criteo {
   @Override
   DeviceInfo getDeviceInfo() {
     return new DummyDeviceInfo();
+  }
+
+  @Override
+  Config getConfig() {
+    return new Config();
   }
 
   private static class DummyDeviceInfo extends DeviceInfo {

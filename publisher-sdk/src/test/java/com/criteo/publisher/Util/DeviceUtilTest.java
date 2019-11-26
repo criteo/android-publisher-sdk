@@ -14,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class DeviceUtilTest {
-
   private static final String DEVICE_ID_LIMITED = "00000000-0000-0000-0000-000000000000";
 
   @Mock
@@ -73,7 +72,7 @@ public class DeviceUtilTest {
   public void getAdvertisingId_GivenLimitedAdTracking_ReturnLimitedDeviceId() {
     when(info.isLimitAdTrackingEnabled(context)).thenReturn(true);
 
-    String advertisingId = DeviceUtil.getAdvertisingId(context);
+    String advertisingId = DeviceUtil.getAdvertisingId(context, info);
 
     assertEquals(DEVICE_ID_LIMITED, advertisingId);
   }
@@ -83,7 +82,7 @@ public class DeviceUtilTest {
     when(info.isLimitAdTrackingEnabled(context)).thenReturn(false);
     when(info.getAdvertisingId(context)).thenReturn("expected");
 
-    String advertisingId = DeviceUtil.getAdvertisingId(context);
+    String advertisingId = DeviceUtil.getAdvertisingId(context, info);
 
     assertEquals("expected", advertisingId);
   }
@@ -92,7 +91,7 @@ public class DeviceUtilTest {
   public void getAdvertisingId_GivenErrorWhenCheckingLimitedAdTracking_ReturnNull() throws Exception {
     when(info.isLimitAdTrackingEnabled(context)).thenThrow(RuntimeException.class);
 
-    String advertisingId = DeviceUtil.getAdvertisingId(context);
+    String advertisingId = DeviceUtil.getAdvertisingId(context, info);
 
     assertNull(advertisingId);
   }
@@ -101,9 +100,8 @@ public class DeviceUtilTest {
   public void getAdvertisingId_GivenErrorWhenFetchingDeviceId_ReturnNull() throws Exception {
     when(info.getAdvertisingId(context)).thenThrow(RuntimeException.class);
 
-    String advertisingId = DeviceUtil.getAdvertisingId(context);
+    String advertisingId = DeviceUtil.getAdvertisingId(context, info);
 
     assertNull(advertisingId);
   }
-
 }

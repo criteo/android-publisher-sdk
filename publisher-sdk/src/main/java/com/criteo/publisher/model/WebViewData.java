@@ -1,16 +1,18 @@
 package com.criteo.publisher.model;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import com.criteo.publisher.Util.WebViewLoadStatus;
 
 public class WebViewData {
-
     private String content;
     private WebViewLoadStatus webViewLoadStatus;
+    private final Config config;
 
-    public WebViewData() {
+    public WebViewData(@NonNull Config config) {
         this.content = "";
         this.webViewLoadStatus = WebViewLoadStatus.NONE;
+        this.config = config;
     }
 
     public boolean isLoaded() {
@@ -21,8 +23,8 @@ public class WebViewData {
         String dataWithTag = "";
 
         if (!TextUtils.isEmpty(data)) {
-            dataWithTag = Config.getAdTagDataMode();
-            dataWithTag = dataWithTag.replace(Config.getAdTagDataMacro(), data);
+            dataWithTag = config.getAdTagDataMode();
+            dataWithTag = dataWithTag.replace(config.getAdTagDataMacro(), data);
         }
 
         this.content = dataWithTag;

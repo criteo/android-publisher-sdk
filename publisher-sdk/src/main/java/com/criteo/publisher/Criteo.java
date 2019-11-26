@@ -7,6 +7,7 @@ import android.util.Log;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
@@ -63,4 +64,5 @@ public abstract class Criteo {
 
   abstract DeviceInfo getDeviceInfo();
 
+  abstract Config getConfig();
 }

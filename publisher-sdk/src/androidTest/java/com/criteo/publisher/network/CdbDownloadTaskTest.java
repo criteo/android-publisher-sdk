@@ -2,6 +2,7 @@ package com.criteo.publisher.network;
 
 import android.content.Context;
 import com.criteo.publisher.Util.AdUnitType;
+import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.CacheAdUnit;
@@ -13,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-public class CdbDownloadTaskTest {
+public class  CdbDownloadTaskTest {
 
     private CdbDownloadTask cdbDownloadTask;
     private List<CacheAdUnit> cacheAdUnits;
@@ -27,6 +28,9 @@ public class CdbDownloadTaskTest {
     @Mock
     private Hashtable<CacheAdUnit, CdbDownloadTask> bidsInCdbTask;
 
+    @Mock
+    private AdvertisingInfo advertisingInfo;
+
     @Test
     public void checkCacheRemove() {
         MockitoAnnotations.initMocks(this);
@@ -34,8 +38,16 @@ public class CdbDownloadTaskTest {
         CacheAdUnit cacheAdUnit = new CacheAdUnit(new AdSize(320, 50), "UniqueId", AdUnitType.CRITEO_BANNER);
         cacheAdUnits.add(cacheAdUnit);
 
-        cdbDownloadTask = new CdbDownloadTask(mContext, responseListener, false,
-                "Agent", cacheAdUnits, bidsInCdbTask);
+        cdbDownloadTask = new CdbDownloadTask(
+            mContext,
+            responseListener,
+            false,
+            "Agent",
+            cacheAdUnits,
+            bidsInCdbTask,
+            advertisingInfo
+        );
+
         cdbDownloadTask.onPostExecute(null);
 
         Mockito.verify(bidsInCdbTask, Mockito.times(1)).remove(cacheAdUnit);

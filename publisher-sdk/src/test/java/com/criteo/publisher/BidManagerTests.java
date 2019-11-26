@@ -6,10 +6,9 @@ import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.content.res.Resources;
-
-import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.AndroidUtil;
+
+import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
@@ -31,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.json.JSONObject;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -53,6 +53,15 @@ public class BidManagerTests {
     private DeviceInfo deviceInfo;
     private TokenCache tokenCache = null;
     private Slot testSlot;
+
+    @Mock
+    private DependencyProvider dependencyProvider;
+
+    @Mock
+    private Config config;
+
+    @Mock
+    private AdvertisingInfo advertisingInfo;
 
     @Mock
     private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
@@ -104,16 +113,33 @@ public class BidManagerTests {
         when(this.sdkCache.getAdUnit(cAdUnit)).thenReturn(testSlot);
 
         tokenCache = mock(TokenCache.class);
+
+        DependencyProvider.setInstance(dependencyProvider);
+    }
+
+    @After
+    public void tearDown() {
+        DependencyProvider.setInstance(null);
     }
 
     @Test
     public void testKillSwitchOnForHeaderBidding() {
         // setup
-        Config config = mock(Config.class);
-        when(config.isKillSwitch()).thenReturn(true);
+        when(config.isKillSwitchEnabled()).thenReturn(true);
 
-        BidManager bidManager = new BidManager(context, publisher, cacheAdUnits, tokenCache,
-            deviceInfo, user, sdkCache, config, placementsWithCdbTasks, androidUtil);
+        BidManager bidManager = new BidManager(
+            context,
+            publisher,
+            cacheAdUnits,
+            tokenCache,
+            deviceInfo,
+            user,
+            sdkCache,
+            placementsWithCdbTasks,
+            config,
+            androidUtil,
+            advertisingInfo
+        );
 
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         bidManager.enrichBid(builder, adUnit);
@@ -126,11 +152,21 @@ public class BidManagerTests {
     @Ignore("DeviceUtil.createDfpCompatibleDisplayUrl has an android.Util.Base64.coder that's unavailable in unit tests")
     public void testKillSwitchOffForHeaderBidding() {
         // setup
-        Config config = mock(Config.class);
-        when(config.isKillSwitch()).thenReturn(false);
+        when(config.isKillSwitchEnabled()).thenReturn(false);
 
-        BidManager bidManager = new BidManager(context, publisher, cacheAdUnits, tokenCache,
-            deviceInfo, user, sdkCache, config, placementsWithCdbTasks, androidUtil);
+        BidManager bidManager = new BidManager(
+            context,
+            publisher,
+            cacheAdUnits,
+            tokenCache,
+            deviceInfo,
+            user,
+            sdkCache,
+            placementsWithCdbTasks,
+            config,
+            androidUtil,
+            advertisingInfo
+        );
 
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         bidManager.enrichBid(builder, adUnit);
@@ -143,11 +179,21 @@ public class BidManagerTests {
     @Test
     public void testKillSwitchOnForStandAlone() {
         // setup
-        Config config = mock(Config.class);
-        when(config.isKillSwitch()).thenReturn(true);
+        when(config.isKillSwitchEnabled()).thenReturn(true);
 
-        BidManager bidManager = new BidManager(context, publisher, cacheAdUnits, tokenCache,
-            deviceInfo, user, sdkCache, config, placementsWithCdbTasks, androidUtil);
+        BidManager bidManager = new BidManager(
+            context,
+            publisher,
+            cacheAdUnits,
+            tokenCache,
+            deviceInfo,
+            user,
+            sdkCache,
+            placementsWithCdbTasks,
+            config,
+            androidUtil,
+            advertisingInfo
+        );
 
         //test
         Slot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
@@ -157,11 +203,21 @@ public class BidManagerTests {
     @Test
     public void testKillSwitchOffForStandAlone() {
         // setup
-        Config config = mock(Config.class);
-        when(config.isKillSwitch()).thenReturn(false);
+        when(config.isKillSwitchEnabled()).thenReturn(false);
 
-        BidManager bidManager = new BidManager(context, publisher, cacheAdUnits, tokenCache,
-            deviceInfo, user, sdkCache, config, placementsWithCdbTasks, androidUtil);
+        BidManager bidManager = new BidManager(
+            context,
+            publisher,
+            cacheAdUnits,
+            tokenCache,
+            deviceInfo,
+            user,
+            sdkCache,
+            placementsWithCdbTasks,
+            config,
+            androidUtil,
+            advertisingInfo
+        );
 
         //test
         Slot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
@@ -172,11 +228,21 @@ public class BidManagerTests {
     @Test
     public void testKillSwitchOnForMediation() {
         // setup
-        Config config = mock(Config.class);
-        when(config.isKillSwitch()).thenReturn(true);
+        when(config.isKillSwitchEnabled()).thenReturn(true);
 
-        BidManager bidManager = new BidManager(context, publisher, cacheAdUnits, tokenCache,
-            deviceInfo, user, sdkCache, config, placementsWithCdbTasks, androidUtil);
+        BidManager bidManager = new BidManager(
+            context,
+            publisher,
+            cacheAdUnits,
+            tokenCache,
+            deviceInfo,
+            user,
+            sdkCache,
+            placementsWithCdbTasks,
+            config,
+            androidUtil,
+            advertisingInfo
+        );
 
         BidResponse expectedResponse = new BidResponse();
 
@@ -191,15 +257,25 @@ public class BidManagerTests {
     @Test
     public void testKillSwitchOffForMediation() {
         // setup
-        Config config = mock(Config.class);
-        when(config.isKillSwitch()).thenReturn(false);
+        when(config.isKillSwitchEnabled()).thenReturn(false);
 
         CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
         when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
         when(this.sdkCache.getAdUnit(cAdUnit)).thenReturn(testSlot);
 
-        BidManager bidManager = new BidManager(context, publisher, cacheAdUnits, tokenCache,
-            deviceInfo, user, sdkCache, config, placementsWithCdbTasks, androidUtil);
+        BidManager bidManager = new BidManager(
+            context,
+            publisher,
+            cacheAdUnits,
+            tokenCache,
+            deviceInfo,
+            user,
+            sdkCache,
+            placementsWithCdbTasks,
+            config,
+            androidUtil,
+            advertisingInfo
+        );
 
         BidResponse expectedResponse = new BidResponse(0.10d,
                 new BidToken(UUID.randomUUID(), new BannerAdUnit("banneradUnitId1", new AdSize(320, 50))), true);
@@ -216,15 +292,24 @@ public class BidManagerTests {
     public void testBidsAreNotSetOnNonBiddableObjects()
     {
         // setup
-        Config config = mock(Config.class);
-        when(config.isKillSwitch()).thenReturn(false);
+        when(config.isKillSwitchEnabled()).thenReturn(false);
 
         CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
         when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
         when(this.sdkCache.getAdUnit(cAdUnit)).thenReturn(testSlot);
-
-        BidManager bidManager = new BidManager(context, publisher, cacheAdUnits, tokenCache,
-            deviceInfo, user, sdkCache, config, placementsWithCdbTasks, androidUtil);
+        BidManager bidManager = new BidManager(
+            context,
+            publisher,
+            cacheAdUnits,
+            tokenCache,
+            deviceInfo,
+            user,
+            sdkCache,
+            placementsWithCdbTasks,
+            config,
+            androidUtil,
+            advertisingInfo
+        );
 
         BannerAdUnit bannerAdUnit = new BannerAdUnit(adUnitId, new AdSize(320,50));
 
@@ -250,15 +335,25 @@ public class BidManagerTests {
     public void testSetBidsOnMap()
     {
         // setup
-        Config config = mock(Config.class);
-        when(config.isKillSwitch()).thenReturn(false);
+        when(config.isKillSwitchEnabled()).thenReturn(false);
 
         CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
         when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
         when(this.sdkCache.getAdUnit(cAdUnit)).thenReturn(testSlot);
 
-        BidManager bidManager = new BidManager(context, publisher, cacheAdUnits, tokenCache,
-            deviceInfo, user, sdkCache, config, placementsWithCdbTasks, androidUtil);
+        BidManager bidManager = new BidManager(
+            context,
+            publisher,
+            cacheAdUnits,
+            tokenCache,
+            deviceInfo,
+            user,
+            sdkCache,
+            placementsWithCdbTasks,
+            config,
+            androidUtil,
+            advertisingInfo
+        );
 
         BannerAdUnit bannerAdUnit = new BannerAdUnit(adUnitId, new AdSize(320,50));
 

@@ -4,6 +4,7 @@ import static android.content.ContentValues.TAG;
 
 import android.content.Context;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -48,9 +49,7 @@ public final class DeviceUtil {
         }
     }
 
-    public static String getAdvertisingId(Context context) {
-        AdvertisingInfo advertisingInfo = DependencyProvider.getInstance().provideAdvertisingInfo();
-
+    public static String getAdvertisingId(@NonNull Context context, @NonNull AdvertisingInfo advertisingInfo) {
         try {
             if (advertisingInfo.isLimitAdTrackingEnabled(context)) {
                 return DEVICE_ID_LIMITED;

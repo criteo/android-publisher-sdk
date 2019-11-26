@@ -4,11 +4,13 @@ import static android.content.ContentValues.TAG;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.AndroidUtil;
+import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
@@ -68,18 +70,20 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private final Publisher publisher;
     private final User user;
     private long cdbTimeToNextCall = 0;
-    private Config config;
     private DeviceInfo deviceInfo;
     private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
     private final AndroidUtil androidUtil;
-
+    private final Config config;
+    private final AdvertisingInfo advertisingInfo;
 
     BidManager(
-        Context context,
-        String criteoPublisherId,
-        List<CacheAdUnit> cacheAdUnits,
-        DeviceInfo deviceInfo,
-        AndroidUtil androidUtil
+        @NonNull Context context,
+        @NonNull String criteoPublisherId,
+        @NonNull List<CacheAdUnit> cacheAdUnits,
+        @NonNull DeviceInfo deviceInfo,
+        @NonNull Config config,
+        @NonNull AndroidUtil androidUtil,
+        @NonNull AdvertisingInfo advertisingInfo
     ) {
         this(
             context,
@@ -89,24 +93,26 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             deviceInfo,
             new User(),
             new SdkCache(),
-            new Config(context),
             new Hashtable<>(),
-            androidUtil
+            config,
+            androidUtil,
+            advertisingInfo
         );
     }
 
     @VisibleForTesting
     BidManager(
-        Context context,
-        Publisher publisher,
-        List<CacheAdUnit> cacheAdUnits,
-        TokenCache tokenCache,
-        DeviceInfo deviceInfo,
-        User user,
-        SdkCache sdkCache,
-        Config config,
-        Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks,
-        AndroidUtil androidUtil
+        @NonNull Context context,
+        @NonNull Publisher publisher,
+        @NonNull List<CacheAdUnit> cacheAdUnits,
+        @NonNull TokenCache tokenCache,
+        @NonNull DeviceInfo deviceInfo,
+        @NonNull User user,
+        @NonNull SdkCache sdkCache,
+        @NonNull Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks,
+        @NonNull Config config,
+        @NonNull AndroidUtil androidUtil,
+        @NonNull AdvertisingInfo advertisingInfo
     ) {
         this.mContext = context;
         this.publisher = publisher;
@@ -115,9 +121,10 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         this.deviceInfo = deviceInfo;
         this.user = user;
         this.cache = sdkCache;
-        this.config = config;
         this.placementsWithCdbTasks = placementsWithCdbTasks;
         this.androidUtil = androidUtil;
+        this.config = config;
+        this.advertisingInfo = advertisingInfo;
     }
 
     /**
@@ -139,8 +146,16 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
      * Method to start new CdbDownload Asynctask
      */
     private void startCdbDownloadTask(boolean callConfig, List<CacheAdUnit> prefetchCacheAdUnits) {
-        CdbDownloadTask cdbDownloadTask = new CdbDownloadTask(mContext, this, callConfig, deviceInfo.getUserAgent(),
-                prefetchCacheAdUnits, placementsWithCdbTasks);
+        CdbDownloadTask cdbDownloadTask = new CdbDownloadTask(
+            mContext,
+            this,
+            callConfig,
+            deviceInfo.getUserAgent(),
+            prefetchCacheAdUnits,
+            placementsWithCdbTasks,
+            advertisingInfo
+        );
+
         for (CacheAdUnit cacheAdUnit : prefetchCacheAdUnits) {
             placementsWithCdbTasks.put(cacheAdUnit, cdbDownloadTask);
         }
@@ -317,8 +332,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     }
 
     @Override
-    public void refreshConfig(JSONObject config) {
-        this.config.refreshConfig(config, this.mContext);
+    public void refreshConfig(JSONObject configJSONObject) {
+        config.refreshConfig(configJSONObject);
     }
 
     @Override
@@ -368,7 +383,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     }
 
     private boolean killSwitchEngaged() {
-        return (config != null && config.isKillSwitch());
+        return config.isKillSwitchEnabled();
     }
-
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 import com.criteo.publisher.DependencyProvider;
+import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.AppEventResponseListener;
 import com.criteo.publisher.Util.DeviceUtil;
 import org.json.JSONObject;
@@ -15,10 +16,16 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
     protected static final String THROTTLE = "throttleSec";
     private final Context mContext;
     private final AppEventResponseListener responseListener;
+    private final AdvertisingInfo advertisingInfo;
 
-    public AppEventTask(Context context, AppEventResponseListener responseListener) {
+    public AppEventTask(
+        Context context,
+        AppEventResponseListener responseListener,
+        AdvertisingInfo advertisingInfo
+    ) {
         this.mContext = context;
         this.responseListener = responseListener;
+        this.advertisingInfo = advertisingInfo;
     }
 
     @Override
@@ -37,7 +44,7 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
     private JSONObject doAppEventTask(Object[] objects) {
         String eventType = (String) objects[0];
         int limitedAdTracking = DeviceUtil.isLimitAdTrackingEnabled(mContext);
-        String gaid = DeviceUtil.getAdvertisingId(mContext);
+        String gaid = DeviceUtil.getAdvertisingId(mContext, advertisingInfo);
         String appId = mContext.getApplicationContext().getPackageName();
 
         PubSdkApi pubSdkApi = DependencyProvider.getInstance().providePubSdkApi();

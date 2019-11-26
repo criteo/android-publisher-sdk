@@ -51,6 +51,8 @@ public class CriteoBannerLoadTask extends AsyncTask<Object, Void, Object> {
     private static final String TAG = "Criteo.BLT";
 
     private final WeakReference<CriteoBannerView> weakReferenceBannerView;
+    private final Config config;
+
     private WebViewClient webViewClient;
 
     /**
@@ -58,9 +60,10 @@ public class CriteoBannerLoadTask extends AsyncTask<Object, Void, Object> {
      * thread. WebView.getSettings().setJavaScriptEnabled() & WebView.setWebViewClient() throws if not done in the
      * onPostExecute() as onPostExecute runs on the UI thread
      */
-    public CriteoBannerLoadTask(CriteoBannerView bannerView, WebViewClient webViewClient) {
+    public CriteoBannerLoadTask(CriteoBannerView bannerView, WebViewClient webViewClient, Config config) {
         this.weakReferenceBannerView = new WeakReference<>(bannerView);
         this.webViewClient = webViewClient;
+        this.config = config;
     }
 
     @Override
@@ -98,8 +101,8 @@ public class CriteoBannerLoadTask extends AsyncTask<Object, Void, Object> {
         if (criteoBannerView != null) {
             criteoBannerView.getSettings().setJavaScriptEnabled(true);
             criteoBannerView.setWebViewClient(this.webViewClient);
-            String displayUrlWithTag = Config.getAdTagUrlMode();
-            String displayUrl = displayUrlWithTag.replace(Config.getDisplayUrlMacro(), url);
+            String displayUrlWithTag = config.getAdTagUrlMode();
+            String displayUrl = displayUrlWithTag.replace(config.getDisplayUrlMacro(), url);
             criteoBannerView.loadDataWithBaseURL("", displayUrl, "text/html", "UTF-8", "");
         }
     }

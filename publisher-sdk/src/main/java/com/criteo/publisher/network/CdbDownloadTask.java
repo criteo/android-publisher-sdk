@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.BuildConfig;
 import com.criteo.publisher.DependencyProvider;
+import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.HostAppUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
@@ -27,16 +28,25 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     private final NetworkResponseListener responseListener;
     private final List<CacheAdUnit> cacheAdUnits;
     private final PubSdkApi api;
+    private final AdvertisingInfo advertisingInfo;
     private Hashtable<CacheAdUnit, CdbDownloadTask> bidsInCdbTask;
 
-    public CdbDownloadTask(Context context, NetworkResponseListener responseListener, boolean callConfig,
-            String userAgent, List<CacheAdUnit> adUnits, Hashtable<CacheAdUnit, CdbDownloadTask> bidsInMap) {
+    public CdbDownloadTask(
+        Context context,
+        NetworkResponseListener responseListener,
+        boolean callConfig,
+        String userAgent,
+        List<CacheAdUnit> adUnits,
+        Hashtable<CacheAdUnit, CdbDownloadTask> bidsInMap,
+        AdvertisingInfo advertisingInfo
+    ) {
         this.mContext = context.getApplicationContext();
         this.responseListener = responseListener;
         this.callConfig = callConfig;
         this.userAgent = userAgent;
         this.cacheAdUnits = adUnits;
         this.bidsInCdbTask = bidsInMap;
+        this.advertisingInfo = advertisingInfo;
         this.api = DependencyProvider.getInstance().providePubSdkApi();
     }
 
@@ -64,7 +74,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
             return null;
         }
 
-        String advertisingId = DeviceUtil.getAdvertisingId(mContext);
+        String advertisingId = DeviceUtil.getAdvertisingId(mContext, advertisingInfo);
         if (!TextUtils.isEmpty(advertisingId)) {
             user.setDeviceId(advertisingId);
         }

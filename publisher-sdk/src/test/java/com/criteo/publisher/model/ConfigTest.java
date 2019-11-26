@@ -21,7 +21,7 @@ public class ConfigTest {
     public void testConfigInit() {
         mockContext = mock(Context.class);
         config = new Config(mockContext);
-        Assert.assertFalse(config.isKillSwitch());
+        Assert.assertFalse(config.isKillSwitchEnabled());
         Assert.assertNotNull(config.getAdTagUrlMode());
         Assert.assertNotNull(config.getDisplayUrlMacro());
         Assert.assertNotNull(config.getAdTagDataMacro());
@@ -40,7 +40,7 @@ public class ConfigTest {
 
         config = new Config(mockContext);
 
-        Assert.assertTrue(config.isKillSwitch());
+        Assert.assertTrue(config.isKillSwitchEnabled());
         Assert.assertNotNull(config.getAdTagUrlMode());
         Assert.assertNotNull(config.getDisplayUrlMacro());
         Assert.assertNotNull(config.getAdTagDataMacro());
@@ -70,9 +70,9 @@ public class ConfigTest {
             Assert.fail("JSON exception" + je.getMessage());
         }
 
-        config.refreshConfig(json, mockContext);
+        config.refreshConfig(json);
 
-        Assert.assertTrue(config.isKillSwitch());
+        Assert.assertTrue(config.isKillSwitchEnabled());
         Assert.assertNotNull(config.getAdTagUrlMode());
         Assert.assertEquals(newDisplayUrlMacro, config.getDisplayUrlMacro());
         Assert.assertNotEquals(oldDisplayUrlMacro, config.getDisplayUrlMacro());

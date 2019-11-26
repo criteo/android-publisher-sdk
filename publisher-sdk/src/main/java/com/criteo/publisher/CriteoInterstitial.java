@@ -14,7 +14,6 @@ import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.WebViewData;
 
 public class CriteoInterstitial {
-
     private static final String TAG = CriteoInterstitial.class.getSimpleName();
     protected static final String WEB_VIEW_DATA = "webviewdata";
     protected static final String RESULT_RECEIVER = "resultreceiver";
@@ -76,7 +75,7 @@ public class CriteoInterstitial {
         if (criteoInterstitialEventController == null) {
             criteoInterstitialEventController = new CriteoInterstitialEventController(
                     criteoInterstitialAdListener, criteoInterstitialAdDisplayListener,
-                    new WebViewDownloader(new WebViewData()),
+                    new WebViewDownloader(new WebViewData(getCriteo().getConfig())),
                     getCriteo());
         }
         criteoInterstitialEventController.fetchAdAsync(interstitialAdUnit);
@@ -97,7 +96,7 @@ public class CriteoInterstitial {
         if (criteoInterstitialEventController == null) {
             criteoInterstitialEventController = new CriteoInterstitialEventController(
                     criteoInterstitialAdListener, criteoInterstitialAdDisplayListener,
-                    new WebViewDownloader(new WebViewData()),
+                    new WebViewDownloader(new WebViewData(getCriteo().getConfig())),
                     getCriteo());
         }
         criteoInterstitialEventController.fetchAdAsync(bidToken);

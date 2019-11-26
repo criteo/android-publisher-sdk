@@ -2,7 +2,9 @@ package com.criteo.publisher.AppEvents;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import com.criteo.publisher.DependencyProvider;
+import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.AppEventResponseListener;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.network.AppEventTask;
@@ -19,9 +21,12 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
     private int appEventThrottle = -1;
     private long throttleSetTime = 0;
 
-    public AppEvents(Context context) {
+    private final AdvertisingInfo advertisingInfo;
+
+    public AppEvents(@NonNull Context context, @NonNull AdvertisingInfo advertisingInfo) {
         this.mContext = context;
-        this.eventTask = new AppEventTask(mContext, this);
+        this.advertisingInfo = advertisingInfo;
+        this.eventTask = new AppEventTask(mContext, this, advertisingInfo);
     }
 
     private void postAppEvent(String eventType) {
@@ -30,7 +35,7 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
             return;
         }
         if (eventTask.getStatus() == AsyncTask.Status.FINISHED) {
-            eventTask = new AppEventTask(mContext, this);
+            eventTask = new AppEventTask(mContext, this, advertisingInfo);
         }
         if (eventTask.getStatus() != AsyncTask.Status.RUNNING) {
             Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();

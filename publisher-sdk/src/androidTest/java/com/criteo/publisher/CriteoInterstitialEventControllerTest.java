@@ -33,19 +33,19 @@ public class CriteoInterstitialEventControllerTest {
     @Before
     public void setup() throws CriteoInitException {
         MockitoAnnotations.initMocks(this);
-        webViewData = new WebViewData();
         config = new Config(InstrumentationRegistry.getContext());
+        webViewData = new WebViewData(config);
         webViewData.setContent("html content");
-        Application app =
-                (Application) InstrumentationRegistry
-                        .getTargetContext()
-                        .getApplicationContext();
+        Application app = (Application) InstrumentationRegistry.getTargetContext().getApplicationContext();
         Criteo.init(app, "B-056946", null);
         WebViewDownloader webViewDownloader = new WebViewDownloader(webViewData);
-        criteoInterstitialEventController = new CriteoInterstitialEventController(criteoInterstitialAdListener,
-                adDisplayListener,
-                webViewDownloader,
-                Criteo.getInstance());
+
+        criteoInterstitialEventController = new CriteoInterstitialEventController(
+            criteoInterstitialAdListener,
+            adDisplayListener,
+            webViewDownloader,
+            Criteo.getInstance()
+        );
     }
 
     @Test

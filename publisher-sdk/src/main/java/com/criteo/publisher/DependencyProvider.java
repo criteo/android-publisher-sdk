@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.AndroidUtil;
+import com.criteo.publisher.model.Config;
 import com.criteo.publisher.network.PubSdkApi;
 import java.util.concurrent.Executor;
 
@@ -56,5 +57,10 @@ public class DependencyProvider {
   @NonNull
   public Executor provideSerialExecutor() {
     return AsyncTask.SERIAL_EXECUTOR;
+  }
+
+  @NonNull
+  public Config provideConfig(Context context) {
+    return new Config(context);
   }
 }

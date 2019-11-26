@@ -36,9 +36,13 @@ public class CriteoBannerView extends WebView {
 
     private void doLoadAd() {
         if (criteoBannerEventController == null) {
-            criteoBannerEventController =
-                    new CriteoBannerEventController(this, criteoBannerAdListener);
+            criteoBannerEventController = new CriteoBannerEventController(
+                this,
+                criteoBannerAdListener,
+                Criteo.getInstance().getConfig()
+            );
         }
+
         criteoBannerEventController.fetchAdAsync(bannerAdUnit);
     }
 
@@ -54,9 +58,13 @@ public class CriteoBannerView extends WebView {
         if (bidToken != null && !ObjectsUtil.equals(bannerAdUnit, bidToken.getAdUnit())) {
             return;
         }
+
         if (criteoBannerEventController == null) {
-            criteoBannerEventController =
-                    new CriteoBannerEventController(this, criteoBannerAdListener);
+            criteoBannerEventController = new CriteoBannerEventController(
+                this,
+                criteoBannerAdListener,
+                Criteo.getInstance().getConfig()
+            );
         }
         criteoBannerEventController.fetchAdAsync(bidToken);
     }

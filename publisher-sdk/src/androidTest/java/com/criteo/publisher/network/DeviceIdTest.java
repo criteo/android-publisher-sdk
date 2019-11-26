@@ -18,7 +18,6 @@ import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.Cdb;
-import com.google.android.gms.common.util.ThreadUtils;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;

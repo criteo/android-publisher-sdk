@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.WindowManager;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.Util.AdUnitType;
+import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.DeviceUtil;
@@ -16,6 +17,7 @@ import com.criteo.publisher.Util.UserAgentCallback;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitHelper;
 import com.criteo.publisher.model.CacheAdUnit;
+import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
@@ -30,6 +32,7 @@ final class CriteoInternal extends Criteo {
   private AppEvents appEvents;
   private AppLifecycleUtil appLifecycleUtil;
   private DeviceInfo deviceInfo;
+  private Config config;
 
   CriteoInternal(Application application, List<AdUnit> adUnits, String criteoPublisherId) {
     if (application == null) {
@@ -49,14 +52,26 @@ final class CriteoInternal extends Criteo {
 
     AndroidUtil androidUtil = DependencyProvider.getInstance().provideAndroidUtil(context);
 
-    List<CacheAdUnit> cacheAdUnits = AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation());
+    List<CacheAdUnit> cacheAdUnits = AdUnitHelper
+        .convertAdUnits(adUnits, androidUtil.getOrientation());
+
     List<CacheAdUnit> validatedCacheAdUnits = AdUnitHelper.filterInvalidCacheAdUnits(cacheAdUnits);
 
+    AdvertisingInfo advertisingInfo = DependencyProvider.getInstance().provideAdvertisingInfo();
     this.deviceInfo = new DeviceInfo();
-    this.bidManager = new BidManager(context, criteoPublisherId, validatedCacheAdUnits,
-        deviceInfo, androidUtil);
+    config = DependencyProvider.getInstance().provideConfig(context);
 
-    this.appEvents = new AppEvents(context);
+    this.bidManager = new BidManager(
+        context,
+        criteoPublisherId,
+        validatedCacheAdUnits,
+        deviceInfo,
+        config,
+        androidUtil,
+        advertisingInfo
+    );
+
+    this.appEvents = new AppEvents(context, advertisingInfo);
     this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
 
     deviceInfo.initialize(context, new UserAgentCallback() {
@@ -95,7 +110,6 @@ final class CriteoInternal extends Criteo {
   }
 
   private void createSupportedScreenSizes(Application application) {
-
     try {
       DisplayMetrics metrics = new DisplayMetrics();
       ((WindowManager) application.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()
@@ -139,5 +153,10 @@ final class CriteoInternal extends Criteo {
   @Override
   DeviceInfo getDeviceInfo() {
     return deviceInfo;
+  }
+
+  @Override
+  Config getConfig() {
+    return config;
   }
 }
