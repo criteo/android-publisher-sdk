@@ -20,7 +20,7 @@ public final class AdUnitHelper {
 
     }
 
-    public static List<CacheAdUnit> convertAdUnits(Context context, List<AdUnit> adUnits) {
+    public static List<CacheAdUnit> convertAdUnits(List<AdUnit> adUnits, int orientation) {
         List<CacheAdUnit> cacheAdUnits = new ArrayList<>();
         for (AdUnit adUnit : adUnits) {
             if (adUnit == null) {
@@ -34,7 +34,7 @@ public final class AdUnitHelper {
 
                 case CRITEO_INTERSTITIAL:
                     InterstitialAdUnit interstitialAdUnit = (InterstitialAdUnit) adUnit;
-                    cacheAdUnits.addAll(createInterstitialAdUnits(context, interstitialAdUnit.getAdUnitId()));
+                    cacheAdUnits.addAll(createInterstitialAdUnits(interstitialAdUnit.getAdUnitId(), orientation));
                     break;
 
                 case CRITEO_CUSTOM_NATIVE:
@@ -49,9 +49,8 @@ public final class AdUnitHelper {
         return cacheAdUnits;
     }
 
-    private static List<CacheAdUnit> createInterstitialAdUnits(Context context, String placementId) {
+    private static List<CacheAdUnit> createInterstitialAdUnits(String placementId, int orientation) {
         List<CacheAdUnit> retCacheAdUnits = new ArrayList<>();
-        int orientation = context.getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
             CacheAdUnit interstitialCacheAdUnitPortrait = new CacheAdUnit(DeviceUtil.getSizePortrait(), placementId, CRITEO_INTERSTITIAL);
             retCacheAdUnits.add(interstitialCacheAdUnitPortrait);

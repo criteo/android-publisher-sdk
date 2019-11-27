@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.WindowManager;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.Util.AdUnitType;
+import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.UserAgentCallback;
@@ -25,70 +26,73 @@ final class CriteoInternal extends Criteo {
 
   private static final String TAG = CriteoInternal.class.getSimpleName();
 
-    private BidManager bidManager;
-    private AppEvents appEvents;
-    private AppLifecycleUtil appLifecycleUtil;
-    private DeviceInfo deviceInfo;
+  private BidManager bidManager;
+  private AppEvents appEvents;
+  private AppLifecycleUtil appLifecycleUtil;
+  private DeviceInfo deviceInfo;
 
-    CriteoInternal(Application application, List<AdUnit> adUnits, String criteoPublisherId) {
-        if (application == null) {
-            throw new IllegalArgumentException("Application reference is required.");
-        }
-
-        if (TextUtils.isEmpty(criteoPublisherId)) {
-            throw new IllegalArgumentException("Criteo Publisher Id is required.");
-        }
-
-        if (adUnits == null) {
-            adUnits = new ArrayList<>();
-        }
-
-        Context context = application.getApplicationContext();
-        createSupportedScreenSizes(application);
-
-        List<CacheAdUnit> cacheAdUnits = AdUnitHelper.convertAdUnits(context, adUnits);
-        List<CacheAdUnit> validatedCacheAdUnits = AdUnitHelper.filterInvalidCacheAdUnits(cacheAdUnits);
-
-        this.deviceInfo = new DeviceInfo();
-        this.bidManager = new BidManager(context, criteoPublisherId, validatedCacheAdUnits, deviceInfo);
-
-        this.appEvents = new AppEvents(context);
-        this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
-
-        deviceInfo.initialize(context, new UserAgentCallback() {
-            @Override
-            public void done() {
-              bidManager.prefetch();
-            }
-        });
+  CriteoInternal(Application application, List<AdUnit> adUnits, String criteoPublisherId) {
+    if (application == null) {
+      throw new IllegalArgumentException("Application reference is required.");
     }
 
-    @Override
-    public void setBidsForAdUnit(Object object, AdUnit adUnit) {
-        try {
-            doSetBidsForAdUnit(object, adUnit);
-        } catch (Throwable e) {
-            Log.e(TAG, "Internal error while setting bids for adUnit.", e);
-        }
+    if (TextUtils.isEmpty(criteoPublisherId)) {
+      throw new IllegalArgumentException("Criteo Publisher Id is required.");
     }
 
-    private void doSetBidsForAdUnit(Object object, AdUnit adUnit) {
-        if (bidManager == null) {
-            return;
-        }
-        bidManager.enrichBid(object, adUnit);
+    if (adUnits == null) {
+      adUnits = new ArrayList<>();
     }
 
-    /**
-     * Method to start new CdbDownload Asynctask
-     */
-    @Override
-    Slot getBidForAdUnit(AdUnit adUnit) {
-        if (bidManager == null) {
-            return null;
-        }
-        return bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    Context context = application.getApplicationContext();
+    createSupportedScreenSizes(application);
+
+    AndroidUtil androidUtil = DependencyProvider.getInstance().provideAndroidUtil(context);
+
+    List<CacheAdUnit> cacheAdUnits = AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation());
+    List<CacheAdUnit> validatedCacheAdUnits = AdUnitHelper.filterInvalidCacheAdUnits(cacheAdUnits);
+
+    this.deviceInfo = new DeviceInfo();
+    this.bidManager = new BidManager(context, criteoPublisherId, validatedCacheAdUnits,
+        deviceInfo, androidUtil);
+
+    this.appEvents = new AppEvents(context);
+    this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
+
+    deviceInfo.initialize(context, new UserAgentCallback() {
+      @Override
+      public void done() {
+        bidManager.prefetch();
+      }
+    });
+  }
+
+  @Override
+  public void setBidsForAdUnit(Object object, AdUnit adUnit) {
+    try {
+      doSetBidsForAdUnit(object, adUnit);
+    } catch (Throwable e) {
+      Log.e(TAG, "Internal error while setting bids for adUnit.", e);
     }
+  }
+
+  private void doSetBidsForAdUnit(Object object, AdUnit adUnit) {
+    if (bidManager == null) {
+      return;
+    }
+    bidManager.enrichBid(object, adUnit);
+  }
+
+  /**
+   * Method to start new CdbDownload Asynctask
+   */
+  @Override
+  Slot getBidForAdUnit(AdUnit adUnit) {
+    if (bidManager == null) {
+      return null;
+    }
+    return bidManager.getBidForAdUnitAndPrefetch(adUnit);
+  }
 
   private void createSupportedScreenSizes(Application application) {
 
@@ -103,37 +107,37 @@ final class CriteoInternal extends Criteo {
     }
   }
 
-    @Override
-    public BidResponse getBidResponse(AdUnit adUnit) {
-        BidResponse response;
+  @Override
+  public BidResponse getBidResponse(AdUnit adUnit) {
+    BidResponse response;
 
-        try {
-            response = doGetBidResponse(adUnit);
-        } catch (Throwable e) {
-            response = new BidResponse();
-            Log.e(TAG, "Internal error while getting Bid Response.", e);
-        }
-
-        return response;
+    try {
+      response = doGetBidResponse(adUnit);
+    } catch (Throwable e) {
+      response = new BidResponse();
+      Log.e(TAG, "Internal error while getting Bid Response.", e);
     }
 
-    private BidResponse doGetBidResponse(AdUnit adUnit) {
-        if (bidManager == null) {
-            return null;
-        }
-        return bidManager.getBidForInhouseMediation(adUnit);
-    }
+    return response;
+  }
 
-    @Override
-    TokenValue getTokenValue(BidToken bidToken, AdUnitType adUnitType) {
-        if (bidManager == null) {
-            return null;
-        }
-        return bidManager.getTokenValue(bidToken, adUnitType);
+  private BidResponse doGetBidResponse(AdUnit adUnit) {
+    if (bidManager == null) {
+      return null;
     }
+    return bidManager.getBidForInhouseMediation(adUnit);
+  }
 
-    @Override
-    DeviceInfo getDeviceInfo() {
-        return deviceInfo;
+  @Override
+  TokenValue getTokenValue(BidToken bidToken, AdUnitType adUnitType) {
+    if (bidManager == null) {
+      return null;
     }
+    return bidManager.getTokenValue(bidToken, adUnitType);
+  }
+
+  @Override
+  DeviceInfo getDeviceInfo() {
+    return deviceInfo;
+  }
 }

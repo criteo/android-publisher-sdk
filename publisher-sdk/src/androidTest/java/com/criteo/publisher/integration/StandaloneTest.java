@@ -13,12 +13,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.TestAdUnits;
+import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.model.InterstitialAdUnit;
@@ -30,6 +32,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InOrder;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
@@ -41,6 +44,9 @@ public class StandaloneTest {
   private final InterstitialAdUnit interstitialAdUnit = TestAdUnits.INTERSTITIAL;
 
   private PubSdkApi api;
+
+  @Mock
+  private AndroidUtil androidUtil;
 
   private Context context;
 
@@ -55,6 +61,7 @@ public class StandaloneTest {
 
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
     when(dependencyProvider.providePubSdkApi()).thenReturn(api);
+    when(dependencyProvider.provideAndroidUtil(any())).thenReturn(androidUtil);
 
     context = InstrumentationRegistry.getContext();
   }
@@ -84,8 +91,19 @@ public class StandaloneTest {
 
   @Test
   public void whenLoadingAnInterstitial_GivenDeviceInPortrait_NotifyListenerForSuccessOnNextCall() throws Exception {
-    // FIXME This test assume that the screen orientation is already set to PORTRAIT
+    givenDeviceInPortrait();
 
+    whenLoadingAnInterstitial_NotifyListenerForSuccessOnNextCall();
+  }
+
+  @Test
+  public void whenLoadingAnInterstitial_GivenDeviceInLandscape_NotifyListenerForSuccessOnNextCall() throws Exception {
+    givenDeviceInLandscape();
+
+    whenLoadingAnInterstitial_NotifyListenerForSuccessOnNextCall();
+  }
+
+  private void whenLoadingAnInterstitial_NotifyListenerForSuccessOnNextCall() throws Exception {
     givenInitializedSdk();
 
     AtomicReference<CriteoInterstitial> interstitial = new AtomicReference<>();
@@ -108,6 +126,14 @@ public class StandaloneTest {
     inOrder.verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
     inOrder.verify(listener).onAdReceived();
     inOrder.verifyNoMoreInteractions();
+  }
+
+  private void givenDeviceInPortrait() {
+    when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_PORTRAIT);
+  }
+
+  private void givenDeviceInLandscape() {
+    when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_LANDSCAPE);
   }
 
   private void givenInitializedSdk() throws Exception {

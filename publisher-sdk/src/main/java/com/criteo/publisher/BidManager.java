@@ -8,6 +8,7 @@ import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.Util.AdUnitType;
+import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
@@ -70,13 +71,15 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private Config config;
     private DeviceInfo deviceInfo;
     private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
+    private final AndroidUtil androidUtil;
 
 
     BidManager(
         Context context,
         String criteoPublisherId,
         List<CacheAdUnit> cacheAdUnits,
-        DeviceInfo deviceInfo
+        DeviceInfo deviceInfo,
+        AndroidUtil androidUtil
     ) {
         this(
             context,
@@ -87,7 +90,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             new User(),
             new SdkCache(),
             new Config(context),
-            new Hashtable<>()
+            new Hashtable<>(),
+            androidUtil
         );
     }
 
@@ -101,7 +105,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         User user,
         SdkCache sdkCache,
         Config config,
-        Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks
+        Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks,
+        AndroidUtil androidUtil
     ) {
         this.mContext = context;
         this.publisher = publisher;
@@ -112,6 +117,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         this.cache = sdkCache;
         this.config = config;
         this.placementsWithCdbTasks = placementsWithCdbTasks;
+        this.androidUtil = androidUtil;
     }
 
     /**
@@ -266,7 +272,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             return null;
         }
         CacheAdUnit cacheAdUnit = AdUnitHelper
-                .convertoCacheAdUnit(adUnit, mContext.getResources().getConfiguration().orientation);
+                .convertoCacheAdUnit(adUnit, androidUtil.getOrientation());
 
         Slot peekSlot = cache.peekAdUnit(cacheAdUnit);
         if (peekSlot == null) {
