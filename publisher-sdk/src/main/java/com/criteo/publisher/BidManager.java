@@ -60,6 +60,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private static final String CRT_NATIVE_PIXEL_URL = "crtn_pixurl_";
     private static final String CRT_NATIVE_PIXEL_COUNT = "crtn_pixcount";
 
+    private static final String DFP_CRT_DISPLAY_URL = "crt_displayurl";
+
 
     private static final int SECOND_TO_MILLI = 1000;
     private static final int PROFILE_ID = 235;
@@ -224,15 +226,15 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
                 enrichNativeRequest(slot, object);
 
             } else {
-                enrichRequest(slot, object);
+                enrichDfpRequest(slot, object);
             }
 
         }
     }
 
     //Banner and Interstitial slot
-    private void enrichRequest(Slot slot, Object object) {
-        ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", CRT_DISPLAY_URL,
+    private void enrichDfpRequest(Slot slot, Object object) {
+        ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", DFP_CRT_DISPLAY_URL,
                 DeviceUtil.createDfpCompatibleString(slot.getDisplayUrl()));
     }
 

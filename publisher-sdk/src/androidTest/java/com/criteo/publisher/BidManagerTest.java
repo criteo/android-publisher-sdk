@@ -66,6 +66,8 @@ public class BidManagerTest {
     private static final String CRT_NATIVE_PIXEL_URL = "crtn_pixurl_";
     private static final String CRT_NATIVE_PIXEL_COUNT = "crtn_pixcount";
 
+    private static final String DFP_CRT_DISPLAY_URL = "crt_displayurl";
+
     private static final String TEST_CREATIVE = "https://rdi.us.criteo.com/delivery/r/ajs.php?did=5c87fcdb7cc0d71b24ee2ee6454eb810&u=%7CvsLBMQ0Ek4IxXQb0B5n7RyCAQymjqwh29YhNM9EzK9Q%3D%7C&c1=fYGSyyN4O4mkT2ynhzfwbdpiG7v0SMGpms6Tk24GWc957HzbzgL1jw-HVL5D0BjRx5ef3wBVfDXXmh9StLy8pf5kDJtrQLTLQrexjq5CZt9tEDx9mY8Y-eTV19PWOQoNjXkJ4_mhKqV0IfwHDIfLVDBWmsizVCoAtU1brQ2weeEkUU5-mDfn3qzTX3jPXszef5bC3pbiLJAK3QamQlglD1dkWYOkUwLAXxMjr2MXeBQk2YK-_qYz0fMVJG0xWJ-jVmsqdOw9A9rkGIgToRoUewB0VAu5eSkjSBoGs4yEbsnJ5Ssq5fquJMNvm6T77b8fzQI-eXgwoEfKkdAuCbj3gNrPBgzGZAJPGO-TYvJgs22Bljy-hNCk1E0E030zLtKo-XvAVRvZ5PswtwoccPSl6u1wiV8fMCXHx9QW9-fdXaVxzZe9AZB6w7pHxKUwiRK9";
     private static final String CRITEO_PUBLISHER_ID = "1000";
     private Context context;
@@ -123,7 +125,7 @@ public class BidManagerTest {
         PublisherAdRequest.Builder builderUpdate = new PublisherAdRequest.Builder();
         manager.enrichBid(builderUpdate, AdUnit);
         PublisherAdRequest request = builderUpdate.build();
-        assertNull(request.getCustomTargeting().getString("crt_displayUrl"));
+        assertNull(request.getCustomTargeting().getString(CRT_DISPLAY_URL));
     }
 
     @Test
@@ -221,7 +223,7 @@ public class BidManagerTest {
         manager.enrichBid(builder, AdUnit);
         manager.enrichBid(builder, AdUnit);
         PublisherAdRequest request = builder.build();
-        assertNull(request.getCustomTargeting().getString("crt_displayUrl"));
+        assertNull(request.getCustomTargeting().getString(CRT_DISPLAY_URL));
     }
 
     @Test
@@ -259,7 +261,7 @@ public class BidManagerTest {
         manager.enrichBid(builder, AdUnit);
         manager.enrichBid(builder, AdUnit);
         PublisherAdRequest request = builder.build();
-        assertNull(request.getCustomTargeting().getString("crt_displayUrl"));
+        assertNull(request.getCustomTargeting().getString(DFP_CRT_DISPLAY_URL));
         try {
             Thread.sleep(5000L);
         } catch (InterruptedException e) {
@@ -267,7 +269,7 @@ public class BidManagerTest {
         }
         manager.enrichBid(builder, AdUnit);
         request = builder.build();
-        assertNotNull(request.getCustomTargeting().getString("crt_displayUrl"));
+        assertNotNull(request.getCustomTargeting().getString(DFP_CRT_DISPLAY_URL));
     }
 
     @Test
@@ -304,7 +306,7 @@ public class BidManagerTest {
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         manager.enrichBid(builder, AdUnit);
         PublisherAdRequest request = builder.build();
-        assertNull(request.getCustomTargeting().getString("crt_displayUrl"));
+        assertNull(request.getCustomTargeting().getString(DFP_CRT_DISPLAY_URL));
         try {
             Thread.sleep(1500L);
         } catch (InterruptedException e) {
@@ -324,7 +326,7 @@ public class BidManagerTest {
         manager.setCacheAdUnits(slots);
         manager.enrichBid(builder, AdUnit);
         request = builder.build();
-        assertNotNull(request.getCustomTargeting().getString("crt_displayUrl"));
+        assertNotNull(request.getCustomTargeting().getString(DFP_CRT_DISPLAY_URL));
 
 
     }
@@ -361,7 +363,7 @@ public class BidManagerTest {
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         manager.enrichBid(builder, AdUnit);
         PublisherAdRequest request = builder.build();
-        assertNull(request.getCustomTargeting().getString("crt_displayUrl"));
+        assertNull(request.getCustomTargeting().getString(CRT_DISPLAY_URL));
     }
 
     //TODO test for getBidForAdUnitAndPrefetch , clear the cache and check whats happening
@@ -562,9 +564,9 @@ public class BidManagerTest {
         PublisherAdRequest adRequest = builder.build();
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_CPM));
         assertEquals("0.10", adRequest.getCustomTargeting().get(CRT_CPM));
-        assertTrue(adRequest.getCustomTargeting().containsKey(CRT_DISPLAY_URL));
+        assertTrue(adRequest.getCustomTargeting().containsKey(DFP_CRT_DISPLAY_URL));
         assertEquals(DeviceUtil.createDfpCompatibleString("https://www.example.com/lone?par1=abcd"),
-                adRequest.getCustomTargeting().get(CRT_DISPLAY_URL));
+                adRequest.getCustomTargeting().get(DFP_CRT_DISPLAY_URL));
     }
 
     @Test

@@ -173,7 +173,7 @@ public class BidManagerTests {
 
         PublisherAdRequest adRequest = builder.build();
         Assert.assertTrue(adRequest.getKeywords().contains("crt_cpm"));
-        Assert.assertTrue(adRequest.getKeywords().contains("crt_displayUrl"));
+        Assert.assertTrue(adRequest.getKeywords().contains("crt_displayurl"));
     }
 
     @Test
