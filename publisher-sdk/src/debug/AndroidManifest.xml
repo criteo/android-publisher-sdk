@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  package="com.criteo.publisher">
+
+  <application>
+    <activity android:name="com.criteo.publisher.test.activity.DummyActivity"/>
+  </application>
+
+</manifest>

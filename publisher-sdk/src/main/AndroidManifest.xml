@@ -5,9 +5,10 @@
   <uses-permission android:name="android.permission.INTERNET"/>
 
   <application>
-    <activity android:name=".CriteoInterstitialActivity"
+    <activity
+      android:name=".CriteoInterstitialActivity"
       android:configChanges="orientation|screenSize"
-      ></activity>
+      />
   </application>
 
 </manifest>
