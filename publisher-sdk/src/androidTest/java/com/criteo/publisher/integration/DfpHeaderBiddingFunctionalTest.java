@@ -25,6 +25,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
   private final BannerAdUnit validBannerAdUnit = TestAdUnits.BANNER_320_50;
   private final BannerAdUnit invalidBannerAdUnit = TestAdUnits.BANNER_UNKNOWN;
+  private final BannerAdUnit demoBannerAdUnit = TestAdUnits.BANNER_DEMO;
 
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchValidBannerId_CriteoMacroAreInjectedInDfpBuilder()
@@ -36,11 +37,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Criteo.getInstance().setBidsForAdUnit(builder, validBannerAdUnit);
 
-    Bundle customTargeting = builder.build().getCustomTargeting();
-
-    assertNotNull(customTargeting.getString(MACRO_CPM));
-    assertNotNull(customTargeting.getString(MACRO_DISPLAY_URL));
-    assertEquals(2, customTargeting.size());
+    assertCriteoMacroAreInjectedInDfpBuilder(builder);
   }
 
   @Test
@@ -58,6 +55,31 @@ public class DfpHeaderBiddingFunctionalTest {
     assertNull(customTargeting.getString(MACRO_CPM));
     assertNull(customTargeting.getString(MACRO_DISPLAY_URL));
     assertEquals(0, customTargeting.size());
+  }
+
+  @Test
+  public void whenGettingTestBid_GivenValidCpIdAndPrefetchDemoBannerId_CriteoMacroAreInjectedInDfpBuilder()
+      throws Exception {
+    givenInitializedCriteo(demoBannerAdUnit);
+    waitForBids();
+
+    Builder builder = new Builder();
+
+    Criteo.getInstance().setBidsForAdUnit(builder, demoBannerAdUnit);
+
+    assertCriteoMacroAreInjectedInDfpBuilder(builder);
+
+    // The amount is not that important, but the format is
+    String cpm = builder.build().getCustomTargeting().getString(MACRO_CPM);
+    assertEquals("20.00", cpm);
+  }
+
+  private void assertCriteoMacroAreInjectedInDfpBuilder(Builder builder) {
+    Bundle customTargeting = builder.build().getCustomTargeting();
+
+    assertNotNull(customTargeting.getString(MACRO_CPM));
+    assertNotNull(customTargeting.getString(MACRO_DISPLAY_URL));
+    assertEquals(2, customTargeting.size());
   }
 
   private void waitForBids() {
