@@ -7,6 +7,8 @@ import java.util.Arrays;
 
 public class CriteoUtil {
 
+  public static final String TEST_CP_ID = "B-000001";
+
   public static Criteo givenInitializedCriteo(AdUnit... preloadedAdUnits) throws CriteoInitException {
     Application app = (Application) InstrumentationRegistry.getTargetContext()
         .getApplicationContext();
@@ -14,7 +16,7 @@ public class CriteoUtil {
     // clears any side effects from previous calls
     Criteo.setInstance(null);
 
-    return Criteo.init(app, "B-000001", Arrays.asList(preloadedAdUnits));
+    return Criteo.init(app, TEST_CP_ID, Arrays.asList(preloadedAdUnits));
   }
 
 }
