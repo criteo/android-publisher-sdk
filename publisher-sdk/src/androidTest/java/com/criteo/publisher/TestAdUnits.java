@@ -18,6 +18,9 @@ public class TestAdUnits {
   public static final BannerAdUnit BANNER_320_480 = new BannerAdUnit("test-PubSdk-Base",
       new AdSize(320, 480));
 
+  public static final BannerAdUnit BANNER_UNKNOWN = new BannerAdUnit("test-PubSdk-Unknown",
+      new AdSize(320, 50));
+
   public static final InterstitialAdUnit INTERSTITIAL = new InterstitialAdUnit(
       "test-PubSdk-Interstitial");
 
