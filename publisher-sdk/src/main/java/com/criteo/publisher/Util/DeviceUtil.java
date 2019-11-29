@@ -57,17 +57,21 @@ public final class DeviceUtil {
             }
             return advertisingInfo.getAdvertisingId(context);
         } catch (Exception e) {
+            // FIXME This seems like a dead code, because AdvertisingInfo already catch exceptions
             Log.e("DeviceUtil", "Error trying to get Advertising id: " + e.getMessage());
         }
         return null;
     }
 
     public static int isLimitAdTrackingEnabled(Context context) {
+        // FIXME This entire method seems dumb. It's just a mapping from bool to 0,1
+
         AdvertisingInfo advertisingInfo = DependencyProvider.getInstance().provideAdvertisingInfo();
 
         try {
             return advertisingInfo.isLimitAdTrackingEnabled(context) ? 1 : 0;
         } catch (Exception e) {
+            // FIXME This seems like a dead code, because AdvertisingInfo already catch exceptions
             Log.e("DeviceUtil", "Error trying to check limited ad tracking: " + e.getMessage());
         }
         return 0;
