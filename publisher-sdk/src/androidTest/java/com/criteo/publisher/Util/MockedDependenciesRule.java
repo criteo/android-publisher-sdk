@@ -1,5 +1,7 @@
 package com.criteo.publisher.Util;
 
+import static org.mockito.AdditionalAnswers.delegatesTo;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.criteo.publisher.DependencyProvider;
@@ -9,6 +11,7 @@ import java.util.concurrent.Executor;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+import org.mockito.AdditionalAnswers;
 import org.mockito.Mockito;
 
 /**
@@ -25,9 +28,10 @@ public class MockedDependenciesRule implements TestRule {
       return new Statement() {
         @Override
         public void evaluate() throws Throwable {
-          Executor oldExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
+          DependencyProvider originalDependencyProvider = DependencyProvider.getInstance();
+          Executor oldExecutor = originalDependencyProvider.provideThreadPoolExecutor();
           trackingCommandsExecutor = new TrackingCommandsExecutor(oldExecutor);
-          dependencyProvider = Mockito.mock(DependencyProvider.class);
+          dependencyProvider = mock(DependencyProvider.class, delegatesTo(originalDependencyProvider));
           MockableDependencyProvider.setInstance(dependencyProvider);
           when(dependencyProvider.provideThreadPoolExecutor()).thenReturn(trackingCommandsExecutor);
           when(dependencyProvider.provideSerialExecutor()).thenReturn(trackingCommandsExecutor);
