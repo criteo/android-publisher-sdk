@@ -6,9 +6,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.BuildConfig;
 import com.criteo.publisher.DependencyProvider;
-import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.HostAppUtil;
+import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Cdb;
@@ -20,15 +20,16 @@ import java.util.List;
 import org.json.JSONObject;
 
 public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
-
     private static final String TAG = "Criteo.CDT";
+
     private final Context mContext;
     private final boolean callConfig;
     private final String userAgent;
     private final NetworkResponseListener responseListener;
     private final List<CacheAdUnit> cacheAdUnits;
     private final PubSdkApi api;
-    private final AdvertisingInfo advertisingInfo;
+    private final DeviceUtil deviceUtil;
+    private final LoggingUtil loggingUtil;
     private Hashtable<CacheAdUnit, CdbDownloadTask> bidsInCdbTask;
 
     public CdbDownloadTask(
@@ -38,7 +39,8 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         String userAgent,
         List<CacheAdUnit> adUnits,
         Hashtable<CacheAdUnit, CdbDownloadTask> bidsInMap,
-        AdvertisingInfo advertisingInfo
+        DeviceUtil deviceUtil,
+        LoggingUtil loggingUtil
     ) {
         this.mContext = context.getApplicationContext();
         this.responseListener = responseListener;
@@ -46,7 +48,8 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         this.userAgent = userAgent;
         this.cacheAdUnits = adUnits;
         this.bidsInCdbTask = bidsInMap;
-        this.advertisingInfo = advertisingInfo;
+        this.deviceUtil = deviceUtil;
+        this.loggingUtil = loggingUtil;
         this.api = DependencyProvider.getInstance().providePubSdkApi();
     }
 
@@ -74,7 +77,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
             return null;
         }
 
-        String advertisingId = DeviceUtil.getAdvertisingId(mContext, advertisingInfo);
+        String advertisingId = deviceUtil.getAdvertisingId();
         if (!TextUtils.isEmpty(advertisingId)) {
             user.setDeviceId(advertisingId);
         }
@@ -100,7 +103,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
             cdbRequest.setGdprConsent(gdpr);
         }
         Cdb cdbResult = api.loadCdb(mContext, cdbRequest, userAgent);
-        if (DeviceUtil.isLoggingEnabled() && cdbResult != null && cdbResult.getSlots() != null
+        if (loggingUtil.isLoggingEnabled() && cdbResult != null && cdbResult.getSlots() != null
                 && cdbResult.getSlots().size() > 0) {
             StringBuilder builder = new StringBuilder();
             for (Slot slot : cdbResult.getSlots()) {

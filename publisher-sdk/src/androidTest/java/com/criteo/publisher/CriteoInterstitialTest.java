@@ -1,7 +1,6 @@
 package com.criteo.publisher;
 
 import android.app.Application;
-import android.os.Looper;
 import android.support.test.InstrumentationRegistry;
 import android.test.UiThreadTest;
 import com.criteo.publisher.Util.MockedDependenciesRule;
@@ -19,7 +18,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
-import static com.criteo.publisher.ThreadingUtil.waitForMessageQueueToBeIdle;
 import static org.mockito.Mockito.*;
 
 public class CriteoInterstitialTest {

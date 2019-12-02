@@ -5,41 +5,42 @@ import static android.content.ContentValues.TAG;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
-import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.model.AdSize;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.Locale;
 
-public final class DeviceUtil {
-
-    private static final String CRITEO_LOGGING = "CRITEO_LOGGING";
+public class DeviceUtil {
     private static final String DEVICE_ID_LIMITED = "00000000-0000-0000-0000-000000000000";
 
     private static AdSize sizePortrait = new AdSize(0, 0);
     private static AdSize sizeLandscape = new AdSize(0, 0);
 
-    private DeviceUtil() {
+    private final Context context;
+    private final AdvertisingInfo advertisingInfo;
+
+    public DeviceUtil(@NonNull Context context, @NonNull AdvertisingInfo advertisingInfo) {
+        this.context = context;
+        this.advertisingInfo = advertisingInfo;
     }
 
-    public static void setScreenSize(int screenWidth, int screenHeight) {
+    public void setScreenSize(int screenWidth, int screenHeight) {
         sizePortrait = new AdSize(screenWidth, screenHeight);
         sizeLandscape = new AdSize(screenHeight, screenWidth);
     }
 
-    public static AdSize getSizePortrait() {
+    public AdSize getSizePortrait() {
         return sizePortrait;
     }
 
-    public static AdSize getSizeLandscape() {
+    public AdSize getSizeLandscape() {
         return sizeLandscape;
     }
 
-    public static String getDeviceModel() {
+    public String getDeviceModel() {
         String manufacturer = Build.MANUFACTURER;
         String model = Build.MODEL;
         if (model.toLowerCase(Locale.ROOT).startsWith(manufacturer.toLowerCase(Locale.ROOT))) {
@@ -49,7 +50,7 @@ public final class DeviceUtil {
         }
     }
 
-    public static String getAdvertisingId(@NonNull Context context, @NonNull AdvertisingInfo advertisingInfo) {
+    public String getAdvertisingId() {
         try {
             if (advertisingInfo.isLimitAdTrackingEnabled(context)) {
                 return DEVICE_ID_LIMITED;
@@ -62,11 +63,8 @@ public final class DeviceUtil {
         return null;
     }
 
-    public static int isLimitAdTrackingEnabled(Context context) {
+    public int isLimitAdTrackingEnabled() {
         // FIXME This entire method seems dumb. It's just a mapping from bool to 0,1
-
-        AdvertisingInfo advertisingInfo = DependencyProvider.getInstance().provideAdvertisingInfo();
-
         try {
             return advertisingInfo.isLimitAdTrackingEnabled(context) ? 1 : 0;
         } catch (Exception e) {
@@ -76,9 +74,9 @@ public final class DeviceUtil {
         return 0;
     }
 
-    public static String createDfpCompatibleString(String stringToEncode) {
-
-        if (TextUtils.isEmpty(stringToEncode)) {
+    // FIXME(ma.chentir) this method does not belong here
+    public String createDfpCompatibleString(String stringToEncode) {
+        if (stringToEncode == null || stringToEncode.length() == 0) {
             return null;
         }
 
@@ -93,7 +91,7 @@ public final class DeviceUtil {
         return null;
     }
 
-    public static boolean isVersionSupported() {
+    public boolean isVersionSupported() {
         if (android.os.Build.VERSION.SDK_INT < 19) {
             Log.e(TAG, "Unsupported Android version");
             return false;
@@ -101,10 +99,4 @@ public final class DeviceUtil {
 
         return true;
     }
-
-    public static boolean isLoggingEnabled() {
-        String log = System.getenv(CRITEO_LOGGING);
-        return TextUtils.isEmpty(log) ? false : Boolean.parseBoolean(log);
-    }
-
 }

@@ -5,6 +5,8 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.AndroidUtil;
+import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.network.PubSdkApi;
 import java.util.concurrent.Executor;
@@ -13,9 +15,11 @@ import java.util.concurrent.Executor;
  * Provides global dependencies to the rest of the codebase
  */
 public class DependencyProvider {
+
   protected static DependencyProvider instance;
 
-  private DependencyProvider() {}
+  private DependencyProvider() {
+  }
 
   @NonNull
   public static synchronized DependencyProvider getInstance() {
@@ -28,7 +32,6 @@ public class DependencyProvider {
   /** KEEP VISIBILITY AS PACKAGE-PRIVATE **/
   /**
    * This method will be used by tests to provide a fake {@link DependencyProvider} instance
-   * @param dependencyProvider
    */
   static synchronized void setInstance(@NonNull DependencyProvider dependencyProvider) {
     instance = dependencyProvider;
@@ -45,8 +48,18 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public AndroidUtil provideAndroidUtil(Context context) {
+  public AndroidUtil provideAndroidUtil(@NonNull Context context) {
     return new AndroidUtil(context);
+  }
+
+  @NonNull
+  public DeviceUtil provideDeviceUtil(@NonNull Context context) {
+    return new DeviceUtil(context, provideAdvertisingInfo());
+  }
+
+  @NonNull
+  public LoggingUtil provideLoggingUtil() {
+    return new LoggingUtil();
   }
 
   @NonNull

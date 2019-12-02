@@ -9,6 +9,8 @@ import android.content.res.Configuration;
 import com.criteo.publisher.Util.AndroidUtil;
 
 import com.criteo.publisher.Util.AdvertisingInfo;
+import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
@@ -68,6 +70,12 @@ public class BidManagerTests {
 
     @Mock
     private AndroidUtil androidUtil;
+
+    @Mock
+    private DeviceUtil deviceUtil;
+
+    @Mock
+    private LoggingUtil loggingUtil;
 
     @Before
     public void setup() {
@@ -138,6 +146,8 @@ public class BidManagerTests {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
 
@@ -165,6 +175,8 @@ public class BidManagerTests {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
 
@@ -192,6 +204,8 @@ public class BidManagerTests {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
 
@@ -216,6 +230,8 @@ public class BidManagerTests {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
 
@@ -241,6 +257,8 @@ public class BidManagerTests {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
 
@@ -274,6 +292,8 @@ public class BidManagerTests {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
 
@@ -308,6 +328,8 @@ public class BidManagerTests {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
 
@@ -352,6 +374,8 @@ public class BidManagerTests {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
 

@@ -4,6 +4,7 @@ import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_INTERSTITIAL;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import com.criteo.publisher.Util.AdUnitType;
@@ -18,9 +19,11 @@ import java.util.Map;
 public class SdkCache {
 
     private final Map<CacheAdUnit, Slot> slotMap;
+    private final DeviceUtil deviceUtil;
 
-    public SdkCache() {
+    public SdkCache(@NonNull DeviceUtil deviceUtil) {
         slotMap = new HashMap<>();
+        this.deviceUtil = deviceUtil;
     }
 
     public void add(Slot slot) {
@@ -49,10 +52,10 @@ public class SdkCache {
             return CRITEO_CUSTOM_NATIVE;
         }
 
-        if ((DeviceUtil.getSizePortrait().getHeight() == slot.getHeight()
-                && DeviceUtil.getSizePortrait().getWidth() == slot.getWidth())
-                || DeviceUtil.getSizeLandscape().getHeight() == slot.getHeight()
-                && DeviceUtil.getSizeLandscape().getWidth() == slot.getWidth()) {
+        if ((deviceUtil .getSizePortrait().getHeight() == slot.getHeight()
+                && deviceUtil.getSizePortrait().getWidth() == slot.getWidth())
+                || deviceUtil.getSizeLandscape().getHeight() == slot.getHeight()
+                && deviceUtil.getSizeLandscape().getWidth() == slot.getWidth()) {
             return CRITEO_INTERSTITIAL;
         }
 
@@ -102,5 +105,4 @@ public class SdkCache {
     int getItemCount() {
         return slotMap.size();
     }
-
 }

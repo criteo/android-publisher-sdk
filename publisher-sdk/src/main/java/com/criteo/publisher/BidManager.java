@@ -13,6 +13,7 @@ import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.Util.ReflectionUtil;
 import com.criteo.publisher.cache.SdkCache;
@@ -75,6 +76,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private DeviceInfo deviceInfo;
     private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
     private final AndroidUtil androidUtil;
+    private final DeviceUtil deviceUtil;
+    private final LoggingUtil loggingUtil;
     private final Config config;
     private final AdvertisingInfo advertisingInfo;
 
@@ -85,6 +88,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         @NonNull DeviceInfo deviceInfo,
         @NonNull Config config,
         @NonNull AndroidUtil androidUtil,
+        @NonNull DeviceUtil deviceUtil,
+        @NonNull LoggingUtil loggingUtil,
         @NonNull AdvertisingInfo advertisingInfo
     ) {
         this(
@@ -93,11 +98,13 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             cacheAdUnits,
             new TokenCache(),
             deviceInfo,
-            new User(),
-            new SdkCache(),
+            new User(deviceUtil),
+            new SdkCache(deviceUtil),
             new Hashtable<>(),
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
     }
@@ -114,6 +121,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         @NonNull Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks,
         @NonNull Config config,
         @NonNull AndroidUtil androidUtil,
+        @NonNull DeviceUtil deviceUtil,
+        @NonNull LoggingUtil loggingUtil,
         @NonNull AdvertisingInfo advertisingInfo
     ) {
         this.mContext = context;
@@ -124,8 +133,10 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         this.user = user;
         this.cache = sdkCache;
         this.placementsWithCdbTasks = placementsWithCdbTasks;
-        this.androidUtil = androidUtil;
         this.config = config;
+        this.androidUtil = androidUtil;
+        this.deviceUtil = deviceUtil;
+        this.loggingUtil = loggingUtil;
         this.advertisingInfo = advertisingInfo;
     }
 
@@ -155,7 +166,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             deviceInfo.getUserAgent(),
             prefetchCacheAdUnits,
             placementsWithCdbTasks,
-            advertisingInfo
+            deviceUtil,
+            loggingUtil
         );
 
         for (CacheAdUnit cacheAdUnit : prefetchCacheAdUnits) {
@@ -235,7 +247,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     //Banner and Interstitial slot
     private void enrichDfpRequest(Slot slot, Object object) {
         ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", DFP_CRT_DISPLAY_URL,
-                DeviceUtil.createDfpCompatibleString(slot.getDisplayUrl()));
+                deviceUtil.createDfpCompatibleString(slot.getDisplayUrl()));
     }
 
     //Native slot
@@ -289,7 +301,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             return null;
         }
         CacheAdUnit cacheAdUnit = AdUnitHelper
-                .convertoCacheAdUnit(adUnit, androidUtil.getOrientation());
+                .convertoCacheAdUnit(adUnit, androidUtil.getOrientation(), deviceUtil);
 
         Slot peekSlot = cache.peekAdUnit(cacheAdUnit);
         if (peekSlot == null) {
@@ -324,7 +336,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private void checkAndReflect(Object object, String fieldName, String enrichmentKey) {
         if (!TextUtils.isEmpty(fieldName)) {
             ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", enrichmentKey,
-                    DeviceUtil.createDfpCompatibleString(fieldName));
+                    deviceUtil.createDfpCompatibleString(fieldName));
         }
     }
 

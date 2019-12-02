@@ -48,12 +48,14 @@ final class CriteoInternal extends Criteo {
     }
 
     Context context = application.getApplicationContext();
-    createSupportedScreenSizes(application);
+    DeviceUtil deviceUtil = DependencyProvider.getInstance().provideDeviceUtil(context);
+    createSupportedScreenSizes(application, deviceUtil);
 
     AndroidUtil androidUtil = DependencyProvider.getInstance().provideAndroidUtil(context);
 
+
     List<CacheAdUnit> cacheAdUnits = AdUnitHelper
-        .convertAdUnits(adUnits, androidUtil.getOrientation());
+        .convertAdUnits(adUnits, androidUtil.getOrientation(), deviceUtil);
 
     List<CacheAdUnit> validatedCacheAdUnits = AdUnitHelper.filterInvalidCacheAdUnits(cacheAdUnits);
 
@@ -68,10 +70,12 @@ final class CriteoInternal extends Criteo {
         deviceInfo,
         config,
         androidUtil,
+        deviceUtil,
+        DependencyProvider.getInstance().provideLoggingUtil(),
         advertisingInfo
     );
 
-    this.appEvents = new AppEvents(context, advertisingInfo);
+    this.appEvents = new AppEvents(context, deviceUtil);
     this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
 
     deviceInfo.initialize(context, new UserAgentCallback() {
@@ -109,14 +113,15 @@ final class CriteoInternal extends Criteo {
     return bidManager.getBidForAdUnitAndPrefetch(adUnit);
   }
 
-  private void createSupportedScreenSizes(Application application) {
+  private void createSupportedScreenSizes(Application application, DeviceUtil deviceUtil) {
     try {
       DisplayMetrics metrics = new DisplayMetrics();
       ((WindowManager) application.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()
           .getMetrics(metrics);
-      DeviceUtil.setScreenSize(Math.round(metrics.widthPixels / metrics.density),
+      deviceUtil.setScreenSize(Math.round(metrics.widthPixels / metrics.density),
           Math.round(metrics.heightPixels / metrics.density));
     } catch (Exception e) {
+      // FIXME(ma.chentir) message might be misleading as this could not be the only exception cause
       throw new Error("Screen parameters can not be empty or null");
     }
   }

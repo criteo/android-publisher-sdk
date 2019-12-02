@@ -3,8 +3,8 @@ package com.criteo.publisher.network;
 import static com.criteo.publisher.network.AppEventTask.THROTTLE;
 
 import android.content.Context;
-import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.AppEventResponseListener;
+import com.criteo.publisher.Util.DeviceUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -26,12 +26,12 @@ public class AppEventTaskTest {
     private Context context;
 
     @Mock
-    private AdvertisingInfo advertisingInfo;
+    private DeviceUtil deviceUtil;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        appEventTask = new AppEventTask(context, responseListener, advertisingInfo);
+        appEventTask = new AppEventTask(context, responseListener, deviceUtil);
         json = new JSONObject();
     }
 

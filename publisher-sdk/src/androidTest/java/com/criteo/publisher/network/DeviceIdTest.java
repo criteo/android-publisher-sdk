@@ -14,6 +14,7 @@ import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.ThreadingUtil;
 import com.criteo.publisher.Util.AdvertisingInfo;
+import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
@@ -52,8 +53,9 @@ public class DeviceIdTest {
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
     when(dependencyProvider.providePubSdkApi()).thenReturn(pubSdkApi);
     when(dependencyProvider.provideAdvertisingInfo()).thenReturn(advertisingInfo);
-
     context = InstrumentationRegistry.getContext();
+    DeviceUtil deviceUtil = new DeviceUtil(context, advertisingInfo);
+    when(dependencyProvider.provideDeviceUtil(any(Context.class))).thenReturn(deviceUtil);
   }
 
   @Test

@@ -1,7 +1,9 @@
 package com.criteo.publisher.model;
 
+import android.bluetooth.BluetoothClass.Device;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import com.criteo.publisher.BuildConfig;
 import com.criteo.publisher.Util.DeviceUtil;
 import org.json.JSONException;
@@ -29,10 +31,10 @@ public class User implements Parcelable {
     private int limit;
     private String connection;
 
-    public User() {
+    public User(@NonNull DeviceUtil deviceUtil) {
         deviceId = "";
         deviceIdType = GAID;
-        deviceModel = DeviceUtil.getDeviceModel();
+        deviceModel = deviceUtil.getDeviceModel();
         deviceOs = ANDROID;
         sdkVer = BuildConfig.VERSION_NAME;
         limit = LMT_VAL;

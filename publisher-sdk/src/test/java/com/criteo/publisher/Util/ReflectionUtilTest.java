@@ -1,7 +1,5 @@
 package com.criteo.publisher.Util;
 
-import static org.junit.Assert.*;
-
 import junit.framework.Assert;
 import org.junit.Test;
 

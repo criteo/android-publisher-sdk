@@ -11,6 +11,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import android.content.Context;
+import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.CacheAdUnit;
@@ -22,14 +24,25 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 public class SdkCacheTest {
-    private SdkCache cache;
+    @Mock
+    private Context context;
+
+    @Mock
+    private AdvertisingInfo advertisingInfo;
+
     private JSONArray slots;
+    private DeviceUtil deviceUtil;
+    private SdkCache cache;
 
     @Before
     public void setUp() throws Exception {
-        cache = new SdkCache();
+        MockitoAnnotations.initMocks(this);
+        deviceUtil = new DeviceUtil(context, advertisingInfo);
+        cache = new SdkCache(deviceUtil);
     }
 
     @Test
@@ -135,7 +148,7 @@ public class SdkCacheTest {
         String json = "{\"slots\":[{\"placementId\":\"/140800857/Endeavour_320x50\",\"cpm\":\"1.12\",\"currency\":\"EUR\",\"width\":320,\"height\":50,\"ttl\":0,\"displayUrl\":\"https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js\"},{\"placementId\":\"/140800857/Endeavour_Interstitial_320x480\",\"cpm\":\"1.12\",\"currency\":\"EUR\",\"width\":320,\"height\":480,\"ttl\":0,\"displayUrl\":\"https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js\"}]}";
         JSONObject element = new JSONObject(json);
         slots = element.getJSONArray("slots");
-        cache = new SdkCache();
+        cache = new SdkCache(deviceUtil);
         for (int i = 0; i < slots.length(); i++) {
             Slot slot = new Slot(slots.getJSONObject(i));
             cache.add(slot);
@@ -150,7 +163,7 @@ public class SdkCacheTest {
         try {
             JSONObject element = new JSONObject(json);
             slots = element.getJSONArray("slots");
-            cache = new SdkCache();
+            cache = new SdkCache(deviceUtil);
             for (int i = 0; i < slots.length(); i++) {
                 Slot slot = new Slot(slots.getJSONObject(i));
                 cache.add(slot);
@@ -211,7 +224,7 @@ public class SdkCacheTest {
             JSONObject cdbResponse = new JSONObject(cdbStringResponse);
             JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
             Slot slot = new Slot(cdbSlot);
-            cache = new SdkCache();
+            cache = new SdkCache(deviceUtil);
             cache.add(slot);
             assertEquals(0, cache.getItemCount());
         } catch (Exception ex) {
@@ -269,7 +282,7 @@ public class SdkCacheTest {
             JSONObject cdbResponse = new JSONObject(cdbStringResponse);
             JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
             Slot slot = new Slot(cdbSlot);
-            cache = new SdkCache();
+            cache = new SdkCache(deviceUtil);
             cache.add(slot);
             assertEquals(1, cache.getItemCount());
         } catch (Exception ex) {
@@ -338,7 +351,7 @@ public class SdkCacheTest {
         when(slot.getPlacementId()).thenReturn("myAdUnit");
 
         // FIXME this has side-effect. After fixing EE-608, this will have no meaning.
-        DeviceUtil.setScreenSize(size.getWidth(), size.getHeight());
+        deviceUtil.setScreenSize(size.getWidth(), size.getHeight());
 
         CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_INTERSTITIAL);
 
@@ -360,7 +373,7 @@ public class SdkCacheTest {
         when(slot.getPlacementId()).thenReturn("myAdUnit");
 
         // FIXME this has side-effect. After fixing EE-608, this will have no meaning.
-        DeviceUtil.setScreenSize(size.getHeight(), size.getWidth());
+        deviceUtil.setScreenSize(size.getHeight(), size.getWidth());
 
         CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_INTERSTITIAL);
 

@@ -2,7 +2,8 @@ package com.criteo.publisher.network;
 
 import android.content.Context;
 import com.criteo.publisher.Util.AdUnitType;
-import com.criteo.publisher.Util.AdvertisingInfo;
+import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.CacheAdUnit;
@@ -29,7 +30,10 @@ public class  CdbDownloadTaskTest {
     private Hashtable<CacheAdUnit, CdbDownloadTask> bidsInCdbTask;
 
     @Mock
-    private AdvertisingInfo advertisingInfo;
+    private DeviceUtil deviceUtil;
+
+    @Mock
+    private LoggingUtil loggingUtil;
 
     @Test
     public void checkCacheRemove() {
@@ -45,7 +49,8 @@ public class  CdbDownloadTaskTest {
             "Agent",
             cacheAdUnits,
             bidsInCdbTask,
-            advertisingInfo
+            deviceUtil,
+            loggingUtil
         );
 
         cdbDownloadTask.onPostExecute(null);

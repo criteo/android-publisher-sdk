@@ -17,6 +17,7 @@ import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
@@ -94,6 +95,11 @@ public class BidManagerTest {
     @Mock
     private AdvertisingInfo advertisingInfo;
 
+    @Mock
+    private LoggingUtil loggingUtil;
+
+    private DeviceUtil deviceUtil;
+
     private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
 
     @Before
@@ -105,8 +111,9 @@ public class BidManagerTest {
         editor.putBoolean("CriteoCachedKillSwitch", false);
         editor.apply();
         publisher = new Publisher(context, CRITEO_PUBLISHER_ID);
-        user = new User();
-        sdkCache = new SdkCache();
+        deviceUtil = new DeviceUtil(context, advertisingInfo);
+        user = new User(deviceUtil);
+        sdkCache = new SdkCache(deviceUtil);
         config = new Config(context);
         placementsWithCdbTasks = new Hashtable<>();
         MockitoAnnotations.initMocks(this);
@@ -142,6 +149,8 @@ public class BidManagerTest {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
 
@@ -176,6 +185,8 @@ public class BidManagerTest {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
         manager.prefetch();
@@ -207,7 +218,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             context,
             publisher,
-            AdUnitHelper.convertAdUnits(adUnits,  androidUtil.getOrientation()),
+            AdUnitHelper.convertAdUnits(adUnits,  androidUtil.getOrientation(), deviceUtil),
             new TokenCache(),
             new DeviceInfo(),
             user,
@@ -215,6 +226,8 @@ public class BidManagerTest {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
 
@@ -236,7 +249,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             context,
             publisher,
-            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation()),
+            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation(), deviceUtil),
             new TokenCache(),
             new DeviceInfo(),
             user,
@@ -244,6 +257,8 @@ public class BidManagerTest {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
         List<Slot> slots = new ArrayList<>();
@@ -281,7 +296,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             context,
             publisher,
-            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation()),
+            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation(), deviceUtil),
             new TokenCache(),
             new DeviceInfo(),
             user,
@@ -289,6 +304,8 @@ public class BidManagerTest {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
 
@@ -327,8 +344,6 @@ public class BidManagerTest {
         manager.enrichBid(builder, AdUnit);
         request = builder.build();
         assertNotNull(request.getCustomTargeting().getString(DFP_CRT_DISPLAY_URL));
-
-
     }
 
     @Test
@@ -349,7 +364,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             context,
             publisher,
-            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation()),
+            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation(), deviceUtil),
             new TokenCache(),
             new DeviceInfo(),
             user,
@@ -357,6 +372,8 @@ public class BidManagerTest {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
 
@@ -399,7 +416,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             context,
             publisher,
-            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation()),
+            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation(), deviceUtil),
             new TokenCache(),
             new DeviceInfo(),
             user,
@@ -407,6 +424,8 @@ public class BidManagerTest {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
 
@@ -427,7 +446,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             context,
             publisher,
-            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation()),
+            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation(), deviceUtil),
             new TokenCache(),
             new DeviceInfo(),
             user,
@@ -435,6 +454,8 @@ public class BidManagerTest {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
 
@@ -457,7 +478,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             context,
             publisher,
-            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation()),
+            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation(), deviceUtil),
             new TokenCache(),
             new DeviceInfo(),
             user,
@@ -465,6 +486,8 @@ public class BidManagerTest {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
 
@@ -493,7 +516,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             context,
             publisher,
-            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation()),
+            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation(), deviceUtil),
             new TokenCache(),
             new DeviceInfo(),
             user,
@@ -501,6 +524,8 @@ public class BidManagerTest {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
 
@@ -555,6 +580,8 @@ public class BidManagerTest {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
 
@@ -565,8 +592,9 @@ public class BidManagerTest {
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_CPM));
         assertEquals("0.10", adRequest.getCustomTargeting().get(CRT_CPM));
         assertTrue(adRequest.getCustomTargeting().containsKey(DFP_CRT_DISPLAY_URL));
-        assertEquals(DeviceUtil.createDfpCompatibleString("https://www.example.com/lone?par1=abcd"),
+        assertEquals(deviceUtil.createDfpCompatibleString("https://www.example.com/lone?par1=abcd"),
                 adRequest.getCustomTargeting().get(DFP_CRT_DISPLAY_URL));
+
     }
 
     @Test
@@ -644,6 +672,8 @@ public class BidManagerTest {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
 
@@ -655,63 +685,63 @@ public class BidManagerTest {
         assertEquals("0.04", adRequest.getCustomTargeting().get(CRT_CPM));
 
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_NATIVE_TITLE));
-        assertEquals(DeviceUtil.createDfpCompatibleString("Stripe Pima Dress"),
+        assertEquals(deviceUtil.createDfpCompatibleString("Stripe Pima Dress"),
                 adRequest.getCustomTargeting().get(CRT_NATIVE_TITLE));
 
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_NATIVE_DESC));
-        assertEquals(DeviceUtil.createDfpCompatibleString("We're All About Comfort."),
+        assertEquals(deviceUtil.createDfpCompatibleString("We're All About Comfort."),
                 adRequest.getCustomTargeting().get(CRT_NATIVE_DESC));
 
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_NATIVE_PRICE));
-        assertEquals(DeviceUtil.createDfpCompatibleString("$99"),
+        assertEquals(deviceUtil.createDfpCompatibleString("$99"),
                 adRequest.getCustomTargeting().get(CRT_NATIVE_PRICE));
 
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_NATIVE_CLICK_URL));
-        assertEquals(DeviceUtil.createDfpCompatibleString("https://cat.sv.us.criteo.com/delivery/ckn.php"),
+        assertEquals(deviceUtil.createDfpCompatibleString("https://cat.sv.us.criteo.com/delivery/ckn.php"),
                 adRequest.getCustomTargeting().get(CRT_NATIVE_CLICK_URL));
 
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_NATIVE_CTA));
-        assertEquals(DeviceUtil.createDfpCompatibleString("Call to Action"),
+        assertEquals(deviceUtil.createDfpCompatibleString("Call to Action"),
                 adRequest.getCustomTargeting().get(CRT_NATIVE_CTA));
 
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_NATIVE_IMAGE_URL));
-        assertEquals(DeviceUtil.createDfpCompatibleString("https://pix.us.criteo.net/img/img?"),
+        assertEquals(deviceUtil.createDfpCompatibleString("https://pix.us.criteo.net/img/img?"),
                 adRequest.getCustomTargeting().get(CRT_NATIVE_IMAGE_URL));
 
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_NATIVE_ADV_NAME));
-        assertEquals(DeviceUtil.createDfpCompatibleString("The Company Store"),
+        assertEquals(deviceUtil.createDfpCompatibleString("The Company Store"),
                 adRequest.getCustomTargeting().get(CRT_NATIVE_ADV_NAME));
 
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_NATIVE_ADV_DOMAIN));
-        assertEquals(DeviceUtil.createDfpCompatibleString("thecompanystore.com"),
+        assertEquals(deviceUtil.createDfpCompatibleString("thecompanystore.com"),
                 adRequest.getCustomTargeting().get(CRT_NATIVE_ADV_DOMAIN));
 
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_NATIVE_ADV_LOGO_URL));
-        assertEquals(DeviceUtil.createDfpCompatibleString("https://pix.us.criteo.net/img/img"),
+        assertEquals(deviceUtil.createDfpCompatibleString("https://pix.us.criteo.net/img/img"),
                 adRequest.getCustomTargeting().get(CRT_NATIVE_ADV_LOGO_URL));
 
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_NATIVE_ADV_URL));
-        assertEquals(DeviceUtil.createDfpCompatibleString("https://cat.sv.us.criteo.com/delivery/ckn.php"),
+        assertEquals(deviceUtil.createDfpCompatibleString("https://cat.sv.us.criteo.com/delivery/ckn.php"),
                 adRequest.getCustomTargeting().get(CRT_NATIVE_ADV_URL));
 
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_NATIVE_PR_URL));
-        assertEquals(DeviceUtil.createDfpCompatibleString("https://privacy.us.criteo.com/adcenter"),
+        assertEquals(deviceUtil.createDfpCompatibleString("https://privacy.us.criteo.com/adcenter"),
                 adRequest.getCustomTargeting().get(CRT_NATIVE_PR_URL));
 
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_NATIVE_PR_IMAGE_URL));
-        assertEquals(DeviceUtil.createDfpCompatibleString("https://static.criteo.net/flash/icon/nai_small.png"),
+        assertEquals(deviceUtil.createDfpCompatibleString("https://static.criteo.net/flash/icon/nai_small.png"),
                 adRequest.getCustomTargeting().get(CRT_NATIVE_PR_IMAGE_URL));
 
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_NATIVE_PR_TEXT));
-        assertEquals(DeviceUtil.createDfpCompatibleString("Long Legal Text"),
+        assertEquals(deviceUtil.createDfpCompatibleString("Long Legal Text"),
                 adRequest.getCustomTargeting().get(CRT_NATIVE_PR_TEXT));
 
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_NATIVE_PIXEL_URL + "0"));
-        assertEquals(DeviceUtil.createDfpCompatibleString("https://cat.sv.us.criteo.com/delivery/lgn.php?"),
+        assertEquals(deviceUtil.createDfpCompatibleString("https://cat.sv.us.criteo.com/delivery/lgn.php?"),
                 adRequest.getCustomTargeting().get(CRT_NATIVE_PIXEL_URL + "0"));
 
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_NATIVE_PIXEL_URL + "1"));
-        assertEquals(DeviceUtil.createDfpCompatibleString("https://dog.da.us.criteo.com/delivery/lgn.php?"),
+        assertEquals(deviceUtil.createDfpCompatibleString("https://dog.da.us.criteo.com/delivery/lgn.php?"),
                 adRequest.getCustomTargeting().get(CRT_NATIVE_PIXEL_URL + "1"));
 
         assertTrue(adRequest.getCustomTargeting().containsKey(CRT_NATIVE_PIXEL_COUNT));
@@ -729,7 +759,7 @@ public class BidManagerTest {
         BannerAdUnit bannerAdUnit = new BannerAdUnit("BannerAdUnitId", new AdSize(320, 50));
         List<CacheAdUnit> adUnits = new ArrayList<>();
         CacheAdUnit cacheAdUnit = AdUnitHelper
-            .convertoCacheAdUnit(bannerAdUnit, androidUtil.getOrientation());
+            .convertoCacheAdUnit(bannerAdUnit, androidUtil.getOrientation(), deviceUtil);
         adUnits.add(cacheAdUnit);
 
         BidManager bidManager = new BidManager(
@@ -743,6 +773,8 @@ public class BidManagerTest {
             placementsWithCdbTasks,
             config,
             androidUtil,
+            deviceUtil,
+            loggingUtil,
             advertisingInfo
         );
 
