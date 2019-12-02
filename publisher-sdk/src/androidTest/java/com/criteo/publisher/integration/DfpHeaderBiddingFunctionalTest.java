@@ -1,21 +1,30 @@
 package com.criteo.publisher.integration;
 
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
+import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import android.os.Bundle;
+import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.Util.WebViewLookup;
 import com.criteo.publisher.model.BannerAdUnit;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest.Builder;
+import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.concurrent.CountDownLatch;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -25,13 +34,17 @@ public class DfpHeaderBiddingFunctionalTest {
   private static final String MACRO_DISPLAY_URL = "crt_displayurl";
 
   private static final String STUB_DISPLAY_URL = "https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js";
+  private static final String STUB_CREATIVE_IMAGE = "https://publisherdirect.criteo.com/publishertag/preprodtest/creative.png";
+  private static final String DFP_BANNER_ID = "/140800857/Endeavour_320x50";
 
   @Rule
-  public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   private final BannerAdUnit validBannerAdUnit = TestAdUnits.BANNER_320_50;
   private final BannerAdUnit invalidBannerAdUnit = TestAdUnits.BANNER_UNKNOWN;
   private final BannerAdUnit demoBannerAdUnit = TestAdUnits.BANNER_DEMO;
+
+  private final WebViewLookup webViewLookup = new WebViewLookup();
 
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchValidBannerId_CriteoMacroAreInjectedInDfpBuilder()
@@ -81,7 +94,8 @@ public class DfpHeaderBiddingFunctionalTest {
   }
 
   @Test
-  public void whenEnrichingDisplayUrl_GivenValidCpIdAndPrefetchBannerId_DisplayUrlIsEncodedInASpecificManner() throws Exception {
+  public void whenEnrichingDisplayUrl_GivenValidCpIdAndPrefetchBannerId_DisplayUrlIsEncodedInASpecificManner()
+      throws Exception {
     givenInitializedCriteo(validBannerAdUnit);
     waitForBids();
 
@@ -104,6 +118,32 @@ public class DfpHeaderBiddingFunctionalTest {
     assertEquals(STUB_DISPLAY_URL, decodedDisplayUrl);
   }
 
+  @Test
+  public void loadingDfpBanner_GivenValidBanner_DfpViewContainsCreative() throws Exception {
+    givenInitializedCriteo(validBannerAdUnit);
+    waitForBids();
+
+    Builder builder = new Builder();
+
+    Criteo.getInstance().setBidsForAdUnit(builder, validBannerAdUnit);
+
+    builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
+    PublisherAdRequest request = builder.build();
+
+    PublisherAdView publisherAdView = new PublisherAdView(InstrumentationRegistry.getContext());
+    publisherAdView.setAdSizes(com.google.android.gms.ads.AdSize.BANNER);
+    publisherAdView.setAdUnitId(DFP_BANNER_ID);
+
+    DfpSync dfpSync = new DfpSync(publisherAdView);
+
+    runOnMainThreadAndWait(() -> publisherAdView.loadAd(request));
+    dfpSync.waitForBid();
+
+    String html = webViewLookup.lookForHtmlContent(publisherAdView).get();
+
+    assertTrue(html.contains(STUB_CREATIVE_IMAGE));
+  }
+
   private void assertCriteoMacroAreInjectedInDfpBuilder(Builder builder) {
     Bundle customTargeting = builder.build().getCustomTargeting();
 
@@ -114,6 +154,32 @@ public class DfpHeaderBiddingFunctionalTest {
 
   private void waitForBids() {
     waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+  }
+
+  private static final class DfpSync {
+
+    private final CountDownLatch isLoaded;
+
+    private DfpSync(PublisherAdView adView) {
+      this.isLoaded = new CountDownLatch(1);
+      adView.setAdListener(new SyncAdListener());
+    }
+
+    void waitForBid() throws InterruptedException {
+      isLoaded.await();
+    }
+
+    private class SyncAdListener extends AdListener {
+      @Override
+      public void onAdLoaded() {
+        isLoaded.countDown();
+      }
+
+      @Override
+      public void onAdFailedToLoad(int i) {
+        isLoaded.countDown();
+      }
+    }
   }
 
 }
