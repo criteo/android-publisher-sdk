@@ -11,6 +11,7 @@ import static org.junit.Assert.assertTrue;
 import android.os.Bundle;
 import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.Util.WebViewLookup;
@@ -120,12 +121,28 @@ public class DfpHeaderBiddingFunctionalTest {
 
   @Test
   public void loadingDfpBanner_GivenValidBanner_DfpViewContainsCreative() throws Exception {
-    givenInitializedCriteo(validBannerAdUnit);
+    String html = loadDfpHtmlBanner(validBannerAdUnit);
+
+    assertTrue(html.contains(STUB_CREATIVE_IMAGE));
+  }
+
+  @Test
+  public void loadingDfpBanner_GivenDemoBanner_DfpViewContainsCreative() throws Exception {
+    String html = loadDfpHtmlBanner(demoBannerAdUnit);
+
+    // The demo creative is a true Criteo creative with a lot of iframe, generated code, ...
+    // It's hard to have a deterministic element inside. Trying to get this ID should be sufficient
+    // to determine if the creative was well loaded.
+    assertTrue(html.contains("#cto_banner_content"));
+  }
+
+  private String loadDfpHtmlBanner(BannerAdUnit demoBannerAdUnit) throws Exception {
+    givenInitializedCriteo(demoBannerAdUnit);
     waitForBids();
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().setBidsForAdUnit(builder, validBannerAdUnit);
+    Criteo.getInstance().setBidsForAdUnit(builder, demoBannerAdUnit);
 
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
     PublisherAdRequest request = builder.build();
@@ -139,9 +156,7 @@ public class DfpHeaderBiddingFunctionalTest {
     runOnMainThreadAndWait(() -> publisherAdView.loadAd(request));
     dfpSync.waitForBid();
 
-    String html = webViewLookup.lookForHtmlContent(publisherAdView).get();
-
-    assertTrue(html.contains(STUB_CREATIVE_IMAGE));
+    return webViewLookup.lookForHtmlContent(publisherAdView).get();
   }
 
   private void assertCriteoMacroAreInjectedInDfpBuilder(Builder builder) {
