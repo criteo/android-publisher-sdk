@@ -4,6 +4,7 @@ import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -134,6 +135,13 @@ public class DfpHeaderBiddingFunctionalTest {
     // It's hard to have a deterministic element inside. Trying to get this ID should be sufficient
     // to determine if the creative was well loaded.
     assertTrue(html.contains("#cto_banner_content"));
+  }
+
+  @Test
+  public void loadingDfpBanner_GivenInvalidBanner_DfpViewDoesNotContainCreative() throws Exception {
+    String html = loadDfpHtmlBanner(invalidBannerAdUnit);
+
+    assertFalse(html.contains(STUB_CREATIVE_IMAGE));
   }
 
   private String loadDfpHtmlBanner(BannerAdUnit demoBannerAdUnit) throws Exception {
