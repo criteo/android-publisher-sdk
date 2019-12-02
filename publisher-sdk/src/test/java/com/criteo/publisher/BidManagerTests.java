@@ -42,6 +42,9 @@ import org.mockito.MockitoAnnotations;
 
 public class BidManagerTests {
 
+    private static final String MAP_CRT_CPM = "crt_cpm";
+    private static final String MAP_CRT_DISPLAY_URL = "crt_displayUrl";
+
     private String adUnitId = "someAdUnit";
     private AdSize adSize = new AdSize(320, 50);
     private AdUnit adUnit;
@@ -386,24 +389,24 @@ public class BidManagerTests {
         bidManager.enrichBid(map, bannerAdUnit);
 
         Assert.assertEquals(2, map.size());
-        Assert.assertEquals(cpm, map.get("crt_cpm"));
-        Assert.assertEquals(displayUrl, map.get("crt_displayUrl"));
+        Assert.assertEquals(cpm, map.get(MAP_CRT_CPM));
+        Assert.assertEquals(displayUrl, map.get(MAP_CRT_DISPLAY_URL));
 
         // Test Dictionary
         Dictionary<String, String> dict = new Hashtable<>();
         bidManager.enrichBid(dict, bannerAdUnit);
 
         Assert.assertEquals(2, dict.size());
-        Assert.assertEquals(cpm, dict.get("crt_cpm"));
-        Assert.assertEquals(displayUrl, dict.get("crt_displayUrl"));
+        Assert.assertEquals(cpm, dict.get(MAP_CRT_CPM));
+        Assert.assertEquals(displayUrl, dict.get(MAP_CRT_DISPLAY_URL));
 
         // Test nested custom class that implements map via a custom interface
         SpecialMap specialHashMap = new SpecialHashMap();
         bidManager.enrichBid(specialHashMap, bannerAdUnit);
 
         Assert.assertEquals(2, specialHashMap.size());
-        Assert.assertEquals(cpm, specialHashMap.get("crt_cpm"));
-        Assert.assertEquals(displayUrl, specialHashMap.get("crt_displayUrl"));
+        Assert.assertEquals(cpm, specialHashMap.get(MAP_CRT_CPM));
+        Assert.assertEquals(displayUrl, specialHashMap.get(MAP_CRT_DISPLAY_URL));
     }
 
     private interface SpecialMap extends Map

@@ -50,7 +50,6 @@ import org.mockito.MockitoAnnotations;
 public class BidManagerTest {
 
     private static final String CRT_CPM = "crt_cpm";
-    private static final String CRT_DISPLAY_URL = "crt_displayUrl";
     private static final String CRT_NATIVE_TITLE = "crtn_title";
     private static final String CRT_NATIVE_DESC = "crtn_desc";
     private static final String CRT_NATIVE_PRICE = "crtn_price";
@@ -132,7 +131,7 @@ public class BidManagerTest {
         PublisherAdRequest.Builder builderUpdate = new PublisherAdRequest.Builder();
         manager.enrichBid(builderUpdate, AdUnit);
         PublisherAdRequest request = builderUpdate.build();
-        assertNull(request.getCustomTargeting().getString(CRT_DISPLAY_URL));
+        assertNull(request.getCustomTargeting().getString(DFP_CRT_DISPLAY_URL));
     }
 
     @Test
@@ -236,7 +235,7 @@ public class BidManagerTest {
         manager.enrichBid(builder, AdUnit);
         manager.enrichBid(builder, AdUnit);
         PublisherAdRequest request = builder.build();
-        assertNull(request.getCustomTargeting().getString(CRT_DISPLAY_URL));
+        assertNull(request.getCustomTargeting().getString(DFP_CRT_DISPLAY_URL));
     }
 
     @Test
@@ -380,7 +379,7 @@ public class BidManagerTest {
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         manager.enrichBid(builder, AdUnit);
         PublisherAdRequest request = builder.build();
-        assertNull(request.getCustomTargeting().getString(CRT_DISPLAY_URL));
+        assertNull(request.getCustomTargeting().getString(DFP_CRT_DISPLAY_URL));
     }
 
     //TODO test for getBidForAdUnitAndPrefetch , clear the cache and check whats happening

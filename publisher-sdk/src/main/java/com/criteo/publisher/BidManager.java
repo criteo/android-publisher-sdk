@@ -44,7 +44,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private static String DFP_ADREQUEST_CLASS = "com.google.android.gms.ads.doubleclick.PublisherAdRequest$Builder";
 
     private static final String CRT_CPM = "crt_cpm";
-    private static final String CRT_DISPLAY_URL = "crt_displayUrl";
     private static final String CRT_NATIVE_TITLE = "crtn_title";
     private static final String CRT_NATIVE_DESC = "crtn_desc";
     private static final String CRT_NATIVE_PRICE = "crtn_price";
@@ -62,6 +61,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private static final String CRT_NATIVE_PIXEL_COUNT = "crtn_pixcount";
 
     private static final String DFP_CRT_DISPLAY_URL = "crt_displayurl";
+    private static final String MOPUB_CRT_DISPLAY_URL = "crt_displayUrl";
+    private static final String MAP_CRT_DISPLAY_URL = "crt_displayUrl";
 
 
     private static final int SECOND_TO_MILLI = 1000;
@@ -200,7 +201,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     {
         Slot slot = getBidForAdUnitAndPrefetch(adUnit);
         if (slot != null && slot.isValid()) {
-            map.put(CRT_DISPLAY_URL, slot.getDisplayUrl());
+            map.put(MAP_CRT_DISPLAY_URL, slot.getDisplayUrl());
             map.put(CRT_CPM, slot.getCpm());
         }
     }
@@ -218,7 +219,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             keywords.append(":");
             keywords.append(slot.getCpm());
             keywords.append(",");
-            keywords.append(CRT_DISPLAY_URL);
+            keywords.append(MOPUB_CRT_DISPLAY_URL);
             keywords.append(":");
             keywords.append(slot.getDisplayUrl());
             ReflectionUtil.callMethodOnObject(object, "setKeywords", keywords.toString());
