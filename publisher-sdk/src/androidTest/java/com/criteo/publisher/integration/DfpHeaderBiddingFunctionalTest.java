@@ -14,7 +14,6 @@ import static org.junit.Assert.assertTrue;
 import android.os.Bundle;
 import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Criteo;
-import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.Util.WebViewLookup;

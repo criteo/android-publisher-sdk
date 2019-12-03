@@ -4,8 +4,9 @@ import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE;
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import android.os.Handler;
@@ -43,6 +44,7 @@ public class MoPubHeaderBiddingFunctionalTest {
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   private final BannerAdUnit validBannerAdUnit = TestAdUnits.BANNER_320_50;
+  private final BannerAdUnit invalidBannerAdUnit = TestAdUnits.BANNER_UNKNOWN;
   private final BannerAdUnit demoBannerAdUnit = TestAdUnits.BANNER_DEMO;
 
   private final WebViewLookup webViewLookup = new WebViewLookup();
@@ -57,6 +59,20 @@ public class MoPubHeaderBiddingFunctionalTest {
 
     assertTrue("Keywords should accept older keywords from outside",
         EXPECTED_KEYWORDS.matcher("previous keywords setup by someone,crt_cpm:1234.56,crt_displayUrl:http://my.super/creative").matches());
+  }
+
+  @Test
+  public void whenGettingBid_GivenValidCpIdAndPrefetchInvalidBannerId_MoPubKeywordsAreNotChange()
+      throws Exception {
+    givenInitializedCriteo(invalidBannerAdUnit);
+    waitForBids();
+
+    MoPubView moPubView = createMoPubView();
+    moPubView.setKeywords("old keywords");
+
+    Criteo.getInstance().setBidsForAdUnit(moPubView, invalidBannerAdUnit);
+
+    assertEquals("old keywords", moPubView.getKeywords());
   }
 
   @Test
