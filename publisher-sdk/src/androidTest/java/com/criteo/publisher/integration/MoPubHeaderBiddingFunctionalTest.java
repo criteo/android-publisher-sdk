@@ -4,6 +4,7 @@ import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE;
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -11,6 +12,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.Util.WebViewLookup;
@@ -41,6 +43,8 @@ public class MoPubHeaderBiddingFunctionalTest {
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   private final BannerAdUnit validBannerAdUnit = TestAdUnits.BANNER_320_50;
+  private final BannerAdUnit demoBannerAdUnit = TestAdUnits.BANNER_DEMO;
+
   private final WebViewLookup webViewLookup = new WebViewLookup();
 
   @Test
@@ -58,12 +62,25 @@ public class MoPubHeaderBiddingFunctionalTest {
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchValidBannerId_CriteoKeywordsAreInjectedInMoPubBuilder()
       throws Exception {
-    givenInitializedCriteo(validBannerAdUnit);
+    whenGettingBid_GivenValidCpIdAndPrefetchValidAdUnit_CriteoKeywordsAreInjectedInMoPubBuilder(
+        validBannerAdUnit);
+  }
+
+  @Test
+  public void whenGettingBid_GivenValidCpIdAndPrefetchDemoBannerId_CriteoKeywordsAreInjectedInMoPubBuilder()
+      throws Exception {
+    whenGettingBid_GivenValidCpIdAndPrefetchValidAdUnit_CriteoKeywordsAreInjectedInMoPubBuilder(
+        demoBannerAdUnit);
+  }
+
+  private void whenGettingBid_GivenValidCpIdAndPrefetchValidAdUnit_CriteoKeywordsAreInjectedInMoPubBuilder(
+      BannerAdUnit adUnit) throws CriteoInitException {
+    givenInitializedCriteo(adUnit);
     waitForBids();
 
     MoPubView moPubView = createMoPubView();
 
-    Criteo.getInstance().setBidsForAdUnit(moPubView, validBannerAdUnit);
+    Criteo.getInstance().setBidsForAdUnit(moPubView, adUnit);
 
     assertCriteoKeywordsAreInjectedInMoPubView(moPubView);
   }
@@ -91,6 +108,7 @@ public class MoPubHeaderBiddingFunctionalTest {
 
   private void assertCriteoKeywordsAreInjectedInMoPubView(MoPubView moPubView) {
     String keywords = moPubView.getKeywords();
+    assertNotNull(keywords);
 
     boolean isMatched = EXPECTED_KEYWORDS.matcher(keywords).matches();
     assertTrue(isMatched);
