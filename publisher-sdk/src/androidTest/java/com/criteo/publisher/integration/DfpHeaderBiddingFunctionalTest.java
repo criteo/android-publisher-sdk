@@ -1,6 +1,8 @@
 package com.criteo.publisher.integration;
 
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
+import static com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE;
+import static com.criteo.publisher.StubConstants.STUB_DISPLAY_URL;
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
 import static org.junit.Assert.assertEquals;
@@ -35,8 +37,6 @@ public class DfpHeaderBiddingFunctionalTest {
   private static final String MACRO_CPM = "crt_cpm";
   private static final String MACRO_DISPLAY_URL = "crt_displayurl";
 
-  private static final String STUB_DISPLAY_URL = "https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js";
-  private static final String STUB_CREATIVE_IMAGE = "https://publisherdirect.criteo.com/publishertag/preprodtest/creative.png";
   private static final String DFP_BANNER_ID = "/140800857/Endeavour_320x50";
 
   @Rule
@@ -144,13 +144,13 @@ public class DfpHeaderBiddingFunctionalTest {
     assertFalse(html.contains(STUB_CREATIVE_IMAGE));
   }
 
-  private String loadDfpHtmlBanner(BannerAdUnit demoBannerAdUnit) throws Exception {
-    givenInitializedCriteo(demoBannerAdUnit);
+  private String loadDfpHtmlBanner(BannerAdUnit adUnit) throws Exception {
+    givenInitializedCriteo(adUnit);
     waitForBids();
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().setBidsForAdUnit(builder, demoBannerAdUnit);
+    Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
 
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
     PublisherAdRequest request = builder.build();
