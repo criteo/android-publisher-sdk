@@ -1,8 +1,7 @@
 package com.criteo.publisher.Util;
 
-import static org.mockito.AdditionalAnswers.delegatesTo;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.MockableDependencyProvider;
@@ -11,8 +10,6 @@ import java.util.concurrent.Executor;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-import org.mockito.AdditionalAnswers;
-import org.mockito.Mockito;
 
 /**
  * Use this Rule when writing tests that require mocking global dependencies
@@ -31,10 +28,10 @@ public class MockedDependenciesRule implements TestRule {
           DependencyProvider originalDependencyProvider = DependencyProvider.getInstance();
           Executor oldExecutor = originalDependencyProvider.provideThreadPoolExecutor();
           trackingCommandsExecutor = new TrackingCommandsExecutor(oldExecutor);
-          dependencyProvider = mock(DependencyProvider.class, delegatesTo(originalDependencyProvider));
+          dependencyProvider = spy(originalDependencyProvider);
           MockableDependencyProvider.setInstance(dependencyProvider);
-          when(dependencyProvider.provideThreadPoolExecutor()).thenReturn(trackingCommandsExecutor);
-          when(dependencyProvider.provideSerialExecutor()).thenReturn(trackingCommandsExecutor);
+          doReturn(trackingCommandsExecutor).when(dependencyProvider).provideThreadPoolExecutor();
+          doReturn(trackingCommandsExecutor).when(dependencyProvider).provideSerialExecutor();
           base.evaluate();
         }
       };
