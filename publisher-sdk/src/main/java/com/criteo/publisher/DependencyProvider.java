@@ -76,4 +76,9 @@ public class DependencyProvider {
   public Config provideConfig(Context context) {
     return new Config(context);
   }
+
+  @NonNull
+  public Clock provideClock() {
+    return new EpochClock();
+  }
 }

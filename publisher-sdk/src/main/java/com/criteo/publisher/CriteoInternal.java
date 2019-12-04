@@ -63,6 +63,8 @@ final class CriteoInternal extends Criteo {
     this.deviceInfo = new DeviceInfo();
     config = DependencyProvider.getInstance().provideConfig(context);
 
+    Clock clock = DependencyProvider.getInstance().provideClock();
+
     this.bidManager = new BidManager(
         context,
         criteoPublisherId,
@@ -72,10 +74,11 @@ final class CriteoInternal extends Criteo {
         androidUtil,
         deviceUtil,
         DependencyProvider.getInstance().provideLoggingUtil(),
-        advertisingInfo
+        advertisingInfo,
+        clock
     );
 
-    this.appEvents = new AppEvents(context, deviceUtil);
+    this.appEvents = new AppEvents(context, deviceUtil, clock);
     this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
 
     deviceInfo.initialize(context, new UserAgentCallback() {

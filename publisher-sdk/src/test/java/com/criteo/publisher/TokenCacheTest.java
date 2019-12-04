@@ -1,5 +1,7 @@
 package com.criteo.publisher;
 
+import static org.mockito.Mockito.when;
+
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
@@ -9,9 +11,11 @@ import java.util.UUID;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 public class TokenCacheTest {
-
     private static final String TEST_CREATIVE = "https://rdi.us.criteo.com/delivery/r/ajs.php?did=5c87fcdb7cc0d71b24ee2ee6454eb810&u=%7CvsLBMQ0Ek4IxXQb0B5n7RyCAQymjqwh29YhNM9EzK9Q%3D%7C&c1=fYGSyyN4O4mkT2ynhzfwbdpiG7v0SMGpms6Tk24GWc957HzbzgL1jw-HVL5D0BjRx5ef3wBVfDXXmh9StLy8pf5kDJtrQLTLQrexjq5CZt9tEDx9mY8Y-eTV19PWOQoNjXkJ4_mhKqV0IfwHDIfLVDBWmsizVCoAtU1brQ2weeEkUU5-mDfn3qzTX3jPXszef5bC3pbiLJAK3QamQlglD1dkWYOkUwLAXxMjr2MXeBQk2YK-_qYz0fMVJG0xWJ-jVmsqdOw9A9rkGIgToRoUewB0VAu5eSkjSBoGs4yEbsnJ5Ssq5fquJMNvm6T77b8fzQI-eXgwoEfKkdAuCbj3gNrPBgzGZAJPGO-TYvJgs22Bljy-hNCk1E0E030zLtKo-XvAVRvZ5PswtwoccPSl6u1wiV8fMCXHx9QW9-fdXaVxzZe9AZB6w7pHxKUwiRK9";
 
     private TokenCache tokenCache;
@@ -20,9 +24,12 @@ public class TokenCacheTest {
     private InterstitialAdUnit interstitialAdUnit1;
     private InterstitialAdUnit interstitialAdUnit2;
 
+    @Mock
+    private Clock clock;
 
     @Before
     public void prepare() {
+        MockitoAnnotations.initMocks(this);
         tokenCache = new TokenCache();
         bannerAdUnit1 = new BannerAdUnit("banneradUnitId1", new AdSize(320, 50));
         interstitialAdUnit1 = new InterstitialAdUnit("interstitialadUnitId1");
@@ -35,13 +42,13 @@ public class TokenCacheTest {
         interstitialAdUnit2 = new InterstitialAdUnit("interstitialadUnitId2");
 
         TokenValue tokenForBanner1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE,
-                AdUnitType.CRITEO_BANNER);
+                AdUnitType.CRITEO_BANNER, clock);
         TokenValue tokenForBanner2 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE,
-                AdUnitType.CRITEO_BANNER);
+                AdUnitType.CRITEO_BANNER, clock);
         TokenValue tokenForInterstitial1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE,
-                AdUnitType.CRITEO_INTERSTITIAL);
+                AdUnitType.CRITEO_INTERSTITIAL, clock);
         TokenValue tokenForInterstitial2 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE,
-                AdUnitType.CRITEO_INTERSTITIAL);
+                AdUnitType.CRITEO_INTERSTITIAL, clock);
 
         BidToken bidTokenForBanner1 = tokenCache.add(tokenForBanner1, bannerAdUnit1);
         BidToken bidTokenForBanner2 = tokenCache.add(tokenForBanner2, bannerAdUnit2);
@@ -58,10 +65,15 @@ public class TokenCacheTest {
 
     @Test
     public void testReturnNullWhenTokenExpired() {
-        TokenValue tokenForBanner1 = new TokenValue(System.currentTimeMillis(), -1, TEST_CREATIVE,
-                AdUnitType.CRITEO_BANNER);
-        TokenValue tokenForInterstitial1 = new TokenValue(System.currentTimeMillis(), -1, TEST_CREATIVE,
-                AdUnitType.CRITEO_INTERSTITIAL);
+        long  bidTime = System.currentTimeMillis();
+        int bidTtlInSeconds = 100;
+        when(clock.getCurrentTimeInMillis()).thenReturn(bidTime + bidTtlInSeconds * 1000 + 1);
+
+        TokenValue tokenForBanner1 = new TokenValue(bidTime, bidTtlInSeconds, TEST_CREATIVE,
+                AdUnitType.CRITEO_BANNER, clock);
+
+        TokenValue tokenForInterstitial1 = new TokenValue(bidTime, bidTtlInSeconds, TEST_CREATIVE,
+                AdUnitType.CRITEO_INTERSTITIAL, clock);
 
         BidToken bidTokenForBanner1 = tokenCache.add(tokenForBanner1, bannerAdUnit1);
         BidToken bidTokenForInterstitial1 = tokenCache.add(tokenForInterstitial1, interstitialAdUnit1);
@@ -73,9 +85,9 @@ public class TokenCacheTest {
     @Test
     public void testReturnNullWhenWrongAdUnitType() {
         TokenValue tokenForBanner1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE,
-                AdUnitType.CRITEO_BANNER);
+                AdUnitType.CRITEO_BANNER, clock);
         TokenValue tokenForInterstitial1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE,
-                AdUnitType.CRITEO_INTERSTITIAL);
+                AdUnitType.CRITEO_INTERSTITIAL, clock);
 
         BidToken bidTokenForBanner1 = tokenCache.add(tokenForBanner1, bannerAdUnit1);
         BidToken bidTokenForInterstitial1 = tokenCache.add(tokenForInterstitial1, bannerAdUnit1);
@@ -90,13 +102,13 @@ public class TokenCacheTest {
         interstitialAdUnit2 = new InterstitialAdUnit("interstitialadUnitId2");
 
         TokenValue tokenForBanner1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE,
-                AdUnitType.CRITEO_BANNER);
+                AdUnitType.CRITEO_BANNER, clock);
         TokenValue tokenForBanner2 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE,
-                AdUnitType.CRITEO_BANNER);
+                AdUnitType.CRITEO_BANNER, clock);
         TokenValue tokenForInterstitial1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE,
-                AdUnitType.CRITEO_INTERSTITIAL);
+                AdUnitType.CRITEO_INTERSTITIAL, clock);
         TokenValue tokenForInterstitial2 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE,
-                AdUnitType.CRITEO_INTERSTITIAL);
+                AdUnitType.CRITEO_INTERSTITIAL, clock);
 
         BidToken bidTokenForBanner2 = tokenCache.add(tokenForBanner2, bannerAdUnit2);
         BidToken bidTokenForInterstitial2 = tokenCache.add(tokenForInterstitial2, interstitialAdUnit2);
@@ -109,9 +121,9 @@ public class TokenCacheTest {
     @Test
     public void testGetTokenForBidAndGetValueForTokenCheckNull() {
         TokenValue tokenForBanner1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE,
-                AdUnitType.CRITEO_BANNER);
+                AdUnitType.CRITEO_BANNER, clock);
         TokenValue tokenForInterstitial1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE,
-                AdUnitType.CRITEO_INTERSTITIAL);
+                AdUnitType.CRITEO_INTERSTITIAL, clock);
 
         BidToken bidTokenForBanner1 = tokenCache.add(tokenForBanner1, bannerAdUnit1);
         BidToken bidTokenForInterstitial1 = tokenCache.add(tokenForInterstitial1, interstitialAdUnit1);

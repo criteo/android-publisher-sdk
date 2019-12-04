@@ -59,11 +59,9 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private static final String CRT_NATIVE_PR_TEXT = "crtn_prtext";
     private static final String CRT_NATIVE_PIXEL_URL = "crtn_pixurl_";
     private static final String CRT_NATIVE_PIXEL_COUNT = "crtn_pixcount";
-
     private static final String DFP_CRT_DISPLAY_URL = "crt_displayurl";
     private static final String MOPUB_CRT_DISPLAY_URL = "crt_displayUrl";
     private static final String MAP_CRT_DISPLAY_URL = "crt_displayUrl";
-
 
     private static final int SECOND_TO_MILLI = 1000;
     private static final int PROFILE_ID = 235;
@@ -81,6 +79,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private final LoggingUtil loggingUtil;
     private final Config config;
     private final AdvertisingInfo advertisingInfo;
+    private final Clock clock;
 
     BidManager(
         @NonNull Context context,
@@ -91,7 +90,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         @NonNull AndroidUtil androidUtil,
         @NonNull DeviceUtil deviceUtil,
         @NonNull LoggingUtil loggingUtil,
-        @NonNull AdvertisingInfo advertisingInfo
+        @NonNull AdvertisingInfo advertisingInfo,
+        @NonNull Clock clock
     ) {
         this(
             context,
@@ -106,7 +106,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
     }
 
@@ -124,7 +125,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         @NonNull AndroidUtil androidUtil,
         @NonNull DeviceUtil deviceUtil,
         @NonNull LoggingUtil loggingUtil,
-        @NonNull AdvertisingInfo advertisingInfo
+        @NonNull AdvertisingInfo advertisingInfo,
+        @NonNull Clock clock
     ) {
         this.mContext = context;
         this.publisher = publisher;
@@ -139,6 +141,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         this.deviceUtil = deviceUtil;
         this.loggingUtil = loggingUtil;
         this.advertisingInfo = advertisingInfo;
+        this.clock = clock;
     }
 
     /**
@@ -149,7 +152,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             return;
         }
 
-        if (cdbTimeToNextCall < System.currentTimeMillis()) {
+        if (cdbTimeToNextCall < clock.getCurrentTimeInMillis()) {
             ArrayList<CacheAdUnit> cacheAdUnitsForPrefetch = new ArrayList<>();
             cacheAdUnitsForPrefetch.add(cacheAdUnit);
             startCdbDownloadTask(false, cacheAdUnitsForPrefetch);
@@ -322,7 +325,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         //If cpm is 0, ttl in slot > 0
         // we will stay silent until ttl expires;
         else if (cpm == 0 && ttl > 0
-                && expiryTimeMillis > System.currentTimeMillis()) {
+                && expiryTimeMillis > clock.getCurrentTimeInMillis()) {
             return null;
         } else {
             //If cpm > 0, ttl > 0 but we are done staying silent
@@ -353,7 +356,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
     @Override
     public void setTimeToNextCall(int seconds) {
-        this.cdbTimeToNextCall = System.currentTimeMillis() + seconds * 1000;
+        this.cdbTimeToNextCall = clock.getCurrentTimeInMillis() + seconds * 1000;
     }
 
     @Override
@@ -369,19 +372,22 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     public BidResponse getBidForInhouseMediation(AdUnit adUnit) {
         BidResponse bidResponse = new BidResponse();
         Slot slot = this.getBidForAdUnitAndPrefetch(adUnit);
-        if (slot != null && slot.isValid()) {
 
-            TokenValue tokenValue = new TokenValue(slot.getTimeOfDownload(), slot.getTtl(), slot.getDisplayUrl(),
-                    adUnit.getAdUnitType());
+        if (slot != null && slot.isValid()) {
+            TokenValue tokenValue = new TokenValue(
+                slot.getTimeOfDownload(),
+                slot.getTtl(),
+                slot.getDisplayUrl(),
+                adUnit.getAdUnitType(),
+                clock
+            );
 
             double price = slot.getCpmAsNumber();
-
             bidResponse = new BidResponse(price, tokenCache.add(tokenValue, adUnit), true);
         }
 
         return bidResponse;
     }
-
 
     /**
      * This method is called back after the "useragent" is fetched

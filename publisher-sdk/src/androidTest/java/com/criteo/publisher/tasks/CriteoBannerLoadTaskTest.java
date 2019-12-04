@@ -38,7 +38,6 @@ public class CriteoBannerLoadTaskTest {
     private static final String PLACEMENT_ID = "placementId";
     private static final String displayUrl = "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script src=\"https://www.criteo.com\"></script></body></html>";
 
-
     @Mock
     private CriteoBannerAdListener criteoBannerAdListener;
 
@@ -116,7 +115,7 @@ public class CriteoBannerLoadTaskTest {
     @Test
     public void testWithValidTokenValue() throws InterruptedException {
         TokenValue tokenValue = new TokenValue(System.currentTimeMillis(), 500, "https://www.criteo.com",
-                AdUnitType.CRITEO_BANNER);
+                AdUnitType.CRITEO_BANNER, mockedDependenciesRule.getDependencyProvider().provideClock());
         criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, new WebViewClient(), config);
         criteoBannerLoadTask.execute(tokenValue);
 

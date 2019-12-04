@@ -80,6 +80,9 @@ public class BidManagerTests {
     @Mock
     private LoggingUtil loggingUtil;
 
+    @Mock
+    private Clock clock;
+
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
@@ -151,7 +154,8 @@ public class BidManagerTests {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
 
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
@@ -180,7 +184,8 @@ public class BidManagerTests {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
 
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
@@ -209,7 +214,8 @@ public class BidManagerTests {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
 
         //test
@@ -235,7 +241,8 @@ public class BidManagerTests {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
 
         //test
@@ -262,7 +269,8 @@ public class BidManagerTests {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
 
         BidResponse expectedResponse = new BidResponse();
@@ -297,7 +305,8 @@ public class BidManagerTests {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
 
         BidResponse expectedResponse = new BidResponse(0.10d,
@@ -333,7 +342,8 @@ public class BidManagerTests {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
 
         BannerAdUnit bannerAdUnit = new BannerAdUnit(adUnitId, new AdSize(320,50));
@@ -379,7 +389,8 @@ public class BidManagerTests {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
 
         BannerAdUnit bannerAdUnit = new BannerAdUnit(adUnitId, new AdSize(320,50));

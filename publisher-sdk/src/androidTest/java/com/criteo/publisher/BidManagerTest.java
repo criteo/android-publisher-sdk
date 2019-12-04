@@ -18,6 +18,7 @@ import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.LoggingUtil;
+import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
@@ -41,6 +42,7 @@ import junit.framework.Assert;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -48,6 +50,8 @@ import org.mockito.MockitoAnnotations;
 
 @RunWith(AndroidJUnit4.class)
 public class BidManagerTest {
+    @Rule
+    public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
     private static final String CRT_CPM = "crt_cpm";
     private static final String CRT_NATIVE_TITLE = "crtn_title";
@@ -97,6 +101,8 @@ public class BidManagerTest {
     @Mock
     private LoggingUtil loggingUtil;
 
+    private Clock clock;
+
     private DeviceUtil deviceUtil;
 
     private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
@@ -116,6 +122,7 @@ public class BidManagerTest {
         config = new Config(context);
         placementsWithCdbTasks = new Hashtable<>();
         MockitoAnnotations.initMocks(this);
+        clock = mockedDependenciesRule.getDependencyProvider().provideClock();
     }
 
     @Test
@@ -150,7 +157,8 @@ public class BidManagerTest {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
 
         AdSize adSize = new AdSize(320, 50);
@@ -186,7 +194,8 @@ public class BidManagerTest {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
         manager.prefetch();
         CdbDownloadTask cdbDownloadTask1 = placementsWithCdbTasks.get(cacheAdUnit1);
@@ -227,7 +236,8 @@ public class BidManagerTest {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
 
         manager.setCacheAdUnits(slots);
@@ -258,7 +268,8 @@ public class BidManagerTest {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
         List<Slot> slots = new ArrayList<>();
         Slot slot1 = new Slot();
@@ -305,7 +316,8 @@ public class BidManagerTest {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
 
         List<Slot> slots = new ArrayList<>();
@@ -373,7 +385,8 @@ public class BidManagerTest {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
 
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
@@ -425,7 +438,8 @@ public class BidManagerTest {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
 
         //mocking response by setting slots
@@ -455,7 +469,8 @@ public class BidManagerTest {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
 
         manager.setCacheAdUnits(slots);
@@ -487,7 +502,8 @@ public class BidManagerTest {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
 
         manager.setCacheAdUnits(slots);
@@ -525,7 +541,8 @@ public class BidManagerTest {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
 
         manager.setCacheAdUnits(slots);
@@ -581,7 +598,8 @@ public class BidManagerTest {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
 
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
@@ -673,7 +691,8 @@ public class BidManagerTest {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
 
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
@@ -774,7 +793,8 @@ public class BidManagerTest {
             androidUtil,
             deviceUtil,
             loggingUtil,
-            advertisingInfo
+            advertisingInfo,
+            clock
         );
 
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();

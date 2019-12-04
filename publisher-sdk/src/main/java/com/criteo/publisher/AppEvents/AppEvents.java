@@ -3,6 +3,7 @@ package com.criteo.publisher.AppEvents;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import com.criteo.publisher.Clock;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.Util.AppEventResponseListener;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
@@ -22,19 +23,22 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
     private long throttleSetTime = 0;
 
     private final DeviceUtil deviceUtil;
+    private final Clock clock;
 
     public AppEvents(
         @NonNull Context context,
-        @NonNull DeviceUtil deviceUtil
+        @NonNull DeviceUtil deviceUtil,
+        @NonNull Clock clock
     ) {
         this.mContext = context;
         this.deviceUtil = deviceUtil;
+        this.clock = clock;
         this.eventTask = new AppEventTask(mContext, this, deviceUtil);
     }
 
     private void postAppEvent(String eventType) {
         if (appEventThrottle > 0 &&
-                System.currentTimeMillis() - throttleSetTime < appEventThrottle * 1000) {
+                clock.getCurrentTimeInMillis() - throttleSetTime < appEventThrottle * 1000) {
             return;
         }
         if (eventTask.getStatus() == AsyncTask.Status.FINISHED) {
@@ -49,7 +53,7 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
     @Override
     public void setThrottle(int throttle) {
         this.appEventThrottle = throttle;
-        this.throttleSetTime = System.currentTimeMillis();
+        this.throttleSetTime = clock.getCurrentTimeInMillis();
     }
 
     public void sendLaunchEvent() {
