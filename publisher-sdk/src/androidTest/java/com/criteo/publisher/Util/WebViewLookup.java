@@ -5,6 +5,8 @@ import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -12,7 +14,7 @@ import java.util.concurrent.Future;
 
 public class WebViewLookup {
 
-  private static final String GET_OUTER_HTML = "(function() { return document.getElementsByTagName('html')[0].outerHTML; })();";
+  private static final String GET_OUTER_HTML = "(function() { return encodeURI(document.getElementsByTagName('html')[0].outerHTML); })();";
 
   /**
    * Look inside the given view for {@link android.webkit.WebView}.
@@ -36,11 +38,22 @@ public class WebViewLookup {
     } else {
       WebView webView = webViews.get(0);
       runOnMainThreadAndWait(() -> {
-        webView.evaluateJavascript(GET_OUTER_HTML, future::complete);
+        webView.evaluateJavascript(GET_OUTER_HTML, value -> {
+          try {
+            future.complete(decodeHtmlString(value));
+          } catch (UnsupportedEncodingException e) {
+            future.completeExceptionally(e);
+          }
+        });
       });
     }
 
     return future;
+  }
+
+  private String decodeHtmlString(String value) throws UnsupportedEncodingException {
+    String htmlWithoutQuotes = value.substring(1, value.length() - 1);
+    return URLDecoder.decode(htmlWithoutQuotes, "UTF-8");
   }
 
   private List<WebView> lookForWebViews(View root) {

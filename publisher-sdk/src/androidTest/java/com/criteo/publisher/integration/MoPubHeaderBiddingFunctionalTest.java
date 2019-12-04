@@ -17,7 +17,10 @@ import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.Util.WebViewLookup;
+import com.criteo.publisher.mock.ResultCaptor;
+import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.model.Cdb;
 import com.mopub.common.MoPub;
 import com.mopub.common.SdkConfiguration;
 import com.mopub.common.logging.MoPubLog.LogLevel;
@@ -103,7 +106,24 @@ public class MoPubHeaderBiddingFunctionalTest {
 
   @Test
   public void loadingMoPubBanner_GivenValidBanner_MoPubViewContainsCreative() throws Exception {
-    givenInitializedCriteo(validBannerAdUnit);
+    String html = loadMoPubHtmlCreative(validBannerAdUnit);
+
+    assertTrue(html.contains(STUB_CREATIVE_IMAGE));
+  }
+
+  @Test
+  public void loadingMoPubBanner_GivenDemoBanner_MoPubViewContainsDemoCreative() throws Exception {
+    ResultCaptor<Cdb> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
+
+    String html = loadMoPubHtmlCreative(demoBannerAdUnit);
+
+    String displayUrl = cdbResultCaptor.getLastCaptureValue().getSlots().get(0).getDisplayUrl();
+    assertTrue(html.contains(displayUrl));
+  }
+
+  private String loadMoPubHtmlCreative(AdUnit adUnit)
+      throws CriteoInitException, InterruptedException, java.util.concurrent.ExecutionException {
+    givenInitializedCriteo(adUnit);
     waitForBids();
 
     givenInitializedMoPub();
@@ -111,15 +131,13 @@ public class MoPubHeaderBiddingFunctionalTest {
     MoPubView moPubView = createMoPubView();
     moPubView.setAdUnitId(MOPUB_BANNER_ID);
 
-    Criteo.getInstance().setBidsForAdUnit(moPubView, validBannerAdUnit);
+    Criteo.getInstance().setBidsForAdUnit(moPubView, adUnit);
 
     MoPubSync moPubSync = new MoPubSync(moPubView);
     runOnMainThreadAndWait(moPubView::loadAd);
     moPubSync.waitForBid();
 
-    String html = webViewLookup.lookForHtmlContent(moPubView).get();
-
-    assertTrue(html.contains(STUB_CREATIVE_IMAGE));
+    return webViewLookup.lookForHtmlContent(moPubView).get();
   }
 
   private void assertCriteoKeywordsAreInjectedInMoPubView(MoPubView moPubView) {

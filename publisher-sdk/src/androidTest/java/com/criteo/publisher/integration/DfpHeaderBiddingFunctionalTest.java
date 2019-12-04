@@ -17,7 +17,9 @@ import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.Util.WebViewLookup;
+import com.criteo.publisher.mock.ResultCaptor;
 import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.model.Cdb;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
@@ -128,12 +130,17 @@ public class DfpHeaderBiddingFunctionalTest {
 
   @Test
   public void loadingDfpBanner_GivenDemoBanner_DfpViewContainsCreative() throws Exception {
+    ResultCaptor<Cdb> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
+
     String html = loadDfpHtmlBanner(demoBannerAdUnit);
 
-    // The demo creative is a true Criteo creative with a lot of iframe, generated code, ...
-    // It's hard to have a deterministic element inside. Trying to get this ID should be sufficient
-    // to determine if the creative was well loaded.
-    assertTrue(html.contains("#cto_banner_content"));
+    // The DFP webview replace the & by &amp; in attribute values.
+    // So we need to replace them back in order to compare its content to our display URL.
+    // This is valid HTML. See https://www.w3.org/TR/xhtml1/guidelines.html#C_12
+    html = html.replace("&amp;", "&");
+
+    String displayUrl = cdbResultCaptor.getLastCaptureValue().getSlots().get(0).getDisplayUrl();
+    assertTrue(html.contains(displayUrl));
   }
 
   @Test
