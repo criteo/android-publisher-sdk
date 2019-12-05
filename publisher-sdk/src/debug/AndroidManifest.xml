@@ -4,6 +4,10 @@
 
   <application>
     <activity android:name="com.criteo.publisher.test.activity.DummyActivity"/>
+
+    <activity
+      android:configChanges="keyboardHidden|orientation|screenSize"
+      android:name="com.mopub.mobileads.MoPubActivity"/>
   </application>
 
 </manifest>

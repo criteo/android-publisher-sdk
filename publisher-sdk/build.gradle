@@ -75,6 +75,11 @@ dependencies {
     androidTestImplementation('com.mopub:mopub-sdk-banner:5.6.0@aar') {
         transitive = true
     }
+
+    // Debug is needed because MoPub need some activities to be declare in the AndroidManifest.xml
+    debugImplementation('com.mopub:mopub-sdk-interstitial:5.6.0@aar') {
+        transitive = true
+    }
 }
 
 // Define artifacts to publish to Nexus

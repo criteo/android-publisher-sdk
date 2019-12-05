@@ -1,7 +1,15 @@
 package com.criteo.publisher.Util;
 
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
+import static org.mockito.AdditionalAnswers.answerVoid;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 
+import android.app.Activity;
+import android.app.Application;
+import android.app.Application.ActivityLifecycleCallbacks;
+import android.support.test.InstrumentationRegistry;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
@@ -10,11 +18,17 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class WebViewLookup {
 
   private static final String GET_OUTER_HTML = "(function() { return encodeURI(document.getElementsByTagName('html')[0].outerHTML); })();";
+
+  private final ExecutorService executor = Executors.newWorkStealingPool();
 
   /**
    * Look inside the given view for {@link android.webkit.WebView}.
@@ -68,6 +82,30 @@ public class WebViewLookup {
     return views;
   }
 
+  public Future<View> lookForResumedActivityView(CheckedRunnable action) {
+    BlockingQueue<Activity> queue = new LinkedBlockingQueue<>(1);
+    ActivityLifecycleCallbacks lifecycleCallbacks = mock(ActivityLifecycleCallbacks.class);
+    doAnswer(answerVoid(queue::put)).when(lifecycleCallbacks).onActivityResumed(any());
+
+    Application application = (Application) InstrumentationRegistry.getTargetContext()
+        .getApplicationContext();
+    application.registerActivityLifecycleCallbacks(lifecycleCallbacks);
+
+    executor.submit(() -> {
+      action.run();
+      return null;
+    });
+
+    return executor.submit(() -> {
+      try {
+        Activity activity = queue.take();
+        return activity.getWindow().getDecorView().getRootView();
+      } finally {
+        application.unregisterActivityLifecycleCallbacks(lifecycleCallbacks);
+      }
+    });
+  }
+
   private void traverse(View root, Processor processor) {
     processor.process(root);
 
@@ -80,6 +118,10 @@ public class WebViewLookup {
         traverse(child, processor);
       }
     }
+  }
+
+  public interface CheckedRunnable {
+    void run() throws Exception;
   }
 
   private interface Processor {
