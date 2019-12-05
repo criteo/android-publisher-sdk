@@ -12,6 +12,7 @@ import static org.junit.Assert.assertTrue;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.test.InstrumentationRegistry;
+import android.webkit.WebView;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.TestAdUnits;
@@ -27,6 +28,7 @@ import com.mopub.common.logging.MoPubLog.LogLevel;
 import com.mopub.mobileads.DefaultBannerAdListener;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubView;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
@@ -121,8 +123,23 @@ public class MoPubHeaderBiddingFunctionalTest {
     assertTrue(html.contains(displayUrl));
   }
 
+  @Test
+  public void loadingMoPubBanner_GivenInvalidBanner_MoPubViewDoesNotContainWebView() throws Exception {
+    MoPubView moPubView = loadMoPubAd(invalidBannerAdUnit);
+
+    List<WebView> webViews = webViewLookup.lookForWebViews(moPubView);
+
+    assertTrue(webViews.isEmpty());
+  }
+
   private String loadMoPubHtmlCreative(AdUnit adUnit)
       throws CriteoInitException, InterruptedException, java.util.concurrent.ExecutionException {
+    MoPubView moPubView = loadMoPubAd(adUnit);
+
+    return webViewLookup.lookForHtmlContent(moPubView).get();
+  }
+
+  private MoPubView loadMoPubAd(AdUnit adUnit) throws CriteoInitException, InterruptedException {
     givenInitializedCriteo(adUnit);
     waitForBids();
 
@@ -137,7 +154,7 @@ public class MoPubHeaderBiddingFunctionalTest {
     runOnMainThreadAndWait(moPubView::loadAd);
     moPubSync.waitForBid();
 
-    return webViewLookup.lookForHtmlContent(moPubView).get();
+    return moPubView;
   }
 
   private void assertCriteoKeywordsAreInjectedInMoPubView(MoPubView moPubView) {

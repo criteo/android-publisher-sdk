@@ -56,7 +56,7 @@ public class WebViewLookup {
     return URLDecoder.decode(htmlWithoutQuotes, "UTF-8");
   }
 
-  private List<WebView> lookForWebViews(View root) {
+  public List<WebView> lookForWebViews(View root) {
     List<WebView> views = new ArrayList<>();
 
     traverse(root, view -> {
