@@ -15,10 +15,11 @@ import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.Cdb;
+import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
-import java.util.Arrays;
 import java.util.Collections;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,9 +30,20 @@ public class CriteoFunctionalTest {
   public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
 
   private final BannerAdUnit validBannerAdUnit = TestAdUnits.BANNER_320_50;
+  private final InterstitialAdUnit validInterstitialAdUnit = TestAdUnits.INTERSTITIAL;
 
   @Test
   public void init_GivenPrefetchCachedBannerAndReInitWithSameBanner_CdbIsNotCallTheSecondTime() throws Exception {
+    init_GivenPrefetchCachedAdAndReInitWithSameAdUnit_CdbIsNotCallTheSecondTime(validBannerAdUnit);
+  }
+
+  @Test
+  public void init_GivenPrefetchCachedInterstitialAndReInitWithSameInterstitial_CdbIsNotCallTheSecondTime() throws Exception {
+    init_GivenPrefetchCachedAdAndReInitWithSameAdUnit_CdbIsNotCallTheSecondTime(validInterstitialAdUnit);
+  }
+
+  private void init_GivenPrefetchCachedAdAndReInitWithSameAdUnit_CdbIsNotCallTheSecondTime(AdUnit adUnit)
+      throws Exception {
     PubSdkApi api = spy(PubSdkApi.getInstance());
     when(mockedDependenciesRule.getDependencyProvider().providePubSdkApi()).thenReturn(api);
 
@@ -46,12 +58,12 @@ public class CriteoFunctionalTest {
       return cdbResponse;
     }).when(api).loadCdb(any(), any(), any());
 
-    givenInitializedCriteo(validBannerAdUnit);
+    givenInitializedCriteo(adUnit);
     waitForBids();
 
     Application app = (Application) InstrumentationRegistry.getTargetContext()
         .getApplicationContext();
-    Criteo.init(app, TEST_CP_ID, Collections.singletonList(validBannerAdUnit));
+    Criteo.init(app, TEST_CP_ID, Collections.singletonList(adUnit));
     waitForBids();
 
     verify(api, times(1)).loadCdb(any(), any(), any());
