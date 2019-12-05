@@ -18,8 +18,10 @@ import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.Util.WebViewLookup;
 import com.criteo.publisher.mock.ResultCaptor;
+import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.Cdb;
+import com.criteo.publisher.model.InterstitialAdUnit;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
@@ -46,6 +48,8 @@ public class DfpHeaderBiddingFunctionalTest {
   private final BannerAdUnit validBannerAdUnit = TestAdUnits.BANNER_320_50;
   private final BannerAdUnit invalidBannerAdUnit = TestAdUnits.BANNER_UNKNOWN;
   private final BannerAdUnit demoBannerAdUnit = TestAdUnits.BANNER_DEMO;
+
+  private final InterstitialAdUnit validInterstitialAdUnit = TestAdUnits.INTERSTITIAL;
 
   private final WebViewLookup webViewLookup = new WebViewLookup();
 
@@ -99,12 +103,26 @@ public class DfpHeaderBiddingFunctionalTest {
   @Test
   public void whenEnrichingDisplayUrl_GivenValidCpIdAndPrefetchBannerId_DisplayUrlIsEncodedInASpecificManner()
       throws Exception {
-    givenInitializedCriteo(validBannerAdUnit);
+    whenEnrichingDisplayUrl_GivenValidCpIdAndPrefetchAdUnit_DisplayUrlIsEncodedInASpecificManner(
+        validBannerAdUnit);
+  }
+
+  @Test
+  public void whenEnrichingDisplayUrl_GivenValidCpIdAndPrefetchInterstitialId_DisplayUrlIsEncodedInASpecificManner()
+      throws Exception {
+    whenEnrichingDisplayUrl_GivenValidCpIdAndPrefetchAdUnit_DisplayUrlIsEncodedInASpecificManner(
+        validInterstitialAdUnit);
+  }
+
+  private void whenEnrichingDisplayUrl_GivenValidCpIdAndPrefetchAdUnit_DisplayUrlIsEncodedInASpecificManner(
+      AdUnit adUnit)
+      throws Exception {
+    givenInitializedCriteo(adUnit);
     waitForBids();
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().setBidsForAdUnit(builder, validBannerAdUnit);
+    Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
 
     String encodedDisplayUrl = builder.build().getCustomTargeting().getString(MACRO_DISPLAY_URL);
 
