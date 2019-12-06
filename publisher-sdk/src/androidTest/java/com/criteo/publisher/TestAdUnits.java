@@ -30,6 +30,10 @@ public class TestAdUnits {
   public static final InterstitialAdUnit INTERSTITIAL = new InterstitialAdUnit(
       "test-PubSdk-Interstitial");
 
-  public static final InterstitialAdUnit INTERSTITIAL_DEMO = new InterstitialAdUnit("6yws53jyfjgoq1ghnuqb");
+  public static final InterstitialAdUnit INTERSTITIAL_UNKNOWN = new InterstitialAdUnit(
+      "test-PubSdk-Unknown");
+
+  public static final InterstitialAdUnit INTERSTITIAL_DEMO = new InterstitialAdUnit(
+      "6yws53jyfjgoq1ghnuqb");
 
 }

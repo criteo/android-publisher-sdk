@@ -61,6 +61,8 @@ public class MoPubHeaderBiddingFunctionalTest {
   private final BannerAdUnit validBannerAdUnit = TestAdUnits.BANNER_320_50;
   private final BannerAdUnit invalidBannerAdUnit = TestAdUnits.BANNER_UNKNOWN;
   private final BannerAdUnit demoBannerAdUnit = TestAdUnits.BANNER_DEMO;
+
+  private final InterstitialAdUnit invalidInterstitialAdUnit = TestAdUnits.INTERSTITIAL_UNKNOWN;
   private final InterstitialAdUnit demoInterstitialAdUnit = TestAdUnits.INTERSTITIAL_DEMO;
 
   private final WebViewLookup webViewLookup = new WebViewLookup();
@@ -92,6 +94,20 @@ public class MoPubHeaderBiddingFunctionalTest {
     Criteo.getInstance().setBidsForAdUnit(moPubView, invalidBannerAdUnit);
 
     assertEquals("old keywords", moPubView.getKeywords());
+  }
+
+  @Test
+  public void whenGettingBid_GivenValidCpIdAndPrefetchInvalidInterstitialId_MoPubKeywordsAreNotChange()
+      throws Exception {
+    givenInitializedCriteo(invalidInterstitialAdUnit);
+    waitForBids();
+
+    MoPubInterstitial moPubInterstitial = createMoPubInterstitial();
+    moPubInterstitial.setKeywords("old keywords");
+
+    Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, invalidInterstitialAdUnit);
+
+    assertEquals("old keywords", moPubInterstitial.getKeywords());
   }
 
   @Test
@@ -170,6 +186,14 @@ public class MoPubHeaderBiddingFunctionalTest {
     assertTrue(webViews.isEmpty());
   }
 
+  @Test
+  public void loadingMoPubBanner_GivenInvalidInterstitial_MoPubViewIsNotReady()
+      throws Exception {
+    MoPubInterstitial moPubInterstitial = loadMoPubInterstitial(invalidInterstitialAdUnit);
+
+    assertFalse(moPubInterstitial.isReady());
+  }
+
   private String loadMoPubHtmlBanner(BannerAdUnit adUnit)
       throws Exception {
     MoPubView moPubView = loadMoPubBanner(adUnit);
@@ -180,7 +204,7 @@ public class MoPubHeaderBiddingFunctionalTest {
   private String loadMoPubHtmlInterstitial(InterstitialAdUnit adUnit)
       throws Exception {
     View moPubView = webViewLookup.lookForResumedActivityView(() -> {
-      loadAndShowMoPubInterstitial(adUnit);
+      loadMoPubInterstitial(adUnit).show();
     }).get();
 
     return webViewLookup.lookForHtmlContent(moPubView).get();
@@ -203,7 +227,7 @@ public class MoPubHeaderBiddingFunctionalTest {
     return moPubView;
   }
 
-  private void loadAndShowMoPubInterstitial(InterstitialAdUnit adUnit) throws Exception {
+  private MoPubInterstitial loadMoPubInterstitial(InterstitialAdUnit adUnit) throws Exception {
     givenInitializedCriteo(adUnit);
     waitForBids();
 
@@ -217,7 +241,7 @@ public class MoPubHeaderBiddingFunctionalTest {
     runOnMainThreadAndWait(moPubInterstitial::load);
     moPubSync.waitForBid();
 
-    moPubInterstitial.show();
+    return moPubInterstitial;
   }
 
   private void assertCriteoKeywordsAreInjectedInMoPubView(String keywords) {
