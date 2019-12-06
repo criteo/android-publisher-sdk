@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 import android.os.Bundle;
 import android.support.test.InstrumentationRegistry;
+import android.view.View;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.Util.MockedDependenciesRule;
@@ -27,6 +28,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest.Builder;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
+import com.google.android.gms.ads.doubleclick.PublisherInterstitialAd;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -41,6 +43,7 @@ public class DfpHeaderBiddingFunctionalTest {
   private static final String MACRO_DISPLAY_URL = "crt_displayurl";
 
   private static final String DFP_BANNER_ID = "/140800857/Endeavour_320x50";
+  private static final String DFP_INTERSTITIAL_ID = "/140800857/Endeavour_Interstitial_320x480";
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
@@ -50,6 +53,7 @@ public class DfpHeaderBiddingFunctionalTest {
   private final BannerAdUnit demoBannerAdUnit = TestAdUnits.BANNER_DEMO;
 
   private final InterstitialAdUnit validInterstitialAdUnit = TestAdUnits.INTERSTITIAL;
+  private final InterstitialAdUnit demoInterstitialAdUnit = TestAdUnits.INTERSTITIAL_DEMO;
 
   private final WebViewLookup webViewLookup = new WebViewLookup();
 
@@ -86,12 +90,25 @@ public class DfpHeaderBiddingFunctionalTest {
   @Test
   public void whenGettingTestBid_GivenValidCpIdAndPrefetchDemoBannerId_CriteoMacroAreInjectedInDfpBuilder()
       throws Exception {
-    givenInitializedCriteo(demoBannerAdUnit);
+    whenGettingTestBid_GivenValidCpIdAndPrefetchDemoAdUnit_CriteoMacroAreInjectedInDfpBuilder(
+        demoBannerAdUnit);
+  }
+
+  @Test
+  public void whenGettingTestBid_GivenValidCpIdAndPrefetchDemoInterstitialId_CriteoMacroAreInjectedInDfpBuilder()
+      throws Exception {
+    whenGettingTestBid_GivenValidCpIdAndPrefetchDemoAdUnit_CriteoMacroAreInjectedInDfpBuilder(
+        demoInterstitialAdUnit);
+  }
+
+  private void whenGettingTestBid_GivenValidCpIdAndPrefetchDemoAdUnit_CriteoMacroAreInjectedInDfpBuilder(AdUnit adUnit)
+      throws Exception {
+    givenInitializedCriteo(adUnit);
     waitForBids();
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().setBidsForAdUnit(builder, demoBannerAdUnit);
+    Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
 
     assertCriteoMacroAreInjectedInDfpBuilder(builder);
 
@@ -147,11 +164,24 @@ public class DfpHeaderBiddingFunctionalTest {
   }
 
   @Test
-  public void loadingDfpBanner_GivenDemoBanner_DfpViewContainsCreative() throws Exception {
+  public void loadingDfpBanner_GivenDemoBanner_DfpViewContainsDisplayUrl() throws Exception {
     ResultCaptor<Cdb> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
 
     String html = loadDfpHtmlBanner(demoBannerAdUnit);
+    assertDfpViewContainsDisplayUrl(cdbResultCaptor, html);
 
+  }
+
+  @Test
+  public void loadingDfpBanner_GivenDemoInterstitial_DfpViewContainsDisplayUrl() throws Exception {
+    ResultCaptor<Cdb> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
+
+    String html = loadDfpHtmlInterstitial(demoInterstitialAdUnit);
+
+    assertDfpViewContainsDisplayUrl(cdbResultCaptor, html);
+  }
+
+  private void assertDfpViewContainsDisplayUrl(ResultCaptor<Cdb> cdbResultCaptor, String html) {
     // The DFP webview replace the & by &amp; in attribute values.
     // So we need to replace them back in order to compare its content to our display URL.
     // This is valid HTML. See https://www.w3.org/TR/xhtml1/guidelines.html#C_12
@@ -191,6 +221,33 @@ public class DfpHeaderBiddingFunctionalTest {
     return webViewLookup.lookForHtmlContent(publisherAdView).get();
   }
 
+  private String loadDfpHtmlInterstitial(InterstitialAdUnit adUnit) throws Exception {
+    givenInitializedCriteo(adUnit);
+    waitForBids();
+
+    Builder builder = new Builder();
+
+    Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
+
+    builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
+    PublisherAdRequest request = builder.build();
+
+    PublisherInterstitialAd publisherInterstitialAd = new PublisherInterstitialAd(
+        InstrumentationRegistry.getContext());
+    publisherInterstitialAd.setAdUnitId(DFP_INTERSTITIAL_ID);
+
+    DfpSync dfpSync = new DfpSync(publisherInterstitialAd);
+
+    runOnMainThreadAndWait(() -> publisherInterstitialAd.loadAd(request));
+    dfpSync.waitForBid();
+
+    View interstitialView = webViewLookup.lookForResumedActivityView(() -> {
+      runOnMainThreadAndWait(publisherInterstitialAd::show);
+    }).get();
+
+    return webViewLookup.lookForHtmlContent(interstitialView).get();
+  }
+
   private void assertCriteoMacroAreInjectedInDfpBuilder(Builder builder) {
     Bundle customTargeting = builder.build().getCustomTargeting();
 
@@ -205,11 +262,14 @@ public class DfpHeaderBiddingFunctionalTest {
 
   private static final class DfpSync {
 
-    private final CountDownLatch isLoaded;
+    private final CountDownLatch isLoaded = new CountDownLatch(1);
 
     private DfpSync(PublisherAdView adView) {
-      this.isLoaded = new CountDownLatch(1);
       adView.setAdListener(new SyncAdListener());
+    }
+
+    private DfpSync(PublisherInterstitialAd interstitialAd) {
+      interstitialAd.setAdListener(new SyncAdListener());
     }
 
     void waitForBid() throws InterruptedException {
