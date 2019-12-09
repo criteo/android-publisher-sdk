@@ -3,6 +3,7 @@ package com.criteo.publisher;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import com.criteo.publisher.model.NativeAdUnit;
 
 /**
  * List of ad units that could be used to get an valid answer from the CDB stub.
@@ -35,5 +36,8 @@ public class TestAdUnits {
 
   public static final InterstitialAdUnit INTERSTITIAL_DEMO = new InterstitialAdUnit(
       "6yws53jyfjgoq1ghnuqb");
+
+  public static final NativeAdUnit NATIVE_UNKNOWN = new NativeAdUnit(
+      "test-PubSdk-Unknown");
 
 }

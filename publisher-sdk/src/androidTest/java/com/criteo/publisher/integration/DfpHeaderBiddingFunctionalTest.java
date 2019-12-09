@@ -23,6 +23,7 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -43,9 +44,24 @@ public class DfpHeaderBiddingFunctionalTest {
 
   private static final String MACRO_CPM = "crt_cpm";
   private static final String MACRO_DISPLAY_URL = "crt_displayurl";
+  private static final String MACRO_NATIVE_TITLE = "crtn_title";
+  private static final String MACRO_NATIVE_DESCRIPTION = "crtn_desc";
+  private static final String MACRO_NATIVE_IMAGE = "crtn_imageurl";
+  private static final String MACRO_NATIVE_PRICE = "crtn_price";
+  private static final String MACRO_NATIVE_CLICK = "crtn_clickurl";
+  private static final String MACRO_NATIVE_CTA = "crtn_cta";
+  private static final String MACRO_NATIVE_ADVERTISER_NAME = "crtn_advname";
+  private static final String MACRO_NATIVE_ADVERTISER_DOMAIN = "crtn_advdomain";
+  private static final String MACRO_NATIVE_ADVERTISER_LOGO = "crtn_advlogourl";
+  private static final String MACRO_NATIVE_ADVERTISER_CLICK = "crtn_url";
+  private static final String MACRO_NATIVE_PRIVACY_LINK = "crtn_prurl";
+  private static final String MACRO_NATIVE_PRIVACY_IMAGE = "crtn_primageurl";
+  private static final String MACRO_NATIVE_PRIVACY_LEGAL = "crtn_prtext";
+  private static final String MACRO_NATIVE_PIXEL_1 = "crtn_pixurl_1";
 
   private static final String DFP_BANNER_ID = "/140800857/Endeavour_320x50";
   private static final String DFP_INTERSTITIAL_ID = "/140800857/Endeavour_Interstitial_320x480";
+  private static final String DFP_NATIVE_ID = "/140800857/Endeavour_Native";
 
   /**
    * Time (in milliseconds) to wait for the interstitial activity of DFP to open itself after
@@ -66,6 +82,8 @@ public class DfpHeaderBiddingFunctionalTest {
   private final InterstitialAdUnit validInterstitialAdUnit = TestAdUnits.INTERSTITIAL;
   private final InterstitialAdUnit invalidInterstitialAdUnit = TestAdUnits.INTERSTITIAL_UNKNOWN;
   private final InterstitialAdUnit demoInterstitialAdUnit = TestAdUnits.INTERSTITIAL_DEMO;
+
+  private final NativeAdUnit invalidNativeAdUnit = TestAdUnits.NATIVE_UNKNOWN;
 
   private final WebViewLookup webViewLookup = new WebViewLookup();
 
@@ -98,18 +116,25 @@ public class DfpHeaderBiddingFunctionalTest {
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchInvalidBannerId_CriteoMacroAreNotInjectedInDfpBuilder()
       throws Exception {
-    whenGettingBid_GivenValidCpIdAndPrefetchInvalidInterstitialId_CriteoMacroAreNotInjectedInDfpBuilder(
+    whenGettingBid_GivenValidCpIdAndPrefetchInvalidAdUnit_CriteoMacroAreNotInjectedInDfpBuilder(
         invalidBannerAdUnit);
   }
 
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchInvalidInterstitialId_CriteoMacroAreNotInjectedInDfpBuilder()
       throws Exception {
-    whenGettingBid_GivenValidCpIdAndPrefetchInvalidInterstitialId_CriteoMacroAreNotInjectedInDfpBuilder(
+    whenGettingBid_GivenValidCpIdAndPrefetchInvalidAdUnit_CriteoMacroAreNotInjectedInDfpBuilder(
         invalidInterstitialAdUnit);
   }
 
-  private void whenGettingBid_GivenValidCpIdAndPrefetchInvalidInterstitialId_CriteoMacroAreNotInjectedInDfpBuilder(AdUnit adUnit)
+  @Test
+  public void whenGettingBid_GivenValidCpIdAndPrefetchInvalidNativeId_CriteoMacroAreNotInjectedInDfpBuilder()
+      throws Exception {
+    whenGettingBid_GivenValidCpIdAndPrefetchInvalidAdUnit_CriteoMacroAreNotInjectedInDfpBuilder(
+        invalidNativeAdUnit);
+  }
+
+  private void whenGettingBid_GivenValidCpIdAndPrefetchInvalidAdUnit_CriteoMacroAreNotInjectedInDfpBuilder(AdUnit adUnit)
       throws Exception {
     givenInitializedCriteo(adUnit);
     waitForBids();
@@ -122,6 +147,20 @@ public class DfpHeaderBiddingFunctionalTest {
 
     assertNull(customTargeting.getString(MACRO_CPM));
     assertNull(customTargeting.getString(MACRO_DISPLAY_URL));
+    assertNull(customTargeting.getString(MACRO_NATIVE_TITLE));
+    assertNull(customTargeting.getString(MACRO_NATIVE_DESCRIPTION));
+    assertNull(customTargeting.getString(MACRO_NATIVE_IMAGE));
+    assertNull(customTargeting.getString(MACRO_NATIVE_PRICE));
+    assertNull(customTargeting.getString(MACRO_NATIVE_CLICK));
+    assertNull(customTargeting.getString(MACRO_NATIVE_CTA));
+    assertNull(customTargeting.getString(MACRO_NATIVE_ADVERTISER_NAME));
+    assertNull(customTargeting.getString(MACRO_NATIVE_ADVERTISER_DOMAIN));
+    assertNull(customTargeting.getString(MACRO_NATIVE_ADVERTISER_LOGO));
+    assertNull(customTargeting.getString(MACRO_NATIVE_ADVERTISER_CLICK));
+    assertNull(customTargeting.getString(MACRO_NATIVE_PRIVACY_LINK));
+    assertNull(customTargeting.getString(MACRO_NATIVE_PRIVACY_IMAGE));
+    assertNull(customTargeting.getString(MACRO_NATIVE_PRIVACY_LEGAL));
+    assertNull(customTargeting.getString(MACRO_NATIVE_PIXEL_1));
     assertEquals(0, customTargeting.size());
   }
 
@@ -251,7 +290,22 @@ public class DfpHeaderBiddingFunctionalTest {
     assertFalse(html.contains(STUB_CREATIVE_IMAGE));
   }
 
+  @Test
+  public void loadingDfpBanner_GivenInvalidNative_DfpViewDoesNotContainProductImage() throws Exception {
+    String html = loadDfpHtmlNative(invalidNativeAdUnit);
+
+    assertFalse(html.contains(STUB_CREATIVE_IMAGE));
+  }
+
   private String loadDfpHtmlBanner(BannerAdUnit adUnit) throws Exception {
+    return loadDfpHtmlBannerOrNative(adUnit, createDfpBannerView());
+  }
+
+  private String loadDfpHtmlNative(NativeAdUnit adUnit) throws Exception {
+    return loadDfpHtmlBannerOrNative(adUnit, createDfpNativeView());
+  }
+
+  private String loadDfpHtmlBannerOrNative(AdUnit adUnit, PublisherAdView publisherAdView) throws Exception {
     givenInitializedCriteo(adUnit);
     waitForBids();
 
@@ -261,11 +315,6 @@ public class DfpHeaderBiddingFunctionalTest {
 
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
     PublisherAdRequest request = builder.build();
-
-    PublisherAdView publisherAdView = new PublisherAdView(
-        activityRule.getActivity().getApplicationContext());
-    publisherAdView.setAdSizes(com.google.android.gms.ads.AdSize.BANNER);
-    publisherAdView.setAdUnitId(DFP_BANNER_ID);
 
     DfpSync dfpSync = new DfpSync(publisherAdView);
 
@@ -286,10 +335,7 @@ public class DfpHeaderBiddingFunctionalTest {
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
     PublisherAdRequest request = builder.build();
 
-    PublisherInterstitialAd publisherInterstitialAd = new PublisherInterstitialAd(
-        activityRule.getActivity().getApplicationContext());
-    publisherInterstitialAd.setAdUnitId(DFP_INTERSTITIAL_ID);
-
+    PublisherInterstitialAd publisherInterstitialAd = createDfpInterstitialView();
     DfpSync dfpSync = new DfpSync(publisherInterstitialAd);
 
     runOnMainThreadAndWait(() -> publisherInterstitialAd.loadAd(request));
@@ -300,6 +346,29 @@ public class DfpHeaderBiddingFunctionalTest {
     }).get(DFP_INTERSTITIAL_OPENING_TIMEOUT_MS, TimeUnit.MILLISECONDS);
 
     return webViewLookup.lookForHtmlContent(interstitialView).get();
+  }
+
+  private PublisherAdView createDfpBannerView() {
+    PublisherAdView publisherAdView = new PublisherAdView(
+        activityRule.getActivity().getApplicationContext());
+    publisherAdView.setAdSizes(com.google.android.gms.ads.AdSize.BANNER);
+    publisherAdView.setAdUnitId(DFP_BANNER_ID);
+    return publisherAdView;
+  }
+
+  private PublisherInterstitialAd createDfpInterstitialView() {
+    PublisherInterstitialAd publisherInterstitialAd = new PublisherInterstitialAd(
+        activityRule.getActivity().getApplicationContext());
+    publisherInterstitialAd.setAdUnitId(DFP_INTERSTITIAL_ID);
+    return publisherInterstitialAd;
+  }
+
+  private PublisherAdView createDfpNativeView() {
+    PublisherAdView publisherAdView = new PublisherAdView(
+        activityRule.getActivity().getApplicationContext());
+    publisherAdView.setAdSizes(com.google.android.gms.ads.AdSize.FLUID);
+    publisherAdView.setAdUnitId(DFP_NATIVE_ID);
+    return publisherAdView;
   }
 
   private void assertCriteoMacroAreInjectedInDfpBuilder(Builder builder) {
