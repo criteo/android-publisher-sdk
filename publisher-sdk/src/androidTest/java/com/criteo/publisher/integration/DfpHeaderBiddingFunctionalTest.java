@@ -12,7 +12,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import android.os.Bundle;
-import android.support.test.InstrumentationRegistry;
+import android.support.test.rule.ActivityTestRule;
 import android.view.View;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
@@ -23,6 +23,7 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import com.criteo.publisher.test.activity.DummyActivity;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
@@ -47,6 +48,9 @@ public class DfpHeaderBiddingFunctionalTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
+  @Rule
+  public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(DummyActivity.class);
 
   private final BannerAdUnit validBannerAdUnit = TestAdUnits.BANNER_320_50;
   private final BannerAdUnit invalidBannerAdUnit = TestAdUnits.BANNER_UNKNOWN;
@@ -231,7 +235,8 @@ public class DfpHeaderBiddingFunctionalTest {
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
     PublisherAdRequest request = builder.build();
 
-    PublisherAdView publisherAdView = new PublisherAdView(InstrumentationRegistry.getContext());
+    PublisherAdView publisherAdView = new PublisherAdView(
+        activityRule.getActivity().getApplicationContext());
     publisherAdView.setAdSizes(com.google.android.gms.ads.AdSize.BANNER);
     publisherAdView.setAdUnitId(DFP_BANNER_ID);
 
@@ -255,7 +260,7 @@ public class DfpHeaderBiddingFunctionalTest {
     PublisherAdRequest request = builder.build();
 
     PublisherInterstitialAd publisherInterstitialAd = new PublisherInterstitialAd(
-        InstrumentationRegistry.getContext());
+        activityRule.getActivity().getApplicationContext());
     publisherInterstitialAd.setAdUnitId(DFP_INTERSTITIAL_ID);
 
     DfpSync dfpSync = new DfpSync(publisherInterstitialAd);
