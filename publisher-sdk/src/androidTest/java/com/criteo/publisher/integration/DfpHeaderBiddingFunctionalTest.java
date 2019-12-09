@@ -53,6 +53,7 @@ public class DfpHeaderBiddingFunctionalTest {
   private final BannerAdUnit demoBannerAdUnit = TestAdUnits.BANNER_DEMO;
 
   private final InterstitialAdUnit validInterstitialAdUnit = TestAdUnits.INTERSTITIAL;
+  private final InterstitialAdUnit invalidInterstitialAdUnit = TestAdUnits.INTERSTITIAL_UNKNOWN;
   private final InterstitialAdUnit demoInterstitialAdUnit = TestAdUnits.INTERSTITIAL_DEMO;
 
   private final WebViewLookup webViewLookup = new WebViewLookup();
@@ -73,12 +74,25 @@ public class DfpHeaderBiddingFunctionalTest {
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchInvalidBannerId_CriteoMacroAreNotInjectedInDfpBuilder()
       throws Exception {
-    givenInitializedCriteo(invalidBannerAdUnit);
+    whenGettingBid_GivenValidCpIdAndPrefetchInvalidInterstitialId_CriteoMacroAreNotInjectedInDfpBuilder(
+        invalidBannerAdUnit);
+  }
+
+  @Test
+  public void whenGettingBid_GivenValidCpIdAndPrefetchInvalidInterstitialId_CriteoMacroAreNotInjectedInDfpBuilder()
+      throws Exception {
+    whenGettingBid_GivenValidCpIdAndPrefetchInvalidInterstitialId_CriteoMacroAreNotInjectedInDfpBuilder(
+        invalidInterstitialAdUnit);
+  }
+
+  private void whenGettingBid_GivenValidCpIdAndPrefetchInvalidInterstitialId_CriteoMacroAreNotInjectedInDfpBuilder(AdUnit adUnit)
+      throws Exception {
+    givenInitializedCriteo(adUnit);
     waitForBids();
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().setBidsForAdUnit(builder, invalidBannerAdUnit);
+    Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
 
     Bundle customTargeting = builder.build().getCustomTargeting();
 
@@ -168,6 +182,7 @@ public class DfpHeaderBiddingFunctionalTest {
     ResultCaptor<Cdb> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
 
     String html = loadDfpHtmlBanner(demoBannerAdUnit);
+
     assertDfpViewContainsDisplayUrl(cdbResultCaptor, html);
 
   }
@@ -194,6 +209,13 @@ public class DfpHeaderBiddingFunctionalTest {
   @Test
   public void loadingDfpBanner_GivenInvalidBanner_DfpViewDoesNotContainCreative() throws Exception {
     String html = loadDfpHtmlBanner(invalidBannerAdUnit);
+
+    assertFalse(html.contains(STUB_CREATIVE_IMAGE));
+  }
+
+  @Test
+  public void loadingDfpBanner_GivenInvalidInterstitial_DfpViewDoesNotContainCreative() throws Exception {
+    String html = loadDfpHtmlInterstitial(invalidInterstitialAdUnit);
 
     assertFalse(html.contains(STUB_CREATIVE_IMAGE));
   }
