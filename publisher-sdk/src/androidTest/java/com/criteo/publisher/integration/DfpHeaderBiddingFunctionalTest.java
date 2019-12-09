@@ -72,12 +72,25 @@ public class DfpHeaderBiddingFunctionalTest {
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchValidBannerId_CriteoMacroAreInjectedInDfpBuilder()
       throws Exception {
-    givenInitializedCriteo(validBannerAdUnit);
+    whenGettingBid_GivenValidCpIdAndPrefetchValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(
+        validBannerAdUnit);
+  }
+
+  @Test
+  public void whenGettingBid_GivenValidCpIdAndPrefetchValidInterstitialId_CriteoMacroAreInjectedInDfpBuilder()
+      throws Exception {
+    whenGettingBid_GivenValidCpIdAndPrefetchValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(
+        validInterstitialAdUnit);
+  }
+
+  private void whenGettingBid_GivenValidCpIdAndPrefetchValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(AdUnit adUnit)
+      throws Exception {
+    givenInitializedCriteo(adUnit);
     waitForBids();
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().setBidsForAdUnit(builder, validBannerAdUnit);
+    Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
 
     assertCriteoMacroAreInjectedInDfpBuilder(builder);
   }
@@ -184,6 +197,13 @@ public class DfpHeaderBiddingFunctionalTest {
   @Test
   public void loadingDfpBanner_GivenValidBanner_DfpViewContainsCreative() throws Exception {
     String html = loadDfpHtmlBanner(validBannerAdUnit);
+
+    assertTrue(html.contains(STUB_CREATIVE_IMAGE));
+  }
+
+  @Test
+  public void loadingDfpBanner_GivenValidInterstitial_DfpViewContainsCreative() throws Exception {
+    String html = loadDfpHtmlInterstitial(validInterstitialAdUnit);
 
     assertTrue(html.contains(STUB_CREATIVE_IMAGE));
   }
