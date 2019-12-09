@@ -3,6 +3,7 @@ package com.criteo.publisher.integration;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE;
 import static com.criteo.publisher.StubConstants.STUB_DISPLAY_URL;
+import static com.criteo.publisher.StubConstants.STUB_NATIVE_ASSETS;
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
 import static org.junit.Assert.assertEquals;
@@ -24,6 +25,8 @@ import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.NativeAdUnit;
+import com.criteo.publisher.model.NativeAssets;
+import com.criteo.publisher.model.NativeProduct;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -32,9 +35,12 @@ import com.google.android.gms.ads.doubleclick.PublisherAdRequest.Builder;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import com.google.android.gms.ads.doubleclick.PublisherInterstitialAd;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.junit.Rule;
@@ -53,11 +59,13 @@ public class DfpHeaderBiddingFunctionalTest {
   private static final String MACRO_NATIVE_ADVERTISER_NAME = "crtn_advname";
   private static final String MACRO_NATIVE_ADVERTISER_DOMAIN = "crtn_advdomain";
   private static final String MACRO_NATIVE_ADVERTISER_LOGO = "crtn_advlogourl";
-  private static final String MACRO_NATIVE_ADVERTISER_CLICK = "crtn_url";
+  private static final String MACRO_NATIVE_ADVERTISER_CLICK = "crtn_advurl";
   private static final String MACRO_NATIVE_PRIVACY_LINK = "crtn_prurl";
   private static final String MACRO_NATIVE_PRIVACY_IMAGE = "crtn_primageurl";
   private static final String MACRO_NATIVE_PRIVACY_LEGAL = "crtn_prtext";
-  private static final String MACRO_NATIVE_PIXEL_1 = "crtn_pixurl_1";
+  private static final String MACRO_NATIVE_PIXEL_COUNT = "crtn_pixcount";
+  private static final String MACRO_NATIVE_PIXEL_1 = "crtn_pixurl_0";
+  private static final String MACRO_NATIVE_PIXEL_2 = "crtn_pixurl_1";
 
   private static final String DFP_BANNER_ID = "/140800857/Endeavour_320x50";
   private static final String DFP_INTERSTITIAL_ID = "/140800857/Endeavour_Interstitial_320x480";
@@ -68,6 +76,11 @@ public class DfpHeaderBiddingFunctionalTest {
    * calling {@link PublisherInterstitialAd#show()}.
    */
   private static final long DFP_INTERSTITIAL_OPENING_TIMEOUT_MS = 1000;
+
+  /**
+   * Charset used to encode/decode data with DFP.
+   */
+  private static final Charset CHARSET = StandardCharsets.UTF_8;
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
@@ -83,6 +96,7 @@ public class DfpHeaderBiddingFunctionalTest {
   private final InterstitialAdUnit invalidInterstitialAdUnit = TestAdUnits.INTERSTITIAL_UNKNOWN;
   private final InterstitialAdUnit demoInterstitialAdUnit = TestAdUnits.INTERSTITIAL_DEMO;
 
+  private final NativeAdUnit validNativeAdUnit = TestAdUnits.NATIVE;
   private final NativeAdUnit invalidNativeAdUnit = TestAdUnits.NATIVE_UNKNOWN;
 
   private final WebViewLookup webViewLookup = new WebViewLookup();
@@ -111,6 +125,40 @@ public class DfpHeaderBiddingFunctionalTest {
     Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
 
     assertCriteoMacroAreInjectedInDfpBuilder(builder);
+  }
+
+  @Test
+  public void whenGettingBid_GivenValidCpIdAndPrefetchValidNativeId_CriteoNativeMacroAreInjectedInDfpBuilder()
+      throws Exception {
+    givenInitializedCriteo(validNativeAdUnit);
+    waitForBids();
+
+    Builder builder = new Builder();
+
+    Criteo.getInstance().setBidsForAdUnit(builder, validNativeAdUnit);
+
+    Bundle customTargeting = builder.build().getCustomTargeting();
+
+    // Note: CDB stub does not return any legal text in the payload.
+    // But this may be covered by unit tests.
+    assertNotNull(customTargeting.getString(MACRO_CPM));
+    assertNull(customTargeting.getString(MACRO_DISPLAY_URL));
+    assertNotNull(customTargeting.getString(MACRO_NATIVE_TITLE));
+    assertNotNull(customTargeting.getString(MACRO_NATIVE_DESCRIPTION));
+    assertNotNull(customTargeting.getString(MACRO_NATIVE_IMAGE));
+    assertNotNull(customTargeting.getString(MACRO_NATIVE_PRICE));
+    assertNotNull(customTargeting.getString(MACRO_NATIVE_CLICK));
+    assertNotNull(customTargeting.getString(MACRO_NATIVE_CTA));
+    assertNotNull(customTargeting.getString(MACRO_NATIVE_ADVERTISER_NAME));
+    assertNotNull(customTargeting.getString(MACRO_NATIVE_ADVERTISER_DOMAIN));
+    assertNotNull(customTargeting.getString(MACRO_NATIVE_ADVERTISER_LOGO));
+    assertNotNull(customTargeting.getString(MACRO_NATIVE_ADVERTISER_CLICK));
+    assertNotNull(customTargeting.getString(MACRO_NATIVE_PRIVACY_LINK));
+    assertNotNull(customTargeting.getString(MACRO_NATIVE_PRIVACY_IMAGE));
+    assertNotNull(customTargeting.getString(MACRO_NATIVE_PIXEL_1));
+    assertNotNull(customTargeting.getString(MACRO_NATIVE_PIXEL_2));
+    assertEquals("2", customTargeting.getString(MACRO_NATIVE_PIXEL_COUNT));
+    assertEquals(16, customTargeting.size());
   }
 
   @Test
@@ -161,6 +209,8 @@ public class DfpHeaderBiddingFunctionalTest {
     assertNull(customTargeting.getString(MACRO_NATIVE_PRIVACY_IMAGE));
     assertNull(customTargeting.getString(MACRO_NATIVE_PRIVACY_LEGAL));
     assertNull(customTargeting.getString(MACRO_NATIVE_PIXEL_1));
+    assertNull(customTargeting.getString(MACRO_NATIVE_PIXEL_2));
+    assertNull(customTargeting.getString(MACRO_NATIVE_PIXEL_COUNT));
     assertEquals(0, customTargeting.size());
   }
 
@@ -224,11 +274,10 @@ public class DfpHeaderBiddingFunctionalTest {
     // So we should get back a good display url by applying the reverse
     // The reverse: URL decoder + URL decoder + Base64 decoder
 
-    Charset charset = StandardCharsets.UTF_8;
-    String step1 = URLDecoder.decode(encodedDisplayUrl, charset.name());
-    String step2 = URLDecoder.decode(step1, charset.name());
+    String step1 = URLDecoder.decode(encodedDisplayUrl, CHARSET.name());
+    String step2 = URLDecoder.decode(step1, CHARSET.name());
     byte[] step3 = Base64.getDecoder().decode(step2);
-    String decodedDisplayUrl = new String(step3, charset);
+    String decodedDisplayUrl = new String(step3, CHARSET);
 
     assertEquals(STUB_DISPLAY_URL, decodedDisplayUrl);
   }
@@ -245,6 +294,47 @@ public class DfpHeaderBiddingFunctionalTest {
     String html = loadDfpHtmlInterstitial(validInterstitialAdUnit);
 
     assertTrue(html.contains(STUB_CREATIVE_IMAGE));
+  }
+
+  @Test
+  public void loadingDfpBanner_GivenValidNative_DfpViewContainsNativePayload() throws Exception {
+    NativeAssets expectedAssets = STUB_NATIVE_ASSETS;
+    NativeProduct expectedProduct = expectedAssets.nativeProducts.get(0);
+
+    // URL are encoded because they are given, as query param, to a Google URL that will redirect
+    // user.
+    // TODO add a test that verify that users are properly redirected to the expected URL.
+    String expectedClickUrl = URLEncoder.encode(expectedProduct.clickUrl, CHARSET.name());
+    String expectedPrivacyUrl = URLEncoder.encode(expectedAssets.privacyOptOutClickUrl, CHARSET.name());
+
+    String html = loadDfpHtmlNative(validNativeAdUnit);
+
+    // TODO In native template, in DFP configuration, there is nothing that use advertiser data.
+    //  This prevent automated testing on this part. We may extends the actual template to use them.
+    //  However, we should verify that it's a dedicated DFP ad unit for our tests. Else we may have
+    //  a side effect.
+
+    assertTrue(html.contains(expectedProduct.title));
+    assertTrue(html.contains(expectedProduct.description));
+    assertTrue(html.contains(expectedProduct.imageUrl));
+    assertTrue(html.contains(expectedProduct.price));
+    assertTrue(html.contains(expectedClickUrl));
+    assertTrue(html.contains(expectedProduct.callToAction));
+    assertTrue(html.contains(expectedAssets.privacyOptOutImageUrl));
+    assertTrue(html.contains(expectedPrivacyUrl));
+    assertTrue(html.contains(expectedAssets.privacyLongLegalText));
+  }
+
+  @Test
+  public void loadingDfpBanner_GivenValidNative_HtmlInDfpViewShouldTriggerImpressionPixels() throws Exception {
+    List<String> expectedPixels = new ArrayList<>(STUB_NATIVE_ASSETS.impressionPixels);
+
+    String html = loadDfpHtmlNative(validNativeAdUnit);
+
+    List<String> firedUrls = webViewLookup.lookForLoadedResources(html, CHARSET).get();
+    expectedPixels.removeAll(firedUrls);
+
+    assertTrue(expectedPixels.isEmpty());
   }
 
   @Test

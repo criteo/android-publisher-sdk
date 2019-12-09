@@ -13,8 +13,10 @@ import android.support.test.InstrumentationRegistry;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -26,7 +28,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class WebViewLookup {
 
-  private static final String GET_OUTER_HTML = "(function() { return encodeURI(document.getElementsByTagName('html')[0].outerHTML); })();";
+  private static final String GET_OUTER_HTML = "(function() { return encodeURIComponent(document.getElementsByTagName('html')[0].outerHTML); })();";
 
   private final ExecutorService executor = Executors.newWorkStealingPool();
 
@@ -118,6 +120,45 @@ public class WebViewLookup {
         traverse(child, processor);
       }
     }
+  }
+
+  /**
+   * Collect the list of all resources loaded by the given HTML code.
+   * <p>
+   * This method (almost) directly return an async future of the result. The future is completed
+   * once the given HTML is completely loaded, without cache, including the javascript.
+   * <p>
+   * Note that only GET resources are triggered, coming from the HTML itself or from a JS script.
+   *
+   * @param html    code to evaluate
+   * @param charset encoding of the given html
+   * @return list of resources triggered by the given html.
+   */
+  public Future<List<String>> lookForLoadedResources(String html, Charset charset) {
+    CompletableFuture<List<String>> future = new CompletableFuture<>();
+    List<String> firedUrls = new ArrayList<>();
+
+    WebViewClient client = new WebViewClient() {
+      @Override
+      public void onPageFinished(WebView view, String url) {
+        future.complete(firedUrls);
+      }
+
+      @Override
+      public void onLoadResource(WebView view, String url) {
+        firedUrls.add(url);
+      }
+    };
+
+    runOnMainThreadAndWait(() -> {
+      WebView webView = new WebView(InstrumentationRegistry.getContext());
+      webView.clearCache(true);
+      webView.setWebViewClient(client);
+      webView.getSettings().setJavaScriptEnabled(true);
+      webView.loadDataWithBaseURL(null, html, "text/html", charset.name(), null);
+    });
+
+    return future;
   }
 
   public interface CheckedRunnable {

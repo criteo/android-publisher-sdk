@@ -37,6 +37,9 @@ public class TestAdUnits {
   public static final InterstitialAdUnit INTERSTITIAL_DEMO = new InterstitialAdUnit(
       "6yws53jyfjgoq1ghnuqb");
 
+  public static final NativeAdUnit NATIVE = new NativeAdUnit(
+      "test-PubSdk-Native");
+
   public static final NativeAdUnit NATIVE_UNKNOWN = new NativeAdUnit(
       "test-PubSdk-Unknown");
 
