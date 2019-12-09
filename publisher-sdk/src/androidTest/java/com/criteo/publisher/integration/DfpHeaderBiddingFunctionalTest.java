@@ -35,6 +35,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -45,6 +46,12 @@ public class DfpHeaderBiddingFunctionalTest {
 
   private static final String DFP_BANNER_ID = "/140800857/Endeavour_320x50";
   private static final String DFP_INTERSTITIAL_ID = "/140800857/Endeavour_Interstitial_320x480";
+
+  /**
+   * Time (in milliseconds) to wait for the interstitial activity of DFP to open itself after
+   * calling {@link PublisherInterstitialAd#show()}.
+   */
+  private static final long DFP_INTERSTITIAL_OPENING_TIMEOUT_MS = 1000;
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
@@ -270,7 +277,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     View interstitialView = webViewLookup.lookForResumedActivityView(() -> {
       runOnMainThreadAndWait(publisherInterstitialAd::show);
-    }).get();
+    }).get(DFP_INTERSTITIAL_OPENING_TIMEOUT_MS, TimeUnit.MILLISECONDS);
 
     return webViewLookup.lookForHtmlContent(interstitialView).get();
   }
