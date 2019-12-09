@@ -16,7 +16,6 @@ import android.support.test.rule.ActivityTestRule;
 import android.view.View;
 import android.webkit.WebView;
 import com.criteo.publisher.Criteo;
-import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.Util.WebViewLookup;
@@ -62,6 +61,7 @@ public class MoPubHeaderBiddingFunctionalTest {
   private final BannerAdUnit invalidBannerAdUnit = TestAdUnits.BANNER_UNKNOWN;
   private final BannerAdUnit demoBannerAdUnit = TestAdUnits.BANNER_DEMO;
 
+  private final InterstitialAdUnit validInterstitialAdUnit = TestAdUnits.INTERSTITIAL;
   private final InterstitialAdUnit invalidInterstitialAdUnit = TestAdUnits.INTERSTITIAL_UNKNOWN;
   private final InterstitialAdUnit demoInterstitialAdUnit = TestAdUnits.INTERSTITIAL_DEMO;
 
@@ -125,7 +125,7 @@ public class MoPubHeaderBiddingFunctionalTest {
   }
 
   private void whenGettingBid_GivenValidCpIdAndPrefetchValidBannerAdUnit_CriteoKeywordsAreInjectedInMoPubBuilder(
-      BannerAdUnit adUnit) throws CriteoInitException {
+      BannerAdUnit adUnit) throws Exception {
     givenInitializedCriteo(adUnit);
     waitForBids();
 
@@ -137,14 +137,28 @@ public class MoPubHeaderBiddingFunctionalTest {
   }
 
   @Test
+  public void whenGettingBid_GivenValidCpIdAndPrefetchValidInterstitialId_CriteoKeywordsAreInjectedInMoPubBuilder()
+      throws Exception {
+    whenGettingBid_GivenValidCpIdAndPrefetchInterstitialId_CriteoKeywordsAreInjectedInMoPubBuilder(
+        validInterstitialAdUnit);
+  }
+
+  @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchDemoInterstitialId_CriteoKeywordsAreInjectedInMoPubBuilder()
       throws Exception {
-    givenInitializedCriteo(demoInterstitialAdUnit);
+    whenGettingBid_GivenValidCpIdAndPrefetchInterstitialId_CriteoKeywordsAreInjectedInMoPubBuilder(
+        demoInterstitialAdUnit);
+  }
+
+  private void whenGettingBid_GivenValidCpIdAndPrefetchInterstitialId_CriteoKeywordsAreInjectedInMoPubBuilder(
+      InterstitialAdUnit interstitialAdUnit)
+      throws Exception {
+    givenInitializedCriteo(interstitialAdUnit);
     waitForBids();
 
     MoPubInterstitial moPubInterstitial = createMoPubInterstitial();
 
-    Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, demoInterstitialAdUnit);
+    Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, interstitialAdUnit);
 
     assertCriteoKeywordsAreInjectedInMoPubView(moPubInterstitial.getKeywords());
   }
@@ -167,7 +181,14 @@ public class MoPubHeaderBiddingFunctionalTest {
   }
 
   @Test
-  public void loadingMoPubBanner_GivenDemoInterstitial_MoPubViewUsesDemoDisplayUrl() throws Exception {
+  public void loadingMoPubInterstitial_GivenValidInterstitial_MoPubViewContainsCreative() throws Exception {
+    String html = loadMoPubHtmlInterstitial(validInterstitialAdUnit);
+
+    assertTrue(html.contains(STUB_CREATIVE_IMAGE));
+  }
+
+  @Test
+  public void loadingMoPubInterstitial_GivenDemoInterstitial_MoPubViewUsesDemoDisplayUrl() throws Exception {
     ResultCaptor<Cdb> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
 
     String html = loadMoPubHtmlInterstitial(demoInterstitialAdUnit);
