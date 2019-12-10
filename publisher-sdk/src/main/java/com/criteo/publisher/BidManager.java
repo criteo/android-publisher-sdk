@@ -13,6 +13,7 @@ import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.Util.ReflectionUtil;
@@ -80,6 +81,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private final Config config;
     private final AdvertisingInfo advertisingInfo;
     private final Clock clock;
+    private final UserPrivacyUtil userPrivacyUtil;
 
     BidManager(
         @NonNull Context context,
@@ -91,7 +93,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         @NonNull DeviceUtil deviceUtil,
         @NonNull LoggingUtil loggingUtil,
         @NonNull AdvertisingInfo advertisingInfo,
-        @NonNull Clock clock
+        @NonNull Clock clock,
+        @NonNull UserPrivacyUtil userPrivacyUtil
     ) {
         this(
             context,
@@ -107,7 +110,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             deviceUtil,
             loggingUtil,
             advertisingInfo,
-            clock
+            clock,
+            userPrivacyUtil
         );
     }
 
@@ -126,7 +130,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         @NonNull DeviceUtil deviceUtil,
         @NonNull LoggingUtil loggingUtil,
         @NonNull AdvertisingInfo advertisingInfo,
-        @NonNull Clock clock
+        @NonNull Clock clock,
+        @NonNull UserPrivacyUtil userPrivacyUtil
     ) {
         this.mContext = context;
         this.publisher = publisher;
@@ -142,6 +147,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         this.loggingUtil = loggingUtil;
         this.advertisingInfo = advertisingInfo;
         this.clock = clock;
+        this.userPrivacyUtil = userPrivacyUtil;
     }
 
     /**
@@ -171,7 +177,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             prefetchCacheAdUnits,
             placementsWithCdbTasks,
             deviceUtil,
-            loggingUtil
+            loggingUtil,
+            userPrivacyUtil
         );
 
         for (CacheAdUnit cacheAdUnit : prefetchCacheAdUnits) {

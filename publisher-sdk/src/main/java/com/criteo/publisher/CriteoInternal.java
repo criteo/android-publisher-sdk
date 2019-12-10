@@ -75,7 +75,8 @@ final class CriteoInternal extends Criteo {
         deviceUtil,
         DependencyProvider.getInstance().provideLoggingUtil(),
         advertisingInfo,
-        clock
+        clock,
+        DependencyProvider.getInstance().provideUserPrivacyUtil(context.getApplicationContext())
     );
 
     this.appEvents = new AppEvents(context, deviceUtil, clock);

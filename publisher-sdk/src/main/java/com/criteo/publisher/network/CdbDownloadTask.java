@@ -7,7 +7,7 @@ import android.util.Log;
 import com.criteo.publisher.BuildConfig;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.HostAppUtil;
+import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.model.CacheAdUnit;
@@ -30,7 +30,8 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     private final PubSdkApi api;
     private final DeviceUtil deviceUtil;
     private final LoggingUtil loggingUtil;
-    private Hashtable<CacheAdUnit, CdbDownloadTask> bidsInCdbTask;
+    private final Hashtable<CacheAdUnit, CdbDownloadTask> bidsInCdbTask;
+    private final UserPrivacyUtil userPrivacyUtil;
 
     public CdbDownloadTask(
         Context context,
@@ -40,7 +41,8 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         List<CacheAdUnit> adUnits,
         Hashtable<CacheAdUnit, CdbDownloadTask> bidsInMap,
         DeviceUtil deviceUtil,
-        LoggingUtil loggingUtil
+        LoggingUtil loggingUtil,
+        UserPrivacyUtil userPrivacyUtil
     ) {
         this.mContext = context.getApplicationContext();
         this.responseListener = responseListener;
@@ -51,6 +53,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         this.deviceUtil = deviceUtil;
         this.loggingUtil = loggingUtil;
         this.api = DependencyProvider.getInstance().providePubSdkApi();
+        this.userPrivacyUtil = userPrivacyUtil;
     }
 
     @Override
@@ -92,13 +95,18 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
             }
         }
 
+        String uspIab =  userPrivacyUtil.getIabUsPrivacyString();
+        if (uspIab != null && !uspIab.isEmpty()) {
+            user.setUspIab(uspIab);
+        }
+
         Cdb cdbRequest = new Cdb();
         cdbRequest.setCacheAdUnits(cacheAdUnits);
         cdbRequest.setUser(user);
         cdbRequest.setPublisher(publisher);
         cdbRequest.setSdkVersion(BuildConfig.VERSION_NAME);
         cdbRequest.setProfileId(profile);
-        JSONObject gdpr = HostAppUtil.gdpr(mContext.getApplicationContext());
+        JSONObject gdpr = userPrivacyUtil.gdpr();
         if (gdpr != null) {
             cdbRequest.setGdprConsent(gdpr);
         }

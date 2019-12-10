@@ -83,6 +83,10 @@ public class Cdb implements Parcelable {
         this.user = user;
     }
 
+    public User getUser() {
+        return user;
+    }
+
     public void setSdkVersion(String sdkVersion) {
         this.sdkVersion = sdkVersion;
     }

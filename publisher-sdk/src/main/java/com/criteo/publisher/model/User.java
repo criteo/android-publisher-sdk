@@ -1,9 +1,9 @@
 package com.criteo.publisher.model;
 
-import android.bluetooth.BluetoothClass.Device;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.criteo.publisher.BuildConfig;
 import com.criteo.publisher.Util.DeviceUtil;
 import org.json.JSONException;
@@ -21,6 +21,8 @@ public class User implements Parcelable {
     private static final String CONNECTION = "connection";
     private static final String GAID = "gaid";
     private static final String ANDROID = "android";
+    private static final String USP_IAB = "uspIab";
+
     private static final int LMT_VAL = 0;
 
     private String deviceId;
@@ -30,6 +32,9 @@ public class User implements Parcelable {
     private String sdkVer;
     private int limit;
     private String connection;
+
+    /** US Privacy consent IAB format (for CCPA) */
+    private String uspIab;
 
     public User(@NonNull DeviceUtil deviceUtil) {
         deviceId = "";
@@ -48,6 +53,15 @@ public class User implements Parcelable {
         return sdkVer;
     }
 
+    public void setUspIab(@NonNull String uspIab) {
+        this.uspIab = uspIab;
+    }
+
+    @Nullable
+    public String getUspIab() {
+        return uspIab;
+    }
+
     public JSONObject toJson() throws JSONException {
         JSONObject object = new JSONObject();
         object.put(DEVICE_ID, deviceId);
@@ -57,6 +71,11 @@ public class User implements Parcelable {
         object.put(SDK_VER, sdkVer);
         object.put(LIMIT, limit);
         object.put(CONNECTION, connection);
+
+        if (this.uspIab != null && !this.uspIab.isEmpty()) {
+            object.put(USP_IAB, uspIab);
+        }
+
         return object;
     }
 
@@ -74,6 +93,7 @@ public class User implements Parcelable {
         dest.writeString(this.sdkVer);
         dest.writeInt(this.limit);
         dest.writeString(this.connection);
+        dest.writeString(this.uspIab);
     }
 
     protected User(Parcel in) {
@@ -84,6 +104,7 @@ public class User implements Parcelable {
         this.sdkVer = in.readString();
         this.limit = in.readInt();
         this.connection = in.readString();
+        this.uspIab = in.readString();
     }
 
     public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {

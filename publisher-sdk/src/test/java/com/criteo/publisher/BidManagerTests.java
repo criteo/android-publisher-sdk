@@ -10,6 +10,7 @@ import com.criteo.publisher.Util.AndroidUtil;
 
 import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
@@ -83,6 +84,9 @@ public class BidManagerTests {
     @Mock
     private Clock clock;
 
+    @Mock
+    private UserPrivacyUtil userPrivacyUtil;
+
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
@@ -155,7 +159,8 @@ public class BidManagerTests {
             deviceUtil,
             loggingUtil,
             advertisingInfo,
-            clock
+            clock,
+            userPrivacyUtil
         );
 
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
@@ -185,7 +190,8 @@ public class BidManagerTests {
             deviceUtil,
             loggingUtil,
             advertisingInfo,
-            clock
+            clock,
+            userPrivacyUtil
         );
 
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
@@ -215,7 +221,8 @@ public class BidManagerTests {
             deviceUtil,
             loggingUtil,
             advertisingInfo,
-            clock
+            clock,
+            userPrivacyUtil
         );
 
         //test
@@ -242,7 +249,8 @@ public class BidManagerTests {
             deviceUtil,
             loggingUtil,
             advertisingInfo,
-            clock
+            clock,
+            userPrivacyUtil
         );
 
         //test
@@ -270,7 +278,8 @@ public class BidManagerTests {
             deviceUtil,
             loggingUtil,
             advertisingInfo,
-            clock
+            clock,
+            userPrivacyUtil
         );
 
         BidResponse expectedResponse = new BidResponse();
@@ -306,7 +315,8 @@ public class BidManagerTests {
             deviceUtil,
             loggingUtil,
             advertisingInfo,
-            clock
+            clock,
+            userPrivacyUtil
         );
 
         BidResponse expectedResponse = new BidResponse(0.10d,
@@ -343,7 +353,8 @@ public class BidManagerTests {
             deviceUtil,
             loggingUtil,
             advertisingInfo,
-            clock
+            clock,
+            userPrivacyUtil
         );
 
         BannerAdUnit bannerAdUnit = new BannerAdUnit(adUnitId, new AdSize(320,50));
@@ -390,7 +401,8 @@ public class BidManagerTests {
             deviceUtil,
             loggingUtil,
             advertisingInfo,
-            clock
+            clock,
+            userPrivacyUtil
         );
 
         BannerAdUnit bannerAdUnit = new BannerAdUnit(adUnitId, new AdSize(320,50));
@@ -427,5 +439,4 @@ public class BidManagerTests {
     private class SpecialHashMap extends HashMap implements SpecialMap
     {
     }
-
 }

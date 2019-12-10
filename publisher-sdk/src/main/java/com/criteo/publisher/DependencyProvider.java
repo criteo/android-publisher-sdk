@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.network.PubSdkApi;
@@ -80,5 +81,10 @@ public class DependencyProvider {
   @NonNull
   public Clock provideClock() {
     return new EpochClock();
+  }
+
+  @NonNull
+  public UserPrivacyUtil provideUserPrivacyUtil(@NonNull Context context) {
+    return new UserPrivacyUtil(context);
   }
 }
