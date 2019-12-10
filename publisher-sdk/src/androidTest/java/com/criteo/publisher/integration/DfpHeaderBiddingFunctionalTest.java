@@ -269,17 +269,53 @@ public class DfpHeaderBiddingFunctionalTest {
     Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
 
     String encodedDisplayUrl = builder.build().getCustomTargeting().getString(MACRO_DISPLAY_URL);
-
-    // Display should be encoded with: Base64 encoder + URL encoder + URL encoder
-    // So we should get back a good display url by applying the reverse
-    // The reverse: URL decoder + URL decoder + Base64 decoder
-
-    String step1 = URLDecoder.decode(encodedDisplayUrl, CHARSET.name());
-    String step2 = URLDecoder.decode(step1, CHARSET.name());
-    byte[] step3 = Base64.getDecoder().decode(step2);
-    String decodedDisplayUrl = new String(step3, CHARSET);
+    String decodedDisplayUrl = decodeDfpPayloadComponent(encodedDisplayUrl);
 
     assertEquals(STUB_DISPLAY_URL, decodedDisplayUrl);
+  }
+
+  @Test
+  public void whenEnrichingNativePayload_GivenValidCpIdAndPrefetchNative_PayloadIsEncodedInASpecificManner()
+      throws Exception {
+    NativeAssets expectedAssets = STUB_NATIVE_ASSETS;
+    NativeProduct expectedProduct = expectedAssets.nativeProducts.get(0);
+
+    givenInitializedCriteo(validNativeAdUnit);
+    waitForBids();
+
+    Builder builder = new Builder();
+
+    Criteo.getInstance().setBidsForAdUnit(builder, validNativeAdUnit);
+
+    Bundle bundle = builder.build().getCustomTargeting();
+
+    assertEquals(expectedProduct.title, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_TITLE)));
+    assertEquals(expectedProduct.description, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_DESCRIPTION)));
+    assertEquals(expectedProduct.imageUrl, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_IMAGE)));
+    assertEquals(expectedProduct.price, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PRICE)));
+    assertEquals(expectedProduct.clickUrl, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_CLICK)));
+    assertEquals(expectedProduct.callToAction, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_CTA)));
+    assertEquals(expectedAssets.advertiserDescription, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_ADVERTISER_NAME)));
+    assertEquals(expectedAssets.advertiserDomain, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_ADVERTISER_DOMAIN)));
+    assertEquals(expectedAssets.advertiserLogoUrl, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_ADVERTISER_LOGO)));
+    assertEquals(expectedAssets.advertiserLogoClickUrl, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_ADVERTISER_CLICK)));
+    assertEquals(expectedAssets.privacyOptOutClickUrl, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PRIVACY_LINK)));
+    assertEquals(expectedAssets.privacyOptOutImageUrl, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PRIVACY_IMAGE)));
+    assertEquals(expectedAssets.impressionPixels.get(0), decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PIXEL_1)));
+    assertEquals(expectedAssets.impressionPixels.get(1), decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PIXEL_2)));
+    assertEquals(String.valueOf(expectedAssets.impressionPixels.size()), bundle.getString(MACRO_NATIVE_PIXEL_COUNT));
+  }
+
+  private String decodeDfpPayloadComponent(String component) throws Exception {
+    // Payload component (such as display URL) should be encoded with:
+    // Base64 encoder + URL encoder + URL encoder
+    // So we should get back a good component by applying the reverse
+    // The reverse: URL decoder + URL decoder + Base64 decoder
+
+    String step1 = URLDecoder.decode(component, CHARSET.name());
+    String step2 = URLDecoder.decode(step1, CHARSET.name());
+    byte[] step3 = Base64.getDecoder().decode(step2);
+    return new String(step3, CHARSET);
   }
 
   @Test
