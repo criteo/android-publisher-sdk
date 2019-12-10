@@ -46,6 +46,11 @@ public class DummyCriteo extends Criteo {
     return new Config();
   }
 
+  @Override
+  public void setUsPrivacyOptOut(boolean usPrivacyOptOut) {
+    // do nothing
+  }
+
   private static class DummyDeviceInfo extends DeviceInfo {
 
     @Override

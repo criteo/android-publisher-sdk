@@ -98,6 +98,11 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
             user.setUspIab(uspIab);
         }
 
+        String uspOptout = userPrivacyUtil.getUsPrivacyOptout();
+        if (uspOptout != null && !uspOptout.isEmpty()) {
+            user.setUspOptout(uspOptout);
+        }
+
         Cdb cdbRequest = new Cdb();
         cdbRequest.setRequestedAdUnits(cacheAdUnits);
         cdbRequest.setUser(user);

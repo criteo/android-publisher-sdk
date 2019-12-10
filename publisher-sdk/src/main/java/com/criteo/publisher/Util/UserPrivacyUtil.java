@@ -2,6 +2,7 @@ package com.criteo.publisher.Util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
@@ -19,6 +20,9 @@ public class UserPrivacyUtil {
 
     // Key provided by the IAB CCPA Compliance Framework
     private static final String IAB_USPRIVACY = "IABUSPrivacy_String";
+
+    // Storage key for the binary optout (for CCPA)
+    private static final String OPTOUT_USPRIVACY = "USPrivacy_Optout";
 
     private final SharedPreferences sharedPreferences;
 
@@ -56,5 +60,16 @@ public class UserPrivacyUtil {
     @NonNull
     public String getIabUsPrivacyString() {
         return sharedPreferences.getString(IAB_USPRIVACY, "");
+    }
+
+    public void storeUsPrivacyOptout(boolean uspOptout) {
+        Editor edit = sharedPreferences.edit();
+        edit.putString(OPTOUT_USPRIVACY, String.valueOf(uspOptout));
+        edit.apply();
+    }
+
+    @NonNull
+    public String getUsPrivacyOptout() {
+        return sharedPreferences.getString(OPTOUT_USPRIVACY, "");
     }
 }

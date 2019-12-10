@@ -2,6 +2,7 @@ package com.criteo.publisher;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
@@ -12,6 +13,7 @@ import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 
 import com.criteo.publisher.Util.UserAgentCallback;
+import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
@@ -25,17 +27,20 @@ final class CriteoInternal extends Criteo {
 
   private static final String TAG = CriteoInternal.class.getSimpleName();
 
-  private BidManager bidManager;
-  private AppEvents appEvents;
-  private AppLifecycleUtil appLifecycleUtil;
-  private DeviceInfo deviceInfo;
-  private Config config;
+  private final BidManager bidManager;
+  private final AppEvents appEvents;
+  private final AppLifecycleUtil appLifecycleUtil;
+  private final DeviceInfo deviceInfo;
+  private final Config config;
+  private final UserPrivacyUtil userPrivacyUtil;
 
   CriteoInternal(
       Application application,
       List<AdUnit> adUnits,
       String criteoPublisherId,
+      @Nullable Boolean usPrivacyOptout,
       DependencyProvider dependencyProvider) {
+
     if (application == null) {
       throw new IllegalArgumentException("Application reference is required.");
     }
@@ -56,6 +61,11 @@ final class CriteoInternal extends Criteo {
     config = dependencyProvider.provideConfig(context);
 
     bidManager = dependencyProvider.provideBidManager(context, criteoPublisherId);
+
+    userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil(context);
+    if (usPrivacyOptout != null) {
+      userPrivacyUtil.storeUsPrivacyOptout(usPrivacyOptout.booleanValue());
+    }
 
     PubSdkApi api = dependencyProvider.providePubSdkApi(context);
 
@@ -141,5 +151,10 @@ final class CriteoInternal extends Criteo {
   @Override
   Config getConfig() {
     return config;
+  }
+
+  @Override
+  public void setUsPrivacyOptOut(boolean usPrivacyOptOut) {
+    userPrivacyUtil.storeUsPrivacyOptout(usPrivacyOptOut);
   }
 }

@@ -4,6 +4,7 @@ import android.app.Application;
 import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.model.AdUnit;
 import java.util.Arrays;
+import java.util.List;
 
 public class CriteoUtil {
 
@@ -25,4 +26,15 @@ public class CriteoUtil {
     Criteo.setInstance(null);
   }
 
+  public static Criteo.Builder getCriteoBuilder(AdUnit... preloadedAdUnits) throws CriteoInitException {
+    Application app = (Application) InstrumentationRegistry.getTargetContext()
+        .getApplicationContext();
+
+    // clears any side effects from previous calls
+    Criteo.setInstance(null);
+
+    List<AdUnit> adUnits = Arrays.asList(preloadedAdUnits);
+    Criteo.Builder builder = new Criteo.Builder(app, TEST_CP_ID).adUnits(adUnits);
+    return builder;
+  }
 }

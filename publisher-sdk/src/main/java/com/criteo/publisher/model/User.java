@@ -22,7 +22,7 @@ public class User implements Parcelable {
     private static final String GAID = "gaid";
     private static final String ANDROID = "android";
     private static final String USP_IAB = "uspIab";
-
+    private static final String USP_OPTOUT = "uspOptout";
     private static final int LMT_VAL = 0;
 
     private String deviceId;
@@ -35,6 +35,9 @@ public class User implements Parcelable {
 
     /** US Privacy consent IAB format (for CCPA) */
     private String uspIab;
+
+    /** US Privacy optout in binary format (for CCPA) */
+    private String uspOptout;
 
     public User(@NonNull DeviceUtil deviceUtil) {
         deviceId = "";
@@ -62,6 +65,15 @@ public class User implements Parcelable {
         return uspIab;
     }
 
+    public void setUspOptout(@NonNull String uspOptout) {
+        this.uspOptout = uspOptout;
+    }
+
+    @Nullable
+    public String getUspOptout() {
+        return uspOptout;
+    }
+
     public JSONObject toJson() throws JSONException {
         JSONObject object = new JSONObject();
         object.put(DEVICE_ID, deviceId);
@@ -74,6 +86,10 @@ public class User implements Parcelable {
 
         if (this.uspIab != null && !this.uspIab.isEmpty()) {
             object.put(USP_IAB, uspIab);
+        }
+
+        if (this.uspOptout != null && !this.uspOptout.isEmpty()) {
+            object.put(USP_OPTOUT, uspOptout);
         }
 
         return object;
@@ -94,6 +110,7 @@ public class User implements Parcelable {
         dest.writeInt(this.limit);
         dest.writeString(this.connection);
         dest.writeString(this.uspIab);
+        dest.writeString(this.uspOptout);
     }
 
     protected User(Parcel in) {
@@ -105,6 +122,7 @@ public class User implements Parcelable {
         this.limit = in.readInt();
         this.connection = in.readString();
         this.uspIab = in.readString();
+        this.uspOptout = in.readString();
     }
 
     public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {

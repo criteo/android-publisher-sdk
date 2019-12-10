@@ -10,6 +10,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -18,6 +19,7 @@ import android.content.Context;
 import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.UserAgentCallback;
+import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
@@ -41,8 +43,13 @@ public class CriteoInternalUnitTest {
 
   private String criteoPublisherId = "B-000001";
 
+  private Boolean usPrivacyOptout = false;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private DependencyProvider dependencyProvider;
+
+  @Mock
+  private UserPrivacyUtil userPrivacyUtil;
 
   @Before
   public void setUp() throws Exception {
@@ -91,6 +98,7 @@ public class CriteoInternalUnitTest {
     // Used to verify transitive dependencies
     dependencyProvider = spy(DependencyProvider.getInstance());
     doReturn(mock(DeviceUtil.class)).when(dependencyProvider).provideDeviceUtil(any());
+    doReturn(mock(UserPrivacyUtil.class)).when(dependencyProvider).provideUserPrivacyUtil(any());
 
     Context applicationContext = mock(Context.class);
     when(application.getApplicationContext()).thenReturn(applicationContext);
@@ -108,6 +116,90 @@ public class CriteoInternalUnitTest {
 
     assertThat(contextCaptor.getAllValues()).containsOnly(applicationContext);
   }
+
+  @Test
+  public void new_GivenTrueUsOptOut_ShouldStoreTrueValue() throws Exception {
+    Context context = application.getApplicationContext();
+    when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
+    usPrivacyOptout = true;
+
+    createCriteo();
+
+    verify(userPrivacyUtil).storeUsPrivacyOptout(true);
+  }
+  @Test
+  public void new_GivenTrueUsOptOut_ThenSetToFalse_ShouldStoreTrueThenFalseValue() throws Exception {
+    Context context = application.getApplicationContext();
+    when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
+    usPrivacyOptout = true;
+
+    CriteoInternal criteoInternal = createCriteo();
+    verify(userPrivacyUtil).storeUsPrivacyOptout(true);
+
+    criteoInternal.setUsPrivacyOptOut(false);
+    verify(userPrivacyUtil).storeUsPrivacyOptout(false);
+  }
+
+  @Test
+  public void new_GivenFalseUsOptOut_ShouldStoreFalseValue() throws Exception {
+    Context context = application.getApplicationContext();
+    when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
+    usPrivacyOptout = false;
+
+    createCriteo();
+
+    verify(userPrivacyUtil).storeUsPrivacyOptout(false);
+  }
+
+  @Test
+  public void new_GivenFalseUsOptOut_ThenSetToTrue_ShouldFalseThenTrue() throws Exception {
+    Context context = application.getApplicationContext();
+    when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
+    usPrivacyOptout = false;
+
+    CriteoInternal criteoInternal = createCriteo();
+    verify(userPrivacyUtil).storeUsPrivacyOptout(false);
+
+    criteoInternal.setUsPrivacyOptOut(true);
+    verify(userPrivacyUtil).storeUsPrivacyOptout(true);
+  }
+
+  @Test
+  public void new_GivenNullUsOptOut_ShouldNotStoreIt() throws Exception {
+    Context context = application.getApplicationContext();
+    when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
+    usPrivacyOptout = null;
+
+    createCriteo();
+
+    verify(userPrivacyUtil, never()).storeUsPrivacyOptout(any(Boolean.class));
+  }
+
+
+  @Test
+  public void new_GivenNullUsOptOut_ThenSetToTrue_ShouldStoreTrueValue() throws Exception {
+    Context context = application.getApplicationContext();
+    when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
+    usPrivacyOptout = null;
+
+    CriteoInternal criteoInternal = createCriteo();
+    criteoInternal.setUsPrivacyOptOut(true);
+
+    verify(userPrivacyUtil).storeUsPrivacyOptout(true);
+  }
+
+  @Test
+  public void new_GivenNullUsOptOut_ThenSetToFalse_ShouldStoreFalseValue() throws Exception {
+    Context context = application.getApplicationContext();
+    when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
+    usPrivacyOptout = null;
+
+    CriteoInternal criteoInternal = createCriteo();
+    criteoInternal.setUsPrivacyOptOut(false);
+
+    verify(userPrivacyUtil).storeUsPrivacyOptout(false);
+  }
+
 
   private BidManager givenMockedBidManager() {
     BidManager bidManager = mock(BidManager.class);
@@ -128,7 +220,7 @@ public class CriteoInternalUnitTest {
   }
 
   private CriteoInternal createCriteo() {
-    return new CriteoInternal(application, adUnits, criteoPublisherId, dependencyProvider);
+    return new CriteoInternal(application, adUnits, criteoPublisherId, usPrivacyOptout, dependencyProvider);
   }
 
 }

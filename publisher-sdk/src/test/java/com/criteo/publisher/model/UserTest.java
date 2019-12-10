@@ -28,8 +28,8 @@ public class UserTest {
 
   @Test
   public void testToJson_AllFieldsProvided() throws Exception {
-    user.setUspIab("1YNNN");
-
+    user.setUspIab("fake_usp_iab");
+    user.setUspOptout("true");
     JSONObject jsonObject = user.toJson();
 
     assertEquals("deviceId", jsonObject.get("deviceId"));
@@ -38,7 +38,8 @@ public class UserTest {
     assertEquals("android", jsonObject.get("deviceOs"));
     assertEquals(BuildConfig.VERSION_NAME, jsonObject.get("sdkver"));
     assertEquals(0, jsonObject.get("lmt"));
-    assertEquals("1YNNN", jsonObject.get("uspIab"));
+    assertEquals("fake_usp_iab", jsonObject.get("uspIab"));
+    assertEquals("true", jsonObject.get("uspOptout"));
   }
 
   @Test

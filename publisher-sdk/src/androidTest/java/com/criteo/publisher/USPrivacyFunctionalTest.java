@@ -1,8 +1,10 @@
 package com.criteo.publisher;
 
+import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import android.app.Application;
@@ -73,6 +75,68 @@ public class USPrivacyFunctionalTest {
 
     Cdb cdb = cdbArgumentCaptor.getValue();
     Assert.assertNull( cdb.getUser().getUspIab());
+  }
+
+  @Test
+  public void whenCriteoInit_GivenUspOptoutNotEmpty_VerifyItIsPassedToCdb() throws Exception {
+    Criteo.Builder builder = CriteoUtil.getCriteoBuilder(TestAdUnits.BANNER_320_50);
+    builder.usPrivacyOptOut(true).init();
+
+    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+
+    ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
+    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
+
+    Cdb cdb = cdbArgumentCaptor.getValue();
+    assertEquals("true", cdb.getUser().getUspOptout());
+  }
+
+  @Test
+  public void whenCriteoInit_GivenUspOptoutEmpty_VerifyItIsPassedToCdb() throws Exception {
+    Criteo.Builder builder = CriteoUtil.getCriteoBuilder(TestAdUnits.BANNER_320_50);
+    builder.init();
+
+    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+
+    ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
+    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
+
+    Cdb cdb = cdbArgumentCaptor.getValue();
+    assertNull(cdb.getUser().getUspOptout());
+  }
+
+  @Test
+  public void whenCriteoInit_GivenUspOptoutTrue_ThenChangedToFalse_VerifyFalseIsPassedToCdb() throws Exception {
+    Criteo.Builder builder = CriteoUtil.getCriteoBuilder(TestAdUnits.BANNER_320_50);
+    Criteo criteo = builder.usPrivacyOptOut(true).init();
+    criteo.setUsPrivacyOptOut(false);
+
+    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+
+    ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
+    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
+
+    Cdb cdb = cdbArgumentCaptor.getValue();
+    assertEquals("false", cdb.getUser().getUspOptout());
+  }
+
+  @Test
+  public void whenCriteoInit_GivenUspOptoutTrue_ThenChangedToFalseAfterFirstCall_VerifyFalseIsPassedToCdbOnTheSecondCall() throws Exception {
+    Criteo.Builder builder = CriteoUtil.getCriteoBuilder(TestAdUnits.BANNER_320_50);
+    Criteo criteo = builder.usPrivacyOptOut(true).init();
+
+    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+
+    criteo.setUsPrivacyOptOut(false);
+    criteo.getBidForAdUnit(TestAdUnits.BANNER_320_480);
+
+    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+
+    ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
+    verify(pubSdkApi, times(2)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
+
+    Cdb cdb = cdbArgumentCaptor.getValue();
+    assertEquals("false", cdb.getUser().getUspOptout());
   }
 
   private void writeIntoDefaultSharedPrefs(String key, String value) {
