@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
   package="com.criteo.publisher">
 
-  <application>
+  <application
+    android:networkSecurityConfig="@xml/network_security_config">
     <activity android:name="com.criteo.publisher.test.activity.DummyActivity"/>
 
     <activity
