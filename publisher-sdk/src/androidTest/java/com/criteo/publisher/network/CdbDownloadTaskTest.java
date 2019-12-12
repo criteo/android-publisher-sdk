@@ -21,8 +21,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class  CdbDownloadTaskTest {
+
     @Rule
-    private MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+    public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
     private CdbDownloadTask cdbDownloadTask;
     private List<CacheAdUnit> cacheAdUnits;
