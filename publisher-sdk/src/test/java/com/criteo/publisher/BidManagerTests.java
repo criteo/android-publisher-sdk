@@ -6,15 +6,15 @@ import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.support.annotation.NonNull;
 import com.criteo.publisher.Util.AndroidUtil;
-
-import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.Util.LoggingUtil;
+import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Config;
@@ -24,7 +24,6 @@ import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.CdbDownloadTask;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
-import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,7 +49,6 @@ public class BidManagerTests {
     private AdSize adSize = new AdSize(320, 50);
     private AdUnit adUnit;
     private String cpm = "0.10";
-    private ArrayList<CacheAdUnit> cacheAdUnits;
     private Context context;
     private String displayUrl = "https://www.example.com/lone?par1=abcd";
     private Publisher publisher;
@@ -65,9 +63,6 @@ public class BidManagerTests {
 
     @Mock
     private Config config;
-
-    @Mock
-    private AdvertisingInfo advertisingInfo;
 
     @Mock
     private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
@@ -87,14 +82,17 @@ public class BidManagerTests {
     @Mock
     private UserPrivacyUtil userPrivacyUtil;
 
+    private AdUnitMapper adUnitMapper;
+
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
+
+        adUnitMapper = new AdUnitMapper(androidUtil, deviceUtil);
+
         adUnit = new BannerAdUnit(adUnitId, adSize);
 
-        cacheAdUnits = new ArrayList<>();
         CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
-        cacheAdUnits.add(cAdUnit);
 
         context = mock(Context.class);
         when(context.getPackageName()).thenReturn("TestThisPackage");
@@ -145,22 +143,7 @@ public class BidManagerTests {
         // setup
         when(config.isKillSwitchEnabled()).thenReturn(true);
 
-        BidManager bidManager = new BidManager(
-            context,
-            publisher,
-            tokenCache,
-            deviceInfo,
-            user,
-            sdkCache,
-            placementsWithCdbTasks,
-            config,
-            androidUtil,
-            deviceUtil,
-            loggingUtil,
-            advertisingInfo,
-            clock,
-            userPrivacyUtil
-        );
+        BidManager bidManager = createBidManager();
 
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         bidManager.enrichBid(builder, adUnit);
@@ -175,22 +158,7 @@ public class BidManagerTests {
         // setup
         when(config.isKillSwitchEnabled()).thenReturn(false);
 
-        BidManager bidManager = new BidManager(
-            context,
-            publisher,
-            tokenCache,
-            deviceInfo,
-            user,
-            sdkCache,
-            placementsWithCdbTasks,
-            config,
-            androidUtil,
-            deviceUtil,
-            loggingUtil,
-            advertisingInfo,
-            clock,
-            userPrivacyUtil
-        );
+        BidManager bidManager = createBidManager();
 
         PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
         bidManager.enrichBid(builder, adUnit);
@@ -205,22 +173,7 @@ public class BidManagerTests {
         // setup
         when(config.isKillSwitchEnabled()).thenReturn(true);
 
-        BidManager bidManager = new BidManager(
-            context,
-            publisher,
-            tokenCache,
-            deviceInfo,
-            user,
-            sdkCache,
-            placementsWithCdbTasks,
-            config,
-            androidUtil,
-            deviceUtil,
-            loggingUtil,
-            advertisingInfo,
-            clock,
-            userPrivacyUtil
-        );
+        BidManager bidManager = createBidManager();
 
         //test
         Slot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
@@ -232,22 +185,7 @@ public class BidManagerTests {
         // setup
         when(config.isKillSwitchEnabled()).thenReturn(false);
 
-        BidManager bidManager = new BidManager(
-            context,
-            publisher,
-            tokenCache,
-            deviceInfo,
-            user,
-            sdkCache,
-            placementsWithCdbTasks,
-            config,
-            androidUtil,
-            deviceUtil,
-            loggingUtil,
-            advertisingInfo,
-            clock,
-            userPrivacyUtil
-        );
+        BidManager bidManager = createBidManager();
 
         //test
         Slot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
@@ -260,22 +198,7 @@ public class BidManagerTests {
         // setup
         when(config.isKillSwitchEnabled()).thenReturn(true);
 
-        BidManager bidManager = new BidManager(
-            context,
-            publisher,
-            tokenCache,
-            deviceInfo,
-            user,
-            sdkCache,
-            placementsWithCdbTasks,
-            config,
-            androidUtil,
-            deviceUtil,
-            loggingUtil,
-            advertisingInfo,
-            clock,
-            userPrivacyUtil
-        );
+        BidManager bidManager = createBidManager();
 
         BidResponse expectedResponse = new BidResponse();
 
@@ -296,22 +219,7 @@ public class BidManagerTests {
         when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
         when(this.sdkCache.getAdUnit(cAdUnit)).thenReturn(testSlot);
 
-        BidManager bidManager = new BidManager(
-            context,
-            publisher,
-            tokenCache,
-            deviceInfo,
-            user,
-            sdkCache,
-            placementsWithCdbTasks,
-            config,
-            androidUtil,
-            deviceUtil,
-            loggingUtil,
-            advertisingInfo,
-            clock,
-            userPrivacyUtil
-        );
+        BidManager bidManager = createBidManager();
 
         BidResponse expectedResponse = new BidResponse(0.10d,
                 new BidToken(UUID.randomUUID(), new BannerAdUnit("banneradUnitId1", new AdSize(320, 50))), true);
@@ -333,22 +241,7 @@ public class BidManagerTests {
         CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
         when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
         when(this.sdkCache.getAdUnit(cAdUnit)).thenReturn(testSlot);
-        BidManager bidManager = new BidManager(
-            context,
-            publisher,
-            tokenCache,
-            deviceInfo,
-            user,
-            sdkCache,
-            placementsWithCdbTasks,
-            config,
-            androidUtil,
-            deviceUtil,
-            loggingUtil,
-            advertisingInfo,
-            clock,
-            userPrivacyUtil
-        );
+        BidManager bidManager = createBidManager();
 
         BannerAdUnit bannerAdUnit = new BannerAdUnit(adUnitId, new AdSize(320,50));
 
@@ -380,22 +273,7 @@ public class BidManagerTests {
         when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
         when(this.sdkCache.getAdUnit(cAdUnit)).thenReturn(testSlot);
 
-        BidManager bidManager = new BidManager(
-            context,
-            publisher,
-            tokenCache,
-            deviceInfo,
-            user,
-            sdkCache,
-            placementsWithCdbTasks,
-            config,
-            androidUtil,
-            deviceUtil,
-            loggingUtil,
-            advertisingInfo,
-            clock,
-            userPrivacyUtil
-        );
+        BidManager bidManager = createBidManager();
 
         BannerAdUnit bannerAdUnit = new BannerAdUnit(adUnitId, new AdSize(320,50));
 
@@ -422,6 +300,25 @@ public class BidManagerTests {
         Assert.assertEquals(2, specialHashMap.size());
         Assert.assertEquals(cpm, specialHashMap.get(MAP_CRT_CPM));
         Assert.assertEquals(displayUrl, specialHashMap.get(MAP_CRT_DISPLAY_URL));
+    }
+
+    @NonNull
+    private BidManager createBidManager() {
+        return new BidManager(
+            context,
+            publisher,
+            tokenCache,
+            deviceInfo,
+            user,
+            sdkCache,
+            placementsWithCdbTasks,
+            config,
+            deviceUtil,
+            loggingUtil,
+            clock,
+            userPrivacyUtil,
+            adUnitMapper
+        );
     }
 
     private interface SpecialMap extends Map

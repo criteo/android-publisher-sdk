@@ -10,12 +10,14 @@ import static org.mockito.Mockito.when;
 
 import android.app.Application;
 import android.content.Context;
+import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.UserAgentCallback;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,25 +46,24 @@ public class CriteoInternalUnitTest {
 
   @Test
   public void new_GivenBidManagerAndAdUnits_ShouldCallPrefetchWithAdUnits() throws Exception {
-    BidManager bidManager = mock(BidManager.class);
-
-    Context context = application.getApplicationContext();
-    Config config = dependencyProvider.provideConfig(context);
+    BidManager bidManager = givenMockedBidManager();
+    givenMockedDeviceInfo();
     adUnits = mock(List.class);
-
-    when(dependencyProvider.provideBidManager(
-        eq(context), eq(criteoPublisherId), any(), eq(config),
-        any(), any(), any(), any(), any(), any()))
-        .thenReturn(bidManager);
-
-    DeviceInfo deviceInfo = dependencyProvider.provideDeviceInfo();
-    doAnswer(answerVoid((Context ignoredContext, UserAgentCallback userAgentCallback) -> {
-      userAgentCallback.done();
-    })).when(deviceInfo).initialize(eq(context), any());
 
     createCriteo();
 
     verify(bidManager).prefetch(adUnits);
+  }
+
+  @Test
+  public void new_GivenBidManagerAndNullAdUnits_ShouldCallPrefetchWithEmptyAdUnits() throws Exception {
+    BidManager bidManager = givenMockedBidManager();
+    givenMockedDeviceInfo();
+    adUnits = null;
+
+    createCriteo();
+
+    verify(bidManager).prefetch(Collections.emptyList());
   }
 
   @Test
@@ -72,17 +73,19 @@ public class CriteoInternalUnitTest {
 
     createCriteo();
 
+    DeviceUtil deviceUtil = dependencyProvider.provideDeviceUtil(context);
+    AndroidUtil androidUtil = dependencyProvider.provideAndroidUtil(context);
+
     verify(dependencyProvider).provideBidManager(
         context,
         criteoPublisherId,
         dependencyProvider.provideDeviceInfo(),
         dependencyProvider.provideConfig(context),
-        dependencyProvider.provideDeviceUtil(context),
-        dependencyProvider.provideAndroidUtil(context),
+        deviceUtil,
         dependencyProvider.provideLoggingUtil(),
-        dependencyProvider.provideAdvertisingInfo(),
         dependencyProvider.provideClock(),
-        dependencyProvider.provideUserPrivacyUtil(context)
+        dependencyProvider.provideUserPrivacyUtil(context),
+        dependencyProvider.provideAdUnitMapper(androidUtil, deviceUtil)
     );
   }
 
@@ -96,6 +99,28 @@ public class CriteoInternalUnitTest {
     createCriteo();
 
     verify(deviceUtil).createSupportedScreenSizes(application);
+  }
+
+  private BidManager givenMockedBidManager() {
+    BidManager bidManager = mock(BidManager.class);
+
+    Context context = application.getApplicationContext();
+    Config config = dependencyProvider.provideConfig(context);
+
+    when(dependencyProvider.provideBidManager(
+        eq(context), eq(criteoPublisherId), any(), eq(config),
+        any(), any(), any(), any(), any()))
+        .thenReturn(bidManager);
+
+    return bidManager;
+  }
+
+  private void givenMockedDeviceInfo() {
+    Context context = application.getApplicationContext();
+    DeviceInfo deviceInfo = dependencyProvider.provideDeviceInfo();
+    doAnswer(answerVoid((Context ignoredContext, UserAgentCallback userAgentCallback) -> {
+      userAgentCallback.done();
+    })).when(deviceInfo).initialize(eq(context), any());
   }
 
   private CriteoInternal createCriteo() {

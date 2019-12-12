@@ -18,7 +18,7 @@ import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.Util.ReflectionUtil;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.AdUnitHelper;
+import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
@@ -73,13 +73,12 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private long cdbTimeToNextCall = 0;
     private DeviceInfo deviceInfo;
     private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
-    private final AndroidUtil androidUtil;
     private final DeviceUtil deviceUtil;
     private final LoggingUtil loggingUtil;
     private final Config config;
-    private final AdvertisingInfo advertisingInfo;
     private final Clock clock;
     private final UserPrivacyUtil userPrivacyUtil;
+    private final AdUnitMapper adUnitMapper;
 
     BidManager(
         @NonNull Context context,
@@ -90,12 +89,11 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         @NonNull SdkCache sdkCache,
         @NonNull Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks,
         @NonNull Config config,
-        @NonNull AndroidUtil androidUtil,
         @NonNull DeviceUtil deviceUtil,
         @NonNull LoggingUtil loggingUtil,
-        @NonNull AdvertisingInfo advertisingInfo,
         @NonNull Clock clock,
-        @NonNull UserPrivacyUtil userPrivacyUtil
+        @NonNull UserPrivacyUtil userPrivacyUtil,
+        @NonNull AdUnitMapper adUnitMapper
     ) {
         this.mContext = context;
         this.publisher = publisher;
@@ -105,12 +103,11 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         this.cache = sdkCache;
         this.placementsWithCdbTasks = placementsWithCdbTasks;
         this.config = config;
-        this.androidUtil = androidUtil;
         this.deviceUtil = deviceUtil;
         this.loggingUtil = loggingUtil;
-        this.advertisingInfo = advertisingInfo;
         this.clock = clock;
         this.userPrivacyUtil = userPrivacyUtil;
+        this.adUnitMapper = adUnitMapper;
     }
 
     /**
@@ -267,15 +264,14 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     }
 
     Slot getBidForAdUnitAndPrefetch(AdUnit adUnit) {
-        if (adUnit == null) {
-            Log.e(TAG, "AdUnit is required.");
-            return null;
-        }
         if (killSwitchEngaged()) {
             return null;
         }
-        CacheAdUnit cacheAdUnit = AdUnitHelper
-                .convertoCacheAdUnit(adUnit, androidUtil.getOrientation(), deviceUtil);
+        CacheAdUnit cacheAdUnit = adUnitMapper.convertValidAdUnit(adUnit);
+        if (cacheAdUnit == null) {
+            Log.e(TAG, "Valid AdUnit is required.");
+            return null;
+        }
 
         Slot peekSlot = cache.peekAdUnit(cacheAdUnit);
         if (peekSlot == null) {
@@ -365,12 +361,9 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
      * @param adUnits list of ad units to prefetch
      */
     void prefetch(@NonNull List<AdUnit> adUnits) {
-        List<CacheAdUnit> cacheAdUnits = AdUnitHelper
-            .convertAdUnits(adUnits, androidUtil.getOrientation(), deviceUtil);
+        List<CacheAdUnit> cacheAdUnits = adUnitMapper.convertValidAdUnits(adUnits);
 
-        List<CacheAdUnit> validatedCacheAdUnits = AdUnitHelper.filterInvalidCacheAdUnits(cacheAdUnits);
-
-        startCdbDownloadTask(true, validatedCacheAdUnits);
+        startCdbDownloadTask(true, cacheAdUnits);
     }
 
     public TokenValue getTokenValue(BidToken bidToken, AdUnitType adUnitType) {

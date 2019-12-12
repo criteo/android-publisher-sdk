@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.Util.AdUnitType;
+import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 
@@ -54,17 +55,18 @@ final class CriteoInternal extends Criteo {
 
     Clock clock = dependencyProvider.provideClock();
 
+    AndroidUtil androidUtil = dependencyProvider.provideAndroidUtil(context);
+
     bidManager = dependencyProvider.provideBidManager(
         context,
         criteoPublisherId,
         deviceInfo,
         config,
         deviceUtil,
-        dependencyProvider.provideAndroidUtil(context),
         dependencyProvider.provideLoggingUtil(),
-        dependencyProvider.provideAdvertisingInfo(),
         clock,
-        dependencyProvider.provideUserPrivacyUtil(context));
+        dependencyProvider.provideUserPrivacyUtil(context),
+        dependencyProvider.provideAdUnitMapper(androidUtil, deviceUtil));
 
     this.appEvents = new AppEvents(context, deviceUtil, clock);
     this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);

@@ -9,6 +9,7 @@ import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.cache.SdkCache;
+import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
@@ -100,11 +101,10 @@ public class DependencyProvider {
       @NonNull DeviceInfo deviceInfo,
       @NonNull Config config,
       @NonNull DeviceUtil deviceUtil,
-      @NonNull AndroidUtil androidUtil,
       @NonNull LoggingUtil loggingUtil,
-      @NonNull AdvertisingInfo advertisingInfo,
       @NonNull Clock clock,
-      @NonNull UserPrivacyUtil userPrivacyUtil) {
+      @NonNull UserPrivacyUtil userPrivacyUtil,
+      @NonNull AdUnitMapper adUnitMapper) {
     return new BidManager(
         context,
         new Publisher(context, criteoPublisherId),
@@ -114,17 +114,20 @@ public class DependencyProvider {
         new SdkCache(deviceUtil),
         new Hashtable<>(),
         config,
-        androidUtil,
         deviceUtil,
         loggingUtil,
-        advertisingInfo,
         clock,
-        userPrivacyUtil
+        userPrivacyUtil,
+        adUnitMapper
     );
   }
 
   @NonNull
   public DeviceInfo provideDeviceInfo() {
     return new DeviceInfo();
+  }
+
+  public AdUnitMapper provideAdUnitMapper(AndroidUtil androidUtil, DeviceUtil deviceUtil) {
+    return new AdUnitMapper(androidUtil, deviceUtil);
   }
 }

@@ -101,7 +101,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         }
 
         Cdb cdbRequest = new Cdb();
-        cdbRequest.setCacheAdUnits(cacheAdUnits);
+        cdbRequest.setRequestedAdUnits(cacheAdUnits);
         cdbRequest.setUser(user);
         cdbRequest.setPublisher(publisher);
         cdbRequest.setSdkVersion(BuildConfig.VERSION_NAME);

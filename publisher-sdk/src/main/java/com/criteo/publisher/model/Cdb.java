@@ -2,6 +2,7 @@ package com.criteo.publisher.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ public class Cdb implements Parcelable {
     private static final String TIME_TO_NEXT_CALL = "timeToNextCall";
     private static final String SLOTS = "slots";
     private List<Slot> slots;
-    private List<CacheAdUnit> cacheAdUnits;
+    private List<CacheAdUnit> requestedAdUnits;
     private Publisher publisher;
     private User user;
     private String sdkVersion;
@@ -67,8 +68,13 @@ public class Cdb implements Parcelable {
         return slots;
     }
 
-    public void setCacheAdUnits(List<CacheAdUnit> cacheAdUnits) {
-        this.cacheAdUnits = cacheAdUnits;
+    public void setRequestedAdUnits(List<CacheAdUnit> requestedAdUnits) {
+        this.requestedAdUnits = requestedAdUnits;
+    }
+
+    @VisibleForTesting
+    public List<CacheAdUnit> getRequestedAdUnits() {
+        return requestedAdUnits;
     }
 
     public Publisher getPublisher() {
@@ -112,7 +118,7 @@ public class Cdb implements Parcelable {
         json.put(PROFILE_ID, profileId);
 
         JSONArray jsonAdUnits = new JSONArray();
-        for (CacheAdUnit cacheAdUnit : cacheAdUnits) {
+        for (CacheAdUnit cacheAdUnit : requestedAdUnits) {
             jsonAdUnits.put(cacheAdUnit.toJson());
         }
         if (jsonAdUnits.length() > 0) {

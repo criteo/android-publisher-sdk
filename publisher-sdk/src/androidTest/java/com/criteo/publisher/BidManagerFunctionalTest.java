@@ -1,21 +1,29 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
+import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
+import static com.criteo.publisher.Util.AdUnitType.CRITEO_INTERSTITIAL;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
+import com.criteo.publisher.Util.AndroidUtil;
+import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.model.AdUnitMapper;
+import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.model.DeviceInfo;
-import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
@@ -62,14 +70,23 @@ public class BidManagerFunctionalTest {
 
   @Test
   public void prefetch_GivenAdUnits_ShouldCallCdbAndPopulateCacheWithResult() throws Exception {
-    BannerAdUnit adUnit1 = new BannerAdUnit("adUnit1", new AdSize(1, 1));
-    AdUnit adUnit2 = new InterstitialAdUnit("adUnit2");
-    List<AdUnit> prefetchAdUnits = Arrays.asList(adUnit1, adUnit2);
+    List<AdUnit> prefetchAdUnits = Arrays.asList(
+        mock(AdUnit.class),
+        mock(AdUnit.class),
+        mock(AdUnit.class));
+
+    List<CacheAdUnit> mappedAdUnits = Arrays.asList(
+        new CacheAdUnit(new AdSize(1, 1), "adUnit1", CRITEO_BANNER),
+        new CacheAdUnit(new AdSize(2, 2), "adUnit2", CRITEO_INTERSTITIAL)
+    );
+
+    AdUnitMapper mapper = givenMockedAdUnitMapper();
 
     Slot slot1 = mock(Slot.class);
     Cdb response = mock(Cdb.class);
     when(response.getSlots()).thenReturn(Collections.singletonList(slot1));
 
+    when(mapper.convertValidAdUnits(prefetchAdUnits)).thenReturn(mappedAdUnits);
     when(api.loadCdb(any(), any(), any())).thenReturn(response);
 
     BidManager bidManager = createBidManager();
@@ -77,15 +94,51 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     verify(cache).addAll(Collections.singletonList(slot1));
-    verify(api).loadCdb(any(), any(), any());
+    verify(api).loadCdb(any(), argThat(cdb -> {
+      assertEquals(mappedAdUnits, cdb.getRequestedAdUnits());
+      return true;
+    }), any());
+  }
+
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenNotValidAdUnit_ReturnNullAndDoNotCallCdb() {
+    AdUnit adUnit = mock(AdUnit.class);
+
+    AdUnitMapper mapper = givenMockedAdUnitMapper();
+    when(mapper.convertValidAdUnit(adUnit)).thenReturn(null);
+
+    BidManager bidManager = createBidManager();
+    Slot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    waitForIdleState();
+
+    assertNull(bid);
+    verify(api, never()).loadCdb(any(), any(), any());
+  }
+
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenNullAdUnit_ReturnNullAndDoNotCallCdb() {
+    BidManager bidManager = createBidManager();
+    Slot bid = bidManager.getBidForAdUnitAndPrefetch(null);
+    waitForIdleState();
+
+    assertNull(bid);
+    verify(api, never()).loadCdb(any(), any(), any());
   }
 
   private void waitForIdleState() {
     waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
   }
 
+  private AdUnitMapper givenMockedAdUnitMapper() {
+    AdUnitMapper mapper = mock(AdUnitMapper.class);
+    when(dependencyProvider.provideAdUnitMapper(any(), any())).thenReturn(mapper);
+    return mapper;
+  }
+
   private BidManager createBidManager() {
     Context context = InstrumentationRegistry.getContext();
+    AndroidUtil androidUtil = dependencyProvider.provideAndroidUtil(context);
+    DeviceUtil deviceUtil = dependencyProvider.provideDeviceUtil(context);
 
     return new BidManager(
         context,
@@ -96,12 +149,11 @@ public class BidManagerFunctionalTest {
         cache,
         new Hashtable<>(),
         dependencyProvider.provideConfig(context),
-        dependencyProvider.provideAndroidUtil(context),
-        dependencyProvider.provideDeviceUtil(context),
+        deviceUtil,
         dependencyProvider.provideLoggingUtil(),
-        dependencyProvider.provideAdvertisingInfo(),
         dependencyProvider.provideClock(),
-        dependencyProvider.provideUserPrivacyUtil(context)
+        dependencyProvider.provideUserPrivacyUtil(context),
+        dependencyProvider.provideAdUnitMapper(androidUtil, deviceUtil)
     );
   }
 
