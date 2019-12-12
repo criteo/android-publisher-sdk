@@ -2,11 +2,14 @@ package com.criteo.publisher.Util;
 
 import static android.content.ContentValues.TAG;
 
+import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.Base64;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.WindowManager;
 import com.criteo.publisher.model.AdSize;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -25,6 +28,19 @@ public class DeviceUtil {
     public DeviceUtil(@NonNull Context context, @NonNull AdvertisingInfo advertisingInfo) {
         this.context = context;
         this.advertisingInfo = advertisingInfo;
+    }
+
+    public void createSupportedScreenSizes(Application application) {
+        try {
+            DisplayMetrics metrics = new DisplayMetrics();
+            ((WindowManager) application.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()
+                .getMetrics(metrics);
+            setScreenSize(Math.round(metrics.widthPixels / metrics.density),
+                Math.round(metrics.heightPixels / metrics.density));
+        } catch (Exception e) {
+            // FIXME(ma.chentir) message might be misleading as this could not be the only exception cause
+            throw new Error("Screen parameters can not be empty or null", e);
+        }
     }
 
     public void setScreenSize(int screenWidth, int screenHeight) {

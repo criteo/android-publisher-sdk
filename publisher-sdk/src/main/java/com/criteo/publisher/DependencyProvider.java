@@ -8,8 +8,13 @@ import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.Util.LoggingUtil;
+import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.Config;
+import com.criteo.publisher.model.DeviceInfo;
+import com.criteo.publisher.model.Publisher;
+import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.PubSdkApi;
+import java.util.Hashtable;
 import java.util.concurrent.Executor;
 
 /**
@@ -86,5 +91,40 @@ public class DependencyProvider {
   @NonNull
   public UserPrivacyUtil provideUserPrivacyUtil(@NonNull Context context) {
     return new UserPrivacyUtil(context);
+  }
+
+  @NonNull
+  public BidManager provideBidManager(
+      @NonNull Context context,
+      @NonNull String criteoPublisherId,
+      @NonNull DeviceInfo deviceInfo,
+      @NonNull Config config,
+      @NonNull DeviceUtil deviceUtil,
+      @NonNull AndroidUtil androidUtil,
+      @NonNull LoggingUtil loggingUtil,
+      @NonNull AdvertisingInfo advertisingInfo,
+      @NonNull Clock clock,
+      @NonNull UserPrivacyUtil userPrivacyUtil) {
+    return new BidManager(
+        context,
+        new Publisher(context, criteoPublisherId),
+        new TokenCache(),
+        deviceInfo,
+        new User(deviceUtil),
+        new SdkCache(deviceUtil),
+        new Hashtable<>(),
+        config,
+        androidUtil,
+        deviceUtil,
+        loggingUtil,
+        advertisingInfo,
+        clock,
+        userPrivacyUtil
+    );
+  }
+
+  @NonNull
+  public DeviceInfo provideDeviceInfo() {
+    return new DeviceInfo();
   }
 }

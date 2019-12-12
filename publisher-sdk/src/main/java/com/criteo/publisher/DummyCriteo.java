@@ -54,7 +54,7 @@ public class DummyCriteo extends Criteo {
     }
 
     @Override
-    public void initialize(Context context, UserAgentCallback userAgentCallback) {
+    public void initialize(@NonNull Context context, @NonNull UserAgentCallback userAgentCallback) {
       userAgentCallback.done();
     }
 

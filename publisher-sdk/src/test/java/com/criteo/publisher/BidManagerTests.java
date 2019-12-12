@@ -148,7 +148,6 @@ public class BidManagerTests {
         BidManager bidManager = new BidManager(
             context,
             publisher,
-            cacheAdUnits,
             tokenCache,
             deviceInfo,
             user,
@@ -179,7 +178,6 @@ public class BidManagerTests {
         BidManager bidManager = new BidManager(
             context,
             publisher,
-            cacheAdUnits,
             tokenCache,
             deviceInfo,
             user,
@@ -210,7 +208,6 @@ public class BidManagerTests {
         BidManager bidManager = new BidManager(
             context,
             publisher,
-            cacheAdUnits,
             tokenCache,
             deviceInfo,
             user,
@@ -238,7 +235,6 @@ public class BidManagerTests {
         BidManager bidManager = new BidManager(
             context,
             publisher,
-            cacheAdUnits,
             tokenCache,
             deviceInfo,
             user,
@@ -267,7 +263,6 @@ public class BidManagerTests {
         BidManager bidManager = new BidManager(
             context,
             publisher,
-            cacheAdUnits,
             tokenCache,
             deviceInfo,
             user,
@@ -304,7 +299,6 @@ public class BidManagerTests {
         BidManager bidManager = new BidManager(
             context,
             publisher,
-            cacheAdUnits,
             tokenCache,
             deviceInfo,
             user,
@@ -342,7 +336,6 @@ public class BidManagerTests {
         BidManager bidManager = new BidManager(
             context,
             publisher,
-            cacheAdUnits,
             tokenCache,
             deviceInfo,
             user,
@@ -390,7 +383,6 @@ public class BidManagerTests {
         BidManager bidManager = new BidManager(
             context,
             publisher,
-            cacheAdUnits,
             tokenCache,
             deviceInfo,
             user,

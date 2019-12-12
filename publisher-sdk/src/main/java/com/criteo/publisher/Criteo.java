@@ -23,11 +23,13 @@ public abstract class Criteo {
       synchronized (Criteo.class) {
           if (criteo == null) {
               try {
-                DeviceUtil deviceUtil = DependencyProvider.getInstance()
+                DependencyProvider dependencyProvider = DependencyProvider.getInstance();
+                DeviceUtil deviceUtil = dependencyProvider
                     .provideDeviceUtil(application.getApplicationContext());
 
                 if (deviceUtil.isVersionSupported()) {
-                  criteo = new CriteoInternal(application, adUnits, criteoPublisherId);
+                  criteo = new CriteoInternal(application, adUnits, criteoPublisherId,
+                      dependencyProvider);
                 } else {
                   criteo = new DummyCriteo();
                 }

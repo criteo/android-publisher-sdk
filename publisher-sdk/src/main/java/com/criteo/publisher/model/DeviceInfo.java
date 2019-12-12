@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.WebView;
@@ -22,7 +23,7 @@ public class DeviceInfo {
         DEFAULT_USER_AGENT = getDefaultUserAgent();
     }
 
-    public void initialize(final Context context, UserAgentCallback userAgentCallback) {
+    public void initialize(@NonNull final Context context, @NonNull UserAgentCallback userAgentCallback) {
 
         // FIXME why should the user agent callback should be called from main thread ?
         final Handler mainHandler = new UserAgentHandler(Looper.getMainLooper(), userAgentCallback);

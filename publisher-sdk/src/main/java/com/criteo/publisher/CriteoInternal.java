@@ -3,20 +3,14 @@ package com.criteo.publisher;
 import android.app.Application;
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.WindowManager;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.Util.AdUnitType;
-import com.criteo.publisher.Util.AdvertisingInfo;
-import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.UserAgentCallback;
 
+import com.criteo.publisher.Util.UserAgentCallback;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.AdUnitHelper;
-import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Slot;
@@ -34,7 +28,11 @@ final class CriteoInternal extends Criteo {
   private DeviceInfo deviceInfo;
   private Config config;
 
-  CriteoInternal(Application application, List<AdUnit> adUnits, String criteoPublisherId) {
+  CriteoInternal(
+      Application application,
+      List<AdUnit> adUnits,
+      String criteoPublisherId,
+      DependencyProvider dependencyProvider) {
     if (application == null) {
       throw new IllegalArgumentException("Application reference is required.");
     }
@@ -48,44 +46,34 @@ final class CriteoInternal extends Criteo {
     }
 
     Context context = application.getApplicationContext();
-    DeviceUtil deviceUtil = DependencyProvider.getInstance().provideDeviceUtil(context);
-    createSupportedScreenSizes(application, deviceUtil);
+    DeviceUtil deviceUtil = dependencyProvider.provideDeviceUtil(context);
+    deviceUtil.createSupportedScreenSizes(application);
 
-    AndroidUtil androidUtil = DependencyProvider.getInstance().provideAndroidUtil(context);
+    deviceInfo = dependencyProvider.provideDeviceInfo();
+    config = dependencyProvider.provideConfig(context);
 
+    Clock clock = dependencyProvider.provideClock();
 
-    List<CacheAdUnit> cacheAdUnits = AdUnitHelper
-        .convertAdUnits(adUnits, androidUtil.getOrientation(), deviceUtil);
-
-    List<CacheAdUnit> validatedCacheAdUnits = AdUnitHelper.filterInvalidCacheAdUnits(cacheAdUnits);
-
-    AdvertisingInfo advertisingInfo = DependencyProvider.getInstance().provideAdvertisingInfo();
-    this.deviceInfo = new DeviceInfo();
-    config = DependencyProvider.getInstance().provideConfig(context);
-
-    Clock clock = DependencyProvider.getInstance().provideClock();
-
-    this.bidManager = new BidManager(
+    bidManager = dependencyProvider.provideBidManager(
         context,
         criteoPublisherId,
-        validatedCacheAdUnits,
         deviceInfo,
         config,
-        androidUtil,
         deviceUtil,
-        DependencyProvider.getInstance().provideLoggingUtil(),
-        advertisingInfo,
+        dependencyProvider.provideAndroidUtil(context),
+        dependencyProvider.provideLoggingUtil(),
+        dependencyProvider.provideAdvertisingInfo(),
         clock,
-        DependencyProvider.getInstance().provideUserPrivacyUtil(context.getApplicationContext())
-    );
+        dependencyProvider.provideUserPrivacyUtil(context));
 
     this.appEvents = new AppEvents(context, deviceUtil, clock);
     this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
 
+    List<AdUnit> prefetchAdUnits = adUnits;
     deviceInfo.initialize(context, new UserAgentCallback() {
       @Override
       public void done() {
-        bidManager.prefetch();
+        bidManager.prefetch(prefetchAdUnits);
       }
     });
   }
@@ -115,19 +103,6 @@ final class CriteoInternal extends Criteo {
       return null;
     }
     return bidManager.getBidForAdUnitAndPrefetch(adUnit);
-  }
-
-  private void createSupportedScreenSizes(Application application, DeviceUtil deviceUtil) {
-    try {
-      DisplayMetrics metrics = new DisplayMetrics();
-      ((WindowManager) application.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()
-          .getMetrics(metrics);
-      deviceUtil.setScreenSize(Math.round(metrics.widthPixels / metrics.density),
-          Math.round(metrics.heightPixels / metrics.density));
-    } catch (Exception e) {
-      // FIXME(ma.chentir) message might be misleading as this could not be the only exception cause
-      throw new Error("Screen parameters can not be empty or null");
-    }
   }
 
   @Override

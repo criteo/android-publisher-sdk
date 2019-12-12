@@ -5,7 +5,6 @@ import static android.content.ContentValues.TAG;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.Util.AdUnitType;
@@ -66,7 +65,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
     private static final int SECOND_TO_MILLI = 1000;
     private static final int PROFILE_ID = 235;
-    private final List<CacheAdUnit> cacheAdUnits;
     private final Context mContext;
     private final SdkCache cache;
     private final TokenCache tokenCache;
@@ -85,41 +83,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
     BidManager(
         @NonNull Context context,
-        @NonNull String criteoPublisherId,
-        @NonNull List<CacheAdUnit> cacheAdUnits,
-        @NonNull DeviceInfo deviceInfo,
-        @NonNull Config config,
-        @NonNull AndroidUtil androidUtil,
-        @NonNull DeviceUtil deviceUtil,
-        @NonNull LoggingUtil loggingUtil,
-        @NonNull AdvertisingInfo advertisingInfo,
-        @NonNull Clock clock,
-        @NonNull UserPrivacyUtil userPrivacyUtil
-    ) {
-        this(
-            context,
-            new Publisher(context, criteoPublisherId),
-            cacheAdUnits,
-            new TokenCache(),
-            deviceInfo,
-            new User(deviceUtil),
-            new SdkCache(deviceUtil),
-            new Hashtable<>(),
-            config,
-            androidUtil,
-            deviceUtil,
-            loggingUtil,
-            advertisingInfo,
-            clock,
-            userPrivacyUtil
-        );
-    }
-
-    @VisibleForTesting
-    BidManager(
-        @NonNull Context context,
         @NonNull Publisher publisher,
-        @NonNull List<CacheAdUnit> cacheAdUnits,
         @NonNull TokenCache tokenCache,
         @NonNull DeviceInfo deviceInfo,
         @NonNull User user,
@@ -135,7 +99,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     ) {
         this.mContext = context;
         this.publisher = publisher;
-        this.cacheAdUnits = cacheAdUnits;
         this.tokenCache = tokenCache;
         this.deviceInfo = deviceInfo;
         this.user = user;
@@ -398,9 +361,16 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
     /**
      * This method is called back after the "useragent" is fetched
+     *
+     * @param adUnits list of ad units to prefetch
      */
-    protected void prefetch() {
-        startCdbDownloadTask(true, cacheAdUnits);
+    void prefetch(@NonNull List<AdUnit> adUnits) {
+        List<CacheAdUnit> cacheAdUnits = AdUnitHelper
+            .convertAdUnits(adUnits, androidUtil.getOrientation(), deviceUtil);
+
+        List<CacheAdUnit> validatedCacheAdUnits = AdUnitHelper.filterInvalidCacheAdUnits(cacheAdUnits);
+
+        startCdbDownloadTask(true, validatedCacheAdUnits);
     }
 
     public TokenValue getTokenValue(BidToken bidToken, AdUnitType adUnitType) {

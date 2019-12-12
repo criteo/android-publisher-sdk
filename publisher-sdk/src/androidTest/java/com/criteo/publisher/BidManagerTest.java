@@ -37,6 +37,7 @@ import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.CdbDownloadTask;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import junit.framework.Assert;
@@ -151,7 +152,6 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             context,
             publisher,
-            mockCacheAdUnits,
             new TokenCache(),
             new DeviceInfo(),
             user,
@@ -178,18 +178,18 @@ public class BidManagerTest {
     @Test
     @UiThreadTest
     public void testPlacementAdditionInPrefetch() throws InterruptedException {
-        List<CacheAdUnit> cacheAdUnits = new ArrayList<>();
         AdSize adSize = new AdSize(320, 50);
-        CacheAdUnit cacheAdUnit1 = new CacheAdUnit(adSize, "SampleBannerAdUnitId1", AdUnitType.CRITEO_BANNER);
         AdSize adSize_2 = new AdSize(300, 250);
+
+        CacheAdUnit cacheAdUnit1 = new CacheAdUnit(adSize, "SampleBannerAdUnitId1", AdUnitType.CRITEO_BANNER);
         CacheAdUnit cacheAdUnit2 = new CacheAdUnit(adSize_2, "SampleBannerAdUnitId2", AdUnitType.CRITEO_BANNER);
-        cacheAdUnits.add(cacheAdUnit1);
-        cacheAdUnits.add(cacheAdUnit2);
+
+        BannerAdUnit bannerAdUnit1 = new BannerAdUnit(cacheAdUnit1.getPlacementId(), cacheAdUnit1.getSize());
+        BannerAdUnit bannerAdUnit2 = new BannerAdUnit(cacheAdUnit2.getPlacementId(), cacheAdUnit2.getSize());
 
         BidManager manager = new BidManager(
             context,
             publisher,
-            cacheAdUnits,
             new TokenCache(),
             new DeviceInfo(),
             user,
@@ -203,7 +203,7 @@ public class BidManagerTest {
             clock,
             userPrivacyUtil
         );
-        manager.prefetch();
+        manager.prefetch(Arrays.asList(bannerAdUnit1, bannerAdUnit2));
         CdbDownloadTask cdbDownloadTask1 = placementsWithCdbTasks.get(cacheAdUnit1);
         CdbDownloadTask cdbDownloadTask2 = placementsWithCdbTasks.get(cacheAdUnit2);
         assertNotNull(cdbDownloadTask1);
@@ -232,7 +232,6 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             context,
             publisher,
-            AdUnitHelper.convertAdUnits(adUnits,  androidUtil.getOrientation(), deviceUtil),
             new TokenCache(),
             new DeviceInfo(),
             user,
@@ -265,7 +264,6 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             context,
             publisher,
-            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation(), deviceUtil),
             new TokenCache(),
             new DeviceInfo(),
             user,
@@ -315,7 +313,6 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             context,
             publisher,
-            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation(), deviceUtil),
             new TokenCache(),
             new DeviceInfo(),
             user,
@@ -385,7 +382,6 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             context,
             publisher,
-            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation(), deviceUtil),
             new TokenCache(),
             new DeviceInfo(),
             user,
@@ -439,7 +435,6 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             context,
             publisher,
-            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation(), deviceUtil),
             new TokenCache(),
             new DeviceInfo(),
             user,
@@ -471,7 +466,6 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             context,
             publisher,
-            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation(), deviceUtil),
             new TokenCache(),
             new DeviceInfo(),
             user,
@@ -505,7 +499,6 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             context,
             publisher,
-            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation(), deviceUtil),
             new TokenCache(),
             new DeviceInfo(),
             user,
@@ -545,7 +538,6 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             context,
             publisher,
-            AdUnitHelper.convertAdUnits(adUnits, androidUtil.getOrientation(), deviceUtil),
             new TokenCache(),
             new DeviceInfo(),
             user,
@@ -603,7 +595,6 @@ public class BidManagerTest {
         BidManager bidManager = new BidManager(
             context,
             publisher,
-            cacheAdUnits,
             tokenCache,
             deviceInfo,
             user,
@@ -697,7 +688,6 @@ public class BidManagerTest {
         BidManager bidManager = new BidManager(
             context,
             publisher,
-            cacheAdUnits,
             tokenCache,
             deviceInfo,
             user,
@@ -800,7 +790,6 @@ public class BidManagerTest {
         BidManager bidManager = new BidManager(
             context,
             publisher,
-            adUnits,
             tokenCache,
             deviceInfo,
             user,
