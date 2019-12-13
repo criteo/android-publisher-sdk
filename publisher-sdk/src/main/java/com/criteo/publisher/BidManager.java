@@ -273,31 +273,37 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
         Slot peekSlot = cache.peekAdUnit(cacheAdUnit);
         if (peekSlot == null) {
+            // If no matching bid response is found
             fetch(cacheAdUnit);
             return null;
         }
+
         double cpm = (peekSlot.getCpmAsNumber() == null ? 0.0 : peekSlot.getCpmAsNumber());
         long ttl = peekSlot.getTtl();
         long expiryTimeMillis = ttl * SECOND_TO_MILLI + peekSlot.getTimeOfDownload();
-        //If cpm and ttl in slot are 0:
-        // Prefetch from CDB and do not update request;
-        if (cpm == 0 && ttl == 0) {
+        boolean isNotExpired = expiryTimeMillis > clock.getCurrentTimeInMillis();
+        boolean isNoBid = (cpm == 0) && (ttl == 0);
+        boolean isSilentMode = (cpm == 0) && (ttl > 0);
+
+        if (isNoBid) {
+            // If it is a no bid, then we transform the no bid into null
             cache.remove(cacheAdUnit);
             fetch(cacheAdUnit);
             return null;
-        }
-        //If cpm is 0, ttl in slot > 0
-        // we will stay silent until ttl expires;
-        else if (cpm == 0 && ttl > 0
-                && expiryTimeMillis > clock.getCurrentTimeInMillis()) {
+        } else if (isSilentMode && isNotExpired) {
+            // If silent mode is still active, then we stay silent until expiration
             return null;
         } else {
             //If cpm > 0, ttl > 0 but we are done staying silent
             cache.remove(cacheAdUnit);
             fetch(cacheAdUnit);
-            return peekSlot;
-        }
 
+            if (isNotExpired) {
+                return peekSlot;
+            } else {
+                return null;
+            }
+        }
     }
 
 

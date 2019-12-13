@@ -265,6 +265,18 @@ public class BidManagerFunctionalTest {
     slots.forEach(slot -> verify(slot).setTimeOfDownload(42));
   }
 
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenExpiredValidCachedBid_ReturnNull() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    givenExpiredValidCachedBid(cacheAdUnit);
+
+    BidManager bidManager = createBidManager();
+    Slot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
+
+    assertNull(bid);
+  }
+
   private void assertShouldCallCdbAndPopulateCacheOnlyOnce(List<CacheAdUnit> requestedAdUnits, List<Slot> slots) {
     verify(cache).addAll(slots);
     verify(api).loadCdb(argThat(cdb -> {
@@ -282,12 +294,23 @@ public class BidManagerFunctionalTest {
     Slot slot = mock(Slot.class);
     when(slot.getCpmAsNumber()).thenReturn(1.);
     when(slot.getTimeOfDownload()).thenReturn(100_000L);
-    when(slot.getTtl()).thenReturn(60); // Valid until 160_000 included
+    when(slot.getTtl()).thenReturn(60); // Valid until 160_000 excluded
+
+    givenMockedClockSetTo(160_000 - 1);
+
+    when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
+    return slot;
+  }
+
+  private void givenExpiredValidCachedBid(CacheAdUnit cacheAdUnit) {
+    Slot slot = mock(Slot.class);
+    when(slot.getCpmAsNumber()).thenReturn(1.);
+    when(slot.getTimeOfDownload()).thenReturn(100_000L);
+    when(slot.getTtl()).thenReturn(60); // Valid until 160_000 excluded
 
     givenMockedClockSetTo(160_000);
 
     when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
-    return slot;
   }
 
   private void givenNoLastBid(CacheAdUnit cacheAdUnit) {
