@@ -331,7 +331,9 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
     @Override
     public void setTimeToNextCall(int seconds) {
-        this.cdbTimeToNextCall = clock.getCurrentTimeInMillis() + seconds * 1000;
+        if (seconds > 0) {
+            this.cdbTimeToNextCall = clock.getCurrentTimeInMillis() + seconds * 1000;
+        }
     }
 
     @Override

@@ -10,6 +10,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -357,8 +358,7 @@ public class BidManagerFunctionalTest {
     BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit);
 
-    verify(cache, never()).addAll(anyList());
-    verify(api, never()).loadCdb(any(), any());
+    assertShouldNotCallCdbAndNotPopulateCache();
   }
 
   @Test
@@ -387,12 +387,88 @@ public class BidManagerFunctionalTest {
     assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slots);
   }
 
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenNotExpiredUserLevelSilentMode_ShouldNotCallCdbAndNotPopulateCache() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+
+    BidManager bidManager = createBidManager();
+    givenMockedClockSetTo(0);
+    bidManager.setTimeToNextCall(60); // Silent until 60_000 included
+    givenMockedClockSetTo(60_000);
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    waitForIdleState();
+
+    assertShouldNotCallCdbAndNotPopulateCache();
+  }
+
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenExpiredUserLevelSilentMode_ShouldCallCdbAndPopulateCache() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    List<Slot> slots = givenMockedCdbRespondingSlots();
+
+    BidManager bidManager = createBidManager();
+    givenMockedClockSetTo(0);
+    bidManager.setTimeToNextCall(60); // Silent until 60_000 included
+    givenMockedClockSetTo(60_001);
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    waitForIdleState();
+
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slots);
+  }
+
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenCdbCallAndCachedPopulatedWithUserLevelSilentMode_UserLevelSilentModeIsUpdated() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    Cdb cdb = givenMockedCdbResponse();
+
+    when(cdb.getTimeToNextCall()).thenReturn(1337);
+
+    BidManager bidManager = spy(createBidManager());
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    waitForIdleState();
+
+    verify(bidManager).setTimeToNextCall(1337);
+  }
+
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenFirstCdbCallWithoutUserLevelSilenceAndASecondFetchJustAfter_SecondFetchIsNotSilenced() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+
+    BidManager bidManager = createBidManager();
+
+    // Given first CDB call without user-level silence
+    Cdb cdb = givenMockedCdbResponse();
+    when(cdb.getTimeToNextCall()).thenReturn(0);
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    waitForIdleState();
+
+    // Count calls from this point
+    clearInvocations(cache);
+    clearInvocations(api);
+
+    // Given a second fetch, without any clock change
+    List<Slot> slots = givenMockedCdbRespondingSlots();
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    waitForIdleState();
+
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slots);
+  }
+
   private void assertShouldCallCdbAndPopulateCacheOnlyOnce(List<CacheAdUnit> requestedAdUnits, List<Slot> slots) {
     verify(cache).addAll(slots);
     verify(api).loadCdb(argThat(cdb -> {
       assertEquals(requestedAdUnits, cdb.getRequestedAdUnits());
       return true;
     }), any());
+  }
+
+  private void assertShouldNotCallCdbAndNotPopulateCache() {
+    verify(cache, never()).addAll(anyList());
+    verify(api, never()).loadCdb(any(), any());
   }
 
   private void waitForIdleState() {
