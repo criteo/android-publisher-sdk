@@ -31,7 +31,6 @@ public class Slot {
     private boolean isNative;
 
     public Slot() {
-        timeOfDownload = System.currentTimeMillis();
     }
 
     public Slot(JSONObject json) {
@@ -58,7 +57,6 @@ public class Slot {
         if (cpmValue > 0.0 && ttl == 0) {
             ttl = DEFAULT_TTL;
         }
-        timeOfDownload = System.currentTimeMillis();
         if (json.has(NATIVE)) {
             isNative = true;
             try {

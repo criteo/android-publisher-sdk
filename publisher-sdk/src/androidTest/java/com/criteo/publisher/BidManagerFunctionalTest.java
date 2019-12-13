@@ -3,6 +3,7 @@ package com.criteo.publisher;
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -246,6 +247,22 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     assertShouldCallCdbAndPopulateCacheOnlyOnce(Collections.singletonList(cacheAdUnit), slots);
+  }
+
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenClockAtFixedTime_CacheShouldContainATimestampedBid() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    List<Slot> slots = givenMockedCdbRespondingSlots();
+    givenMockedClockSetTo(42);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    waitForIdleState();
+
+    verify(cache).addAll(slots);
+    assertFalse(slots.isEmpty());
+    slots.forEach(slot -> verify(slot).setTimeOfDownload(42));
   }
 
   private void assertShouldCallCdbAndPopulateCacheOnlyOnce(List<CacheAdUnit> requestedAdUnits, List<Slot> slots) {
