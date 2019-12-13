@@ -5,19 +5,8 @@ import android.util.Log;
 
 public class AdvertisingInfo {
 
-    private static AdvertisingInfo advertisingInfo;
     private static final String GET_ADVERTISING_ID = "getId";
     private static final String IS_LIMIT_AD_TRACKING_ENABLED = "isLimitAdTrackingEnabled";
-
-    private AdvertisingInfo() {
-    }
-
-    public static AdvertisingInfo getInstance() {
-        if (advertisingInfo == null) {
-            advertisingInfo = new AdvertisingInfo();
-        }
-        return advertisingInfo;
-    }
 
     public String getAdvertisingId(Context context) {
         try {

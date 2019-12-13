@@ -8,14 +8,12 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.Util.AdUnitType;
-import com.criteo.publisher.Util.AndroidUtil;
-import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.Util.ReflectionUtil;
+import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
@@ -33,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-
 import java.util.concurrent.Executor;
 import org.json.JSONObject;
 

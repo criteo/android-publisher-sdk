@@ -57,9 +57,9 @@ public class StandaloneTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    api = spy(PubSdkApi.getInstance());
-
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
+
+    api = spy(dependencyProvider.providePubSdkApi());
     when(dependencyProvider.providePubSdkApi()).thenReturn(api);
     when(dependencyProvider.provideAndroidUtil(any())).thenReturn(androidUtil);
 

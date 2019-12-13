@@ -46,12 +46,12 @@ public class DependencyProvider {
 
   @NonNull
   public PubSdkApi providePubSdkApi() {
-    return PubSdkApi.getInstance();
+    return new PubSdkApi();
   }
 
   @NonNull
   public AdvertisingInfo provideAdvertisingInfo() {
-    return AdvertisingInfo.getInstance();
+    return new AdvertisingInfo();
   }
 
   @NonNull

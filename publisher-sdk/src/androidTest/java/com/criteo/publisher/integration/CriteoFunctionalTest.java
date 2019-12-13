@@ -44,7 +44,7 @@ public class CriteoFunctionalTest {
 
   private void init_GivenPrefetchCachedAdAndReInitWithSameAdUnit_CdbIsNotCallTheSecondTime(AdUnit adUnit)
       throws Exception {
-    PubSdkApi api = spy(PubSdkApi.getInstance());
+    PubSdkApi api = spy(mockedDependenciesRule.getDependencyProvider().providePubSdkApi());
     when(mockedDependenciesRule.getDependencyProvider().providePubSdkApi()).thenReturn(api);
 
     int dayTtl = 3600 * 24;

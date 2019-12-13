@@ -29,13 +29,6 @@ public class PubSdkApi {
     private static final String EVENT_TYPE = "eventType";
     private static final String LIMITED_AD_TRACKING = "limitedAdTracking";
 
-    private PubSdkApi() {
-    }
-
-    public static PubSdkApi getInstance() {
-        return PubSdkApiHolder.instance;
-    }
-
     JSONObject loadConfig(Context context, String criteoPublisherId, String appId, String sdkVersion) {
 
         Map<String, String> parameters = new HashMap<>();
@@ -162,7 +155,4 @@ public class PubSdkApi {
                 : queryString.toString();
     }
 
-    static final class PubSdkApiHolder {
-        static volatile PubSdkApi instance = new PubSdkApi();
-    }
 }
