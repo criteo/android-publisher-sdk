@@ -225,12 +225,27 @@ public class BidManagerFunctionalTest {
     CacheAdUnit cacheAdUnit = sampleAdUnit(1);
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
 
-    when(cache.peekAdUnit(cacheAdUnit)).thenReturn(null);
+    givenNoLastBid(cacheAdUnit);
 
     BidManager bidManager = createBidManager();
     Slot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
 
     assertNull(bid);
+  }
+
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenEmptyCache_ShouldCallCdbAndPopulateCache() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    List<Slot> slots = givenMockedCdbRespondingSlots();
+
+    givenNoLastBid(cacheAdUnit);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    waitForIdleState();
+
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(Collections.singletonList(cacheAdUnit), slots);
   }
 
   private void assertShouldCallCdbAndPopulateCacheOnlyOnce(List<CacheAdUnit> requestedAdUnits, List<Slot> slots) {
@@ -256,6 +271,10 @@ public class BidManagerFunctionalTest {
 
     when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
     return slot;
+  }
+
+  private void givenNoLastBid(CacheAdUnit cacheAdUnit) {
+    when(cache.peekAdUnit(cacheAdUnit)).thenReturn(null);
   }
 
   @NonNull
