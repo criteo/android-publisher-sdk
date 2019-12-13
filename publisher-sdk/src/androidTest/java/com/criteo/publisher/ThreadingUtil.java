@@ -24,18 +24,24 @@ public class ThreadingUtil {
   }
 
   public static void waitForAllThreads(@NonNull TrackingCommandsExecutor trackingCommandsExecutor) {
+    // FIXME EE-764 This is a wait with two different steps (main and async). Because of those steps, it
+    //  may me possible that we're not awaiting all threads. For instance, given an async task
+    //  posting in main thread, which is again posting in async thread. Then the last task is not
+    //  waited.
+    //  Generally we have three level of tasks: main first, then async and finally on main thread.
+    //  This is because the bid manager is prefetch on main thread. Then network is done on async.
+    //  And finally listener are called on main thread again.
+    //  But it would be great to have a single async entry point and consider main thread just as an
+    //  normal async task.
+
+    waitForMessageQueueToBeIdle();
+
     try {
       trackingCommandsExecutor.waitCommands();
     } catch(InterruptedException e) {
       throw new RuntimeException(e);
     }
 
-    // FIXME This is a wait with two different steps. Because of those steps, it may me possible
-    //  that we're not awaiting all threads. For instance, given an async task posting in main
-    //  thread, which is again posting in async thread. Then the last task is not waited.
-    //  Generally we have two level of tasks: async before and then on main thread after.
-    //  But it would be great to have a single async entry point and consider main thread just as an
-    //  normal async task.
     waitForMessageQueueToBeIdle();
   }
 
