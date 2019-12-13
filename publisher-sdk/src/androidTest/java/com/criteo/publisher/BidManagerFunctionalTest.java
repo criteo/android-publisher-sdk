@@ -2,6 +2,7 @@ package com.criteo.publisher;
 
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -146,7 +147,7 @@ public class BidManagerFunctionalTest {
     bidManager.getBidForAdUnitAndPrefetch(adUnit);
     waitForIdleState();
 
-    assertShouldCallCdbAndPopulateCacheOnlyOnce(Collections.singletonList(cacheAdUnit), slots);
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slots);
   }
 
   @Test
@@ -155,7 +156,7 @@ public class BidManagerFunctionalTest {
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
 
     Cdb response = mock(Cdb.class);
-    List<Slot> slots = Collections.singletonList(mock(Slot.class));
+    List<Slot> slots = singletonList(mock(Slot.class));
     when(response.getSlots()).thenReturn(slots);
 
     // We force a synchronization here to make the test deterministic.
@@ -246,7 +247,7 @@ public class BidManagerFunctionalTest {
     bidManager.getBidForAdUnitAndPrefetch(adUnit);
     waitForIdleState();
 
-    assertShouldCallCdbAndPopulateCacheOnlyOnce(Collections.singletonList(cacheAdUnit), slots);
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slots);
   }
 
   @Test
@@ -275,6 +276,20 @@ public class BidManagerFunctionalTest {
     Slot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
 
     assertNull(bid);
+  }
+
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenExpiredValidCachedBid_ShouldCallCdbAndPopulateCache() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    givenExpiredValidCachedBid(cacheAdUnit);
+    List<Slot> slots = givenMockedCdbRespondingSlots();
+
+    BidManager bidManager = createBidManager();
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    waitForIdleState();
+
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slots);
   }
 
   private void assertShouldCallCdbAndPopulateCacheOnlyOnce(List<CacheAdUnit> requestedAdUnits, List<Slot> slots) {
@@ -346,7 +361,7 @@ public class BidManagerFunctionalTest {
   }
 
   private List<Slot> givenMockedCdbRespondingSlots() {
-    List<Slot> slots = Collections.singletonList(mock(Slot.class));
+    List<Slot> slots = singletonList(mock(Slot.class));
     Cdb response = givenMockedCdbResponse();
     when(response.getSlots()).thenReturn(slots);
     return slots;
