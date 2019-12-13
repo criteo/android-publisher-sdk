@@ -14,7 +14,9 @@ import com.criteo.publisher.mock.ResultCaptor;
 import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.network.PubSdkApi;
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 import org.junit.rules.TestRule;
+import org.junit.rules.Timeout;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
@@ -23,6 +25,25 @@ import org.junit.runners.model.Statement;
  * See {@link com.criteo.publisher.degraded.StandaloneDegradedTest} for example.
  */
 public class MockedDependenciesRule implements TestRule {
+
+  /**
+   * Apply a timeout on all tests using this rule.
+   *
+   * Lot of tests are waiting for end of AsyncTasks or for third-parties' events. Those tests may
+   * be stuck and block the overall execution. In order to avoid any infinite blocking, long tests
+   * will be killed by this timeout rule.
+   *
+   * This timeout duration is roughly set and may have to be updated in the future.
+   *
+   * Warning: When debugging, this timeout may interrupt your work and be annoying. To deactivate
+   * it, you may set the {@link #iAmDebuggingDoNotTimeoutMe} variable to <code>true</code>.
+   */
+  private final Timeout timeout = Timeout.builder()
+      .withTimeout(20, TimeUnit.SECONDS)
+      .build();
+
+  private final boolean iAmDebuggingDoNotTimeoutMe = false;
+
   protected DependencyProvider dependencyProvider;
   private TrackingCommandsExecutor trackingCommandsExecutor = null;
 
@@ -39,7 +60,12 @@ public class MockedDependenciesRule implements TestRule {
           MockableDependencyProvider.setInstance(dependencyProvider);
           doReturn(trackingCommandsExecutor).when(dependencyProvider).provideThreadPoolExecutor();
           doReturn(trackingCommandsExecutor).when(dependencyProvider).provideSerialExecutor();
-          base.evaluate();
+
+          if (iAmDebuggingDoNotTimeoutMe) {
+            base.evaluate();
+          } else {
+            timeout.apply(base, description).evaluate();
+          }
         }
       };
     } finally {
