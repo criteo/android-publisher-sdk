@@ -55,28 +55,14 @@ final class CriteoInternal extends Criteo {
     deviceInfo = dependencyProvider.provideDeviceInfo();
     config = dependencyProvider.provideConfig(context);
 
-    Clock clock = dependencyProvider.provideClock();
-
-    AndroidUtil androidUtil = dependencyProvider.provideAndroidUtil(context);
+    bidManager = dependencyProvider.provideBidManager(context, criteoPublisherId);
 
     PubSdkApi api = dependencyProvider.providePubSdkApi(context);
-
-    bidManager = dependencyProvider.provideBidManager(
-        context,
-        criteoPublisherId,
-        deviceInfo,
-        config,
-        deviceUtil,
-        dependencyProvider.provideLoggingUtil(),
-        clock,
-        dependencyProvider.provideUserPrivacyUtil(context),
-        dependencyProvider.provideAdUnitMapper(androidUtil, deviceUtil),
-        api);
 
     this.appEvents = new AppEvents(
         context,
         deviceUtil,
-        clock,
+        dependencyProvider.provideClock(),
         api);
 
     this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);

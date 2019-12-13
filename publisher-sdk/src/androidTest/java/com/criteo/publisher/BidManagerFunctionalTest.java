@@ -616,7 +616,7 @@ public class BidManagerFunctionalTest {
 
   private AdUnitMapper givenMockedAdUnitMapper() {
     AdUnitMapper mapper = mock(AdUnitMapper.class);
-    when(dependencyProvider.provideAdUnitMapper(any(), any())).thenReturn(mapper);
+    when(dependencyProvider.provideAdUnitMapper(any())).thenReturn(mapper);
     return mapper;
   }
 
@@ -635,8 +635,6 @@ public class BidManagerFunctionalTest {
 
   private BidManager createBidManager() {
     Context context = InstrumentationRegistry.getContext();
-    AndroidUtil androidUtil = dependencyProvider.provideAndroidUtil(context);
-    DeviceUtil deviceUtil = dependencyProvider.provideDeviceUtil(context);
 
     return new BidManager(
         publisher,
@@ -646,11 +644,11 @@ public class BidManagerFunctionalTest {
         cache,
         new Hashtable<>(),
         dependencyProvider.provideConfig(context),
-        deviceUtil,
+        dependencyProvider.provideDeviceUtil(context),
         dependencyProvider.provideLoggingUtil(),
         dependencyProvider.provideClock(),
         dependencyProvider.provideUserPrivacyUtil(context),
-        dependencyProvider.provideAdUnitMapper(androidUtil, deviceUtil),
+        dependencyProvider.provideAdUnitMapper(context),
         dependencyProvider.providePubSdkApi(context)
     );
   }

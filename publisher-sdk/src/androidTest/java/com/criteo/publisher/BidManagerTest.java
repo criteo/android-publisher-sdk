@@ -115,7 +115,7 @@ public class BidManagerTest {
 
     @Before
     public void setup() {
-        context = InstrumentationRegistry.getContext();
+        context = InstrumentationRegistry.getContext().getApplicationContext();
         SharedPreferences sharedPref = context.getSharedPreferences(
                 context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -129,8 +129,8 @@ public class BidManagerTest {
         placementsWithCdbTasks = new Hashtable<>();
         MockitoAnnotations.initMocks(this);
         clock = mockedDependenciesRule.getDependencyProvider().provideClock();
-        userPrivacyUtil = mockedDependenciesRule.getDependencyProvider().provideUserPrivacyUtil(context.getApplicationContext());
-        adUnitMapper = mockedDependenciesRule.getDependencyProvider().provideAdUnitMapper(androidUtil, deviceUtil);
+        userPrivacyUtil = mockedDependenciesRule.getDependencyProvider().provideUserPrivacyUtil(context);
+        adUnitMapper = mockedDependenciesRule.getDependencyProvider().provideAdUnitMapper(context);
         api = mockedDependenciesRule.getDependencyProvider().providePubSdkApi(context.getApplicationContext());
     }
 

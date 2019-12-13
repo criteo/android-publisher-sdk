@@ -6,8 +6,8 @@ import android.support.annotation.NonNull;
 import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.Util.LoggingUtil;
+import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.Config;
@@ -15,7 +15,9 @@ import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.PubSdkApi;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.concurrent.Executor;
 
 /**
@@ -24,6 +26,8 @@ import java.util.concurrent.Executor;
 public class DependencyProvider {
 
   protected static DependencyProvider instance;
+
+  private final Map<Class, Object> services = new HashMap<>();
 
   private DependencyProvider() {
   }
@@ -46,27 +50,27 @@ public class DependencyProvider {
 
   @NonNull
   public PubSdkApi providePubSdkApi(Context context) {
-    return new PubSdkApi(context);
+    return getOrCreate(PubSdkApi.class, () -> new PubSdkApi(context));
   }
 
   @NonNull
   public AdvertisingInfo provideAdvertisingInfo() {
-    return new AdvertisingInfo();
+    return getOrCreate(AdvertisingInfo.class, AdvertisingInfo::new);
   }
 
   @NonNull
   public AndroidUtil provideAndroidUtil(@NonNull Context context) {
-    return new AndroidUtil(context);
+    return getOrCreate(AndroidUtil.class, () -> new AndroidUtil(context));
   }
 
   @NonNull
   public DeviceUtil provideDeviceUtil(@NonNull Context context) {
-    return new DeviceUtil(context, provideAdvertisingInfo());
+    return getOrCreate(DeviceUtil.class, () -> new DeviceUtil(context, provideAdvertisingInfo()));
   }
 
   @NonNull
   public LoggingUtil provideLoggingUtil() {
-    return new LoggingUtil();
+    return getOrCreate(LoggingUtil.class, LoggingUtil::new);
   }
 
   @NonNull
@@ -81,54 +85,67 @@ public class DependencyProvider {
 
   @NonNull
   public Config provideConfig(Context context) {
-    return new Config(context);
+    return getOrCreate(Config.class, () -> new Config(context));
   }
 
   @NonNull
   public Clock provideClock() {
-    return new EpochClock();
+    return getOrCreate(Clock.class, EpochClock::new);
   }
 
   @NonNull
   public UserPrivacyUtil provideUserPrivacyUtil(@NonNull Context context) {
-    return new UserPrivacyUtil(context);
+    return getOrCreate(UserPrivacyUtil.class, () -> new UserPrivacyUtil(context));
   }
 
   @NonNull
   public BidManager provideBidManager(
       @NonNull Context context,
-      @NonNull String criteoPublisherId,
-      @NonNull DeviceInfo deviceInfo,
-      @NonNull Config config,
-      @NonNull DeviceUtil deviceUtil,
-      @NonNull LoggingUtil loggingUtil,
-      @NonNull Clock clock,
-      @NonNull UserPrivacyUtil userPrivacyUtil,
-      @NonNull AdUnitMapper adUnitMapper,
-      @NonNull PubSdkApi api) {
-    return new BidManager(
+      @NonNull String criteoPublisherId) {
+    return getOrCreate(BidManager.class, () -> new BidManager(
         new Publisher(context, criteoPublisherId),
         new TokenCache(),
-        deviceInfo,
-        new User(deviceUtil),
-        new SdkCache(deviceUtil),
+        provideDeviceInfo(),
+        new User(provideDeviceUtil(context)),
+        new SdkCache(provideDeviceUtil(context)),
         new Hashtable<>(),
-        config,
-        deviceUtil,
-        loggingUtil,
-        clock,
-        userPrivacyUtil,
-        adUnitMapper,
-        api
-    );
+        provideConfig(context),
+        provideDeviceUtil(context),
+        provideLoggingUtil(),
+        provideClock(),
+        provideUserPrivacyUtil(context),
+        provideAdUnitMapper(context),
+        providePubSdkApi(context)
+    ));
   }
 
   @NonNull
   public DeviceInfo provideDeviceInfo() {
-    return new DeviceInfo();
+    return getOrCreate(DeviceInfo.class, DeviceInfo::new);
   }
 
-  public AdUnitMapper provideAdUnitMapper(AndroidUtil androidUtil, DeviceUtil deviceUtil) {
-    return new AdUnitMapper(androidUtil, deviceUtil);
+  @NonNull
+  public AdUnitMapper provideAdUnitMapper(Context context) {
+    return getOrCreate(AdUnitMapper.class, () -> new AdUnitMapper(
+        provideAndroidUtil(context),
+        provideDeviceUtil(context)));
   }
+
+  @SuppressWarnings("unchecked")
+  private <T> T getOrCreate(Class<T> klass, Factory<T> factory) {
+    Object service = services.get(klass);
+    if (service != null) {
+      // safe because the services map is only filled there by typed factory
+      return (T) service;
+    }
+
+    T newService = factory.create();
+    services.put(klass, newService);
+    return newService;
+  }
+
+  private interface Factory<T> {
+    T create();
+  }
+
 }

@@ -1,10 +1,15 @@
 package com.criteo.publisher;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalAnswers.answerVoid;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -19,9 +24,11 @@ import com.criteo.publisher.model.DeviceInfo;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -67,30 +74,6 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void new_GivenDependencyProvider_BuildBidManagerWithProvidedDependencies() throws Exception {
-    Context context = application.getApplicationContext();
-    criteoPublisherId = "B-123456";
-
-    createCriteo();
-
-    DeviceUtil deviceUtil = dependencyProvider.provideDeviceUtil(context);
-    AndroidUtil androidUtil = dependencyProvider.provideAndroidUtil(context);
-
-    verify(dependencyProvider).provideBidManager(
-        context,
-        criteoPublisherId,
-        dependencyProvider.provideDeviceInfo(),
-        dependencyProvider.provideConfig(context),
-        deviceUtil,
-        dependencyProvider.provideLoggingUtil(),
-        dependencyProvider.provideClock(),
-        dependencyProvider.provideUserPrivacyUtil(context),
-        dependencyProvider.provideAdUnitMapper(androidUtil, deviceUtil),
-        dependencyProvider.providePubSdkApi(context)
-    );
-  }
-
-  @Test
   public void new_GivenApplication_ShouldCreateSupportedScreenSizes() throws Exception {
     DeviceUtil deviceUtil = mock(DeviceUtil.class);
 
@@ -102,16 +85,36 @@ public class CriteoInternalUnitTest {
     verify(deviceUtil).createSupportedScreenSizes(application);
   }
 
+  @Test
+  public void new_GivenDependencyProvider_OnlyUseApplicationContextToBuildDependencies()
+      throws Exception {
+    // Used to verify transitive dependencies
+    dependencyProvider = spy(DependencyProvider.getInstance());
+    doReturn(mock(DeviceUtil.class)).when(dependencyProvider).provideDeviceUtil(any());
+
+    Context applicationContext = mock(Context.class);
+    when(application.getApplicationContext()).thenReturn(applicationContext);
+    criteoPublisherId = "B-123456";
+
+    createCriteo();
+
+    ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
+    verify(dependencyProvider, atLeastOnce()).provideDeviceUtil(contextCaptor.capture());
+    verify(dependencyProvider, atLeastOnce()).provideAdUnitMapper(contextCaptor.capture());
+    verify(dependencyProvider, atLeastOnce()).provideAndroidUtil(contextCaptor.capture());
+    verify(dependencyProvider, atLeastOnce()).provideBidManager(contextCaptor.capture(), eq(criteoPublisherId));
+    verify(dependencyProvider, atLeastOnce()).provideConfig(contextCaptor.capture());
+    verify(dependencyProvider, atLeastOnce()).provideUserPrivacyUtil(contextCaptor.capture());
+
+    assertThat(contextCaptor.getAllValues()).containsOnly(applicationContext);
+  }
+
   private BidManager givenMockedBidManager() {
     BidManager bidManager = mock(BidManager.class);
 
     Context context = application.getApplicationContext();
-    Config config = dependencyProvider.provideConfig(context);
 
-    when(dependencyProvider.provideBidManager(
-        eq(context), eq(criteoPublisherId), any(), eq(config),
-        any(), any(), any(), any(), any(), any()))
-        .thenReturn(bidManager);
+    when(dependencyProvider.provideBidManager(context, criteoPublisherId)).thenReturn(bidManager);
 
     return bidManager;
   }

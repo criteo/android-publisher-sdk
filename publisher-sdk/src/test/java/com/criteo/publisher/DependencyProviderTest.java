@@ -2,10 +2,17 @@ package com.criteo.publisher;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import android.content.Context;
 import com.criteo.publisher.Util.AdvertisingInfo;
+import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.network.PubSdkApi;
+import java.security.Provider;
+import java.util.function.Function;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +21,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class DependencyProviderTest {
-
 
   @Mock
   private DependencyProvider dependencyProvider;
@@ -45,6 +51,88 @@ public class DependencyProviderTest {
     // when, then
     assertTrue(pubSdkApi == DependencyProvider.getInstance().providePubSdkApi(any()));
     assertTrue(advertisingInfo == DependencyProvider.getInstance().provideAdvertisingInfo());
+  }
 
+  @Test
+  public void provideDeviceUtil_WhenProvidedTwice_ReturnsTheSame() throws Exception {
+    provideBean_WhenProvidedTwice_ReturnsTheSame(provider ->
+        provider.provideDeviceUtil(mock(Context.class)));
+  }
+
+  @Test
+  public void provideUserPrivacyUtil_WhenProvidedTwice_ReturnsTheSame() throws Exception {
+    provideBean_WhenProvidedTwice_ReturnsTheSame(provider ->
+        provider.provideUserPrivacyUtil(mock(Context.class)));
+  }
+
+  @Test
+  public void provideConfig_WhenProvidedTwice_ReturnsTheSame() throws Exception {
+    provideBean_WhenProvidedTwice_ReturnsTheSame(provider ->
+        provider.provideConfig(mock(Context.class)));
+  }
+
+  @Test
+  public void provideAndroidUtil_WhenProvidedTwice_ReturnsTheSame() throws Exception {
+    provideBean_WhenProvidedTwice_ReturnsTheSame(provider ->
+        provider.provideAndroidUtil(mock(Context.class)));
+  }
+
+  @Test
+  public void provideAdUnitMapper_WhenProvidedTwice_ReturnsTheSame() throws Exception {
+    provideBean_WhenProvidedTwice_ReturnsTheSame(provider ->
+        provider.provideAdUnitMapper(mock(Context.class)));
+  }
+
+  @Test
+  public void provideBidManager_WhenProvidedTwice_ReturnsTheSame() throws Exception {
+    provideBean_WhenProvidedTwice_ReturnsTheSame(provider -> {
+      doReturn(mock(DeviceUtil.class)).when(provider).provideDeviceUtil(any());
+
+      return provider.provideBidManager(mock(Context.class), "cpId");
+    });
+  }
+
+  @Test
+  public void providePubSdkApi_WhenProvidedTwice_ReturnsTheSame() throws Exception {
+    provideBean_WhenProvidedTwice_ReturnsTheSame(provider ->
+        provider.providePubSdkApi(mock(Context.class)));
+  }
+
+  @Test
+  public void provideAdvertisingInfo_WhenProvidedTwice_ReturnsTheSame() throws Exception {
+    provideBean_WhenProvidedTwice_ReturnsTheSame(DependencyProvider::provideAdvertisingInfo);
+  }
+
+  @Test
+  public void provideClock_WhenProvidedTwice_ReturnsTheSame() throws Exception {
+    provideBean_WhenProvidedTwice_ReturnsTheSame(DependencyProvider::provideClock);
+  }
+
+  @Test
+  public void provideDeviceInfo_WhenProvidedTwice_ReturnsTheSame() throws Exception {
+    provideBean_WhenProvidedTwice_ReturnsTheSame(DependencyProvider::provideDeviceInfo);
+  }
+
+  @Test
+  public void provideLoggingUtil_WhenProvidedTwice_ReturnsTheSame() throws Exception {
+    provideBean_WhenProvidedTwice_ReturnsTheSame(DependencyProvider::provideLoggingUtil);
+  }
+
+  @Test
+  public void provideSerialExecutor_WhenProvidedTwice_ReturnsTheSame() throws Exception {
+    provideBean_WhenProvidedTwice_ReturnsTheSame(DependencyProvider::provideSerialExecutor);
+  }
+
+  @Test
+  public void provideThreadPoolExecutor_WhenProvidedTwice_ReturnsTheSame() throws Exception {
+    provideBean_WhenProvidedTwice_ReturnsTheSame(DependencyProvider::provideThreadPoolExecutor);
+  }
+
+  private <T> void provideBean_WhenProvidedTwice_ReturnsTheSame(Function<DependencyProvider, T> providing) {
+    DependencyProvider instance = spy(DependencyProvider.getInstance());
+    T bean1 = providing.apply(instance);
+    T bean2 = providing.apply(instance);
+
+    assertTrue(bean1 == bean2);
   }
 }
