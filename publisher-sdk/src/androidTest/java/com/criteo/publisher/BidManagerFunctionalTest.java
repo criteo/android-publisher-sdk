@@ -38,7 +38,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-// TODO p.turpin: Move some tests in a unit test.
 public class BidManagerFunctionalTest {
 
   @Rule
@@ -82,9 +81,7 @@ public class BidManagerFunctionalTest {
 
     AdUnitMapper mapper = givenMockedAdUnitMapper();
 
-    Slot slot1 = mock(Slot.class);
-    Cdb response = givenMockedCdbResponse();
-    when(response.getSlots()).thenReturn(Collections.singletonList(slot1));
+    List<Slot> slots = givenMockedCdbRespondingSlots();
 
     when(mapper.convertValidAdUnits(prefetchAdUnits)).thenReturn(mappedAdUnits);
 
@@ -92,11 +89,7 @@ public class BidManagerFunctionalTest {
     bidManager.prefetch(prefetchAdUnits);
     waitForIdleState();
 
-    verify(cache).addAll(Collections.singletonList(slot1));
-    verify(api).loadCdb(argThat(cdb -> {
-      assertEquals(mappedAdUnits, cdb.getRequestedAdUnits());
-      return true;
-    }), any());
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(mappedAdUnits, slots);
   }
 
   @Test
@@ -122,19 +115,10 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenPreviouslyNotExpiredCachedBid_ReturnItAndRemoveItFromCache()
-      throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenNotExpiredValidCachedBid_ReturnItAndRemoveItFromCache() throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit(1);
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-
-    Slot slot = mock(Slot.class);
-    when(slot.getCpmAsNumber()).thenReturn(1.);
-    when(slot.getTimeOfDownload()).thenReturn(100_000L);
-    when(slot.getTtl()).thenReturn(60); // Valid until 160_000 included
-
-    givenMockedClockSetTo(160_000);
-
-    when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
+    Slot slot = givenNotExpiredValidCachedBid(cacheAdUnit);
 
     BidManager bidManager = createBidManager();
     Slot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
@@ -143,13 +127,55 @@ public class BidManagerFunctionalTest {
     verify(cache).remove(cacheAdUnit);
   }
 
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenNotExpiredValidCachedBid_ShouldCallCdbAndPopulateCache() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    givenNotExpiredValidCachedBid(cacheAdUnit);
+    List<Slot> slots = givenMockedCdbRespondingSlots();
+
+    BidManager bidManager = createBidManager();
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    waitForIdleState();
+
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(Collections.singletonList(cacheAdUnit), slots);
+  }
+
+  private void assertShouldCallCdbAndPopulateCacheOnlyOnce(List<CacheAdUnit> requestedAdUnits, List<Slot> slots) {
+    verify(cache).addAll(slots);
+    verify(api).loadCdb(argThat(cdb -> {
+      assertEquals(requestedAdUnits, cdb.getRequestedAdUnits());
+      return true;
+    }), any());
+  }
+
   private void waitForIdleState() {
     waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
   }
 
   @NonNull
+  private Slot givenNotExpiredValidCachedBid(CacheAdUnit cacheAdUnit) {
+    Slot slot = mock(Slot.class);
+    when(slot.getCpmAsNumber()).thenReturn(1.);
+    when(slot.getTimeOfDownload()).thenReturn(100_000L);
+    when(slot.getTtl()).thenReturn(60); // Valid until 160_000 included
+
+    givenMockedClockSetTo(160_000);
+
+    when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
+    return slot;
+  }
+
+  @NonNull
   private CacheAdUnit sampleAdUnit(int id) {
     return new CacheAdUnit(new AdSize(1, 1), "adUnit" + id, CRITEO_BANNER);
+  }
+
+  private List<Slot> givenMockedCdbRespondingSlots() {
+    List<Slot> slots = Collections.singletonList(mock(Slot.class));
+    Cdb response = givenMockedCdbResponse();
+    when(response.getSlots()).thenReturn(slots);
+    return slots;
   }
 
   private Cdb givenMockedCdbResponse() {
