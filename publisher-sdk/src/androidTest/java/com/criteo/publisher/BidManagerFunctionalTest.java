@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.DeviceUtil;
@@ -38,6 +39,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+// TODO p.turpin: Move some tests in a unit test.
 public class BidManagerFunctionalTest {
 
   @Rule
@@ -76,18 +78,16 @@ public class BidManagerFunctionalTest {
         mock(AdUnit.class));
 
     List<CacheAdUnit> mappedAdUnits = Arrays.asList(
-        new CacheAdUnit(new AdSize(1, 1), "adUnit1", CRITEO_BANNER),
-        new CacheAdUnit(new AdSize(2, 2), "adUnit2", CRITEO_INTERSTITIAL)
-    );
+        sampleAdUnit(1),
+        sampleAdUnit(2));
 
     AdUnitMapper mapper = givenMockedAdUnitMapper();
 
     Slot slot1 = mock(Slot.class);
-    Cdb response = mock(Cdb.class);
+    Cdb response = givenMockedCdbResponse();
     when(response.getSlots()).thenReturn(Collections.singletonList(slot1));
 
     when(mapper.convertValidAdUnits(prefetchAdUnits)).thenReturn(mappedAdUnits);
-    when(api.loadCdb(any(), any(), any())).thenReturn(response);
 
     BidManager bidManager = createBidManager();
     bidManager.prefetch(prefetchAdUnits);
@@ -102,10 +102,7 @@ public class BidManagerFunctionalTest {
 
   @Test
   public void getBidForAdUnitAndPrefetch_GivenNotValidAdUnit_ReturnNullAndDoNotCallCdb() {
-    AdUnit adUnit = mock(AdUnit.class);
-
-    AdUnitMapper mapper = givenMockedAdUnitMapper();
-    when(mapper.convertValidAdUnit(adUnit)).thenReturn(null);
+    AdUnit adUnit = givenMockedAdUnitMappingTo(null);
 
     BidManager bidManager = createBidManager();
     Slot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
@@ -125,14 +122,63 @@ public class BidManagerFunctionalTest {
     verify(api, never()).loadCdb(any(), any(), any());
   }
 
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenPreviouslyNotExpiredCachedBid_ReturnItAndRemoveItFromCache()
+      throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+
+    Slot slot = mock(Slot.class);
+    when(slot.getCpmAsNumber()).thenReturn(1.);
+    when(slot.getTimeOfDownload()).thenReturn(100_000L);
+    when(slot.getTtl()).thenReturn(60); // Valid until 160_000 included
+
+    givenMockedClockSetTo(160_000);
+
+    when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
+
+    BidManager bidManager = createBidManager();
+    Slot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
+
+    assertEquals(slot, bid);
+    verify(cache).remove(cacheAdUnit);
+  }
+
   private void waitForIdleState() {
     waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+  }
+
+  @NonNull
+  private CacheAdUnit sampleAdUnit(int id) {
+    return new CacheAdUnit(new AdSize(1, 1), "adUnit" + id, CRITEO_BANNER);
+  }
+
+  private Cdb givenMockedCdbResponse() {
+    Cdb response = mock(Cdb.class);
+    when(api.loadCdb(any(), any(), any())).thenReturn(response);
+    return response;
   }
 
   private AdUnitMapper givenMockedAdUnitMapper() {
     AdUnitMapper mapper = mock(AdUnitMapper.class);
     when(dependencyProvider.provideAdUnitMapper(any(), any())).thenReturn(mapper);
     return mapper;
+  }
+
+  private AdUnit givenMockedAdUnitMappingTo(CacheAdUnit toAdUnit) {
+    AdUnit fromAdUnit = mock(AdUnit.class);
+
+    AdUnitMapper adUnitMapper = givenMockedAdUnitMapper();
+    when(adUnitMapper.convertValidAdUnit(fromAdUnit)).thenReturn(toAdUnit);
+
+    return fromAdUnit;
+  }
+
+  private void givenMockedClockSetTo(long instant) {
+    Clock clock = mock(Clock.class);
+    when(clock.getCurrentTimeInMillis()).thenReturn(instant);
+
+    when(dependencyProvider.provideClock()).thenReturn(clock);
   }
 
   private BidManager createBidManager() {

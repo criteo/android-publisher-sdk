@@ -59,7 +59,7 @@ public class SdkCacheTest {
             String placement = slots.getJSONObject(i).getString("placementId");
             AdSize adSize = new AdSize(slots.getJSONObject(i).getInt("width"), slots.getJSONObject(i).getInt("height"));
             CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
-            Slot cachedSlot = cache.getAdUnit(testAdUnit);
+            Slot cachedSlot = cache.peekAdUnit(testAdUnit);
             assertEquals(placement, cachedSlot.getPlacementId());
             assertEquals(slots.getJSONObject(i).getString("currency"), cachedSlot.getCurrency());
             assertEquals(slots.getJSONObject(i).getString("cpm"), cachedSlot.getCpm());
@@ -76,7 +76,7 @@ public class SdkCacheTest {
         String placement = "this/isnt/in/the/cache";
         AdSize adSize = new AdSize(320, 50);
         CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
-        Slot cachedSlot = cache.getAdUnit(testAdUnit);
+        Slot cachedSlot = cache.peekAdUnit(testAdUnit);
         assertNull(cachedSlot);
     }
 
@@ -127,7 +127,6 @@ public class SdkCacheTest {
 
             cache.remove(testAdUnit);
             assertNull(cache.peekAdUnit(testAdUnit));
-            assertNull(cache.getAdUnit(testAdUnit));
             assertEquals(i, cache.getItemCount());
         }
     }
@@ -315,7 +314,7 @@ public class SdkCacheTest {
         CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_CUSTOM_NATIVE);
 
         cache.add(slot);
-        Slot adUnit = cache.getAdUnit(expectedKey);
+        Slot adUnit = cache.peekAdUnit(expectedKey);
 
         assertThat(adUnit).isSameAs(slot);
     }
@@ -334,7 +333,7 @@ public class SdkCacheTest {
         CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_BANNER);
 
         cache.add(slot);
-        Slot adUnit = cache.getAdUnit(expectedKey);
+        Slot adUnit = cache.peekAdUnit(expectedKey);
 
         assertThat(adUnit).isSameAs(slot);
     }
@@ -356,7 +355,7 @@ public class SdkCacheTest {
         CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_INTERSTITIAL);
 
         cache.add(slot);
-        Slot adUnit = cache.getAdUnit(expectedKey);
+        Slot adUnit = cache.peekAdUnit(expectedKey);
 
         assertThat(adUnit).isSameAs(slot);
     }
@@ -378,7 +377,7 @@ public class SdkCacheTest {
         CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_INTERSTITIAL);
 
         cache.add(slot);
-        Slot adUnit = cache.getAdUnit(expectedKey);
+        Slot adUnit = cache.peekAdUnit(expectedKey);
 
         assertThat(adUnit).isSameAs(slot);
     }
@@ -426,31 +425,6 @@ public class SdkCacheTest {
         CacheAdUnit key = new CacheAdUnit(size, "myAdUnit", CRITEO_CUSTOM_NATIVE);
 
         Slot slot = cache.peekAdUnit(key);
-
-        assertThat(slot).isNull();
-    }
-
-    @Test
-    public void getAdUnit_GettingTwiceExistingSlot_ReturnFirstTheSameSlotThenReturnNull() throws Exception {
-        AdSize size = new AdSize(1, 2);
-        Slot slot = givenNativeSlot(size, "myAdUnit");
-        CacheAdUnit key = new CacheAdUnit(size, "myAdUnit", CRITEO_CUSTOM_NATIVE);
-
-        cache.add(slot);
-        Slot slot1 = cache.getAdUnit(key);
-        Slot slot2 = cache.getAdUnit(key);
-
-        assertThat(cache.getItemCount()).isEqualTo(0);
-        assertThat(slot1).isSameAs(slot);
-        assertThat(slot2).isNull();
-    }
-
-    @Test
-    public void getAdUnit_GettingNonExistingSlot_ReturnNull() throws Exception {
-        AdSize size = new AdSize(1, 2);
-        CacheAdUnit key = new CacheAdUnit(size, "myAdUnit", CRITEO_CUSTOM_NATIVE);
-
-        Slot slot = cache.getAdUnit(key);
 
         assertThat(slot).isNull();
     }

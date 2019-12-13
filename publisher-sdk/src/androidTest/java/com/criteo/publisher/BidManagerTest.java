@@ -579,8 +579,6 @@ public class BidManagerTest {
 
         Slot testSlot = new Slot(slotJson);
         when(this.mockSdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
-        when(this.mockSdkCache.getAdUnit(cAdUnit)).thenReturn(testSlot);
-
 
         BidManager bidManager = new BidManager(
             context,
@@ -672,7 +670,6 @@ public class BidManagerTest {
 
         Slot testSlot = new Slot(slotJson);
         when(this.mockSdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
-        when(this.mockSdkCache.getAdUnit(cAdUnit)).thenReturn(testSlot);
 
         BidManager bidManager = new BidManager(
             context,
@@ -795,7 +792,6 @@ public class BidManagerTest {
         Slot slot = mock(Slot.class);
         NativeAssets nativeAssets = mock(NativeAssets.class);
         when(mockSdkCache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
-        when(mockSdkCache.getAdUnit(cacheAdUnit)).thenReturn(slot);
         when(slot.isValid()).thenReturn(true);
         when(slot.isNative()).thenReturn(true);
         when(slot.getCpmAsNumber()).thenReturn(2.2);

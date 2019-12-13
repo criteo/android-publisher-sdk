@@ -295,9 +295,9 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             return null;
         } else {
             //If cpm > 0, ttl > 0 but we are done staying silent
-            Slot slot = cache.getAdUnit(cacheAdUnit);
+            cache.remove(cacheAdUnit);
             fetch(cacheAdUnit);
-            return slot;
+            return peekSlot;
         }
 
     }

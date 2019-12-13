@@ -84,19 +84,6 @@ public class SdkCache {
         return slotMap.get(key);
     }
 
-    /**
-     * Get and remove the slot corresponding to the given key.
-     * <p>
-     * If no slot match the given key, then <code>null</code> is returned.
-     *
-     * @param key of the slot to look for
-     * @return found slot or null if not found
-     */
-    @Nullable
-    public Slot getAdUnit(CacheAdUnit key) {
-        return slotMap.remove(key);
-    }
-
     public void remove(CacheAdUnit key) {
         slotMap.remove(key);
     }

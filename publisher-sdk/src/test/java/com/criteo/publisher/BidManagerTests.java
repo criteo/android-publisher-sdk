@@ -126,7 +126,6 @@ public class BidManagerTests {
 
         testSlot = new Slot(slotJson);
         when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
-        when(this.sdkCache.getAdUnit(cAdUnit)).thenReturn(testSlot);
 
         tokenCache = mock(TokenCache.class);
 
@@ -217,7 +216,6 @@ public class BidManagerTests {
 
         CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
         when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
-        when(this.sdkCache.getAdUnit(cAdUnit)).thenReturn(testSlot);
 
         BidManager bidManager = createBidManager();
 
@@ -240,7 +238,6 @@ public class BidManagerTests {
 
         CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
         when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
-        when(this.sdkCache.getAdUnit(cAdUnit)).thenReturn(testSlot);
         BidManager bidManager = createBidManager();
 
         BannerAdUnit bannerAdUnit = new BannerAdUnit(adUnitId, new AdSize(320,50));
@@ -271,7 +268,6 @@ public class BidManagerTests {
 
         CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
         when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
-        when(this.sdkCache.getAdUnit(cAdUnit)).thenReturn(testSlot);
 
         BidManager bidManager = createBidManager();
 

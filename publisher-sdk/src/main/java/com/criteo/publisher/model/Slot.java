@@ -115,6 +115,9 @@ public class Slot {
         return currency;
     }
 
+    /**
+     * Returns the TTL in seconds for this bid response.
+     */
     public int getTtl() {
         return ttl;
     }
@@ -123,6 +126,10 @@ public class Slot {
         this.ttl = ttl;
     }
 
+    /**
+     * Return the time of download in milliseconds for this bid response.
+     * This time represent a client-side time given by a {@link com.criteo.publisher.Clock}.
+     */
     public long getTimeOfDownload() {
         return timeOfDownload;
     }
