@@ -63,7 +63,7 @@ public class AndroidUtilTest {
   }
 
   private void waitForOrientation() throws InterruptedException {
-    Thread.sleep(500); // FIXME EE-657
+    Thread.sleep(1000); // FIXME EE-657
   }
 
 }
