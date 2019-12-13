@@ -5,9 +5,13 @@ import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,9 +36,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -141,6 +148,78 @@ public class BidManagerFunctionalTest {
     assertShouldCallCdbAndPopulateCacheOnlyOnce(Collections.singletonList(cacheAdUnit), slots);
   }
 
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenAdUnitBeingLoaded_ShouldCallCdbAndPopulateCacheOnlyOnceForThePendingCall() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+
+    Cdb response = mock(Cdb.class);
+    List<Slot> slots = Collections.singletonList(mock(Slot.class));
+    when(response.getSlots()).thenReturn(slots);
+
+    // We force a synchronization here to make the test deterministic.
+    // Hence we can predict that the second bid manager call is done after the cdb call.
+    // The test should also work in the other way (see the other "given ad unit being loaded" test).
+    CountDownLatch cdbRequestHasStarted = new CountDownLatch(1);
+
+    CountDownLatch cdbRequestIsPending = new CountDownLatch(1);
+    when(api.loadCdb(any(), any())).thenAnswer(invocation -> {
+      cdbRequestHasStarted.countDown();
+      cdbRequestIsPending.await();
+      return response;
+    });
+
+    BidManager bidManager = spy(createBidManager());
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    cdbRequestHasStarted.await();
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    cdbRequestIsPending.countDown();
+    waitForIdleState();
+
+    // It is expected, with those two calls to the bid manager, that only one CDB call and only one
+    // cache update is done. Indeed, the only CDB call correspond to the one mocked above with the
+    // latch "slowing the network call". The only cache update is the one done after this single CDB
+    // call. Hence, the second bid manager call, which happen between the CDB call and the cache
+    // update should do nothing.
+
+    InOrder inOrder = inOrder(bidManager, api, cache);
+    inOrder.verify(bidManager).getBidForAdUnitAndPrefetch(adUnit);
+    inOrder.verify(api).loadCdb(any(), any());
+    inOrder.verify(bidManager).getBidForAdUnitAndPrefetch(adUnit);
+    inOrder.verify(cache).addAll(slots);
+    inOrder.verify(bidManager).setTimeToNextCall(anyInt());
+    inOrder.verifyNoMoreInteractions();
+  }
+
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenAdUnitBeingLoaded_ShouldCallCdbAndPopulateCacheOnlyOnceForThePendingCall2() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    List<Slot> slots = givenMockedCdbRespondingSlots();
+
+    // We force the CDB call to be after the second bid manager call to make the test deterministic.
+    CountDownLatch bidManagerIsCalledASecondTime = givenExecutorWaitingOn();
+
+    BidManager bidManager = spy(createBidManager());
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    bidManagerIsCalledASecondTime.countDown();
+
+    // It is expected, with those two calls to the bid manager, that only one CDB call and only one
+    // cache update is done. Indeed, the only CDB call correspond to the one triggered by the first
+    // bid manager call but run after the second bid manager call. The only cache update is the one
+    // done after this single CDB call. Hence, the second bid manager call, which happen before the
+    // CDB call and the cache update should do nothing.
+
+    InOrder inOrder = inOrder(bidManager, api, cache);
+    inOrder.verify(bidManager).getBidForAdUnitAndPrefetch(adUnit);
+    inOrder.verify(bidManager).getBidForAdUnitAndPrefetch(adUnit);
+    inOrder.verify(api, timeout(1000)).loadCdb(any(), any());
+    inOrder.verify(cache).addAll(slots);
+    inOrder.verify(bidManager).setTimeToNextCall(anyInt());
+    inOrder.verifyNoMoreInteractions();
+  }
+
   private void assertShouldCallCdbAndPopulateCacheOnlyOnce(List<CacheAdUnit> requestedAdUnits, List<Slot> slots) {
     verify(cache).addAll(slots);
     verify(api).loadCdb(argThat(cdb -> {
@@ -169,6 +248,29 @@ public class BidManagerFunctionalTest {
   @NonNull
   private CacheAdUnit sampleAdUnit(int id) {
     return new CacheAdUnit(new AdSize(1, 1), "adUnit" + id, CRITEO_BANNER);
+  }
+
+  @NonNull
+  private CountDownLatch givenExecutorWaitingOn() {
+    CountDownLatch waitingLatch = new CountDownLatch(1);
+
+    when(dependencyProvider.provideThreadPoolExecutor()).thenAnswer(invocation -> {
+      Executor executor = (Executor) invocation.callRealMethod();
+      return (Executor) command -> {
+        Runnable waitingCommand = () -> {
+          try {
+            waitingLatch.await();
+          } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+          }
+          command.run();
+        };
+
+        executor.execute(waitingCommand);
+      };
+    });
+
+    return waitingLatch;
   }
 
   private List<Slot> givenMockedCdbRespondingSlots() {
