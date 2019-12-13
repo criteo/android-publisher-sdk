@@ -22,7 +22,6 @@ import org.json.JSONObject;
 public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     private static final String TAG = "Criteo.CDT";
 
-    private final Context mContext;
     private final boolean callConfig;
     private final String userAgent;
     private final NetworkResponseListener responseListener;
@@ -34,7 +33,6 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     private final UserPrivacyUtil userPrivacyUtil;
 
     public CdbDownloadTask(
-        Context context,
         NetworkResponseListener responseListener,
         boolean callConfig,
         String userAgent,
@@ -42,9 +40,9 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         Hashtable<CacheAdUnit, CdbDownloadTask> bidsInMap,
         DeviceUtil deviceUtil,
         LoggingUtil loggingUtil,
-        UserPrivacyUtil userPrivacyUtil
+        UserPrivacyUtil userPrivacyUtil,
+        PubSdkApi api
     ) {
-        this.mContext = context.getApplicationContext();
         this.responseListener = responseListener;
         this.callConfig = callConfig;
         this.userAgent = userAgent;
@@ -52,7 +50,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         this.bidsInCdbTask = bidsInMap;
         this.deviceUtil = deviceUtil;
         this.loggingUtil = loggingUtil;
-        this.api = DependencyProvider.getInstance().providePubSdkApi();
+        this.api = api;
         this.userPrivacyUtil = userPrivacyUtil;
     }
 
@@ -88,7 +86,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         NetworkResult result = new NetworkResult();
         JSONObject configResult = null;
         if (callConfig) {
-            configResult = api.loadConfig(mContext, publisher.getCriteoPublisherId(),
+            configResult = api.loadConfig(publisher.getCriteoPublisherId(),
                     publisher.getBundleId(), user.getSdkVer());
             if (configResult != null) {
                 result.setConfig(configResult);
@@ -110,7 +108,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
         if (gdpr != null) {
             cdbRequest.setGdprConsent(gdpr);
         }
-        Cdb cdbResult = api.loadCdb(mContext, cdbRequest, userAgent);
+        Cdb cdbResult = api.loadCdb(cdbRequest, userAgent);
         if (loggingUtil.isLoggingEnabled() && cdbResult != null && cdbResult.getSlots() != null
                 && cdbResult.getSlots().size() > 0) {
             StringBuilder builder = new StringBuilder();

@@ -28,10 +28,13 @@ public class AppEventTaskTest {
     @Mock
     private DeviceUtil deviceUtil;
 
+    @Mock
+    private PubSdkApi api;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        appEventTask = new AppEventTask(context, responseListener, deviceUtil);
+        appEventTask = new AppEventTask(context, responseListener, deviceUtil, api);
         json = new JSONObject();
     }
 

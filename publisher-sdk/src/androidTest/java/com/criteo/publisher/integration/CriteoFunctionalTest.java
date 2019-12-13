@@ -44,8 +44,11 @@ public class CriteoFunctionalTest {
 
   private void init_GivenPrefetchCachedAdAndReInitWithSameAdUnit_CdbIsNotCallTheSecondTime(AdUnit adUnit)
       throws Exception {
-    PubSdkApi api = spy(mockedDependenciesRule.getDependencyProvider().providePubSdkApi());
-    when(mockedDependenciesRule.getDependencyProvider().providePubSdkApi()).thenReturn(api);
+    Application app = (Application) InstrumentationRegistry.getTargetContext()
+        .getApplicationContext();
+
+    PubSdkApi api = spy(mockedDependenciesRule.getDependencyProvider().providePubSdkApi(app));
+    when(mockedDependenciesRule.getDependencyProvider().providePubSdkApi(any())).thenReturn(api);
 
     int dayTtl = 3600 * 24;
 
@@ -56,17 +59,15 @@ public class CriteoFunctionalTest {
         slot.setTtl(dayTtl);
       });
       return cdbResponse;
-    }).when(api).loadCdb(any(), any(), any());
+    }).when(api).loadCdb(any(), any());
 
     givenInitializedCriteo(adUnit);
     waitForBids();
 
-    Application app = (Application) InstrumentationRegistry.getTargetContext()
-        .getApplicationContext();
     Criteo.init(app, TEST_CP_ID, Collections.singletonList(adUnit));
     waitForBids();
 
-    verify(api, times(1)).loadCdb(any(), any(), any());
+    verify(api, times(1)).loadCdb(any(), any());
   }
 
   private void waitForBids() {

@@ -45,8 +45,8 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public PubSdkApi providePubSdkApi() {
-    return new PubSdkApi();
+  public PubSdkApi providePubSdkApi(Context context) {
+    return new PubSdkApi(context);
   }
 
   @NonNull
@@ -104,9 +104,9 @@ public class DependencyProvider {
       @NonNull LoggingUtil loggingUtil,
       @NonNull Clock clock,
       @NonNull UserPrivacyUtil userPrivacyUtil,
-      @NonNull AdUnitMapper adUnitMapper) {
+      @NonNull AdUnitMapper adUnitMapper,
+      @NonNull PubSdkApi api) {
     return new BidManager(
-        context,
         new Publisher(context, criteoPublisherId),
         new TokenCache(),
         deviceInfo,
@@ -118,7 +118,8 @@ public class DependencyProvider {
         loggingUtil,
         clock,
         userPrivacyUtil,
-        adUnitMapper
+        adUnitMapper,
+        api
     );
   }
 

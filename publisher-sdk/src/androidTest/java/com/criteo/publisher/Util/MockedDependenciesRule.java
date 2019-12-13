@@ -5,6 +5,8 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
+import android.content.Context;
+import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.MockableDependencyProvider;
 import com.criteo.publisher.TrackingCommandsExecutor;
@@ -54,11 +56,11 @@ public class MockedDependenciesRule implements TestRule {
     return trackingCommandsExecutor;
   }
 
-  public ResultCaptor<Cdb> captorCdbResult() {
+  public ResultCaptor<Cdb> captorCdbResult(Context context) {
     ResultCaptor<Cdb> captor = new ResultCaptor<>();
-    PubSdkApi spyApi = spy(getDependencyProvider().providePubSdkApi());
-    doReturn(spyApi).when(getDependencyProvider()).providePubSdkApi();
-    doAnswer(captor).when(spyApi).loadCdb(any(), any(), any());
+    PubSdkApi spyApi = spy(getDependencyProvider().providePubSdkApi(context));
+    doReturn(spyApi).when(getDependencyProvider()).providePubSdkApi(any());
+    doAnswer(captor).when(spyApi).loadCdb(any(), any());
     return captor;
   }
 }

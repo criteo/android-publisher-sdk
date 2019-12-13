@@ -27,6 +27,7 @@ import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.CdbDownloadTask;
+import com.criteo.publisher.network.PubSdkApi;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -62,7 +63,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
     private static final int SECOND_TO_MILLI = 1000;
     private static final int PROFILE_ID = 235;
-    private final Context mContext;
     private final SdkCache cache;
     private final TokenCache tokenCache;
     private final Publisher publisher;
@@ -76,9 +76,9 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private final Clock clock;
     private final UserPrivacyUtil userPrivacyUtil;
     private final AdUnitMapper adUnitMapper;
+    private final PubSdkApi api;
 
     BidManager(
-        @NonNull Context context,
         @NonNull Publisher publisher,
         @NonNull TokenCache tokenCache,
         @NonNull DeviceInfo deviceInfo,
@@ -90,9 +90,9 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         @NonNull LoggingUtil loggingUtil,
         @NonNull Clock clock,
         @NonNull UserPrivacyUtil userPrivacyUtil,
-        @NonNull AdUnitMapper adUnitMapper
+        @NonNull AdUnitMapper adUnitMapper,
+        @NonNull PubSdkApi api
     ) {
-        this.mContext = context;
         this.publisher = publisher;
         this.tokenCache = tokenCache;
         this.deviceInfo = deviceInfo;
@@ -105,6 +105,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         this.clock = clock;
         this.userPrivacyUtil = userPrivacyUtil;
         this.adUnitMapper = adUnitMapper;
+        this.api = api;
     }
 
     /**
@@ -127,7 +128,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
      */
     private void startCdbDownloadTask(boolean callConfig, List<CacheAdUnit> prefetchCacheAdUnits) {
         CdbDownloadTask cdbDownloadTask = new CdbDownloadTask(
-            mContext,
             this,
             callConfig,
             deviceInfo.getUserAgent(),
@@ -135,7 +135,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             placementsWithCdbTasks,
             deviceUtil,
             loggingUtil,
-            userPrivacyUtil
+            userPrivacyUtil,
+            api
         );
 
         for (CacheAdUnit cacheAdUnit : prefetchCacheAdUnits) {

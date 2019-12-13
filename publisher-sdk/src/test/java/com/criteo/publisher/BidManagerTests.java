@@ -23,6 +23,7 @@ import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.CdbDownloadTask;
+import com.criteo.publisher.network.PubSdkApi;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -84,11 +85,14 @@ public class BidManagerTests {
 
     private AdUnitMapper adUnitMapper;
 
+    private PubSdkApi api;
+
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
 
         adUnitMapper = new AdUnitMapper(androidUtil, deviceUtil);
+        api = new PubSdkApi(context);
 
         adUnit = new BannerAdUnit(adUnitId, adSize);
 
@@ -301,7 +305,6 @@ public class BidManagerTests {
     @NonNull
     private BidManager createBidManager() {
         return new BidManager(
-            context,
             publisher,
             tokenCache,
             deviceInfo,
@@ -313,7 +316,8 @@ public class BidManagerTests {
             loggingUtil,
             clock,
             userPrivacyUtil,
-            adUnitMapper
+            adUnitMapper,
+            api
         );
     }
 

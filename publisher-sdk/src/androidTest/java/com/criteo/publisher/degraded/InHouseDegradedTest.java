@@ -4,6 +4,7 @@ package com.criteo.publisher.degraded;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
@@ -38,7 +39,7 @@ public class InHouseDegradedTest {
     MockitoAnnotations.initMocks(this);
 
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-    when(dependencyProvider.providePubSdkApi()).thenReturn(api);
+    when(dependencyProvider.providePubSdkApi(any())).thenReturn(api);
     DegradedUtil.assumeIsDegraded();
 
     criteo = CriteoUtil.givenInitializedCriteo();

@@ -9,6 +9,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.test.InstrumentationRegistry;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -66,6 +68,13 @@ public class MoPubHeaderBiddingFunctionalTest {
   private final InterstitialAdUnit demoInterstitialAdUnit = TestAdUnits.INTERSTITIAL_DEMO;
 
   private final WebViewLookup webViewLookup = new WebViewLookup();
+
+  private Context context;
+
+  @Before
+  public void setUp() throws Exception {
+    context = activityRule.getActivity().getApplicationContext();
+  }
 
   @Test
   public void exampleOfExpectedKeywords() throws Exception {
@@ -172,7 +181,7 @@ public class MoPubHeaderBiddingFunctionalTest {
 
   @Test
   public void loadingMoPubBanner_GivenDemoBanner_MoPubViewUsesDemoDisplayUrl() throws Exception {
-    ResultCaptor<Cdb> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
+    ResultCaptor<Cdb> cdbResultCaptor = mockedDependenciesRule.captorCdbResult(context);
 
     String html = loadMoPubHtmlBanner(demoBannerAdUnit);
 
@@ -189,7 +198,7 @@ public class MoPubHeaderBiddingFunctionalTest {
 
   @Test
   public void loadingMoPubInterstitial_GivenDemoInterstitial_MoPubViewUsesDemoDisplayUrl() throws Exception {
-    ResultCaptor<Cdb> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
+    ResultCaptor<Cdb> cdbResultCaptor = mockedDependenciesRule.captorCdbResult(context);
 
     String html = loadMoPubHtmlInterstitial(demoInterstitialAdUnit);
 

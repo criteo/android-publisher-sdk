@@ -56,14 +56,13 @@ public class StandaloneTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
+    context = InstrumentationRegistry.getContext();
 
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
-    api = spy(dependencyProvider.providePubSdkApi());
-    when(dependencyProvider.providePubSdkApi()).thenReturn(api);
+    api = spy(dependencyProvider.providePubSdkApi(context));
+    when(dependencyProvider.providePubSdkApi(any())).thenReturn(api);
     when(dependencyProvider.provideAndroidUtil(any())).thenReturn(androidUtil);
-
-    context = InstrumentationRegistry.getContext();
   }
 
   @Test
@@ -78,7 +77,7 @@ public class StandaloneTest {
     });
     waitForBids();
 
-    verify(api).loadCdb(any(), requestCaptor.capture(), anyString());
+    verify(api).loadCdb(requestCaptor.capture(), anyString());
     Cdb request = requestCaptor.getValue();
 
     boolean interstitialFlag = request.toJson()

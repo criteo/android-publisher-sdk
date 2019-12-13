@@ -1,14 +1,11 @@
 package com.criteo.publisher;
 
-import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 
 import android.app.Application;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
@@ -42,7 +39,7 @@ public class USPrivacyFunctionalTest {
     Application app = (Application) InstrumentationRegistry.getTargetContext().getApplicationContext();
     defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(app.getApplicationContext());
 
-    doReturn(pubSdkApi).when(dependencyProvider).providePubSdkApi();
+    doReturn(pubSdkApi).when(dependencyProvider).providePubSdkApi(any());
   }
 
   @After
@@ -58,7 +55,7 @@ public class USPrivacyFunctionalTest {
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
-    verify(pubSdkApi).loadCdb(any(Context.class), cdbArgumentCaptor.capture(), any(String.class));
+    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
     Cdb cdb = cdbArgumentCaptor.getValue();
     assertEquals("1YNNN", cdb.getUser().getUspIab());
@@ -72,7 +69,7 @@ public class USPrivacyFunctionalTest {
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
-    verify(pubSdkApi).loadCdb(any(Context.class), cdbArgumentCaptor.capture(), any(String.class));
+    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
     Cdb cdb = cdbArgumentCaptor.getValue();
     Assert.assertNull( cdb.getUser().getUspIab());

@@ -1,5 +1,6 @@
 package com.criteo.publisher.degraded;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -33,7 +34,7 @@ public class HeaderBiddingDegradedTest {
     MockitoAnnotations.initMocks(this);
 
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-    when(dependencyProvider.providePubSdkApi()).thenReturn(api);
+    when(dependencyProvider.providePubSdkApi(any())).thenReturn(api);
 
     DegradedUtil.assumeIsDegraded();
 

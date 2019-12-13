@@ -12,6 +12,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.test.rule.ActivityTestRule;
 import android.view.View;
@@ -43,6 +44,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -100,6 +102,13 @@ public class DfpHeaderBiddingFunctionalTest {
   private final NativeAdUnit invalidNativeAdUnit = TestAdUnits.NATIVE_UNKNOWN;
 
   private final WebViewLookup webViewLookup = new WebViewLookup();
+
+  private Context context;
+
+  @Before
+  public void setUp() throws Exception {
+    context = activityRule.getActivity().getApplicationContext();
+  }
 
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchValidBannerId_CriteoMacroAreInjectedInDfpBuilder()
@@ -375,7 +384,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
   @Test
   public void loadingDfpBanner_GivenDemoBanner_DfpViewContainsDisplayUrl() throws Exception {
-    ResultCaptor<Cdb> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
+    ResultCaptor<Cdb> cdbResultCaptor = mockedDependenciesRule.captorCdbResult(context);
 
     String html = loadDfpHtmlBanner(demoBannerAdUnit);
 
@@ -385,7 +394,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
   @Test
   public void loadingDfpBanner_GivenDemoInterstitial_DfpViewContainsDisplayUrl() throws Exception {
-    ResultCaptor<Cdb> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
+    ResultCaptor<Cdb> cdbResultCaptor = mockedDependenciesRule.captorCdbResult(context);
 
     String html = loadDfpHtmlInterstitial(demoInterstitialAdUnit);
 

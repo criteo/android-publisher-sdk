@@ -2,7 +2,6 @@ package com.criteo.publisher;
 
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_INTERSTITIAL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -67,7 +66,7 @@ public class BidManagerFunctionalTest {
     MockitoAnnotations.initMocks(this);
     dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
-    when(dependencyProvider.providePubSdkApi()).thenReturn(api);
+    when(dependencyProvider.providePubSdkApi(any())).thenReturn(api);
   }
 
   @Test
@@ -94,7 +93,7 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     verify(cache).addAll(Collections.singletonList(slot1));
-    verify(api).loadCdb(any(), argThat(cdb -> {
+    verify(api).loadCdb(argThat(cdb -> {
       assertEquals(mappedAdUnits, cdb.getRequestedAdUnits());
       return true;
     }), any());
@@ -109,7 +108,7 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     assertNull(bid);
-    verify(api, never()).loadCdb(any(), any(), any());
+    verify(api, never()).loadCdb(any(), any());
   }
 
   @Test
@@ -119,7 +118,7 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     assertNull(bid);
-    verify(api, never()).loadCdb(any(), any(), any());
+    verify(api, never()).loadCdb(any(), any());
   }
 
   @Test
@@ -155,7 +154,7 @@ public class BidManagerFunctionalTest {
 
   private Cdb givenMockedCdbResponse() {
     Cdb response = mock(Cdb.class);
-    when(api.loadCdb(any(), any(), any())).thenReturn(response);
+    when(api.loadCdb(any(), any())).thenReturn(response);
     return response;
   }
 
@@ -187,7 +186,6 @@ public class BidManagerFunctionalTest {
     DeviceUtil deviceUtil = dependencyProvider.provideDeviceUtil(context);
 
     return new BidManager(
-        context,
         publisher,
         tokenCache,
         new DeviceInfo(),
@@ -199,7 +197,8 @@ public class BidManagerFunctionalTest {
         dependencyProvider.provideLoggingUtil(),
         dependencyProvider.provideClock(),
         dependencyProvider.provideUserPrivacyUtil(context),
-        dependencyProvider.provideAdUnitMapper(androidUtil, deviceUtil)
+        dependencyProvider.provideAdUnitMapper(androidUtil, deviceUtil),
+        dependencyProvider.providePubSdkApi(context)
     );
   }
 

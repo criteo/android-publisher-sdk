@@ -29,9 +29,6 @@ public class  CdbDownloadTaskTest {
     private List<CacheAdUnit> cacheAdUnits;
 
     @Mock
-    private Context mContext;
-
-    @Mock
     private NetworkResponseListener responseListener;
 
     @Mock
@@ -42,6 +39,9 @@ public class  CdbDownloadTaskTest {
 
     @Mock
     private LoggingUtil loggingUtil;
+
+    @Mock
+    private PubSdkApi api;
 
     private UserPrivacyUtil userPrivacyUtil;
 
@@ -58,7 +58,6 @@ public class  CdbDownloadTaskTest {
         cacheAdUnits.add(cacheAdUnit);
 
         cdbDownloadTask = new CdbDownloadTask(
-            mContext,
             responseListener,
             false,
             "Agent",
@@ -66,7 +65,8 @@ public class  CdbDownloadTaskTest {
             bidsInCdbTask,
             deviceUtil,
             loggingUtil,
-            userPrivacyUtil
+            userPrivacyUtil,
+            api
         );
 
         cdbDownloadTask.onPostExecute(null);

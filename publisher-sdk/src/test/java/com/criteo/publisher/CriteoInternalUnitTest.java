@@ -85,7 +85,8 @@ public class CriteoInternalUnitTest {
         dependencyProvider.provideLoggingUtil(),
         dependencyProvider.provideClock(),
         dependencyProvider.provideUserPrivacyUtil(context),
-        dependencyProvider.provideAdUnitMapper(androidUtil, deviceUtil)
+        dependencyProvider.provideAdUnitMapper(androidUtil, deviceUtil),
+        dependencyProvider.providePubSdkApi(context)
     );
   }
 
@@ -109,7 +110,7 @@ public class CriteoInternalUnitTest {
 
     when(dependencyProvider.provideBidManager(
         eq(context), eq(criteoPublisherId), any(), eq(config),
-        any(), any(), any(), any(), any()))
+        any(), any(), any(), any(), any(), any()))
         .thenReturn(bidManager);
 
     return bidManager;

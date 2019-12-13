@@ -16,15 +16,18 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
     private final Context mContext;
     private final AppEventResponseListener responseListener;
     private final DeviceUtil deviceUtil;
+    private final PubSdkApi api;
 
     public AppEventTask(
         Context context,
         AppEventResponseListener responseListener,
-        DeviceUtil deviceUtil
+        DeviceUtil deviceUtil,
+        PubSdkApi api
     ) {
         this.mContext = context;
         this.responseListener = responseListener;
         this.deviceUtil = deviceUtil;
+        this.api = api;
     }
 
     @Override
@@ -46,8 +49,7 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
         String gaid = deviceUtil.getAdvertisingId();
         String appId = mContext.getApplicationContext().getPackageName();
 
-        PubSdkApi pubSdkApi = DependencyProvider.getInstance().providePubSdkApi();
-        JSONObject response = pubSdkApi.postAppEvent(mContext, SENDER_ID, appId, gaid, eventType, limitedAdTracking);
+        JSONObject response = api.postAppEvent(SENDER_ID, appId, gaid, eventType, limitedAdTracking);
         if (response != null) {
             Log.d(TAG, response.toString());
         }

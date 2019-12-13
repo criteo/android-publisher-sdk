@@ -16,6 +16,7 @@ import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
+import com.criteo.publisher.network.PubSdkApi;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +58,8 @@ final class CriteoInternal extends Criteo {
 
     AndroidUtil androidUtil = dependencyProvider.provideAndroidUtil(context);
 
+    PubSdkApi api = dependencyProvider.providePubSdkApi(context);
+
     bidManager = dependencyProvider.provideBidManager(
         context,
         criteoPublisherId,
@@ -66,9 +69,15 @@ final class CriteoInternal extends Criteo {
         dependencyProvider.provideLoggingUtil(),
         clock,
         dependencyProvider.provideUserPrivacyUtil(context),
-        dependencyProvider.provideAdUnitMapper(androidUtil, deviceUtil));
+        dependencyProvider.provideAdUnitMapper(androidUtil, deviceUtil),
+        api);
 
-    this.appEvents = new AppEvents(context, deviceUtil, clock);
+    this.appEvents = new AppEvents(
+        context,
+        deviceUtil,
+        clock,
+        api);
+
     this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
 
     List<AdUnit> prefetchAdUnits = adUnits;

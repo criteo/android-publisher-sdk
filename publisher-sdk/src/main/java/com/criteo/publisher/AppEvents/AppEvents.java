@@ -9,6 +9,7 @@ import com.criteo.publisher.Util.AppEventResponseListener;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.network.AppEventTask;
+import com.criteo.publisher.network.PubSdkApi;
 import java.util.concurrent.Executor;
 
 public class AppEvents implements AppEventResponseListener, ApplicationStoppedListener {
@@ -18,22 +19,25 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
     private static final String EVENT_LAUNCH = "Launch";
 
     private AppEventTask eventTask;
-    private Context mContext;
+    private final Context mContext;
     private int appEventThrottle = -1;
     private long throttleSetTime = 0;
 
     private final DeviceUtil deviceUtil;
     private final Clock clock;
+    private final PubSdkApi api;
 
     public AppEvents(
         @NonNull Context context,
         @NonNull DeviceUtil deviceUtil,
-        @NonNull Clock clock
+        @NonNull Clock clock,
+        @NonNull PubSdkApi api
     ) {
         this.mContext = context;
         this.deviceUtil = deviceUtil;
         this.clock = clock;
-        this.eventTask = new AppEventTask(mContext, this, deviceUtil);
+        this.api = api;
+        this.eventTask = new AppEventTask(mContext, this, deviceUtil, api);
     }
 
     private void postAppEvent(String eventType) {
@@ -42,7 +46,7 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
             return;
         }
         if (eventTask.getStatus() == AsyncTask.Status.FINISHED) {
-            eventTask = new AppEventTask(mContext, this, deviceUtil);
+            eventTask = new AppEventTask(mContext, this, deviceUtil, api);
         }
         if (eventTask.getStatus() != AsyncTask.Status.RUNNING) {
             Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();

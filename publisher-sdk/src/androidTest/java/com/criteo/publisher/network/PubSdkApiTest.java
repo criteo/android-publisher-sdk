@@ -30,20 +30,20 @@ public class PubSdkApiTest {
 
     @Before
     public void setup() {
-        context = InstrumentationRegistry.getContext();
+        context = InstrumentationRegistry.getContext().getApplicationContext();
         appId = context.getApplicationContext().getPackageName();
         senderId = 2379;
         limitedAdTracking = 0;
         gaid = "021a86de-ef82-4f69-867b-61ca66688c9c";
         eventType = "Launch";
-        api = mockedDependenciesRule.getDependencyProvider().providePubSdkApi();
+        api = mockedDependenciesRule.getDependencyProvider().providePubSdkApi(context);
     }
 
 
     @Test
     public void testPostAppEventWithNullGaid() {
         JSONObject object = api
-            .postAppEvent(context, senderId, appId, gaid, eventType, limitedAdTracking);
+            .postAppEvent(senderId, appId, gaid, eventType, limitedAdTracking);
         assertNotNull(object);
     }
 
@@ -51,7 +51,7 @@ public class PubSdkApiTest {
     public void testPostAppEventWithGaid() {
         gaid = null;
         JSONObject object = api
-            .postAppEvent(context, senderId, appId, gaid, eventType, limitedAdTracking);
+            .postAppEvent(senderId, appId, gaid, eventType, limitedAdTracking);
         assertNotNull(object);
     }
 }

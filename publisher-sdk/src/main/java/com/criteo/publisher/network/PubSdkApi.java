@@ -29,7 +29,13 @@ public class PubSdkApi {
     private static final String EVENT_TYPE = "eventType";
     private static final String LIMITED_AD_TRACKING = "limitedAdTracking";
 
-    JSONObject loadConfig(Context context, String criteoPublisherId, String appId, String sdkVersion) {
+    private final Context context;
+
+    public PubSdkApi(Context context) {
+        this.context = context;
+    }
+
+    JSONObject loadConfig(String criteoPublisherId, String appId, String sdkVersion) {
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put(CRITEO_PUBLISHER_ID, criteoPublisherId);
@@ -48,7 +54,7 @@ public class PubSdkApi {
         return configResult;
     }
 
-    public Cdb loadCdb(Context context, Cdb cdbRequest, String userAgent) {
+    public Cdb loadCdb(Cdb cdbRequest, String userAgent) {
         Cdb cdbResult = null;
         try {
             URL url = new URL(context.getString(R.string.cdb_url) + "/inapp/v2");
@@ -62,9 +68,9 @@ public class PubSdkApi {
         return cdbResult;
     }
 
-    JSONObject postAppEvent(Context context, int senderId,
-            String appId, String gaid, String eventType,
-            int limitedAdTracking) {
+    JSONObject postAppEvent(int senderId,
+        String appId, String gaid, String eventType,
+        int limitedAdTracking) {
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put(APP_ID, appId);
