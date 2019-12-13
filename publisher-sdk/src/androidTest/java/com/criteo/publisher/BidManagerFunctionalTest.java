@@ -304,6 +304,20 @@ public class BidManagerFunctionalTest {
     assertNull(bid);
   }
 
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenNoBidCached_ShouldCallCdbAndPopulateCache() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    givenNoBidCached(cacheAdUnit);
+    List<Slot> slots = givenMockedCdbRespondingSlots();
+
+    BidManager bidManager = createBidManager();
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    waitForIdleState();
+
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slots);
+  }
+
   private void assertShouldCallCdbAndPopulateCacheOnlyOnce(List<CacheAdUnit> requestedAdUnits, List<Slot> slots) {
     verify(cache).addAll(slots);
     verify(api).loadCdb(argThat(cdb -> {
