@@ -8,6 +8,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -35,7 +36,6 @@ import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.PubSdkApi;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -69,12 +69,29 @@ public class BidManagerFunctionalTest {
   @Mock
   private PubSdkApi api;
 
+  @Mock
+  private Clock clock;
+
+  private int adUnitId = 0;
+
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
     when(dependencyProvider.providePubSdkApi(any())).thenReturn(api);
+    when(dependencyProvider.provideClock()).thenReturn(clock);
+
+    // Should be set to at least 1 because user-level silent mode is set the 0 included
+    givenMockedClockSetTo(1);
+
+    // Given unrelated ad units in the cache, the tests should ignore them
+    givenNotExpiredValidCachedBid(sampleAdUnit());
+    givenExpiredValidCachedBid(sampleAdUnit());
+    givenNotExpiredSilentModeBidCached(sampleAdUnit());
+    givenExpiredSilentModeBidCached(sampleAdUnit());
+    givenNoBidCached(sampleAdUnit());
+    givenNoLastBid(sampleAdUnit());
   }
 
   @Test
@@ -85,8 +102,8 @@ public class BidManagerFunctionalTest {
         mock(AdUnit.class));
 
     List<CacheAdUnit> mappedAdUnits = Arrays.asList(
-        sampleAdUnit(1),
-        sampleAdUnit(2));
+        sampleAdUnit(),
+        sampleAdUnit());
 
     AdUnitMapper mapper = givenMockedAdUnitMapper();
 
@@ -125,7 +142,7 @@ public class BidManagerFunctionalTest {
 
   @Test
   public void getBidForAdUnitAndPrefetch_GivenNotExpiredValidCachedBid_ReturnItAndRemoveItFromCache() throws Exception {
-    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     Slot slot = givenNotExpiredValidCachedBid(cacheAdUnit);
 
@@ -138,7 +155,7 @@ public class BidManagerFunctionalTest {
 
   @Test
   public void getBidForAdUnitAndPrefetch_GivenNotExpiredValidCachedBid_ShouldCallCdbAndPopulateCache() throws Exception {
-    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenNotExpiredValidCachedBid(cacheAdUnit);
     List<Slot> slots = givenMockedCdbRespondingSlots();
@@ -152,7 +169,7 @@ public class BidManagerFunctionalTest {
 
   @Test
   public void getBidForAdUnitAndPrefetch_GivenAdUnitBeingLoaded_ShouldCallCdbAndPopulateCacheOnlyOnceForThePendingCall() throws Exception {
-    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
 
     Cdb response = mock(Cdb.class);
@@ -195,7 +212,7 @@ public class BidManagerFunctionalTest {
 
   @Test
   public void getBidForAdUnitAndPrefetch_GivenAdUnitBeingLoaded_ShouldCallCdbAndPopulateCacheOnlyOnceForThePendingCall2() throws Exception {
-    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     List<Slot> slots = givenMockedCdbRespondingSlots();
 
@@ -224,7 +241,7 @@ public class BidManagerFunctionalTest {
 
   @Test
   public void getBidForAdUnitAndPrefetch_GivenEmptyCache_ReturnNull() throws Exception {
-    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
 
     givenNoLastBid(cacheAdUnit);
@@ -237,7 +254,7 @@ public class BidManagerFunctionalTest {
 
   @Test
   public void getBidForAdUnitAndPrefetch_GivenEmptyCache_ShouldCallCdbAndPopulateCache() throws Exception {
-    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     List<Slot> slots = givenMockedCdbRespondingSlots();
 
@@ -252,7 +269,7 @@ public class BidManagerFunctionalTest {
 
   @Test
   public void getBidForAdUnitAndPrefetch_GivenClockAtFixedTime_CacheShouldContainATimestampedBid() throws Exception {
-    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     List<Slot> slots = givenMockedCdbRespondingSlots();
     givenMockedClockSetTo(42);
@@ -268,7 +285,7 @@ public class BidManagerFunctionalTest {
 
   @Test
   public void getBidForAdUnitAndPrefetch_GivenExpiredValidCachedBid_ReturnNull() throws Exception {
-    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenExpiredValidCachedBid(cacheAdUnit);
 
@@ -280,7 +297,7 @@ public class BidManagerFunctionalTest {
 
   @Test
   public void getBidForAdUnitAndPrefetch_GivenExpiredValidCachedBid_ShouldCallCdbAndPopulateCache() throws Exception {
-    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenExpiredValidCachedBid(cacheAdUnit);
     List<Slot> slots = givenMockedCdbRespondingSlots();
@@ -294,7 +311,7 @@ public class BidManagerFunctionalTest {
 
   @Test
   public void getBidForAdUnitAndPrefetch_GivenNoBidCached_ReturnNull() throws Exception {
-    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenNoBidCached(cacheAdUnit);
 
@@ -306,9 +323,61 @@ public class BidManagerFunctionalTest {
 
   @Test
   public void getBidForAdUnitAndPrefetch_GivenNoBidCached_ShouldCallCdbAndPopulateCache() throws Exception {
-    CacheAdUnit cacheAdUnit = sampleAdUnit(1);
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenNoBidCached(cacheAdUnit);
+    List<Slot> slots = givenMockedCdbRespondingSlots();
+
+    BidManager bidManager = createBidManager();
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    waitForIdleState();
+
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slots);
+  }
+
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenNotExpiredSilentModeBidCached_ReturnNullAndDoNotRemoveIt() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    givenNotExpiredSilentModeBidCached(cacheAdUnit);
+
+    BidManager bidManager = createBidManager();
+    Slot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
+
+    assertNull(bid);
+    verify(cache, never()).remove(cacheAdUnit);
+  }
+
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenNotExpiredSilentModeBidCached_ShouldNotCallCdbAndNotPopulateCache() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    givenNotExpiredSilentModeBidCached(cacheAdUnit);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+
+    verify(cache, never()).addAll(anyList());
+    verify(api, never()).loadCdb(any(), any());
+  }
+
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenExpiredSilentModeBidCached_ReturnNull() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    givenExpiredSilentModeBidCached(cacheAdUnit);
+
+    BidManager bidManager = createBidManager();
+    Slot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
+
+    assertNull(bid);
+  }
+
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenExpiredSilentModeBidCached_ShouldCallCdbAndPopulateCache() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    givenExpiredSilentModeBidCached(cacheAdUnit);
     List<Slot> slots = givenMockedCdbRespondingSlots();
 
     BidManager bidManager = createBidManager();
@@ -332,24 +401,25 @@ public class BidManagerFunctionalTest {
 
   @NonNull
   private Slot givenNotExpiredValidCachedBid(CacheAdUnit cacheAdUnit) {
+    // not expired := tod + ttl * 1000 > clock
+    // not expired := tod > clock - ttl * 1000
+    // not expired := tod > clock - 60000
+    long timeOfDownload = clock.getCurrentTimeInMillis() - 60_000 + 1;
     Slot slot = mock(Slot.class);
     when(slot.getCpmAsNumber()).thenReturn(1.);
-    when(slot.getTimeOfDownload()).thenReturn(100_000L);
-    when(slot.getTtl()).thenReturn(60); // Valid until 160_000 excluded
-
-    givenMockedClockSetTo(160_000 - 1);
+    when(slot.getTimeOfDownload()).thenReturn(timeOfDownload);
+    when(slot.getTtl()).thenReturn(60);
 
     when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
     return slot;
   }
 
   private void givenExpiredValidCachedBid(CacheAdUnit cacheAdUnit) {
+    long timeOfDownload = clock.getCurrentTimeInMillis() - 60_000;
     Slot slot = mock(Slot.class);
     when(slot.getCpmAsNumber()).thenReturn(1.);
-    when(slot.getTimeOfDownload()).thenReturn(100_000L);
-    when(slot.getTtl()).thenReturn(60); // Valid until 160_000 excluded
-
-    givenMockedClockSetTo(160_000);
+    when(slot.getTimeOfDownload()).thenReturn(timeOfDownload);
+    when(slot.getTtl()).thenReturn(60);
 
     when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
   }
@@ -366,9 +436,31 @@ public class BidManagerFunctionalTest {
     when(cache.peekAdUnit(cacheAdUnit)).thenReturn(null);
   }
 
+  private void givenNotExpiredSilentModeBidCached(CacheAdUnit cacheAdUnit) {
+    long timeOfDownload = clock.getCurrentTimeInMillis() - 60_000 + 1;
+
+    Slot slot = mock(Slot.class);
+    when(slot.getCpmAsNumber()).thenReturn(0.);
+    when(slot.getTimeOfDownload()).thenReturn(timeOfDownload);
+    when(slot.getTtl()).thenReturn(60);
+
+    when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
+  }
+
+  private void givenExpiredSilentModeBidCached(CacheAdUnit cacheAdUnit) {
+    long timeOfDownload = clock.getCurrentTimeInMillis() - 60_000;
+
+    Slot slot = mock(Slot.class);
+    when(slot.getCpmAsNumber()).thenReturn(0.);
+    when(slot.getTimeOfDownload()).thenReturn(timeOfDownload);
+    when(slot.getTtl()).thenReturn(60);
+
+    when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
+  }
+
   @NonNull
-  private CacheAdUnit sampleAdUnit(int id) {
-    return new CacheAdUnit(new AdSize(1, 1), "adUnit" + id, CRITEO_BANNER);
+  private CacheAdUnit sampleAdUnit() {
+    return new CacheAdUnit(new AdSize(1, 1), "adUnit" + adUnitId++, CRITEO_BANNER);
   }
 
   @NonNull
@@ -423,10 +515,7 @@ public class BidManagerFunctionalTest {
   }
 
   private void givenMockedClockSetTo(long instant) {
-    Clock clock = mock(Clock.class);
     when(clock.getCurrentTimeInMillis()).thenReturn(instant);
-
-    when(dependencyProvider.provideClock()).thenReturn(clock);
   }
 
   private BidManager createBidManager() {
