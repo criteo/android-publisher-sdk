@@ -1,6 +1,7 @@
 package com.criteo.publisher.model;
 
 import android.util.Log;
+import com.criteo.publisher.Util.URLUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -172,7 +173,7 @@ public class Slot {
         }
 
         // Check display Url
-        if (!isNative && (this.displayUrl == null || (this.displayUrl.length() == 0))) {
+        if (!isNative && !URLUtil.isValidUrl(displayUrl)) {
             return false;
         }
 

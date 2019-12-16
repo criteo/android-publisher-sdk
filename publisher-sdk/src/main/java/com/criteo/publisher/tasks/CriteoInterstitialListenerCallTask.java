@@ -90,24 +90,10 @@ public class CriteoInterstitialListenerCallTask extends AsyncTask<Object, Void, 
         if (criteoInterstitialAdListener != null) {
             if (object == null) {
                 criteoInterstitialAdListener.onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
-                return;
-            }
-
-            if (object instanceof Slot) {
-                Slot slot = (Slot) object;
-                if (!slot.isValid() || !URLUtil
-                        .isValidUrl(slot.getDisplayUrl())) {
-                    criteoInterstitialAdListener.onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
-                } else {
-                    criteoInterstitialAdListener.onAdReceived();
-                }
+            } else if (object instanceof Slot) {
+                criteoInterstitialAdListener.onAdReceived();
             } else if (object instanceof TokenValue) {
-                TokenValue tokenValue = (TokenValue) object;
-                if (!URLUtil.isValidUrl(tokenValue.getDisplayUrl())) {
-                    criteoInterstitialAdListener.onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
-                } else {
-                    criteoInterstitialAdListener.onAdReceived();
-                }
+                criteoInterstitialAdListener.onAdReceived();
             }
         }
     }

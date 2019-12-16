@@ -59,7 +59,7 @@ public class CriteoInterstitialEventController {
                     criteoInterstitialAdListener);
             criteoInterstitialListenerCallTask.executeOnExecutor(serialExecutor, slot);
 
-            if (slot != null && slot.isValid() && URLUtil.isValidUrl(slot.getDisplayUrl())) {
+            if (slot != null) {
                 //gets Webview data from Criteo before showing Interstitialview Activity
                 getWebviewDataAsync(slot.getDisplayUrl());
             } else {
@@ -69,18 +69,10 @@ public class CriteoInterstitialEventController {
     }
 
     private void getWebviewDataAsync(String displayUrl) {
-        if (TextUtils.isEmpty(displayUrl) || (!URLUtil.isValidUrl(displayUrl))) {
-            Slot slot = null;
-            webViewDownloader.downloadFailed();
-            criteoInterstitialListenerCallTask = new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener);
-            Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
-            criteoInterstitialListenerCallTask.executeOnExecutor(threadPoolExecutor, slot);
-            return;
-        }
-
-        webViewDownloader
-                .fillWebViewHtmlContent(displayUrl, deviceInfo.getUserAgent(), criteoInterstitialAdDisplayListener);
-
+        webViewDownloader.fillWebViewHtmlContent(
+            displayUrl,
+            deviceInfo.getUserAgent(),
+            criteoInterstitialAdDisplayListener);
     }
 
     public String getWebViewDataContent() {

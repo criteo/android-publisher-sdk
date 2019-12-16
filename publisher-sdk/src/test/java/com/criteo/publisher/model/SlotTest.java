@@ -653,6 +653,22 @@ public class SlotTest {
         }
     }
 
+    @Test
+    public void isValid_GivenInvalidDisplayUrlForBannerOrInterstitial_ReturnFalse() throws Exception {
+        String json = "{\n"
+            + "  \"placementId\": \"myAdUnit\",\n"
+            + "  \"cpm\": \"20.00\",\n"
+            + "  \"currency\": \"USD\",\n"
+            + "  \"width\": 100,\n"
+            + "  \"height\": 100,\n"
+            + "  \"ttl\": 60,\n"
+            + "  \"displayUrl\": \"notAValidUrl\"\n"
+            + "}";
+        Slot slot = new Slot(new JSONObject(json));
+
+        assertThat(slot.isValid()).isFalse();
+    }
+
     private JSONObject getNativeJSONSlot() {
         String cdbStringResponse = "{\n" +
                 "    \"slots\": [{\n" +

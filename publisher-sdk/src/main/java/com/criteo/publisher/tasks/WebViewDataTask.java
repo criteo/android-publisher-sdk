@@ -43,19 +43,16 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
 
     private String doWebViewDataTask(String[] args) {
         String result = "";
-        URL url = null;
+        URL url;
         try {
-            if (args.length > 0 && !URLUtil.isValidUrl(args[0])) {
-                return "";
-            }
             url = new URL(args[0]);
-
         } catch (MalformedURLException e) {
             e.printStackTrace();
+            return "";
         }
 
         String webViewUserAgent = args[1];
-        HttpURLConnection urlConnection = null;
+        HttpURLConnection urlConnection;
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
         } catch (IOException e) {

@@ -168,48 +168,49 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private void enrichMapBid(Map map, AdUnit adUnit)
     {
         Slot slot = getBidForAdUnitAndPrefetch(adUnit);
-        if (slot != null && slot.isValid()) {
-            map.put(MAP_CRT_DISPLAY_URL, slot.getDisplayUrl());
-            map.put(CRT_CPM, slot.getCpm());
+        if (slot == null) {
+            return;
         }
+
+        map.put(MAP_CRT_DISPLAY_URL, slot.getDisplayUrl());
+        map.put(CRT_CPM, slot.getCpm());
     }
 
     private void enrichMoPubBid(Object object, AdUnit adUnit) {
         Slot slot = getBidForAdUnitAndPrefetch(adUnit);
-        if (slot != null && slot.isValid()) {
-            StringBuilder keywords = new StringBuilder();
-            Object existingKeywords = ReflectionUtil.callMethodOnObject(object, "getKeywords");
-            if (existingKeywords != null) {
-                keywords.append(existingKeywords);
-                keywords.append(",");
-            }
-            keywords.append(CRT_CPM);
-            keywords.append(":");
-            keywords.append(slot.getCpm());
-            keywords.append(",");
-            keywords.append(MOPUB_CRT_DISPLAY_URL);
-            keywords.append(":");
-            keywords.append(slot.getDisplayUrl());
-            ReflectionUtil.callMethodOnObject(object, "setKeywords", keywords.toString());
+        if (slot == null) {
+            return;
         }
+
+        StringBuilder keywords = new StringBuilder();
+        Object existingKeywords = ReflectionUtil.callMethodOnObject(object, "getKeywords");
+        if (existingKeywords != null) {
+            keywords.append(existingKeywords);
+            keywords.append(",");
+        }
+        keywords.append(CRT_CPM);
+        keywords.append(":");
+        keywords.append(slot.getCpm());
+        keywords.append(",");
+        keywords.append(MOPUB_CRT_DISPLAY_URL);
+        keywords.append(":");
+        keywords.append(slot.getDisplayUrl());
+        ReflectionUtil.callMethodOnObject(object, "setKeywords", keywords.toString());
     }
 
     private void enrichDfpBid(Object object, AdUnit adUnit) {
         Slot slot = getBidForAdUnitAndPrefetch(adUnit);
-        if (slot != null) {
-            if (!slot.isValid()) {
-                return;
-            }
+        if (slot == null) {
+            return;
+        }
 
-            ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", CRT_CPM, slot.getCpm());
+        ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", CRT_CPM, slot.getCpm());
 
-            if (slot.isNative()) {
-                enrichNativeRequest(slot, object);
+        if (slot.isNative()) {
+            enrichNativeRequest(slot, object);
 
-            } else {
-                enrichDfpRequest(slot, object);
-            }
-
+        } else {
+            enrichDfpRequest(slot, object);
         }
     }
 
@@ -370,24 +371,24 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         }
     }
 
+    @NonNull
     public BidResponse getBidForInhouseMediation(AdUnit adUnit) {
-        BidResponse bidResponse = new BidResponse();
         Slot slot = this.getBidForAdUnitAndPrefetch(adUnit);
-
-        if (slot != null && slot.isValid()) {
-            TokenValue tokenValue = new TokenValue(
-                slot.getTimeOfDownload(),
-                slot.getTtl(),
-                slot.getDisplayUrl(),
-                adUnit.getAdUnitType(),
-                clock
-            );
-
-            double price = slot.getCpmAsNumber();
-            bidResponse = new BidResponse(price, tokenCache.add(tokenValue, adUnit), true);
+        if (slot == null) {
+            return new BidResponse();
         }
 
-        return bidResponse;
+        TokenValue tokenValue = new TokenValue(
+            slot.getTimeOfDownload(),
+            slot.getTtl(),
+            slot.getDisplayUrl(),
+            adUnit.getAdUnitType(),
+            clock
+        );
+
+        double price = slot.getCpmAsNumber();
+        return new BidResponse(price, tokenCache.add(tokenValue, adUnit), true);
+
     }
 
     /**

@@ -42,7 +42,7 @@ public class CriteoBannerEventController {
         }
 
         CriteoListenerCode code = CriteoListenerCode.INVALID;
-        if (slot != null && slot.isValid() && URLUtil.isValidUrl(slot.getDisplayUrl())) {
+        if (slot != null) {
             code = CriteoListenerCode.VALID;
         }
 
@@ -62,7 +62,7 @@ public class CriteoBannerEventController {
         TokenValue tokenValue = Criteo.getInstance().getTokenValue(bidToken, AdUnitType.CRITEO_BANNER);
 
         CriteoListenerCode code = CriteoListenerCode.INVALID;
-        if (tokenValue != null && URLUtil.isValidUrl(tokenValue.getDisplayUrl())) {
+        if (tokenValue != null) {
             code = CriteoListenerCode.VALID;
         }
 
