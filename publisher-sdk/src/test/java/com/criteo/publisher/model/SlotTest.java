@@ -12,7 +12,7 @@ import org.junit.Test;
 
 
 public class SlotTest {
-    private static final int DEFAULT_TTL = 15 * 60 * 1000;
+
     private static final String CPM = "cpm";
     private static final String DISPLAY_URL = "displayUrl";
     private static final String PLACEMENT_ID = "placementId";
@@ -43,16 +43,6 @@ public class SlotTest {
         Slot result = new Slot(response);
         assertEquals("0", result.getCpm());
         assertEquals(ttlval, result.getTtl());
-    }
-
-    @Test
-    public void bidTest() throws JSONException {
-        String cpmval = "1.5";
-        response.put("cpm", cpmval);
-        response.put("ttl", 0);
-        Slot result = new Slot(response);
-        assertEquals(cpmval, result.getCpm());
-        assertEquals(DEFAULT_TTL, result.getTtl());
     }
 
     @Test
@@ -667,6 +657,40 @@ public class SlotTest {
         Slot slot = new Slot(new JSONObject(json));
 
         assertThat(slot.isValid()).isFalse();
+    }
+
+    @Test
+    public void getTtl_GivenImmediateBid_ShouldNotOverrideTtl() throws Exception {
+        // Immediate bid means CPM > 0 and TTL = 0
+        // Business logic is managed by the BidManager. This is only expected to decode CDB payload.
+
+        String json = "{\n"
+            + "  \"placementId\": \"myAdUnit\",\n"
+            + "  \"cpm\": \"20.00\",\n"
+            + "  \"currency\": \"USD\",\n"
+            + "  \"width\": 100,\n"
+            + "  \"height\": 100,\n"
+            + "  \"ttl\": 0,\n"
+            + "  \"displayUrl\": \"http://criteo.com\"\n"
+            + "}";
+        Slot slot = new Slot(new JSONObject(json));
+
+        assertThat(slot.getTtl()).isZero();
+    }
+
+    @Test
+    public void getTtl_GivenNoTtl_ShouldNotOverrideTtl() throws Exception {
+        String json = "{\n"
+            + "  \"placementId\": \"myAdUnit\",\n"
+            + "  \"cpm\": \"20.00\",\n"
+            + "  \"currency\": \"USD\",\n"
+            + "  \"width\": 100,\n"
+            + "  \"height\": 100,\n"
+            + "  \"displayUrl\": \"http://criteo.com\"\n"
+            + "}";
+        Slot slot = new Slot(new JSONObject(json));
+
+        assertThat(slot.getTtl()).isZero();
     }
 
     private JSONObject getNativeJSONSlot() {

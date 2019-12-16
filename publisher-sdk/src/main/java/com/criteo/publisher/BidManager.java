@@ -61,6 +61,11 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private static final String MOPUB_CRT_DISPLAY_URL = "crt_displayUrl";
     private static final String MAP_CRT_DISPLAY_URL = "crt_displayUrl";
 
+    /**
+     * Default TTL (15 minutes in seconds) overridden on immediate bids (CPM > 0, TTL = 0).
+     */
+    private static final int DEFAULT_TTL_IN_SECONDS = 15 * 60;
+
     private static final int SECOND_TO_MILLI = 1000;
     private static final int PROFILE_ID = 235;
     private final SdkCache cache;
@@ -343,6 +348,11 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         long instant = clock.getCurrentTimeInMillis();
         for (Slot slot : slots) {
             if (slot.isValid()) {
+                boolean isImmediateBid = slot.getCpmAsNumber() > 0 && slot.getTtl() == 0;
+                if (isImmediateBid) {
+                    slot.setTtl(DEFAULT_TTL_IN_SECONDS);
+                }
+
                 slot.setTimeOfDownload(instant);
                 cache.add(slot);
             }

@@ -7,7 +7,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.inOrder;
@@ -48,6 +47,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class BidManagerFunctionalTest {
+
+  /**
+   * Default TTL (in seconds) overridden on immediate bids (CPM > 0, TTL = 0)
+   */
+  private static final int DEFAULT_TTL_IN_SECONDS = 900;
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
@@ -279,8 +283,9 @@ public class BidManagerFunctionalTest {
     bidManager.getBidForAdUnitAndPrefetch(adUnit);
     waitForIdleState();
 
-    verify(cache).add(slot);
-    verify(slot).setTimeOfDownload(42);
+    InOrder inOrder = inOrder(cache, slot);
+    inOrder.verify(slot).setTimeOfDownload(42);
+    inOrder.verify(cache).add(slot);
   }
 
   @Test
@@ -455,6 +460,25 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slot);
+  }
+
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenCdbGivingAnImmediateBid_ShouldPopulateCacheWithTtlSetToDefaultOne() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+
+    // Immediate bid means CPM > 0, TTL = 0
+    Slot slot = givenMockedCdbRespondingSlot();
+    when(slot.getCpmAsNumber()).thenReturn(1.);
+    when(slot.getTtl()).thenReturn(0);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    waitForIdleState();
+
+    InOrder inOrder = inOrder(cache, slot);
+    inOrder.verify(slot).setTtl(DEFAULT_TTL_IN_SECONDS);
+    inOrder.verify(cache).add(slot);
   }
 
   @Test

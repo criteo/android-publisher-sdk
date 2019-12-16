@@ -15,7 +15,6 @@ public class Slot {
     private static final String PLACEMENT_ID = "placementId";
     private static final String NATIVE = "native";
     private static final String TTL = "ttl";
-    private static final int DEFAULT_TTL = 15 * 60 * 1000;
     private static final String DISPLAY_URL = "displayUrl";
 
     private String cpm;
@@ -51,12 +50,9 @@ public class Slot {
         width = json.optInt(WIDTH, 0);
         height = json.optInt(HEIGHT, 0);
         displayUrl = json.optString(DISPLAY_URL, null);
-        ttl = json.optInt(TTL, DEFAULT_TTL);
+        ttl = json.optInt(TTL, 0);
         if (getCpmAsNumber() == null) {
             cpmValue = 0.0;
-        }
-        if (cpmValue > 0.0 && ttl == 0) {
-            ttl = DEFAULT_TTL;
         }
         if (json.has(NATIVE)) {
             isNative = true;
