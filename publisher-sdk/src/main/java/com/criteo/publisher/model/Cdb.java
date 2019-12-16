@@ -2,6 +2,7 @@ package com.criteo.publisher.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import java.util.ArrayList;
@@ -34,6 +35,9 @@ public class Cdb implements Parcelable {
     }
 
     public Cdb(JSONObject json) {
+        timeToNextCall = 0;
+        slots = new ArrayList<>();
+
         if(json != null && json.has(TIME_TO_NEXT_CALL)) {
             try {
                 this.setTimeToNextCall(json.getInt(TIME_TO_NEXT_CALL));
@@ -48,7 +52,6 @@ public class Cdb implements Parcelable {
             } catch (JSONException ex) {
                 Log.d(TAG, "Exception while reading slots array" + ex.getMessage());
             }
-            slots = new ArrayList<>();
             for (int i = 0; i < array.length(); i++) {
                 try {
                     JSONObject slotStr = array.getJSONObject(i);
@@ -64,6 +67,7 @@ public class Cdb implements Parcelable {
         this.gdprConsent = gdprConsent;
     }
 
+    @NonNull
     public List<Slot> getSlots() {
         return slots;
     }

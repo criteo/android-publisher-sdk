@@ -26,13 +26,11 @@ public class SdkCache {
         this.deviceUtil = deviceUtil;
     }
 
-    public void add(Slot slot) {
-        if (slot != null && slot.isValid()) {
-            AdUnitType adUnitType = findAdUnitType(slot);
-            CacheAdUnit key = new CacheAdUnit(new AdSize(slot.getWidth(), slot.getHeight())
-                    , slot.getPlacementId(), adUnitType);
-            slotMap.put(key, slot);
-        }
+    public void add(@NonNull Slot slot) {
+        AdUnitType adUnitType = findAdUnitType(slot);
+        CacheAdUnit key = new CacheAdUnit(new AdSize(slot.getWidth(), slot.getHeight())
+                , slot.getPlacementId(), adUnitType);
+        slotMap.put(key, slot);
     }
 
     // FIXME: this kind of method should not exist:
@@ -60,15 +58,6 @@ public class SdkCache {
         }
 
         return CRITEO_BANNER;
-    }
-
-    public void addAll(List<Slot> slots) {
-        if (slots == null) {
-            return;
-        }
-        for (Slot slot : slots) {
-            this.add(slot);
-        }
     }
 
     /**

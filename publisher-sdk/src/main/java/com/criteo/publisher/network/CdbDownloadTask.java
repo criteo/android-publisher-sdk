@@ -109,8 +109,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
             cdbRequest.setGdprConsent(gdpr);
         }
         Cdb cdbResult = api.loadCdb(cdbRequest, userAgent);
-        if (loggingUtil.isLoggingEnabled() && cdbResult != null && cdbResult.getSlots() != null
-                && cdbResult.getSlots().size() > 0) {
+        if (loggingUtil.isLoggingEnabled() && cdbResult != null && cdbResult.getSlots().size() > 0) {
             StringBuilder builder = new StringBuilder();
             for (Slot slot : cdbResult.getSlots()) {
                 builder.append(slot.toString());

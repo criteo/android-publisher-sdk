@@ -1,16 +1,13 @@
 package com.criteo.publisher.model;
 
-import junit.framework.Assert;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONArray;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-
-import static org.junit.Assert.assertEquals;
 
 public class CdbTest {
     private static final String SLOTS = "slots";
@@ -67,4 +64,23 @@ public class CdbTest {
         assertEquals(bid.getString(DISPLAY_URL), cdb.getSlots().get(0).getDisplayUrl());
         assertEquals(0, cdb.getTimeToNextCall());
     }
+
+    @Test
+    public void new_GivenUserLevelSilent_ContainsTimeToNextCallAndEmptySlot() throws Exception {
+        String json = "{\"slots\":[],\"timeToNextCall\":30}";
+        Cdb cdb = new Cdb(new JSONObject(json));
+
+        assertThat(cdb.getTimeToNextCall()).isEqualTo(30);
+        assertThat(cdb.getSlots()).isEmpty();
+    }
+
+    @Test
+    public void new_GivenEmptyJson_ContainsNoSlotAndNoTimeToNextCall() throws Exception {
+        String json = "{}";
+        Cdb cdb = new Cdb(new JSONObject(json));
+
+        assertThat(cdb.getTimeToNextCall()).isEqualTo(0);
+        assertThat(cdb.getSlots()).isEmpty();
+    }
+
 }

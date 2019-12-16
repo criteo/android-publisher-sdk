@@ -338,13 +338,14 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     }
 
     @Override
-    public void setCacheAdUnits(List<Slot> slots) {
+    public void setCacheAdUnits(@NonNull List<Slot> slots) {
         long instant = clock.getCurrentTimeInMillis();
         for (Slot slot : slots) {
-            slot.setTimeOfDownload(instant);
+            if (slot.isValid()) {
+                slot.setTimeOfDownload(instant);
+                cache.add(slot);
+            }
         }
-
-        cache.addAll(slots);
     }
 
     @Override

@@ -4,7 +4,6 @@ import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -108,7 +107,7 @@ public class BidManagerFunctionalTest {
 
     AdUnitMapper mapper = givenMockedAdUnitMapper();
 
-    List<Slot> slots = givenMockedCdbRespondingSlots();
+    Slot slot = givenMockedCdbRespondingSlot();
 
     when(mapper.convertValidAdUnits(prefetchAdUnits)).thenReturn(mappedAdUnits);
 
@@ -116,7 +115,7 @@ public class BidManagerFunctionalTest {
     bidManager.prefetch(prefetchAdUnits);
     waitForIdleState();
 
-    assertShouldCallCdbAndPopulateCacheOnlyOnce(mappedAdUnits, slots);
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(mappedAdUnits, slot);
   }
 
   @Test
@@ -159,13 +158,13 @@ public class BidManagerFunctionalTest {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenNotExpiredValidCachedBid(cacheAdUnit);
-    List<Slot> slots = givenMockedCdbRespondingSlots();
+    Slot slot = givenMockedCdbRespondingSlot();
 
     BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit);
     waitForIdleState();
 
-    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slots);
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slot);
   }
 
   @Test
@@ -174,8 +173,9 @@ public class BidManagerFunctionalTest {
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
 
     Cdb response = mock(Cdb.class);
-    List<Slot> slots = singletonList(mock(Slot.class));
-    when(response.getSlots()).thenReturn(slots);
+    Slot slot = mock(Slot.class);
+    when(slot.isValid()).thenReturn(true);
+    when(response.getSlots()).thenReturn(singletonList(slot));
 
     // We force a synchronization here to make the test deterministic.
     // Hence we can predict that the second bid manager call is done after the cdb call.
@@ -206,7 +206,7 @@ public class BidManagerFunctionalTest {
     inOrder.verify(bidManager).getBidForAdUnitAndPrefetch(adUnit);
     inOrder.verify(api).loadCdb(any(), any());
     inOrder.verify(bidManager).getBidForAdUnitAndPrefetch(adUnit);
-    inOrder.verify(cache).addAll(slots);
+    inOrder.verify(cache).add(slot);
     inOrder.verify(bidManager).setTimeToNextCall(anyInt());
     inOrder.verifyNoMoreInteractions();
   }
@@ -215,7 +215,7 @@ public class BidManagerFunctionalTest {
   public void getBidForAdUnitAndPrefetch_GivenAdUnitBeingLoaded_ShouldCallCdbAndPopulateCacheOnlyOnceForThePendingCall2() throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    List<Slot> slots = givenMockedCdbRespondingSlots();
+    Slot slot = givenMockedCdbRespondingSlot();
 
     // We force the CDB call to be after the second bid manager call to make the test deterministic.
     CountDownLatch bidManagerIsCalledASecondTime = givenExecutorWaitingOn();
@@ -235,7 +235,7 @@ public class BidManagerFunctionalTest {
     inOrder.verify(bidManager).getBidForAdUnitAndPrefetch(adUnit);
     inOrder.verify(bidManager).getBidForAdUnitAndPrefetch(adUnit);
     inOrder.verify(api, timeout(1000)).loadCdb(any(), any());
-    inOrder.verify(cache).addAll(slots);
+    inOrder.verify(cache).add(slot);
     inOrder.verify(bidManager).setTimeToNextCall(anyInt());
     inOrder.verifyNoMoreInteractions();
   }
@@ -257,7 +257,7 @@ public class BidManagerFunctionalTest {
   public void getBidForAdUnitAndPrefetch_GivenEmptyCache_ShouldCallCdbAndPopulateCache() throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    List<Slot> slots = givenMockedCdbRespondingSlots();
+    Slot slot = givenMockedCdbRespondingSlot();
 
     givenNoLastBid(cacheAdUnit);
 
@@ -265,23 +265,22 @@ public class BidManagerFunctionalTest {
     bidManager.getBidForAdUnitAndPrefetch(adUnit);
     waitForIdleState();
 
-    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slots);
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slot);
   }
 
   @Test
   public void getBidForAdUnitAndPrefetch_GivenClockAtFixedTime_CacheShouldContainATimestampedBid() throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    List<Slot> slots = givenMockedCdbRespondingSlots();
+    Slot slot = givenMockedCdbRespondingSlot();
     givenMockedClockSetTo(42);
 
     BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit);
     waitForIdleState();
 
-    verify(cache).addAll(slots);
-    assertFalse(slots.isEmpty());
-    slots.forEach(slot -> verify(slot).setTimeOfDownload(42));
+    verify(cache).add(slot);
+    verify(slot).setTimeOfDownload(42);
   }
 
   @Test
@@ -301,13 +300,13 @@ public class BidManagerFunctionalTest {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenExpiredValidCachedBid(cacheAdUnit);
-    List<Slot> slots = givenMockedCdbRespondingSlots();
+    Slot slot = givenMockedCdbRespondingSlot();
 
     BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit);
     waitForIdleState();
 
-    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slots);
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slot);
   }
 
   @Test
@@ -327,13 +326,13 @@ public class BidManagerFunctionalTest {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenNoBidCached(cacheAdUnit);
-    List<Slot> slots = givenMockedCdbRespondingSlots();
+    Slot slot = givenMockedCdbRespondingSlot();
 
     BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit);
     waitForIdleState();
 
-    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slots);
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slot);
   }
 
   @Test
@@ -378,13 +377,13 @@ public class BidManagerFunctionalTest {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenExpiredSilentModeBidCached(cacheAdUnit);
-    List<Slot> slots = givenMockedCdbRespondingSlots();
+    Slot slot = givenMockedCdbRespondingSlot();
 
     BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit);
     waitForIdleState();
 
-    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slots);
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slot);
   }
 
   @Test
@@ -406,7 +405,7 @@ public class BidManagerFunctionalTest {
   public void getBidForAdUnitAndPrefetch_GivenExpiredUserLevelSilentMode_ShouldCallCdbAndPopulateCache() throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    List<Slot> slots = givenMockedCdbRespondingSlots();
+    Slot slot = givenMockedCdbRespondingSlot();
 
     BidManager bidManager = createBidManager();
     givenMockedClockSetTo(0);
@@ -415,7 +414,7 @@ public class BidManagerFunctionalTest {
     bidManager.getBidForAdUnitAndPrefetch(adUnit);
     waitForIdleState();
 
-    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slots);
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slot);
   }
 
   @Test
@@ -451,15 +450,30 @@ public class BidManagerFunctionalTest {
     clearInvocations(api);
 
     // Given a second fetch, without any clock change
-    List<Slot> slots = givenMockedCdbRespondingSlots();
+    Slot slot = givenMockedCdbRespondingSlot();
     bidManager.getBidForAdUnitAndPrefetch(adUnit);
     waitForIdleState();
 
-    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slots);
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slot);
   }
 
-  private void assertShouldCallCdbAndPopulateCacheOnlyOnce(List<CacheAdUnit> requestedAdUnits, List<Slot> slots) {
-    verify(cache).addAll(slots);
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenCdbGivingInvalidSlots_IgnoreThem() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    Slot slot = givenMockedCdbRespondingSlot();
+
+    when(slot.isValid()).thenReturn(false);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    waitForIdleState();
+
+    verify(cache, never()).add(slot);
+  }
+
+  private void assertShouldCallCdbAndPopulateCacheOnlyOnce(List<CacheAdUnit> requestedAdUnits, Slot slot) {
+    verify(cache).add(slot);
     verify(api).loadCdb(argThat(cdb -> {
       assertEquals(requestedAdUnits, cdb.getRequestedAdUnits());
       return true;
@@ -467,7 +481,7 @@ public class BidManagerFunctionalTest {
   }
 
   private void assertShouldNotCallCdbAndNotPopulateCache() {
-    verify(cache, never()).addAll(anyList());
+    verify(cache, never()).add(any());
     verify(api, never()).loadCdb(any(), any());
   }
 
@@ -562,11 +576,12 @@ public class BidManagerFunctionalTest {
     return waitingLatch;
   }
 
-  private List<Slot> givenMockedCdbRespondingSlots() {
-    List<Slot> slots = singletonList(mock(Slot.class));
+  private Slot givenMockedCdbRespondingSlot() {
+    Slot slot = mock(Slot.class);
+    when(slot.isValid()).thenReturn(true);
     Cdb response = givenMockedCdbResponse();
-    when(response.getSlots()).thenReturn(slots);
-    return slots;
+    when(response.getSlots()).thenReturn(singletonList(slot));
+    return slot;
   }
 
   private Cdb givenMockedCdbResponse() {

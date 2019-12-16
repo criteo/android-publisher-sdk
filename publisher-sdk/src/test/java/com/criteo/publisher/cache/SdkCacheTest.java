@@ -7,8 +7,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
@@ -17,7 +15,6 @@ import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Slot;
-import java.util.Arrays;
 import junit.framework.Assert;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -155,83 +152,6 @@ public class SdkCacheTest {
     }
 
     @Test
-    public void testAdditionOfInvalidSlot() {
-        // One is missing a displayUrl and the other has a negative cpm
-        // Neither bid should be added to the cache
-        String json = "{\"slots\":[{\"placementId\":\"/140800857/Endeavour_320x50\",\"cpm\":\"0.00\",\"currency\":\"EUR\",\"width\":320,\"height\":50,\"ttl\":0,\"displayUrl\":\"\"},{\"placementId\":\"/140800857/Endeavour_Interstitial_320x480\",\"cpm\":\"-1.00\",\"currency\":\"EUR\",\"width\":320,\"height\":480,\"ttl\":0,\"displayUrl\":\"https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js\"}]}";
-        try {
-            JSONObject element = new JSONObject(json);
-            slots = element.getJSONArray("slots");
-            cache = new SdkCache(deviceUtil);
-            for (int i = 0; i < slots.length(); i++) {
-                Slot slot = new Slot(slots.getJSONObject(i));
-                cache.add(slot);
-            }
-            Assert.assertEquals(0, cache.getItemCount());
-        } catch (Exception ex) {
-            Assert.fail("json parsing failed " + ex.getLocalizedMessage());
-        }
-    }
-
-    @Test
-    public void testAdditionOfInvalidNativeSlot() {
-        String cdbStringResponse = "{\n" +
-                "    \"slots\": [{\n" +
-                "        \"placementId\": \"/140800857/Endeavour_Native\",\n" +
-                "        \"cpm\": \"0.04\",\n" +
-                "        \"currency\": \"USD\",\n" +
-                "        \"width\": 2,\n" +
-                "        \"height\": 2,\n" +
-                "        \"ttl\": 3600,\n" +
-                "        \"native\": {\n" +
-                "            \"products\": [{\n" +
-                "                \"title\": \"\\\"Stripe Pima Dress\\\" - $99\",\n" +
-                "                \"description\": \"We're All About Comfort.\",\n" +
-                "                \"price\": \"$99\",\n" +
-                "                \"clickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\",\n" +
-                "                \"callToAction\": \"\",\n" +
-                "                \"image\": {\n" +
-                "                    \"url\": \"https://pix.us.criteo.net/img/img?\",\n" +
-                "                    \"height\": 400,\n" +
-                "                    \"width\": 400\n" +
-                "                }\n" +
-                "            }],\n" +
-                "            \"advertiser\": {\n" +
-                "                \"description\": \"The Company Store\",\n" +
-                "                \"domain\": \"thecompanystore.com\",\n" +
-                "                \"logo\": {\n" +
-                "                    \"url\": \"https://pix.us.criteo.net/img/img\",\n" +
-                "                    \"height\": 200,\n" +
-                "                    \"width\": 200\n" +
-                "                },\n" +
-                "                \"logoClickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\"\n" +
-                "            },\n" +
-                "            \"privacy\": {\n" +
-                "                \"optoutClickUrl\": \"\",\n" +
-                "                \"optoutImageUrl\": \"https://static.criteo.net/flash/icon/nai_small.png\",\n" +
-                "                \"longLegalText\": \"\"\n" +
-                "            },\n" +
-                "            \"impressionPixels\": [{\n" +
-                "                \"url\": \"https://cat.sv.us.criteo.com/delivery/lgn.php?\"},{\n" +
-                "                \"url\": \"https://dog.da.us.criteo.com/delivery/lgn.php?\"\n" +
-                "            }]\n" +
-                "        }\n" +
-                "    }]\n" +
-                "}";
-
-        try {
-            JSONObject cdbResponse = new JSONObject(cdbStringResponse);
-            JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
-            Slot slot = new Slot(cdbSlot);
-            cache = new SdkCache(deviceUtil);
-            cache.add(slot);
-            assertEquals(0, cache.getItemCount());
-        } catch (Exception ex) {
-            Assert.fail("Json exception in test data : "+ ex.getLocalizedMessage());
-        }
-    }
-
-    @Test
     public void testCacheWithNativeSlot() {
         String cdbStringResponse = "{\n" +
                 "    \"slots\": [{\n" +
@@ -290,23 +210,6 @@ public class SdkCacheTest {
     }
 
     @Test
-    public void add_GivenNullSlot_DoesNotAddSlot() throws Exception {
-        cache.add(null);
-
-        assertThat(cache.getItemCount()).isZero();
-    }
-
-    @Test
-    public void add_GivenInvalidSlot_DoesNotAddSlot() throws Exception {
-        Slot slot = mock(Slot.class);
-        when(slot.isValid()).thenReturn(false);
-
-        cache.add(slot);
-
-        assertThat(cache.getItemCount()).isZero();
-    }
-
-    @Test
     public void add_GivenValidNativeSlot_AddItInCache() {
         AdSize size = new AdSize(1, 2);
         Slot slot = givenNativeSlot(size, "myAdUnit");
@@ -324,7 +227,6 @@ public class SdkCacheTest {
         AdSize size = new AdSize(1, 2);
 
         Slot slot = mock(Slot.class);
-        when(slot.isValid()).thenReturn(true);
         when(slot.isNative()).thenReturn(false);
         when(slot.getWidth()).thenReturn(size.getWidth());
         when(slot.getHeight()).thenReturn(size.getHeight());
@@ -343,7 +245,6 @@ public class SdkCacheTest {
         AdSize size = new AdSize(300, 400);
 
         Slot slot = mock(Slot.class);
-        when(slot.isValid()).thenReturn(true);
         when(slot.isNative()).thenReturn(false);
         when(slot.getWidth()).thenReturn(size.getWidth());
         when(slot.getHeight()).thenReturn(size.getHeight());
@@ -365,7 +266,6 @@ public class SdkCacheTest {
         AdSize size = new AdSize(400, 300);
 
         Slot slot = mock(Slot.class);
-        when(slot.isValid()).thenReturn(true);
         when(slot.isNative()).thenReturn(false);
         when(slot.getWidth()).thenReturn(size.getWidth());
         when(slot.getHeight()).thenReturn(size.getHeight());
@@ -380,28 +280,6 @@ public class SdkCacheTest {
         Slot adUnit = cache.peekAdUnit(expectedKey);
 
         assertThat(adUnit).isSameAs(slot);
-    }
-
-    @Test
-    public void addAll_GivenNull_DoesNothing() throws Exception {
-        cache.addAll(null);
-
-        assertThat(cache.getItemCount()).isEqualTo(0);
-    }
-
-    @Test
-    public void addAll_GivenSomeSlots_AddThemAll() throws Exception {
-        Slot slot1 = mock(Slot.class);
-        Slot slot2 = mock(Slot.class);
-        Slot slot3 = mock(Slot.class);
-
-        cache = spy(cache);
-
-        cache.addAll(Arrays.asList(slot1, slot2, slot3));
-
-        verify(cache).add(slot1);
-        verify(cache).add(slot2);
-        verify(cache).add(slot3);
     }
 
     @Test
@@ -431,7 +309,6 @@ public class SdkCacheTest {
 
     private static Slot givenNativeSlot(AdSize size, String placementId) {
         Slot slot = mock(Slot.class);
-        when(slot.isValid()).thenReturn(true);
         when(slot.isNative()).thenReturn(true);
         when(slot.getWidth()).thenReturn(size.getWidth());
         when(slot.getHeight()).thenReturn(size.getHeight());

@@ -1,6 +1,7 @@
 package com.criteo.publisher.network;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.R;
@@ -54,6 +55,7 @@ public class PubSdkApi {
         return configResult;
     }
 
+    @Nullable
     public Cdb loadCdb(Cdb cdbRequest, String userAgent) {
         Cdb cdbResult = null;
         try {
