@@ -60,7 +60,7 @@ public abstract class Criteo {
   public abstract void setBidsForAdUnit(Object object, AdUnit adUnit);
 
   @Nullable
-  abstract Slot getBidForAdUnit(AdUnit adUnit);
+  abstract Slot getBidForAdUnit(@Nullable AdUnit adUnit);
 
   public abstract BidResponse getBidResponse(AdUnit adUnit);
 

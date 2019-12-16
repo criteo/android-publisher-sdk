@@ -2,6 +2,7 @@ package com.criteo.publisher;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.AppEvents.AppEvents;
@@ -108,6 +109,7 @@ final class CriteoInternal extends Criteo {
   /**
    * Method to start new CdbDownload Asynctask
    */
+  @Nullable
   @Override
   Slot getBidForAdUnit(AdUnit adUnit) {
     if (bidManager == null) {

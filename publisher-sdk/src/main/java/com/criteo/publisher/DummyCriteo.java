@@ -21,7 +21,7 @@ public class DummyCriteo extends Criteo {
 
   @Nullable
   @Override
-  Slot getBidForAdUnit(AdUnit adUnit) {
+  Slot getBidForAdUnit(@Nullable AdUnit adUnit) {
     return null;
   }
 

@@ -2,9 +2,9 @@ package com.criteo.publisher;
 
 import static android.content.ContentValues.TAG;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.Util.AdUnitType;
@@ -261,7 +261,37 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
     }
 
-    Slot getBidForAdUnitAndPrefetch(AdUnit adUnit) {
+    /**
+     * Returns the last fetched bid a fetch a new one for the next invocation.
+     * <p>
+     * A <code>null</code> value could be returned. This means that there is no valid bid for the
+     * given {@link AdUnit}. And caller should not try to display anything.
+     * <code>null</code> may be returned in case of
+     * <ul>
+     *   <li>The kill switch is engaged. See {@link Config#isKillSwitchEnabled()}</li>
+     *   <li>The given {@link AdUnit} is not valid. See {@link AdUnitMapper} for validity definition</li>
+     *   <li>There is no last fetch bid or last is consumed</li>
+     *   <li>Last fetch bid correspond to a no-bid (CPM = 0 and TTL = 0)</li>
+     *   <li>Last fetch bid is a not-expired silence (CPM = 0 and TTL > 0)</li>
+     *   <li>Last fetch bid is expired</li>
+     * </ul>
+     * <p>
+     * Asynchronously, a new bid is fetch to CDB to get a new proposition. Hence if this method
+     * returns a bid, it is consumed, and you have to wait for the new proposition to get a result
+     * again. Meanwhile, you'll only get a <code>null</code> value.
+     * There may be some case when a new bid is not fetch:
+     * <ul>
+     *   <li>The kill switch is engaged</li>
+     *   <li>The given {@link AdUnit} is not valid</li>
+     *   <li>Last fetch bid is a not-expired silence</li>
+     *   <li>There is already an async call to CDB for the given {@link AdUnit}</li>
+     * </ul>
+     *
+     * @param adUnit Declaration of ad unit to get a bid from
+     * @return a valid bid that may be displayed or <code>null</code> that should be ignored
+     */
+    @Nullable
+    Slot getBidForAdUnitAndPrefetch(@Nullable AdUnit adUnit) {
         if (killSwitchEngaged()) {
             return null;
         }
@@ -281,29 +311,22 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         double cpm = (peekSlot.getCpmAsNumber() == null ? 0.0 : peekSlot.getCpmAsNumber());
         long ttl = peekSlot.getTtl();
         long expiryTimeMillis = ttl * SECOND_TO_MILLI + peekSlot.getTimeOfDownload();
+
         boolean isNotExpired = expiryTimeMillis > clock.getCurrentTimeInMillis();
-        boolean isNoBid = (cpm == 0) && (ttl == 0);
-        boolean isSilentMode = (cpm == 0) && (ttl > 0);
+        boolean isValidBid = (cpm > 0) && (ttl > 0);
+        boolean isSilentBid = (cpm == 0) && (ttl > 0);
 
-        if (isNoBid) {
-            // If it is a no bid, then we transform the no bid into null
-            cache.remove(cacheAdUnit);
-            fetch(cacheAdUnit);
+        if (isSilentBid && isNotExpired) {
             return null;
-        } else if (isSilentMode && isNotExpired) {
-            // If silent mode is still active, then we stay silent until expiration
-            return null;
-        } else {
-            //If cpm > 0, ttl > 0 but we are done staying silent
-            cache.remove(cacheAdUnit);
-            fetch(cacheAdUnit);
-
-            if (isNotExpired) {
-                return peekSlot;
-            } else {
-                return null;
-            }
         }
+
+        cache.remove(cacheAdUnit);
+        fetch(cacheAdUnit);
+
+        if (isValidBid && isNotExpired) {
+            return peekSlot;
+        }
+        return null;
     }
 
 
