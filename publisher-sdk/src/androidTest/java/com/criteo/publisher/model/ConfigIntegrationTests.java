@@ -21,6 +21,7 @@ import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.R;
+import com.criteo.publisher.ThreadingUtil;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.network.PubSdkApi;
 import org.json.JSONObject;
@@ -52,7 +53,7 @@ public class ConfigIntegrationTests {
     @Test
     public void isKillSwitchEnabled_GivenEmptyLocalStorageAndNoRemoteConfig_KillSwitchIsDisabledByDefault() throws Exception {
         givenEmptyLocalStorage();
-        givenRemoteConfigCallInError();
+        givenRemoteConfigInError();
 
         givenInitializedCriteo();
         Config config = getConfig();
@@ -72,12 +73,32 @@ public class ConfigIntegrationTests {
 
     private void isKillSwitchEnabled_GivenKillSwitchInLocalStorageAndNoRemoteConfig_ReturnsLocalStorageValue(boolean isEnabled) throws Exception {
         givenKillSwitchInLocalStorage(isEnabled);
-        givenRemoteConfigCallInError();
+        givenRemoteConfigInError();
 
         givenInitializedCriteo();
         Config config = getConfig();
 
         assertEquals(isEnabled, config.isKillSwitchEnabled());
+    }
+
+    @Test
+    public void localStorage_GivenRemoteConfigWithEnabledKillSwitch_PersistKillSwitchInLocalStorage() throws Exception {
+        localStorage_GivenRemoteConfigWithKillSwitch_PersistKillSwitchInLocalStorage(true);
+    }
+
+    @Test
+    public void localStorage_GivenRemoteConfigWithDisabledKillSwitch_PersistKillSwitchInLocalStorage() throws Exception {
+        localStorage_GivenRemoteConfigWithKillSwitch_PersistKillSwitchInLocalStorage(false);
+    }
+
+    private void localStorage_GivenRemoteConfigWithKillSwitch_PersistKillSwitchInLocalStorage(boolean isEnabled) throws Exception {
+        givenEmptyLocalStorage();
+        givenRemoteConfigWithKillSwitch(isEnabled);
+
+        givenInitializedCriteo();
+        waitForIdleState();
+
+        assertEquals(isEnabled, getKillSwitchInLocalStorage());
     }
 
     @Test
@@ -170,12 +191,23 @@ public class ConfigIntegrationTests {
         return mockedDependenciesRule.getDependencyProvider().provideConfig(context);
     }
 
-    private void givenRemoteConfigCallInError() {
-        PubSdkApi api = mock(PubSdkApi.class);
+    private void givenRemoteConfigInError() {
+        PubSdkApi api = givenMockedRemoteConfig();
         when(api.loadConfig(any(), any(), any())).thenReturn(null);
+    }
 
+    private void givenRemoteConfigWithKillSwitch(boolean isEnabled) throws Exception {
+        JSONObject configJson = new JSONObject("{ \"killSwitch\": " + isEnabled + " }");
+
+        PubSdkApi api = givenMockedRemoteConfig();
+        when(api.loadConfig(any(), any(), any())).thenReturn(configJson);
+    }
+
+    private PubSdkApi givenMockedRemoteConfig() {
+        PubSdkApi api = mock(PubSdkApi.class);
         when(mockedDependenciesRule.getDependencyProvider().providePubSdkApi(any()))
             .thenReturn(api);
+        return api;
     }
 
     @Nullable
@@ -209,5 +241,9 @@ public class ConfigIntegrationTests {
         String sharedPreferencesName = context.getString(R.string.shared_preferences);
         return context.getSharedPreferences(
             sharedPreferencesName, Context.MODE_PRIVATE);
+    }
+
+    private void waitForIdleState() {
+        ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
     }
 }

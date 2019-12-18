@@ -58,24 +58,22 @@ public class Config {
         if (json.has(KILL_SWITCH)) {
             try {
                 boolean newKillSwitch = json.getBoolean(KILL_SWITCH);
-                if (newKillSwitch != this.killSwitchEnabled) {
-                    this.killSwitchEnabled = newKillSwitch;
+                this.killSwitchEnabled = newKillSwitch;
 
-                    // FIXME(ma.chentir): the context object is effectively NonNull if this method is
-                    //  called, as it can only be called when creating a real Criteo instance.
-                    //  However, the null check is done for safety purposes. when we implement CSM,
-                    //  we would need to trigger an event if context is null as it would indicate a
-                    //  potential problem.
-                    if (context != null) {
-                        SharedPreferences sharedPref = context.getSharedPreferences(
-                            context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+                // FIXME(ma.chentir): the context object is effectively NonNull if this method is
+                //  called, as it can only be called when creating a real Criteo instance.
+                //  However, the null check is done for safety purposes. when we implement CSM,
+                //  we would need to trigger an event if context is null as it would indicate a
+                //  potential problem.
+                if (context != null) {
+                    SharedPreferences sharedPref = context.getSharedPreferences(
+                        context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
 
-                        SharedPreferences.Editor editor = sharedPref.edit();
-                        editor.putBoolean(KILL_SWITCH_STORAGE_KEY, newKillSwitch);
-                        editor.apply();
-                    }
-
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putBoolean(KILL_SWITCH_STORAGE_KEY, newKillSwitch);
+                    editor.apply();
                 }
+
             } catch (Exception ex) {
                 Log.d(TAG, "Couldn't refresh cached values : " + ex.getMessage());
             }
