@@ -113,23 +113,13 @@ public class ConfigIntegrationTests {
     }
 
     @Test
-    public void testConfigWithCriteoInit() throws CriteoInitException {
+    public void sdkInit_GivenContext_ProvidedConfigIsUsed() throws CriteoInitException {
         clearCriteo();
 
         Application app = (Application) InstrumentationRegistry.getTargetContext().getApplicationContext();
         Criteo.init(app, CriteoUtil.TEST_CP_ID, null);
+
         verify(mockedDependenciesRule.getDependencyProvider()).provideConfig(app);
-    }
-
-    @Test
-    public void testConfigWithoutCriteoInit()  {
-        verify(mockedDependenciesRule.getDependencyProvider(), never()).provideConfig(any(Context.class));
-    }
-
-    @Test
-    public void testConfigConstructor() {
-        // Assert that default value isn't cached
-        assertNull(getKillSwitchInLocalStorage());
     }
 
     @Test
