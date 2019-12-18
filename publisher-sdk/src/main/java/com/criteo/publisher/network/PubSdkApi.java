@@ -36,7 +36,7 @@ public class PubSdkApi {
         this.context = context;
     }
 
-    JSONObject loadConfig(String criteoPublisherId, String appId, String sdkVersion) {
+    public JSONObject loadConfig(String criteoPublisherId, String appId, String sdkVersion) {
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put(CRITEO_PUBLISHER_ID, criteoPublisherId);

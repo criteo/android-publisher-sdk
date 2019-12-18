@@ -13,10 +13,16 @@ public class CriteoUtil {
     Application app = (Application) InstrumentationRegistry.getTargetContext()
         .getApplicationContext();
 
-    // clears any side effects from previous calls
-    Criteo.setInstance(null);
+    clearCriteo();
 
     return Criteo.init(app, TEST_CP_ID, Arrays.asList(preloadedAdUnits));
+  }
+
+  /**
+   * Clear any side effects from previous calls
+   */
+  public static void clearCriteo() {
+    Criteo.setInstance(null);
   }
 
 }
