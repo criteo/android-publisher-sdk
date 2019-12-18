@@ -113,6 +113,17 @@ public class ConfigIntegrationTests {
     }
 
     @Test
+    public void localStorage_GivenNoRemoteConfig_DoesNotPersistKillSwitch() throws Exception {
+        givenEmptyLocalStorage();
+        givenRemoteConfigInError();
+
+        givenInitializedCriteo();
+        waitForIdleState();
+
+        assertNull(getKillSwitchInLocalStorage());
+    }
+
+    @Test
     public void sdkInit_GivenContext_ProvidedConfigIsUsed() throws CriteoInitException {
         clearCriteo();
 
