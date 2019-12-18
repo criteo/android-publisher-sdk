@@ -2,6 +2,7 @@ package com.criteo.publisher.model;
 
 import static com.criteo.publisher.CriteoUtil.clearCriteo;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -15,7 +16,6 @@ import android.content.SharedPreferences;
 import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoInitException;
-import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.R;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.network.PubSdkApi;
@@ -39,23 +39,43 @@ public class ConfigIntegrationTests {
     @Before
     public void setup() {
         context = InstrumentationRegistry.getTargetContext().getApplicationContext();
-        clearSharedPrefs();
+        givenEmptyLocalStorage();
     }
 
     @After
     public void tearDown() {
-       clearSharedPrefs();
+       givenEmptyLocalStorage();
     }
 
     @Test
-    public void isKillSwitchEnabled_GivenEmptyLocalStorage_KillSwitchIsDisabledByDefault() throws Exception {
-        clearSharedPrefs();
+    public void isKillSwitchEnabled_GivenEmptyLocalStorageAndNoRemoteConfig_KillSwitchIsDisabledByDefault() throws Exception {
+        givenEmptyLocalStorage();
         givenRemoteConfigCallInError();
 
         givenInitializedCriteo();
         Config config = getConfig();
 
         assertFalse(config.isKillSwitchEnabled());
+    }
+
+    @Test
+    public void isKillSwitchEnabled_GivenKillSwitchEnabledInLocalStorageAndNoRemoteConfig_ReturnsEnabled() throws Exception {
+        isKillSwitchEnabled_GivenKillSwitchInLocalStorageAndNoRemoteConfig_ReturnsLocalStorageValue(true);
+    }
+
+    @Test
+    public void isKillSwitchEnabled_GivenKillSwitchDisabledInLocalStorageAndNoRemoteConfig_ReturnsDisabled() throws Exception {
+        isKillSwitchEnabled_GivenKillSwitchInLocalStorageAndNoRemoteConfig_ReturnsLocalStorageValue(false);
+    }
+
+    private void isKillSwitchEnabled_GivenKillSwitchInLocalStorageAndNoRemoteConfig_ReturnsLocalStorageValue(boolean isEnabled) throws Exception {
+        givenKillSwitchInLocalStorage(isEnabled);
+        givenRemoteConfigCallInError();
+
+        givenInitializedCriteo();
+        Config config = getConfig();
+
+        assertEquals(isEnabled, config.isKillSwitchEnabled());
     }
 
     @Test
@@ -183,13 +203,25 @@ public class ConfigIntegrationTests {
             .thenReturn(api);
     }
 
-    private void clearSharedPrefs() {
-        //clear the sharedPrefs
-        SharedPreferences sharedPref = context.getSharedPreferences(
-            context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+    private void givenEmptyLocalStorage() {
+        SharedPreferences sharedPreferences = getSharedPreferences();
 
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.remove(CACHED_KILL_SWITCH);
-        editor.commit();
+        sharedPreferences.edit()
+            .remove(CACHED_KILL_SWITCH)
+            .commit();
+    }
+
+    private void givenKillSwitchInLocalStorage(boolean isEnabled) {
+        SharedPreferences sharedPreferences = getSharedPreferences();
+
+        sharedPreferences.edit()
+            .putBoolean(CACHED_KILL_SWITCH, isEnabled)
+            .commit();
+    }
+
+    private SharedPreferences getSharedPreferences() {
+        String sharedPreferencesName = context.getString(R.string.shared_preferences);
+        return context.getSharedPreferences(
+            sharedPreferencesName, Context.MODE_PRIVATE);
     }
 }
