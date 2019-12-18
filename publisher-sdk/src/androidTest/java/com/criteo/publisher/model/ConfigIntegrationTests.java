@@ -4,6 +4,8 @@ import static com.criteo.publisher.CriteoUtil.clearCriteo;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -13,16 +15,16 @@ import static org.mockito.Mockito.when;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoInitException;
+import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.R;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.network.PubSdkApi;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -83,7 +85,7 @@ public class ConfigIntegrationTests {
         clearCriteo();
 
         Application app = (Application) InstrumentationRegistry.getTargetContext().getApplicationContext();
-        Criteo.init(app, "B-056946", null);
+        Criteo.init(app, CriteoUtil.TEST_CP_ID, null);
         verify(mockedDependenciesRule.getDependencyProvider()).provideConfig(app);
     }
 
@@ -94,69 +96,46 @@ public class ConfigIntegrationTests {
 
     @Test
     public void testConfigConstructor() {
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         // Assert that default value isn't cached
-        assertFalse(sharedPref.contains(CACHED_KILL_SWITCH));
+        assertNull(getKillSwitchInLocalStorage());
     }
 
     @Test
     public void testConfigConstructorCachedKillSwitch() {
-        //set the killSwitch to true in sharedPrefs
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean(CACHED_KILL_SWITCH, true);
-        editor.commit();
+        givenKillSwitchInLocalStorage(true);
 
         // test
         Config config = new Config(context);
         // Assert that constructor hasn't cleared the cache
-        Assert.assertTrue(sharedPref.contains(CACHED_KILL_SWITCH));
-        boolean killSwitchFromCache = sharedPref.getBoolean(CACHED_KILL_SWITCH, false);
-        Assert.assertTrue(killSwitchFromCache);
-        Assert.assertTrue(config.isKillSwitchEnabled());
+        assertTrue(getKillSwitchInLocalStorage());
+        assertTrue(config.isKillSwitchEnabled());
     }
 
     @Test
-    public void testRefreshConfig() {
+    public void testRefreshConfig() throws Exception {
         Config config = new Config(context);
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
         // The config ctor shouldn't set the default to the shared prefs
-        assertFalse(sharedPref.contains(CACHED_KILL_SWITCH));
+        assertNull(getKillSwitchInLocalStorage());
 
         JSONObject json = new JSONObject();
-        try {
-            json.put("killSwitch", true);
-        } catch (JSONException je) {
-            Assert.fail("JSON exception" + je.getMessage());
-        }
+        json.put("killSwitch", true);
 
         // test
         config.refreshConfig(json);
 
-        Assert.assertTrue(config.isKillSwitchEnabled());
-        Assert.assertTrue(sharedPref.getBoolean(CACHED_KILL_SWITCH, false));
+        assertTrue(config.isKillSwitchEnabled());
+        assertTrue(getKillSwitchInLocalStorage());
     }
 
     @Test
-    public void testRefreshConfigCachedKillSwitch() {
+    public void testRefreshConfigCachedKillSwitch() throws Exception {
         //set the killSwitch to true in sharedPrefs
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean(CACHED_KILL_SWITCH, true);
-        editor.commit();
+        givenKillSwitchInLocalStorage(true);
 
         Config config = new Config(context);
 
         JSONObject json = new JSONObject();
-        try {
-            json.put("killSwitch", false);
-        } catch (JSONException je) {
-            Assert.fail("JSON exception" + je.getMessage());
-        }
+        json.put("killSwitch", false);
 
         // test
         config.refreshConfig(json);
@@ -165,17 +144,13 @@ public class ConfigIntegrationTests {
         // This should flip from the explicitly set true to false from the JSON.
         // To prevent confusion of where the 'false' value came from
         // changing the defaultValue of getBoolean to true
-        assertFalse(sharedPref.getBoolean(CACHED_KILL_SWITCH, true));
+        assertFalse(getKillSwitchInLocalStorage());
     }
 
     @Test
     public void testRefreshBadJson() {
         //set the killSwitch to true in sharedPrefs
-        SharedPreferences sharedPref = context.getSharedPreferences(
-                context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean(CACHED_KILL_SWITCH, true);
-        editor.commit();
+        givenKillSwitchInLocalStorage(true);
 
         Config config = new Config(context);
 
@@ -185,10 +160,10 @@ public class ConfigIntegrationTests {
         // test
         config.refreshConfig(json);
 
-        Assert.assertTrue(config.isKillSwitchEnabled());
+        assertTrue(config.isKillSwitchEnabled());
         // this should not flip from the explicitly set value
         // as the json doesn't have a kill switch value to overwrite
-        Assert.assertTrue(sharedPref.getBoolean(CACHED_KILL_SWITCH, false));
+        assertTrue(getKillSwitchInLocalStorage());
     }
 
     private Config getConfig() {
@@ -201,6 +176,17 @@ public class ConfigIntegrationTests {
 
         when(mockedDependenciesRule.getDependencyProvider().providePubSdkApi(any()))
             .thenReturn(api);
+    }
+
+    @Nullable
+    private Boolean getKillSwitchInLocalStorage() {
+        SharedPreferences sharedPreferences = getSharedPreferences();
+
+        if (!sharedPreferences.contains(CACHED_KILL_SWITCH)) {
+            return null;
+        } else {
+            return sharedPreferences.getBoolean(CACHED_KILL_SWITCH, false);
+        }
     }
 
     private void givenEmptyLocalStorage() {
