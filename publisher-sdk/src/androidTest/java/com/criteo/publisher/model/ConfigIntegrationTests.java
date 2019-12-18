@@ -102,6 +102,17 @@ public class ConfigIntegrationTests {
     }
 
     @Test
+    public void localStorage_GivenRemoteConfigWithInvalidResponse_DoesNotPersistKillSwitch() throws Exception {
+        givenEmptyLocalStorage();
+        givenRemoteConfigWithResponse("{}");
+
+        givenInitializedCriteo();
+        waitForIdleState();
+
+        assertNull(getKillSwitchInLocalStorage());
+    }
+
+    @Test
     public void testConfigWithCriteoInit() throws CriteoInitException {
         clearCriteo();
 
@@ -197,7 +208,11 @@ public class ConfigIntegrationTests {
     }
 
     private void givenRemoteConfigWithKillSwitch(boolean isEnabled) throws Exception {
-        JSONObject configJson = new JSONObject("{ \"killSwitch\": " + isEnabled + " }");
+        givenRemoteConfigWithResponse("{ \"killSwitch\": " + isEnabled + " }");
+    }
+
+    private void givenRemoteConfigWithResponse(String jsonResponse) throws Exception {
+        JSONObject configJson = new JSONObject(jsonResponse);
 
         PubSdkApi api = givenMockedRemoteConfig();
         when(api.loadConfig(any(), any(), any())).thenReturn(configJson);
