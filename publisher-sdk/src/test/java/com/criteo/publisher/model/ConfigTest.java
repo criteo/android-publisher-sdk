@@ -1,83 +1,105 @@
 package com.criteo.publisher.model;
 
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 public class ConfigTest {
 
     private Config config;
-    private Context mockContext;
 
-    @Test
-    public void testConfigInit() {
-        mockContext = mock(Context.class);
-        config = new Config(mockContext);
-        Assert.assertFalse(config.isKillSwitchEnabled());
-        Assert.assertNotNull(config.getAdTagUrlMode());
-        Assert.assertNotNull(config.getDisplayUrlMacro());
-        Assert.assertNotNull(config.getAdTagDataMacro());
-        Assert.assertNotNull(config.getAdTagDataMode());
+    @Mock
+    private Context context;
+
+    @Mock
+    private SharedPreferences sharedPreferences;
+
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+
+        when(context.getSharedPreferences(any(), anyInt())).thenReturn(sharedPreferences);
     }
 
     @Test
-    public void testConfigInitWithCachedKillSwitch() {
-        mockContext = mock(Context.class);
+    public void new_GivenEmptyLocalStorage_ContainsDefaultValues() {
+        when(sharedPreferences.getBoolean(any(), anyBoolean()))
+            .thenAnswer(invocation -> invocation.getArguments()[1]);
 
-        SharedPreferences mockSharedPref = mock(SharedPreferences.class);
-        when(mockSharedPref.getBoolean("CriteoCachedKillSwitch", false)).thenReturn(true);
-        when(mockContext.getString(Mockito.any(int.class))).thenReturn("sharedPref");
-        when(mockContext.getSharedPreferences(
-                Mockito.any(String.class), Mockito.any(int.class))).thenReturn(mockSharedPref);
+        config = new Config(context);
 
-        config = new Config(mockContext);
-
-        Assert.assertTrue(config.isKillSwitchEnabled());
-        Assert.assertNotNull(config.getAdTagUrlMode());
-        Assert.assertNotNull(config.getDisplayUrlMacro());
-        Assert.assertNotNull(config.getAdTagDataMacro());
-        Assert.assertNotNull(config.getAdTagDataMode());
+        assertConfigContainsDefaultValues();
     }
 
     @Test
-    public void testRefreshConfig() {
-        mockContext = mock(Context.class);
+    public void new_GivenInvalidValueInLocalStorage_DoesNotThrowAndUseDefaultValues() throws Exception {
+        when(sharedPreferences.getBoolean(any(), anyBoolean())).thenThrow(ClassCastException.class);
 
-        SharedPreferences mockSharedPref = mock(SharedPreferences.class);
-        when(mockSharedPref.getBoolean("CriteoCachedKillSwitch", false)).thenReturn(false);
-        when(mockContext.getString(Mockito.any(int.class))).thenReturn("sharedPref");
-        when(mockContext.getSharedPreferences(
-                Mockito.any(String.class), Mockito.any(int.class))).thenReturn(mockSharedPref);
+        config = new Config(context);
 
-        config = new Config(mockContext);
+        assertConfigContainsDefaultValues();
+    }
 
-        String oldDisplayUrlMacro = "%%displayUrl%%";
+    @Test
+    public void isKillSwitchEnabled_GivenKillSwitchEnabledInLocalStorage_ReturnsEnabled() {
+        givenKillSwitchInLocalStorage(true);
+
+        config = new Config(context);
+
+        assertTrue(config.isKillSwitchEnabled());
+    }
+
+    @Test
+    public void isKillSwitchEnabled_GivenKillSwitchDisabledInLocalStorage_ReturnsDisabled() {
+        givenKillSwitchInLocalStorage(false);
+
+        config = new Config(context);
+
+        assertFalse(config.isKillSwitchEnabled());
+    }
+
+    @Test
+    public void testRefreshConfig() throws Exception {
+        givenKillSwitchInLocalStorage(false);
+
+        config = new Config(context);
+
         String newDisplayUrlMacro = "%%newDisplayUrl%%";
         JSONObject json = new JSONObject();
-        try {
-            json.put("killSwitch", true);
-            json.put("AndroidDisplayUrlMacro", newDisplayUrlMacro);
-
-        } catch (JSONException je) {
-            Assert.fail("JSON exception" + je.getMessage());
-        }
+        json.put("killSwitch", true);
+        json.put("AndroidDisplayUrlMacro", newDisplayUrlMacro);
 
         config.refreshConfig(json);
 
-        Assert.assertTrue(config.isKillSwitchEnabled());
-        Assert.assertNotNull(config.getAdTagUrlMode());
-        Assert.assertEquals(newDisplayUrlMacro, config.getDisplayUrlMacro());
-        Assert.assertNotEquals(oldDisplayUrlMacro, config.getDisplayUrlMacro());
-        Assert.assertNotNull(config.getAdTagDataMacro());
-        Assert.assertNotNull(config.getAdTagDataMode());
+        assertTrue(config.isKillSwitchEnabled());
+        assertNotNull(config.getAdTagUrlMode());
+        assertEquals(newDisplayUrlMacro, config.getDisplayUrlMacro());
+    }
+
+    private void givenKillSwitchInLocalStorage(boolean isEnabled) {
+        when(sharedPreferences.getBoolean(eq("CriteoCachedKillSwitch"), anyBoolean())).thenReturn(isEnabled);
+    }
+
+    private void assertConfigContainsDefaultValues() {
+        assertFalse(config.isKillSwitchEnabled());
+        assertEquals("%%adTagData%%", config.getAdTagDataMacro());
+        assertEquals("%%displayUrl%%", config.getDisplayUrlMacro());
+        assertEquals("<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script src=\"%%displayUrl%%\"></script></body></html>", config.getAdTagUrlMode());
+        assertEquals("<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>", config.getAdTagDataMode());
     }
 
 }
