@@ -7,6 +7,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -124,13 +126,26 @@ public class ConfigIntegrationTests {
     }
 
     @Test
+    public void refreshConfig_GivenRemoteConfigInError_DoesNotUpdateConfig() throws Exception {
+        Config config = mock(Config.class);
+        doReturn(config).when(mockedDependenciesRule.getDependencyProvider()).provideConfig(any());
+
+        givenRemoteConfigInError();
+
+        givenInitializedCriteo();
+        waitForIdleState();
+
+        verify(config, never()).refreshConfig(any());
+    }
+
+    @Test
     public void sdkInit_GivenContext_ProvidedConfigIsUsed() throws CriteoInitException {
         clearCriteo();
 
         Application app = (Application) InstrumentationRegistry.getTargetContext().getApplicationContext();
         Criteo.init(app, CriteoUtil.TEST_CP_ID, null);
 
-        verify(mockedDependenciesRule.getDependencyProvider()).provideConfig(app);
+        verify(mockedDependenciesRule.getDependencyProvider(), atLeastOnce()).provideConfig(app);
     }
 
     @Test
