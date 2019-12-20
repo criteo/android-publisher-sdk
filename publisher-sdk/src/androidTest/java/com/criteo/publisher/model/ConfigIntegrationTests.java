@@ -139,6 +139,36 @@ public class ConfigIntegrationTests {
     }
 
     @Test
+    public void refreshConfig_GivenRemoteConfigWithGoodResponse_UpdateConfig() throws Exception {
+        Config config = mock(Config.class);
+        when(config.isKillSwitchEnabled()).thenReturn(false);
+        doReturn(config).when(mockedDependenciesRule.getDependencyProvider()).provideConfig(any());
+
+        JSONObject response = mock(JSONObject.class);
+        givenRemoteConfigWithResponse(response);
+
+        givenInitializedCriteo();
+        waitForIdleState();
+
+        verify(config).refreshConfig(response);
+    }
+
+    @Test
+    public void refreshConfig_GivenRemoteConfigWithGoodResponseAndKillSwitchIsEnabled_UpdateConfig() throws Exception {
+        Config config = mock(Config.class);
+        when(config.isKillSwitchEnabled()).thenReturn(true);
+        doReturn(config).when(mockedDependenciesRule.getDependencyProvider()).provideConfig(any());
+
+        JSONObject response = mock(JSONObject.class);
+        givenRemoteConfigWithResponse(response);
+
+        givenInitializedCriteo();
+        waitForIdleState();
+
+        verify(config).refreshConfig(response);
+    }
+
+    @Test
     public void sdkInit_GivenContext_ProvidedConfigIsUsed() throws CriteoInitException {
         clearCriteo();
 
@@ -219,8 +249,7 @@ public class ConfigIntegrationTests {
     }
 
     private void givenRemoteConfigInError() {
-        PubSdkApi api = givenMockedRemoteConfig();
-        when(api.loadConfig(any(), any(), any())).thenReturn(null);
+        givenRemoteConfigWithResponse((JSONObject) null);
     }
 
     private void givenRemoteConfigWithKillSwitch(boolean isEnabled) throws Exception {
@@ -228,8 +257,10 @@ public class ConfigIntegrationTests {
     }
 
     private void givenRemoteConfigWithResponse(String jsonResponse) throws Exception {
-        JSONObject configJson = new JSONObject(jsonResponse);
+        givenRemoteConfigWithResponse(new JSONObject(jsonResponse));
+    }
 
+    private void givenRemoteConfigWithResponse(JSONObject configJson) {
         PubSdkApi api = givenMockedRemoteConfig();
         when(api.loadConfig(any(), any(), any())).thenReturn(configJson);
     }
