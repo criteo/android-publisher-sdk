@@ -70,7 +70,7 @@ public class PubSdkApi {
         return cdbResult;
     }
 
-    JSONObject postAppEvent(int senderId,
+    public JSONObject postAppEvent(int senderId,
         String appId, String gaid, String eventType,
         int limitedAdTracking) {
 

@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import com.criteo.publisher.Util.AdUnitType;
+import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
@@ -115,4 +116,5 @@ public abstract class Criteo {
   abstract Config getConfig();
 
   public abstract void setUsPrivacyOptOut(boolean usPrivacyOptOut);
+
 }

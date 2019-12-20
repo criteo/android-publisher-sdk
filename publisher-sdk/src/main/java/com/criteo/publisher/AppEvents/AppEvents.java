@@ -8,6 +8,7 @@ import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.Util.AppEventResponseListener;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.network.AppEventTask;
 import com.criteo.publisher.network.PubSdkApi;
 import java.util.concurrent.Executor;
@@ -26,31 +27,36 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
     private final DeviceUtil deviceUtil;
     private final Clock clock;
     private final PubSdkApi api;
+    private final UserPrivacyUtil userPrivacyUtil;
 
     public AppEvents(
         @NonNull Context context,
         @NonNull DeviceUtil deviceUtil,
         @NonNull Clock clock,
-        @NonNull PubSdkApi api
+        @NonNull PubSdkApi api,
+        @NonNull UserPrivacyUtil userPrivacyUtil
     ) {
         this.mContext = context;
         this.deviceUtil = deviceUtil;
         this.clock = clock;
         this.api = api;
         this.eventTask = new AppEventTask(mContext, this, deviceUtil, api);
+        this.userPrivacyUtil = userPrivacyUtil;
     }
 
     private void postAppEvent(String eventType) {
-        if (appEventThrottle > 0 &&
+        if (userPrivacyUtil.isCCPAConsentGiven()) {
+            if (appEventThrottle > 0 &&
                 clock.getCurrentTimeInMillis() - throttleSetTime < appEventThrottle * 1000) {
-            return;
-        }
-        if (eventTask.getStatus() == AsyncTask.Status.FINISHED) {
-            eventTask = new AppEventTask(mContext, this, deviceUtil, api);
-        }
-        if (eventTask.getStatus() != AsyncTask.Status.RUNNING) {
-            Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
-            eventTask.executeOnExecutor(threadPoolExecutor, eventType);
+                return;
+            }
+            if (eventTask.getStatus() == AsyncTask.Status.FINISHED) {
+                eventTask = new AppEventTask(mContext, this, deviceUtil, api);
+            }
+            if (eventTask.getStatus() != AsyncTask.Status.RUNNING) {
+                Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
+                eventTask.executeOnExecutor(threadPoolExecutor, eventType);
+            }
         }
     }
 

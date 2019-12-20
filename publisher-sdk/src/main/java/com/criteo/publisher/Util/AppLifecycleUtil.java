@@ -31,7 +31,6 @@ public class AppLifecycleUtil implements Application.ActivityLifecycleCallbacks 
             created = true;
             appEvents.sendLaunchEvent();
         }
-
     }
 
     @Override

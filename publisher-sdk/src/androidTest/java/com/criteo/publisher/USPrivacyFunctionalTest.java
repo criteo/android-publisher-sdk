@@ -51,7 +51,7 @@ public class USPrivacyFunctionalTest {
 
   @Test
   public void whenCriteoInit_GivenUspIabNotEmpty_VerifyItIsPassedToCdb() throws Exception {
-    writeIntoDefaultSharedPrefs("IABUSPrivacy_String", "1YNNN");
+    writeIntoDefaultSharedPrefs("IABUSPrivacy_String", "fake_iab_usp");
 
     CriteoUtil.givenInitializedCriteo(TestAdUnits.BANNER_320_50);
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
@@ -60,7 +60,7 @@ public class USPrivacyFunctionalTest {
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
     Cdb cdb = cdbArgumentCaptor.getValue();
-    assertEquals("1YNNN", cdb.getUser().getUspIab());
+    assertEquals("fake_iab_usp", cdb.getUser().getUspIab());
   }
 
   @Test

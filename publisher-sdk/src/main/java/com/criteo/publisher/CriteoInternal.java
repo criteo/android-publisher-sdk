@@ -1,5 +1,6 @@
 package com.criteo.publisher;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -73,7 +74,9 @@ final class CriteoInternal extends Criteo {
         context,
         deviceUtil,
         dependencyProvider.provideClock(),
-        api);
+        api,
+        dependencyProvider.provideUserPrivacyUtil(context)
+    );
 
     this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
 

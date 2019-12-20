@@ -3,7 +3,6 @@ package com.criteo.publisher.network;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.Util.AppEventResponseListener;
 import com.criteo.publisher.Util.DeviceUtil;
 import org.json.JSONObject;
