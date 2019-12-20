@@ -7,16 +7,22 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import java.util.function.Function;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -27,14 +33,14 @@ public class ConfigTest {
     @Mock
     private Context context;
 
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private SharedPreferences sharedPreferences;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        when(context.getSharedPreferences(any(), anyInt())).thenReturn(sharedPreferences);
+        when(context.getSharedPreferences(any(), eq(Context.MODE_PRIVATE))).thenReturn(sharedPreferences);
     }
 
     @Test
@@ -140,6 +146,57 @@ public class ConfigTest {
         T newValue = projection.apply(config);
 
         assertEquals(previousValue, newValue);
+    }
+
+    @Test
+    public void refreshConfig_GivenEnabledKillSwitch_ItIsPersisted() throws Exception {
+        Editor editor = mock(Editor.class);
+        when(sharedPreferences.edit()).thenReturn(editor);
+
+        config = new Config(context);
+
+        JSONObject newConfig = givenFullNewPayload(config);
+        newConfig.put("killSwitch", true);
+
+        config.refreshConfig(newConfig);
+
+        InOrder inOrder = inOrder(editor);
+        inOrder.verify(editor).putBoolean("CriteoCachedKillSwitch", true);
+        inOrder.verify(editor).apply();
+        inOrder.verifyNoMoreInteractions();
+    }
+
+    @Test
+    public void refreshConfig_GivenInvalidKillSwitch_ItIsNotPersisted() throws Exception {
+        config = new Config(context);
+
+        JSONObject newConfig = givenFullNewPayload(config);
+        newConfig.put("killSwitch", "not a boolean");
+
+        clearInvocations(sharedPreferences);
+        config.refreshConfig(newConfig);
+
+        verifyZeroInteractions(sharedPreferences);
+    }
+
+    @Test
+    public void refreshConfig_GivenNewConfig_UpdateEverything() throws Exception {
+        config = new Config(context);
+        boolean killSwitchEnabled = config.isKillSwitchEnabled();
+        String displayUrlMacro = config.getDisplayUrlMacro();
+        String adTagUrlMode = config.getAdTagUrlMode();
+        String adTagDataMacro = config.getAdTagDataMacro();
+        String adTagDataMode = config.getAdTagDataMode();
+
+        JSONObject newConfig = givenFullNewPayload(config);
+
+        config.refreshConfig(newConfig);
+
+        assertEquals(!config.isKillSwitchEnabled(), killSwitchEnabled);
+        assertEquals("new_" + displayUrlMacro, config.getDisplayUrlMacro());
+        assertEquals("new_" + adTagUrlMode, config.getAdTagUrlMode());
+        assertEquals("new_" + adTagDataMacro, config.getAdTagDataMacro());
+        assertEquals("new_" + adTagDataMode, config.getAdTagDataMode());
     }
 
     @Test

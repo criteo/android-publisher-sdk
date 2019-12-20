@@ -2,13 +2,14 @@ package com.criteo.publisher.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
 import com.criteo.publisher.R;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Config {
@@ -43,45 +44,50 @@ public class Config {
         this.adTagDataMacro = DEFAULT_AD_TAG_DATA_MACRO;
         this.adTagDataMode = DEFAULT_AD_TAG_DATA_MODE;
         this.context = context;
-
-        try {
-            SharedPreferences sharedPref = context.getSharedPreferences(
-                    context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
-
-            killSwitchEnabled = sharedPref.getBoolean(KILL_SWITCH_STORAGE_KEY, false);
-        } catch (Exception ex) {
-            Log.d(TAG, "Couldn't read cached values : " + ex.getMessage());
-        }
+        this.killSwitchEnabled = readKillSwitchOrFalse(context);
     }
 
     public void refreshConfig(JSONObject json) {
-        if (json.has(KILL_SWITCH)) {
-            try {
-                boolean newKillSwitch = json.getBoolean(KILL_SWITCH);
-                this.killSwitchEnabled = newKillSwitch;
-
-                // FIXME(ma.chentir): the context object is effectively NonNull if this method is
-                //  called, as it can only be called when creating a real Criteo instance.
-                //  However, the null check is done for safety purposes. when we implement CSM,
-                //  we would need to trigger an event if context is null as it would indicate a
-                //  potential problem.
-                if (context != null) {
-                    SharedPreferences sharedPref = context.getSharedPreferences(
-                        context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
-
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putBoolean(KILL_SWITCH_STORAGE_KEY, newKillSwitch);
-                    editor.apply();
-                }
-
-            } catch (Exception ex) {
-                Log.d(TAG, "Couldn't refresh cached values : " + ex.getMessage());
-            }
+        try {
+            killSwitchEnabled = json.getBoolean(KILL_SWITCH);
+            persistKillSwitch();
+        } catch (JSONException e) {
+            Log.d(TAG, "Couldn't read kill switch status: " + e.getMessage());
         }
-        this.displayUrlMacro = json.optString(DISPLAY_URL_MACRO_KEY, this.displayUrlMacro);
-        this.adTagUrlMode = json.optString(AD_TAG_URL_MODE_KEY, this.adTagUrlMode);
-        this.adTagDataMacro = json.optString(AD_TAG_DATA_MACRO_KEY, this.adTagDataMacro);
-        this.adTagDataMode = json.optString(AD_TAG_DATA_MODE_KEY, this.adTagDataMode);
+
+        displayUrlMacro = json.optString(DISPLAY_URL_MACRO_KEY, displayUrlMacro);
+        adTagUrlMode = json.optString(AD_TAG_URL_MODE_KEY, adTagUrlMode);
+        adTagDataMacro = json.optString(AD_TAG_DATA_MACRO_KEY, adTagDataMacro);
+        adTagDataMode = json.optString(AD_TAG_DATA_MODE_KEY, adTagDataMode);
+    }
+
+    private static boolean readKillSwitchOrFalse(@NonNull Context context) {
+        try {
+            return getSharedPreferences(context).getBoolean(KILL_SWITCH_STORAGE_KEY, false);
+        } catch (ClassCastException ex) {
+            Log.d(TAG, "Couldn't read cached values : " + ex.getMessage());
+        }
+        return false;
+    }
+
+    private void persistKillSwitch() {
+        // FIXME(ma.chentir): the context object is effectively NonNull if this method is
+        //  called, as it can only be called when creating a real Criteo instance.
+        //  However, the null check is done for safety purposes. when we implement CSM,
+        //  we would need to trigger an event if context is null as it would indicate a
+        //  potential problem.
+        if (context == null) {
+            return;
+        }
+
+        Editor editor = getSharedPreferences(context).edit();
+        editor.putBoolean(KILL_SWITCH_STORAGE_KEY, killSwitchEnabled);
+        editor.apply();
+    }
+
+    private static SharedPreferences getSharedPreferences(@NonNull Context context) {
+        String sharedPreferenceName = context.getString(R.string.shared_preferences);
+        return context.getSharedPreferences(sharedPreferenceName, Context.MODE_PRIVATE);
     }
 
     public boolean isKillSwitchEnabled() {

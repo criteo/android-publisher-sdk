@@ -100,6 +100,7 @@ public class CriteoInternalUnitTest {
     dependencyProvider = spy(DependencyProvider.getInstance());
     doReturn(mock(DeviceUtil.class)).when(dependencyProvider).provideDeviceUtil(any());
     doReturn(mock(UserPrivacyUtil.class)).when(dependencyProvider).provideUserPrivacyUtil(any());
+    doReturn(mock(Config.class)).when(dependencyProvider).provideConfig(any());
 
     Context applicationContext = mock(Context.class);
     when(application.getApplicationContext()).thenReturn(applicationContext);
