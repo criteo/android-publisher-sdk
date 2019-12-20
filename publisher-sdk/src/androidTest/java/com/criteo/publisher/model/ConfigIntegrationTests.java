@@ -288,7 +288,7 @@ public class ConfigIntegrationTests {
 
         sharedPreferences.edit()
             .remove(CACHED_KILL_SWITCH)
-            .commit();
+            .apply();
     }
 
     private void givenKillSwitchInLocalStorage(boolean isEnabled) {
@@ -296,7 +296,7 @@ public class ConfigIntegrationTests {
 
         sharedPreferences.edit()
             .putBoolean(CACHED_KILL_SWITCH, isEnabled)
-            .commit();
+            .apply();
     }
 
     private SharedPreferences getSharedPreferences() {

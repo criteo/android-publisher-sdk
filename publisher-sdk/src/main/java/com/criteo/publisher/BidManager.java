@@ -131,10 +131,11 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     /**
      * Method to start new CdbDownload Asynctask
      */
-    private void startCdbDownloadTask(boolean callConfig, List<CacheAdUnit> prefetchCacheAdUnits) {
+    private void startCdbDownloadTask(boolean isConfigRequested, List<CacheAdUnit> prefetchCacheAdUnits) {
         CdbDownloadTask cdbDownloadTask = new CdbDownloadTask(
             this,
-            callConfig,
+            isConfigRequested,
+            !killSwitchEngaged(),
             deviceInfo.getUserAgent(),
             prefetchCacheAdUnits,
             placementsWithCdbTasks,
@@ -360,7 +361,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     }
 
     @Override
-    public void refreshConfig(JSONObject configJSONObject) {
+    public void refreshConfig(@NonNull JSONObject configJSONObject) {
         config.refreshConfig(configJSONObject);
     }
 

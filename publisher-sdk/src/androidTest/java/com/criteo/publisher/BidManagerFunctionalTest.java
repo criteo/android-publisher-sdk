@@ -21,8 +21,6 @@ import static org.mockito.Mockito.when;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
-import com.criteo.publisher.Util.AndroidUtil;
-import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
@@ -41,6 +39,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -83,6 +84,8 @@ public class BidManagerFunctionalTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
+    CriteoUtil.clearSharedPreferences();
+
     dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
     when(dependencyProvider.providePubSdkApi(any())).thenReturn(api);
@@ -98,6 +101,11 @@ public class BidManagerFunctionalTest {
     givenExpiredSilentModeBidCached(sampleAdUnit());
     givenNoBidCached(sampleAdUnit());
     givenNoLastBid(sampleAdUnit());
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    CriteoUtil.clearSharedPreferences();
   }
 
   @Test
@@ -122,6 +130,32 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     assertShouldCallCdbAndPopulateCacheOnlyOnce(mappedAdUnits, slot);
+  }
+
+  @Test
+  public void prefetch_GivenKillSwitchIsEnabled_ShouldNotCallCdbAndNotPopulateCache() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    givenKillSwitchIs(true);
+
+    BidManager bidManager = createBidManager();
+    bidManager.prefetch(singletonList(adUnit));
+    waitForIdleState();
+
+    assertShouldNotCallCdbAndNotPopulateCache();
+  }
+
+  @Test
+  public void prefetch_GivenRemoteConfigWithKillSwitchEnabled_ShouldNotCallCdbAndNotPopulateCache() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    givenRemoteConfigWithKillSwitchEnabled();
+
+    BidManager bidManager = createBidManager();
+    bidManager.prefetch(singletonList(adUnit));
+    waitForIdleState();
+
+    assertShouldNotCallCdbAndNotPopulateCache();
   }
 
   @Test
@@ -596,6 +630,12 @@ public class BidManagerFunctionalTest {
     Config config = mock(Config.class);
     when(config.isKillSwitchEnabled()).thenReturn(isEnabled);
     doReturn(config).when(dependencyProvider).provideConfig(any());
+  }
+
+  private void givenRemoteConfigWithKillSwitchEnabled() throws JSONException {
+    JSONObject json = new JSONObject();
+    json.put("killSwitch", true);
+    when(api.loadConfig(any(), any(), any())).thenReturn(json);
   }
 
   @NonNull

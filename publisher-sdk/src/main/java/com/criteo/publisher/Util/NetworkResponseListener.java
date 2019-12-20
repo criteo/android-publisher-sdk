@@ -11,7 +11,7 @@ public interface NetworkResponseListener {
 
     void setCacheAdUnits(@NonNull List<Slot> slots);
 
-    void refreshConfig(JSONObject config);
+    void refreshConfig(@NonNull JSONObject config);
 
     void setTimeToNextCall(int seconds);
 }

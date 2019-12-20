@@ -60,6 +60,7 @@ public class  CdbDownloadTaskTest {
         cdbDownloadTask = new CdbDownloadTask(
             responseListener,
             false,
+            true,
             "Agent",
             cacheAdUnits,
             bidsInCdbTask,

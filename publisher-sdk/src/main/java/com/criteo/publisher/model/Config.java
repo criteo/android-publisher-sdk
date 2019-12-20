@@ -47,12 +47,33 @@ public class Config {
         this.killSwitchEnabled = readKillSwitchOrFalse(context);
     }
 
-    public void refreshConfig(JSONObject json) {
+    /**
+     * Parse kill switch from given JSON payload.
+     *
+     * It is expected to read a boolean value at the {@link #KILL_SWITCH} element.
+     * If none is found or non boolean value is found, <code>null</code> is returned.
+     *
+     * @param json payload to read from
+     * @return existing kill switch status or <code>null</code> if not readable
+     */
+    @Nullable
+    public static Boolean parseKillSwitch(@Nullable JSONObject json) {
+        if (json == null) {
+            return null;
+        }
+
         try {
-            killSwitchEnabled = json.getBoolean(KILL_SWITCH);
-            persistKillSwitch();
+            return json.getBoolean(KILL_SWITCH);
         } catch (JSONException e) {
-            Log.d(TAG, "Couldn't read kill switch status: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public void refreshConfig(@NonNull JSONObject json) {
+        Boolean newKillSwitch = parseKillSwitch(json);
+        if (newKillSwitch != null) {
+            killSwitchEnabled = newKillSwitch;
+            persistKillSwitch();
         }
 
         displayUrlMacro = json.optString(DISPLAY_URL_MACRO_KEY, displayUrlMacro);
