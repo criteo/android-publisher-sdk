@@ -61,6 +61,15 @@
           android:background="#81D4FA"
           android:text="@string/btn_mopub_mediation"/>
 
+        <Button
+          android:id="@+id/buttonConsentSelector"
+          style="@style/Widget.AppCompat.Button.Colored"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="20dp"
+          android:background="#81D4FA"
+          android:text="@string/btn_privacy_consent_selector"/>
+
     </LinearLayout>
 
 </RelativeLayout>

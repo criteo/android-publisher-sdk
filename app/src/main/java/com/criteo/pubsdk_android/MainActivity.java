@@ -47,6 +47,11 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        findViewById(R.id.buttonConsentSelector).setOnClickListener((View v) -> {
+            Intent intent = new Intent(getApplicationContext(), PrivacyConsentSelectorActivity.class);
+            startActivity(intent);
+        });
+
         Log.d(TAG, "onCreate:" + calendar.getTimeInMillis());
 
     }

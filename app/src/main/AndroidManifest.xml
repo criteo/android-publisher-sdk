@@ -74,6 +74,16 @@
         android:name="android.support.PARENT_ACTIVITY"
         android:value="com.criteo.pubsdk_android.MainActivity"/>
     </activity>
+
+    <activity
+      android:name=".PrivacyConsentSelectorActivity"
+      android:configChanges="orientation|screenSize"
+      android:theme="@style/AppTheme">
+      <meta-data
+        android:name="android.support.PARENT_ACTIVITY"
+        android:value="com.criteo.pubsdk_android.MainActivity"/>
+    </activity>
+
     <activity
       android:label="@string/title_activity_mopub"
       android:name=".MopubActivity"
@@ -91,6 +101,7 @@
     <activity
       android:configChanges="keyboardHidden|orientation|screenSize"
       android:name="com.mopub.mobileads.MraidActivity"/>
+
   </application>
 
 </manifest>
