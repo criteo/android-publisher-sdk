@@ -50,6 +50,10 @@
    public *;
 }
 
+-keep class com.criteo.publisher.Criteo$Builder {
+  public *;
+}
+
 -keep public class com.criteo.publisher.CriteoBannerView
 -keepclassmembers class com.criteo.publisher.CriteoBannerView {
    public *;
