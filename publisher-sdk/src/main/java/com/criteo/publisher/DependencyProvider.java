@@ -50,27 +50,52 @@ public class DependencyProvider {
 
   @NonNull
   public PubSdkApi providePubSdkApi(Context context) {
-    return getOrCreate(PubSdkApi.class, () -> new PubSdkApi(context));
+    return getOrCreate(PubSdkApi.class, new Factory<PubSdkApi>() {
+      @Override
+      public PubSdkApi create() {
+        return new PubSdkApi(context);
+      }
+    });
   }
 
   @NonNull
   public AdvertisingInfo provideAdvertisingInfo() {
-    return getOrCreate(AdvertisingInfo.class, AdvertisingInfo::new);
+    return getOrCreate(AdvertisingInfo.class, new Factory<AdvertisingInfo>() {
+      @Override
+      public AdvertisingInfo create() {
+        return new AdvertisingInfo();
+      }
+    });
   }
 
   @NonNull
   public AndroidUtil provideAndroidUtil(@NonNull Context context) {
-    return getOrCreate(AndroidUtil.class, () -> new AndroidUtil(context));
+    return getOrCreate(AndroidUtil.class, new Factory<AndroidUtil>() {
+      @Override
+      public AndroidUtil create() {
+        return new AndroidUtil(context);
+      }
+    });
   }
 
   @NonNull
   public DeviceUtil provideDeviceUtil(@NonNull Context context) {
-    return getOrCreate(DeviceUtil.class, () -> new DeviceUtil(context, provideAdvertisingInfo()));
+    return getOrCreate(DeviceUtil.class, new Factory<DeviceUtil>() {
+      @Override
+      public DeviceUtil create() {
+        return new DeviceUtil(context, DependencyProvider.this.provideAdvertisingInfo());
+      }
+    });
   }
 
   @NonNull
   public LoggingUtil provideLoggingUtil() {
-    return getOrCreate(LoggingUtil.class, LoggingUtil::new);
+    return getOrCreate(LoggingUtil.class, new Factory<LoggingUtil>() {
+      @Override
+      public LoggingUtil create() {
+        return new LoggingUtil();
+      }
+    });
   }
 
   @NonNull
@@ -85,50 +110,80 @@ public class DependencyProvider {
 
   @NonNull
   public Config provideConfig(Context context) {
-    return getOrCreate(Config.class, () -> new Config(context));
+    return getOrCreate(Config.class, new Factory<Config>() {
+      @Override
+      public Config create() {
+        return new Config(context);
+      }
+    });
   }
 
   @NonNull
   public Clock provideClock() {
-    return getOrCreate(Clock.class, EpochClock::new);
+    return getOrCreate(Clock.class, new Factory<Clock>() {
+      @Override
+      public Clock create() {
+        return new EpochClock();
+      }
+    });
   }
 
   @NonNull
   public UserPrivacyUtil provideUserPrivacyUtil(@NonNull Context context) {
-    return getOrCreate(UserPrivacyUtil.class, () -> new UserPrivacyUtil(context));
+    return getOrCreate(UserPrivacyUtil.class, new Factory<UserPrivacyUtil>() {
+      @Override
+      public UserPrivacyUtil create() {
+        return new UserPrivacyUtil(context);
+      }
+    });
   }
 
   @NonNull
   public BidManager provideBidManager(
       @NonNull Context context,
       @NonNull String criteoPublisherId) {
-    return getOrCreate(BidManager.class, () -> new BidManager(
-        new Publisher(context, criteoPublisherId),
-        new TokenCache(),
-        provideDeviceInfo(),
-        new User(provideDeviceUtil(context)),
-        new SdkCache(provideDeviceUtil(context)),
-        new Hashtable<>(),
-        provideConfig(context),
-        provideDeviceUtil(context),
-        provideLoggingUtil(),
-        provideClock(),
-        provideUserPrivacyUtil(context),
-        provideAdUnitMapper(context),
-        providePubSdkApi(context)
-    ));
+    return getOrCreate(BidManager.class, new Factory<BidManager>() {
+      @Override
+      public BidManager create() {
+        return new BidManager(
+            new Publisher(context, criteoPublisherId),
+            new TokenCache(),
+            DependencyProvider.this.provideDeviceInfo(),
+            new User(DependencyProvider.this.provideDeviceUtil(context)),
+            new SdkCache(DependencyProvider.this.provideDeviceUtil(context)),
+            new Hashtable<>(),
+            DependencyProvider.this.provideConfig(context),
+            DependencyProvider.this.provideDeviceUtil(context),
+            DependencyProvider.this.provideLoggingUtil(),
+            DependencyProvider.this.provideClock(),
+            DependencyProvider.this.provideUserPrivacyUtil(context),
+            DependencyProvider.this.provideAdUnitMapper(context),
+            DependencyProvider.this.providePubSdkApi(context)
+        );
+      }
+    });
   }
 
   @NonNull
   public DeviceInfo provideDeviceInfo() {
-    return getOrCreate(DeviceInfo.class, DeviceInfo::new);
+    return getOrCreate(DeviceInfo.class, new Factory<DeviceInfo>() {
+      @Override
+      public DeviceInfo create() {
+        return new DeviceInfo();
+      }
+    });
   }
 
   @NonNull
   public AdUnitMapper provideAdUnitMapper(Context context) {
-    return getOrCreate(AdUnitMapper.class, () -> new AdUnitMapper(
-        provideAndroidUtil(context),
-        provideDeviceUtil(context)));
+    return getOrCreate(AdUnitMapper.class, new Factory<AdUnitMapper>() {
+      @Override
+      public AdUnitMapper create() {
+        return new AdUnitMapper(
+            DependencyProvider.this.provideAndroidUtil(context),
+            DependencyProvider.this.provideDeviceUtil(context));
+      }
+    });
   }
 
   @SuppressWarnings("unchecked")

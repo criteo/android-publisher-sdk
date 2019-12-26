@@ -28,9 +28,6 @@
     @retrofit2.http.* <methods>;
 }
 
-# Ignore warning related to lambda: https://stackoverflow.com/a/48629518
--dontwarn java.lang.invoke.**
-
 # Ignore annotation used for build tooling.
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 
