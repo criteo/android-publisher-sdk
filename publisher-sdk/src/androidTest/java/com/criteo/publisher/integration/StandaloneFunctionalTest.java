@@ -22,6 +22,7 @@ import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
@@ -36,7 +37,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-public class StandaloneTest {
+public class StandaloneFunctionalTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
@@ -135,8 +136,8 @@ public class StandaloneTest {
     when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_LANDSCAPE);
   }
 
-  private void givenInitializedSdk() throws Exception {
-    givenInitializedCriteo();
+  private void givenInitializedSdk(AdUnit... preloadedAdUnits) throws Exception {
+    givenInitializedCriteo(preloadedAdUnits);
     waitForBids();
   }
 
