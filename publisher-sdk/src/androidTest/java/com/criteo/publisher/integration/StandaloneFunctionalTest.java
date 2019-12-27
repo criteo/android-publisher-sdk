@@ -4,6 +4,7 @@ import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.StubConstants.STUB_DISPLAY_URL;
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -18,6 +19,7 @@ import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.test.InstrumentationRegistry;
+import android.util.Log;
 import android.view.View;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
@@ -34,7 +36,11 @@ import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Before;
 import org.junit.Rule;
@@ -48,10 +54,14 @@ import org.mockito.MockitoAnnotations;
 
 public class StandaloneFunctionalTest {
 
+  private static final Charset CHARSET = StandardCharsets.UTF_8;
+
   @Rule
   public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
 
-  private final BannerAdUnit bannerAdUnit = TestAdUnits.BANNER_320_50;
+  private final BannerAdUnit validBannerAdUnit = TestAdUnits.BANNER_320_50;
+  private final BannerAdUnit invalidBannerAdUnit = TestAdUnits.BANNER_UNKNOWN;
+
   private final InterstitialAdUnit interstitialAdUnit = TestAdUnits.INTERSTITIAL;
 
   private PubSdkApi api;
@@ -82,15 +92,29 @@ public class StandaloneFunctionalTest {
 
   @Test
   public void whenLoadingABanner_GivenBidAvailable_DisplayUrlIsProperlyLoadedInBannerView() throws Exception {
-    givenInitializedSdk(bannerAdUnit);
+    givenInitializedSdk(validBannerAdUnit);
 
-    CriteoBannerView bannerView = whenLoadingABanner();
+    CriteoBannerView bannerView = whenLoadingABanner(validBannerAdUnit);
     String html = webViewLookup.lookForHtmlContent(bannerView).get();
 
     assertTrue(html.contains(STUB_DISPLAY_URL));
   }
 
-  private CriteoBannerView whenLoadingABanner() throws Exception {
+  @Test
+  public void whenLoadingABanner_GivenNoBidAvailable_NothingIsLoadedInBannerView() throws Exception {
+    givenInitializedSdk(invalidBannerAdUnit);
+
+    CriteoBannerView bannerView = whenLoadingABanner(invalidBannerAdUnit);
+
+    // Empty webview may not be totally empty. When tested, it contains "ul" inside.
+    // So instead of testing that HTML is empty, we could test that no resources in fetched.
+    String html = webViewLookup.lookForHtmlContent(bannerView).get();
+    List<String> loadedResources = webViewLookup.lookForLoadedResources(html, CHARSET).get();
+
+    assertTrue(loadedResources.isEmpty());
+  }
+
+  private CriteoBannerView whenLoadingABanner(BannerAdUnit bannerAdUnit) throws Exception {
     AtomicReference<CriteoBannerView> bannerViewRef = new AtomicReference<>();
     AtomicReference<CriteoSync> syncRef = new AtomicReference<>();
 
