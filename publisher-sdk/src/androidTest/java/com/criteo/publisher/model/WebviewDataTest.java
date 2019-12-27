@@ -3,9 +3,8 @@ package com.criteo.publisher.model;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 
-import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.text.TextUtils;
 import com.criteo.publisher.DependencyProvider;
@@ -30,7 +29,7 @@ public class WebviewDataTest {
         MockitoAnnotations.initMocks(this);
         DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
         config = new Config(InstrumentationRegistry.getContext());
-        when(dependencyProvider.provideConfig(any(Context.class))).thenReturn(config);
+        doReturn(config).when(dependencyProvider).provideConfig(any());
         webviewData = new WebViewData(config);
     }
 

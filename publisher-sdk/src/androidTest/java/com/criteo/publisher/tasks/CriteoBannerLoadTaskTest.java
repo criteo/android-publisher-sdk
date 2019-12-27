@@ -1,16 +1,15 @@
 package com.criteo.publisher.tasks;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.test.InstrumentationRegistry;
 import android.webkit.WebSettings;
 import android.webkit.WebViewClient;
-
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
@@ -26,7 +25,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class CriteoBannerLoadTaskTest {
@@ -54,7 +52,7 @@ public class CriteoBannerLoadTaskTest {
         when(criteoBannerView.getSettings()).thenReturn(new TestWebSettings());
         config = new Config(InstrumentationRegistry.getContext());
         DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-        when(dependencyProvider.provideConfig(any(Context.class))).thenReturn(config);
+        doReturn(config).when(dependencyProvider).provideConfig(any());
     }
 
 
