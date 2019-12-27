@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -29,6 +30,7 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Cdb;
+import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
@@ -99,7 +101,7 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void prefetch_GivenAdUnits_ShouldCallCdbAndPopulateCacheWithResult() throws Exception {
+  public void prefetch_GivenAdUnits_ShouldCallCdbAndPopulateCache() throws Exception {
     List<AdUnit> prefetchAdUnits = Arrays.asList(
         mock(AdUnit.class),
         mock(AdUnit.class),
@@ -496,6 +498,19 @@ public class BidManagerFunctionalTest {
     verify(cache, never()).add(slot);
   }
 
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenKillSwitchIsEnabledAndNoSilentMode_ShouldNotCallCdbAndNotPopulateCache() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    givenKillSwitchIs(true);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    waitForIdleState();
+
+    assertShouldNotCallCdbAndNotPopulateCache();
+  }
+
   private void assertShouldCallCdbAndPopulateCacheOnlyOnce(List<CacheAdUnit> requestedAdUnits, Slot slot) {
     verify(cache).add(slot);
     verify(api).loadCdb(argThat(cdb -> {
@@ -575,6 +590,12 @@ public class BidManagerFunctionalTest {
   @NonNull
   private CacheAdUnit sampleAdUnit() {
     return new CacheAdUnit(new AdSize(1, 1), "adUnit" + adUnitId++, CRITEO_BANNER);
+  }
+
+  private void givenKillSwitchIs(boolean isEnabled) {
+    Config config = mock(Config.class);
+    when(config.isKillSwitchEnabled()).thenReturn(isEnabled);
+    doReturn(config).when(dependencyProvider).provideConfig(any());
   }
 
   @NonNull
