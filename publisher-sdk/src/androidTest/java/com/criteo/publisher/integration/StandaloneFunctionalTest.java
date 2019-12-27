@@ -1,6 +1,7 @@
 package com.criteo.publisher.integration;
 
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
+import static com.criteo.publisher.StubConstants.STUB_DISPLAY_URL;
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
 import static org.junit.Assert.assertTrue;
@@ -14,7 +15,12 @@ import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.test.InstrumentationRegistry;
+import android.view.View;
+import com.criteo.publisher.CriteoBannerAdListener;
+import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdListener;
@@ -22,10 +28,13 @@ import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.Util.WebViewLookup;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.Cdb;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Before;
 import org.junit.Rule;
@@ -42,6 +51,7 @@ public class StandaloneFunctionalTest {
   @Rule
   public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
 
+  private final BannerAdUnit bannerAdUnit = TestAdUnits.BANNER_320_50;
   private final InterstitialAdUnit interstitialAdUnit = TestAdUnits.INTERSTITIAL;
 
   private PubSdkApi api;
@@ -54,6 +64,8 @@ public class StandaloneFunctionalTest {
   @Captor
   private ArgumentCaptor<Cdb> requestCaptor;
 
+  private WebViewLookup webViewLookup;
+
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
@@ -64,6 +76,34 @@ public class StandaloneFunctionalTest {
     api = spy(dependencyProvider.providePubSdkApi(context));
     when(dependencyProvider.providePubSdkApi(any())).thenReturn(api);
     when(dependencyProvider.provideAndroidUtil(any())).thenReturn(androidUtil);
+
+    webViewLookup = new WebViewLookup();
+  }
+
+  @Test
+  public void whenLoadingABanner_GivenBidAvailable_DisplayUrlIsProperlyLoadedInBannerView() throws Exception {
+    givenInitializedSdk(bannerAdUnit);
+
+    CriteoBannerView bannerView = whenLoadingABanner();
+    String html = webViewLookup.lookForHtmlContent(bannerView).get();
+
+    assertTrue(html.contains(STUB_DISPLAY_URL));
+  }
+
+  private CriteoBannerView whenLoadingABanner() throws Exception {
+    AtomicReference<CriteoBannerView> bannerViewRef = new AtomicReference<>();
+    AtomicReference<CriteoSync> syncRef = new AtomicReference<>();
+
+    runOnMainThreadAndWait(() -> {
+      CriteoBannerView bannerView = new CriteoBannerView(context, bannerAdUnit);
+      syncRef.set(new CriteoSync(bannerView));
+      bannerViewRef.set(bannerView);
+
+      bannerView.loadAd();
+    });
+
+    syncRef.get().waitForBid();
+    return bannerViewRef.get();
   }
 
   @Test
@@ -143,6 +183,62 @@ public class StandaloneFunctionalTest {
 
   private void waitForBids() {
     waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+  }
+
+  private static final class CriteoSync {
+
+    private final CountDownLatch isLoaded;
+    private final Handler handler;
+
+    CriteoSync(CriteoBannerView bannerView) {
+      this.isLoaded = new CountDownLatch(1);
+      this.handler = new Handler(Looper.getMainLooper());
+      bannerView.setCriteoBannerAdListener(new SyncAdListener());
+    }
+
+    void waitForBid() throws InterruptedException {
+      isLoaded.await();
+    }
+
+    private void onLoaded() {
+      // Criteo does not seem to totally be ready at this point.
+      // It seems to be ready few times after the end of this method.
+      // This may be caused by the webview that should load the creative.
+      // So we should still wait a little in a non-deterministic way, but not in this method.
+      handler.postDelayed(isLoaded::countDown, 1000);
+    }
+
+    private void onFailed() {
+      isLoaded.countDown();
+    }
+
+    private class SyncAdListener implements CriteoBannerAdListener {
+      @Override
+      public void onAdReceived(View view) {
+        onLoaded();
+      }
+
+      @Override
+      public void onAdFailedToReceive(CriteoErrorCode code) {
+        onFailed();
+      }
+
+      @Override
+      public void onAdLeftApplication() {
+      }
+
+      @Override
+      public void onAdClicked() {
+      }
+
+      @Override
+      public void onAdOpened() {
+      }
+
+      @Override
+      public void onAdClosed() {
+      }
+    }
   }
 
 }
