@@ -4,7 +4,6 @@ import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.StubConstants.STUB_DISPLAY_URL;
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -20,7 +19,6 @@ import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.test.InstrumentationRegistry;
-import android.util.Log;
 import android.view.View;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
@@ -41,7 +39,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Before;
 import org.junit.Rule;
@@ -142,6 +139,20 @@ public class StandaloneFunctionalTest {
     waitForBids();
 
     verify(listener).onAdReceived(bannerView);
+    verifyNoMoreInteractions(listener);
+  }
+
+  @Test
+  public void whenLoadingABanner_GivenListenerAndNoBidAvailable_OnAdFailedToReceivedIsCalledWithNoFill() throws Exception {
+    givenInitializedSdk(invalidBannerAdUnit);
+
+    CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
+    CriteoBannerView bannerView = createBanner(invalidBannerAdUnit, listener);
+
+    runOnMainThreadAndWait(bannerView::loadAd);
+    waitForBids();
+
+    verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
     verifyNoMoreInteractions(listener);
   }
 
