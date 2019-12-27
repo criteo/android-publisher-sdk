@@ -12,6 +12,7 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
@@ -127,6 +128,31 @@ public class StandaloneFunctionalTest {
     });
 
     syncRef.get().waitForBid();
+    return bannerViewRef.get();
+  }
+
+  @Test
+  public void whenLoadingABanner_GivenListenerAndBidAvailable_OnAdReceivedIsCalled() throws Exception {
+    givenInitializedSdk(validBannerAdUnit);
+
+    CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
+    CriteoBannerView bannerView = createBanner(validBannerAdUnit, listener);
+
+    runOnMainThreadAndWait(bannerView::loadAd);
+    waitForBids();
+
+    verify(listener).onAdReceived(bannerView);
+    verifyNoMoreInteractions(listener);
+  }
+
+  private CriteoBannerView createBanner(BannerAdUnit bannerAdUnit, CriteoBannerAdListener listener) {
+    AtomicReference<CriteoBannerView> bannerViewRef = new AtomicReference<>();
+
+    runOnMainThreadAndWait(() -> {
+      bannerViewRef.set(new CriteoBannerView(context, bannerAdUnit));
+      bannerViewRef.get().setCriteoBannerAdListener(listener);
+    });
+
     return bannerViewRef.get();
   }
 
