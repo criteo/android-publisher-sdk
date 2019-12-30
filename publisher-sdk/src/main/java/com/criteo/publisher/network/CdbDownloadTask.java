@@ -143,7 +143,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     cdbRequest.setRequestedAdUnits(cacheAdUnits);
     cdbRequest.setUser(user);
     cdbRequest.setPublisher(publisher);
-    cdbRequest.setSdkVersion(BuildConfig.VERSION_NAME);
+    cdbRequest.setSdkVersion(user.getSdkVer());
     cdbRequest.setProfileId(profile);
     JSONObject gdpr = userPrivacyUtil.gdpr();
     if (gdpr != null) {

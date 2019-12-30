@@ -8,6 +8,7 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
@@ -22,6 +23,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
@@ -39,6 +41,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
+import java.util.function.Consumer;
+import org.json.JSONObject;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
@@ -156,6 +160,52 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     assertShouldNotCallCdbAndNotPopulateCache();
+  }
+
+  @Test
+  public void prefetch_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo() throws Exception {
+    callingCdb_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo(adUnit -> {
+      BidManager bidManager = createBidManager();
+      bidManager.prefetch(singletonList(adUnit));
+    });
+  }
+
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo() throws Exception {
+    callingCdb_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo(adUnit -> {
+      BidManager bidManager = createBidManager();
+      bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    });
+  }
+
+  private void callingCdb_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo(Consumer<AdUnit> callingCdb) {
+    DeviceInfo deviceInfo = mock(DeviceInfo.class);
+    when(deviceInfo.getUserAgent()).thenReturn("expectedUserAgent");
+    doReturn(deviceInfo).when(dependencyProvider).provideDeviceInfo();
+
+    when(user.getSdkVer()).thenReturn("1.2.3");
+
+    JSONObject expectedGdpr = mock(JSONObject.class);
+    UserPrivacyUtil userPrivacyUtil = mock(UserPrivacyUtil.class);
+    when(userPrivacyUtil.gdpr()).thenReturn(expectedGdpr);
+    doReturn(userPrivacyUtil).when(dependencyProvider).provideUserPrivacyUtil(any());
+
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+
+    callingCdb.accept(adUnit);
+    waitForIdleState();
+
+    verify(api).loadCdb(argThat(cdb -> {
+      assertEquals(publisher, cdb.getPublisher());
+      assertEquals(user, cdb.getUser());
+      assertEquals(singletonList(cacheAdUnit), cdb.getRequestedAdUnits());
+      assertEquals("1.2.3", cdb.getSdkVersion());
+      assertEquals(235, cdb.getProfileId());
+      assertEquals(expectedGdpr, cdb.getGdprConsent());
+
+      return true;
+    }), eq("expectedUserAgent"));
   }
 
   @Test
@@ -686,6 +736,8 @@ public class BidManagerFunctionalTest {
 
     AdUnitMapper adUnitMapper = givenMockedAdUnitMapper();
     when(adUnitMapper.convertValidAdUnit(fromAdUnit)).thenReturn(toAdUnit);
+    when(adUnitMapper.convertValidAdUnits(singletonList(fromAdUnit)))
+        .thenReturn(singletonList(toAdUnit));
 
     return fromAdUnit;
   }
@@ -700,7 +752,7 @@ public class BidManagerFunctionalTest {
     return new BidManager(
         publisher,
         tokenCache,
-        new DeviceInfo(),
+        dependencyProvider.provideDeviceInfo(),
         user,
         cache,
         new Hashtable<>(),

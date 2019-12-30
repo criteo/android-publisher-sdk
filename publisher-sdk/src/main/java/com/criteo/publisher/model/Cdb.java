@@ -67,6 +67,10 @@ public class Cdb implements Parcelable {
         this.gdprConsent = gdprConsent;
     }
 
+    public JSONObject getGdprConsent() {
+        return gdprConsent;
+    }
+
     @NonNull
     public List<Slot> getSlots() {
         return slots;
@@ -101,8 +105,16 @@ public class Cdb implements Parcelable {
         this.sdkVersion = sdkVersion;
     }
 
+    public  String getSdkVersion() {
+        return sdkVersion;
+    }
+
     public void setProfileId(int profileId) {
         this.profileId = profileId;
+    }
+
+    public int getProfileId() {
+        return profileId;
     }
 
     public int getTimeToNextCall() {

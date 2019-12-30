@@ -95,7 +95,7 @@ public class CriteoFunctionalTest {
 
     verify(api).loadCdb(any(), any());
     verify(api).loadConfig(any(), any(), any());
-    verify(api).postAppEvent(anyInt(), any(), any(), any(), anyInt());
+    verify(api).postAppEvent(anyInt(), any(), any(), any(), anyInt(), any());
   }
 
   private void waitForBids() {

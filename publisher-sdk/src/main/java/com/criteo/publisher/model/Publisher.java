@@ -11,8 +11,9 @@ public class Publisher implements Parcelable {
 
     private static final String BUNDLE_ID = "bundleId";
     private static final String CRITEO_PUBLISHER_ID = "cpId";
-    private String bundleId;
-    private String criteoPublisherId;
+
+    private final String bundleId;
+    private final String criteoPublisherId;
 
     public Publisher(Context context, String criteoPublisherId) {
         this.bundleId = context.getPackageName();
@@ -23,16 +24,8 @@ public class Publisher implements Parcelable {
         return bundleId;
     }
 
-    public void setBundleId(String bundleId) {
-        this.bundleId = bundleId;
-    }
-
     public String getCriteoPublisherId() {
         return criteoPublisherId;
-    }
-
-    public void setCriteoPublisherId(String criteoPublisherId) {
-        this.criteoPublisherId = criteoPublisherId;
     }
 
     public JSONObject toJson() throws JSONException {
