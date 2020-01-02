@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.WebView;
@@ -67,7 +68,8 @@ public class DeviceInfo {
         return userAgent != null ? userAgent : "";
     }
 
-    private static String resolveUserAgent(Context context) {
+    @VisibleForTesting
+    public String resolveUserAgent(Context context) {
         String userAgent = null;
 
         // Try to fetch the UA from a web view

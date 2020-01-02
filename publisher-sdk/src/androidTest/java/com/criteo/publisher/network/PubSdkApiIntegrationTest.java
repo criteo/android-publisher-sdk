@@ -14,7 +14,7 @@ import org.junit.runner.RunWith;
 
 
 @RunWith(AndroidJUnit4.class)
-public class PubSdkApiTest {
+public class PubSdkApiIntegrationTest {
 
     @Rule
     public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
@@ -43,7 +43,7 @@ public class PubSdkApiTest {
     @Test
     public void testPostAppEventWithNullGaid() {
         JSONObject object = api
-            .postAppEvent(senderId, appId, gaid, eventType, limitedAdTracking);
+            .postAppEvent(senderId, appId, gaid, eventType, limitedAdTracking, "");
         assertNotNull(object);
     }
 
@@ -51,7 +51,7 @@ public class PubSdkApiTest {
     public void testPostAppEventWithGaid() {
         gaid = null;
         JSONObject object = api
-            .postAppEvent(senderId, appId, gaid, eventType, limitedAdTracking);
+            .postAppEvent(senderId, appId, gaid, eventType, limitedAdTracking, "");
         assertNotNull(object);
     }
 }

@@ -1,10 +1,9 @@
 package com.criteo.publisher.controller;
 
-import android.os.AsyncTask;
 import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.DependencyProvider;
-import com.criteo.publisher.tasks.WebViewDataTask;
 import com.criteo.publisher.model.WebViewData;
+import com.criteo.publisher.tasks.WebViewDataTask;
 import java.util.concurrent.Executor;
 
 public class WebViewDownloader {

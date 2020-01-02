@@ -2,9 +2,12 @@ package com.criteo.publisher.network;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import com.criteo.publisher.Util.AppEventResponseListener;
 import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.model.DeviceInfo;
 import org.json.JSONObject;
 
 public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
@@ -12,21 +15,34 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
     private static final String TAG = "Criteo.AET";
     private static final int SENDER_ID = 2379;
     protected static final String THROTTLE = "throttleSec";
+
+    @NonNull
     private final Context mContext;
+
+    @NonNull
     private final AppEventResponseListener responseListener;
+
+    @NonNull
     private final DeviceUtil deviceUtil;
+
+    @NonNull
     private final PubSdkApi api;
 
+    @NonNull
+    private final DeviceInfo deviceInfo;
+
     public AppEventTask(
-        Context context,
-        AppEventResponseListener responseListener,
-        DeviceUtil deviceUtil,
-        PubSdkApi api
+        @NonNull Context context,
+        @NonNull AppEventResponseListener responseListener,
+        @NonNull DeviceUtil deviceUtil,
+        @NonNull PubSdkApi api,
+        @NonNull DeviceInfo deviceInfo
     ) {
         this.mContext = context;
         this.responseListener = responseListener;
         this.deviceUtil = deviceUtil;
         this.api = api;
+        this.deviceInfo = deviceInfo;
     }
 
     @Override
@@ -48,7 +64,7 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
         String gaid = deviceUtil.getAdvertisingId();
         String appId = mContext.getApplicationContext().getPackageName();
 
-        JSONObject response = api.postAppEvent(SENDER_ID, appId, gaid, eventType, limitedAdTracking);
+        JSONObject response = api.postAppEvent(SENDER_ID, appId, gaid, eventType, limitedAdTracking, deviceInfo.getUserAgent());
         if (response != null) {
             Log.d(TAG, response.toString());
         }
@@ -56,7 +72,7 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
     }
 
     @Override
-    protected void onPostExecute(JSONObject result) {
+    protected void onPostExecute(@Nullable JSONObject result) {
         try {
             doOnPostExecute(result);
         } catch (Throwable tr) {
@@ -64,14 +80,13 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
         }
     }
 
-    private void doOnPostExecute(JSONObject result) {
+    private void doOnPostExecute(@Nullable JSONObject result) {
         super.onPostExecute(result);
-        if (responseListener != null) {
-            if (result != null && result.has(THROTTLE)) {
-                responseListener.setThrottle(result.optInt(THROTTLE, 0));
-            } else {
-                responseListener.setThrottle(0);
-            }
+
+        if (result != null && result.has(THROTTLE)) {
+            responseListener.setThrottle(result.optInt(THROTTLE, 0));
+        } else {
+            responseListener.setThrottle(0);
         }
     }
 }

@@ -98,9 +98,9 @@ public class BearcatCcpaFunctionalTest {
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     if (callBearcat) {
-      verify(pubSdkApi).postAppEvent(any(Integer.class), any(String.class), any(String.class), any(String.class), any(Integer.class));
+      verify(pubSdkApi).postAppEvent(any(Integer.class), any(String.class), any(String.class), any(String.class), any(Integer.class), any());
     } else {
-      verify(pubSdkApi, never()).postAppEvent(any(Integer.class), any(String.class), any(String.class), any(String.class), any(Integer.class));
+      verify(pubSdkApi, never()).postAppEvent(any(Integer.class), any(String.class), any(String.class), any(String.class), any(Integer.class), any());
     }
   }
 

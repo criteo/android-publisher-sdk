@@ -1,6 +1,7 @@
 package com.criteo.publisher.network;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
@@ -48,7 +49,7 @@ public class PubSdkApi {
         try {
             URL url = new URL(
                     context.getString(R.string.config_url) + "/v2.0/api/config" + "?" + getParamsString(parameters));
-            configResult = executeGet(url);
+            configResult = executeGet(url, null);
         } catch (IOException | JSONException e) {
             Log.d(TAG, "Unable to process request to remote config TLA:" + e.getMessage());
             e.printStackTrace();
@@ -71,9 +72,14 @@ public class PubSdkApi {
         return cdbResult;
     }
 
-    public JSONObject postAppEvent(int senderId,
-        String appId, String gaid, String eventType,
-        int limitedAdTracking) {
+    @Nullable
+    public JSONObject postAppEvent(
+        int senderId,
+        @NonNull String appId,
+        @Nullable String gaid,
+        @NonNull String eventType,
+        int limitedAdTracking,
+        @NonNull String userAgent) {
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put(APP_ID, appId);
@@ -89,8 +95,7 @@ public class PubSdkApi {
             URL url = new URL(
                     context.getString(R.string.event_url) + "/appevent/v1/" + senderId + "?" + getParamsString(
                             parameters));
-            JSONObject result = executeGet(url);
-            return result;
+            return executeGet(url, userAgent);
         } catch (IOException | JSONException e) {
             Log.d(TAG, "Unable to process request to post app event:" + e.getMessage());
             e.printStackTrace();
@@ -129,12 +134,15 @@ public class PubSdkApi {
         return result;
     }
 
-    private static JSONObject executeGet(URL url) throws IOException, JSONException {
+    private static JSONObject executeGet(URL url, @Nullable String userAgent) throws IOException, JSONException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestMethod("GET");
-        urlConnection.setRequestProperty("Content-Type", "text/plain");
         urlConnection.setReadTimeout(TIMEOUT_IN_MILLIS);
         urlConnection.setConnectTimeout(TIMEOUT_IN_MILLIS);
+        urlConnection.setRequestProperty("Content-Type", "text/plain");
+        if (!TextUtils.isEmpty(userAgent)) {
+            urlConnection.setRequestProperty("User-Agent", userAgent);
+        }
         JSONObject result = new JSONObject();
         if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
             String response = StreamUtil.readStream(urlConnection.getInputStream());

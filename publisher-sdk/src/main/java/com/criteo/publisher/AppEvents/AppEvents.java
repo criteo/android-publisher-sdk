@@ -9,6 +9,7 @@ import com.criteo.publisher.Util.AppEventResponseListener;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.UserPrivacyUtil;
+import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.network.AppEventTask;
 import com.criteo.publisher.network.PubSdkApi;
 import java.util.concurrent.Executor;
@@ -29,19 +30,24 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
     private final PubSdkApi api;
     private final UserPrivacyUtil userPrivacyUtil;
 
+    @NonNull
+    private final DeviceInfo deviceInfo;
+
     public AppEvents(
         @NonNull Context context,
         @NonNull DeviceUtil deviceUtil,
         @NonNull Clock clock,
         @NonNull PubSdkApi api,
-        @NonNull UserPrivacyUtil userPrivacyUtil
+        @NonNull UserPrivacyUtil userPrivacyUtil,
+        @NonNull DeviceInfo deviceInfo
     ) {
         this.mContext = context;
         this.deviceUtil = deviceUtil;
         this.clock = clock;
         this.api = api;
-        this.eventTask = new AppEventTask(mContext, this, deviceUtil, api);
         this.userPrivacyUtil = userPrivacyUtil;
+        this.deviceInfo = deviceInfo;
+        this.eventTask = createEventTask();
     }
 
     private void postAppEvent(String eventType) {
@@ -51,13 +57,18 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
                 return;
             }
             if (eventTask.getStatus() == AsyncTask.Status.FINISHED) {
-                eventTask = new AppEventTask(mContext, this, deviceUtil, api);
+                eventTask = createEventTask();
             }
             if (eventTask.getStatus() != AsyncTask.Status.RUNNING) {
                 Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
                 eventTask.executeOnExecutor(threadPoolExecutor, eventType);
             }
         }
+    }
+
+    @NonNull
+    private AppEventTask createEventTask() {
+        return new AppEventTask(mContext, this, deviceUtil, api, deviceInfo);
     }
 
     @Override

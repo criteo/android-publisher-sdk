@@ -1,18 +1,14 @@
 package com.criteo.publisher;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.Util.AdUnitType;
-import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.DeviceUtil;
-
 import com.criteo.publisher.Util.UserAgentCallback;
 import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.model.AdUnit;
@@ -20,7 +16,6 @@ import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
-import com.criteo.publisher.network.PubSdkApi;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,14 +63,13 @@ final class CriteoInternal extends Criteo {
       userPrivacyUtil.storeUsPrivacyOptout(usPrivacyOptout.booleanValue());
     }
 
-    PubSdkApi api = dependencyProvider.providePubSdkApi(context);
-
     this.appEvents = new AppEvents(
         context,
         deviceUtil,
         dependencyProvider.provideClock(),
-        api,
-        dependencyProvider.provideUserPrivacyUtil(context)
+        dependencyProvider.providePubSdkApi(context),
+        dependencyProvider.provideUserPrivacyUtil(context),
+        dependencyProvider.provideDeviceInfo()
     );
 
     this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);

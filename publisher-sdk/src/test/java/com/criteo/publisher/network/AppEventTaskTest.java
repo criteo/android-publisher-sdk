@@ -5,6 +5,7 @@ import static com.criteo.publisher.network.AppEventTask.THROTTLE;
 import android.content.Context;
 import com.criteo.publisher.Util.AppEventResponseListener;
 import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.model.DeviceInfo;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -31,10 +32,13 @@ public class AppEventTaskTest {
     @Mock
     private PubSdkApi api;
 
+    @Mock
+    private DeviceInfo deviceInfo;
+
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        appEventTask = new AppEventTask(context, responseListener, deviceUtil, api);
+        appEventTask = new AppEventTask(context, responseListener, deviceUtil, api, deviceInfo);
         json = new JSONObject();
     }
 
