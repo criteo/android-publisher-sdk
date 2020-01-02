@@ -23,7 +23,7 @@ import com.criteo.publisher.Util.WebViewLookup;
 import com.criteo.publisher.mock.ResultCaptor;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
-import com.criteo.publisher.model.Cdb;
+import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.NativeAssets;
@@ -384,7 +384,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
   @Test
   public void loadingDfpBanner_GivenDemoBanner_DfpViewContainsDisplayUrl() throws Exception {
-    ResultCaptor<Cdb> cdbResultCaptor = mockedDependenciesRule.captorCdbResult(context);
+    ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult(context);
 
     String html = loadDfpHtmlBanner(demoBannerAdUnit);
 
@@ -394,14 +394,14 @@ public class DfpHeaderBiddingFunctionalTest {
 
   @Test
   public void loadingDfpBanner_GivenDemoInterstitial_DfpViewContainsDisplayUrl() throws Exception {
-    ResultCaptor<Cdb> cdbResultCaptor = mockedDependenciesRule.captorCdbResult(context);
+    ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult(context);
 
     String html = loadDfpHtmlInterstitial(demoInterstitialAdUnit);
 
     assertDfpViewContainsDisplayUrl(cdbResultCaptor, html);
   }
 
-  private void assertDfpViewContainsDisplayUrl(ResultCaptor<Cdb> cdbResultCaptor, String html) {
+  private void assertDfpViewContainsDisplayUrl(ResultCaptor<CdbResponse> cdbResultCaptor, String html) {
     // The DFP webview replace the & by &amp; in attribute values.
     // So we need to replace them back in order to compare its content to our display URL.
     // This is valid HTML. See https://www.w3.org/TR/xhtml1/guidelines.html#C_12

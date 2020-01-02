@@ -20,7 +20,7 @@ import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
-import com.criteo.publisher.model.Cdb;
+import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
@@ -69,7 +69,7 @@ public class CriteoFunctionalTest {
 
     doAnswer(invocation -> {
       Object response = invocation.callRealMethod();
-      Cdb cdbResponse = (Cdb) response;
+      CdbResponse cdbResponse = (CdbResponse) response;
       cdbResponse.getSlots().forEach(slot -> {
         slot.setTtl(dayTtl);
       });

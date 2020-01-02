@@ -13,7 +13,7 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Util.MockedDependenciesRule;
-import com.criteo.publisher.model.Cdb;
+import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.network.PubSdkApi;
 import org.junit.After;
 import org.junit.Assert;
@@ -56,10 +56,10 @@ public class USPrivacyFunctionalTest {
     CriteoUtil.givenInitializedCriteo(TestAdUnits.BANNER_320_50);
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
-    ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
-    Cdb cdb = cdbArgumentCaptor.getValue();
+    CdbRequest cdb = cdbArgumentCaptor.getValue();
     assertEquals("fake_iab_usp", cdb.getUser().getUspIab());
   }
 
@@ -70,10 +70,10 @@ public class USPrivacyFunctionalTest {
     CriteoUtil.givenInitializedCriteo(TestAdUnits.BANNER_320_50);
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
-    ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
-    Cdb cdb = cdbArgumentCaptor.getValue();
+    CdbRequest cdb = cdbArgumentCaptor.getValue();
     Assert.assertNull( cdb.getUser().getUspIab());
   }
 
@@ -84,10 +84,10 @@ public class USPrivacyFunctionalTest {
 
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
-    ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
-    Cdb cdb = cdbArgumentCaptor.getValue();
+    CdbRequest cdb = cdbArgumentCaptor.getValue();
     assertEquals("true", cdb.getUser().getUspOptout());
   }
 
@@ -98,10 +98,10 @@ public class USPrivacyFunctionalTest {
 
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
-    ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
-    Cdb cdb = cdbArgumentCaptor.getValue();
+    CdbRequest cdb = cdbArgumentCaptor.getValue();
     assertNull(cdb.getUser().getUspOptout());
   }
 
@@ -113,10 +113,10 @@ public class USPrivacyFunctionalTest {
 
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
-    ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
-    Cdb cdb = cdbArgumentCaptor.getValue();
+    CdbRequest cdb = cdbArgumentCaptor.getValue();
     assertEquals("false", cdb.getUser().getUspOptout());
   }
 
@@ -132,10 +132,10 @@ public class USPrivacyFunctionalTest {
 
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
-    ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi, times(2)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
-    Cdb cdb = cdbArgumentCaptor.getValue();
+    CdbRequest cdb = cdbArgumentCaptor.getValue();
     assertEquals("false", cdb.getUser().getUspOptout());
   }
 

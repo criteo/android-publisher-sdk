@@ -9,7 +9,7 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CdbTest {
+public class CdbResponseTest {
     private static final String SLOTS = "slots";
     private static final String TIME_TO_NEXT_CALL = "timeToNextCall";
     private static final String PLACEMENT_ID = "placementId";
@@ -40,47 +40,47 @@ public class CdbTest {
 
     @Test
     public void testValidTimeToCallInCdbResponse() throws JSONException {
-        cdbResponse.put(TIME_TO_NEXT_CALL, 300);
-        Cdb cdb = new Cdb(cdbResponse);
-        assertEquals(300, cdb.getTimeToNextCall());
+        this.cdbResponse.put(TIME_TO_NEXT_CALL, 300);
+        CdbResponse cdbResponse = new CdbResponse(this.cdbResponse);
+        assertEquals(300, cdbResponse.getTimeToNextCall());
     }
 
     @Test
     public void testInValidTimeToCallInCdbResponse() throws JSONException {
-        cdbResponse.put(TIME_TO_NEXT_CALL, "xyz");
-        Cdb cdb = new Cdb(cdbResponse);
-        assertEquals(0, cdb.getTimeToNextCall());
+        this.cdbResponse.put(TIME_TO_NEXT_CALL, "xyz");
+        CdbResponse cdbResponse = new CdbResponse(this.cdbResponse);
+        assertEquals(0, cdbResponse.getTimeToNextCall());
     }
 
     @Test
     public void testValidSlotInCdbResponse() throws JSONException {
-        Cdb cdb = new Cdb(cdbResponse);
-        assertEquals(bid.getString(PLACEMENT_ID), cdb.getSlots().get(0).getPlacementId());
-        assertEquals(bid.getString(CPM), cdb.getSlots().get(0).getCpm());
-        assertEquals(bid.getString(CURRENCY), cdb.getSlots().get(0).getCurrency());
-        assertEquals(bid.getInt(WIDTH), cdb.getSlots().get(0).getWidth());
-        assertEquals(bid.getInt(HEIGHT), cdb.getSlots().get(0).getHeight());
-        assertEquals(bid.getInt(TTL), cdb.getSlots().get(0).getTtl());
-        assertEquals(bid.getString(DISPLAY_URL), cdb.getSlots().get(0).getDisplayUrl());
-        assertEquals(0, cdb.getTimeToNextCall());
+        CdbResponse cdbResponse = new CdbResponse(this.cdbResponse);
+        assertEquals(bid.getString(PLACEMENT_ID), cdbResponse.getSlots().get(0).getPlacementId());
+        assertEquals(bid.getString(CPM), cdbResponse.getSlots().get(0).getCpm());
+        assertEquals(bid.getString(CURRENCY), cdbResponse.getSlots().get(0).getCurrency());
+        assertEquals(bid.getInt(WIDTH), cdbResponse.getSlots().get(0).getWidth());
+        assertEquals(bid.getInt(HEIGHT), cdbResponse.getSlots().get(0).getHeight());
+        assertEquals(bid.getInt(TTL), cdbResponse.getSlots().get(0).getTtl());
+        assertEquals(bid.getString(DISPLAY_URL), cdbResponse.getSlots().get(0).getDisplayUrl());
+        assertEquals(0, cdbResponse.getTimeToNextCall());
     }
 
     @Test
     public void new_GivenUserLevelSilent_ContainsTimeToNextCallAndEmptySlot() throws Exception {
         String json = "{\"slots\":[],\"timeToNextCall\":30}";
-        Cdb cdb = new Cdb(new JSONObject(json));
+        CdbResponse cdbResponse = new CdbResponse(new JSONObject(json));
 
-        assertThat(cdb.getTimeToNextCall()).isEqualTo(30);
-        assertThat(cdb.getSlots()).isEmpty();
+        assertThat(cdbResponse.getTimeToNextCall()).isEqualTo(30);
+        assertThat(cdbResponse.getSlots()).isEmpty();
     }
 
     @Test
     public void new_GivenEmptyJson_ContainsNoSlotAndNoTimeToNextCall() throws Exception {
         String json = "{}";
-        Cdb cdb = new Cdb(new JSONObject(json));
+        CdbResponse cdbResponse = new CdbResponse(new JSONObject(json));
 
-        assertThat(cdb.getTimeToNextCall()).isEqualTo(0);
-        assertThat(cdb.getSlots()).isEmpty();
+        assertThat(cdbResponse.getTimeToNextCall()).isEqualTo(0);
+        assertThat(cdbResponse.getSlots()).isEmpty();
     }
 
 }

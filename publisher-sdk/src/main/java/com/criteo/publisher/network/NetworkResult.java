@@ -1,26 +1,26 @@
 package com.criteo.publisher.network;
 
 import android.support.annotation.Nullable;
-import com.criteo.publisher.model.Cdb;
+import com.criteo.publisher.model.CdbResponse;
 
 import org.json.JSONObject;
 
 public class NetworkResult {
 
     @Nullable
-    private Cdb cdb;
+    private CdbResponse cdbResponse;
 
     @Nullable
     private JSONObject config;
 
-    NetworkResult(@Nullable Cdb cdb, @Nullable JSONObject config) {
-        this.cdb = cdb;
+    NetworkResult(@Nullable CdbResponse cdbResponse, @Nullable JSONObject config) {
+        this.cdbResponse = cdbResponse;
         this.config = config;
     }
 
     @Nullable
-    public Cdb getCdb() {
-        return cdb;
+    public CdbResponse getCdbResponse() {
+        return cdbResponse;
     }
 
     @Nullable

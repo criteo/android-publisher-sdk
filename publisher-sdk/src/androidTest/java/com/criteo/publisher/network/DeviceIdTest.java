@@ -17,7 +17,7 @@ import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
-import com.criteo.publisher.model.Cdb;
+import com.criteo.publisher.model.CdbRequest;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
@@ -28,7 +28,7 @@ import org.mockito.MockitoAnnotations;
 
 /**
  * This test file is purposefully located within the <code>com.criteo.publisher.network</code>
- * package as it needs to access {@link #loadCdb(Cdb, String)} method.
+ * package as it needs to access {@link PubSdkApi#loadCdb(CdbRequest, String)} method.
  */
 public class DeviceIdTest {
   private static final String FAKE_DEVICE_ID = "FAKE_DEVICE_ID";
@@ -63,7 +63,7 @@ public class DeviceIdTest {
     CriteoUtil.givenInitializedCriteo();
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
-    ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
     assertEquals("", fetchDeviceIdSentInCdbRequest(cdbArgumentCaptor.getValue()));
@@ -77,7 +77,7 @@ public class DeviceIdTest {
     CriteoUtil.givenInitializedCriteo();
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
-    ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
     assertEquals(DEVICE_ID_LIMITED, fetchDeviceIdSentInCdbRequest(cdbArgumentCaptor.getValue()));
@@ -91,10 +91,10 @@ public class DeviceIdTest {
     CriteoUtil.givenInitializedCriteo();
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
-    ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
-    Cdb cdb = cdbArgumentCaptor.getValue();
+    CdbRequest cdb = cdbArgumentCaptor.getValue();
 
     assertEquals(FAKE_DEVICE_ID, fetchDeviceIdSentInCdbRequest(cdb));
   }
@@ -107,10 +107,10 @@ public class DeviceIdTest {
     CriteoUtil.givenInitializedCriteo();
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
-    ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
-    Cdb cdb = cdbArgumentCaptor.getValue();
+    CdbRequest cdb = cdbArgumentCaptor.getValue();
 
     assertEquals(DEVICE_ID_LIMITED, fetchDeviceIdSentInCdbRequest(cdb));
   }
@@ -130,7 +130,7 @@ public class DeviceIdTest {
 
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
-    ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
     verify(pubSdkApi, times(2)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
     assertEquals("", fetchDeviceIdSentInCdbRequest(cdbArgumentCaptor.getValue()));
@@ -151,7 +151,7 @@ public class DeviceIdTest {
 
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
-    ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
     verify(pubSdkApi, times(2)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
     assertEquals(FAKE_DEVICE_ID, fetchDeviceIdSentInCdbRequest(cdbArgumentCaptor.getValue()));
@@ -172,7 +172,7 @@ public class DeviceIdTest {
 
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
-    ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
     verify(pubSdkApi, times(2)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
     assertEquals(DEVICE_ID_LIMITED, fetchDeviceIdSentInCdbRequest(cdbArgumentCaptor.getValue()));
@@ -193,13 +193,13 @@ public class DeviceIdTest {
 
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
-    ArgumentCaptor<Cdb> cdbArgumentCaptor = ArgumentCaptor.forClass(Cdb.class);
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
     verify(pubSdkApi, times(2)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
     assertEquals(DEVICE_ID_LIMITED, fetchDeviceIdSentInCdbRequest(cdbArgumentCaptor.getValue()));
   }
 
-  private String fetchDeviceIdSentInCdbRequest(Cdb cdb) throws Exception {
+  private String fetchDeviceIdSentInCdbRequest(CdbRequest cdb) throws Exception {
     JSONObject cdbJSONObject = cdb.toJson();
     JSONObject userJSONObject = (JSONObject) cdbJSONObject.get("user");
     return (String) userJSONObject.get("deviceId");

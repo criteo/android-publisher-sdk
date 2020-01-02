@@ -6,12 +6,11 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.MockableDependencyProvider;
 import com.criteo.publisher.TrackingCommandsExecutor;
 import com.criteo.publisher.mock.ResultCaptor;
-import com.criteo.publisher.model.Cdb;
+import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.network.PubSdkApi;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
@@ -82,8 +81,8 @@ public class MockedDependenciesRule implements TestRule {
     return trackingCommandsExecutor;
   }
 
-  public ResultCaptor<Cdb> captorCdbResult(Context context) {
-    ResultCaptor<Cdb> captor = new ResultCaptor<>();
+  public ResultCaptor<CdbResponse> captorCdbResult(Context context) {
+    ResultCaptor<CdbResponse> captor = new ResultCaptor<>();
     PubSdkApi spyApi = spy(getDependencyProvider().providePubSdkApi(context));
     doReturn(spyApi).when(getDependencyProvider()).providePubSdkApi(any());
     doAnswer(captor).when(spyApi).loadCdb(any(), any());

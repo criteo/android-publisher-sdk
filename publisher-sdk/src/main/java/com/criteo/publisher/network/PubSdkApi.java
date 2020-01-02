@@ -7,7 +7,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.R;
 import com.criteo.publisher.Util.StreamUtil;
-import com.criteo.publisher.model.Cdb;
+import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.model.CdbRequest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -58,18 +59,18 @@ public class PubSdkApi {
     }
 
     @Nullable
-    public Cdb loadCdb(Cdb cdbRequest, String userAgent) {
-        Cdb cdbResult = null;
+    public CdbResponse loadCdb(CdbRequest cdbRequest, String userAgent) {
+        CdbResponse cdbResponse = null;
         try {
             URL url = new URL(context.getString(R.string.cdb_url) + "/inapp/v2");
             JSONObject cdbRequestJson = cdbRequest.toJson();
             JSONObject result = executePost(url, cdbRequestJson, userAgent);
-            cdbResult = new Cdb(result);
+            cdbResponse = new CdbResponse(result);
         } catch (IOException | JSONException e) {
             Log.d(TAG, "Unable to process request to Cdb:" + e.getMessage());
             e.printStackTrace();
         }
-        return cdbResult;
+        return cdbResponse;
     }
 
     @Nullable

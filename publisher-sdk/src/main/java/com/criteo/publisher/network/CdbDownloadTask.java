@@ -11,7 +11,8 @@ import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.model.CacheAdUnit;
-import com.criteo.publisher.model.Cdb;
+import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
@@ -84,8 +85,8 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     }
 
     JSONObject configResult = requestConfig(user, publisher);
-    Cdb cdbResult = requestCdb(profile, user, publisher);
-    return new NetworkResult(cdbResult, configResult);
+    CdbResponse cdbResponse = requestCdb(profile, user, publisher);
+    return new NetworkResult(cdbResponse, configResult);
   }
 
   @Nullable
@@ -112,20 +113,20 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
   }
 
   @Nullable
-  private Cdb requestCdb(int profile, User user, Publisher publisher) {
+  private CdbResponse requestCdb(int profile, User user, Publisher publisher) {
     if (!isCdbRequested) {
       return null;
     }
 
-    Cdb cdbRequest = buildCdbRequest(profile, user, publisher);
-    Cdb cdbResult = api.loadCdb(cdbRequest, userAgent);
+    CdbRequest cdbRequest = buildCdbRequest(profile, user, publisher);
+    CdbResponse cdbResult = api.loadCdb(cdbRequest, userAgent);
     logCdbResponse(cdbResult);
 
     return cdbResult;
   }
 
   @NonNull
-  private Cdb buildCdbRequest(int profile, User user, Publisher publisher) {
+  private CdbRequest buildCdbRequest(int profile, User user, Publisher publisher) {
     String advertisingId = deviceUtil.getAdvertisingId();
     if (!TextUtils.isEmpty(advertisingId)) {
       user.setDeviceId(advertisingId);
@@ -139,20 +140,13 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     String uspOptout = userPrivacyUtil.getUsPrivacyOptout();
         if (uspOptout != null && !uspOptout.isEmpty()) {
             user.setUspOptout(uspOptout);
-        }Cdb cdbRequest = new Cdb();
-    cdbRequest.setRequestedAdUnits(cacheAdUnits);
-    cdbRequest.setUser(user);
-    cdbRequest.setPublisher(publisher);
-    cdbRequest.setSdkVersion(user.getSdkVer());
-    cdbRequest.setProfileId(profile);
-    JSONObject gdpr = userPrivacyUtil.gdpr();
-    if (gdpr != null) {
-      cdbRequest.setGdprConsent(gdpr);
-    }
-    return cdbRequest;
-  }
+        }
 
-  private void logCdbResponse(Cdb response) {
+    return new CdbRequest(publisher, user, user.getSdkVer(), profile,
+        userPrivacyUtil.gdpr(), cacheAdUnits);
+    }
+
+  private void logCdbResponse(CdbResponse response) {
     if (loggingUtil.isLoggingEnabled() && response != null && response.getSlots().size() > 0) {
       StringBuilder builder = new StringBuilder();
       for (Slot slot : response.getSlots()) {
@@ -180,9 +174,9 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     }
 
     if (responseListener != null && networkResult != null) {
-      if (networkResult.getCdb() != null) {
-        responseListener.setCacheAdUnits(networkResult.getCdb().getSlots());
-        responseListener.setTimeToNextCall(networkResult.getCdb().getTimeToNextCall());
+      if (networkResult.getCdbResponse() != null) {
+        responseListener.setCacheAdUnits(networkResult.getCdbResponse().getSlots());
+        responseListener.setTimeToNextCall(networkResult.getCdbResponse().getTimeToNextCall());
       }
       if (networkResult.getConfig() != null) {
         responseListener.refreshConfig(networkResult.getConfig());

@@ -22,7 +22,7 @@ import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.Util.WebViewLookup;
 import com.criteo.publisher.mock.ResultCaptor;
 import com.criteo.publisher.model.BannerAdUnit;
-import com.criteo.publisher.model.Cdb;
+import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.mopub.common.MoPub;
@@ -181,7 +181,7 @@ public class MoPubHeaderBiddingFunctionalTest {
 
   @Test
   public void loadingMoPubBanner_GivenDemoBanner_MoPubViewUsesDemoDisplayUrl() throws Exception {
-    ResultCaptor<Cdb> cdbResultCaptor = mockedDependenciesRule.captorCdbResult(context);
+    ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult(context);
 
     String html = loadMoPubHtmlBanner(demoBannerAdUnit);
 
@@ -198,7 +198,7 @@ public class MoPubHeaderBiddingFunctionalTest {
 
   @Test
   public void loadingMoPubInterstitial_GivenDemoInterstitial_MoPubViewUsesDemoDisplayUrl() throws Exception {
-    ResultCaptor<Cdb> cdbResultCaptor = mockedDependenciesRule.captorCdbResult(context);
+    ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult(context);
 
     String html = loadMoPubHtmlInterstitial(demoInterstitialAdUnit);
 

@@ -32,7 +32,7 @@ import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.Util.WebViewLookup;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
-import com.criteo.publisher.model.Cdb;
+import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
 import java.nio.charset.Charset;
@@ -70,7 +70,7 @@ public class StandaloneFunctionalTest {
   private Context context;
 
   @Captor
-  private ArgumentCaptor<Cdb> requestCaptor;
+  private ArgumentCaptor<CdbRequest> requestCaptor;
 
   private WebViewLookup webViewLookup;
 
@@ -180,7 +180,7 @@ public class StandaloneFunctionalTest {
     waitForBids();
 
     verify(api).loadCdb(requestCaptor.capture(), anyString());
-    Cdb request = requestCaptor.getValue();
+    CdbRequest request = requestCaptor.getValue();
 
     boolean interstitialFlag = request.toJson()
         .getJSONArray("slots")

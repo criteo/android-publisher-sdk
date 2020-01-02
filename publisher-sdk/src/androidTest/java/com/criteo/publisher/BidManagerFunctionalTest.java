@@ -29,7 +29,7 @@ import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CacheAdUnit;
-import com.criteo.publisher.model.Cdb;
+import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
@@ -199,7 +199,7 @@ public class BidManagerFunctionalTest {
     verify(api).loadCdb(argThat(cdb -> {
       assertEquals(publisher, cdb.getPublisher());
       assertEquals(user, cdb.getUser());
-      assertEquals(singletonList(cacheAdUnit), cdb.getRequestedAdUnits());
+      assertEquals(singletonList(cacheAdUnit), cdb.getAdUnits());
       assertEquals("1.2.3", cdb.getSdkVersion());
       assertEquals(235, cdb.getProfileId());
       assertEquals(expectedGdpr, cdb.getGdprConsent());
@@ -262,7 +262,7 @@ public class BidManagerFunctionalTest {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
 
-    Cdb response = mock(Cdb.class);
+    CdbResponse response = mock(CdbResponse.class);
     Slot slot = mock(Slot.class);
     when(slot.isValid()).thenReturn(true);
     when(response.getSlots()).thenReturn(singletonList(slot));
@@ -512,9 +512,9 @@ public class BidManagerFunctionalTest {
   public void getBidForAdUnitAndPrefetch_GivenCdbCallAndCachedPopulatedWithUserLevelSilentMode_UserLevelSilentModeIsUpdated() throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    Cdb cdb = givenMockedCdbResponse();
+    CdbResponse cdbResponse = givenMockedCdbResponse();
 
-    when(cdb.getTimeToNextCall()).thenReturn(1337);
+    when(cdbResponse.getTimeToNextCall()).thenReturn(1337);
 
     BidManager bidManager = spy(createBidManager());
     bidManager.getBidForAdUnitAndPrefetch(adUnit);
@@ -531,8 +531,8 @@ public class BidManagerFunctionalTest {
     BidManager bidManager = createBidManager();
 
     // Given first CDB call without user-level silence
-    Cdb cdb = givenMockedCdbResponse();
-    when(cdb.getTimeToNextCall()).thenReturn(0);
+    CdbResponse cdbResponse = givenMockedCdbResponse();
+    when(cdbResponse.getTimeToNextCall()).thenReturn(0);
     bidManager.getBidForAdUnitAndPrefetch(adUnit);
     waitForIdleState();
 
@@ -598,7 +598,7 @@ public class BidManagerFunctionalTest {
   private void assertShouldCallCdbAndPopulateCacheOnlyOnce(List<CacheAdUnit> requestedAdUnits, Slot slot) {
     verify(cache).add(slot);
     verify(api).loadCdb(argThat(cdb -> {
-      assertEquals(requestedAdUnits, cdb.getRequestedAdUnits());
+      assertEquals(requestedAdUnits, cdb.getAdUnits());
       return true;
     }), any());
   }
@@ -714,13 +714,13 @@ public class BidManagerFunctionalTest {
   private Slot givenMockedCdbRespondingSlot() {
     Slot slot = mock(Slot.class);
     when(slot.isValid()).thenReturn(true);
-    Cdb response = givenMockedCdbResponse();
+    CdbResponse response = givenMockedCdbResponse();
     when(response.getSlots()).thenReturn(singletonList(slot));
     return slot;
   }
 
-  private Cdb givenMockedCdbResponse() {
-    Cdb response = mock(Cdb.class);
+  private CdbResponse givenMockedCdbResponse() {
+    CdbResponse response = mock(CdbResponse.class);
     when(api.loadCdb(any(), any())).thenReturn(response);
     return response;
   }
