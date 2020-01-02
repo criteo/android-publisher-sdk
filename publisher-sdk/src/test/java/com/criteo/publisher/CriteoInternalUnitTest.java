@@ -3,21 +3,18 @@ package com.criteo.publisher;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalAnswers.answerVoid;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockingDetails;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.app.Application;
 import android.content.Context;
-import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.UserAgentCallback;
 import com.criteo.publisher.Util.UserPrivacyUtil;
@@ -27,7 +24,6 @@ import com.criteo.publisher.model.DeviceInfo;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
@@ -102,7 +98,7 @@ public class CriteoInternalUnitTest {
     doReturn(mock(UserPrivacyUtil.class)).when(dependencyProvider).provideUserPrivacyUtil(any());
     doReturn(mock(Config.class)).when(dependencyProvider).provideConfig(any());
 
-    Context applicationContext = mock(Context.class);
+    Context applicationContext = mock(Context.class, Answers.RETURNS_DEEP_STUBS);
     when(application.getApplicationContext()).thenReturn(applicationContext);
     criteoPublisherId = "B-123456";
 
@@ -110,11 +106,13 @@ public class CriteoInternalUnitTest {
 
     ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
     verify(dependencyProvider, atLeastOnce()).provideDeviceUtil(contextCaptor.capture());
+    verify(dependencyProvider, atLeastOnce()).provideDeviceInfo(contextCaptor.capture());
     verify(dependencyProvider, atLeastOnce()).provideAdUnitMapper(contextCaptor.capture());
     verify(dependencyProvider, atLeastOnce()).provideAndroidUtil(contextCaptor.capture());
     verify(dependencyProvider, atLeastOnce()).provideBidManager(contextCaptor.capture(), eq(criteoPublisherId));
     verify(dependencyProvider, atLeastOnce()).provideConfig(contextCaptor.capture());
     verify(dependencyProvider, atLeastOnce()).provideUserPrivacyUtil(contextCaptor.capture());
+    verify(dependencyProvider, atLeastOnce()).provideAppEvents(contextCaptor.capture());
 
     assertThat(contextCaptor.getAllValues()).containsOnly(applicationContext);
   }
@@ -202,6 +200,15 @@ public class CriteoInternalUnitTest {
     verify(userPrivacyUtil).storeUsPrivacyOptout(false);
   }
 
+  @Test
+  public void new_GivenDeviceInfo_InitializeIt() throws Exception {
+    DeviceInfo deviceInfo = mock(DeviceInfo.class);
+    doReturn(deviceInfo).when(dependencyProvider).provideDeviceInfo(any());
+
+    createCriteo();
+
+    verify(deviceInfo).initialize(any());
+  }
 
   private BidManager givenMockedBidManager() {
     BidManager bidManager = mock(BidManager.class);
@@ -215,10 +222,8 @@ public class CriteoInternalUnitTest {
 
   private void givenMockedDeviceInfo() {
     Context context = application.getApplicationContext();
-    DeviceInfo deviceInfo = dependencyProvider.provideDeviceInfo();
-    doAnswer(answerVoid((Context ignoredContext, UserAgentCallback userAgentCallback) -> {
-      userAgentCallback.done();
-    })).when(deviceInfo).initialize(eq(context), any());
+    DeviceInfo deviceInfo = dependencyProvider.provideDeviceInfo(context);
+    doAnswer(answerVoid(UserAgentCallback::done)).when(deviceInfo).initialize(any());
   }
 
   private CriteoInternal createCriteo() {

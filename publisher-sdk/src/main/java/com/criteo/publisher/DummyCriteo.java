@@ -1,6 +1,7 @@
 package com.criteo.publisher;
 
-import android.content.Context;
+import static com.criteo.publisher.Util.CompletableFuture.completedFuture;
+
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.criteo.publisher.Util.AdUnitType;
@@ -8,9 +9,9 @@ import com.criteo.publisher.Util.UserAgentCallback;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
-import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
+import java.util.concurrent.Future;
 
 public class DummyCriteo extends Criteo {
 
@@ -36,6 +37,7 @@ public class DummyCriteo extends Criteo {
     return null;
   }
 
+  @NonNull
   @Override
   DeviceInfo getDeviceInfo() {
     return new DummyDeviceInfo();
@@ -53,13 +55,18 @@ public class DummyCriteo extends Criteo {
 
   private static class DummyDeviceInfo extends DeviceInfo {
 
+    private DummyDeviceInfo() {
+      super(null);
+    }
+
+    @NonNull
     @Override
-    public String getUserAgent() {
-      return "";
+    public Future<String> getUserAgent() {
+      return completedFuture("");
     }
 
     @Override
-    public void initialize(@NonNull Context context, @NonNull UserAgentCallback userAgentCallback) {
+    public void initialize(@NonNull UserAgentCallback userAgentCallback) {
       userAgentCallback.done();
     }
 

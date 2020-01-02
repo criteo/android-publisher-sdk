@@ -1,60 +1,110 @@
 package com.criteo.publisher.model;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.WebView;
+import com.criteo.publisher.Util.CompletableFuture;
 import com.criteo.publisher.Util.UserAgentCallback;
-import com.criteo.publisher.Util.UserAgentHandler;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DeviceInfo {
     private static final String TAG = DeviceInfo.class.getSimpleName();
 
-    private static final String DEFAULT_USER_AGENT;
+    private final Context context;
+    private final CompletableFuture<String> userAgentFuture = new CompletableFuture<>();
+    private final AtomicBoolean isInitialized = new AtomicBoolean(false);
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    private volatile String resolvedUserAgent;
-
-    static {
-        DEFAULT_USER_AGENT = getDefaultUserAgent();
+    public DeviceInfo(Context context) {
+        this.context = context;
     }
 
-    public void initialize(@NonNull final Context context, @NonNull UserAgentCallback userAgentCallback) {
+    public void initialize(@NonNull UserAgentCallback userAgentCallback) {
+        // This needs to be run on UI thread because a WebView is used to fetch the user-agent
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (isInitialized.compareAndSet(false, true)) {
+                    String userAgent = resolveUserAgent();
+                    userAgentFuture.complete(userAgent);
+                }
 
-        // FIXME why should the user agent callback should be called from main thread ?
-        final Handler mainHandler = new UserAgentHandler(Looper.getMainLooper(), userAgentCallback);
+                // Notify the userAgentCallback that the user agent is ready
+                userAgentCallback.done();
+            }
+        });
+    }
 
-        final Runnable setUserAgentTask = new Runnable() {
+    @NonNull
+    public Future<String> getUserAgent() {
+        // Initialize automatically so that it's safe to call this method alone.
+        initialize(new UserAgentCallback() {
+            @Override
+            public void done() {
+            }
+        });
+
+        return userAgentFuture;
+    }
+
+    private void runOnUiThread(Runnable runnable) {
+        Runnable safeRunnable = new Runnable() {
             @Override
             public void run() {
                 try {
-                    doSetUserAgentTask();
+                    runnable.run();
                 } catch (Throwable tr) {
                     Log.e(TAG, "Internal error while setting user-agent.", tr);
                 }
             }
-
-            private void doSetUserAgentTask() {
-                // Capture the user-agent for internal use inside DeviceInfo
-                resolvedUserAgent = resolveUserAgent(context);
-
-                // Send the user-agent string forward to the userAgentCallback
-                Message msg = mainHandler.obtainMessage();
-                Bundle bundle = new Bundle();
-                bundle.putString("userAgent", resolvedUserAgent);
-                msg.setData(bundle);
-                mainHandler.sendMessage(msg);
-            }
         };
 
-        mainHandler.post(setUserAgentTask);
+        if (Thread.currentThread() != context.getMainLooper().getThread()) {
+            mainHandler.post(safeRunnable);
+        } else {
+            safeRunnable.run();
+        }
     }
 
+    @VisibleForTesting
+    @NonNull
+    @UiThread
+    String resolveUserAgent() {
+        String userAgent = null;
+
+        // Try to fetch the UA from a web view
+        // This may fail with a RuntimeException that is safe to ignore
+        try {
+            userAgent = getWebViewUserAgent();
+        } catch (Throwable ignore) {
+            // FIXME this is not a RuntimeException, this is a throwable that should not be
+            //  catch and ignore so easily.
+        }
+
+        // If we failed to get a WebView UA, try to fall back to a system UA, instead
+        if (TextUtils.isEmpty(userAgent)) {
+            userAgent = getDefaultUserAgent();
+        }
+
+        return userAgent;
+    }
+
+    @UiThread
+    private String getWebViewUserAgent() {
+        WebView webView = new WebView(context);
+        String userAgent = webView.getSettings().getUserAgentString();
+        webView.destroy();
+        return userAgent;
+    }
+
+    @NonNull
     private static String getDefaultUserAgent()
     {
         String userAgent = null;
@@ -66,40 +116,5 @@ public class DeviceInfo {
         }
 
         return userAgent != null ? userAgent : "";
-    }
-
-    @VisibleForTesting
-    public String resolveUserAgent(Context context) {
-        String userAgent = null;
-
-        // Try to fetch the UA from a web view
-        // This may fail with a RuntimeException that is safe to ignore
-        try {
-            userAgent = getWebViewUserAgent(context);
-        } catch (Throwable ignore) {
-            // FIXME this is not a RuntimeException, this is a throwable that should not be
-            //  catch and ignore so easily.
-        }
-
-        // If we failed to get a WebView UA, try to fall back to a system UA, instead
-        if (TextUtils.isEmpty(userAgent)) {
-            userAgent = DEFAULT_USER_AGENT;
-        }
-
-        return userAgent;
-    }
-
-    private static String getWebViewUserAgent(Context context) {
-        WebView webView = new WebView(context);
-        String userAgent = webView.getSettings().getUserAgentString();
-        webView.destroy();
-        return userAgent;
-    }
-
-    // FIXME nothing prevent the user agent to not be null.
-    //  But after an initialization, the empty string seems to represent that there is no user
-    //  agent.
-    public String getUserAgent() {
-        return resolvedUserAgent;
     }
 }

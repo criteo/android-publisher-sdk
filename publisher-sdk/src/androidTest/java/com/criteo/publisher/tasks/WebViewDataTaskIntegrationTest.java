@@ -3,6 +3,7 @@ package com.criteo.publisher.tasks;
 import android.test.UiThreadTest;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
+import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.WebViewData;
 import org.junit.Assert;
 import org.junit.Before;
@@ -11,12 +12,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-public class WebViewDataTaskTest {
+public class WebViewDataTaskIntegrationTest {
 
     private static final String INVALID_URL = "!!!!";
 
     @Mock
     private WebViewData webViewData;
+
+    @Mock
+    private DeviceInfo deviceInfo;
 
     @Mock
     private CriteoInterstitialAdDisplayListener adDisplayListener;
@@ -28,7 +32,7 @@ public class WebViewDataTaskTest {
     @UiThreadTest
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        webViewDataTask = new WebViewDataTask(webViewData, adDisplayListener);
+        webViewDataTask = new WebViewDataTask(webViewData, deviceInfo, adDisplayListener);
     }
 
     @Test

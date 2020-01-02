@@ -1,12 +1,13 @@
 package com.criteo.publisher.tasks;
 
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
-import android.webkit.URLUtil;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.Util.StreamUtil;
+import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.WebViewData;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -20,13 +21,18 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
 
     private WebViewData webviewData;
 
+    @NonNull
+    private final DeviceInfo deviceInfo;
+
     private CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
 
-    public WebViewDataTask(WebViewData webviewData, CriteoInterstitialAdDisplayListener adDisplayListener) {
+    public WebViewDataTask(WebViewData webviewData,
+        @NonNull DeviceInfo deviceInfo,
+        CriteoInterstitialAdDisplayListener adDisplayListener) {
         this.webviewData = webviewData;
+        this.deviceInfo = deviceInfo;
         this.criteoInterstitialAdDisplayListener = adDisplayListener;
     }
-
 
     @Override
     protected String doInBackground(String... args) {
@@ -41,17 +47,19 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
         return result;
     }
 
-    private String doWebViewDataTask(String[] args) {
+    private String doWebViewDataTask(String[] args) throws Exception {
+        String displayUrl = args[0];
+
         String result = "";
         URL url;
         try {
-            url = new URL(args[0]);
+            url = new URL(displayUrl);
         } catch (MalformedURLException e) {
             e.printStackTrace();
             return "";
         }
 
-        String webViewUserAgent = args[1];
+        String userAgent = deviceInfo.getUserAgent().get();
         HttpURLConnection urlConnection;
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -64,8 +72,8 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
             e.printStackTrace();
         }
         urlConnection.setRequestProperty("Content-Type", "text/plain");
-        if (!TextUtils.isEmpty(webViewUserAgent)) {
-            urlConnection.setRequestProperty("User-Agent", webViewUserAgent);
+        if (!TextUtils.isEmpty(userAgent)) {
+            urlConnection.setRequestProperty("User-Agent", userAgent);
         }
 
         try {

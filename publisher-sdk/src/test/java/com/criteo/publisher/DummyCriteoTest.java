@@ -85,10 +85,10 @@ public class DummyCriteoTest {
     UserAgentCallback callback = mock(UserAgentCallback.class);
 
     DeviceInfo deviceInfo = criteo.getDeviceInfo();
-    deviceInfo.initialize(null, callback);
+    deviceInfo.initialize(callback);
 
     verify(callback).done();
-    assertThat(deviceInfo.getUserAgent()).isEmpty();
+    assertThat(deviceInfo.getUserAgent().get()).isEmpty();
   }
 
 }

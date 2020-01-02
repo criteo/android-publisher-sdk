@@ -1,6 +1,7 @@
 package com.criteo.publisher.Util;
 
 import android.support.annotation.NonNull;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -25,10 +26,13 @@ public class CompletableFuture<T> implements Future<T> {
   private final FutureTask<T> task;
 
   public CompletableFuture() {
-    task = new FutureTask<>(() -> {
-      isDone.await();
-      return valueRef.get().get();
-    });
+    task = new FutureTask<>(new CompletableCallable());
+  }
+
+  public static <T> CompletableFuture<T> completedFuture(T value) {
+    CompletableFuture<T> future = new CompletableFuture<>();
+    future.complete(value);
+    return future;
   }
 
   public void complete(T value) {
@@ -67,6 +71,14 @@ public class CompletableFuture<T> implements Future<T> {
       throws InterruptedException, ExecutionException, TimeoutException {
     task.run();
     return task.get(timeout, unit);
+  }
+
+  private class CompletableCallable implements Callable<T> {
+    @Override
+    public T call() throws Exception {
+      isDone.await();
+      return valueRef.get().get();
+    }
   }
 
   private static final class Result<T> {

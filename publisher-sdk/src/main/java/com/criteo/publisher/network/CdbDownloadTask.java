@@ -14,6 +14,7 @@ import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.Config;
+import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
@@ -27,7 +28,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
 
   private final boolean isConfigRequested;
   private boolean isCdbRequested;
-  private final String userAgent;
+  private final DeviceInfo deviceInfo;
   private final NetworkResponseListener responseListener;
   private final List<CacheAdUnit> cacheAdUnits;
   private final PubSdkApi api;
@@ -40,7 +41,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
       NetworkResponseListener responseListener,
       boolean isConfigRequested,
       boolean isCdbRequested,
-      String userAgent,
+      DeviceInfo deviceInfo,
       List<CacheAdUnit> adUnits,
       Hashtable<CacheAdUnit, CdbDownloadTask> bidsInMap,
       DeviceUtil deviceUtil,
@@ -51,7 +52,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     this.responseListener = responseListener;
     this.isConfigRequested = isConfigRequested;
     this.isCdbRequested = isCdbRequested;
-    this.userAgent = userAgent;
+    this.deviceInfo = deviceInfo;
     this.cacheAdUnits = adUnits;
     this.bidsInCdbTask = bidsInMap;
     this.deviceUtil = deviceUtil;
@@ -73,7 +74,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     return result;
   }
 
-  private NetworkResult doCdbDownloadTask(Object[] objects) {
+  private NetworkResult doCdbDownloadTask(Object[] objects) throws Exception {
     if (objects.length < 3) {
       return null;
     }
@@ -113,12 +114,13 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
   }
 
   @Nullable
-  private CdbResponse requestCdb(int profile, User user, Publisher publisher) {
+  private CdbResponse requestCdb(int profile, User user, Publisher publisher) throws Exception {
     if (!isCdbRequested) {
       return null;
     }
 
     CdbRequest cdbRequest = buildCdbRequest(profile, user, publisher);
+    String userAgent = deviceInfo.getUserAgent().get();
     CdbResponse cdbResult = api.loadCdb(cdbRequest, userAgent);
     logCdbResponse(cdbResult);
 
@@ -144,7 +146,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
 
     return new CdbRequest(publisher, user, user.getSdkVer(), profile,
         userPrivacyUtil.gdpr(), cacheAdUnits);
-    }
+  }
 
   private void logCdbResponse(CdbResponse response) {
     if (loggingUtil.isLoggingEnabled() && response != null && response.getSlots().size() > 0) {

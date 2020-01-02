@@ -136,7 +136,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             this,
             isConfigRequested,
             !killSwitchEngaged(),
-            deviceInfo.getUserAgent(),
+            deviceInfo,
             prefetchCacheAdUnits,
             placementsWithCdbTasks,
             deviceUtil,

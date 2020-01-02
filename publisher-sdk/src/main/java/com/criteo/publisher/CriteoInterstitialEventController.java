@@ -1,7 +1,6 @@
 package com.criteo.publisher;
 
-import android.text.TextUtils;
-import android.webkit.URLUtil;
+import android.support.annotation.NonNull;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.controller.WebViewDownloader;
 import com.criteo.publisher.model.AdUnit;
@@ -22,6 +21,7 @@ public class CriteoInterstitialEventController {
 
     private WebViewDownloader webViewDownloader;
 
+    @NonNull
     private DeviceInfo deviceInfo;
 
     private final Criteo criteo;
@@ -71,7 +71,7 @@ public class CriteoInterstitialEventController {
     private void getWebviewDataAsync(String displayUrl) {
         webViewDownloader.fillWebViewHtmlContent(
             displayUrl,
-            deviceInfo.getUserAgent(),
+            deviceInfo,
             criteoInterstitialAdDisplayListener);
     }
 

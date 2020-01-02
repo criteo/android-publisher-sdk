@@ -12,14 +12,12 @@ import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.network.PubSdkApi;
-import java.security.Provider;
 import java.util.function.Function;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.Mock;
-
 import org.mockito.MockitoAnnotations;
 
 public class DependencyProviderTest {
@@ -102,6 +100,12 @@ public class DependencyProviderTest {
   }
 
   @Test
+  public void provideDeviceInfo_WhenProvidedTwice_ReturnsTheSame() throws Exception {
+    provideBean_WhenProvidedTwice_ReturnsTheSame(provider ->
+        provider.provideDeviceInfo(mock(Context.class)));
+  }
+
+  @Test
   public void provideAdvertisingInfo_WhenProvidedTwice_ReturnsTheSame() throws Exception {
     provideBean_WhenProvidedTwice_ReturnsTheSame(DependencyProvider::provideAdvertisingInfo);
   }
@@ -109,11 +113,6 @@ public class DependencyProviderTest {
   @Test
   public void provideClock_WhenProvidedTwice_ReturnsTheSame() throws Exception {
     provideBean_WhenProvidedTwice_ReturnsTheSame(DependencyProvider::provideClock);
-  }
-
-  @Test
-  public void provideDeviceInfo_WhenProvidedTwice_ReturnsTheSame() throws Exception {
-    provideBean_WhenProvidedTwice_ReturnsTheSame(DependencyProvider::provideDeviceInfo);
   }
 
   @Test

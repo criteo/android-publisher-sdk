@@ -2,6 +2,7 @@ package com.criteo.publisher;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
@@ -53,29 +54,22 @@ final class CriteoInternal extends Criteo {
     DeviceUtil deviceUtil = dependencyProvider.provideDeviceUtil(context);
     deviceUtil.createSupportedScreenSizes(application);
 
-    deviceInfo = dependencyProvider.provideDeviceInfo();
+    deviceInfo = dependencyProvider.provideDeviceInfo(context);
     config = dependencyProvider.provideConfig(context);
 
     bidManager = dependencyProvider.provideBidManager(context, criteoPublisherId);
+
 
     userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil(context);
     if (usPrivacyOptout != null) {
       userPrivacyUtil.storeUsPrivacyOptout(usPrivacyOptout.booleanValue());
     }
 
-    this.appEvents = new AppEvents(
-        context,
-        deviceUtil,
-        dependencyProvider.provideClock(),
-        dependencyProvider.providePubSdkApi(context),
-        dependencyProvider.provideUserPrivacyUtil(context),
-        dependencyProvider.provideDeviceInfo()
-    );
+    this.appEvents = dependencyProvider.provideAppEvents(context);
 
     this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
-
     List<AdUnit> prefetchAdUnits = adUnits;
-    deviceInfo.initialize(context, new UserAgentCallback() {
+    deviceInfo.initialize(new UserAgentCallback() {
       @Override
       public void done() {
         bidManager.prefetch(prefetchAdUnits);
@@ -140,6 +134,7 @@ final class CriteoInternal extends Criteo {
     return bidManager.getTokenValue(bidToken, adUnitType);
   }
 
+  @NonNull
   @Override
   DeviceInfo getDeviceInfo() {
     return deviceInfo;

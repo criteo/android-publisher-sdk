@@ -1,6 +1,12 @@
 package com.criteo.publisher.network;
 
+import static com.criteo.publisher.Util.CompletableFuture.completedFuture;
 import static com.criteo.publisher.network.AppEventTask.THROTTLE;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import com.criteo.publisher.Util.AppEventResponseListener;
@@ -61,6 +67,15 @@ public class AppEventTaskTest {
         json = null;
         appEventTask.onPostExecute(json);
         Mockito.verify(responseListener, Mockito.times(1)).setThrottle(0);
+    }
+
+    @Test
+    public void backgroundTask_GivenUserAgent_CallApiWithIt() throws Exception {
+        when(deviceInfo.getUserAgent()).thenReturn(completedFuture("myUserAgent"));
+
+        appEventTask.doInBackground("eventType");
+
+        verify(api).postAppEvent(anyInt(), any(), any(), any(), anyInt(), eq("myUserAgent"));
     }
 
 }

@@ -156,7 +156,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             publisher,
             new TokenCache(),
-            new DeviceInfo(),
+            new DeviceInfo(context),
             user,
             sdkCache,
             placementsWithCdbTasks,
@@ -193,7 +193,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             publisher,
             new TokenCache(),
-            new DeviceInfo(),
+            new DeviceInfo(context),
             user,
             sdkCache,
             placementsWithCdbTasks,
@@ -234,7 +234,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             publisher,
             new TokenCache(),
-            new DeviceInfo(),
+            new DeviceInfo(context),
             user,
             sdkCache,
             placementsWithCdbTasks,
@@ -264,7 +264,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             publisher,
             new TokenCache(),
-            new DeviceInfo(),
+            new DeviceInfo(context),
             user,
             sdkCache,
             placementsWithCdbTasks,
@@ -332,7 +332,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             publisher,
             new TokenCache(),
-            new DeviceInfo(),
+            new DeviceInfo(context),
             user,
             sdkCache,
             placementsWithCdbTasks,
@@ -384,7 +384,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             publisher,
             new TokenCache(),
-            new DeviceInfo(),
+            new DeviceInfo(context),
             user,
             sdkCache,
             placementsWithCdbTasks,
@@ -414,7 +414,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             publisher,
             new TokenCache(),
-            new DeviceInfo(),
+            new DeviceInfo(context),
             user,
             sdkCache,
             placementsWithCdbTasks,
@@ -446,7 +446,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             publisher,
             new TokenCache(),
-            new DeviceInfo(),
+            new DeviceInfo(context),
             user,
             sdkCache,
             placementsWithCdbTasks,
@@ -484,7 +484,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             publisher,
             new TokenCache(),
-            new DeviceInfo(),
+            new DeviceInfo(context),
             user,
             sdkCache,
             placementsWithCdbTasks,

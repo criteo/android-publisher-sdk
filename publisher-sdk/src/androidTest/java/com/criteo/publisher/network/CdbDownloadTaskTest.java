@@ -1,15 +1,15 @@
 package com.criteo.publisher.network;
 
-import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.Util.NetworkResponseListener;
+import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.CacheAdUnit;
+import com.criteo.publisher.model.DeviceInfo;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -38,6 +38,9 @@ public class  CdbDownloadTaskTest {
     private DeviceUtil deviceUtil;
 
     @Mock
+    private DeviceInfo deviceInfo;
+
+    @Mock
     private LoggingUtil loggingUtil;
 
     @Mock
@@ -61,7 +64,7 @@ public class  CdbDownloadTaskTest {
             responseListener,
             false,
             true,
-            "Agent",
+            deviceInfo,
             cacheAdUnits,
             bidsInCdbTask,
             deviceUtil,

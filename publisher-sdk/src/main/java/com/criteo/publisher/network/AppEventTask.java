@@ -58,13 +58,14 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
         return jsonObject;
     }
 
-    private JSONObject doAppEventTask(Object[] objects) {
+    private JSONObject doAppEventTask(Object[] objects) throws Exception {
         String eventType = (String) objects[0];
         int limitedAdTracking = deviceUtil.isLimitAdTrackingEnabled();
         String gaid = deviceUtil.getAdvertisingId();
-        String appId = mContext.getApplicationContext().getPackageName();
+        String appId = mContext.getPackageName();
 
-        JSONObject response = api.postAppEvent(SENDER_ID, appId, gaid, eventType, limitedAdTracking, deviceInfo.getUserAgent());
+        String userAgent = deviceInfo.getUserAgent().get();
+        JSONObject response = api.postAppEvent(SENDER_ID, appId, gaid, eventType, limitedAdTracking, userAgent);
         if (response != null) {
             Log.d(TAG, response.toString());
         }

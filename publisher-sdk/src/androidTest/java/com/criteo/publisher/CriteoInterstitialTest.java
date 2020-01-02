@@ -1,24 +1,29 @@
 package com.criteo.publisher;
 
+import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
+import static com.criteo.publisher.Util.CompletableFuture.completedFuture;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import android.app.Application;
 import android.support.test.InstrumentationRegistry;
 import android.test.UiThreadTest;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
-import static org.mockito.Mockito.*;
 
 public class CriteoInterstitialTest {
     @Rule
@@ -110,8 +115,9 @@ public class CriteoInterstitialTest {
     public void loadAdForStandaloneTwice_GivenOnlyNoBid_ShouldNotifyListenerTwiceForFailure() throws Exception {
         CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
 
-        Criteo criteo = mock(Criteo.class);
+        Criteo criteo = mock(Criteo.class, Answers.RETURNS_DEEP_STUBS);
         when(criteo.getBidForAdUnit(interstitialAdUnit)).thenReturn(null);
+        when(criteo.getDeviceInfo().getUserAgent()).thenReturn(completedFuture(""));
 
         AtomicReference<CriteoInterstitial> interstitial = new AtomicReference<>();
 

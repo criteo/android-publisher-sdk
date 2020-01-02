@@ -3,6 +3,7 @@ package com.criteo.publisher;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.DeviceUtil;
@@ -148,7 +149,7 @@ public class DependencyProvider {
         return new BidManager(
             new Publisher(context, criteoPublisherId),
             new TokenCache(),
-            DependencyProvider.this.provideDeviceInfo(),
+            DependencyProvider.this.provideDeviceInfo(context),
             new User(DependencyProvider.this.provideDeviceUtil(context)),
             new SdkCache(DependencyProvider.this.provideDeviceUtil(context)),
             new Hashtable<>(),
@@ -165,11 +166,11 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public DeviceInfo provideDeviceInfo() {
+  public DeviceInfo provideDeviceInfo(Context context) {
     return getOrCreate(DeviceInfo.class, new Factory<DeviceInfo>() {
       @Override
       public DeviceInfo create() {
-        return new DeviceInfo();
+        return new DeviceInfo(context);
       }
     });
   }
@@ -182,6 +183,23 @@ public class DependencyProvider {
         return new AdUnitMapper(
             DependencyProvider.this.provideAndroidUtil(context),
             DependencyProvider.this.provideDeviceUtil(context));
+      }
+    });
+  }
+
+  @NonNull
+  public AppEvents provideAppEvents(Context context) {
+    return getOrCreate(AppEvents.class, new Factory<AppEvents>() {
+      @Override
+      public AppEvents create() {
+        return new AppEvents(
+            context,
+            DependencyProvider.this.provideDeviceUtil(context),
+            DependencyProvider.this.provideClock(),
+            DependencyProvider.this.providePubSdkApi(context),
+            DependencyProvider.this.provideUserPrivacyUtil(context),
+            DependencyProvider.this.provideDeviceInfo(context)
+        );
       }
     });
   }

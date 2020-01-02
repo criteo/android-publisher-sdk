@@ -2,6 +2,7 @@ package com.criteo.publisher;
 
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
+import static com.criteo.publisher.Util.CompletableFuture.completedFuture;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -22,6 +23,7 @@ import static org.mockito.Mockito.when;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
+import com.criteo.publisher.Util.CompletableFuture;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.cache.SdkCache;
@@ -180,8 +182,8 @@ public class BidManagerFunctionalTest {
 
   private void callingCdb_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo(Consumer<AdUnit> callingCdb) {
     DeviceInfo deviceInfo = mock(DeviceInfo.class);
-    when(deviceInfo.getUserAgent()).thenReturn("expectedUserAgent");
-    doReturn(deviceInfo).when(dependencyProvider).provideDeviceInfo();
+    when(deviceInfo.getUserAgent()).thenReturn(completedFuture("expectedUserAgent"));
+    doReturn(deviceInfo).when(dependencyProvider).provideDeviceInfo(any());
 
     when(user.getSdkVer()).thenReturn("1.2.3");
 
@@ -314,6 +316,7 @@ public class BidManagerFunctionalTest {
     bidManager.getBidForAdUnitAndPrefetch(adUnit);
     bidManager.getBidForAdUnitAndPrefetch(adUnit);
     bidManagerIsCalledASecondTime.countDown();
+    waitForIdleState();
 
     // It is expected, with those two calls to the bid manager, that only one CDB call and only one
     // cache update is done. Indeed, the only CDB call correspond to the one triggered by the first
@@ -692,21 +695,20 @@ public class BidManagerFunctionalTest {
   private CountDownLatch givenExecutorWaitingOn() {
     CountDownLatch waitingLatch = new CountDownLatch(1);
 
-    when(dependencyProvider.provideThreadPoolExecutor()).thenAnswer(invocation -> {
-      Executor executor = (Executor) invocation.callRealMethod();
-      return (Executor) command -> {
-        Runnable waitingCommand = () -> {
-          try {
-            waitingLatch.await();
-          } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-          }
-          command.run();
-        };
+    Executor executor = dependencyProvider.provideThreadPoolExecutor();
+    when(dependencyProvider.provideThreadPoolExecutor())
+        .thenAnswer(invocation -> (Executor) command -> {
+          Runnable waitingCommand = () -> {
+            try {
+              waitingLatch.await();
+            } catch (InterruptedException e) {
+              throw new RuntimeException(e);
+            }
+            command.run();
+          };
 
-        executor.execute(waitingCommand);
-      };
-    });
+          executor.execute(waitingCommand);
+        });
 
     return waitingLatch;
   }
@@ -752,7 +754,7 @@ public class BidManagerFunctionalTest {
     return new BidManager(
         publisher,
         tokenCache,
-        dependencyProvider.provideDeviceInfo(),
+        dependencyProvider.provideDeviceInfo(context),
         user,
         cache,
         new Hashtable<>(),

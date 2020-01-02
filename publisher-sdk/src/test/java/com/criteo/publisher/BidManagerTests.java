@@ -1,6 +1,7 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
+import static com.criteo.publisher.Util.CompletableFuture.completedFuture;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -109,7 +110,7 @@ public class BidManagerTests {
         sdkCache = mock(SdkCache.class);
 
         deviceInfo = mock(DeviceInfo.class);
-        when(deviceInfo.getUserAgent()).thenReturn("Some fun user-agent that is probably webkit based 10.3");
+        when(deviceInfo.getUserAgent()).thenReturn(completedFuture("Some fun user-agent that is probably webkit based 10.3"));
 
         JSONObject slotJson = null;
         try {
