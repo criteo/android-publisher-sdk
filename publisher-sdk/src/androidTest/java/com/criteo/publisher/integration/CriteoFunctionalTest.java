@@ -3,19 +3,26 @@ package com.criteo.publisher.integration;
 import static com.criteo.publisher.CriteoUtil.TEST_CP_ID;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.AdditionalAnswers.answerVoid;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import android.app.Application;
 import android.content.Intent;
+import android.os.Looper;
 import android.support.test.InstrumentationRegistry;
+import com.criteo.publisher.BidManager;
 import android.support.test.rule.ActivityTestRule;
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
@@ -25,6 +32,8 @@ import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
 import java.util.Collections;
+import org.junit.Before;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,13 +53,17 @@ public class CriteoFunctionalTest {
 
   private PubSdkApi api;
 
+  private DependencyProvider dependencyProvider;
+
   @Before
   public void setUp() throws Exception {
     application = (Application) InstrumentationRegistry.getTargetContext()
         .getApplicationContext();
 
-    api = spy(mockedDependenciesRule.getDependencyProvider().providePubSdkApi(application));
-    doReturn(api).when(mockedDependenciesRule.getDependencyProvider()).providePubSdkApi(any());
+    dependencyProvider = mockedDependenciesRule.getDependencyProvider();
+
+    api = spy(dependencyProvider.providePubSdkApi(application));
+    doReturn(api).when(dependencyProvider).providePubSdkApi(any());
   }
 
   @Test
@@ -96,6 +109,22 @@ public class CriteoFunctionalTest {
     verify(api).loadCdb(any(), any());
     verify(api).loadConfig(any(), any(), any());
     verify(api).postAppEvent(anyInt(), any(), any(), any(), anyInt(), any());
+  }
+
+  @Test
+  public void init_WaitingForIdleState_BidManagerIsPrefetchOnMainThread() throws Exception {
+    BidManager bidManager = mock(BidManager.class);
+    doReturn(bidManager).when(dependencyProvider).provideBidManager(any(), any());
+
+    doAnswer(answerVoid((List<AdUnit>  adUnits) -> {
+      assertTrue(adUnits.isEmpty());
+      assertSame(Thread.currentThread(), Looper.getMainLooper().getThread());
+    })).when(bidManager).prefetch(any());
+
+    givenInitializedCriteo();
+    waitForBids();
+
+    verify(bidManager).prefetch(any());
   }
 
   private void waitForBids() {

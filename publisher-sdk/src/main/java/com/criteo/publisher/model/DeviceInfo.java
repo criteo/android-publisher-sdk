@@ -1,8 +1,6 @@
 package com.criteo.publisher.model;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.support.annotation.VisibleForTesting;
@@ -10,7 +8,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.WebView;
 import com.criteo.publisher.Util.CompletableFuture;
-import com.criteo.publisher.Util.UserAgentCallback;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -18,15 +16,16 @@ public class DeviceInfo {
     private static final String TAG = DeviceInfo.class.getSimpleName();
 
     private final Context context;
+    private final Executor runOnUiThreadExecutor;
     private final CompletableFuture<String> userAgentFuture = new CompletableFuture<>();
     private final AtomicBoolean isInitialized = new AtomicBoolean(false);
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
-    public DeviceInfo(Context context) {
+    public DeviceInfo(Context context, Executor runOnUiThreadExecutor) {
         this.context = context;
+        this.runOnUiThreadExecutor = runOnUiThreadExecutor;
     }
 
-    public void initialize(@NonNull UserAgentCallback userAgentCallback) {
+    public void initialize() {
         // This needs to be run on UI thread because a WebView is used to fetch the user-agent
         runOnUiThread(new Runnable() {
             @Override
@@ -35,9 +34,6 @@ public class DeviceInfo {
                     String userAgent = resolveUserAgent();
                     userAgentFuture.complete(userAgent);
                 }
-
-                // Notify the userAgentCallback that the user agent is ready
-                userAgentCallback.done();
             }
         });
     }
@@ -45,11 +41,7 @@ public class DeviceInfo {
     @NonNull
     public Future<String> getUserAgent() {
         // Initialize automatically so that it's safe to call this method alone.
-        initialize(new UserAgentCallback() {
-            @Override
-            public void done() {
-            }
-        });
+        initialize();
 
         return userAgentFuture;
     }
@@ -66,11 +58,7 @@ public class DeviceInfo {
             }
         };
 
-        if (Thread.currentThread() != context.getMainLooper().getThread()) {
-            mainHandler.post(safeRunnable);
-        } else {
-            safeRunnable.run();
-        }
+        runOnUiThreadExecutor.execute(safeRunnable);
     }
 
     @VisibleForTesting

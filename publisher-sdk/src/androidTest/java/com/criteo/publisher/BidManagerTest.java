@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.Executor;
 import junit.framework.Assert;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -113,6 +114,8 @@ public class BidManagerTest {
 
     private PubSdkApi api;
 
+    private Executor runOnUiThreadExecutor;
+
     @Before
     public void setup() {
         context = InstrumentationRegistry.getContext().getApplicationContext();
@@ -132,6 +135,7 @@ public class BidManagerTest {
         userPrivacyUtil = mockedDependenciesRule.getDependencyProvider().provideUserPrivacyUtil(context);
         adUnitMapper = mockedDependenciesRule.getDependencyProvider().provideAdUnitMapper(context);
         api = mockedDependenciesRule.getDependencyProvider().providePubSdkApi(context.getApplicationContext());
+        runOnUiThreadExecutor = mockedDependenciesRule.getDependencyProvider().provideRunOnUiThreadExecutor();
     }
 
     @Test
@@ -156,7 +160,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             publisher,
             new TokenCache(),
-            new DeviceInfo(context),
+            new DeviceInfo(context, runOnUiThreadExecutor),
             user,
             sdkCache,
             placementsWithCdbTasks,
@@ -193,7 +197,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             publisher,
             new TokenCache(),
-            new DeviceInfo(context),
+            new DeviceInfo(context, runOnUiThreadExecutor),
             user,
             sdkCache,
             placementsWithCdbTasks,
@@ -234,7 +238,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             publisher,
             new TokenCache(),
-            new DeviceInfo(context),
+            new DeviceInfo(context, runOnUiThreadExecutor),
             user,
             sdkCache,
             placementsWithCdbTasks,
@@ -257,6 +261,55 @@ public class BidManagerTest {
 
     @Test
     @UiThreadTest
+    public void testSilentModeSlotZeroCpmNonZeroTtl() {
+        List<AdUnit> adUnits = new ArrayList<>();
+        BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
+        adUnits.add(AdUnit);
+
+        BidManager manager = new BidManager(
+            publisher,
+            new TokenCache(),
+            new DeviceInfo(context, runOnUiThreadExecutor),
+            user,
+            sdkCache,
+            placementsWithCdbTasks,
+            config,
+            deviceUtil,
+            loggingUtil,
+            clock,
+            userPrivacyUtil,
+            adUnitMapper,
+            api
+        );
+
+        List<Slot> slots = new ArrayList<>();
+        Slot slot1 = new Slot();
+        slot1.setPlacementId("/140800857/Endeavour_320x50");
+        slot1.setHeight(50);
+        slot1.setWidth(320);
+        slot1.setDisplayUrl(TEST_CREATIVE);
+        slot1.setCpm("0.0");
+        slot1.setTimeOfDownload(System.currentTimeMillis());
+        slot1.setTtl(3);
+        slots.add(slot1);
+        manager.setCacheAdUnits(slots);
+        PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
+        manager.enrichBid(builder, AdUnit);
+        manager.enrichBid(builder, AdUnit);
+        PublisherAdRequest request = builder.build();
+        assertNull(request.getCustomTargeting().getString(DFP_CRT_DISPLAY_URL));
+        try {
+            Thread.sleep(5000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        manager.enrichBid(builder, AdUnit);
+        request = builder.build();
+        assertNotNull(request.getCustomTargeting().getString(DFP_CRT_DISPLAY_URL));
+    }
+
+    @Test
+    @UiThreadTest
     public void testPrefetch() {
         List<AdUnit> adUnits = new ArrayList<>();
         BannerAdUnit AdUnit = new BannerAdUnit("/140800857/Endeavour_320x50", new AdSize(320, 50));
@@ -264,7 +317,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             publisher,
             new TokenCache(),
-            new DeviceInfo(context),
+            new DeviceInfo(context, runOnUiThreadExecutor),
             user,
             sdkCache,
             placementsWithCdbTasks,
@@ -332,7 +385,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             publisher,
             new TokenCache(),
-            new DeviceInfo(context),
+            new DeviceInfo(context, runOnUiThreadExecutor),
             user,
             sdkCache,
             placementsWithCdbTasks,
@@ -384,7 +437,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             publisher,
             new TokenCache(),
-            new DeviceInfo(context),
+            new DeviceInfo(context, runOnUiThreadExecutor),
             user,
             sdkCache,
             placementsWithCdbTasks,
@@ -414,7 +467,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             publisher,
             new TokenCache(),
-            new DeviceInfo(context),
+            new DeviceInfo(context, runOnUiThreadExecutor),
             user,
             sdkCache,
             placementsWithCdbTasks,
@@ -446,7 +499,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             publisher,
             new TokenCache(),
-            new DeviceInfo(context),
+            new DeviceInfo(context, runOnUiThreadExecutor),
             user,
             sdkCache,
             placementsWithCdbTasks,
@@ -484,7 +537,7 @@ public class BidManagerTest {
         BidManager manager = new BidManager(
             publisher,
             new TokenCache(),
-            new DeviceInfo(context),
+            new DeviceInfo(context, runOnUiThreadExecutor),
             user,
             sdkCache,
             placementsWithCdbTasks,

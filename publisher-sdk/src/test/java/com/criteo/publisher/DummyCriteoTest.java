@@ -2,11 +2,8 @@ package com.criteo.publisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 import com.criteo.publisher.Util.AdUnitType;
-import com.criteo.publisher.Util.UserAgentCallback;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.DeviceInfo;
@@ -82,12 +79,9 @@ public class DummyCriteoTest {
 
   @Test
   public void getDeviceInfo_ReturnNoUserAgentAndInitializeDirectly() throws Exception {
-    UserAgentCallback callback = mock(UserAgentCallback.class);
-
     DeviceInfo deviceInfo = criteo.getDeviceInfo();
-    deviceInfo.initialize(callback);
+    deviceInfo.initialize();
 
-    verify(callback).done();
     assertThat(deviceInfo.getUserAgent().get()).isEmpty();
   }
 

@@ -1,11 +1,9 @@
 package com.criteo.publisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.AdditionalAnswers.answerVoid;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -16,7 +14,6 @@ import static org.mockito.Mockito.when;
 import android.app.Application;
 import android.content.Context;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.UserAgentCallback;
 import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
@@ -24,6 +21,7 @@ import com.criteo.publisher.model.DeviceInfo;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executor;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
@@ -52,13 +50,14 @@ public class CriteoInternalUnitTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
+    when(dependencyProvider.provideRunOnUiThreadExecutor()).thenReturn(Runnable::run);
+
     adUnits = new ArrayList<>();
   }
 
   @Test
   public void new_GivenBidManagerAndAdUnits_ShouldCallPrefetchWithAdUnits() throws Exception {
     BidManager bidManager = givenMockedBidManager();
-    givenMockedDeviceInfo();
     adUnits = mock(List.class);
 
     createCriteo();
@@ -69,7 +68,6 @@ public class CriteoInternalUnitTest {
   @Test
   public void new_GivenBidManagerAndNullAdUnits_ShouldCallPrefetchWithEmptyAdUnits() throws Exception {
     BidManager bidManager = givenMockedBidManager();
-    givenMockedDeviceInfo();
     adUnits = null;
 
     createCriteo();
@@ -97,6 +95,7 @@ public class CriteoInternalUnitTest {
     doReturn(mock(DeviceUtil.class)).when(dependencyProvider).provideDeviceUtil(any());
     doReturn(mock(UserPrivacyUtil.class)).when(dependencyProvider).provideUserPrivacyUtil(any());
     doReturn(mock(Config.class)).when(dependencyProvider).provideConfig(any());
+    doReturn((Executor) Runnable::run).when(dependencyProvider).provideRunOnUiThreadExecutor();
 
     Context applicationContext = mock(Context.class, Answers.RETURNS_DEEP_STUBS);
     when(application.getApplicationContext()).thenReturn(applicationContext);
@@ -207,7 +206,7 @@ public class CriteoInternalUnitTest {
 
     createCriteo();
 
-    verify(deviceInfo).initialize(any());
+    verify(deviceInfo).initialize();
   }
 
   private BidManager givenMockedBidManager() {
@@ -218,12 +217,6 @@ public class CriteoInternalUnitTest {
     when(dependencyProvider.provideBidManager(context, criteoPublisherId)).thenReturn(bidManager);
 
     return bidManager;
-  }
-
-  private void givenMockedDeviceInfo() {
-    Context context = application.getApplicationContext();
-    DeviceInfo deviceInfo = dependencyProvider.provideDeviceInfo(context);
-    doAnswer(answerVoid(UserAgentCallback::done)).when(deviceInfo).initialize(any());
   }
 
   private CriteoInternal createCriteo() {

@@ -5,7 +5,7 @@ import static com.criteo.publisher.Util.CompletableFuture.completedFuture;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.criteo.publisher.Util.AdUnitType;
-import com.criteo.publisher.Util.UserAgentCallback;
+import com.criteo.publisher.Util.RunOnUiThreadExecutor;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
@@ -56,7 +56,7 @@ public class DummyCriteo extends Criteo {
   private static class DummyDeviceInfo extends DeviceInfo {
 
     private DummyDeviceInfo() {
-      super(null);
+      super(null, new RunOnUiThreadExecutor());
     }
 
     @NonNull
@@ -66,8 +66,7 @@ public class DummyCriteo extends Criteo {
     }
 
     @Override
-    public void initialize(@NonNull UserAgentCallback userAgentCallback) {
-      userAgentCallback.done();
+    public void initialize() {
     }
 
   }

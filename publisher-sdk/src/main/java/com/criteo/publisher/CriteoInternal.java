@@ -10,7 +10,6 @@ import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.UserAgentCallback;
 import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
@@ -19,6 +18,7 @@ import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 final class CriteoInternal extends Criteo {
 
@@ -55,10 +55,11 @@ final class CriteoInternal extends Criteo {
     deviceUtil.createSupportedScreenSizes(application);
 
     deviceInfo = dependencyProvider.provideDeviceInfo(context);
+    deviceInfo.initialize();
+
     config = dependencyProvider.provideConfig(context);
 
     bidManager = dependencyProvider.provideBidManager(context, criteoPublisherId);
-
 
     userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil(context);
     if (usPrivacyOptout != null) {
@@ -68,11 +69,15 @@ final class CriteoInternal extends Criteo {
     this.appEvents = dependencyProvider.provideAppEvents(context);
 
     this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
-    List<AdUnit> prefetchAdUnits = adUnits;
-    deviceInfo.initialize(new UserAgentCallback() {
+
+    prefetchAdUnits(dependencyProvider.provideRunOnUiThreadExecutor(), adUnits);
+  }
+
+  private void prefetchAdUnits(Executor executor, List<AdUnit> adUnits) {
+    executor.execute(new Runnable() {
       @Override
-      public void done() {
-        bidManager.prefetch(prefetchAdUnits);
+      public void run() {
+        bidManager.prefetch(adUnits);
       }
     });
   }

@@ -8,6 +8,7 @@ import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.LoggingUtil;
+import com.criteo.publisher.Util.RunOnUiThreadExecutor;
 import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdUnitMapper;
@@ -110,6 +111,16 @@ public class DependencyProvider {
   }
 
   @NonNull
+  public Executor provideRunOnUiThreadExecutor() {
+    return getOrCreate(RunOnUiThreadExecutor.class, new Factory<RunOnUiThreadExecutor>() {
+      @Override
+      public RunOnUiThreadExecutor create() {
+        return new RunOnUiThreadExecutor();
+      }
+    });
+  }
+
+  @NonNull
   public Config provideConfig(Context context) {
     return getOrCreate(Config.class, new Factory<Config>() {
       @Override
@@ -170,7 +181,9 @@ public class DependencyProvider {
     return getOrCreate(DeviceInfo.class, new Factory<DeviceInfo>() {
       @Override
       public DeviceInfo create() {
-        return new DeviceInfo(context);
+        return new DeviceInfo(
+            context,
+            DependencyProvider.this.provideRunOnUiThreadExecutor());
       }
     });
   }

@@ -407,7 +407,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
      *
      * @param adUnits list of ad units to prefetch
      */
-    void prefetch(@NonNull List<AdUnit> adUnits) {
+    public void prefetch(@NonNull List<AdUnit> adUnits) {
         List<CacheAdUnit> cacheAdUnits = adUnitMapper.convertValidAdUnits(adUnits);
 
         startCdbDownloadTask(true, cacheAdUnits);

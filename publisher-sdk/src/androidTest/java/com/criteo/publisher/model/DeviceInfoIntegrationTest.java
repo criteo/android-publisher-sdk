@@ -14,6 +14,7 @@ import com.criteo.publisher.ThreadingUtil;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.Util.UserAgentCallback;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import org.junit.Before;
 import org.junit.Rule;
@@ -23,45 +24,35 @@ public class DeviceInfoIntegrationTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
+
   private Context context;
+  private Executor runOnUiThreadExecutor;
 
   @Before
   public void setUp() throws Exception {
     context = InstrumentationRegistry.getContext().getApplicationContext();
+    runOnUiThreadExecutor = mockedDependenciesRule.getDependencyProvider().provideRunOnUiThreadExecutor();
   }
 
   @Test
-  public void initialize_GivenCallback_CallItBack() throws Exception {
-    UserAgentCallback callback = mock(UserAgentCallback.class);
-    DeviceInfo deviceInfo = new DeviceInfo(context);
-
-    deviceInfo.initialize(callback);
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
-
-    verify(callback).done();
-  }
-
-  @Test
-  public void initialize_GivenCallbackAndPreviouslyFetchedUserAgent_CallItBackAndRetrieveUserAgentOnce() throws Exception {
-    UserAgentCallback callback = mock(UserAgentCallback.class);
-    DeviceInfo deviceInfo = spy(new DeviceInfo(context));
+  public void initialize_GivenPreviouslyFetchedUserAgent_RetrieveUserAgentOnce() throws Exception {
+    DeviceInfo deviceInfo = spy(new DeviceInfo(context, runOnUiThreadExecutor));
 
     deviceInfo.getUserAgent().get();
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
-    deviceInfo.initialize(callback);
+    deviceInfo.initialize();
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
-    verify(callback).done();
     verify(deviceInfo, times(1)).resolveUserAgent();
   }
 
   @Test
   public void getUserAgent_GivenInitializedDeviceInfo_ReturnsCompletedFuture() throws Exception {
-    DeviceInfo deviceInfo = new DeviceInfo(context);
+    DeviceInfo deviceInfo = new DeviceInfo(context, runOnUiThreadExecutor);
 
     UserAgentCallback mock = mock(UserAgentCallback.class);
-    deviceInfo.initialize(mock);
+    deviceInfo.initialize();
     Future<String> userAgent = deviceInfo.getUserAgent();
 
     assertNotNull(userAgent.get());
@@ -69,7 +60,7 @@ public class DeviceInfoIntegrationTest {
 
   @Test
   public void getUserAgent_GivenUninitializedDeviceInfoAndWaitForIdleState_ReturnsCompletedFuture() throws Exception {
-    DeviceInfo deviceInfo = new DeviceInfo(context);
+    DeviceInfo deviceInfo = new DeviceInfo(context, runOnUiThreadExecutor);
 
     Future<String> userAgent = deviceInfo.getUserAgent();
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
@@ -79,7 +70,7 @@ public class DeviceInfoIntegrationTest {
 
   @Test
   public void getUserAgent_WhenOnMainThreadAndWaitForIdleState_DoNotBlockAndReturnCompletedFuture() throws Exception {
-    DeviceInfo deviceInfo = new DeviceInfo(context);
+    DeviceInfo deviceInfo = new DeviceInfo(context, runOnUiThreadExecutor);
 
     new Handler(Looper.getMainLooper()).post(() -> {
       String userAgent;
