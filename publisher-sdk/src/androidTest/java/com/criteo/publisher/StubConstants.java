@@ -15,7 +15,7 @@ public class StubConstants {
    * Image that is shown in the AJS creative (see {@link #STUB_DISPLAY_URL}) returned by CDB stub.
    * This is also the image of the single product in case of native response from CDB.
    */
-  public static final String STUB_CREATIVE_IMAGE = "https://publisherdirect.criteo.com/publishertag/preprodtest/creative.png";
+  public static final String STUB_CREATIVE_IMAGE = "https://publisherdirect.criteo.com/publishertag/preprodtest/creative_cas.png";
 
   /**
    * Native assets that are always returned by CDB stub.
