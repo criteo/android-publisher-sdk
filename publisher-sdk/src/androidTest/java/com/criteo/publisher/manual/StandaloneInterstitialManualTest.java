@@ -41,6 +41,26 @@ public class StandaloneInterstitialManualTest {
     context = activityRule.getActivity().getApplicationContext();
   }
 
+  /**
+   * Here is the list of test scenarios that could be verified through this test case.
+   *
+   * <h1>Scenario: Interstitial Ad should fit the size of the screen</h1>
+   * <ul>
+   *  <li>Given this test case</li>
+   *  <li>Then interstitial ad's width matches the screen of the device (no scrolling)</li>
+   *  <li>Then interstitial ad's height matches the screen of the device (no scrolling)</li>
+   * </ul>
+   *
+   * <h1>Scenario: Interstitial Ad should hide the status and action bar but keep the home button
+   * bar</h1>
+   * <ul>
+   *  <li>Given visible home button bar</li>
+   *  <li>Given this test case</li>
+   *  <li>Then action bar should be hidden</li>
+   *  <li>Then status bar should be hidden</li>
+   *  <li>Then home button bar should stay visible</li>
+   * </ul>
+   */
   @Test
   public void showingAnInterstitialDemoAd() throws Exception {
     givenInitializedCriteo(interstitialDemo);

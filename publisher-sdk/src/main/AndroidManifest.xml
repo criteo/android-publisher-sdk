@@ -6,6 +6,7 @@
 
   <application>
     <activity
+      android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
       android:name=".CriteoInterstitialActivity"
       android:configChanges="orientation|screenSize"
       />
