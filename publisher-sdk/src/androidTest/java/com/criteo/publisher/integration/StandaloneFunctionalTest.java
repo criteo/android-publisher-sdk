@@ -95,7 +95,7 @@ public class StandaloneFunctionalTest {
     CriteoBannerView bannerView = whenLoadingABanner(validBannerAdUnit);
     String html = webViewLookup.lookForHtmlContent(bannerView).get();
 
-    assertTrue(html.contains(STUB_DISPLAY_URL));
+    assertTrue(STUB_DISPLAY_URL.matcher(html).find());
   }
 
   @Test

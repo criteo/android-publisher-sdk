@@ -1,6 +1,7 @@
 package com.criteo.publisher;
 
 import com.criteo.publisher.model.NativeAssets;
+import java.util.regex.Pattern;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -9,7 +10,7 @@ public class StubConstants {
   /**
    * Display URL that is always returned by CDB stub.
    */
-  public static final String STUB_DISPLAY_URL = "https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js";
+  public static final Pattern STUB_DISPLAY_URL = Pattern.compile("https://directbidder-uat-stubs.par.preprod.crto.in/delivery/ajs.php\\?width=[0-9]+(&|&amp;)height=[0-9]+");
 
   /**
    * Image that is shown in the AJS creative (see {@link #STUB_DISPLAY_URL}) returned by CDB stub.

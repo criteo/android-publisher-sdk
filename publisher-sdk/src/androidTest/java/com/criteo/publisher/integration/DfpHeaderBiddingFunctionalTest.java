@@ -280,7 +280,7 @@ public class DfpHeaderBiddingFunctionalTest {
     String encodedDisplayUrl = builder.build().getCustomTargeting().getString(MACRO_DISPLAY_URL);
     String decodedDisplayUrl = decodeDfpPayloadComponent(encodedDisplayUrl);
 
-    assertEquals(STUB_DISPLAY_URL, decodedDisplayUrl);
+    assertTrue(STUB_DISPLAY_URL.matcher(decodedDisplayUrl).matches());
   }
 
   @Test
