@@ -14,6 +14,8 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import com.criteo.publisher.Util.CriteoResultReceiver;
 import java.util.Collection;
 import org.junit.Rule;
@@ -24,10 +26,25 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class CriteoInterstitialActivityTest {
 
-
     @Rule
     public ActivityTestRule<CriteoInterstitialActivity> activityRule = new ActivityTestRule<>(
             CriteoInterstitialActivity.class, true, false);
+
+    @Test
+    public void whenDeeplinkIsLoaded_GivenTargetAppIsNotInstalled_DontThrowActivityNotFound() {
+        CriteoResultReceiver criteoResultReceiver = mock(CriteoResultReceiver.class);
+        Intent intent = new Intent();
+        Bundle bundle = new Bundle();
+        bundle.putString(WEB_VIEW_DATA, "");
+        bundle.putParcelable(RESULT_RECEIVER, criteoResultReceiver);
+        intent.putExtras(bundle);
+        activityRule.launchActivity(intent);
+
+        CriteoInterstitialActivity activity = activityRule.getActivity();
+        WebView webView = activity.getWebView();
+        WebViewClient webViewClient  = webView.getWebViewClient();
+        webViewClient.shouldOverrideUrlLoading(webView, "fake_deeplink://fakeappdispatch");
+    }
 
     @Test
     public void testAppearAndDoNotDismiss() {

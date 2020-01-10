@@ -1,8 +1,11 @@
 package com.criteo.publisher;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
-import android.webkit.URLUtil;
+import android.support.annotation.VisibleForTesting;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.criteo.publisher.Util.AdUnitType;
@@ -13,6 +16,7 @@ import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.tasks.CriteoBannerListenerCallTask;
 import com.criteo.publisher.tasks.CriteoBannerLoadTask;
 import java.lang.ref.WeakReference;
+import java.util.List;
 import java.util.concurrent.Executor;
 
 
@@ -81,17 +85,31 @@ public class CriteoBannerEventController {
     // WebViewClient is created here to prevent passing the AdListener everywhere.
     // Setting this webViewClient to the WebView is done in the CriteoBannerLoadTask as all
     // WebView methods need to run in the same UI thread
-    private WebViewClient createWebViewClient() {
+    @VisibleForTesting
+    WebViewClient createWebViewClient() {
         WebViewClient webViewClient = new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.getContext().startActivity(
-                        new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                if (adListener != null) {
-                    Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
-                    CriteoBannerListenerCallTask listenerCallTask = new CriteoBannerListenerCallTask(adListener, null);
-                    listenerCallTask.executeOnExecutor(threadPoolExecutor, CriteoListenerCode.CLICK);
+                Context context = view.getContext();
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                // this callback gets called after the user has clicked on the creative. In case of deeplink,
+                // if the target application is not installed on the device, an ActivityNotFoundException
+                // will be thrown. Therefore, an explicit check is made to ensure that there exists at least
+                // one package that can handle the intent
+                PackageManager packageManager = context.getPackageManager();
+                List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+
+                if (list.size() > 0) {
+                    context.startActivity(intent);
+
+                    if (adListener != null) {
+                        Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
+                        CriteoBannerListenerCallTask listenerCallTask = new CriteoBannerListenerCallTask(adListener, null);
+                        listenerCallTask.executeOnExecutor(threadPoolExecutor, CriteoListenerCode.CLICK);
+                    }
                 }
+
                 return true;
             }
 
