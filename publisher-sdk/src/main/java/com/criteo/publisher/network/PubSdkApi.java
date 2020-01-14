@@ -3,12 +3,12 @@ package com.criteo.publisher.network;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.R;
 import com.criteo.publisher.Util.StreamUtil;
-import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.Util.TextUtils;
 import com.criteo.publisher.model.CdbRequest;
+import com.criteo.publisher.model.CdbResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -59,18 +59,17 @@ public class PubSdkApi {
     }
 
     @Nullable
-    public CdbResponse loadCdb(CdbRequest cdbRequest, String userAgent) {
-        CdbResponse cdbResponse = null;
+    public CdbResponse loadCdb(@NonNull CdbRequest cdbRequest, @NonNull String userAgent) {
         try {
             URL url = new URL(context.getString(R.string.cdb_url) + "/inapp/v2");
             JSONObject cdbRequestJson = cdbRequest.toJson();
             JSONObject result = executePost(url, cdbRequestJson, userAgent);
-            cdbResponse = new CdbResponse(result);
+            return CdbResponse.fromJson(result);
         } catch (IOException | JSONException e) {
             Log.d(TAG, "Unable to process request to Cdb:" + e.getMessage());
             e.printStackTrace();
         }
-        return cdbResponse;
+        return null;
     }
 
     @Nullable
@@ -104,54 +103,61 @@ public class PubSdkApi {
         }
     }
 
-    private static JSONObject executePost(URL url, JSONObject requestJson, String userAgent)
+    @Nullable
+    private static JSONObject executePost(
+        @NonNull URL url,
+        @NonNull JSONObject requestJson,
+        @NonNull String userAgent)
             throws IOException, JSONException {
-
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        urlConnection.setRequestMethod("POST");
-        urlConnection.setReadTimeout(TIMEOUT_IN_MILLIS);
-        urlConnection.setConnectTimeout(TIMEOUT_IN_MILLIS);
-        urlConnection.setRequestProperty("Content-Type", "text/plain");
-        if (!TextUtils.isEmpty(userAgent)) {
-            urlConnection.setRequestProperty("User-Agent", userAgent);
-        }
-        try {
-            OutputStream outputStream = urlConnection.getOutputStream();
-            outputStream.write(requestJson.toString().getBytes(Charset.forName("UTF-8")));
-            outputStream.flush();
-            outputStream.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-
-        JSONObject result = new JSONObject();
-        if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-            String response = StreamUtil.readStream(urlConnection.getInputStream());
-            if (!TextUtils.isEmpty(response)) {
-                result = new JSONObject(response);
-            }
-        }
-        return result;
+        HttpURLConnection urlConnection = prepareConnection(url, userAgent, "POST");
+        writePayload(urlConnection, requestJson);
+        return readResponseIfSuccess(urlConnection);
     }
 
     private static JSONObject executeGet(URL url, @Nullable String userAgent) throws IOException, JSONException {
+        HttpURLConnection urlConnection = prepareConnection(url, userAgent, "GET");
+
+        return readResponseIfSuccess(urlConnection);
+    }
+
+    @NonNull
+    private static HttpURLConnection prepareConnection(@NonNull URL url,
+        @NonNull String userAgent, String method) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        urlConnection.setRequestMethod("GET");
+        urlConnection.setRequestMethod(method);
         urlConnection.setReadTimeout(TIMEOUT_IN_MILLIS);
         urlConnection.setConnectTimeout(TIMEOUT_IN_MILLIS);
         urlConnection.setRequestProperty("Content-Type", "text/plain");
         if (!TextUtils.isEmpty(userAgent)) {
             urlConnection.setRequestProperty("User-Agent", userAgent);
         }
-        JSONObject result = new JSONObject();
-        if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+        return urlConnection;
+    }
+
+    @Nullable
+    private static JSONObject readResponseIfSuccess(@NonNull HttpURLConnection urlConnection)
+        throws IOException, JSONException {
+        int status = urlConnection.getResponseCode();
+        if (status == HttpURLConnection.HTTP_OK || status == HttpURLConnection.HTTP_NO_CONTENT) {
             String response = StreamUtil.readStream(urlConnection.getInputStream());
             if (!TextUtils.isEmpty(response)) {
-                result = new JSONObject(response);
+                return new JSONObject(response);
             }
+            return new JSONObject();
         }
-        return result;
+        return null;
+    }
+
+    private static void writePayload(
+        @NonNull HttpURLConnection urlConnection,
+        @NonNull JSONObject requestJson) throws IOException {
+        byte[] payload = requestJson.toString().getBytes(Charset.forName("UTF-8"));
+
+        urlConnection.setDoOutput(true);
+        try (OutputStream outputStream = urlConnection.getOutputStream()) {
+            outputStream.write(payload);
+            outputStream.flush();
+        }
     }
 
     private static String getParamsString(Map<String, String> params) {

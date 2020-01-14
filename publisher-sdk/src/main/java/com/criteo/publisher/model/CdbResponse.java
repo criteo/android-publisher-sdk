@@ -1,6 +1,7 @@
 package com.criteo.publisher.model;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,18 +18,18 @@ public class CdbResponse {
     private final List<Slot> slots;
     private final int timeToNextCall;
 
-    public CdbResponse(JSONObject json) {
+    public CdbResponse(@NonNull JSONObject json) {
         int timeToNextCall = 0;
         slots = new ArrayList<>();
 
-        if(json != null && json.has(TIME_TO_NEXT_CALL)) {
+        if(json.has(TIME_TO_NEXT_CALL)) {
             try {
                 timeToNextCall = json.getInt(TIME_TO_NEXT_CALL);
             } catch (JSONException ex) {
                 Log.d(TAG, "Exception while reading cdb time to next call" + ex.getMessage());
             }
         }
-        if (json != null && json.has(SLOTS)) {
+        if (json.has(SLOTS)) {
             JSONArray array = new JSONArray();
             try {
                 array = json.getJSONArray(SLOTS);
@@ -46,6 +47,14 @@ public class CdbResponse {
         }
 
         this.timeToNextCall = timeToNextCall;
+    }
+
+    @Nullable
+    public static CdbResponse fromJson(@Nullable JSONObject json) {
+        if (json == null) {
+            return null;
+        }
+        return new CdbResponse(json);
     }
 
     @NonNull
