@@ -3,6 +3,7 @@ package com.criteo.publisher.model;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -12,18 +13,23 @@ public class Publisher implements Parcelable {
     private static final String BUNDLE_ID = "bundleId";
     private static final String CRITEO_PUBLISHER_ID = "cpId";
 
+    @NonNull
     private final String bundleId;
+
+    @NonNull
     private final String criteoPublisherId;
 
-    public Publisher(Context context, String criteoPublisherId) {
+    public Publisher(@NonNull Context context, @NonNull String criteoPublisherId) {
         this.bundleId = context.getPackageName();
         this.criteoPublisherId = criteoPublisherId;
     }
 
+    @NonNull
     public String getBundleId() {
         return bundleId;
     }
 
+    @NonNull
     public String getCriteoPublisherId() {
         return criteoPublisherId;
     }

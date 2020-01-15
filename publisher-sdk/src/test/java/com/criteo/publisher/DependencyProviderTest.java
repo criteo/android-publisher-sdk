@@ -100,6 +100,15 @@ public class DependencyProviderTest {
   }
 
   @Test
+  public void provideUser_WhenProvidedTwice_ReturnsTheSame() throws Exception {
+    provideBean_WhenProvidedTwice_ReturnsTheSame(provider -> {
+      doReturn(mock(DeviceUtil.class)).when(provider).provideDeviceUtil(any());
+
+      return provider.provideUser(mock(Context.class));
+    });
+  }
+
+  @Test
   public void provideDeviceInfo_WhenProvidedTwice_ReturnsTheSame() throws Exception {
     provideBean_WhenProvidedTwice_ReturnsTheSame(provider ->
         provider.provideDeviceInfo(mock(Context.class)));

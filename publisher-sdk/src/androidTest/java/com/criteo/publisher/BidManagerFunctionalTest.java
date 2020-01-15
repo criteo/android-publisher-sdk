@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
-import org.json.JSONObject;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
@@ -185,7 +184,7 @@ public class BidManagerFunctionalTest {
     when(deviceInfo.getUserAgent()).thenReturn(completedFuture("expectedUserAgent"));
     doReturn(deviceInfo).when(dependencyProvider).provideDeviceInfo(any());
 
-    when(user.getSdkVer()).thenReturn("1.2.3");
+    when(user.getSdkVersion()).thenReturn("1.2.3");
 
     JSONObject expectedGdpr = mock(JSONObject.class);
     UserPrivacyUtil userPrivacyUtil = mock(UserPrivacyUtil.class);

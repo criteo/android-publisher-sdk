@@ -14,6 +14,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import android.app.Application;
 import android.content.Intent;
@@ -29,6 +30,7 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
 import java.util.Collections;
@@ -125,6 +127,19 @@ public class CriteoFunctionalTest {
     waitForBids();
 
     verify(bidManager).prefetch(any());
+  }
+
+  @Test
+  public void init_GivenCpIdAppIdAndVersion_CallConfigWithThose() throws Exception {
+    User user = mock(User.class);
+    when(user.getSdkVersion()).thenReturn("1.2.3");
+
+    doReturn(user).when(dependencyProvider).provideUser(any());
+
+    givenInitializedCriteo();
+    waitForBids();
+
+    verify(api).loadConfig(TEST_CP_ID, "com.criteo.publisher.test", "1.2.3");
   }
 
   private void waitForBids() {

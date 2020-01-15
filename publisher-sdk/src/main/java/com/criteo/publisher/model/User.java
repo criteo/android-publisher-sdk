@@ -29,7 +29,10 @@ public class User implements Parcelable {
     private String deviceIdType;
     private String deviceModel;
     private String deviceOs;
-    private String sdkVer;
+
+    @NonNull
+    private String sdkVersion;
+
     private int limit;
     private String connection;
 
@@ -44,7 +47,7 @@ public class User implements Parcelable {
         deviceIdType = GAID;
         deviceModel = deviceUtil.getDeviceModel();
         deviceOs = ANDROID;
-        sdkVer = BuildConfig.VERSION_NAME;
+        sdkVersion = BuildConfig.VERSION_NAME;
         limit = LMT_VAL;
     }
 
@@ -52,8 +55,9 @@ public class User implements Parcelable {
         this.deviceId = deviceId;
     }
 
-    public String getSdkVer() {
-        return sdkVer;
+    @NonNull
+    public String getSdkVersion() {
+        return sdkVersion;
     }
 
     public void setUspIab(@NonNull String uspIab) {
@@ -80,7 +84,7 @@ public class User implements Parcelable {
         object.put(DEVICE_ID_TYPE, deviceIdType);
         object.put(DEVICE_MODEL, deviceModel);
         object.put(DEVICE_OS, deviceOs);
-        object.put(SDK_VER, sdkVer);
+        object.put(SDK_VER, sdkVersion);
         object.put(LIMIT, limit);
         object.put(CONNECTION, connection);
 
@@ -106,7 +110,7 @@ public class User implements Parcelable {
         dest.writeString(this.deviceIdType);
         dest.writeString(this.deviceModel);
         dest.writeString(this.deviceOs);
-        dest.writeString(this.sdkVer);
+        dest.writeString(this.sdkVersion);
         dest.writeInt(this.limit);
         dest.writeString(this.connection);
         dest.writeString(this.uspIab);
@@ -118,7 +122,7 @@ public class User implements Parcelable {
         this.deviceIdType = in.readString();
         this.deviceModel = in.readString();
         this.deviceOs = in.readString();
-        this.sdkVer = in.readString();
+        this.sdkVersion = in.readString();
         this.limit = in.readInt();
         this.connection = in.readString();
         this.uspIab = in.readString();

@@ -161,7 +161,7 @@ public class DependencyProvider {
             new Publisher(context, criteoPublisherId),
             new TokenCache(),
             DependencyProvider.this.provideDeviceInfo(context),
-            new User(DependencyProvider.this.provideDeviceUtil(context)),
+            DependencyProvider.this.provideUser(context),
             new SdkCache(DependencyProvider.this.provideDeviceUtil(context)),
             new Hashtable<>(),
             DependencyProvider.this.provideConfig(context),
@@ -172,6 +172,16 @@ public class DependencyProvider {
             DependencyProvider.this.provideAdUnitMapper(context),
             DependencyProvider.this.providePubSdkApi(context)
         );
+      }
+    });
+  }
+
+  @NonNull
+  public User provideUser(@NonNull Context context) {
+    return getOrCreate(User.class, new Factory<User>() {
+      @Override
+      public User create() {
+        return new User(DependencyProvider.this.provideDeviceUtil(context));
       }
     });
   }

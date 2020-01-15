@@ -5,14 +5,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
-import com.criteo.publisher.BuildConfig;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.model.CacheAdUnit;
-import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.CdbRequest;
+import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
@@ -99,7 +98,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     JSONObject configResult = api.loadConfig(
         publisher.getCriteoPublisherId(),
         publisher.getBundleId(),
-        user.getSdkVer());
+        user.getSdkVersion());
 
     // FIXME EE-792 Proper solution would be to separate the remote config and the CDB calls
     //  This will remove the is*Requested boolean, this ugly partial parsing and partial
@@ -144,7 +143,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
             user.setUspOptout(uspOptout);
         }
 
-    return new CdbRequest(publisher, user, user.getSdkVer(), profile,
+    return new CdbRequest(publisher, user, user.getSdkVersion(), profile,
         userPrivacyUtil.gdpr(), cacheAdUnits);
   }
 

@@ -20,7 +20,6 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-//TODO: Add unit tests
 public class PubSdkApi {
 
     private static final int TIMEOUT_IN_MILLIS = 60 * 1000;
@@ -39,8 +38,10 @@ public class PubSdkApi {
     }
 
     @Nullable
-    public JSONObject loadConfig(String criteoPublisherId, String appId, String sdkVersion) {
-
+    public JSONObject loadConfig(
+        @NonNull String criteoPublisherId,
+        @NonNull String appId,
+        @NonNull String sdkVersion) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put(CRITEO_PUBLISHER_ID, criteoPublisherId);
         parameters.put(APP_ID, appId);

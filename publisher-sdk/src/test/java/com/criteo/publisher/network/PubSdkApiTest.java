@@ -7,6 +7,7 @@ import static org.mockserver.model.HttpError.error;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 import static org.mockserver.model.NottableString.not;
+import static org.mockserver.verify.VerificationTimes.once;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -23,7 +24,6 @@ import org.mockito.MockitoAnnotations;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.junit.MockServerRule;
 import org.mockserver.model.MediaType;
-import org.mockserver.verify.VerificationTimes;
 
 public class PubSdkApiTest {
 
@@ -44,6 +44,7 @@ public class PubSdkApiTest {
 
     when(context.getString(R.string.cdb_url)).thenReturn("http://localhost:" + mockServerRule.getPort());
     when(context.getString(R.string.event_url)).thenReturn("http://localhost:" + mockServerRule.getPort());
+    when(context.getString(R.string.config_url)).thenReturn("http://localhost:" + mockServerRule.getPort());
 
     api = new PubSdkApi(context);
   }
@@ -55,7 +56,7 @@ public class PubSdkApiTest {
     mockServerClient.verify(request()
         .withPath("/appevent/v1/42")
         .withMethod("GET")
-        .withContentType(MediaType.TEXT_PLAIN), VerificationTimes.once());
+        .withContentType(MediaType.TEXT_PLAIN), once());
   }
 
   @Test
@@ -101,7 +102,7 @@ public class PubSdkApiTest {
         .withPath("/inapp/v2")
         .withMethod("POST")
         .withContentType(MediaType.TEXT_PLAIN)
-        .withBody(json, StandardCharsets.UTF_8), VerificationTimes.once()
+        .withBody(json, StandardCharsets.UTF_8), once()
     );
   }
 
@@ -218,6 +219,18 @@ public class PubSdkApiTest {
     CdbResponse cdbResponse = api.loadCdb(cdbRequest, "");
 
     assertThat(cdbResponse).isNull();
+  }
+
+  @Test
+  public void loadConfig_GivenInput_SendGetRequestWithQueryParameters() throws Exception {
+    api.loadConfig("myCpId", "myAppId", "myVersion");
+
+    mockServerClient.verify(request()
+        .withMethod("GET")
+        .withPath("/v2.0/api/config")
+        .withQueryStringParameter("cpId", "myCpId")
+        .withQueryStringParameter("appId", "myAppId")
+        .withQueryStringParameter("sdkVersion", "myVersion"), once());
   }
 
   @NonNull

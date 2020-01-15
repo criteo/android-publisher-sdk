@@ -111,6 +111,7 @@ public class CriteoInternalUnitTest {
     verify(dependencyProvider, atLeastOnce()).provideBidManager(contextCaptor.capture(), eq(criteoPublisherId));
     verify(dependencyProvider, atLeastOnce()).provideConfig(contextCaptor.capture());
     verify(dependencyProvider, atLeastOnce()).provideUserPrivacyUtil(contextCaptor.capture());
+    verify(dependencyProvider, atLeastOnce()).provideUser(contextCaptor.capture());
     verify(dependencyProvider, atLeastOnce()).provideAppEvents(contextCaptor.capture());
 
     assertThat(contextCaptor.getAllValues()).containsOnly(applicationContext);
