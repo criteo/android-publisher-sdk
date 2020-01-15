@@ -7,13 +7,16 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
+import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.network.PubSdkApi;
@@ -34,6 +37,7 @@ public class BearcatFunctionalTest {
 
   @Mock
   private PubSdkApi api;
+  private DependencyProvider dependencyProvider;
 
   private Context context;
 
@@ -41,14 +45,14 @@ public class BearcatFunctionalTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    doReturn(api).when(mockedDependenciesRule.getDependencyProvider()).providePubSdkApi(any());
+    dependencyProvider = mockedDependenciesRule.getDependencyProvider();
+
+    doReturn(api).when(dependencyProvider).providePubSdkApi(any());
     context = InstrumentationRegistry.getContext().getApplicationContext();
   }
 
   @Test
   public void init_GivenUserAgentAndLaunchedActivity_SendInitEventWithUserAgent() throws Exception {
-    DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-
     DeviceInfo deviceInfo = spy(dependencyProvider.provideDeviceInfo(context));
     doReturn(deviceInfo).when(dependencyProvider).provideDeviceInfo(any());
     doReturn(completedFuture("expectedUserAgent")).when(deviceInfo).getUserAgent();
@@ -58,6 +62,48 @@ public class BearcatFunctionalTest {
     waitForIdleState();
 
     verify(api).postAppEvent(anyInt(), any(), any(), any(), anyInt(), eq("expectedUserAgent"));
+  }
+
+  @Test
+  public void init_GivenInputAndLaunchedActivity_SendInitEventWithGivenData() throws Exception {
+    AdvertisingInfo advertisingInfo = mock(AdvertisingInfo.class);
+    when(advertisingInfo.isLimitAdTrackingEnabled(any())).thenReturn(false);
+    when(advertisingInfo.getAdvertisingId(any())).thenReturn("myAdvertisingId");
+
+    doReturn(advertisingInfo).when(dependencyProvider).provideAdvertisingInfo();
+
+    givenInitializedCriteo();
+    activityRule.launchActivity(new Intent());
+    waitForIdleState();
+
+    verify(api).postAppEvent(
+        eq(2379),
+        eq("com.criteo.publisher.test"),
+        eq("myAdvertisingId"),
+        eq("Launch"),
+        eq(0),
+        any());
+  }
+
+  @Test
+  public void init_GivenLimitedAdTracking_SendInitEventWithDummyGaidAndLimitation() throws Exception {
+    AdvertisingInfo advertisingInfo = mock(AdvertisingInfo.class);
+    when(advertisingInfo.isLimitAdTrackingEnabled(any())).thenReturn(true);
+    when(advertisingInfo.getAdvertisingId(any())).thenReturn("myAdvertisingId");
+
+    doReturn(advertisingInfo).when(dependencyProvider).provideAdvertisingInfo();
+
+    givenInitializedCriteo();
+    activityRule.launchActivity(new Intent());
+    waitForIdleState();
+
+    verify(api).postAppEvent(
+        anyInt(),
+        any(),
+        eq("00000000-0000-0000-0000-000000000000"),
+        any(),
+        eq(1),
+        any());
   }
 
   private void waitForIdleState() {
