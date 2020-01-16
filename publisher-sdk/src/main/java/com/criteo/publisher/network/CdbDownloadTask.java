@@ -139,9 +139,14 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     }
 
     String uspOptout = userPrivacyUtil.getUsPrivacyOptout();
-        if (uspOptout != null && !uspOptout.isEmpty()) {
-            user.setUspOptout(uspOptout);
-        }
+    if (!uspOptout.isEmpty()) {
+        user.setUspOptout(uspOptout);
+    }
+
+    String mopubConsent = userPrivacyUtil.getMopubConsent();
+    if (!mopubConsent.isEmpty()) {
+      user.setMopubConsent(mopubConsent);
+    }
 
     return new CdbRequest(publisher, user, user.getSdkVersion(), profile,
         userPrivacyUtil.gdpr(), cacheAdUnits);

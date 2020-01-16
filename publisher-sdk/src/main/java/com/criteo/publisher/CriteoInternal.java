@@ -36,6 +36,7 @@ final class CriteoInternal extends Criteo {
       List<AdUnit> adUnits,
       String criteoPublisherId,
       @Nullable Boolean usPrivacyOptout,
+      @Nullable String mopubConsent,
       DependencyProvider dependencyProvider) {
 
     if (application == null) {
@@ -64,6 +65,12 @@ final class CriteoInternal extends Criteo {
     userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil(context);
     if (usPrivacyOptout != null) {
       userPrivacyUtil.storeUsPrivacyOptout(usPrivacyOptout.booleanValue());
+    }
+
+    // this nulll check ensures that instantiating Criteo object with null mopub consent value,
+    // doesn't erase the previously stored consent value
+    if (mopubConsent != null) {
+      userPrivacyUtil.storeMopubConsent(mopubConsent);
     }
 
     this.appEvents = dependencyProvider.provideAppEvents(context);
@@ -153,5 +160,10 @@ final class CriteoInternal extends Criteo {
   @Override
   public void setUsPrivacyOptOut(boolean usPrivacyOptOut) {
     userPrivacyUtil.storeUsPrivacyOptout(usPrivacyOptOut);
+  }
+
+  @Override
+  public void setMopubConsent(@Nullable String mopubConsent) {
+    userPrivacyUtil.storeMopubConsent(mopubConsent);
   }
 }

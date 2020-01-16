@@ -24,7 +24,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class USPrivacyFunctionalTest {
+public class UserPrivacyFunctionalTest {
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
@@ -137,6 +137,64 @@ public class USPrivacyFunctionalTest {
 
     CdbRequest cdb = cdbArgumentCaptor.getValue();
     assertEquals("false", cdb.getUser().getUspOptout());
+  }
+
+  @Test
+  public void whenCriteoInit_GivenMopubConsentNotEmpty_VerifyItIsPassedToCdb() throws Exception {
+    Criteo.Builder builder = CriteoUtil.getCriteoBuilder(TestAdUnits.BANNER_320_50);
+    builder.mopubConsent("fake_mopub_consent").init();
+
+    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
+    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
+
+    CdbRequest cdb = cdbArgumentCaptor.getValue();
+    assertEquals("fake_mopub_consent", cdb.getUser().getMopubConsent());
+  }
+
+  @Test
+  public void whenCriteoInit_GivenMopubConsentNotProvided_ThenProvidedAfterFirstCall_VerifyItIsPassedToCdbOnTheSecondCall() throws Exception {
+    Criteo.Builder builder = CriteoUtil.getCriteoBuilder(TestAdUnits.BANNER_320_50);
+    Criteo criteo = builder.init();
+
+    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+
+    criteo.setMopubConsent("fake_mopub_consent");
+    criteo.getBidForAdUnit(TestAdUnits.BANNER_320_480);
+
+    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
+    verify(pubSdkApi, times(2)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
+
+    CdbRequest cdb = cdbArgumentCaptor.getValue();
+    assertEquals("fake_mopub_consent", cdb.getUser().getMopubConsent());
+  }
+
+  @Test
+  public void whenCriteoInit_GivenMopubConsentThroughSetter_ThenCriteoCleared_ThenVerifyItIsStillPassedToCdb() throws Exception {
+    // given
+    Criteo.Builder builder = CriteoUtil.getCriteoBuilder(TestAdUnits.BANNER_320_50);
+    Criteo criteo = builder.init();
+
+    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+
+    criteo.setMopubConsent("fake_mopub_consent");
+
+    // when
+    CriteoUtil.clearCriteo();
+
+    // then
+    Criteo.Builder builder2 = CriteoUtil.getCriteoBuilder(TestAdUnits.BANNER_320_50);
+    Criteo criteo2 = builder2.init();
+    criteo2.getBidForAdUnit(TestAdUnits.BANNER_320_480);
+    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
+    verify(pubSdkApi, times(3)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
+
+    CdbRequest cdb = cdbArgumentCaptor.getValue();
+    assertEquals("fake_mopub_consent", cdb.getUser().getMopubConsent());
   }
 
   private void writeIntoDefaultSharedPrefs(String key, String value) {

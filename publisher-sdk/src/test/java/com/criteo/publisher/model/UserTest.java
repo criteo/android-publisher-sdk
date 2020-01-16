@@ -30,6 +30,7 @@ public class UserTest {
   public void testToJson_AllFieldsProvided() throws Exception {
     user.setUspIab("fake_usp_iab");
     user.setUspOptout("true");
+    user.setMopubConsent("fake_mopub_consent");
     JSONObject jsonObject = user.toJson();
 
     assertEquals("deviceId", jsonObject.get("deviceId"));
@@ -40,6 +41,7 @@ public class UserTest {
     assertEquals(0, jsonObject.get("lmt"));
     assertEquals("fake_usp_iab", jsonObject.get("uspIab"));
     assertEquals("true", jsonObject.get("uspOptout"));
+    assertEquals("fake_mopub_consent", jsonObject.get("mopubConsent"));
   }
 
   @Test
@@ -48,6 +50,19 @@ public class UserTest {
 
     assertFalse(jsonObject.has("uspIab"));
     assertFalse(jsonObject.has("uspOptout"));
+    assertFalse(jsonObject.has("mopubConsent"));
+  }
+
+  @Test
+  public void testToJson_UspValuesEmpty() throws Exception {
+    JSONObject jsonObject = user.toJson();
+    user.setUspOptout("");
+    user.setMopubConsent("");
+    user.setUspIab("");
+
+    assertFalse(jsonObject.has("uspIab"));
+    assertFalse(jsonObject.has("uspOptout"));
+    assertFalse(jsonObject.has("mopubConsent"));
   }
 }
 

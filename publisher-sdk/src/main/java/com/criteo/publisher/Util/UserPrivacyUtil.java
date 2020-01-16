@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import java.util.Arrays;
@@ -14,12 +15,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class UserPrivacyUtil {
-    private static final String CONSENT_STRING = "IABConsent_ConsentString";
-    private static final String SUBJECT_TO_GDPR = "IABConsent_SubjectToGDPR";
-    private static final String VENDORS = "IABConsent_ParsedVendorConsents";
-    private static final String CONSENT_DATA = "consentData";
-    private static final String GDPR_APPLIES = "gdprApplies";
-    private static final String CONSENT_GIVEN = "consentGiven";
+    private static final String IAB_CONSENT_STRING_SHARED_PREFS_KEY = "IABConsent_ConsentString";
+    private static final String IAB_SUBJECT_TO_GDPR_SHARED_PREFS_KEY = "IABConsent_SubjectToGDPR";
+    private static final String IAB_VENDORS_SHARED_PREFS_KEY = "IABConsent_ParsedVendorConsents";
+    private static final String CONSENT_DATA_SHARED_PREFS_KEY = "consentData";
+    private static final String GDPR_APPLIES_SHARED_PREFS_KEY = "gdprApplies";
+    private static final String CONSENT_GIVEN_SHARED_PREFS_KEY = "consentGiven";
 
     // Regex according to the CCPA IAB String format defined in
     // https://iabtechlab.com/wp-content/uploads/2019/11/U.S.-Privacy-String-v1.0-IAB-Tech-Lab.pdf
@@ -29,10 +30,12 @@ public class UserPrivacyUtil {
     private static final List<String> IAB_USPRIVACY_WITH_CONSENT = Arrays.asList("1ynn", "1yny", "1---");
 
     // Key provided by the IAB CCPA Compliance Framework
-    private static final String IAB_USPRIVACY = "IABUSPrivacy_String";
+    private static final String IAB_USPRIVACY_SHARED_PREFS_KEY = "IABUSPrivacy_String";
 
     // Storage key for the binary optout (for CCPA)
-    private static final String OPTOUT_USPRIVACY = "USPrivacy_Optout";
+    private static final String OPTOUT_USPRIVACY_SHARED_PREFS_KEY = "USPrivacy_Optout";
+
+    private static final String MOPUB_CONSENT_SHARED_PREFS_KEY = "MoPubConsent_String";
 
     private final SharedPreferences sharedPreferences;
 
@@ -46,9 +49,9 @@ public class UserPrivacyUtil {
     }
 
     public JSONObject gdpr() {
-        String consentString = sharedPreferences.getString(CONSENT_STRING, "");
-        String subjectToGdpr = sharedPreferences.getString(SUBJECT_TO_GDPR, "");
-        String vendorConsents = sharedPreferences.getString(VENDORS, "");
+        String consentString = sharedPreferences.getString(IAB_CONSENT_STRING_SHARED_PREFS_KEY, "");
+        String subjectToGdpr = sharedPreferences.getString(IAB_SUBJECT_TO_GDPR_SHARED_PREFS_KEY, "");
+        String vendorConsents = sharedPreferences.getString(IAB_VENDORS_SHARED_PREFS_KEY, "");
 
         JSONObject gdprConsent = null;
         if (!TextUtils.isEmpty(consentString) &&
@@ -57,9 +60,9 @@ public class UserPrivacyUtil {
             gdprConsent = new JSONObject();
 
             try {
-                gdprConsent.put(CONSENT_DATA, consentString);
-                gdprConsent.put(GDPR_APPLIES, "1".equals(subjectToGdpr));
-                gdprConsent.put(CONSENT_GIVEN, (vendorConsents.length() > 90 && vendorConsents.charAt(90) == '1'));
+                gdprConsent.put(CONSENT_DATA_SHARED_PREFS_KEY, consentString);
+                gdprConsent.put(GDPR_APPLIES_SHARED_PREFS_KEY, "1".equals(subjectToGdpr));
+                gdprConsent.put(CONSENT_GIVEN_SHARED_PREFS_KEY, (vendorConsents.length() > 90 && vendorConsents.charAt(90) == '1'));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -69,18 +72,18 @@ public class UserPrivacyUtil {
 
     @NonNull
     public String getIabUsPrivacyString() {
-        return sharedPreferences.getString(IAB_USPRIVACY, "");
+        return sharedPreferences.getString(IAB_USPRIVACY_SHARED_PREFS_KEY, "");
     }
 
     public void storeUsPrivacyOptout(boolean uspOptout) {
         Editor edit = sharedPreferences.edit();
-        edit.putString(OPTOUT_USPRIVACY, String.valueOf(uspOptout));
+        edit.putString(OPTOUT_USPRIVACY_SHARED_PREFS_KEY, String.valueOf(uspOptout));
         edit.apply();
     }
 
     @NonNull
     public String getUsPrivacyOptout() {
-        return sharedPreferences.getString(OPTOUT_USPRIVACY, "");
+        return sharedPreferences.getString(OPTOUT_USPRIVACY_SHARED_PREFS_KEY, "");
     }
 
     /**
@@ -115,5 +118,16 @@ public class UserPrivacyUtil {
 
         return !IAB_USPRIVACY_PATTERN.matcher(iabUsPrivacy).matches() ||
                 IAB_USPRIVACY_WITH_CONSENT.contains(iabUsPrivacy.toLowerCase());
+    }
+
+    public void storeMopubConsent(@Nullable String mopubConsent) {
+        Editor edit = sharedPreferences.edit();
+        edit.putString(MOPUB_CONSENT_SHARED_PREFS_KEY, mopubConsent);
+        edit.apply();
+    }
+
+    @NonNull
+    public String getMopubConsent() {
+        return sharedPreferences.getString(MOPUB_CONSENT_SHARED_PREFS_KEY, "");
     }
 }

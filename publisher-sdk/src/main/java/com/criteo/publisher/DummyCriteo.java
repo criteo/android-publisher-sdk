@@ -53,6 +53,11 @@ public class DummyCriteo extends Criteo {
     // do nothing
   }
 
+  @Override
+  public void setMopubConsent(String mopubConsent) {
+    // do nothing
+  }
+
   private static class DummyDeviceInfo extends DeviceInfo {
 
     private DummyDeviceInfo() {

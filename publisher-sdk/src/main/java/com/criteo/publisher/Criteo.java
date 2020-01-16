@@ -20,10 +20,20 @@ public abstract class Criteo {
   private static Criteo criteo;
 
   public static class Builder {
-    private String criteoPublisherId;
+    @NonNull
+    private final String criteoPublisherId;
+
+    @NonNull
+    private final Application application;
+
+    @Nullable
     private List<AdUnit> adUnits;
-    private Application application;
+
+    @Nullable
     private Boolean usPrivacyOptOut;
+
+    @Nullable
+    private String mopubConsent;
 
     public Builder(@NonNull Application application, @NonNull String criteoPublisherId) {
       this.application = application;
@@ -40,8 +50,13 @@ public abstract class Criteo {
       return this;
     }
 
+    public Builder mopubConsent(@Nullable String mopubConsent) {
+        this.mopubConsent = mopubConsent;
+        return this;
+    }
+
     public Criteo init() throws CriteoInitException {
-      return Criteo.init(application, criteoPublisherId, adUnits, usPrivacyOptOut);
+      return Criteo.init(application, criteoPublisherId, adUnits, usPrivacyOptOut, mopubConsent);
     }
   }
 
@@ -57,10 +72,11 @@ public abstract class Criteo {
   }
 
   private static Criteo init(
-      Application application,
-      String criteoPublisherId,
-      List<AdUnit> adUnits,
-      @Nullable Boolean usPrivacyOptOut
+      @NonNull Application application,
+      @NonNull String criteoPublisherId,
+      @Nullable List<AdUnit> adUnits,
+      @Nullable Boolean usPrivacyOptOut,
+      @Nullable String mopubConsent
   ) throws CriteoInitException {
 
     synchronized (Criteo.class) {
@@ -71,8 +87,14 @@ public abstract class Criteo {
               .provideDeviceUtil(application.getApplicationContext());
 
           if (deviceUtil.isVersionSupported()) {
-            criteo = new CriteoInternal(application, adUnits, criteoPublisherId, usPrivacyOptOut,
-                dependencyProvider);
+            criteo = new CriteoInternal(
+                application,
+                adUnits,
+                criteoPublisherId,
+                usPrivacyOptOut,
+                mopubConsent,
+                dependencyProvider
+            );
           } else {
             criteo = new DummyCriteo();
           }
@@ -116,5 +138,7 @@ public abstract class Criteo {
   abstract Config getConfig();
 
   public abstract void setUsPrivacyOptOut(boolean usPrivacyOptOut);
+
+  public abstract void setMopubConsent(@Nullable String mopubConsent);
 
 }

@@ -147,6 +147,24 @@ public class UserPrivacyUtilTest {
     verify(editor, timeout(1)).putString("USPrivacy_Optout", "false");
   }
 
+  @Test
+  public void testSetMopubConsentValue() {
+    when(sharedPreferences.edit()).thenReturn(editor);
+
+    userPrivacyUtil.storeMopubConsent("fake_mopub_consent_value");
+
+    verify(editor, timeout(1)).putString("MoPubConsent_String", "fake_mopub_consent_value");
+  }
+
+  @Test
+  public void testGetMopubConsentValue() {
+    when(sharedPreferences.getString("MoPubConsent_String", "")).thenReturn("fake_mopub_consent_value");
+
+    String mopubConsent = userPrivacyUtil.getMopubConsent();
+
+    assertEquals("fake_mopub_consent_value", mopubConsent);
+  }
+
   private void assertConsentGiven(String iabUsPrivacyString, String usPrivacyOptout, boolean consentGiven) {
     givenUsPrivacySetup(iabUsPrivacyString, usPrivacyOptout);
     assertEquals(consentGiven, userPrivacyUtil.isCCPAConsentGiven());

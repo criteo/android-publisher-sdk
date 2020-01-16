@@ -23,6 +23,8 @@ public class User implements Parcelable {
     private static final String ANDROID = "android";
     private static final String USP_IAB = "uspIab";
     private static final String USP_OPTOUT = "uspOptout";
+    private static final String MOPUB_CONSENT = "mopubConsent";
+
     private static final int LMT_VAL = 0;
 
     private String deviceId;
@@ -42,6 +44,9 @@ public class User implements Parcelable {
     /** US Privacy optout in binary format (for CCPA) */
     private String uspOptout;
 
+    @Nullable
+    private String mopubConsent;
+
     public User(@NonNull DeviceUtil deviceUtil) {
         deviceId = "";
         deviceIdType = GAID;
@@ -60,7 +65,7 @@ public class User implements Parcelable {
         return sdkVersion;
     }
 
-    public void setUspIab(@NonNull String uspIab) {
+    public void setUspIab(@Nullable String uspIab) {
         this.uspIab = uspIab;
     }
 
@@ -69,13 +74,22 @@ public class User implements Parcelable {
         return uspIab;
     }
 
-    public void setUspOptout(@NonNull String uspOptout) {
+    public void setUspOptout(@Nullable String uspOptout) {
         this.uspOptout = uspOptout;
     }
 
     @Nullable
     public String getUspOptout() {
         return uspOptout;
+    }
+
+    public void setMopubConsent(@Nullable String mopubConsent) {
+        this.mopubConsent = mopubConsent;
+    }
+
+    @Nullable
+    public String getMopubConsent() {
+        return mopubConsent;
     }
 
     public JSONObject toJson() throws JSONException {
@@ -94,6 +108,10 @@ public class User implements Parcelable {
 
         if (this.uspOptout != null && !this.uspOptout.isEmpty()) {
             object.put(USP_OPTOUT, uspOptout);
+        }
+
+        if (this.mopubConsent != null && !this.mopubConsent.isEmpty()) {
+            object.put(MOPUB_CONSENT, mopubConsent);
         }
 
         return object;
@@ -115,6 +133,7 @@ public class User implements Parcelable {
         dest.writeString(this.connection);
         dest.writeString(this.uspIab);
         dest.writeString(this.uspOptout);
+        dest.writeString(this.mopubConsent);
     }
 
     protected User(Parcel in) {
@@ -127,6 +146,7 @@ public class User implements Parcelable {
         this.connection = in.readString();
         this.uspIab = in.readString();
         this.uspOptout = in.readString();
+        this.mopubConsent = in.readString();
     }
 
     public static final Parcelable.Creator<User> CREATOR = new Parcelable.Creator<User>() {
