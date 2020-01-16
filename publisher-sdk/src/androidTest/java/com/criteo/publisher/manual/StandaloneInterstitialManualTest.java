@@ -16,9 +16,11 @@ import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.test.activity.DummyActivity;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
+@Ignore // Those are test that should only be run manually
 public class StandaloneInterstitialManualTest {
 
   private static final int INVESTIGATION_TIME_MS = 15_000;
@@ -30,6 +32,7 @@ public class StandaloneInterstitialManualTest {
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   private final InterstitialAdUnit interstitialDemo = TestAdUnits.INTERSTITIAL_DEMO;
+  private final InterstitialAdUnit interstitialIbvDemo = TestAdUnits.INTERSTITIAL_IBV_DEMO;
 
   private Context context;
 
@@ -63,11 +66,29 @@ public class StandaloneInterstitialManualTest {
    */
   @Test
   public void showingAnInterstitialDemoAd() throws Exception {
-    givenInitializedCriteo(interstitialDemo);
+    showingAnInterstitialAd(interstitialDemo);
+  }
+
+  /**
+   * Here is the list of test scenarios that could be verified through this test case.
+   *
+   * <h1>Scenario: IBV should be played automatically</h1>
+   * <ul>
+   *  <li>Given this test case</li>
+   *  <li>Then video start automatically</li>
+   * </ul>
+   */
+  @Test
+  public void showingAnInterstitialIbvDemoAd() throws Exception {
+    showingAnInterstitialAd(interstitialIbvDemo);
+  }
+
+  private void showingAnInterstitialAd(InterstitialAdUnit adUnit) throws Exception {
+    givenInitializedCriteo(adUnit);
     waitForBids();
 
     runOnMainThreadAndWait(() -> {
-      interstitial = new CriteoInterstitial(context, interstitialDemo);
+      interstitial = new CriteoInterstitial(context, adUnit);
 
       listener = new ShowingInterstitialListener(interstitial);
       interstitial.setCriteoInterstitialAdListener(listener);
