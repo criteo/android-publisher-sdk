@@ -3,6 +3,7 @@ package com.criteo.publisher;
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
 import static com.criteo.publisher.Util.CompletableFuture.completedFuture;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -23,7 +24,6 @@ import static org.mockito.Mockito.when;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
-import com.criteo.publisher.Util.CompletableFuture;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.cache.SdkCache;
@@ -111,6 +111,15 @@ public class BidManagerFunctionalTest {
   @After
   public void tearDown() throws Exception {
     CriteoUtil.clearSharedPreferences();
+  }
+
+  @Test
+  public void prefetch_GivenNoAdUnit_ShouldNotCallCdbAndPopulateCache() throws Exception {
+    BidManager bidManager = createBidManager();
+    bidManager.prefetch(emptyList());
+    waitForIdleState();
+
+    assertShouldNotCallCdbAndNotPopulateCache();
   }
 
   @Test

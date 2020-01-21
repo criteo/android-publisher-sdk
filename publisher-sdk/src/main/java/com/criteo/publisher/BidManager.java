@@ -132,10 +132,12 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
      * Method to start new CdbDownload Asynctask
      */
     private void startCdbDownloadTask(boolean isConfigRequested, List<CacheAdUnit> prefetchCacheAdUnits) {
+        boolean isCdbRequested = !killSwitchEngaged() && !prefetchCacheAdUnits.isEmpty();
+
         CdbDownloadTask cdbDownloadTask = new CdbDownloadTask(
             this,
             isConfigRequested,
-            !killSwitchEngaged(),
+            isCdbRequested,
             deviceInfo,
             prefetchCacheAdUnits,
             placementsWithCdbTasks,

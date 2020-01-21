@@ -3,7 +3,6 @@ package com.criteo.publisher.network;
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -60,7 +59,7 @@ public class DeviceIdTest {
     when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(null);
     when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(false);
 
-    CriteoUtil.givenInitializedCriteo();
+    CriteoUtil.givenInitializedCriteo(bannerAdUnit);
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
@@ -74,7 +73,7 @@ public class DeviceIdTest {
     when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(null);
     when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(true);
 
-    CriteoUtil.givenInitializedCriteo();
+    CriteoUtil.givenInitializedCriteo(bannerAdUnit);
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
@@ -88,7 +87,7 @@ public class DeviceIdTest {
     when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(FAKE_DEVICE_ID);
     when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(false);
 
-    CriteoUtil.givenInitializedCriteo();
+    CriteoUtil.givenInitializedCriteo(bannerAdUnit);
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
@@ -104,7 +103,7 @@ public class DeviceIdTest {
     when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(FAKE_DEVICE_ID);
     when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(true);
 
-    CriteoUtil.givenInitializedCriteo();
+    CriteoUtil.givenInitializedCriteo(bannerAdUnit);
     ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
@@ -132,7 +131,7 @@ public class DeviceIdTest {
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
-    verify(pubSdkApi, times(2)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
+    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
     assertEquals("", fetchDeviceIdSentInCdbRequest(cdbArgumentCaptor.getValue()));
   }
 
@@ -153,7 +152,7 @@ public class DeviceIdTest {
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
-    verify(pubSdkApi, times(2)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
+    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
     assertEquals(FAKE_DEVICE_ID, fetchDeviceIdSentInCdbRequest(cdbArgumentCaptor.getValue()));
   }
 
@@ -174,7 +173,7 @@ public class DeviceIdTest {
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
-    verify(pubSdkApi, times(2)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
+    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
     assertEquals(DEVICE_ID_LIMITED, fetchDeviceIdSentInCdbRequest(cdbArgumentCaptor.getValue()));
   }
 
@@ -195,7 +194,7 @@ public class DeviceIdTest {
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
-    verify(pubSdkApi, times(2)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
+    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
     assertEquals(DEVICE_ID_LIMITED, fetchDeviceIdSentInCdbRequest(cdbArgumentCaptor.getValue()));
   }
 
