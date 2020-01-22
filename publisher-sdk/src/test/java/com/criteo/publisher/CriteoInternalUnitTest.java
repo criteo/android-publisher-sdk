@@ -24,6 +24,7 @@ import com.criteo.publisher.network.PubSdkApi;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Executor;
 import org.junit.Before;
 import org.junit.Test;
@@ -213,6 +214,35 @@ public class CriteoInternalUnitTest {
     createCriteo();
 
     verify(deviceInfo).initialize();
+  }
+
+  @Test
+  public void getBidResponse_GivenBidManagerThrowing_DoNotThrowAndReturnNoBidResponse() throws Exception {
+    AdUnit adUnit = mock(AdUnit.class);
+
+    BidManager bidManager = givenMockedBidManager();
+    when(bidManager.getBidForInhouseMediation(adUnit)).thenThrow(RuntimeException.class);
+
+    BidResponse noBid = new BidResponse(0., null, false);
+
+    Criteo criteo = createCriteo();
+    BidResponse bidResponse = criteo.getBidResponse(adUnit);
+
+    assertThat(bidResponse).isEqualTo(noBid);
+  }
+
+  @Test
+  public void getBidResponse_GivenBidManagerYieldingOne_ReturnIt() throws Exception {
+    AdUnit adUnit = mock(AdUnit.class);
+    BidResponse expectedBid = new BidResponse(42., new BidToken(UUID.randomUUID(), adUnit), true);
+
+    BidManager bidManager = givenMockedBidManager();
+    when(bidManager.getBidForInhouseMediation(adUnit)).thenReturn(expectedBid);
+
+    Criteo criteo = createCriteo();
+    BidResponse bidResponse = criteo.getBidResponse(adUnit);
+
+    assertThat(bidResponse).isEqualTo(expectedBid);
   }
 
   private void givenMockedUserPrivacyUtil() {
