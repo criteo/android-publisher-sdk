@@ -68,6 +68,7 @@ public class StandaloneFunctionalTest {
   private final BannerAdUnit invalidBannerAdUnit = TestAdUnits.BANNER_UNKNOWN;
 
   private final InterstitialAdUnit validInterstitialAdUnit = TestAdUnits.INTERSTITIAL;
+  private final InterstitialAdUnit invalidInterstitialAdUnit = TestAdUnits.INTERSTITIAL_UNKNOWN;
 
   private PubSdkApi api;
 
@@ -209,6 +210,20 @@ public class StandaloneFunctionalTest {
     verifyNoMoreInteractions(listener);
   }
 
+  @Test
+  public void whenLoadingAnInterstitial_GivenListenerAndNoBidAvailable_OnAdFailedToReceivedIsCalledWithNoFill() throws Exception {
+    givenInitializedSdk(invalidInterstitialAdUnit);
+
+    CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
+    CriteoInterstitial interstitial = createInterstitial(invalidInterstitialAdUnit, listener);
+
+    runOnMainThreadAndWait(interstitial::loadAd);
+    waitForBids();
+
+    verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+    verifyNoMoreInteractions(listener);
+  }
+
   private CriteoBannerView createBanner(BannerAdUnit bannerAdUnit, CriteoBannerAdListener listener) {
     AtomicReference<CriteoBannerView> bannerViewRef = new AtomicReference<>();
 
@@ -218,6 +233,17 @@ public class StandaloneFunctionalTest {
     });
 
     return bannerViewRef.get();
+  }
+
+  private CriteoInterstitial createInterstitial(InterstitialAdUnit interstitialAdUnit, CriteoInterstitialAdListener listener) {
+    AtomicReference<CriteoInterstitial> interstitial = new AtomicReference<>();
+
+    runOnMainThreadAndWait(() -> {
+      interstitial.set(new CriteoInterstitial(context, interstitialAdUnit));
+      interstitial.get().setCriteoInterstitialAdListener(listener);
+    });
+
+    return interstitial.get();
   }
 
   @Test
@@ -260,20 +286,15 @@ public class StandaloneFunctionalTest {
   private void whenLoadingAnInterstitial_NotifyListenerForSuccessOnNextCall() throws Exception {
     givenInitializedSdk();
 
-    AtomicReference<CriteoInterstitial> interstitial = new AtomicReference<>();
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
-
-    runOnMainThreadAndWait(() -> {
-      interstitial.set(new CriteoInterstitial(context, validInterstitialAdUnit));
-      interstitial.get().setCriteoInterstitialAdListener(listener);
-    });
+    CriteoInterstitial interstitial = createInterstitial(validInterstitialAdUnit, listener);
 
     // Given a first bid (that should do a cache miss)
-    runOnMainThreadAndWait(interstitial.get()::loadAd);
+    runOnMainThreadAndWait(interstitial::loadAd);
     waitForBids();
 
     // Given a second bid (that should success)
-    runOnMainThreadAndWait(interstitial.get()::loadAd);
+    runOnMainThreadAndWait(interstitial::loadAd);
     waitForBids();
 
     InOrder inOrder = inOrder(listener);
