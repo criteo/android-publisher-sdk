@@ -1,6 +1,7 @@
 package com.criteo.publisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -9,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import android.app.Application;
@@ -18,6 +20,7 @@ import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
+import com.criteo.publisher.network.PubSdkApi;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -53,6 +56,15 @@ public class CriteoInternalUnitTest {
     when(dependencyProvider.provideRunOnUiThreadExecutor()).thenReturn(Runnable::run);
 
     adUnits = new ArrayList<>();
+  }
+
+  @Test
+  public void new_GivenNullCpId_ThrowExceptionAndDoNotUseNetwork() throws Exception {
+    PubSdkApi api = givenMockedPubSdkApi();
+    criteoPublisherId = null;
+
+    assertThatThrownBy(this::createCriteo).isInstanceOf(IllegalArgumentException.class);
+    verifyZeroInteractions(api);
   }
 
   @Test
@@ -119,8 +131,7 @@ public class CriteoInternalUnitTest {
 
   @Test
   public void new_GivenTrueUsOptOut_ShouldStoreTrueValue() throws Exception {
-    Context context = application.getApplicationContext();
-    when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
+    givenMockedUserPrivacyUtil();
     usPrivacyOptout = true;
 
     createCriteo();
@@ -129,8 +140,7 @@ public class CriteoInternalUnitTest {
   }
   @Test
   public void new_GivenTrueUsOptOut_ThenSetToFalse_ShouldStoreTrueThenFalseValue() throws Exception {
-    Context context = application.getApplicationContext();
-    when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
+    givenMockedUserPrivacyUtil();
     usPrivacyOptout = true;
 
     CriteoInternal criteoInternal = createCriteo();
@@ -142,8 +152,7 @@ public class CriteoInternalUnitTest {
 
   @Test
   public void new_GivenFalseUsOptOut_ShouldStoreFalseValue() throws Exception {
-    Context context = application.getApplicationContext();
-    when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
+    givenMockedUserPrivacyUtil();
     usPrivacyOptout = false;
 
     createCriteo();
@@ -153,8 +162,7 @@ public class CriteoInternalUnitTest {
 
   @Test
   public void new_GivenFalseUsOptOut_ThenSetToTrue_ShouldFalseThenTrue() throws Exception {
-    Context context = application.getApplicationContext();
-    when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
+    givenMockedUserPrivacyUtil();
     usPrivacyOptout = false;
 
     CriteoInternal criteoInternal = createCriteo();
@@ -166,8 +174,7 @@ public class CriteoInternalUnitTest {
 
   @Test
   public void new_GivenNullUsOptOut_ShouldNotStoreIt() throws Exception {
-    Context context = application.getApplicationContext();
-    when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
+    givenMockedUserPrivacyUtil();
     usPrivacyOptout = null;
 
     createCriteo();
@@ -178,8 +185,7 @@ public class CriteoInternalUnitTest {
 
   @Test
   public void new_GivenNullUsOptOut_ThenSetToTrue_ShouldStoreTrueValue() throws Exception {
-    Context context = application.getApplicationContext();
-    when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
+    givenMockedUserPrivacyUtil();
     usPrivacyOptout = null;
 
     CriteoInternal criteoInternal = createCriteo();
@@ -190,8 +196,7 @@ public class CriteoInternalUnitTest {
 
   @Test
   public void new_GivenNullUsOptOut_ThenSetToFalse_ShouldStoreFalseValue() throws Exception {
-    Context context = application.getApplicationContext();
-    when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
+    givenMockedUserPrivacyUtil();
     usPrivacyOptout = null;
 
     CriteoInternal criteoInternal = createCriteo();
@@ -210,14 +215,27 @@ public class CriteoInternalUnitTest {
     verify(deviceInfo).initialize();
   }
 
+  private void givenMockedUserPrivacyUtil() {
+    Context context = application.getApplicationContext();
+    when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
+  }
+
   private BidManager givenMockedBidManager() {
     BidManager bidManager = mock(BidManager.class);
 
     Context context = application.getApplicationContext();
-
     when(dependencyProvider.provideBidManager(context, criteoPublisherId)).thenReturn(bidManager);
 
     return bidManager;
+  }
+
+  private PubSdkApi givenMockedPubSdkApi() {
+    PubSdkApi api = mock(PubSdkApi.class);
+
+    Context context = application.getApplicationContext();
+    when(dependencyProvider.providePubSdkApi(context)).thenReturn(api);
+
+    return api;
   }
 
   private CriteoInternal createCriteo() {
