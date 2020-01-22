@@ -5,6 +5,9 @@ import static com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE;
 import static com.criteo.publisher.StubConstants.STUB_DISPLAY_URL;
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
+import static com.criteo.publisher.Util.WebViewLookup.getRootView;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -15,7 +18,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Looper;
@@ -121,7 +126,7 @@ public class StandaloneFunctionalTest {
   private void whenLoadingAnInterstitial_GivenBidAvailable_DisplayUrlIsProperlyLoadedInInterstitialActivity() throws Exception {
     givenInitializedSdk(validInterstitialAdUnit);
 
-    View interstitialView = whenLoadingAnInterstitial(validInterstitialAdUnit);
+    View interstitialView = whenLoadingAndDisplayingAnInterstitial(validInterstitialAdUnit);
     String html = webViewLookup.lookForHtmlContent(interstitialView).get();
 
     assertTrue(html.contains(STUB_CREATIVE_IMAGE));
@@ -141,6 +146,24 @@ public class StandaloneFunctionalTest {
     assertTrue(loadedResources.isEmpty());
   }
 
+  @Test
+  public void whenLoadingAnInterstitial_GivenNoBidAvailable_InterstitialIsNotLoadedAndCannotBeShown() throws Exception {
+    givenInitializedSdk(invalidInterstitialAdUnit);
+
+    CriteoInterstitial interstitial = whenLoadingAnInterstitial(invalidInterstitialAdUnit);
+
+    assertFalse(interstitial.isAdLoaded());
+
+    Activity activity = webViewLookup.lookForResumedActivity(() -> {
+      runOnMainThreadAndWait(interstitial::show);
+
+      activityRule.launchActivity(new Intent(context, DummyActivity.class));
+    }).get();
+
+    // So launched activity is not the interstitial one
+    assertEquals(DummyActivity.class, activity.getClass());
+  }
+
   private CriteoBannerView whenLoadingABanner(BannerAdUnit bannerAdUnit) throws Exception {
     AtomicReference<CriteoBannerView> bannerViewRef = new AtomicReference<>();
     AtomicReference<CriteoSync> syncRef = new AtomicReference<>();
@@ -157,9 +180,27 @@ public class StandaloneFunctionalTest {
     return bannerViewRef.get();
   }
 
-  private View whenLoadingAnInterstitial(InterstitialAdUnit interstitialAdUnit) throws Exception {
+  private View whenLoadingAndDisplayingAnInterstitial(InterstitialAdUnit interstitialAdUnit) throws Exception {
     AtomicReference<CriteoInterstitial> interstitialRef = new AtomicReference<>();
     AtomicReference<CriteoSync> syncRef = new AtomicReference<>();
+
+    whenLoadingAnInterstitial(interstitialAdUnit, syncRef);
+
+    Future<Activity> activity = webViewLookup.lookForResumedActivity(() -> {
+      runOnMainThreadAndWait(() -> interstitialRef.get().show());
+    });
+
+    syncRef.get().waitForDisplay();
+
+    return getRootView(activity.get());
+  }
+
+  private CriteoInterstitial whenLoadingAnInterstitial(InterstitialAdUnit interstitialAdUnit) throws Exception {
+    return whenLoadingAnInterstitial(interstitialAdUnit, new AtomicReference<>());
+  }
+
+  private CriteoInterstitial whenLoadingAnInterstitial(InterstitialAdUnit interstitialAdUnit, AtomicReference<CriteoSync> syncRef) throws Exception {
+    AtomicReference<CriteoInterstitial> interstitialRef = new AtomicReference<>();
 
     runOnMainThreadAndWait(() -> {
       CriteoInterstitial interstitial = new CriteoInterstitial(context, interstitialAdUnit);
@@ -170,16 +211,7 @@ public class StandaloneFunctionalTest {
     });
 
     syncRef.get().waitForBid();
-
-    Future<View> view = webViewLookup.lookForResumedActivityView(() -> {
-      runOnMainThreadAndWait(() -> {
-        interstitialRef.get().show();
-      });
-    });
-
-    syncRef.get().waitForDisplay();
-
-    return view.get();
+    return interstitialRef.get();
   }
 
   @Test
@@ -365,6 +397,7 @@ public class StandaloneFunctionalTest {
 
     private void onFailed() {
       isLoaded.countDown();
+      isDisplayed.countDown();
     }
 
     private class SyncAdListener implements CriteoBannerAdListener,

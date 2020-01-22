@@ -4,6 +4,7 @@ import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE;
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
+import static com.criteo.publisher.Util.WebViewLookup.getRootView;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -233,9 +234,9 @@ public class MoPubHeaderBiddingFunctionalTest {
 
   private String loadMoPubHtmlInterstitial(InterstitialAdUnit adUnit)
       throws Exception {
-    View moPubView = webViewLookup.lookForResumedActivityView(() -> {
+    View moPubView = getRootView(webViewLookup.lookForResumedActivity(() -> {
       loadMoPubInterstitial(adUnit).show();
-    }).get();
+    }).get());
 
     return webViewLookup.lookForHtmlContent(moPubView).get();
   }

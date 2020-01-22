@@ -6,6 +6,7 @@ import static com.criteo.publisher.StubConstants.STUB_DISPLAY_URL;
 import static com.criteo.publisher.StubConstants.STUB_NATIVE_ASSETS;
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
+import static com.criteo.publisher.Util.WebViewLookup.getRootView;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -476,9 +477,9 @@ public class DfpHeaderBiddingFunctionalTest {
     runOnMainThreadAndWait(() -> publisherInterstitialAd.loadAd(request));
     dfpSync.waitForBid();
 
-    View interstitialView = webViewLookup.lookForResumedActivityView(() -> {
+    View interstitialView = getRootView(webViewLookup.lookForResumedActivity(() -> {
       runOnMainThreadAndWait(publisherInterstitialAd::show);
-    }).get(DFP_INTERSTITIAL_OPENING_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+    }).get(DFP_INTERSTITIAL_OPENING_TIMEOUT_MS, TimeUnit.MILLISECONDS));
 
     return webViewLookup.lookForHtmlContent(interstitialView).get();
   }

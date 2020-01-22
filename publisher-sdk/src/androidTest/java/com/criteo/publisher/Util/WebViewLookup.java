@@ -84,7 +84,7 @@ public class WebViewLookup {
     return views;
   }
 
-  public Future<View> lookForResumedActivityView(CheckedRunnable action) {
+  public Future<Activity> lookForResumedActivity(CheckedRunnable action) {
     BlockingQueue<Activity> queue = new LinkedBlockingQueue<>(1);
     ActivityLifecycleCallbacks lifecycleCallbacks = mock(ActivityLifecycleCallbacks.class);
     doAnswer(answerVoid(queue::put)).when(lifecycleCallbacks).onActivityResumed(any());
@@ -100,12 +100,15 @@ public class WebViewLookup {
 
     return executor.submit(() -> {
       try {
-        Activity activity = queue.take();
-        return activity.getWindow().getDecorView().getRootView();
+        return queue.take();
       } finally {
         application.unregisterActivityLifecycleCallbacks(lifecycleCallbacks);
       }
     });
+  }
+
+  public static View getRootView(Activity activity) {
+    return activity.getWindow().getDecorView().getRootView();
   }
 
   private void traverse(View root, Processor processor) {
