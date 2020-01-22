@@ -51,7 +51,7 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
     }
 
     private void postAppEvent(String eventType) {
-        if (userPrivacyUtil.isCCPAConsentGiven()) {
+        if (shouldCallBearcat()) {
             if (appEventThrottle > 0 &&
                 clock.getCurrentTimeInMillis() - throttleSetTime < appEventThrottle * 1000) {
                 return;
@@ -91,5 +91,9 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
 
     @Override
     public void onApplicationStopped() {
+    }
+
+    private boolean shouldCallBearcat() {
+        return userPrivacyUtil.isCCPAConsentGivenOrNotApplicable() && userPrivacyUtil.isMopubConsentGivenOrNotApplicable();
     }
 }

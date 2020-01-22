@@ -10,10 +10,13 @@ import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+// FIXME (ma.chentir) this class should be broken down into specific classes to handle each consent
+//  mechanism separately https://jira.criteois.com/browse/EE-823
 public class UserPrivacyUtil {
     private static final String IAB_CONSENT_STRING_SHARED_PREFS_KEY = "IABConsent_ConsentString";
     private static final String IAB_SUBJECT_TO_GDPR_SHARED_PREFS_KEY = "IABConsent_SubjectToGDPR";
@@ -28,6 +31,8 @@ public class UserPrivacyUtil {
 
     // List of IAB Strings representing a positive consent
     private static final List<String> IAB_USPRIVACY_WITH_CONSENT = Arrays.asList("1ynn", "1yny", "1---");
+
+    private static final List<String> MOPUB_CONSENT_DECLINED_STRINGS = Arrays.asList("EXPLICIT_NO", "POTENTIAL_WHITELIST", "DNT");
 
     // Key provided by the IAB CCPA Compliance Framework
     private static final String IAB_USPRIVACY_SHARED_PREFS_KEY = "IABUSPrivacy_String";
@@ -100,7 +105,7 @@ public class UserPrivacyUtil {
      *
      * @return {@code true} if consent is given, {@code false} otherwise
      */
-    public boolean isCCPAConsentGiven() {
+    public boolean isCCPAConsentGivenOrNotApplicable() {
         String iabUsPrivacy = getIabUsPrivacyString();
         if (iabUsPrivacy.isEmpty()) {
             return isBinaryConsentGiven();
@@ -117,7 +122,12 @@ public class UserPrivacyUtil {
         String iabUsPrivacy = getIabUsPrivacyString();
 
         return !IAB_USPRIVACY_PATTERN.matcher(iabUsPrivacy).matches() ||
-                IAB_USPRIVACY_WITH_CONSENT.contains(iabUsPrivacy.toLowerCase());
+                IAB_USPRIVACY_WITH_CONSENT.contains(iabUsPrivacy.toLowerCase(Locale.ROOT));
+    }
+
+    public boolean isMopubConsentGivenOrNotApplicable() {
+        String mopubConsent = getMopubConsent();
+        return !MOPUB_CONSENT_DECLINED_STRINGS.contains(mopubConsent);
     }
 
     public void storeMopubConsent(@Nullable String mopubConsent) {

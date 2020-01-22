@@ -211,7 +211,7 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public AppEvents provideAppEvents(Context context) {
+  public AppEvents provideAppEvents(@NonNull Context context) {
     return getOrCreate(AppEvents.class, new Factory<AppEvents>() {
       @Override
       public AppEvents create() {

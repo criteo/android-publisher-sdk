@@ -39,58 +39,37 @@ public class UserPrivacyUtilTest {
   }
 
   @Test
-  public void testIsConsentGiven_True() {
-    assertConsentGiven("1YNN", "true", true);
-    assertConsentGiven("1YNY", "true", true);
-    assertConsentGiven("1---", "true", true);
-    assertConsentGiven("1ynn", "true", true);
-    assertConsentGiven("1yny", "true", true);
-    assertConsentGiven("", "tr", true);
-    assertConsentGiven("", "", true);
-  }
-
-  @Test
-  public void testIsConsentGiven_False() {
-    assertConsentGiven("", "true", false);
-    assertConsentGiven("1NNY", "", false);
-    assertConsentGiven("1NYN", "", false);
-    assertConsentGiven("1nny", "", false);
-    assertConsentGiven("1nyn", "", false);
-    assertConsentGiven("", "true", false);
-  }
-
-  @Test
   public void testIsIabConsentGiven_True_1YNN() {
     when(sharedPreferences.getString("IABUSPrivacy_String", "")).thenReturn("1YNN");
-    boolean isConsent = userPrivacyUtil.isCCPAConsentGiven();
+    boolean isConsent = userPrivacyUtil.isCCPAConsentGivenOrNotApplicable();
     assertTrue(isConsent);
   }
 
   @Test
   public void testIsIabConsentGiven_True_1YNY() {
     when(sharedPreferences.getString("IABUSPrivacy_String", "")).thenReturn("1YNY");
-    boolean isConsent = userPrivacyUtil.isCCPAConsentGiven();
+    boolean isConsent = userPrivacyUtil.isCCPAConsentGivenOrNotApplicable();
     assertTrue(isConsent);
   }
 
   @Test
   public void testIsIabConsentGiven_True_1dashdashdash() {
     when(sharedPreferences.getString("IABUSPrivacy_String", "")).thenReturn("1---");
-    boolean isConsent = userPrivacyUtil.isCCPAConsentGiven();
+    boolean isConsent = userPrivacyUtil.isCCPAConsentGivenOrNotApplicable();
     assertTrue(isConsent);
   }
 
   @Test
   public void testIsIabConsentGiven_False_1NNN() {
     when(sharedPreferences.getString("IABUSPrivacy_String", "")).thenReturn("1NNN");
-    boolean isConsent = userPrivacyUtil.isCCPAConsentGiven();
+    boolean isConsent = userPrivacyUtil.isCCPAConsentGivenOrNotApplicable();
     assertFalse(isConsent);
   }
 
   @Test
   public void testIsIabConsentGiven_True_2YNN() {
     when(sharedPreferences.getString("IABUSPrivacy_String", "")).thenReturn("2YNN");
-    boolean isConsent = userPrivacyUtil.isCCPAConsentGiven();
+    boolean isConsent = userPrivacyUtil.isCCPAConsentGivenOrNotApplicable();
     assertTrue(isConsent);
   }
 
@@ -98,7 +77,7 @@ public class UserPrivacyUtilTest {
   @Test
   public void testIsIabConsentGiven_False_Empty() {
     when(sharedPreferences.getString("IABUSPrivacy_String", "")).thenReturn("");
-    boolean isConsent = userPrivacyUtil.isCCPAConsentGiven();
+    boolean isConsent = userPrivacyUtil.isCCPAConsentGivenOrNotApplicable();
     assertTrue(isConsent);
   }
 
@@ -165,9 +144,49 @@ public class UserPrivacyUtilTest {
     assertEquals("fake_mopub_consent_value", mopubConsent);
   }
 
-  private void assertConsentGiven(String iabUsPrivacyString, String usPrivacyOptout, boolean consentGiven) {
+  @Test
+  public void testIsMopubConsentGiven_True() {
+    assertMopubConsentGiven("EXPLICIT_YES",  true);
+    assertMopubConsentGiven("UNKNOWN",  true);
+    assertMopubConsentGiven("", true);
+  }
+
+  @Test
+  public void testIsMopubConsentGiven_False() {
+    assertMopubConsentGiven("EXPLICIT_NO",  false);
+    assertMopubConsentGiven("POTENTIAL_WHITELIST",  false);
+    assertMopubConsentGiven("DNT",  false);
+  }
+
+  private void assertMopubConsentGiven(String mopubConsentString, boolean consentGiven) {
+    when(sharedPreferences.getString("MoPubConsent_String", "")).thenReturn(mopubConsentString);
+    assertEquals(consentGiven, userPrivacyUtil.isMopubConsentGivenOrNotApplicable());
+  }
+
+  @Test
+  public void testIsCCPAConsentGiven_True() {
+    assertCCPAConsentGiven("1YNN", "true", true);
+    assertCCPAConsentGiven("1YNY", "true", true);
+    assertCCPAConsentGiven("1---", "true", true);
+    assertCCPAConsentGiven("1ynn", "true", true);
+    assertCCPAConsentGiven("1yny", "true", true);
+    assertCCPAConsentGiven("", "tr", true);
+    assertCCPAConsentGiven("", "", true);
+  }
+
+  @Test
+  public void testIsCCPAConsentGiven_False() {
+    assertCCPAConsentGiven("", "true", false);
+    assertCCPAConsentGiven("1NNY", "", false);
+    assertCCPAConsentGiven("1NYN", "", false);
+    assertCCPAConsentGiven("1nny", "", false);
+    assertCCPAConsentGiven("1nyn", "", false);
+    assertCCPAConsentGiven("", "true", false);
+  }
+
+  private void assertCCPAConsentGiven(String iabUsPrivacyString, String usPrivacyOptout, boolean consentGiven) {
     givenUsPrivacySetup(iabUsPrivacyString, usPrivacyOptout);
-    assertEquals(consentGiven, userPrivacyUtil.isCCPAConsentGiven());
+    assertEquals(consentGiven, userPrivacyUtil.isCCPAConsentGivenOrNotApplicable());
   }
 
   private void givenUsPrivacySetup(String iabUsPrivacyString, String usPrivacyOptout) {
