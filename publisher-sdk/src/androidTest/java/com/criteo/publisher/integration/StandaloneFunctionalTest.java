@@ -1,6 +1,7 @@
 package com.criteo.publisher.integration;
 
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
+import static com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE;
 import static com.criteo.publisher.StubConstants.STUB_DISPLAY_URL;
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
@@ -18,12 +19,13 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.test.InstrumentationRegistry;
+import android.support.test.rule.ActivityTestRule;
 import android.view.View;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
+import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.TestAdUnits;
@@ -35,10 +37,12 @@ import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.test.activity.DummyActivity;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Before;
 import org.junit.Rule;
@@ -57,10 +61,13 @@ public class StandaloneFunctionalTest {
   @Rule
   public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
 
+  @Rule
+  public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(DummyActivity.class);
+
   private final BannerAdUnit validBannerAdUnit = TestAdUnits.BANNER_320_50;
   private final BannerAdUnit invalidBannerAdUnit = TestAdUnits.BANNER_UNKNOWN;
 
-  private final InterstitialAdUnit interstitialAdUnit = TestAdUnits.INTERSTITIAL;
+  private final InterstitialAdUnit validInterstitialAdUnit = TestAdUnits.INTERSTITIAL;
 
   private PubSdkApi api;
 
@@ -77,7 +84,7 @@ public class StandaloneFunctionalTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    context = InstrumentationRegistry.getContext();
+    context = activityRule.getActivity().getApplicationContext();
 
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
@@ -96,6 +103,27 @@ public class StandaloneFunctionalTest {
     String html = webViewLookup.lookForHtmlContent(bannerView).get();
 
     assertTrue(STUB_DISPLAY_URL.matcher(html).find());
+  }
+
+  @Test
+  public void whenLoadingAnInterstitial_GivenBidAvailableAndDeviceInPortrait_DisplayUrlIsProperlyLoadedInInterstitialActivity() throws Exception {
+    givenDeviceInPortrait();
+    whenLoadingAnInterstitial_GivenBidAvailable_DisplayUrlIsProperlyLoadedInInterstitialActivity();
+  }
+
+  @Test
+  public void whenLoadingAnInterstitial_GivenBidAvailableAndDeviceInLandscape_DisplayUrlIsProperlyLoadedInInterstitialActivity() throws Exception {
+    givenDeviceInLandscape();
+    whenLoadingAnInterstitial_GivenBidAvailable_DisplayUrlIsProperlyLoadedInInterstitialActivity();
+  }
+
+  private void whenLoadingAnInterstitial_GivenBidAvailable_DisplayUrlIsProperlyLoadedInInterstitialActivity() throws Exception {
+    givenInitializedSdk(validInterstitialAdUnit);
+
+    View interstitialView = whenLoadingAnInterstitial(validInterstitialAdUnit);
+    String html = webViewLookup.lookForHtmlContent(interstitialView).get();
+
+    assertTrue(html.contains(STUB_CREATIVE_IMAGE));
   }
 
   @Test
@@ -126,6 +154,31 @@ public class StandaloneFunctionalTest {
 
     syncRef.get().waitForBid();
     return bannerViewRef.get();
+  }
+
+  private View whenLoadingAnInterstitial(InterstitialAdUnit interstitialAdUnit) throws Exception {
+    AtomicReference<CriteoInterstitial> interstitialRef = new AtomicReference<>();
+    AtomicReference<CriteoSync> syncRef = new AtomicReference<>();
+
+    runOnMainThreadAndWait(() -> {
+      CriteoInterstitial interstitial = new CriteoInterstitial(context, interstitialAdUnit);
+      syncRef.set(new CriteoSync(interstitial));
+      interstitialRef.set(interstitial);
+
+      interstitial.loadAd();
+    });
+
+    syncRef.get().waitForBid();
+
+    Future<View> view = webViewLookup.lookForResumedActivityView(() -> {
+      runOnMainThreadAndWait(() -> {
+        interstitialRef.get().show();
+      });
+    });
+
+    syncRef.get().waitForDisplay();
+
+    return view.get();
   }
 
   @Test
@@ -174,7 +227,7 @@ public class StandaloneFunctionalTest {
     Mockito.clearInvocations(api);
 
     runOnMainThreadAndWait(() -> {
-      CriteoInterstitial interstitial = new CriteoInterstitial(context, interstitialAdUnit);
+      CriteoInterstitial interstitial = new CriteoInterstitial(context, validInterstitialAdUnit);
       interstitial.loadAd();
     });
     waitForBids();
@@ -211,7 +264,7 @@ public class StandaloneFunctionalTest {
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
 
     runOnMainThreadAndWait(() -> {
-      interstitial.set(new CriteoInterstitial(context, interstitialAdUnit));
+      interstitial.set(new CriteoInterstitial(context, validInterstitialAdUnit));
       interstitial.get().setCriteoInterstitialAdListener(listener);
     });
 
@@ -249,16 +302,32 @@ public class StandaloneFunctionalTest {
   private static final class CriteoSync {
 
     private final CountDownLatch isLoaded;
+    private final CountDownLatch isDisplayed;
     private final Handler handler;
 
     CriteoSync(CriteoBannerView bannerView) {
       this.isLoaded = new CountDownLatch(1);
+      this.isDisplayed = isLoaded;
       this.handler = new Handler(Looper.getMainLooper());
       bannerView.setCriteoBannerAdListener(new SyncAdListener());
     }
 
+    CriteoSync(CriteoInterstitial interstitial) {
+      this.isLoaded = new CountDownLatch(1);
+      this.isDisplayed = new CountDownLatch(1);
+      this.handler = new Handler(Looper.getMainLooper());
+
+      SyncAdListener listener = new SyncAdListener();
+      interstitial.setCriteoInterstitialAdDisplayListener(listener);
+      interstitial.setCriteoInterstitialAdListener(listener);
+    }
+
     void waitForBid() throws InterruptedException {
       isLoaded.await();
+    }
+
+    void waitForDisplay() throws InterruptedException {
+      isDisplayed.await();
     }
 
     private void onLoaded() {
@@ -269,18 +338,39 @@ public class StandaloneFunctionalTest {
       handler.postDelayed(isLoaded::countDown, 1000);
     }
 
+    private void onDisplayed() {
+      handler.postDelayed(isDisplayed::countDown, 1000);
+    }
+
     private void onFailed() {
       isLoaded.countDown();
     }
 
-    private class SyncAdListener implements CriteoBannerAdListener {
+    private class SyncAdListener implements CriteoBannerAdListener,
+        CriteoInterstitialAdListener,
+        CriteoInterstitialAdDisplayListener {
       @Override
       public void onAdReceived(View view) {
         onLoaded();
       }
 
       @Override
+      public void onAdReadyToDisplay() {
+        onLoaded();
+      }
+
+      @Override
+      public void onAdOpened() {
+        onDisplayed();
+      }
+
+      @Override
       public void onAdFailedToReceive(CriteoErrorCode code) {
+        onFailed();
+      }
+
+      @Override
+      public void onAdFailedToDisplay(CriteoErrorCode error) {
         onFailed();
       }
 
@@ -293,11 +383,11 @@ public class StandaloneFunctionalTest {
       }
 
       @Override
-      public void onAdOpened() {
+      public void onAdClosed() {
       }
 
       @Override
-      public void onAdClosed() {
+      public void onAdReceived() {
       }
     }
   }
