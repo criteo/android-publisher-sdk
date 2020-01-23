@@ -1,6 +1,8 @@
 package com.criteo.publisher;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.webkit.WebView;
 import com.criteo.publisher.Util.ObjectsUtil;
@@ -10,19 +12,21 @@ public class CriteoBannerView extends WebView {
 
     private static final String TAG = CriteoBannerView.class.getSimpleName();
 
+    @Nullable
     private BannerAdUnit bannerAdUnit;
 
+    @Nullable
     private CriteoBannerAdListener criteoBannerAdListener;
 
+    @Nullable
     private CriteoBannerEventController criteoBannerEventController;
 
-
-    public CriteoBannerView(Context context, BannerAdUnit bannerAdUnit) {
+    public CriteoBannerView(@NonNull Context context, @Nullable BannerAdUnit bannerAdUnit) {
         super(context);
         this.bannerAdUnit = bannerAdUnit;
     }
 
-    public void setCriteoBannerAdListener(CriteoBannerAdListener criteoBannerAdListener) {
+    public void setCriteoBannerAdListener(@Nullable CriteoBannerAdListener criteoBannerAdListener) {
         this.criteoBannerAdListener = criteoBannerAdListener;
     }
 
@@ -35,18 +39,10 @@ public class CriteoBannerView extends WebView {
     }
 
     private void doLoadAd() {
-        if (criteoBannerEventController == null) {
-            criteoBannerEventController = new CriteoBannerEventController(
-                this,
-                criteoBannerAdListener,
-                Criteo.getInstance().getConfig()
-            );
-        }
-
-        criteoBannerEventController.fetchAdAsync(bannerAdUnit);
+        getOrCreateController().fetchAdAsync(bannerAdUnit);
     }
 
-    public void loadAd(BidToken bidToken) {
+    public void loadAd(@Nullable BidToken bidToken) {
         try {
             doLoadAd(bidToken);
         } catch (Throwable tr) {
@@ -54,11 +50,16 @@ public class CriteoBannerView extends WebView {
         }
     }
 
-    private void doLoadAd(BidToken bidToken) {
+    private void doLoadAd(@Nullable BidToken bidToken) {
         if (bidToken != null && !ObjectsUtil.equals(bannerAdUnit, bidToken.getAdUnit())) {
             return;
         }
 
+        getOrCreateController().fetchAdAsync(bidToken);
+    }
+
+    @NonNull
+    private CriteoBannerEventController getOrCreateController() {
         if (criteoBannerEventController == null) {
             criteoBannerEventController = new CriteoBannerEventController(
                 this,
@@ -66,7 +67,7 @@ public class CriteoBannerView extends WebView {
                 Criteo.getInstance().getConfig()
             );
         }
-        criteoBannerEventController.fetchAdAsync(bidToken);
+        return criteoBannerEventController;
     }
 
     public void destroy() {

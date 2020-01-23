@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -39,7 +40,7 @@ public class CriteoBannerEventController {
         bannerView.setCriteoBannerAdListener(criteoBannerAdListener);
     }
 
-    public void fetchAdAsync(AdUnit adUnit) {
+    public void fetchAdAsync(@Nullable AdUnit adUnit) {
         Slot slot = null;
         if (adUnit != null) {
             slot = Criteo.getInstance().getBidForAdUnit(adUnit);
@@ -62,7 +63,7 @@ public class CriteoBannerEventController {
         }
     }
 
-    public void fetchAdAsync(BidToken bidToken) {
+    public void fetchAdAsync(@Nullable BidToken bidToken) {
         TokenValue tokenValue = Criteo.getInstance().getTokenValue(bidToken, AdUnitType.CRITEO_BANNER);
 
         CriteoListenerCode code = CriteoListenerCode.INVALID;
