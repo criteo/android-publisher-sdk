@@ -3,6 +3,7 @@ package com.criteo.publisher;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.AndroidUtil;
@@ -46,7 +47,7 @@ public class DependencyProvider {
   /**
    * This method will be used by tests to provide a fake {@link DependencyProvider} instance
    */
-  static synchronized void setInstance(@NonNull DependencyProvider dependencyProvider) {
+  static synchronized void setInstance(@Nullable DependencyProvider dependencyProvider) {
     instance = dependencyProvider;
   }
 

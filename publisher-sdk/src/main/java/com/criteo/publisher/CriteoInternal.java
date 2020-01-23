@@ -28,7 +28,10 @@ final class CriteoInternal extends Criteo {
   private final AppEvents appEvents;
   private final AppLifecycleUtil appLifecycleUtil;
   private final DeviceInfo deviceInfo;
+
+  @NonNull
   private final Config config;
+
   private final UserPrivacyUtil userPrivacyUtil;
 
   CriteoInternal(
@@ -152,6 +155,7 @@ final class CriteoInternal extends Criteo {
     return deviceInfo;
   }
 
+  @NonNull
   @Override
   Config getConfig() {
     return config;

@@ -43,6 +43,7 @@ public class DummyCriteo extends Criteo {
     return new DummyDeviceInfo();
   }
 
+  @NonNull
   @Override
   Config getConfig() {
     return new Config();

@@ -30,6 +30,11 @@ public class CriteoBannerView extends WebView {
         this.criteoBannerAdListener = criteoBannerAdListener;
     }
 
+    @Nullable
+    CriteoBannerAdListener getCriteoBannerAdListener() {
+        return criteoBannerAdListener;
+    }
+
     public void loadAd() {
         try {
             doLoadAd();
@@ -63,9 +68,7 @@ public class CriteoBannerView extends WebView {
         if (criteoBannerEventController == null) {
             criteoBannerEventController = new CriteoBannerEventController(
                 this,
-                criteoBannerAdListener,
-                Criteo.getInstance().getConfig()
-            );
+                Criteo.getInstance());
         }
         return criteoBannerEventController;
     }

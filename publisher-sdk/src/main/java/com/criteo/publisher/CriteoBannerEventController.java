@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.webkit.WebView;
@@ -25,61 +26,54 @@ public class CriteoBannerEventController {
 
     private final WeakReference<CriteoBannerView> view;
     private CriteoBannerLoadTask loadTask;
+
+    @Nullable
     private final CriteoBannerAdListener adListener;
-    private CriteoBannerListenerCallTask listenerCallTask;
+
+    @NonNull
     private final Config config;
 
+    @NonNull
+    private final Criteo criteo;
+
     public CriteoBannerEventController(
-        CriteoBannerView bannerView,
-        CriteoBannerAdListener criteoBannerAdListener,
-        Config config
-    ) {
+        @NonNull CriteoBannerView bannerView,
+        @NonNull Criteo criteo) {
         this.view = new WeakReference<>(bannerView);
-        this.adListener = criteoBannerAdListener;
-        this.config = config;
-        bannerView.setCriteoBannerAdListener(criteoBannerAdListener);
+        this.adListener = bannerView.getCriteoBannerAdListener();
+        this.criteo = criteo;
+        this.config = criteo.getConfig();
     }
 
     public void fetchAdAsync(@Nullable AdUnit adUnit) {
-        Slot slot = null;
-        if (adUnit != null) {
-            slot = Criteo.getInstance().getBidForAdUnit(adUnit);
-        }
+        Slot slot = criteo.getBidForAdUnit(adUnit);
 
-        CriteoListenerCode code = CriteoListenerCode.INVALID;
-        if (slot != null) {
-            code = CriteoListenerCode.VALID;
-        }
-
-        Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
-        listenerCallTask = new CriteoBannerListenerCallTask(this.adListener, view.get());
-        listenerCallTask.executeOnExecutor(threadPoolExecutor, code);
-
-        if (CriteoListenerCode.VALID == code) {
-            loadTask = new CriteoBannerLoadTask(view.get(), createWebViewClient(), config);
-            // Must run on UI thread as it is displaying the fetched ad
-            Executor serialExecutor = DependencyProvider.getInstance().provideSerialExecutor();
-            loadTask.executeOnExecutor(serialExecutor, slot);
-        }
+        notifyAndDisplay(slot);
     }
 
     public void fetchAdAsync(@Nullable BidToken bidToken) {
-        TokenValue tokenValue = Criteo.getInstance().getTokenValue(bidToken, AdUnitType.CRITEO_BANNER);
+        TokenValue tokenValue = criteo.getTokenValue(bidToken, AdUnitType.CRITEO_BANNER);
 
+        notifyAndDisplay(tokenValue);
+    }
+
+    // bidResponse could be either a Slot or a BidToken
+    private void notifyAndDisplay(@Nullable Object bidResponse) {
         CriteoListenerCode code = CriteoListenerCode.INVALID;
-        if (tokenValue != null) {
+        if (bidResponse != null) {
             code = CriteoListenerCode.VALID;
         }
 
         Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
-        listenerCallTask = new CriteoBannerListenerCallTask(this.adListener, view.get());
+        CriteoBannerListenerCallTask listenerCallTask = new CriteoBannerListenerCallTask(
+            adListener, view.get());
         listenerCallTask.executeOnExecutor(threadPoolExecutor, code);
 
         if (CriteoListenerCode.VALID == code) {
             loadTask = new CriteoBannerLoadTask(view.get(), createWebViewClient(), config);
             // Must run on UI thread as it is displaying the fetched ad
             Executor serialExecutor = DependencyProvider.getInstance().provideSerialExecutor();
-            loadTask.executeOnExecutor(serialExecutor, tokenValue);
+            loadTask.executeOnExecutor(serialExecutor, bidResponse);
         }
     }
 
@@ -88,7 +82,7 @@ public class CriteoBannerEventController {
     // WebView methods need to run in the same UI thread
     @VisibleForTesting
     WebViewClient createWebViewClient() {
-        WebViewClient webViewClient = new WebViewClient() {
+        return new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 Context context = view.getContext();
@@ -118,7 +112,6 @@ public class CriteoBannerEventController {
             public void onPageFinished(WebView view, String url) {
             }
         };
-        return webViewClient;
     }
 
     protected void destroy() {

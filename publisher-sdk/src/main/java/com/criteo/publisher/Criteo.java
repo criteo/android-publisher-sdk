@@ -135,6 +135,7 @@ public abstract class Criteo {
   @NonNull
   abstract DeviceInfo getDeviceInfo();
 
+  @NonNull
   abstract Config getConfig();
 
   public abstract void setUsPrivacyOptOut(boolean usPrivacyOptOut);
