@@ -168,8 +168,12 @@ public class UserPrivacyUtilTest {
     assertCCPAConsentGiven("1YNN", "true", true);
     assertCCPAConsentGiven("1YNY", "true", true);
     assertCCPAConsentGiven("1---", "true", true);
+    assertCCPAConsentGiven("1-N-", "true", true);
+    assertCCPAConsentGiven("1YN-", "true", true);
     assertCCPAConsentGiven("1ynn", "true", true);
     assertCCPAConsentGiven("1yny", "true", true);
+    assertCCPAConsentGiven("1-n-", "true", true);
+    assertCCPAConsentGiven("1yn-", "true", true);
     assertCCPAConsentGiven("", "tr", true);
     assertCCPAConsentGiven("", "", true);
   }

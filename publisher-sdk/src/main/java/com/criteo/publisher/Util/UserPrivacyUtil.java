@@ -30,9 +30,9 @@ public class UserPrivacyUtil {
     private static final Pattern IAB_USPRIVACY_PATTERN = Pattern.compile("^1(Y|N|-|y|n){3}$");
 
     // List of IAB Strings representing a positive consent
-    private static final List<String> IAB_USPRIVACY_WITH_CONSENT = Arrays.asList("1ynn", "1yny", "1---");
+    private static final List<String> IAB_USPRIVACY_WITH_CONSENT = Arrays.asList("1ynn", "1yny", "1---", "", "1yn-", "1-n-");
 
-    private static final List<String> MOPUB_CONSENT_DECLINED_STRINGS = Arrays.asList("EXPLICIT_NO", "POTENTIAL_WHITELIST", "DNT");
+    private static final List<String> MOPUB_CONSENT_DECLINED_STRINGS = Arrays.asList("explicit_no", "potential_whitelist", "dnt");
 
     // Key provided by the IAB CCPA Compliance Framework
     private static final String IAB_USPRIVACY_SHARED_PREFS_KEY = "IABUSPrivacy_String";
@@ -127,7 +127,7 @@ public class UserPrivacyUtil {
 
     public boolean isMopubConsentGivenOrNotApplicable() {
         String mopubConsent = getMopubConsent();
-        return !MOPUB_CONSENT_DECLINED_STRINGS.contains(mopubConsent);
+        return !MOPUB_CONSENT_DECLINED_STRINGS.contains(mopubConsent.toLowerCase(Locale.ROOT));
     }
 
     public void storeMopubConsent(@Nullable String mopubConsent) {
