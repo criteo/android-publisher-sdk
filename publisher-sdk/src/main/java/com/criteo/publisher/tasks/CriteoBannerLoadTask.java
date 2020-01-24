@@ -3,11 +3,9 @@ package com.criteo.publisher.tasks;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.model.Config;
-import com.criteo.publisher.model.Slot;
-import com.criteo.publisher.model.TokenValue;
 import java.lang.ref.Reference;
 
 /**
@@ -52,7 +50,7 @@ public class CriteoBannerLoadTask extends AsyncTask<Object, Void, Object> {
     private static final String TAG = "Criteo.BLT";
 
     @NonNull
-    private final Reference<CriteoBannerView> bannerViewRef;
+    private final Reference<? extends WebView> webViewRef;
 
     @NonNull
     private final Config config;
@@ -66,16 +64,15 @@ public class CriteoBannerLoadTask extends AsyncTask<Object, Void, Object> {
      * onPostExecute() as onPostExecute runs on the UI thread
      */
     public CriteoBannerLoadTask(
-        @NonNull Reference<CriteoBannerView> bannerViewRef,
+        @NonNull Reference<? extends WebView> webViewRef,
         @NonNull WebViewClient webViewClient,
         @NonNull Config config) {
-        this.bannerViewRef = bannerViewRef;
+        this.webViewRef = webViewRef;
         this.webViewClient = webViewClient;
         this.config = config;
     }
 
     @Override
-    // Caller must pass Slot/TokenValue
     protected Object doInBackground(Object... objects) {
         try {
             if (objects == null || objects.length == 0) {
@@ -92,20 +89,17 @@ public class CriteoBannerLoadTask extends AsyncTask<Object, Void, Object> {
     @Override
     protected void onPostExecute(Object object) {
         try {
-            if (object instanceof Slot) {
-                Slot slot = (Slot) object;
-                loadWebview(slot.getDisplayUrl());
-            } else if (object instanceof TokenValue) {
-                TokenValue tokenValue = (TokenValue) object;
-                loadWebview(tokenValue.getDisplayUrl());
+            if (object instanceof String) {
+                String displayUrl = (String) object;
+                loadWebview(displayUrl);
             }
         } catch (Throwable tr) {
             Log.e(TAG, "Internal BLT exec error.", tr);
         }
     }
 
-    private void loadWebview(String url) {
-        CriteoBannerView criteoBannerView = bannerViewRef.get();
+    private void loadWebview(@NonNull String url) {
+        WebView criteoBannerView = webViewRef.get();
         if (criteoBannerView != null) {
             criteoBannerView.getSettings().setJavaScriptEnabled(true);
             criteoBannerView.setWebViewClient(this.webViewClient);

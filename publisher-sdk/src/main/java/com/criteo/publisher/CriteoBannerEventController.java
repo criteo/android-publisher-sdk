@@ -1,5 +1,9 @@
 package com.criteo.publisher;
 
+import static com.criteo.publisher.CriteoListenerCode.CLICK;
+import static com.criteo.publisher.CriteoListenerCode.INVALID;
+import static com.criteo.publisher.CriteoListenerCode.VALID;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,7 +16,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.tasks.CriteoBannerListenerCallTask;
@@ -31,9 +34,6 @@ public class CriteoBannerEventController {
     private final CriteoBannerAdListener adListener;
 
     @NonNull
-    private final Config config;
-
-    @NonNull
     private final Criteo criteo;
 
     public CriteoBannerEventController(
@@ -42,40 +42,43 @@ public class CriteoBannerEventController {
         this.view = new WeakReference<>(bannerView);
         this.adListener = bannerView.getCriteoBannerAdListener();
         this.criteo = criteo;
-        this.config = criteo.getConfig();
     }
 
     public void fetchAdAsync(@Nullable AdUnit adUnit) {
         Slot slot = criteo.getBidForAdUnit(adUnit);
 
-        notifyAndDisplay(slot);
+        if (slot == null) {
+            notifyFor(INVALID);
+        } else {
+            notifyFor(VALID);
+            displayAd(slot.getDisplayUrl());
+        }
     }
 
     public void fetchAdAsync(@Nullable BidToken bidToken) {
         TokenValue tokenValue = criteo.getTokenValue(bidToken, AdUnitType.CRITEO_BANNER);
 
-        notifyAndDisplay(tokenValue);
+        if (tokenValue == null) {
+            notifyFor(INVALID);
+        } else {
+            notifyFor(VALID);
+            displayAd(tokenValue.getDisplayUrl());
+        }
     }
 
-    // bidResponse could be either a Slot or a BidToken
-    private void notifyAndDisplay(@Nullable Object bidResponse) {
-        CriteoListenerCode code = CriteoListenerCode.INVALID;
-        if (bidResponse != null) {
-            code = CriteoListenerCode.VALID;
-        }
-
+    private void notifyFor(@NonNull CriteoListenerCode code) {
         Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
         CriteoBannerListenerCallTask listenerCallTask = new CriteoBannerListenerCallTask(
             adListener, view);
         listenerCallTask.executeOnExecutor(threadPoolExecutor, code);
+    }
 
-        if (CriteoListenerCode.VALID == code) {
-            CriteoBannerLoadTask loadTask = new CriteoBannerLoadTask(
-                view, createWebViewClient(), config);
-            // Must run on UI thread as it is displaying the fetched ad
-            Executor serialExecutor = DependencyProvider.getInstance().provideSerialExecutor();
-            loadTask.executeOnExecutor(serialExecutor, bidResponse);
-        }
+    private void displayAd(@NonNull String displayUrl) {
+        CriteoBannerLoadTask loadTask = new CriteoBannerLoadTask(
+            view, createWebViewClient(), criteo.getConfig());
+        // Must run on UI thread as it is displaying the fetched ad
+        Executor serialExecutor = DependencyProvider.getInstance().provideSerialExecutor();
+        loadTask.executeOnExecutor(serialExecutor, displayUrl);
     }
 
     // WebViewClient is created here to prevent passing the AdListener everywhere.
@@ -99,12 +102,7 @@ public class CriteoBannerEventController {
                 if (list.size() > 0) {
                     context.startActivity(intent);
 
-                    if (adListener != null) {
-                        Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
-                        CriteoBannerListenerCallTask listenerCallTask = new CriteoBannerListenerCallTask(
-                            adListener, CriteoBannerEventController.this.view);
-                        listenerCallTask.executeOnExecutor(threadPoolExecutor, CriteoListenerCode.CLICK);
-                    }
+                    notifyFor(CLICK);
                 }
 
                 return true;
