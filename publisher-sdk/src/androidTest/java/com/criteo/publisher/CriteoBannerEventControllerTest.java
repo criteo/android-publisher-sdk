@@ -3,7 +3,11 @@ package com.criteo.publisher;
 import static com.criteo.publisher.CriteoErrorCode.ERROR_CODE_NO_FILL;
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.AdditionalAnswers.answerVoid;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -11,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.app.Application;
+import android.os.Looper;
 import android.support.test.InstrumentationRegistry;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -20,6 +25,8 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,6 +59,46 @@ public class CriteoBannerEventControllerTest {
 
         when(criteoBannerView.getCriteoBannerAdListener()).thenReturn(criteoBannerAdListener);
         criteoBannerEventController = spy(new CriteoBannerEventController(criteoBannerView, criteo));
+    }
+
+    @Test
+    public void fetchAdAsyncAdUnit_GivenListener_InvokeItAsyncOnMainThread() throws Exception {
+        CountDownLatch latch = new CountDownLatch(1);
+
+        doAnswer(answerVoid((CriteoErrorCode ignored) -> {
+            assertSame(Thread.currentThread(), Looper.getMainLooper().getThread());
+            assertTrue(latch.await(1, TimeUnit.SECONDS));
+        })).when(criteoBannerAdListener).onAdFailedToReceive(any());
+
+        AdUnit adUnit = mock(AdUnit.class);
+        when(criteo.getBidForAdUnit(adUnit)).thenReturn(null);
+
+        runOnMainThreadAndWait(() -> {
+            criteoBannerEventController.fetchAdAsync(adUnit);
+            latch.countDown();
+        });
+
+        waitForIdleState();
+    }
+
+    @Test
+    public void fetchAdAsyncToken_GivenListener_InvokeItAsyncOnMainThread() throws Exception {
+        CountDownLatch latch = new CountDownLatch(1);
+
+        doAnswer(answerVoid((CriteoErrorCode ignored) -> {
+            assertSame(Thread.currentThread(), Looper.getMainLooper().getThread());
+            assertTrue(latch.await(1, TimeUnit.SECONDS));
+        })).when(criteoBannerAdListener).onAdFailedToReceive(any());
+
+        BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
+        when(criteo.getTokenValue(token, AdUnitType.CRITEO_BANNER)).thenReturn(null);
+
+        runOnMainThreadAndWait(() -> {
+            criteoBannerEventController.fetchAdAsync(token);
+            latch.countDown();
+        });
+
+        waitForIdleState();
     }
 
     @Test

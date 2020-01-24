@@ -43,8 +43,8 @@ public class CriteoBannerLoadTaskTest {
         when(config.getDisplayUrlMacro()).thenReturn("%macro%");
         when(config.getAdTagUrlMode()).thenReturn("myDisplayUrl: %macro%");
 
-        CriteoBannerLoadTask criteoBannerLoadTask = createTask();
-        criteoBannerLoadTask.onPostExecute(displayUrl);
+        CriteoBannerLoadTask criteoBannerLoadTask = createTask(displayUrl);
+        criteoBannerLoadTask.run();
 
         verify(webView.getSettings()).setJavaScriptEnabled(true);
         verify(webView).setWebViewClient(webViewClient);
@@ -60,15 +60,15 @@ public class CriteoBannerLoadTaskTest {
     public void execute_GivenExpiredReference_DoesNothing() throws Exception {
         webViewRef = new WeakReference<>(null);
 
-        CriteoBannerLoadTask criteoBannerLoadTask = createTask();
-        criteoBannerLoadTask.onPostExecute("anything");
+        CriteoBannerLoadTask criteoBannerLoadTask = createTask("anything");
+        criteoBannerLoadTask.run();
 
         verifyZeroInteractions(config);
     }
 
     @NonNull
-    private CriteoBannerLoadTask createTask() {
-        return new CriteoBannerLoadTask(webViewRef, webViewClient, config);
+    private CriteoBannerLoadTask createTask(String displayUrl) {
+        return new CriteoBannerLoadTask(webViewRef, webViewClient, config, displayUrl);
     }
 
 }

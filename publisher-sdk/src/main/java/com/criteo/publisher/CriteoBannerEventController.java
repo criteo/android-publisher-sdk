@@ -15,6 +15,7 @@ import android.support.annotation.VisibleForTesting;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.criteo.publisher.Util.AdUnitType;
+import com.criteo.publisher.Util.RunOnUiThreadExecutor;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
@@ -22,7 +23,6 @@ import com.criteo.publisher.tasks.CriteoBannerListenerCallTask;
 import com.criteo.publisher.tasks.CriteoBannerLoadTask;
 import java.lang.ref.WeakReference;
 import java.util.List;
-import java.util.concurrent.Executor;
 
 
 public class CriteoBannerEventController {
@@ -36,12 +36,16 @@ public class CriteoBannerEventController {
     @NonNull
     private final Criteo criteo;
 
+    @NonNull
+    private final RunOnUiThreadExecutor executor;
+
     public CriteoBannerEventController(
         @NonNull CriteoBannerView bannerView,
         @NonNull Criteo criteo) {
         this.view = new WeakReference<>(bannerView);
         this.adListener = bannerView.getCriteoBannerAdListener();
         this.criteo = criteo;
+        this.executor = DependencyProvider.getInstance().provideRunOnUiThreadExecutor();
     }
 
     public void fetchAdAsync(@Nullable AdUnit adUnit) {
@@ -67,19 +71,13 @@ public class CriteoBannerEventController {
     }
 
     private void notifyFor(@NonNull CriteoListenerCode code) {
-        Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
-        CriteoBannerListenerCallTask listenerCallTask = new CriteoBannerListenerCallTask(
-            adListener, view);
-        listenerCallTask.executeOnExecutor(threadPoolExecutor, code);
+        executor.executeAsync(new CriteoBannerListenerCallTask(adListener, view, code));
     }
 
     @VisibleForTesting
     void displayAd(@NonNull String displayUrl) {
-        CriteoBannerLoadTask loadTask = new CriteoBannerLoadTask(
-            view, createWebViewClient(), criteo.getConfig());
-        // Must run on UI thread as it is displaying the fetched ad
-        Executor serialExecutor = DependencyProvider.getInstance().provideSerialExecutor();
-        loadTask.executeOnExecutor(serialExecutor, displayUrl);
+        executor.executeAsync(new CriteoBannerLoadTask(
+            view, createWebViewClient(), criteo.getConfig(), displayUrl));
     }
 
     // WebViewClient is created here to prevent passing the AdListener everywhere.
