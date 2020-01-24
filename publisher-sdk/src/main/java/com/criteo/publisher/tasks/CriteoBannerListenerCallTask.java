@@ -5,7 +5,7 @@ import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoListenerCode;
-import java.lang.ref.WeakReference;
+import java.lang.ref.Reference;
 
 /**
  * /!\ Don't remove this class unless you know what you are doing. /!\
@@ -47,17 +47,18 @@ import java.lang.ref.WeakReference;
 public class CriteoBannerListenerCallTask extends AsyncTask<Object, Void, Object> {
 
     private CriteoBannerAdListener adListener;
-    private WeakReference<CriteoBannerView> view;
+    private Reference<CriteoBannerView> bannerViewRef;
 
     /**
-     * Task that calls the relevant callback in the criteoBannerAdListener based on the CriteoListenerCode passed to
-     * execute. Passes the criteoBannerView as a parameter to the onAdReceived callback if the CriteoListenerCode is
-     * valid
+     * Task that calls the relevant callback in the criteoBannerAdListener based on the
+     * {@link CriteoListenerCode} passed to execute. Passes the {@link CriteoBannerView} as a
+     * parameter to the onAdReceived callback if the CriteoListenerCode is valid.
      */
-    public CriteoBannerListenerCallTask(CriteoBannerAdListener criteoBannerAdListener
-            , CriteoBannerView criteoBannerView) {
-        adListener = criteoBannerAdListener;
-        this.view = new WeakReference<>(criteoBannerView);
+    public CriteoBannerListenerCallTask(
+        CriteoBannerAdListener criteoBannerAdListener,
+        Reference<CriteoBannerView> bannerViewRef) {
+        this.adListener = criteoBannerAdListener;
+        this.bannerViewRef = bannerViewRef;
     }
 
     @Override
@@ -80,7 +81,7 @@ public class CriteoBannerListenerCallTask extends AsyncTask<Object, Void, Object
                         adListener.onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
                         break;
                     case VALID:
-                        adListener.onAdReceived(view.get());
+                        adListener.onAdReceived(bannerViewRef.get());
                         break;
                     case CLICK:
                         adListener.onAdClicked();

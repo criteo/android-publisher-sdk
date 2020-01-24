@@ -25,7 +25,6 @@ import java.util.concurrent.Executor;
 public class CriteoBannerEventController {
 
     private final WeakReference<CriteoBannerView> view;
-    private CriteoBannerLoadTask loadTask;
 
     @Nullable
     private final CriteoBannerAdListener adListener;
@@ -66,11 +65,12 @@ public class CriteoBannerEventController {
 
         Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
         CriteoBannerListenerCallTask listenerCallTask = new CriteoBannerListenerCallTask(
-            adListener, view.get());
+            adListener, view);
         listenerCallTask.executeOnExecutor(threadPoolExecutor, code);
 
         if (CriteoListenerCode.VALID == code) {
-            loadTask = new CriteoBannerLoadTask(view.get(), createWebViewClient(), config);
+            CriteoBannerLoadTask loadTask = new CriteoBannerLoadTask(view.get(),
+                createWebViewClient(), config);
             // Must run on UI thread as it is displaying the fetched ad
             Executor serialExecutor = DependencyProvider.getInstance().provideSerialExecutor();
             loadTask.executeOnExecutor(serialExecutor, bidResponse);
@@ -100,7 +100,8 @@ public class CriteoBannerEventController {
 
                     if (adListener != null) {
                         Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
-                        CriteoBannerListenerCallTask listenerCallTask = new CriteoBannerListenerCallTask(adListener, null);
+                        CriteoBannerListenerCallTask listenerCallTask = new CriteoBannerListenerCallTask(
+                            adListener, CriteoBannerEventController.this.view);
                         listenerCallTask.executeOnExecutor(threadPoolExecutor, CriteoListenerCode.CLICK);
                     }
                 }
@@ -114,9 +115,4 @@ public class CriteoBannerEventController {
         };
     }
 
-    protected void destroy() {
-        if (loadTask != null) {
-            loadTask.cancel(true);
-        }
-    }
 }

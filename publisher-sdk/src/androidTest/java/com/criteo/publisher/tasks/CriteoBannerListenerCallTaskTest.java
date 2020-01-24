@@ -4,6 +4,7 @@ import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoListenerCode;
+import java.lang.ref.WeakReference;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -24,7 +25,7 @@ public class CriteoBannerListenerCallTaskTest {
     public void setup() {
         MockitoAnnotations.initMocks(this);
         criteoBannerListenerCallTask = new CriteoBannerListenerCallTask(criteoBannerAdListener,
-                criteoBannerView);
+                new WeakReference<>(criteoBannerView));
     }
 
     @Test
