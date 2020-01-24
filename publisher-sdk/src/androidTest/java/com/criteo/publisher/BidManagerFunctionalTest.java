@@ -198,6 +198,9 @@ public class BidManagerFunctionalTest {
     JSONObject expectedGdpr = mock(JSONObject.class);
     UserPrivacyUtil userPrivacyUtil = mock(UserPrivacyUtil.class);
     when(userPrivacyUtil.gdpr()).thenReturn(expectedGdpr);
+    when(userPrivacyUtil.getUsPrivacyOptout()).thenReturn("");
+    when(userPrivacyUtil.getIabUsPrivacyString()).thenReturn("");
+    when(userPrivacyUtil.getMopubConsent()).thenReturn("");
     doReturn(userPrivacyUtil).when(dependencyProvider).provideUserPrivacyUtil(any());
 
     CacheAdUnit cacheAdUnit = sampleAdUnit();

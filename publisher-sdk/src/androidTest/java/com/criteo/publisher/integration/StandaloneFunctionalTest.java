@@ -181,13 +181,12 @@ public class StandaloneFunctionalTest {
   }
 
   private View whenLoadingAndDisplayingAnInterstitial(InterstitialAdUnit interstitialAdUnit) throws Exception {
-    AtomicReference<CriteoInterstitial> interstitialRef = new AtomicReference<>();
     AtomicReference<CriteoSync> syncRef = new AtomicReference<>();
 
-    whenLoadingAnInterstitial(interstitialAdUnit, syncRef);
+    CriteoInterstitial interstitial = whenLoadingAnInterstitial(interstitialAdUnit, syncRef);
 
     Future<Activity> activity = webViewLookup.lookForResumedActivity(() -> {
-      runOnMainThreadAndWait(() -> interstitialRef.get().show());
+      runOnMainThreadAndWait(interstitial::show);
     });
 
     syncRef.get().waitForDisplay();

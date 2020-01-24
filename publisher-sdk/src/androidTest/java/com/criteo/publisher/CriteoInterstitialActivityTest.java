@@ -4,6 +4,7 @@ import static android.support.test.runner.lifecycle.Stage.DESTROYED;
 import static android.support.test.runner.lifecycle.Stage.RESUMED;
 import static com.criteo.publisher.CriteoInterstitial.RESULT_RECEIVER;
 import static com.criteo.publisher.CriteoInterstitial.WEB_VIEW_DATA;
+import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -41,9 +42,11 @@ public class CriteoInterstitialActivityTest {
         activityRule.launchActivity(intent);
 
         CriteoInterstitialActivity activity = activityRule.getActivity();
-        WebView webView = activity.getWebView();
-        WebViewClient webViewClient  = webView.getWebViewClient();
-        webViewClient.shouldOverrideUrlLoading(webView, "fake_deeplink://fakeappdispatch");
+        runOnMainThreadAndWait(() -> {
+            WebView webView = activity.getWebView();
+            WebViewClient webViewClient  = webView.getWebViewClient();
+            webViewClient.shouldOverrideUrlLoading(webView, "fake_deeplink://fakeappdispatch");
+        });
     }
 
     @Test
