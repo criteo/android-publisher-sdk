@@ -15,6 +15,7 @@ public class PrivacyConsentSelectorActivity extends AppCompatActivity {
   private static final String TAG = PrivacyConsentSelectorActivity.class.getSimpleName();
 
   private EditText ccpaIabEditText;
+  private EditText ccpaMopubEditText;
   private CheckBox ccpaBinaryValue;
   private Button saveBtn;
 
@@ -26,6 +27,9 @@ public class PrivacyConsentSelectorActivity extends AppCompatActivity {
     ccpaIabEditText = findViewById(R.id.editCcpaIabString);
     ccpaIabEditText.setText(getIabConsentString());
 
+    ccpaMopubEditText = findViewById(R.id.editCcpaMopubString);
+    ccpaMopubEditText.setText(getMopubString());
+
     ccpaBinaryValue = findViewById(R.id.checkboxCcpaBinary);
     ccpaBinaryValue.setChecked(getBinaryValue());
 
@@ -33,6 +37,8 @@ public class PrivacyConsentSelectorActivity extends AppCompatActivity {
 
     saveBtn.setOnClickListener(v -> {
       saveIabConsentString();
+
+      saveMopubConsentString();
 
       setBinaryValue();
     });
@@ -58,6 +64,13 @@ public class PrivacyConsentSelectorActivity extends AppCompatActivity {
     return defaultSharedPreferences.getString("IABUSPrivacy_String", "");
   }
 
+  private String getMopubString() {
+    SharedPreferences defaultSharedPreferences = PreferenceManager
+        .getDefaultSharedPreferences(this);
+
+    return defaultSharedPreferences.getString("MoPubConsent_String", "");
+  }
+
   private void saveIabConsentString() {
     Log.d(TAG, "Storing IAB String: " + ccpaIabEditText.getText().toString());
 
@@ -66,6 +79,17 @@ public class PrivacyConsentSelectorActivity extends AppCompatActivity {
 
     Editor edit = defaultSharedPreferences.edit();
     edit.putString("IABUSPrivacy_String", ccpaIabEditText.getText().toString());
+    edit.commit();
+  }
+
+  private void saveMopubConsentString() {
+    Log.d(TAG, "Storing Mopub String: " + ccpaMopubEditText.getText().toString());
+
+    SharedPreferences defaultSharedPreferences = PreferenceManager
+        .getDefaultSharedPreferences(this);
+
+    Editor edit = defaultSharedPreferences.edit();
+    edit.putString("MoPubConsent_String", ccpaMopubEditText.getText().toString());
     edit.commit();
   }
 }

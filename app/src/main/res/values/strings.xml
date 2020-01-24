@@ -1,9 +1,9 @@
 <resources>
   <string name="app_name">Criteo Pub SDK Demo</string>
   <string name="demo_app_title">Publisher SDK \nDemo App</string>
-  <string name="sdk_version">1.1.2</string>
+  <string name="sdk_version">3.4.0</string>
   <string name="sdk_version_label">Publisher SDK:</string>
-  <string name="demo_app_version">1.1.2</string>
+  <string name="demo_app_version">3.4.0</string>
   <string name="demo_app_version_label">Demo App version:</string>
   <string name="criteo_logo_content_description">Criteo Logo</string>
   <string name="title_activity_standalone">Standalone</string>
@@ -22,6 +22,7 @@
   <string name="btn_mopub_mediation">Mopub-Mediation</string>
   <string name="btn_privacy_consent_selector">Privacy Consent Selector</string>
   <string name="hint_ccpa_iab">CCPA IAB String</string>
+  <string name="hint_ccpa_mopub">CCPA Mopub String</string>
   <string name="ccpa_binary_value">CCPA Binary Value</string>
   <string name="btn_save">Save</string>
 </resources>

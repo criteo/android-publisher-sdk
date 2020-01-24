@@ -12,6 +12,14 @@
     android:layout_margin="16dp"
     android:hint="@string/hint_ccpa_iab"/>
 
+  <EditText
+    android:id="@+id/editCcpaMopubString"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:layout_margin="16dp"
+    android:hint="@string/hint_ccpa_mopub"/>
+
   <CheckBox
     android:id="@+id/checkboxCcpaBinary"
     android:layout_width="match_parent"
