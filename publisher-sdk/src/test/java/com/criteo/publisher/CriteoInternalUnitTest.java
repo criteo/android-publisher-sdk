@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 import android.app.Application;
 import android.content.Context;
 import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.Util.DirectMockRunOnUiThreadExecutor;
 import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.Executor;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
@@ -56,7 +56,8 @@ public class CriteoInternalUnitTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    when(dependencyProvider.provideRunOnUiThreadExecutor()).thenReturn(Runnable::run);
+    when(dependencyProvider.provideRunOnUiThreadExecutor())
+        .thenReturn(new DirectMockRunOnUiThreadExecutor());
 
     adUnits = new ArrayList<>();
   }
@@ -110,7 +111,7 @@ public class CriteoInternalUnitTest {
     doReturn(mock(DeviceUtil.class)).when(dependencyProvider).provideDeviceUtil(any());
     doReturn(mock(UserPrivacyUtil.class)).when(dependencyProvider).provideUserPrivacyUtil(any());
     doReturn(mock(Config.class)).when(dependencyProvider).provideConfig(any());
-    doReturn((Executor) Runnable::run).when(dependencyProvider).provideRunOnUiThreadExecutor();
+    doReturn(new DirectMockRunOnUiThreadExecutor()).when(dependencyProvider).provideRunOnUiThreadExecutor();
 
     Context applicationContext = mock(Context.class, Answers.RETURNS_DEEP_STUBS);
     when(application.getApplicationContext()).thenReturn(applicationContext);

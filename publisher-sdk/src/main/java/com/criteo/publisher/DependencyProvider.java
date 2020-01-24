@@ -112,7 +112,7 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public Executor provideRunOnUiThreadExecutor() {
+  public RunOnUiThreadExecutor provideRunOnUiThreadExecutor() {
     return getOrCreate(RunOnUiThreadExecutor.class, new Factory<RunOnUiThreadExecutor>() {
       @Override
       public RunOnUiThreadExecutor create() {
