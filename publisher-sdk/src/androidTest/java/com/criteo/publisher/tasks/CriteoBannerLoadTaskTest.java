@@ -6,6 +6,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.test.InstrumentationRegistry;
 import android.webkit.WebSettings;
@@ -19,6 +20,8 @@ import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -42,6 +45,8 @@ public class CriteoBannerLoadTaskTest {
     @Mock
     private CriteoBannerView criteoBannerView;
 
+    private Reference<CriteoBannerView> bannerViewRef;
+
     private CriteoBannerLoadTask criteoBannerLoadTask;
 
     private Config config;
@@ -53,13 +58,15 @@ public class CriteoBannerLoadTaskTest {
         config = new Config(InstrumentationRegistry.getContext());
         DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
         doReturn(config).when(dependencyProvider).provideConfig(any());
+
+        bannerViewRef = new WeakReference<>(criteoBannerView);
     }
 
 
     @Test
     public void testWithNullSlot() throws InterruptedException {
         Slot slot = null;
-        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, new WebViewClient(), config);
+        criteoBannerLoadTask = createTask();
         criteoBannerLoadTask.execute(slot);
 
         Thread.sleep(100);
@@ -81,7 +88,7 @@ public class CriteoBannerLoadTaskTest {
         }
         Slot slot = new Slot(response);
 
-        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, new WebViewClient(), config);
+        criteoBannerLoadTask = createTask();
         criteoBannerLoadTask.execute(slot);
 
         Thread.sleep(100);
@@ -99,7 +106,7 @@ public class CriteoBannerLoadTaskTest {
         response.put(CPM, "10.0");
         response.put(DISPLAY_URL, "https://www.criteo.com");
         Slot slot = new Slot(response);
-        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, new WebViewClient(), config);
+        criteoBannerLoadTask = createTask();
         criteoBannerLoadTask.execute(slot);
 
         Thread.sleep(100);
@@ -114,7 +121,7 @@ public class CriteoBannerLoadTaskTest {
     public void testWithValidTokenValue() throws InterruptedException {
         TokenValue tokenValue = new TokenValue(System.currentTimeMillis(), 500, "https://www.criteo.com",
                 AdUnitType.CRITEO_BANNER, mockedDependenciesRule.getDependencyProvider().provideClock());
-        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, new WebViewClient(), config);
+        criteoBannerLoadTask = createTask();
         criteoBannerLoadTask.execute(tokenValue);
 
         Thread.sleep(100);
@@ -127,11 +134,10 @@ public class CriteoBannerLoadTaskTest {
 
     }
 
-
     @Test
     public void testWithNullTokenValue() throws InterruptedException {
         TokenValue tokenValue = null;
-        criteoBannerLoadTask = new CriteoBannerLoadTask(criteoBannerView, new WebViewClient(), config);
+        criteoBannerLoadTask = createTask();
         criteoBannerLoadTask.execute(tokenValue);
 
         Thread.sleep(100);
@@ -143,6 +149,10 @@ public class CriteoBannerLoadTaskTest {
                 .loadDataWithBaseURL("", displayUrl, "text/html", "UTF-8", "");
     }
 
+    @NonNull
+    private CriteoBannerLoadTask createTask() {
+        return new CriteoBannerLoadTask(bannerViewRef, new WebViewClient(), config);
+    }
 
     private class TestWebSettings extends WebSettings {
 

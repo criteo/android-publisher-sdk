@@ -133,6 +133,13 @@ public class Slot {
         this.timeOfDownload = timeOfDownload;
     }
 
+    /**
+     * Returns the URL of the AJS creative to load for displaying the ad.
+     * <p>
+     * Non null after validation through {@link #isValid()}
+     *
+     * @return display URL
+     */
     public String getDisplayUrl() {
         return displayUrl;
     }

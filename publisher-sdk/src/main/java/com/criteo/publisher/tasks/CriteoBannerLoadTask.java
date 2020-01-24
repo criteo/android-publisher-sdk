@@ -1,13 +1,14 @@
 package com.criteo.publisher.tasks;
 
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.webkit.WebViewClient;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
-import java.lang.ref.WeakReference;
+import java.lang.ref.Reference;
 
 /**
  * /!\ Don't remove this class unless you know what you are doing. /!\
@@ -50,9 +51,13 @@ public class CriteoBannerLoadTask extends AsyncTask<Object, Void, Object> {
 
     private static final String TAG = "Criteo.BLT";
 
-    private final WeakReference<CriteoBannerView> weakReferenceBannerView;
+    @NonNull
+    private final Reference<CriteoBannerView> bannerViewRef;
+
+    @NonNull
     private final Config config;
 
+    @NonNull
     private WebViewClient webViewClient;
 
     /**
@@ -60,8 +65,11 @@ public class CriteoBannerLoadTask extends AsyncTask<Object, Void, Object> {
      * thread. WebView.getSettings().setJavaScriptEnabled() & WebView.setWebViewClient() throws if not done in the
      * onPostExecute() as onPostExecute runs on the UI thread
      */
-    public CriteoBannerLoadTask(CriteoBannerView bannerView, WebViewClient webViewClient, Config config) {
-        this.weakReferenceBannerView = new WeakReference<>(bannerView);
+    public CriteoBannerLoadTask(
+        @NonNull Reference<CriteoBannerView> bannerViewRef,
+        @NonNull WebViewClient webViewClient,
+        @NonNull Config config) {
+        this.bannerViewRef = bannerViewRef;
         this.webViewClient = webViewClient;
         this.config = config;
     }
@@ -97,7 +105,7 @@ public class CriteoBannerLoadTask extends AsyncTask<Object, Void, Object> {
     }
 
     private void loadWebview(String url) {
-        CriteoBannerView criteoBannerView = weakReferenceBannerView.get();
+        CriteoBannerView criteoBannerView = bannerViewRef.get();
         if (criteoBannerView != null) {
             criteoBannerView.getSettings().setJavaScriptEnabled(true);
             criteoBannerView.setWebViewClient(this.webViewClient);

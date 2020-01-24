@@ -1,6 +1,8 @@
 package com.criteo.publisher.tasks;
 
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
@@ -46,18 +48,21 @@ import java.lang.ref.Reference;
  */
 public class CriteoBannerListenerCallTask extends AsyncTask<Object, Void, Object> {
 
-    private CriteoBannerAdListener adListener;
+    @Nullable
+    private CriteoBannerAdListener listener;
+
+    @NonNull
     private Reference<CriteoBannerView> bannerViewRef;
 
     /**
-     * Task that calls the relevant callback in the criteoBannerAdListener based on the
+     * Task that calls the relevant callback in the {@link CriteoBannerAdListener} based on the
      * {@link CriteoListenerCode} passed to execute. Passes the {@link CriteoBannerView} as a
      * parameter to the onAdReceived callback if the CriteoListenerCode is valid.
      */
     public CriteoBannerListenerCallTask(
-        CriteoBannerAdListener criteoBannerAdListener,
-        Reference<CriteoBannerView> bannerViewRef) {
-        this.adListener = criteoBannerAdListener;
+        @Nullable CriteoBannerAdListener listener,
+        @NonNull Reference<CriteoBannerView> bannerViewRef) {
+        this.listener = listener;
         this.bannerViewRef = bannerViewRef;
     }
 
@@ -71,22 +76,22 @@ public class CriteoBannerListenerCallTask extends AsyncTask<Object, Void, Object
 
     @Override
     protected void onPostExecute(Object object) {
-        if (adListener != null) {
+        if (listener != null) {
             if (object == null) {
-                adListener.onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+                listener.onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
             } else {
                 CriteoListenerCode code = (CriteoListenerCode) object;
                 switch (code) {
                     case INVALID:
-                        adListener.onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+                        listener.onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
                         break;
                     case VALID:
-                        adListener.onAdReceived(bannerViewRef.get());
+                        listener.onAdReceived(bannerViewRef.get());
                         break;
                     case CLICK:
-                        adListener.onAdClicked();
-                        adListener.onAdLeftApplication();
-                        adListener.onAdOpened();
+                        listener.onAdClicked();
+                        listener.onAdLeftApplication();
+                        listener.onAdOpened();
                         break;
                 }
             }

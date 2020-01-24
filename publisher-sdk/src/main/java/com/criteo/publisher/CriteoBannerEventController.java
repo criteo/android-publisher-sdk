@@ -24,6 +24,7 @@ import java.util.concurrent.Executor;
 
 public class CriteoBannerEventController {
 
+    @NonNull
     private final WeakReference<CriteoBannerView> view;
 
     @Nullable
@@ -69,8 +70,8 @@ public class CriteoBannerEventController {
         listenerCallTask.executeOnExecutor(threadPoolExecutor, code);
 
         if (CriteoListenerCode.VALID == code) {
-            CriteoBannerLoadTask loadTask = new CriteoBannerLoadTask(view.get(),
-                createWebViewClient(), config);
+            CriteoBannerLoadTask loadTask = new CriteoBannerLoadTask(
+                view, createWebViewClient(), config);
             // Must run on UI thread as it is displaying the fetched ad
             Executor serialExecutor = DependencyProvider.getInstance().provideSerialExecutor();
             loadTask.executeOnExecutor(serialExecutor, bidResponse);

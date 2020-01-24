@@ -1,14 +1,17 @@
 package com.criteo.publisher.model;
 
+import android.support.annotation.NonNull;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.ObjectsUtil;
 
 public abstract class AdUnit {
 
     private final String adUnitId;
+
+    @NonNull
     private final AdUnitType adUnitType;
 
-    protected AdUnit(String adUnitId, AdUnitType adUnitType) {
+    protected AdUnit(String adUnitId, @NonNull AdUnitType adUnitType) {
         this.adUnitId = adUnitId;
         this.adUnitType = adUnitType;
     }
@@ -17,6 +20,7 @@ public abstract class AdUnit {
         return adUnitId;
     }
 
+    @NonNull
     public AdUnitType getAdUnitType() {
         return adUnitType;
     }

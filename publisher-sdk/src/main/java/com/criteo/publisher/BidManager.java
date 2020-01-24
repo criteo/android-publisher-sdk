@@ -78,6 +78,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     private final DeviceUtil deviceUtil;
     private final LoggingUtil loggingUtil;
     private final Config config;
+
+    @NonNull
     private final Clock clock;
     private final UserPrivacyUtil userPrivacyUtil;
     private final AdUnitMapper adUnitMapper;
