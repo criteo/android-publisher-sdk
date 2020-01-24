@@ -107,10 +107,6 @@ public class CriteoBannerEventController {
 
                 return true;
             }
-
-            @Override
-            public void onPageFinished(WebView view, String url) {
-            }
         };
     }
 
