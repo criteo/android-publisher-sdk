@@ -6,9 +6,7 @@ import android.content.SharedPreferences.Editor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
-
 import com.criteo.publisher.R;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -115,18 +113,22 @@ public class Config {
         return killSwitchEnabled;
     }
 
+    @NonNull
     public String getDisplayUrlMacro() {
         return displayUrlMacro;
     }
 
+    @NonNull
     public String getAdTagUrlMode() {
         return adTagUrlMode;
     }
 
+    @NonNull
     public String getAdTagDataMacro() {
         return adTagDataMacro;
     }
 
+    @NonNull
     public String getAdTagDataMode() {
         return adTagDataMode;
     }

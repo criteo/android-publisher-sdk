@@ -1,7 +1,12 @@
 package com.criteo.publisher;
 
+import static com.criteo.publisher.CriteoErrorCode.ERROR_CODE_NO_FILL;
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
-import static org.mockito.Mockito.times;
+import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -9,44 +14,108 @@ import android.app.Application;
 import android.support.test.InstrumentationRegistry;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import com.criteo.publisher.Util.AdUnitType;
+import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.Slot;
+import com.criteo.publisher.model.TokenValue;
+import java.util.UUID;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class CriteoBannerEventControllerTest {
 
+    @Rule
+    public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
+
     private CriteoBannerEventController criteoBannerEventController;
 
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private CriteoBannerView criteoBannerView;
 
     @Mock
     private CriteoBannerAdListener criteoBannerAdListener;
 
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private Criteo criteo;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        when(criteoBannerView.getCriteoBannerAdListener()).thenReturn(criteoBannerAdListener);
+        when(criteo.getConfig().getDisplayUrlMacro()).thenReturn("");
+        when(criteo.getConfig().getAdTagUrlMode()).thenReturn("");
 
-        criteoBannerEventController = new CriteoBannerEventController(criteoBannerView, criteo);
+        when(criteoBannerView.getCriteoBannerAdListener()).thenReturn(criteoBannerAdListener);
+        criteoBannerEventController = spy(new CriteoBannerEventController(criteoBannerView, criteo));
     }
 
     @Test
-    public void testWithNullAdUnit() throws Exception {
-        when(criteo.getBidForAdUnit(null)).thenReturn(null);
+    public void fetchAdAsyncAdUnit_GivenNoBid_NotifyListenerForFailureAndDoNotDisplayAd() throws Exception {
+        AdUnit adUnit = mock(AdUnit.class);
 
-        criteoBannerEventController.fetchAdAsync((AdUnit) null);
+        when(criteo.getBidForAdUnit(adUnit)).thenReturn(null);
 
-        Thread.sleep(1000);
+        criteoBannerEventController.fetchAdAsync(adUnit);
+        waitForIdleState();
 
-        verify(criteoBannerAdListener, times(0)).onAdReceived(criteoBannerView);
-        verify(criteoBannerAdListener, times(1)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+        verify(criteoBannerAdListener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
+        verify(criteoBannerEventController, never()).displayAd(any());
+    }
+
+    @Test
+    public void fetchAdAsyncAdUnit_GivenBidNotifyListenerForSuccessAndDisplayAd() throws Exception {
+        AdUnit adUnit = mock(AdUnit.class);
+        Slot slot = mock(Slot.class);
+
+        when(criteo.getBidForAdUnit(adUnit)).thenReturn(slot);
+        when(slot.getDisplayUrl()).thenReturn("http://my.display.url");
+
+        criteoBannerEventController.fetchAdAsync(adUnit);
+        waitForIdleState();
+
+        verify(criteoBannerAdListener).onAdReceived(criteoBannerView);
+        verify(criteoBannerEventController).displayAd("http://my.display.url");
+    }
+
+    @Test
+    public void fetchAdAsyncToken_GivenNoBid_NotifyListenerForFailureAndDoNotDisplayAd() throws Exception {
+        BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
+
+        when(criteo.getTokenValue(token, AdUnitType.CRITEO_BANNER)).thenReturn(null);
+
+        criteoBannerEventController.fetchAdAsync(token);
+        waitForIdleState();
+
+        verify(criteoBannerAdListener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
+        verify(criteoBannerEventController, never()).displayAd(any());
+    }
+
+    @Test
+    public void fetchAdAsyncToken_GivenBidNotifyListenerForSuccessAndDisplayAd() throws Exception {
+        BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
+        TokenValue tokenValue = mock(TokenValue.class);
+
+        when(criteo.getTokenValue(token, AdUnitType.CRITEO_BANNER)).thenReturn(tokenValue);
+        when(tokenValue.getDisplayUrl()).thenReturn("http://my.display.url");
+
+        criteoBannerEventController.fetchAdAsync(token);
+        waitForIdleState();
+
+        verify(criteoBannerAdListener).onAdReceived(criteoBannerView);
+        verify(criteoBannerEventController).displayAd("http://my.display.url");
+    }
+
+    @Test
+    public void displayAd_GivenDisplayUrl_LoadItInBanner() throws Exception {
+        criteoBannerEventController.displayAd("http://my.display.url");
+        waitForIdleState();
+
+        verify(criteoBannerView).loadDataWithBaseURL(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -56,5 +125,9 @@ public class CriteoBannerEventControllerTest {
             Application app = (Application) InstrumentationRegistry.getTargetContext().getApplicationContext();
             webViewClient.shouldOverrideUrlLoading(new WebView(app.getApplicationContext()), "fake_deeplink://fakeappdispatch");
         });
+    }
+
+    private void waitForIdleState() {
+        waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
     }
 }

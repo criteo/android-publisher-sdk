@@ -73,7 +73,8 @@ public class CriteoBannerEventController {
         listenerCallTask.executeOnExecutor(threadPoolExecutor, code);
     }
 
-    private void displayAd(@NonNull String displayUrl) {
+    @VisibleForTesting
+    void displayAd(@NonNull String displayUrl) {
         CriteoBannerLoadTask loadTask = new CriteoBannerLoadTask(
             view, createWebViewClient(), criteo.getConfig());
         // Must run on UI thread as it is displaying the fetched ad
