@@ -32,6 +32,14 @@ android {
         }
     }
 
+    flavorDimensions "mode"
+    productFlavors {
+        memoryLeaksHunt {
+            dimension "mode"
+            versionNameSuffix "-memoryLeaksHunt"
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -75,6 +83,8 @@ dependencies {
     implementation('com.mopub:mopub-sdk-interstitial:5.6.0@aar') {
         transitive = true
     }
+
+    memoryLeaksHuntImplementation('com.squareup.leakcanary:leakcanary-android:2.1')
 }
 
 // Define artifacts to publish to Nexus
