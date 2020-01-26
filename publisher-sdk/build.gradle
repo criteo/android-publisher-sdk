@@ -35,6 +35,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             consumerProguardFiles 'consumer-proguard.txt'
         }
+        staging {
+            initWith debug
+        }
     }
     testOptions {
         unitTests.returnDefaultValues = true
