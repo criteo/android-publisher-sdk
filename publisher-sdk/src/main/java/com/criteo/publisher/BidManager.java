@@ -417,11 +417,9 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         startCdbDownloadTask(true, cacheAdUnits);
     }
 
-    public TokenValue getTokenValue(BidToken bidToken, AdUnitType adUnitType) {
-        if (bidToken != null) {
-            return tokenCache.getTokenValue(bidToken, adUnitType);
-        }
-        return null;
+    @Nullable
+    public TokenValue getTokenValue(@Nullable BidToken bidToken, @NonNull AdUnitType adUnitType) {
+        return tokenCache.getTokenValue(bidToken, adUnitType);
     }
 
     private boolean killSwitchEngaged() {

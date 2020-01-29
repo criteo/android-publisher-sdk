@@ -1,5 +1,7 @@
 package com.criteo.publisher;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.TokenValue;
@@ -21,7 +23,8 @@ public class TokenCache {
         return bidToken;
     }
 
-    public TokenValue getTokenValue(BidToken bidToken, AdUnitType adUnitType) {
+    @Nullable
+    public TokenValue getTokenValue(@Nullable BidToken bidToken, @NonNull AdUnitType adUnitType) {
         if (bidToken == null) {
             return null;
         }

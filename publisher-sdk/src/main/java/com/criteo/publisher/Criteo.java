@@ -130,7 +130,7 @@ public abstract class Criteo {
   public abstract BidResponse getBidResponse(AdUnit adUnit);
 
   @Nullable
-  abstract TokenValue getTokenValue(BidToken bidToken, AdUnitType adUnitType);
+  abstract TokenValue getTokenValue(@Nullable BidToken bidToken, @NonNull AdUnitType adUnitType);
 
   @NonNull
   abstract DeviceInfo getDeviceInfo();

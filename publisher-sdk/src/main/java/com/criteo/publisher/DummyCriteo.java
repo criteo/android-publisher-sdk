@@ -33,7 +33,7 @@ public class DummyCriteo extends Criteo {
 
   @Nullable
   @Override
-  TokenValue getTokenValue(BidToken bidToken, AdUnitType adUnitType) {
+  TokenValue getTokenValue(@Nullable BidToken bidToken, @NonNull AdUnitType adUnitType) {
     return null;
   }
 

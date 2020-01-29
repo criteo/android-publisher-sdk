@@ -1,26 +1,32 @@
 package com.criteo.publisher;
 
+import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import android.app.Application;
 import android.content.Context;
+import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.DirectMockRunOnUiThreadExecutor;
 import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
+import com.criteo.publisher.model.Slot;
+import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.network.PubSdkApi;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -220,6 +226,13 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
+  public void whenCreatingNewCriteo_GivenApplication_RegisterOneActivityLifecycleCallback() throws Exception {
+    createCriteo();
+
+    verify(application).registerActivityLifecycleCallbacks(any(AppLifecycleUtil.class));
+  }
+
+  @Test
   public void getBidResponse_GivenBidManagerThrowing_DoNotThrowAndReturnNoBidResponse() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
 
@@ -268,6 +281,59 @@ public class CriteoInternalUnitTest {
     createCriteo();
 
     verify(userPrivacyUtil, never()).storeMopubConsent("fake_mopub_consent_value");
+  }
+
+  @Test
+  public void setBidsForAdUnit_GivenBidManagerThrowing_DoNotThrow() throws Exception {
+    BidManager bidManager = givenMockedBidManager();
+    doThrow(RuntimeException.class).when(bidManager).enrichBid(any(), any());
+
+    CriteoInternal criteo = createCriteo();
+
+    assertThatCode(() -> {
+      criteo.setBidsForAdUnit(mock(Object.class), mock(AdUnit.class));
+    }).doesNotThrowAnyException();
+  }
+
+  @Test
+  public void setBidsForAdUnit_GivenBidManager_DelegateToIt() throws Exception {
+    BidManager bidManager = givenMockedBidManager();
+
+    Object object = mock(Object.class);
+    AdUnit adUnit = mock(AdUnit.class);
+
+    CriteoInternal criteo = createCriteo();
+    criteo.setBidsForAdUnit(object, adUnit);
+
+    verify(bidManager).enrichBid(object, adUnit);
+  }
+
+  @Test
+  public void getBidForAdUnit_GivenBidManager_DelegateToIt() throws Exception {
+    AdUnit adUnit = mock(AdUnit.class);
+    Slot expected = mock(Slot.class);
+
+    BidManager bidManager = givenMockedBidManager();
+    when(bidManager.getBidForAdUnitAndPrefetch(adUnit)).thenReturn(expected);
+
+    CriteoInternal criteo = createCriteo();
+    Slot bid = criteo.getBidForAdUnit(adUnit);
+
+    assertThat(bid).isSameAs(expected);
+  }
+
+  @Test
+  public void getTokenValue_GivenBidManager_DelegateToIt() throws Exception {
+    BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
+    TokenValue expected = mock(TokenValue.class);
+
+    BidManager bidManager = givenMockedBidManager();
+    when(bidManager.getTokenValue(token, CRITEO_BANNER)).thenReturn(expected);
+
+    CriteoInternal criteo = createCriteo();
+    TokenValue tokenValue = criteo.getTokenValue(token, CRITEO_BANNER);
+
+    assertThat(tokenValue).isSameAs(expected);
   }
 
   private void givenMockedUserPrivacyUtil() {

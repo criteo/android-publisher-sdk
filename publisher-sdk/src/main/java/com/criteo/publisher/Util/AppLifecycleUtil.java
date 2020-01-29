@@ -15,10 +15,9 @@ public class AppLifecycleUtil implements Application.ActivityLifecycleCallbacks 
     private boolean transitionPossible;
     private boolean created;
 
-    public AppLifecycleUtil(Application application, AppEvents appEvents, BidManager bidmanager) {
+    public AppLifecycleUtil(AppEvents appEvents, BidManager bidmanager) {
         this.appEvents = appEvents;
         this.bidManager = bidmanager;
-        application.registerActivityLifecycleCallbacks(this);
         started = 0;
         resumed = 0;
         transitionPossible = false;

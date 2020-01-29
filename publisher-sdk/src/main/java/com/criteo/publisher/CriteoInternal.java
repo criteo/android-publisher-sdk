@@ -24,14 +24,16 @@ final class CriteoInternal extends Criteo {
 
   private static final String TAG = CriteoInternal.class.getSimpleName();
 
+  @NonNull
   private final BidManager bidManager;
-  private final AppEvents appEvents;
-  private final AppLifecycleUtil appLifecycleUtil;
+
+  @NonNull
   private final DeviceInfo deviceInfo;
 
   @NonNull
   private final Config config;
 
+  @NonNull
   private final UserPrivacyUtil userPrivacyUtil;
 
   CriteoInternal(
@@ -67,7 +69,7 @@ final class CriteoInternal extends Criteo {
 
     userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil(context);
     if (usPrivacyOptout != null) {
-      userPrivacyUtil.storeUsPrivacyOptout(usPrivacyOptout.booleanValue());
+      userPrivacyUtil.storeUsPrivacyOptout(usPrivacyOptout);
     }
 
     // this nulll check ensures that instantiating Criteo object with null mopub consent value,
@@ -76,9 +78,9 @@ final class CriteoInternal extends Criteo {
       userPrivacyUtil.storeMopubConsent(mopubConsent);
     }
 
-    this.appEvents = dependencyProvider.provideAppEvents(context);
-
-    this.appLifecycleUtil = new AppLifecycleUtil(application, appEvents, bidManager);
+    AppEvents appEvents = dependencyProvider.provideAppEvents(context);
+    AppLifecycleUtil lifecycleCallback = new AppLifecycleUtil(appEvents, bidManager);
+    application.registerActivityLifecycleCallbacks(lifecycleCallback);
 
     prefetchAdUnits(dependencyProvider.provideRunOnUiThreadExecutor(), adUnits);
   }
@@ -102,9 +104,6 @@ final class CriteoInternal extends Criteo {
   }
 
   private void doSetBidsForAdUnit(Object object, AdUnit adUnit) {
-    if (bidManager == null) {
-      return;
-    }
     bidManager.enrichBid(object, adUnit);
   }
 
@@ -114,9 +113,6 @@ final class CriteoInternal extends Criteo {
   @Nullable
   @Override
   Slot getBidForAdUnit(AdUnit adUnit) {
-    if (bidManager == null) {
-      return null;
-    }
     return bidManager.getBidForAdUnitAndPrefetch(adUnit);
   }
 
@@ -135,17 +131,12 @@ final class CriteoInternal extends Criteo {
   }
 
   private BidResponse doGetBidResponse(AdUnit adUnit) {
-    if (bidManager == null) {
-      return null;
-    }
     return bidManager.getBidForInhouseMediation(adUnit);
   }
 
+  @Nullable
   @Override
-  TokenValue getTokenValue(BidToken bidToken, AdUnitType adUnitType) {
-    if (bidManager == null) {
-      return null;
-    }
+  TokenValue getTokenValue(@Nullable BidToken bidToken, @NonNull AdUnitType adUnitType) {
     return bidManager.getTokenValue(bidToken, adUnitType);
   }
 
