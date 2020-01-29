@@ -1,7 +1,6 @@
 package com.criteo.publisher.model;
 
 import com.criteo.publisher.Clock;
-import com.criteo.publisher.Util.AdUnitType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,12 +23,11 @@ public class TokenValueTest {
     @Before
     public void prepare() {
         MockitoAnnotations.initMocks(this);
-        tokenValue = new TokenValue(BID_TIME, BID_TTLE, DISPLAY_URL, AdUnitType.CRITEO_BANNER, clock);
+        tokenValue = new TokenValue(BID_TIME, BID_TTLE, DISPLAY_URL, clock);
     }
 
     @Test
     public void testTokenValueCreated() {
-        Assert.assertEquals(tokenValue.getAdUnitType(), AdUnitType.CRITEO_BANNER);
         Assert.assertEquals(tokenValue.getDisplayUrl(), DISPLAY_URL);
         Assert.assertEquals(tokenValue.gettokenExpirationTime(), BID_TIME + BID_TTLE * SECOND_TO_MILLI);
     }

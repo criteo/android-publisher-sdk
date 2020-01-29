@@ -397,7 +397,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             slot.getTimeOfDownload(),
             slot.getTtl(),
             slot.getDisplayUrl(),
-            adUnit.getAdUnitType(),
             clock
         );
 

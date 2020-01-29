@@ -1,7 +1,6 @@
 package com.criteo.publisher;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import com.criteo.publisher.model.AdUnit;
 import java.util.UUID;
 
@@ -10,10 +9,10 @@ public final class BidToken {
     @NonNull
     private final UUID tokenId;
 
-    @Nullable
+    @NonNull
     private final AdUnit adUnit;
 
-    BidToken(UUID uuid, @Nullable AdUnit adUnit) {
+    BidToken(UUID uuid, @NonNull AdUnit adUnit) {
         this.tokenId = uuid != null ? uuid : UUID.randomUUID();
         this.adUnit = adUnit;
     }
@@ -23,7 +22,7 @@ public final class BidToken {
      * state.
      * Plan for removal: v4.0.0 EE-824
      */
-    @Nullable
+    @NonNull
     @Deprecated
     public AdUnit getAdUnit() {
         return adUnit;

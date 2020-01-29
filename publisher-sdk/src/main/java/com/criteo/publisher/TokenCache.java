@@ -5,44 +5,36 @@ import android.support.annotation.Nullable;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.TokenValue;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TokenCache {
 
     private final Map<BidToken, TokenValue> tokenMap;
 
     public TokenCache() {
-        tokenMap = new Hashtable<>();
+        tokenMap = new ConcurrentHashMap<>();
     }
 
-    public BidToken add(TokenValue tokenValue, AdUnit adUnit) {
+    public BidToken add(@NonNull TokenValue tokenValue, @NonNull AdUnit adUnit) {
         BidToken bidToken = new BidToken(UUID.randomUUID(), adUnit);
         tokenMap.put(bidToken, tokenValue);
         return bidToken;
     }
 
     @Nullable
-    public TokenValue getTokenValue(@Nullable BidToken bidToken, @NonNull AdUnitType adUnitType) {
-        if (bidToken == null) {
+    public TokenValue getTokenValue(@Nullable BidToken bidToken, @NonNull AdUnitType expectedType) {
+        if (bidToken == null || bidToken.getAdUnit().getAdUnitType() != expectedType) {
             return null;
         }
 
-        if (tokenMap.containsKey(bidToken)) {
-            TokenValue tokenValue = tokenMap.get(bidToken);
-            if (tokenValue.isExpired()) {
-                tokenMap.remove(bidToken);
-                return null;
-            }
-            if (tokenValue.getAdUnitType() != adUnitType) {
-                return null;
-            }
-            tokenMap.remove(bidToken);
-            return tokenValue;
-        } else {
+        TokenValue tokenValue = tokenMap.remove(bidToken);
+        if (tokenValue == null || tokenValue.isExpired()) {
             return null;
         }
+
+        return tokenValue;
     }
 
 }
