@@ -17,14 +17,8 @@ public final class BidToken {
         this.adUnit = adUnit;
     }
 
-    /**
-     * @deprecated because {@link BidToken} should be used as is without relying on any internal
-     * state.
-     * Plan for removal: v4.0.0 EE-824
-     */
     @NonNull
-    @Deprecated
-    public AdUnit getAdUnit() {
+    AdUnit getAdUnit() {
         return adUnit;
     }
 
