@@ -28,10 +28,12 @@ public class CriteoInterstitial {
 
     private CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
 
-    // FIXME Use a nullable there so that calling the main constructor does not call directly
-    //  the Criteo.getInstance method. It may throw an exception, if not call before the
-    //  Criteo.init. And, as this class is part of the public API, we should not (yet) break any
-    //  integration.
+    /**
+     * Null means that the singleton Criteo should be used.
+     *
+     * {@link Criteo#getInstance()} is fetched lazily so publishers may call the constructor without
+     * having to init the SDK before.
+     */
     @Nullable
     private final Criteo criteo;
 
