@@ -1,6 +1,7 @@
 package com.criteo.publisher.model;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.DependencyProvider;
@@ -62,7 +63,7 @@ public class WebViewData {
     public void fillWebViewHtmlContent(
         String displayUrl,
         @NonNull DeviceInfo deviceInfo,
-        CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener) {
+        @Nullable CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener) {
         Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
         new WebViewDataTask(this, deviceInfo, criteoInterstitialAdDisplayListener).executeOnExecutor(threadPoolExecutor, displayUrl);
     }

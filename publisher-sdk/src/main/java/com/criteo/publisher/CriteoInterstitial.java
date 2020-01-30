@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
@@ -19,12 +20,16 @@ public class CriteoInterstitial {
 
     private InterstitialAdUnit interstitialAdUnit;
 
+    @NonNull
     private Context context;
 
+    @Nullable
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
+    @Nullable
     private CriteoInterstitialEventController criteoInterstitialEventController;
 
+    @Nullable
     private CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
 
     /**
@@ -36,30 +41,32 @@ public class CriteoInterstitial {
     @Nullable
     private final Criteo criteo;
 
-    public CriteoInterstitial(Context context, InterstitialAdUnit interstitialAdUnit) {
+    public CriteoInterstitial(@NonNull Context context, InterstitialAdUnit interstitialAdUnit) {
         this(context, interstitialAdUnit, null);
     }
 
     @VisibleForTesting
-    CriteoInterstitial(Context context,
+    CriteoInterstitial(@NonNull Context context,
         InterstitialAdUnit interstitialAdUnit,
-        Criteo criteo) {
+        @Nullable Criteo criteo) {
         this.context = context;
         this.interstitialAdUnit = interstitialAdUnit;
         this.criteo = criteo;
     }
 
+    @NonNull
     private Criteo getCriteo() {
         return criteo == null ? Criteo.getInstance() : criteo;
     }
 
-    public void setCriteoInterstitialAdListener(CriteoInterstitialAdListener criteoInterstitialAdListener) {
+    public void setCriteoInterstitialAdListener(
+        @Nullable CriteoInterstitialAdListener criteoInterstitialAdListener) {
         this.criteoInterstitialAdListener = criteoInterstitialAdListener;
 
     }
 
     public void setCriteoInterstitialAdDisplayListener(
-            CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener) {
+            @Nullable CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener) {
         this.criteoInterstitialAdDisplayListener = criteoInterstitialAdDisplayListener;
 
     }

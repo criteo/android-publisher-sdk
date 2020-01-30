@@ -1,6 +1,7 @@
 package com.criteo.publisher;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.DeviceInfo;
@@ -13,28 +14,34 @@ import java.util.concurrent.Executor;
 
 public class CriteoInterstitialEventController {
 
+    @Nullable
     private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
+    @Nullable
     private CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
 
+    @Nullable
     private CriteoInterstitialListenerCallTask criteoInterstitialListenerCallTask;
 
+    @NonNull
     private WebViewData webViewData;
 
     @NonNull
     private DeviceInfo deviceInfo;
 
+    @NonNull
     private final Criteo criteo;
 
     public CriteoInterstitialEventController(
-            CriteoInterstitialAdListener listener, CriteoInterstitialAdDisplayListener adDisplayListener,
-            WebViewData webViewData,
-            Criteo criteo) {
+        @Nullable CriteoInterstitialAdListener listener,
+        @Nullable CriteoInterstitialAdDisplayListener adDisplayListener,
+        @NonNull WebViewData webViewData,
+        @NonNull Criteo criteo) {
         this.criteoInterstitialAdListener = listener;
         this.criteoInterstitialAdDisplayListener = adDisplayListener;
         this.webViewData = webViewData;
-        this.deviceInfo = criteo.getDeviceInfo();
         this.criteo = criteo;
+        this.deviceInfo = criteo.getDeviceInfo();
     }
 
     public boolean isAdLoaded() {

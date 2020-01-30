@@ -2,33 +2,33 @@ package com.criteo.publisher.tasks;
 
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.Util.StreamUtil;
+import com.criteo.publisher.Util.TextUtils;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.WebViewData;
-import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 
 public class WebViewDataTask extends AsyncTask<String, Void, String> {
 
     private static final String TAG = "Criteo.WVDT";
 
+    @NonNull
     private WebViewData webviewData;
 
     @NonNull
     private final DeviceInfo deviceInfo;
 
+    @Nullable
     private CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
 
-    public WebViewDataTask(WebViewData webviewData,
+    public WebViewDataTask(@NonNull WebViewData webviewData,
         @NonNull DeviceInfo deviceInfo,
-        CriteoInterstitialAdDisplayListener adDisplayListener) {
+        @Nullable CriteoInterstitialAdDisplayListener adDisplayListener) {
         this.webviewData = webviewData;
         this.deviceInfo = deviceInfo;
         this.criteoInterstitialAdDisplayListener = adDisplayListener;
@@ -36,62 +36,37 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected String doInBackground(String... args) {
-        String result = null;
-
         try {
-            result = doWebViewDataTask(args);
+            return doWebViewDataTask(args);
         } catch (Throwable tr) {
             Log.e(TAG, "Internal WVDT exec error.", tr);
         }
 
-        return result;
+        return null;
     }
 
     private String doWebViewDataTask(String[] args) throws Exception {
         String displayUrl = args[0];
-
-        String result = "";
-        URL url;
-        try {
-            url = new URL(displayUrl);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            return "";
-        }
-
         String userAgent = deviceInfo.getUserAgent().get();
-        HttpURLConnection urlConnection;
-        try {
-            urlConnection = (HttpURLConnection) url.openConnection();
-        } catch (IOException e) {
-            return "";
-        }
-        try {
-            urlConnection.setRequestMethod("GET");
-        } catch (ProtocolException e) {
-            e.printStackTrace();
-        }
+
+        URL url = new URL(displayUrl);
+
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestMethod("GET");
         urlConnection.setRequestProperty("Content-Type", "text/plain");
         if (!TextUtils.isEmpty(userAgent)) {
             urlConnection.setRequestProperty("User-Agent", userAgent);
         }
 
-        try {
-            if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                String response = StreamUtil.readStream(urlConnection.getInputStream());
-                if (!TextUtils.isEmpty(response)) {
-                    result = (response);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+            return StreamUtil.readStream(urlConnection.getInputStream());
         }
-        return result;
 
+        return null;
     }
 
     @Override
-    protected void onPostExecute(String data) {
+    protected void onPostExecute(@Nullable String data) {
         try {
             doOnPostExecute(data);
         } catch (Throwable tr) {
@@ -99,18 +74,18 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
         }
     }
 
-    private void doOnPostExecute(String data) {
+    private void doOnPostExecute(@Nullable String data) {
         if (TextUtils.isEmpty(data)) {
             webviewData.downloadFailed();
             if (criteoInterstitialAdDisplayListener != null) {
                 criteoInterstitialAdDisplayListener.onAdFailedToDisplay(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
             }
-            return;
-        }
-        webviewData.setContent(data);
-        webviewData.downloadSucceeded();
-        if (criteoInterstitialAdDisplayListener != null) {
-            criteoInterstitialAdDisplayListener.onAdReadyToDisplay();
+        } else {
+            webviewData.setContent(data);
+            webviewData.downloadSucceeded();
+            if (criteoInterstitialAdDisplayListener != null) {
+                criteoInterstitialAdDisplayListener.onAdReadyToDisplay();
+            }
         }
     }
 
