@@ -108,7 +108,7 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
             return;
         }
         webviewData.setContent(data);
-        webviewData.downloadSucceeeded();
+        webviewData.downloadSucceeded();
         if (criteoInterstitialAdDisplayListener != null) {
             criteoInterstitialAdDisplayListener.onAdReadyToDisplay();
         }

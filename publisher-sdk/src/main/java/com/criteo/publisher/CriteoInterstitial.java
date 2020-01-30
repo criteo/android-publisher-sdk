@@ -9,7 +9,6 @@ import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import com.criteo.publisher.Util.CriteoResultReceiver;
 import com.criteo.publisher.Util.ObjectsUtil;
-import com.criteo.publisher.controller.WebViewDownloader;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.WebViewData;
 
@@ -77,7 +76,7 @@ public class CriteoInterstitial {
         if (criteoInterstitialEventController == null) {
             criteoInterstitialEventController = new CriteoInterstitialEventController(
                     criteoInterstitialAdListener, criteoInterstitialAdDisplayListener,
-                    new WebViewDownloader(new WebViewData(getCriteo().getConfig())),
+                    new WebViewData(getCriteo().getConfig()),
                     getCriteo());
         }
         criteoInterstitialEventController.fetchAdAsync(interstitialAdUnit);
@@ -98,7 +97,7 @@ public class CriteoInterstitial {
         if (criteoInterstitialEventController == null) {
             criteoInterstitialEventController = new CriteoInterstitialEventController(
                     criteoInterstitialAdListener, criteoInterstitialAdDisplayListener,
-                    new WebViewDownloader(new WebViewData(getCriteo().getConfig())),
+                    new WebViewData(getCriteo().getConfig()),
                     getCriteo());
         }
         criteoInterstitialEventController.fetchAdAsync(bidToken);

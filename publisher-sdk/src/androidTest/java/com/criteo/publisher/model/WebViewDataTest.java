@@ -14,7 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
-public class WebviewDataTest {
+public class WebViewDataTest {
     @Rule
     public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
 

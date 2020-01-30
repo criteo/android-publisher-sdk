@@ -2,7 +2,11 @@ package com.criteo.publisher.model;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
+import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.Util.WebViewLoadStatus;
+import com.criteo.publisher.tasks.WebViewDataTask;
+import java.util.concurrent.Executor;
 
 public class WebViewData {
     private String content;
@@ -47,11 +51,19 @@ public class WebViewData {
         this.webViewLoadStatus = WebViewLoadStatus.FAILED;
     }
 
-    public void downloadSucceeeded() {
+    public void downloadSucceeded() {
         this.webViewLoadStatus = WebViewLoadStatus.LOADED;
     }
 
-    public void downloadloading() {
+    public void downloadLoading() {
         this.webViewLoadStatus = WebViewLoadStatus.LOADING;
+    }
+
+    public void fillWebViewHtmlContent(
+        String displayUrl,
+        @NonNull DeviceInfo deviceInfo,
+        CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener) {
+        Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
+        new WebViewDataTask(this, deviceInfo, criteoInterstitialAdDisplayListener).executeOnExecutor(threadPoolExecutor, displayUrl);
     }
 }

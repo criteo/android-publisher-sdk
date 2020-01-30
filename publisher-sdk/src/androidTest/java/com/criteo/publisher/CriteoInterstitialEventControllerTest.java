@@ -2,7 +2,6 @@ package com.criteo.publisher;
 
 import android.app.Application;
 import android.support.test.InstrumentationRegistry;
-import com.criteo.publisher.controller.WebViewDownloader;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.WebViewData;
@@ -27,9 +26,6 @@ public class CriteoInterstitialEventControllerTest {
     @Mock
     private CriteoInterstitialAdDisplayListener adDisplayListener;
 
-    @Mock
-    private WebViewDownloader mockWebViewDownloader;
-
     @Before
     public void setup() throws CriteoInitException {
         MockitoAnnotations.initMocks(this);
@@ -38,12 +34,11 @@ public class CriteoInterstitialEventControllerTest {
         webViewData.setContent("html content");
         Application app = (Application) InstrumentationRegistry.getTargetContext().getApplicationContext();
         Criteo.init(app, "B-056946", null);
-        WebViewDownloader webViewDownloader = new WebViewDownloader(webViewData);
 
         criteoInterstitialEventController = new CriteoInterstitialEventController(
             criteoInterstitialAdListener,
             adDisplayListener,
-            webViewDownloader,
+            webViewData,
             Criteo.getInstance()
         );
     }

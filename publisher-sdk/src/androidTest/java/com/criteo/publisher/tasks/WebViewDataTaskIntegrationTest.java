@@ -39,7 +39,7 @@ public class WebViewDataTaskIntegrationTest {
     public void testWithData() {
         webViewDataTask.onPostExecute("<html></html>");
 
-        Mockito.verify(webViewData, Mockito.times(1)).downloadSucceeeded();
+        Mockito.verify(webViewData, Mockito.times(1)).downloadSucceeded();
         Mockito.verify(webViewData, Mockito.times(0)).downloadFailed();
         Mockito.verify(adDisplayListener, Mockito.times(1)).onAdReadyToDisplay();
         Mockito.verify(adDisplayListener, Mockito.times(0))
@@ -56,7 +56,7 @@ public class WebViewDataTaskIntegrationTest {
             e.printStackTrace();
         }
         Assert.assertFalse(webViewData.isLoaded());
-        Mockito.verify(webViewData, Mockito.times(0)).downloadSucceeeded();
+        Mockito.verify(webViewData, Mockito.times(0)).downloadSucceeded();
         Mockito.verify(webViewData, Mockito.times(1)).downloadFailed();
         Mockito.verify(adDisplayListener, Mockito.times(0)).onAdReadyToDisplay();
         Mockito.verify(adDisplayListener, Mockito.times(1))
