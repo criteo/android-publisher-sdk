@@ -3,6 +3,7 @@ package com.criteo.publisher;
 import static android.content.ContentValues.TAG;
 
 import android.os.AsyncTask;
+import android.support.annotation.GuardedBy;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -33,6 +34,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicLong;
 import org.json.JSONObject;
 
 public class BidManager implements NetworkResponseListener, ApplicationStoppedListener {
@@ -68,11 +70,17 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
     private static final int SECOND_TO_MILLI = 1000;
     private static final int PROFILE_ID = 235;
+
+    @NonNull
+    @GuardedBy("cacheLock")
     private final SdkCache cache;
+    private final Object cacheLock = new Object();
+
+    private final AtomicLong cdbTimeToNextCall = new AtomicLong(0);
+
     private final TokenCache tokenCache;
     private final Publisher publisher;
     private final User user;
-    private long cdbTimeToNextCall = 0;
     private DeviceInfo deviceInfo;
     private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
     private final DeviceUtil deviceUtil;
@@ -123,7 +131,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             return;
         }
 
-        if (cdbTimeToNextCall < clock.getCurrentTimeInMillis()) {
+        if (cdbTimeToNextCall.get() < clock.getCurrentTimeInMillis()) {
             ArrayList<CacheAdUnit> cacheAdUnitsForPrefetch = new ArrayList<>();
             cacheAdUnitsForPrefetch.add(cacheAdUnit);
             startCdbDownloadTask(false, cacheAdUnitsForPrefetch);
@@ -312,32 +320,34 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
             return null;
         }
 
-        Slot peekSlot = cache.peekAdUnit(cacheAdUnit);
-        if (peekSlot == null) {
-            // If no matching bid response is found
+        synchronized (cacheLock) {
+            Slot peekSlot = cache.peekAdUnit(cacheAdUnit);
+            if (peekSlot == null) {
+                // If no matching bid response is found
+                fetch(cacheAdUnit);
+                return null;
+            }
+
+            double cpm = (peekSlot.getCpmAsNumber() == null ? 0.0 : peekSlot.getCpmAsNumber());
+            long ttl = peekSlot.getTtl();
+            long expiryTimeMillis = ttl * SECOND_TO_MILLI + peekSlot.getTimeOfDownload();
+
+            boolean isNotExpired = expiryTimeMillis > clock.getCurrentTimeInMillis();
+            boolean isValidBid = (cpm > 0) && (ttl > 0);
+            boolean isSilentBid = (cpm == 0) && (ttl > 0);
+
+            if (isSilentBid && isNotExpired) {
+                return null;
+            }
+
+            cache.remove(cacheAdUnit);
             fetch(cacheAdUnit);
+
+            if (isValidBid && isNotExpired) {
+                return peekSlot;
+            }
             return null;
         }
-
-        double cpm = (peekSlot.getCpmAsNumber() == null ? 0.0 : peekSlot.getCpmAsNumber());
-        long ttl = peekSlot.getTtl();
-        long expiryTimeMillis = ttl * SECOND_TO_MILLI + peekSlot.getTimeOfDownload();
-
-        boolean isNotExpired = expiryTimeMillis > clock.getCurrentTimeInMillis();
-        boolean isValidBid = (cpm > 0) && (ttl > 0);
-        boolean isSilentBid = (cpm == 0) && (ttl > 0);
-
-        if (isSilentBid && isNotExpired) {
-            return null;
-        }
-
-        cache.remove(cacheAdUnit);
-        fetch(cacheAdUnit);
-
-        if (isValidBid && isNotExpired) {
-            return peekSlot;
-        }
-        return null;
     }
 
 
@@ -351,15 +361,18 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     @Override
     public void setCacheAdUnits(@NonNull List<Slot> slots) {
         long instant = clock.getCurrentTimeInMillis();
-        for (Slot slot : slots) {
-            if (slot.isValid()) {
-                boolean isImmediateBid = slot.getCpmAsNumber() > 0 && slot.getTtl() == 0;
-                if (isImmediateBid) {
-                    slot.setTtl(DEFAULT_TTL_IN_SECONDS);
-                }
 
-                slot.setTimeOfDownload(instant);
-                cache.add(slot);
+        synchronized (cacheLock) {
+            for (Slot slot : slots) {
+                if (slot.isValid()) {
+                    boolean isImmediateBid = slot.getCpmAsNumber() > 0 && slot.getTtl() == 0;
+                    if (isImmediateBid) {
+                        slot.setTtl(DEFAULT_TTL_IN_SECONDS);
+                    }
+
+                    slot.setTimeOfDownload(instant);
+                    cache.add(slot);
+                }
             }
         }
     }
@@ -372,7 +385,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     @Override
     public void setTimeToNextCall(int seconds) {
         if (seconds > 0) {
-            this.cdbTimeToNextCall = clock.getCurrentTimeInMillis() + seconds * 1000;
+            this.cdbTimeToNextCall.set(clock.getCurrentTimeInMillis() + seconds * 1000);
         }
     }
 

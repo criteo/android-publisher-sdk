@@ -24,7 +24,11 @@ public class Config {
     private static final String AD_TAG_URL_MODE_KEY = "AndroidAdTagUrlMode";
     private static final String AD_TAG_DATA_MACRO_KEY = "AndroidAdTagDataMacro";
     private static final String AD_TAG_DATA_MODE_KEY = "AndroidAdTagDataMode";
-    private boolean killSwitchEnabled;
+
+    // NOTE: This entire object is not at all thread-safe, but except the kill switch, other config
+    //  are only accessed at display time. As they are only updated during SDK init, before any bids
+    //  are registered. Then we may consider that, by usage, this object is thread-safe.
+    private volatile boolean killSwitchEnabled;
     private String displayUrlMacro;
     private String adTagUrlMode;
     private String adTagDataMacro;

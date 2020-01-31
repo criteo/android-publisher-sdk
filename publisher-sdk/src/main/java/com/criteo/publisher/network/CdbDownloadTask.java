@@ -180,12 +180,12 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     }
 
     if (responseListener != null && networkResult != null) {
+      if (networkResult.getConfig() != null) {
+        responseListener.refreshConfig(networkResult.getConfig());
+      }
       if (networkResult.getCdbResponse() != null) {
         responseListener.setCacheAdUnits(networkResult.getCdbResponse().getSlots());
         responseListener.setTimeToNextCall(networkResult.getCdbResponse().getTimeToNextCall());
-      }
-      if (networkResult.getConfig() != null) {
-        responseListener.refreshConfig(networkResult.getConfig());
       }
     }
   }
