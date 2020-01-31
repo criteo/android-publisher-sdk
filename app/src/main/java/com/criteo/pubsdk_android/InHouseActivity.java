@@ -1,5 +1,7 @@
 package com.criteo.pubsdk_android;
 
+import static com.criteo.pubsdk_android.PubSdkDemoApplication.INTERSTITIAL_IBV_DEMO;
+
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -31,8 +33,8 @@ public class InHouseActivity extends AppCompatActivity {
     private Context context;
     private LinearLayout adLayout;
     private CriteoBannerView criteoBannerView;
-    private CriteoInterstitial criteoInterstitial;
     private Button btnShowInterstitial;
+    private Button btnShowInterstitialIbv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +43,10 @@ public class InHouseActivity extends AppCompatActivity {
 
         adLayout = findViewById(R.id.AdLayout);
         btnShowInterstitial = findViewById(R.id.buttonInhouseInterstitial);
+        btnShowInterstitialIbv = findViewById(R.id.buttonInhouseInterstitialIbv);
         context = getApplicationContext();
 
         findViewById(R.id.buttonInhouseBanner).setOnClickListener(v -> loadBannerAd());
-        btnShowInterstitial.setOnClickListener(v -> showInterstitial());
-
     }
 
     @Override
@@ -60,12 +61,14 @@ public class InHouseActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         btnShowInterstitial.setEnabled(false);
-        loadInterstitialAd();
+        btnShowInterstitialIbv.setEnabled(false);
+        loadInterstitialAd(INTERSTITIAL, btnShowInterstitial);
+        loadInterstitialAd(INTERSTITIAL_IBV_DEMO, btnShowInterstitialIbv);
     }
 
-    private void showInterstitial() {
-        if (criteoInterstitial.isAdLoaded()) {
-            criteoInterstitial.show();
+    private void showInterstitial(CriteoInterstitial interstitial) {
+        if (interstitial.isAdLoaded()) {
+            interstitial.show();
         }
     }
 
@@ -83,16 +86,20 @@ public class InHouseActivity extends AppCompatActivity {
         criteoBannerView.loadAd(bidResponse.getBidToken());
     }
 
-    private void loadInterstitialAd() {
-        criteoInterstitial = new CriteoInterstitial(context, INTERSTITIAL);
-        criteoInterstitial.setCriteoInterstitialAdListener(new TestAppInterstitialAdListener(
-            TAG, "In-House", btnShowInterstitial));
-        criteoInterstitial.setCriteoInterstitialAdDisplayListener(
-            new TestAppInterstitialAdDisplayListener(TAG, "In-House"));
+    private void loadInterstitialAd(InterstitialAdUnit adUnit, Button btnShow) {
+        String prefix = "In-House " + adUnit.getAdUnitId();
 
-        Log.d(TAG, "Interstitial Requested");
-        BidResponse bidResponse = Criteo.getInstance().getBidResponse(INTERSTITIAL);
-        criteoInterstitial.loadAd(bidResponse.getBidToken());
+        CriteoInterstitial interstitial = new CriteoInterstitial(context, adUnit);
+        interstitial.setCriteoInterstitialAdListener(
+            new TestAppInterstitialAdListener(TAG, prefix, btnShow));
+        interstitial.setCriteoInterstitialAdDisplayListener(
+            new TestAppInterstitialAdDisplayListener(TAG, prefix));
+
+        btnShow.setOnClickListener(v -> showInterstitial(interstitial));
+
+        Log.d(TAG, prefix + " - Interstitial Requested");
+        BidResponse bidResponse = Criteo.getInstance().getBidResponse(adUnit);
+        interstitial.loadAd(bidResponse.getBidToken());
     }
 
 }

@@ -20,6 +20,8 @@ public class PubSdkDemoApplication extends Application {
     public static final String MOPUB_INTERSTITIAL_ADUNIT_ID = "86c36b6223ce4730acf52323de3baa93";
     public static final String NATIVE_AD_UNIT_ID = "/140800857/Endeavour_Native";
 
+    public static final InterstitialAdUnit INTERSTITIAL_IBV_DEMO = new InterstitialAdUnit(
+        "mf2v6pikq5vqdjdtfo3j");
 
     @Override
     public void onCreate() {
@@ -45,6 +47,8 @@ public class PubSdkDemoApplication extends Application {
 
         InterstitialAdUnit moPubInterstitialAdUnit = new InterstitialAdUnit(MOPUB_INTERSTITIAL_ADUNIT_ID);
         adUnits.add(moPubInterstitialAdUnit);
+
+        adUnits.add(INTERSTITIAL_IBV_DEMO);
 
         try {
             Criteo.init(this, "B-056946", adUnits);

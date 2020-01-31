@@ -35,6 +35,16 @@
           android:layout_marginLeft="5dp"
           android:background="@android:color/holo_orange_dark"
           android:text="@string/btn_banner"/>
+        <Button
+          android:id="@+id/buttonInhouseInterstitialIbv"
+          style="@style/Widget.AppCompat.Button.Colored"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight=".5"
+          android:layout_marginStart="5dp"
+          android:layout_marginLeft="5dp"
+          android:background="@android:color/holo_orange_dark"
+          android:text="@string/btn_interstitial_ibv"/>
       </LinearLayout>
       <LinearLayout
         android:id="@+id/AdLayout"
