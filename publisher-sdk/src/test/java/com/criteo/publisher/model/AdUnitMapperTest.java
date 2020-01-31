@@ -3,6 +3,8 @@ package com.criteo.publisher.model;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_INTERSTITIAL;
+import static com.criteo.publisher.model.AdUnitMapper.splitIntoChunks;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -211,6 +213,44 @@ public class AdUnitMapperTest {
     CacheAdUnit validAdUnit = mapper.map(null);
 
     assertThat(validAdUnit).isNull();
+  }
+
+  @Test
+  public void splitIntoChunks_GivenAnyChunkSizeAndNoElements_ReturnsEmpty() throws Exception {
+    List<List<Object>> chunks = splitIntoChunks(emptyList(), 1);
+
+    assertThat(chunks).isEmpty();
+  }
+
+  @Test
+  public void splitIntoChunks_GivenAnyChunkSizeAndNoElements_ReturnsEmpty2() throws Exception {
+    List<List<Object>> chunks = splitIntoChunks(emptyList(), 1000);
+
+    assertThat(chunks).isEmpty();
+  }
+
+  @Test
+  public void splitIntoChunks_GivenChunkSizeAndSampleOfElements_ReturnsSplitChunks() throws Exception {
+    assertThat(splitIntoChunks(asList(1), 1))
+        .containsExactly(asList(1));
+
+    assertThat(splitIntoChunks(asList(1, 2, 3), 1))
+        .containsExactly(asList(1), asList(2), asList(3));
+  }
+
+  @Test
+  public void splitIntoChunks_GivenChunkSizeAndSampleOfElements_ReturnsSplitChunks2() throws Exception {
+    assertThat(splitIntoChunks(asList(1), 2))
+        .containsExactly(asList(1));
+
+    assertThat(splitIntoChunks(asList(1, 2), 2))
+        .containsExactly(asList(1, 2));
+
+    assertThat(splitIntoChunks(asList(1, 2, 3), 2))
+        .containsExactly(asList(1, 2), asList(3));
+
+    assertThat(splitIntoChunks(asList(1, 2, 3, 4), 2))
+        .containsExactly(asList(1, 2), asList(3, 4));
   }
 
 }

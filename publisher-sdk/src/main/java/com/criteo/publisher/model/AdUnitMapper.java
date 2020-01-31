@@ -7,6 +7,7 @@ import static com.criteo.publisher.Util.AdUnitType.CRITEO_INTERSTITIAL;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.DeviceUtil;
@@ -16,6 +17,20 @@ import java.util.List;
 
 public class AdUnitMapper {
     private static final String TAG = AdUnitMapper.class.getSimpleName();
+
+    /**
+     * Ad units are grouped into chunks so bid request size stay reasonable and this may improve the
+     * situation in case of flaky network.
+     * <p>
+     * This constant is set given a CDB suggestion:
+     * <ul>
+     *   <li>RTB does not handle too many slots</li>
+     *   <li>Arbitrage is optimized to process 8 slots in parallel</li>
+     * </ul>
+     * <p>
+     * Although, the reason may change over time and it would require a proper study.
+     */
+    private static final int CHUNK_SIZE = 8;
 
     private final AndroidUtil androidUtil;
     private final DeviceUtil deviceUtil;
@@ -62,7 +77,7 @@ public class AdUnitMapper {
                     throw new IllegalArgumentException("Found an invalid AdUnit");
             }
         }
-        return splitIntoChunks(filterInvalidCacheAdUnits(cacheAdUnits));
+        return splitIntoChunks(filterInvalidCacheAdUnits(cacheAdUnits), CHUNK_SIZE);
     }
 
     /**
@@ -118,13 +133,30 @@ public class AdUnitMapper {
         return validatedCacheAdUnits;
     }
 
-    private <T> List<List<T>> splitIntoChunks(List<T> elements) {
+    /**
+     * Returns consecutive {@linkplain List#subList(int, int) sub-lists} of given list, each of the
+     * same size (the last list may be smaller).
+     *
+     * For example, splitting a list containing <code>[a, b, c, d, e]</code> with a chunk size of 3
+     * yields <code>[[a, b, c], [d, e]]]</code>.
+     *
+     * @param elements the list to return consecutive sub-lists of
+     * @param chunkSize the desired size of each sub-lists (the last may be smaller)
+     * @return a list of consecutive sub-lists
+     */
+    @VisibleForTesting
+    static <T> List<List<T>> splitIntoChunks(List<T> elements, int chunkSize) {
         if (elements.isEmpty()) {
             return Collections.emptyList();
         }
 
         List<List<T>> chunks = new ArrayList<>();
-        chunks.add(elements);
+
+        for (int from = 0; from < elements.size(); from += chunkSize) {
+            int to = Math.min(from + chunkSize, elements.size());
+            chunks.add(elements.subList(from, to));
+        }
+
         return chunks;
     }
 
