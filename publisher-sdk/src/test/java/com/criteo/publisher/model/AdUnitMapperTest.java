@@ -169,6 +169,25 @@ public class AdUnitMapperTest {
   }
 
   @Test
+  public void convertValidAdUnits_GivenSameAdUnits_MergeThem() throws Exception {
+    AdSize size = new AdSize(1, 1);
+    AdUnit adUnit1 = new BannerAdUnit("adUnit1", size);
+    AdUnit adUnit2 = new BannerAdUnit("adUnit2", size);
+
+    List<List<CacheAdUnit>> validAdUnits = mapper.mapToChunks(asList(
+        adUnit1,
+        adUnit2,
+        adUnit2,
+        adUnit1));
+
+    assertThat(validAdUnits).hasSize(1);
+    assertThat(validAdUnits.get(0)).containsExactlyInAnyOrder(
+        new CacheAdUnit(size, "adUnit1", CRITEO_BANNER),
+        new CacheAdUnit(size, "adUnit2", CRITEO_BANNER)
+    );
+  }
+
+  @Test
   public void convertValidAdUnit_GivenListVersionReturningNothing_ReturnNull() throws Exception {
     mapper = spy(mapper);
     AdUnit adUnit = mock(AdUnit.class);

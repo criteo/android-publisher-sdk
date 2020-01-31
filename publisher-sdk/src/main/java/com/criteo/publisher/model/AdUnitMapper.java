@@ -12,8 +12,11 @@ import android.util.Log;
 import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class AdUnitMapper {
     private static final String TAG = AdUnitMapper.class.getSimpleName();
@@ -52,7 +55,7 @@ public class AdUnitMapper {
      * @return chunks of internal ad unit representations
      */
     public List<List<CacheAdUnit>> mapToChunks(@NonNull List<AdUnit> adUnits) {
-        List<CacheAdUnit> cacheAdUnits = new ArrayList<>();
+        Set<CacheAdUnit> cacheAdUnits = new HashSet<>();
         for (AdUnit adUnit : adUnits) {
             if (adUnit == null) {
                 continue;
@@ -115,7 +118,7 @@ public class AdUnitMapper {
         }
     }
 
-    private List<CacheAdUnit> filterInvalidCacheAdUnits(List<CacheAdUnit> cacheAdUnits) {
+    private List<CacheAdUnit> filterInvalidCacheAdUnits(Collection<CacheAdUnit> cacheAdUnits) {
         List<CacheAdUnit> validatedCacheAdUnits = new ArrayList<>();
 
         for (CacheAdUnit cacheAdUnit : cacheAdUnits) {
