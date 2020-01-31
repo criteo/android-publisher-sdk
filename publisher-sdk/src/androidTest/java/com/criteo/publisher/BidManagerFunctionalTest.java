@@ -129,21 +129,91 @@ public class BidManagerFunctionalTest {
         mock(AdUnit.class),
         mock(AdUnit.class));
 
-    List<CacheAdUnit> mappedAdUnits = Arrays.asList(
+    List<List<CacheAdUnit>> mappedAdUnitsChunks = singletonList(Arrays.asList(
         sampleAdUnit(),
-        sampleAdUnit());
+        sampleAdUnit()));
 
     AdUnitMapper mapper = givenMockedAdUnitMapper();
 
     Slot slot = givenMockedCdbRespondingSlot();
 
-    when(mapper.convertValidAdUnits(prefetchAdUnits)).thenReturn(mappedAdUnits);
+    when(mapper.mapToChunks(prefetchAdUnits)).thenReturn(mappedAdUnitsChunks);
 
     BidManager bidManager = createBidManager();
     bidManager.prefetch(prefetchAdUnits);
     waitForIdleState();
 
-    assertShouldCallCdbAndPopulateCacheOnlyOnce(mappedAdUnits, slot);
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(mappedAdUnitsChunks.get(0), slot);
+  }
+
+  @Test
+  public void prefetch_GivenMapperSplittingIntoChunks_ExecuteChunksIndependently() throws Exception {
+    // Remove concurrency. This would make this test really hard to follow.
+    // We should wait for idle state of main thread every time because the async task post execution
+    // is running on it.
+    when(dependencyProvider.provideThreadPoolExecutor()).thenReturn(runnable -> {
+      runnable.run();
+      ThreadingUtil.waitForMessageQueueToBeIdle();
+    });
+
+    List<AdUnit> prefetchAdUnits = Arrays.asList(
+        mock(AdUnit.class),
+        mock(AdUnit.class),
+        mock(AdUnit.class));
+
+    List<CacheAdUnit> requestedAdUnits1 = singletonList(sampleAdUnit());
+    List<CacheAdUnit> requestedAdUnits2 = singletonList(sampleAdUnit());
+    List<CacheAdUnit> requestedAdUnits3 = singletonList(sampleAdUnit());
+    List<List<CacheAdUnit>> mappedAdUnitsChunks = Arrays.asList(
+        requestedAdUnits1,
+        requestedAdUnits2,
+        requestedAdUnits3);
+
+    AdUnitMapper mapper = givenMockedAdUnitMapper();
+    when(mapper.mapToChunks(prefetchAdUnits)).thenReturn(mappedAdUnitsChunks);
+
+    CdbResponse response1 = givenMockedCdbResponseWithValidSlot(1);
+    CdbResponse response3 = givenMockedCdbResponseWithValidSlot(3);
+    JSONObject jsonConfig = mock(JSONObject.class);
+
+    when(api.loadCdb(any(), any()))
+        .thenReturn(response1)
+        .thenReturn(null)
+        .thenReturn(response3);
+    when(api.loadConfig(any(), any(), any())).thenReturn(jsonConfig);
+
+    BidManager bidManager = spy(createBidManager());
+    bidManager.prefetch(prefetchAdUnits);
+    waitForIdleState();
+
+    InOrder inOrder = inOrder(bidManager, cache, api);
+
+    // First call with config call
+    inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits1.equals(cdb.getAdUnits())), any());
+    response1.getSlots().forEach(inOrder.verify(cache)::add);
+    inOrder.verify(bidManager).setTimeToNextCall(1);
+    inOrder.verify(bidManager).refreshConfig(jsonConfig);
+
+    // Second call with error
+    inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits2.equals(cdb.getAdUnits())), any());
+
+    // Third call in success but without the config call
+    inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits3.equals(cdb.getAdUnits())), any());
+    response3.getSlots().forEach(inOrder.verify(cache)::add);
+    inOrder.verify(bidManager).setTimeToNextCall(3);
+    inOrder.verify(bidManager, never()).refreshConfig(any());
+
+    inOrder.verifyNoMoreInteractions();
+  }
+
+  private CdbResponse givenMockedCdbResponseWithValidSlot(int timeToNextCall) {
+    Slot slot = mock(Slot.class);
+    when(slot.isValid()).thenReturn(true);
+
+    CdbResponse response = mock(CdbResponse.class);
+    when(response.getSlots()).thenReturn(singletonList(slot));
+    when(response.getTimeToNextCall()).thenReturn(timeToNextCall);
+    return response;
   }
 
   @Test
@@ -748,9 +818,9 @@ public class BidManagerFunctionalTest {
     AdUnit fromAdUnit = mock(AdUnit.class);
 
     AdUnitMapper adUnitMapper = givenMockedAdUnitMapper();
-    when(adUnitMapper.convertValidAdUnit(fromAdUnit)).thenReturn(toAdUnit);
-    when(adUnitMapper.convertValidAdUnits(singletonList(fromAdUnit)))
-        .thenReturn(singletonList(toAdUnit));
+    when(adUnitMapper.map(fromAdUnit)).thenReturn(toAdUnit);
+    when(adUnitMapper.mapToChunks(singletonList(fromAdUnit)))
+        .thenReturn(singletonList(singletonList(toAdUnit)));
 
     return fromAdUnit;
   }

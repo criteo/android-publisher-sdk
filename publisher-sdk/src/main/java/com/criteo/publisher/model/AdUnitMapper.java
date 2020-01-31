@@ -25,7 +25,18 @@ public class AdUnitMapper {
         this.deviceUtil = deviceUtil;
     }
 
-    public List<CacheAdUnit> convertValidAdUnits(@NonNull List<AdUnit> adUnits) {
+    /**
+     * Transform the given valid {@link AdUnit} into internal {@link CacheAdUnit}.
+     * <p>
+     * Valid ad units are transformed and collected while invalid ad units are ignored. See {@link
+     * #map(AdUnit)} for validity rules.
+     * <p>
+     * Collected ad units are then grouped into chunks to load.
+     *
+     * @param adUnits to transform
+     * @return chunks of internal ad unit representations
+     */
+    public List<List<CacheAdUnit>> mapToChunks(@NonNull List<AdUnit> adUnits) {
         List<CacheAdUnit> cacheAdUnits = new ArrayList<>();
         for (AdUnit adUnit : adUnits) {
             if (adUnit == null) {
@@ -51,16 +62,32 @@ public class AdUnitMapper {
                     throw new IllegalArgumentException("Found an invalid AdUnit");
             }
         }
-        return filterInvalidCacheAdUnits(cacheAdUnits);
+        return splitIntoChunks(filterInvalidCacheAdUnits(cacheAdUnits));
     }
 
+    /**
+     * Transform the given {@link AdUnit} into an internal {@link CacheAdUnit} if valid
+     * <p>
+     * The given ad unit is considered valid if all those conditions are met:
+     * <ul>
+     *   <li>not null</li>
+     *   <li>placement ID is not empty nor null</li>
+     *   <li>width is strictly positive</li>
+     *   <li>height is strictly positive</li>
+     * </ul>
+     * <p>
+     * If the ad unit is not valid, then <code>null</code> is returned instead.
+     *
+     * @param adUnit to transform
+     * @return internal ad unit representation or <code>null</code> if given ad unit is invalid
+     */
     @Nullable
-    public CacheAdUnit convertValidAdUnit(@Nullable AdUnit adUnit) {
-        List<CacheAdUnit> validAdUnits = convertValidAdUnits(Collections.singletonList(adUnit));
-        if (validAdUnits.isEmpty()) {
+    public CacheAdUnit map(@Nullable AdUnit adUnit) {
+        List<List<CacheAdUnit>> validAdUnits = mapToChunks(Collections.singletonList(adUnit));
+        if (validAdUnits.isEmpty() || validAdUnits.get(0).isEmpty()) {
             return null;
         } else {
-            return validAdUnits.get(0);
+            return validAdUnits.get(0).get(0);
         }
     }
 
@@ -89,6 +116,16 @@ public class AdUnitMapper {
         }
 
         return validatedCacheAdUnits;
+    }
+
+    private <T> List<List<T>> splitIntoChunks(List<T> elements) {
+        if (elements.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<List<T>> chunks = new ArrayList<>();
+        chunks.add(elements);
+        return chunks;
     }
 
 }

@@ -29,7 +29,7 @@ import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.CdbDownloadTask;
 import com.criteo.publisher.network.PubSdkApi;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -132,9 +132,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         }
 
         if (cdbTimeToNextCall.get() < clock.getCurrentTimeInMillis()) {
-            ArrayList<CacheAdUnit> cacheAdUnitsForPrefetch = new ArrayList<>();
-            cacheAdUnitsForPrefetch.add(cacheAdUnit);
-            startCdbDownloadTask(false, cacheAdUnitsForPrefetch);
+            startCdbDownloadTask(false, Collections.singletonList(cacheAdUnit));
         }
     }
 
@@ -314,7 +312,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         if (killSwitchEngaged()) {
             return null;
         }
-        CacheAdUnit cacheAdUnit = adUnitMapper.convertValidAdUnit(adUnit);
+        CacheAdUnit cacheAdUnit = adUnitMapper.map(adUnit);
         if (cacheAdUnit == null) {
             Log.e(TAG, "Valid AdUnit is required.");
             return null;
@@ -424,9 +422,13 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
      * @param adUnits list of ad units to prefetch
      */
     public void prefetch(@NonNull List<AdUnit> adUnits) {
-        List<CacheAdUnit> cacheAdUnits = adUnitMapper.convertValidAdUnits(adUnits);
+        List<List<CacheAdUnit>> requestedAdUnitsChunks = adUnitMapper.mapToChunks(adUnits);
+        boolean isConfigRequested = true;
 
-        startCdbDownloadTask(true, cacheAdUnits);
+        for (List<CacheAdUnit> requestedAdUnits : requestedAdUnitsChunks) {
+            startCdbDownloadTask(isConfigRequested, requestedAdUnits);
+            isConfigRequested = false;
+        }
     }
 
     @Nullable

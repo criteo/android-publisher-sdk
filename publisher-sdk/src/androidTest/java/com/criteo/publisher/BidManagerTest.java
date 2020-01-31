@@ -728,9 +728,7 @@ public class BidManagerTest {
     @Test
     public void testEnrichNativeRequestWithNullProducts() {
         BannerAdUnit bannerAdUnit = new BannerAdUnit("BannerAdUnitId", new AdSize(320, 50));
-        List<CacheAdUnit> adUnits = new ArrayList<>();
-        CacheAdUnit cacheAdUnit = adUnitMapper.convertValidAdUnit(bannerAdUnit);
-        adUnits.add(cacheAdUnit);
+        CacheAdUnit cacheAdUnit = adUnitMapper.map(bannerAdUnit);
 
         BidManager bidManager = new BidManager(
             publisher,
