@@ -61,7 +61,7 @@ public class WebViewData {
     }
 
     public void fillWebViewHtmlContent(
-        String displayUrl,
+        @NonNull String displayUrl,
         @NonNull DeviceInfo deviceInfo,
         @Nullable CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener) {
         Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
