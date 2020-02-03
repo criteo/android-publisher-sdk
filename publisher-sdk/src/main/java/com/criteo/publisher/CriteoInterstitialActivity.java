@@ -14,7 +14,6 @@ import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.ResultReceiver;
 import android.support.annotation.VisibleForTesting;
 import android.view.View;
@@ -30,7 +29,6 @@ public class CriteoInterstitialActivity extends Activity {
     private WebView webView;
     private ResultReceiver resultReceiver;
     private ImageButton closeButton;
-    private Handler handler = new Handler();
     private RelativeLayout adLayout;
 
     @Override
@@ -76,12 +74,6 @@ public class CriteoInterstitialActivity extends Activity {
 
     private void displayWebView(String webViewData) {
         webView.loadDataWithBaseURL("https://criteo.com", webViewData, "text/html", "UTF-8", "about:blank");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        handler.removeCallbacksAndMessages(null);
     }
 
     private void prepareWebView() {

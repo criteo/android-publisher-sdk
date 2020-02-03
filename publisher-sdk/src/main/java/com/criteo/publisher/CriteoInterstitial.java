@@ -18,19 +18,10 @@ public class CriteoInterstitial {
     protected static final String WEB_VIEW_DATA = "webviewdata";
     protected static final String RESULT_RECEIVER = "resultreceiver";
 
-    private InterstitialAdUnit interstitialAdUnit;
+    private final InterstitialAdUnit interstitialAdUnit;
 
     @NonNull
-    private Context context;
-
-    @Nullable
-    private CriteoInterstitialAdListener criteoInterstitialAdListener;
-
-    @Nullable
-    private CriteoInterstitialEventController criteoInterstitialEventController;
-
-    @Nullable
-    private CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
+    private final Context context;
 
     /**
      * Null means that the singleton Criteo should be used.
@@ -40,6 +31,15 @@ public class CriteoInterstitial {
      */
     @Nullable
     private final Criteo criteo;
+
+    @Nullable
+    private CriteoInterstitialEventController criteoInterstitialEventController;
+
+    @Nullable
+    private CriteoInterstitialAdListener criteoInterstitialAdListener;
+
+    @Nullable
+    private CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
 
     public CriteoInterstitial(@NonNull Context context, InterstitialAdUnit interstitialAdUnit) {
         this(context, interstitialAdUnit, null);
@@ -54,21 +54,14 @@ public class CriteoInterstitial {
         this.criteo = criteo;
     }
 
-    @NonNull
-    private Criteo getCriteo() {
-        return criteo == null ? Criteo.getInstance() : criteo;
-    }
-
     public void setCriteoInterstitialAdListener(
         @Nullable CriteoInterstitialAdListener criteoInterstitialAdListener) {
         this.criteoInterstitialAdListener = criteoInterstitialAdListener;
-
     }
 
     public void setCriteoInterstitialAdDisplayListener(
-            @Nullable CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener) {
+        @Nullable CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener) {
         this.criteoInterstitialAdDisplayListener = criteoInterstitialAdDisplayListener;
-
     }
 
     public void loadAd() {
@@ -80,19 +73,10 @@ public class CriteoInterstitial {
     }
 
     private void doLoadAd() {
-        if (criteoInterstitialEventController == null) {
-            criteoInterstitialEventController = new CriteoInterstitialEventController(
-                    criteoInterstitialAdListener, criteoInterstitialAdDisplayListener,
-                    new WebViewData(getCriteo().getConfig()),
-                    getCriteo());
-        }
-        criteoInterstitialEventController.fetchAdAsync(interstitialAdUnit);
+        getOrCreateController().fetchAdAsync(interstitialAdUnit);
     }
 
-    public void loadAd(BidToken bidToken) {
-        if (bidToken != null && !ObjectsUtil.equals(interstitialAdUnit, bidToken.getAdUnit())) {
-            return;
-        }
+    public void loadAd(@Nullable BidToken bidToken) {
         try {
             doLoadAd(bidToken);
         } catch (Throwable tr) {
@@ -100,26 +84,21 @@ public class CriteoInterstitial {
         }
     }
 
-    private void doLoadAd(BidToken bidToken) {
-        if (criteoInterstitialEventController == null) {
-            criteoInterstitialEventController = new CriteoInterstitialEventController(
-                    criteoInterstitialAdListener, criteoInterstitialAdDisplayListener,
-                    new WebViewData(getCriteo().getConfig()),
-                    getCriteo());
+    private void doLoadAd(@Nullable BidToken bidToken) {
+        if (bidToken != null && !ObjectsUtil.equals(interstitialAdUnit, bidToken.getAdUnit())) {
+            return;
         }
-        criteoInterstitialEventController.fetchAdAsync(bidToken);
+
+        getOrCreateController().fetchAdAsync(bidToken);
     }
 
     public boolean isAdLoaded() {
-        boolean isAdLoaded = false;
-
         try {
-            isAdLoaded = criteoInterstitialEventController.isAdLoaded();
+            return getOrCreateController().isAdLoaded();
         } catch (Throwable tr) {
             Log.e(TAG, "Internal error while detecting interstitial load state.", tr);
+            return false;
         }
-
-        return isAdLoaded;
     }
 
     public void show() {
@@ -135,7 +114,8 @@ public class CriteoInterstitial {
             Intent intent = new Intent(context, CriteoInterstitialActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             Bundle bundle = new Bundle();
-            bundle.putString(WEB_VIEW_DATA, criteoInterstitialEventController.getWebViewDataContent());
+            CriteoInterstitialEventController controller = getOrCreateController();
+            bundle.putString(WEB_VIEW_DATA, controller.getWebViewDataContent());
             CriteoResultReceiver criteoResultReceiver = new CriteoResultReceiver(new Handler(),
                     criteoInterstitialAdListener);
             bundle.putParcelable(RESULT_RECEIVER, criteoResultReceiver);
@@ -143,11 +123,27 @@ public class CriteoInterstitial {
             if (criteoInterstitialAdListener != null) {
                 criteoInterstitialAdListener.onAdOpened();
             }
-            if (criteoInterstitialEventController != null) {
-                criteoInterstitialEventController.refresh();
-            }
+            controller.refresh();
             context.startActivity(intent);
         }
+    }
+
+    @NonNull
+    private CriteoInterstitialEventController getOrCreateController() {
+        if (criteoInterstitialEventController == null) {
+            criteoInterstitialEventController = new CriteoInterstitialEventController(
+                criteoInterstitialAdListener,
+                criteoInterstitialAdDisplayListener,
+                new WebViewData(getCriteo().getConfig()),
+                getCriteo()
+            );
+        }
+        return criteoInterstitialEventController;
+    }
+
+    @NonNull
+    private Criteo getCriteo() {
+        return criteo == null ? Criteo.getInstance() : criteo;
     }
 
 

@@ -185,6 +185,8 @@ public class StandaloneFunctionalTest {
 
     CriteoInterstitial interstitial = whenLoadingAnInterstitial(interstitialAdUnit, syncRef);
 
+    assertTrue(interstitial.isAdLoaded());
+
     Future<Activity> activity = webViewLookup.lookForResumedActivity(() -> {
       runOnMainThreadAndWait(interstitial::show);
     });
