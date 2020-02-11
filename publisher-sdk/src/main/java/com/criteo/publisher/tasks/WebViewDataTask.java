@@ -15,78 +15,79 @@ import java.net.URL;
 
 public class WebViewDataTask extends AsyncTask<String, Void, String> {
 
-    private static final String TAG = "Criteo.WVDT";
+  private static final String TAG = "Criteo.WVDT";
 
-    @NonNull
-    private WebViewData webviewData;
+  @NonNull
+  private WebViewData webviewData;
 
-    @NonNull
-    private final DeviceInfo deviceInfo;
+  @NonNull
+  private final DeviceInfo deviceInfo;
 
-    @Nullable
-    private CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
+  @Nullable
+  private CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
 
-    public WebViewDataTask(@NonNull WebViewData webviewData,
-        @NonNull DeviceInfo deviceInfo,
-        @Nullable CriteoInterstitialAdDisplayListener adDisplayListener) {
-        this.webviewData = webviewData;
-        this.deviceInfo = deviceInfo;
-        this.criteoInterstitialAdDisplayListener = adDisplayListener;
+  public WebViewDataTask(@NonNull WebViewData webviewData,
+      @NonNull DeviceInfo deviceInfo,
+      @Nullable CriteoInterstitialAdDisplayListener adDisplayListener) {
+    this.webviewData = webviewData;
+    this.deviceInfo = deviceInfo;
+    this.criteoInterstitialAdDisplayListener = adDisplayListener;
+  }
+
+  @Override
+  protected String doInBackground(String... args) {
+    try {
+      return doWebViewDataTask(args);
+    } catch (Throwable tr) {
+      Log.e(TAG, "Internal WVDT exec error.", tr);
     }
 
-    @Override
-    protected String doInBackground(String... args) {
-        try {
-            return doWebViewDataTask(args);
-        } catch (Throwable tr) {
-            Log.e(TAG, "Internal WVDT exec error.", tr);
-        }
+    return null;
+  }
 
-        return null;
+  private String doWebViewDataTask(String[] args) throws Exception {
+    String displayUrl = args[0];
+    String userAgent = deviceInfo.getUserAgent().get();
+
+    URL url = new URL(displayUrl);
+
+    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+    urlConnection.setRequestMethod("GET");
+    urlConnection.setRequestProperty("Content-Type", "text/plain");
+    if (!TextUtils.isEmpty(userAgent)) {
+      urlConnection.setRequestProperty("User-Agent", userAgent);
     }
 
-    private String doWebViewDataTask(String[] args) throws Exception {
-        String displayUrl = args[0];
-        String userAgent = deviceInfo.getUserAgent().get();
-
-        URL url = new URL(displayUrl);
-
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        urlConnection.setRequestMethod("GET");
-        urlConnection.setRequestProperty("Content-Type", "text/plain");
-        if (!TextUtils.isEmpty(userAgent)) {
-            urlConnection.setRequestProperty("User-Agent", userAgent);
-        }
-
-        if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-            return StreamUtil.readStream(urlConnection.getInputStream());
-        }
-
-        return null;
+    if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+      return StreamUtil.readStream(urlConnection.getInputStream());
     }
 
-    @Override
-    protected void onPostExecute(@Nullable String data) {
-        try {
-            doOnPostExecute(data);
-        } catch (Throwable tr) {
-            Log.e(TAG, "Internal WVDT PostExec error.", tr);
-        }
-    }
+    return null;
+  }
 
-    private void doOnPostExecute(@Nullable String data) {
-        if (TextUtils.isEmpty(data)) {
-            webviewData.downloadFailed();
-            if (criteoInterstitialAdDisplayListener != null) {
-                criteoInterstitialAdDisplayListener.onAdFailedToDisplay(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
-            }
-        } else {
-            webviewData.setContent(data);
-            webviewData.downloadSucceeded();
-            if (criteoInterstitialAdDisplayListener != null) {
-                criteoInterstitialAdDisplayListener.onAdReadyToDisplay();
-            }
-        }
+  @Override
+  protected void onPostExecute(@Nullable String data) {
+    try {
+      doOnPostExecute(data);
+    } catch (Throwable tr) {
+      Log.e(TAG, "Internal WVDT PostExec error.", tr);
     }
+  }
+
+  private void doOnPostExecute(@Nullable String data) {
+    if (TextUtils.isEmpty(data)) {
+      webviewData.downloadFailed();
+      if (criteoInterstitialAdDisplayListener != null) {
+        criteoInterstitialAdDisplayListener
+            .onAdFailedToDisplay(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
+      }
+    } else {
+      webviewData.setContent(data);
+      webviewData.downloadSucceeded();
+      if (criteoInterstitialAdDisplayListener != null) {
+        criteoInterstitialAdDisplayListener.onAdReadyToDisplay();
+      }
+    }
+  }
 
 }

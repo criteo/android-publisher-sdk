@@ -23,6 +23,7 @@ public class AndroidUtil {
 
   /**
    * Overall orientation of the screen.
+   * <p>
    * May be one of {@link android.content.res.Configuration#ORIENTATION_LANDSCAPE},
    * {@link android.content.res.Configuration#ORIENTATION_PORTRAIT}.
    */

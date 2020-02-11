@@ -120,7 +120,8 @@ public class CriteoBannerViewTest {
   }
 
   @Test
-  public void loadAdInHouse_GivenTokenWithDifferentButEqualAdUnit_DelegateToController() throws Exception {
+  public void loadAdInHouse_GivenTokenWithDifferentButEqualAdUnit_DelegateToController()
+      throws Exception {
     doReturn(controller).when(bannerView).getOrCreateController();
     BannerAdUnit equalAdUnit = new BannerAdUnit(bannerAdUnit.getAdUnitId(), bannerAdUnit.getSize());
     bidToken = new BidToken(UUID.randomUUID(), equalAdUnit);
@@ -132,18 +133,17 @@ public class CriteoBannerViewTest {
   }
 
   /**
-   * FIXME EE-831 this test scenario is not well-defined.
-   *  This is currently failing silently.
-   *  Should the failure be logged and where ?
-   *  Should the listener be notified for the failure ?
-   *  This is an integration error on publisher side, at least when an interstitial (or native)
-   *  token is provided for a banner view. But, for banner token, this is also due to an API that
-   *  is error prone: The ad unit given to the view is useless for in-house.
+   * FIXME EE-831 this test scenario is not well-defined. This is currently failing silently. Should
+   * the failure be logged and where ? Should the listener be notified for the failure ? This is an
+   * integration error on publisher side, at least when an interstitial (or native) token is
+   * provided for a banner view. But, for banner token, this is also due to an API that is error
+   * prone: The ad unit given to the view is useless for in-house.
    */
   @Test
   public void loadAdInHouse_GivenTokenWithDifferentAdUnit_SkipIt() throws Exception {
     doReturn(controller).when(bannerView).getOrCreateController();
-    BannerAdUnit differentAdUnit = new BannerAdUnit(bannerAdUnit.getAdUnitId() + "_", bannerAdUnit.getSize());
+    BannerAdUnit differentAdUnit = new BannerAdUnit(bannerAdUnit.getAdUnitId() + "_",
+        bannerAdUnit.getSize());
     bidToken = new BidToken(UUID.randomUUID(), differentAdUnit);
 
     bannerView.loadAd(bidToken);

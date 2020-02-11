@@ -33,12 +33,12 @@ public class WebViewLookup {
   private final ExecutorService executor = Executors.newWorkStealingPool();
 
   /**
-   * Look inside the given view for {@link android.webkit.WebView}.
-   * Then if exactly one webview is found, then its HTML content is fetch.
-   *
-   * If no webview is found, then the future will fail with a
-   * {@link java.util.NoSuchElementException}. And if more than one webview are found, then the
-   * future will fail with a {@link TooManyWebViewsException}.
+   * Look inside the given view for {@link android.webkit.WebView}. Then if exactly one webview is
+   * found, then its HTML content is fetch.
+   * <p>
+   * If no webview is found, then the future will fail with a {@link java.util.NoSuchElementException}.
+   * And if more than one webview are found, then the future will fail with a {@link
+   * TooManyWebViewsException}.
    *
    * @param root the view to look into
    * @return either the HTML content of the found webview, either an error state.
@@ -165,14 +165,17 @@ public class WebViewLookup {
   }
 
   public interface CheckedRunnable {
+
     void run() throws Exception;
   }
 
   private interface Processor {
+
     void process(View view);
   }
 
   public static final class TooManyWebViewsException extends IllegalStateException {
+
   }
 
 }

@@ -8,6 +8,7 @@ import java.util.concurrent.Executor;
 
 
 public class TrackingCommandsExecutor implements Executor {
+
   private final Queue<CountDownLatch> commandLatches = new ConcurrentLinkedQueue<>();
   private final Executor delegate;
 
@@ -30,6 +31,7 @@ public class TrackingCommandsExecutor implements Executor {
 
   /**
    * Wait for all the commands passed to the {@link Executor} to finish executing
+   *
    * @throws InterruptedException
    */
   public void waitCommands() throws InterruptedException {

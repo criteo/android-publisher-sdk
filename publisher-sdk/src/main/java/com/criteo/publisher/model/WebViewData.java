@@ -10,61 +10,63 @@ import com.criteo.publisher.tasks.WebViewDataTask;
 import java.util.concurrent.Executor;
 
 public class WebViewData {
-    private String content;
-    private WebViewLoadStatus webViewLoadStatus;
-    private final Config config;
 
-    public WebViewData(@NonNull Config config) {
-        this.content = "";
-        this.webViewLoadStatus = WebViewLoadStatus.NONE;
-        this.config = config;
+  private String content;
+  private WebViewLoadStatus webViewLoadStatus;
+  private final Config config;
+
+  public WebViewData(@NonNull Config config) {
+    this.content = "";
+    this.webViewLoadStatus = WebViewLoadStatus.NONE;
+    this.config = config;
+  }
+
+  public boolean isLoaded() {
+    return (webViewLoadStatus == WebViewLoadStatus.LOADED);
+  }
+
+  public void setContent(String data) {
+    String dataWithTag = "";
+
+    if (!TextUtils.isEmpty(data)) {
+      dataWithTag = config.getAdTagDataMode();
+      dataWithTag = dataWithTag.replace(config.getAdTagDataMacro(), data);
     }
 
-    public boolean isLoaded() {
-        return (webViewLoadStatus == WebViewLoadStatus.LOADED);
-    }
+    this.content = dataWithTag;
+  }
 
-    public void setContent(String data) {
-        String dataWithTag = "";
+  public boolean isLoading() {
+    return webViewLoadStatus == WebViewLoadStatus.LOADING;
+  }
 
-        if (!TextUtils.isEmpty(data)) {
-            dataWithTag = config.getAdTagDataMode();
-            dataWithTag = dataWithTag.replace(config.getAdTagDataMacro(), data);
-        }
+  public String getContent() {
+    return content;
+  }
 
-        this.content = dataWithTag;
-    }
+  public void refresh() {
+    webViewLoadStatus = WebViewLoadStatus.NONE;
+    content = "";
+  }
 
-    public boolean isLoading() {
-        return webViewLoadStatus == WebViewLoadStatus.LOADING;
-    }
+  public void downloadFailed() {
+    this.webViewLoadStatus = WebViewLoadStatus.FAILED;
+  }
 
-    public String getContent() {
-        return content;
-    }
+  public void downloadSucceeded() {
+    this.webViewLoadStatus = WebViewLoadStatus.LOADED;
+  }
 
-    public void refresh() {
-        webViewLoadStatus = WebViewLoadStatus.NONE;
-        content = "";
-    }
+  public void downloadLoading() {
+    this.webViewLoadStatus = WebViewLoadStatus.LOADING;
+  }
 
-    public void downloadFailed() {
-        this.webViewLoadStatus = WebViewLoadStatus.FAILED;
-    }
-
-    public void downloadSucceeded() {
-        this.webViewLoadStatus = WebViewLoadStatus.LOADED;
-    }
-
-    public void downloadLoading() {
-        this.webViewLoadStatus = WebViewLoadStatus.LOADING;
-    }
-
-    public void fillWebViewHtmlContent(
-        @NonNull String displayUrl,
-        @NonNull DeviceInfo deviceInfo,
-        @Nullable CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener) {
-        Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
-        new WebViewDataTask(this, deviceInfo, criteoInterstitialAdDisplayListener).executeOnExecutor(threadPoolExecutor, displayUrl);
-    }
+  public void fillWebViewHtmlContent(
+      @NonNull String displayUrl,
+      @NonNull DeviceInfo deviceInfo,
+      @Nullable CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener) {
+    Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
+    new WebViewDataTask(this, deviceInfo, criteoInterstitialAdDisplayListener)
+        .executeOnExecutor(threadPoolExecutor, displayUrl);
+  }
 }

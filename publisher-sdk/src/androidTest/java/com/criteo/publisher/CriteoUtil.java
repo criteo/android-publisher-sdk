@@ -14,7 +14,8 @@ public class CriteoUtil {
 
   private static final String CACHED_KILL_SWITCH = "CriteoCachedKillSwitch";
 
-  public static Criteo givenInitializedCriteo(AdUnit... preloadedAdUnits) throws CriteoInitException {
+  public static Criteo givenInitializedCriteo(AdUnit... preloadedAdUnits)
+      throws CriteoInitException {
     Application app = (Application) InstrumentationRegistry.getTargetContext()
         .getApplicationContext();
 
@@ -30,7 +31,8 @@ public class CriteoUtil {
     Criteo.setInstance(null);
   }
 
-  public static Criteo.Builder getCriteoBuilder(AdUnit... preloadedAdUnits) throws CriteoInitException {
+  public static Criteo.Builder getCriteoBuilder(AdUnit... preloadedAdUnits)
+      throws CriteoInitException {
     Application app = (Application) InstrumentationRegistry.getTargetContext()
         .getApplicationContext();
 
@@ -41,6 +43,7 @@ public class CriteoUtil {
     Criteo.Builder builder = new Criteo.Builder(app, TEST_CP_ID).adUnits(adUnits);
     return builder;
   }
+
   /**
    * Clear all states retained in shared preferences used by the SDK.
    */

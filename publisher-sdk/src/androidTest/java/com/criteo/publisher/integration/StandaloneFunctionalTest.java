@@ -64,7 +64,7 @@ public class StandaloneFunctionalTest {
   private static final Charset CHARSET = StandardCharsets.UTF_8;
 
   @Rule
-  public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   @Rule
   public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(DummyActivity.class);
@@ -102,7 +102,8 @@ public class StandaloneFunctionalTest {
   }
 
   @Test
-  public void whenLoadingABanner_GivenBidAvailable_DisplayUrlIsProperlyLoadedInBannerView() throws Exception {
+  public void whenLoadingABanner_GivenBidAvailable_DisplayUrlIsProperlyLoadedInBannerView()
+      throws Exception {
     givenInitializedSdk(validBannerAdUnit);
 
     CriteoBannerView bannerView = whenLoadingABanner(validBannerAdUnit);
@@ -112,18 +113,21 @@ public class StandaloneFunctionalTest {
   }
 
   @Test
-  public void whenLoadingAnInterstitial_GivenBidAvailableAndDeviceInPortrait_DisplayUrlIsProperlyLoadedInInterstitialActivity() throws Exception {
+  public void whenLoadingAnInterstitial_GivenBidAvailableAndDeviceInPortrait_DisplayUrlIsProperlyLoadedInInterstitialActivity()
+      throws Exception {
     givenDeviceInPortrait();
     whenLoadingAnInterstitial_GivenBidAvailable_DisplayUrlIsProperlyLoadedInInterstitialActivity();
   }
 
   @Test
-  public void whenLoadingAnInterstitial_GivenBidAvailableAndDeviceInLandscape_DisplayUrlIsProperlyLoadedInInterstitialActivity() throws Exception {
+  public void whenLoadingAnInterstitial_GivenBidAvailableAndDeviceInLandscape_DisplayUrlIsProperlyLoadedInInterstitialActivity()
+      throws Exception {
     givenDeviceInLandscape();
     whenLoadingAnInterstitial_GivenBidAvailable_DisplayUrlIsProperlyLoadedInInterstitialActivity();
   }
 
-  private void whenLoadingAnInterstitial_GivenBidAvailable_DisplayUrlIsProperlyLoadedInInterstitialActivity() throws Exception {
+  private void whenLoadingAnInterstitial_GivenBidAvailable_DisplayUrlIsProperlyLoadedInInterstitialActivity()
+      throws Exception {
     givenInitializedSdk(validInterstitialAdUnit);
 
     View interstitialView = whenLoadingAndDisplayingAnInterstitial(validInterstitialAdUnit);
@@ -133,7 +137,8 @@ public class StandaloneFunctionalTest {
   }
 
   @Test
-  public void whenLoadingABanner_GivenNoBidAvailable_NothingIsLoadedInBannerView() throws Exception {
+  public void whenLoadingABanner_GivenNoBidAvailable_NothingIsLoadedInBannerView()
+      throws Exception {
     givenInitializedSdk(invalidBannerAdUnit);
 
     CriteoBannerView bannerView = whenLoadingABanner(invalidBannerAdUnit);
@@ -147,7 +152,8 @@ public class StandaloneFunctionalTest {
   }
 
   @Test
-  public void whenLoadingAnInterstitial_GivenNoBidAvailable_InterstitialIsNotLoadedAndCannotBeShown() throws Exception {
+  public void whenLoadingAnInterstitial_GivenNoBidAvailable_InterstitialIsNotLoadedAndCannotBeShown()
+      throws Exception {
     givenInitializedSdk(invalidInterstitialAdUnit);
 
     CriteoInterstitial interstitial = whenLoadingAnInterstitial(invalidInterstitialAdUnit);
@@ -180,7 +186,8 @@ public class StandaloneFunctionalTest {
     return bannerViewRef.get();
   }
 
-  private View whenLoadingAndDisplayingAnInterstitial(InterstitialAdUnit interstitialAdUnit) throws Exception {
+  private View whenLoadingAndDisplayingAnInterstitial(InterstitialAdUnit interstitialAdUnit)
+      throws Exception {
     AtomicReference<CriteoSync> syncRef = new AtomicReference<>();
 
     CriteoInterstitial interstitial = whenLoadingAnInterstitial(interstitialAdUnit, syncRef);
@@ -196,11 +203,13 @@ public class StandaloneFunctionalTest {
     return getRootView(activity.get());
   }
 
-  private CriteoInterstitial whenLoadingAnInterstitial(InterstitialAdUnit interstitialAdUnit) throws Exception {
+  private CriteoInterstitial whenLoadingAnInterstitial(InterstitialAdUnit interstitialAdUnit)
+      throws Exception {
     return whenLoadingAnInterstitial(interstitialAdUnit, new AtomicReference<>());
   }
 
-  private CriteoInterstitial whenLoadingAnInterstitial(InterstitialAdUnit interstitialAdUnit, AtomicReference<CriteoSync> syncRef) throws Exception {
+  private CriteoInterstitial whenLoadingAnInterstitial(InterstitialAdUnit interstitialAdUnit,
+      AtomicReference<CriteoSync> syncRef) throws Exception {
     AtomicReference<CriteoInterstitial> interstitialRef = new AtomicReference<>();
 
     runOnMainThreadAndWait(() -> {
@@ -216,7 +225,8 @@ public class StandaloneFunctionalTest {
   }
 
   @Test
-  public void whenLoadingABanner_GivenListenerAndBidAvailable_OnAdReceivedIsCalled() throws Exception {
+  public void whenLoadingABanner_GivenListenerAndBidAvailable_OnAdReceivedIsCalled()
+      throws Exception {
     givenInitializedSdk(validBannerAdUnit);
 
     CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
@@ -230,7 +240,8 @@ public class StandaloneFunctionalTest {
   }
 
   @Test
-  public void whenLoadingABanner_GivenListenerAndNoBidAvailable_OnAdFailedToReceivedIsCalledWithNoFill() throws Exception {
+  public void whenLoadingABanner_GivenListenerAndNoBidAvailable_OnAdFailedToReceivedIsCalledWithNoFill()
+      throws Exception {
     givenInitializedSdk(invalidBannerAdUnit);
 
     CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
@@ -244,7 +255,8 @@ public class StandaloneFunctionalTest {
   }
 
   @Test
-  public void whenLoadingAnInterstitial_GivenListenerAndNoBidAvailable_OnAdFailedToReceivedIsCalledWithNoFill() throws Exception {
+  public void whenLoadingAnInterstitial_GivenListenerAndNoBidAvailable_OnAdFailedToReceivedIsCalledWithNoFill()
+      throws Exception {
     givenInitializedSdk(invalidInterstitialAdUnit);
 
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
@@ -257,7 +269,8 @@ public class StandaloneFunctionalTest {
     verifyNoMoreInteractions(listener);
   }
 
-  private CriteoBannerView createBanner(BannerAdUnit bannerAdUnit, CriteoBannerAdListener listener) {
+  private CriteoBannerView createBanner(BannerAdUnit bannerAdUnit,
+      CriteoBannerAdListener listener) {
     AtomicReference<CriteoBannerView> bannerViewRef = new AtomicReference<>();
 
     runOnMainThreadAndWait(() -> {
@@ -268,7 +281,8 @@ public class StandaloneFunctionalTest {
     return bannerViewRef.get();
   }
 
-  private CriteoInterstitial createInterstitial(InterstitialAdUnit interstitialAdUnit, CriteoInterstitialAdListener listener) {
+  private CriteoInterstitial createInterstitial(InterstitialAdUnit interstitialAdUnit,
+      CriteoInterstitialAdListener listener) {
     AtomicReference<CriteoInterstitial> interstitial = new AtomicReference<>();
 
     runOnMainThreadAndWait(() -> {
@@ -303,14 +317,16 @@ public class StandaloneFunctionalTest {
   }
 
   @Test
-  public void whenLoadingAnInterstitial_GivenDeviceInPortrait_NotifyListenerForSuccessOnNextCall() throws Exception {
+  public void whenLoadingAnInterstitial_GivenDeviceInPortrait_NotifyListenerForSuccessOnNextCall()
+      throws Exception {
     givenDeviceInPortrait();
 
     whenLoadingAnInterstitial_NotifyListenerForSuccessOnNextCall();
   }
 
   @Test
-  public void whenLoadingAnInterstitial_GivenDeviceInLandscape_NotifyListenerForSuccessOnNextCall() throws Exception {
+  public void whenLoadingAnInterstitial_GivenDeviceInLandscape_NotifyListenerForSuccessOnNextCall()
+      throws Exception {
     givenDeviceInLandscape();
 
     whenLoadingAnInterstitial_NotifyListenerForSuccessOnNextCall();
@@ -404,6 +420,7 @@ public class StandaloneFunctionalTest {
     private class SyncAdListener implements CriteoBannerAdListener,
         CriteoInterstitialAdListener,
         CriteoInterstitialAdDisplayListener {
+
       @Override
       public void onAdReceived(View view) {
         onLoaded();

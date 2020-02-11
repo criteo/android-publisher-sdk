@@ -242,6 +242,7 @@ public class DependencyProvider {
   }
 
   private interface Factory<T> {
+
     T create();
   }
 

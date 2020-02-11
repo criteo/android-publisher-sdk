@@ -20,6 +20,7 @@ public abstract class Criteo {
   private static Criteo criteo;
 
   public static class Builder {
+
     @NonNull
     private final String criteoPublisherId;
 
@@ -51,8 +52,8 @@ public abstract class Criteo {
     }
 
     public Builder mopubConsent(@Nullable String mopubConsent) {
-        this.mopubConsent = mopubConsent;
-        return this;
+      this.mopubConsent = mopubConsent;
+      return this;
     }
 
     public Criteo init() throws CriteoInitException {
@@ -110,16 +111,17 @@ public abstract class Criteo {
   }
 
   public static Criteo getInstance() {
-      if (criteo == null) {
-          throw new IllegalStateException("You must call Criteo.Init() before calling Criteo.getInstance()");
-      }
+    if (criteo == null) {
+      throw new IllegalStateException(
+          "You must call Criteo.Init() before calling Criteo.getInstance()");
+    }
 
-      return criteo;
+    return criteo;
   }
 
   @VisibleForTesting
   static void setInstance(@Nullable Criteo instance) {
-      criteo = instance;
+    criteo = instance;
   }
 
   public abstract void setBidsForAdUnit(Object object, AdUnit adUnit);

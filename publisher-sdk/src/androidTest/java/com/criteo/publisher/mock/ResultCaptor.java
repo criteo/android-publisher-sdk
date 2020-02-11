@@ -21,7 +21,8 @@ public class ResultCaptor<T> implements Answer<T> {
   /**
    * Returns the captured value of the result.
    * <p>
-   * If verified method was called multiple times then this method it returns the latest captured value.
+   * If verified method was called multiple times then this method it returns the latest captured
+   * value.
    * <p>
    * Example:
    * <pre class="code"><code class="java">
@@ -41,7 +42,7 @@ public class ResultCaptor<T> implements Answer<T> {
     if (results.isEmpty()) {
       throw noArgumentValueWasCaptured();
     }
-    return (T) results.getLast();
+    return results.getLast();
   }
 
   /**

@@ -5,9 +5,9 @@ import org.junit.Test;
 
 public class ReflectionUtilTest {
 
-    @Test
-    public void testCallMethodOnObjectWithNullParams(){
-        Assert.assertNull(ReflectionUtil.callMethodOnObject(null,null,null));
-    }
+  @Test
+  public void testCallMethodOnObjectWithNullParams() {
+    Assert.assertNull(ReflectionUtil.callMethodOnObject(null, null, null));
+  }
 
 }

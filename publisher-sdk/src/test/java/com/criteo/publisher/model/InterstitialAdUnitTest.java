@@ -5,11 +5,11 @@ import org.junit.Test;
 
 public class InterstitialAdUnitTest {
 
-	@Test
-	public void equalsContract() {
-		EqualsVerifier.forClass(InterstitialAdUnit.class)
-				.withRedefinedSuperclass()
-				.verify();
-	}
+  @Test
+  public void equalsContract() {
+    EqualsVerifier.forClass(InterstitialAdUnit.class)
+        .withRedefinedSuperclass()
+        .verify();
+  }
 
 }

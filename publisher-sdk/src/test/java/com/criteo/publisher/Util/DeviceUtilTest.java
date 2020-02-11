@@ -2,7 +2,6 @@ package com.criteo.publisher.Util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
@@ -13,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class DeviceUtilTest {
+
   private static final String DEVICE_ID_LIMITED = "00000000-0000-0000-0000-000000000000";
 
   @Mock
@@ -28,7 +28,7 @@ public class DeviceUtilTest {
     MockitoAnnotations.initMocks(this);
     deviceUtil = new DeviceUtil(context, info);
   }
-  
+
   @Test
   public void testCreateDfpCompatibleWithNullDisplayUrl() {
     String displayUrl = null;
@@ -73,7 +73,8 @@ public class DeviceUtilTest {
   }
 
   @Test
-  public void getAdvertisingId_GivenErrorWhenCheckingLimitedAdTracking_ReturnNull() throws Exception {
+  public void getAdvertisingId_GivenErrorWhenCheckingLimitedAdTracking_ReturnNull()
+      throws Exception {
     when(info.isLimitAdTrackingEnabled(context)).thenThrow(RuntimeException.class);
 
     String advertisingId = deviceUtil.getAdvertisingId();

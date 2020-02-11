@@ -57,7 +57,8 @@ public class InHouseFunctionalTest {
   }
 
   @Test
-  public void loadBannerAd_GivenInvalidAdUnit_ThenListenerIsNotifiedOfTheFailure() throws Exception {
+  public void loadBannerAd_GivenInvalidAdUnit_ThenListenerIsNotifiedOfTheFailure()
+      throws Exception {
     Criteo criteo = givenInitializedSdk(invalidBannerAdUnit);
 
     CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
@@ -72,7 +73,8 @@ public class InHouseFunctionalTest {
   }
 
   @Test
-  public void loadBannerAd_GivenValidBannerAndTokenUsedTwice_ThenListenerIsNotifiedOfSuccessFirstThenFailure() throws Exception {
+  public void loadBannerAd_GivenValidBannerAndTokenUsedTwice_ThenListenerIsNotifiedOfSuccessFirstThenFailure()
+      throws Exception {
     Criteo criteo = givenInitializedSdk(validBannerAdUnit);
 
     CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);

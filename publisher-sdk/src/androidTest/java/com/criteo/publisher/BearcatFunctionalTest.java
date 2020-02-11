@@ -30,7 +30,7 @@ import org.mockito.MockitoAnnotations;
 public class BearcatFunctionalTest {
 
   @Rule
-  public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   @Rule
   public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(DummyActivity.class);
@@ -86,7 +86,8 @@ public class BearcatFunctionalTest {
   }
 
   @Test
-  public void init_GivenLimitedAdTracking_SendInitEventWithDummyGaidAndLimitation() throws Exception {
+  public void init_GivenLimitedAdTracking_SendInitEventWithDummyGaidAndLimitation()
+      throws Exception {
     AdvertisingInfo advertisingInfo = mock(AdvertisingInfo.class);
     when(advertisingInfo.isLimitAdTrackingEnabled(any())).thenReturn(true);
     when(advertisingInfo.getAdvertisingId(any())).thenReturn("myAdvertisingId");

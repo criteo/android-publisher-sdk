@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class UserTest {
+
   @Mock
   private DeviceUtil deviceUtil;
 

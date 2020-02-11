@@ -22,60 +22,60 @@ import org.mockito.MockitoAnnotations;
 
 public class AppEventTaskTest {
 
-    private AppEventTask appEventTask;
+  private AppEventTask appEventTask;
 
-    private JSONObject json;
+  private JSONObject json;
 
-    @Mock
-    private AppEventResponseListener responseListener;
+  @Mock
+  private AppEventResponseListener responseListener;
 
-    @Mock
-    private Context context;
+  @Mock
+  private Context context;
 
-    @Mock
-    private DeviceUtil deviceUtil;
+  @Mock
+  private DeviceUtil deviceUtil;
 
-    @Mock
-    private PubSdkApi api;
+  @Mock
+  private PubSdkApi api;
 
-    @Mock
-    private DeviceInfo deviceInfo;
+  @Mock
+  private DeviceInfo deviceInfo;
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        appEventTask = new AppEventTask(context, responseListener, deviceUtil, api, deviceInfo);
-        json = new JSONObject();
-    }
+  @Before
+  public void setUp() {
+    MockitoAnnotations.initMocks(this);
+    appEventTask = new AppEventTask(context, responseListener, deviceUtil, api, deviceInfo);
+    json = new JSONObject();
+  }
 
 
-    @Test
-    public void testWithThrottleOnPostExecute() throws JSONException {
-        json.put(THROTTLE, 5);
-        appEventTask.onPostExecute(json);
-        Mockito.verify(responseListener, Mockito.times(1)).setThrottle(json.optInt(THROTTLE, 0));
-    }
+  @Test
+  public void testWithThrottleOnPostExecute() throws JSONException {
+    json.put(THROTTLE, 5);
+    appEventTask.onPostExecute(json);
+    Mockito.verify(responseListener, Mockito.times(1)).setThrottle(json.optInt(THROTTLE, 0));
+  }
 
-    @Test
-    public void testWithNullThrottleOnPostExecute() {
-        appEventTask.onPostExecute(json);
-        Mockito.verify(responseListener, Mockito.times(1)).setThrottle(0);
-    }
+  @Test
+  public void testWithNullThrottleOnPostExecute() {
+    appEventTask.onPostExecute(json);
+    Mockito.verify(responseListener, Mockito.times(1)).setThrottle(0);
+  }
 
-    @Test
-    public void testWithNullJsonOnPostExecute() {
-        json = null;
-        appEventTask.onPostExecute(json);
-        Mockito.verify(responseListener, Mockito.times(1)).setThrottle(0);
-    }
+  @Test
+  public void testWithNullJsonOnPostExecute() {
+    json = null;
+    appEventTask.onPostExecute(json);
+    Mockito.verify(responseListener, Mockito.times(1)).setThrottle(0);
+  }
 
-    @Test
-    public void backgroundTask_GivenUserAgent_CallApiWithIt() throws Exception {
-        when(deviceInfo.getUserAgent()).thenReturn(completedFuture("myUserAgent"));
+  @Test
+  public void backgroundTask_GivenUserAgent_CallApiWithIt() throws Exception {
+    when(deviceInfo.getUserAgent()).thenReturn(completedFuture("myUserAgent"));
 
-        appEventTask.doInBackground("eventType");
+    appEventTask.doInBackground("eventType");
 
-        verify(api).postAppEvent(anyInt(), any(), any(), any(), anyInt(), eq("myUserAgent"));
-    }
+    verify(api).postAppEvent(anyInt(), any(), any(), any(), anyInt(), eq("myUserAgent"));
+  }
 
 }

@@ -36,145 +36,149 @@ import org.mockito.MockitoAnnotations;
 
 public class CriteoBannerEventControllerTest {
 
-    @Rule
-    public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
+  @Rule
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
-    private CriteoBannerEventController criteoBannerEventController;
+  private CriteoBannerEventController criteoBannerEventController;
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private CriteoBannerView criteoBannerView;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private CriteoBannerView criteoBannerView;
 
-    @Mock
-    private CriteoBannerAdListener criteoBannerAdListener;
+  @Mock
+  private CriteoBannerAdListener criteoBannerAdListener;
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private Criteo criteo;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private Criteo criteo;
 
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+  @Before
+  public void setUp() throws Exception {
+    MockitoAnnotations.initMocks(this);
 
-        when(criteo.getConfig().getDisplayUrlMacro()).thenReturn("");
-        when(criteo.getConfig().getAdTagUrlMode()).thenReturn("");
+    when(criteo.getConfig().getDisplayUrlMacro()).thenReturn("");
+    when(criteo.getConfig().getAdTagUrlMode()).thenReturn("");
 
-        when(criteoBannerView.getCriteoBannerAdListener()).thenReturn(criteoBannerAdListener);
-        criteoBannerEventController = spy(new CriteoBannerEventController(criteoBannerView, criteo));
-    }
+    when(criteoBannerView.getCriteoBannerAdListener()).thenReturn(criteoBannerAdListener);
+    criteoBannerEventController = spy(new CriteoBannerEventController(criteoBannerView, criteo));
+  }
 
-    @Test
-    public void fetchAdAsyncAdUnit_GivenListener_InvokeItAsyncOnMainThread() throws Exception {
-        CountDownLatch latch = new CountDownLatch(1);
+  @Test
+  public void fetchAdAsyncAdUnit_GivenListener_InvokeItAsyncOnMainThread() throws Exception {
+    CountDownLatch latch = new CountDownLatch(1);
 
-        doAnswer(answerVoid((CriteoErrorCode ignored) -> {
-            assertSame(Thread.currentThread(), Looper.getMainLooper().getThread());
-            assertTrue(latch.await(1, TimeUnit.SECONDS));
-        })).when(criteoBannerAdListener).onAdFailedToReceive(any());
+    doAnswer(answerVoid((CriteoErrorCode ignored) -> {
+      assertSame(Thread.currentThread(), Looper.getMainLooper().getThread());
+      assertTrue(latch.await(1, TimeUnit.SECONDS));
+    })).when(criteoBannerAdListener).onAdFailedToReceive(any());
 
-        AdUnit adUnit = mock(AdUnit.class);
-        when(criteo.getBidForAdUnit(adUnit)).thenReturn(null);
+    AdUnit adUnit = mock(AdUnit.class);
+    when(criteo.getBidForAdUnit(adUnit)).thenReturn(null);
 
-        runOnMainThreadAndWait(() -> {
-            criteoBannerEventController.fetchAdAsync(adUnit);
-            latch.countDown();
-        });
+    runOnMainThreadAndWait(() -> {
+      criteoBannerEventController.fetchAdAsync(adUnit);
+      latch.countDown();
+    });
 
-        waitForIdleState();
-    }
+    waitForIdleState();
+  }
 
-    @Test
-    public void fetchAdAsyncToken_GivenListener_InvokeItAsyncOnMainThread() throws Exception {
-        CountDownLatch latch = new CountDownLatch(1);
+  @Test
+  public void fetchAdAsyncToken_GivenListener_InvokeItAsyncOnMainThread() throws Exception {
+    CountDownLatch latch = new CountDownLatch(1);
 
-        doAnswer(answerVoid((CriteoErrorCode ignored) -> {
-            assertSame(Thread.currentThread(), Looper.getMainLooper().getThread());
-            assertTrue(latch.await(1, TimeUnit.SECONDS));
-        })).when(criteoBannerAdListener).onAdFailedToReceive(any());
+    doAnswer(answerVoid((CriteoErrorCode ignored) -> {
+      assertSame(Thread.currentThread(), Looper.getMainLooper().getThread());
+      assertTrue(latch.await(1, TimeUnit.SECONDS));
+    })).when(criteoBannerAdListener).onAdFailedToReceive(any());
 
-        BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
-        when(criteo.getTokenValue(token, AdUnitType.CRITEO_BANNER)).thenReturn(null);
+    BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
+    when(criteo.getTokenValue(token, AdUnitType.CRITEO_BANNER)).thenReturn(null);
 
-        runOnMainThreadAndWait(() -> {
-            criteoBannerEventController.fetchAdAsync(token);
-            latch.countDown();
-        });
+    runOnMainThreadAndWait(() -> {
+      criteoBannerEventController.fetchAdAsync(token);
+      latch.countDown();
+    });
 
-        waitForIdleState();
-    }
+    waitForIdleState();
+  }
 
-    @Test
-    public void fetchAdAsyncAdUnit_GivenNoBid_NotifyListenerForFailureAndDoNotDisplayAd() throws Exception {
-        AdUnit adUnit = mock(AdUnit.class);
+  @Test
+  public void fetchAdAsyncAdUnit_GivenNoBid_NotifyListenerForFailureAndDoNotDisplayAd()
+      throws Exception {
+    AdUnit adUnit = mock(AdUnit.class);
 
-        when(criteo.getBidForAdUnit(adUnit)).thenReturn(null);
+    when(criteo.getBidForAdUnit(adUnit)).thenReturn(null);
 
-        criteoBannerEventController.fetchAdAsync(adUnit);
-        waitForIdleState();
+    criteoBannerEventController.fetchAdAsync(adUnit);
+    waitForIdleState();
 
-        verify(criteoBannerAdListener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
-        verify(criteoBannerEventController, never()).displayAd(any());
-    }
+    verify(criteoBannerAdListener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
+    verify(criteoBannerEventController, never()).displayAd(any());
+  }
 
-    @Test
-    public void fetchAdAsyncAdUnit_GivenBidNotifyListenerForSuccessAndDisplayAd() throws Exception {
-        AdUnit adUnit = mock(AdUnit.class);
-        Slot slot = mock(Slot.class);
+  @Test
+  public void fetchAdAsyncAdUnit_GivenBidNotifyListenerForSuccessAndDisplayAd() throws Exception {
+    AdUnit adUnit = mock(AdUnit.class);
+    Slot slot = mock(Slot.class);
 
-        when(criteo.getBidForAdUnit(adUnit)).thenReturn(slot);
-        when(slot.getDisplayUrl()).thenReturn("http://my.display.url");
+    when(criteo.getBidForAdUnit(adUnit)).thenReturn(slot);
+    when(slot.getDisplayUrl()).thenReturn("http://my.display.url");
 
-        criteoBannerEventController.fetchAdAsync(adUnit);
-        waitForIdleState();
+    criteoBannerEventController.fetchAdAsync(adUnit);
+    waitForIdleState();
 
-        verify(criteoBannerAdListener).onAdReceived(criteoBannerView);
-        verify(criteoBannerEventController).displayAd("http://my.display.url");
-    }
+    verify(criteoBannerAdListener).onAdReceived(criteoBannerView);
+    verify(criteoBannerEventController).displayAd("http://my.display.url");
+  }
 
-    @Test
-    public void fetchAdAsyncToken_GivenNoBid_NotifyListenerForFailureAndDoNotDisplayAd() throws Exception {
-        BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
+  @Test
+  public void fetchAdAsyncToken_GivenNoBid_NotifyListenerForFailureAndDoNotDisplayAd()
+      throws Exception {
+    BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
 
-        when(criteo.getTokenValue(token, AdUnitType.CRITEO_BANNER)).thenReturn(null);
+    when(criteo.getTokenValue(token, AdUnitType.CRITEO_BANNER)).thenReturn(null);
 
-        criteoBannerEventController.fetchAdAsync(token);
-        waitForIdleState();
+    criteoBannerEventController.fetchAdAsync(token);
+    waitForIdleState();
 
-        verify(criteoBannerAdListener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
-        verify(criteoBannerEventController, never()).displayAd(any());
-    }
+    verify(criteoBannerAdListener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
+    verify(criteoBannerEventController, never()).displayAd(any());
+  }
 
-    @Test
-    public void fetchAdAsyncToken_GivenBidNotifyListenerForSuccessAndDisplayAd() throws Exception {
-        BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
-        TokenValue tokenValue = mock(TokenValue.class);
+  @Test
+  public void fetchAdAsyncToken_GivenBidNotifyListenerForSuccessAndDisplayAd() throws Exception {
+    BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
+    TokenValue tokenValue = mock(TokenValue.class);
 
-        when(criteo.getTokenValue(token, AdUnitType.CRITEO_BANNER)).thenReturn(tokenValue);
-        when(tokenValue.getDisplayUrl()).thenReturn("http://my.display.url");
+    when(criteo.getTokenValue(token, AdUnitType.CRITEO_BANNER)).thenReturn(tokenValue);
+    when(tokenValue.getDisplayUrl()).thenReturn("http://my.display.url");
 
-        criteoBannerEventController.fetchAdAsync(token);
-        waitForIdleState();
+    criteoBannerEventController.fetchAdAsync(token);
+    waitForIdleState();
 
-        verify(criteoBannerAdListener).onAdReceived(criteoBannerView);
-        verify(criteoBannerEventController).displayAd("http://my.display.url");
-    }
+    verify(criteoBannerAdListener).onAdReceived(criteoBannerView);
+    verify(criteoBannerEventController).displayAd("http://my.display.url");
+  }
 
-    @Test
-    public void displayAd_GivenDisplayUrl_LoadItInBanner() throws Exception {
-        criteoBannerEventController.displayAd("http://my.display.url");
-        waitForIdleState();
+  @Test
+  public void displayAd_GivenDisplayUrl_LoadItInBanner() throws Exception {
+    criteoBannerEventController.displayAd("http://my.display.url");
+    waitForIdleState();
 
-        verify(criteoBannerView).loadDataWithBaseURL(any(), any(), any(), any(), any());
-    }
+    verify(criteoBannerView).loadDataWithBaseURL(any(), any(), any(), any(), any());
+  }
 
-    @Test
-    public void whenDeeplinkIsLoaded_GivenTargetAppIsNotInstalled_DontThrowActivityNotFound() {
-        runOnMainThreadAndWait(() -> {
-            WebViewClient webViewClient  = criteoBannerEventController.createWebViewClient();
-            Application app = (Application) InstrumentationRegistry.getTargetContext().getApplicationContext();
-            webViewClient.shouldOverrideUrlLoading(new WebView(app.getApplicationContext()), "fake_deeplink://fakeappdispatch");
-        });
-    }
+  @Test
+  public void whenDeeplinkIsLoaded_GivenTargetAppIsNotInstalled_DontThrowActivityNotFound() {
+    runOnMainThreadAndWait(() -> {
+      WebViewClient webViewClient = criteoBannerEventController.createWebViewClient();
+      Application app = (Application) InstrumentationRegistry.getTargetContext()
+          .getApplicationContext();
+      webViewClient.shouldOverrideUrlLoading(new WebView(app.getApplicationContext()),
+          "fake_deeplink://fakeappdispatch");
+    });
+  }
 
-    private void waitForIdleState() {
-        waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
-    }
+  private void waitForIdleState() {
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+  }
 }

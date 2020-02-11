@@ -69,7 +69,8 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void whenCreatingNewCriteo_GivenNullCpId_ThrowExceptionAndDoNotUseNetwork() throws Exception {
+  public void whenCreatingNewCriteo_GivenNullCpId_ThrowExceptionAndDoNotUseNetwork()
+      throws Exception {
     PubSdkApi api = givenMockedPubSdkApi();
     criteoPublisherId = null;
 
@@ -78,7 +79,8 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void whenCreatingNewCriteo_GivenBidManagerAndAdUnits_ShouldCallPrefetchWithAdUnits() throws Exception {
+  public void whenCreatingNewCriteo_GivenBidManagerAndAdUnits_ShouldCallPrefetchWithAdUnits()
+      throws Exception {
     BidManager bidManager = givenMockedBidManager();
     adUnits = mock(List.class);
 
@@ -88,7 +90,8 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void whenCreatingNewCriteo_GivenBidManagerAndNullAdUnits_ShouldCallPrefetchWithEmptyAdUnits() throws Exception {
+  public void whenCreatingNewCriteo_GivenBidManagerAndNullAdUnits_ShouldCallPrefetchWithEmptyAdUnits()
+      throws Exception {
     BidManager bidManager = givenMockedBidManager();
     adUnits = null;
 
@@ -98,7 +101,8 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void whenCreatingNewCriteo_GivenApplication_ShouldCreateSupportedScreenSizes() throws Exception {
+  public void whenCreatingNewCriteo_GivenApplication_ShouldCreateSupportedScreenSizes()
+      throws Exception {
     DeviceUtil deviceUtil = mock(DeviceUtil.class);
 
     Context context = application.getApplicationContext();
@@ -117,7 +121,8 @@ public class CriteoInternalUnitTest {
     doReturn(mock(DeviceUtil.class)).when(dependencyProvider).provideDeviceUtil(any());
     doReturn(mock(UserPrivacyUtil.class)).when(dependencyProvider).provideUserPrivacyUtil(any());
     doReturn(mock(Config.class)).when(dependencyProvider).provideConfig(any());
-    doReturn(new DirectMockRunOnUiThreadExecutor()).when(dependencyProvider).provideRunOnUiThreadExecutor();
+    doReturn(new DirectMockRunOnUiThreadExecutor()).when(dependencyProvider)
+        .provideRunOnUiThreadExecutor();
 
     Context applicationContext = mock(Context.class, Answers.RETURNS_DEEP_STUBS);
     when(application.getApplicationContext()).thenReturn(applicationContext);
@@ -130,7 +135,8 @@ public class CriteoInternalUnitTest {
     verify(dependencyProvider, atLeastOnce()).provideDeviceInfo(contextCaptor.capture());
     verify(dependencyProvider, atLeastOnce()).provideAdUnitMapper(contextCaptor.capture());
     verify(dependencyProvider, atLeastOnce()).provideAndroidUtil(contextCaptor.capture());
-    verify(dependencyProvider, atLeastOnce()).provideBidManager(contextCaptor.capture(), eq(criteoPublisherId));
+    verify(dependencyProvider, atLeastOnce())
+        .provideBidManager(contextCaptor.capture(), eq(criteoPublisherId));
     verify(dependencyProvider, atLeastOnce()).provideConfig(contextCaptor.capture());
     verify(dependencyProvider, atLeastOnce()).provideUserPrivacyUtil(contextCaptor.capture());
     verify(dependencyProvider, atLeastOnce()).provideUser(contextCaptor.capture());
@@ -150,7 +156,8 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void whenCreatingNewCriteo_GivenTrueUsOptOut_ThenSetToFalse_ShouldStoreTrueThenFalseValue() throws Exception {
+  public void whenCreatingNewCriteo_GivenTrueUsOptOut_ThenSetToFalse_ShouldStoreTrueThenFalseValue()
+      throws Exception {
     givenMockedUserPrivacyUtil();
     usPrivacyOptout = true;
 
@@ -172,7 +179,8 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void whenCreatingNewCriteo_GivenFalseUsOptOut_ThenSetToTrue_ShouldFalseThenTrue() throws Exception {
+  public void whenCreatingNewCriteo_GivenFalseUsOptOut_ThenSetToTrue_ShouldFalseThenTrue()
+      throws Exception {
     givenMockedUserPrivacyUtil();
     usPrivacyOptout = false;
 
@@ -194,7 +202,8 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void whenCreatingNewCriteo_GivenNullUsOptOut_ThenSetToTrue_ShouldStoreTrueValue() throws Exception {
+  public void whenCreatingNewCriteo_GivenNullUsOptOut_ThenSetToTrue_ShouldStoreTrueValue()
+      throws Exception {
     givenMockedUserPrivacyUtil();
     usPrivacyOptout = null;
 
@@ -205,7 +214,8 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void whenCreatingNewCriteo_GivenNullUsOptOut_ThenSetToFalse_ShouldStoreFalseValue() throws Exception {
+  public void whenCreatingNewCriteo_GivenNullUsOptOut_ThenSetToFalse_ShouldStoreFalseValue()
+      throws Exception {
     givenMockedUserPrivacyUtil();
     usPrivacyOptout = null;
 
@@ -226,14 +236,16 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void whenCreatingNewCriteo_GivenApplication_RegisterOneActivityLifecycleCallback() throws Exception {
+  public void whenCreatingNewCriteo_GivenApplication_RegisterOneActivityLifecycleCallback()
+      throws Exception {
     createCriteo();
 
     verify(application).registerActivityLifecycleCallbacks(any(AppLifecycleUtil.class));
   }
 
   @Test
-  public void getBidResponse_GivenBidManagerThrowing_DoNotThrowAndReturnNoBidResponse() throws Exception {
+  public void getBidResponse_GivenBidManagerThrowing_DoNotThrowAndReturnNoBidResponse()
+      throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
 
     BidManager bidManager = givenMockedBidManager();
@@ -262,7 +274,8 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void whenCreatingNewCriteo_GivenNonNullMopubConsent_ShouldCallStoreMethod() throws Exception {
+  public void whenCreatingNewCriteo_GivenNonNullMopubConsent_ShouldCallStoreMethod()
+      throws Exception {
     Context context = application.getApplicationContext();
     when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
     mopubConsentValue = "fake_mopub_consent_value";
@@ -273,7 +286,8 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void whenCreatingNewCriteo_GivenNullMopubConsent_ShouldNotCallStoreMethod() throws Exception {
+  public void whenCreatingNewCriteo_GivenNullMopubConsent_ShouldNotCallStoreMethod()
+      throws Exception {
     Context context = application.getApplicationContext();
     when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
     mopubConsentValue = null;
@@ -360,7 +374,8 @@ public class CriteoInternalUnitTest {
   }
 
   private CriteoInternal createCriteo() {
-    return new CriteoInternal(application, adUnits, criteoPublisherId, usPrivacyOptout, mopubConsentValue, dependencyProvider);
+    return new CriteoInternal(application, adUnits, criteoPublisherId, usPrivacyOptout,
+        mopubConsentValue, dependencyProvider);
   }
 
 }

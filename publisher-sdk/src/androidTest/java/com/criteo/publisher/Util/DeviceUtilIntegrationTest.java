@@ -2,7 +2,6 @@ package com.criteo.publisher.Util;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.when;
 
 import android.os.Build.VERSION;
 import android.support.test.InstrumentationRegistry;
@@ -16,6 +15,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class DeviceUtilIntegrationTest {
+
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
@@ -23,7 +23,8 @@ public class DeviceUtilIntegrationTest {
 
   @Before
   public void setup() {
-    deviceUtil = mockedDependenciesRule.getDependencyProvider().provideDeviceUtil(InstrumentationRegistry.getContext());
+    deviceUtil = mockedDependenciesRule.getDependencyProvider()
+        .provideDeviceUtil(InstrumentationRegistry.getContext());
   }
 
   // TODO Create Intrumentation Test , change settings as Limited and test

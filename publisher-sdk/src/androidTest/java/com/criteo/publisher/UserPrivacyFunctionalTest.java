@@ -25,6 +25,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class UserPrivacyFunctionalTest {
+
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
@@ -38,8 +39,10 @@ public class UserPrivacyFunctionalTest {
     MockitoAnnotations.initMocks(this);
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
-    Application app = (Application) InstrumentationRegistry.getTargetContext().getApplicationContext();
-    defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(app.getApplicationContext());
+    Application app = (Application) InstrumentationRegistry.getTargetContext()
+        .getApplicationContext();
+    defaultSharedPreferences = PreferenceManager
+        .getDefaultSharedPreferences(app.getApplicationContext());
 
     doReturn(pubSdkApi).when(dependencyProvider).providePubSdkApi(any());
   }
@@ -74,7 +77,7 @@ public class UserPrivacyFunctionalTest {
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
     CdbRequest cdb = cdbArgumentCaptor.getValue();
-    Assert.assertNull( cdb.getUser().getUspIab());
+    Assert.assertNull(cdb.getUser().getUspIab());
   }
 
   @Test
@@ -106,7 +109,8 @@ public class UserPrivacyFunctionalTest {
   }
 
   @Test
-  public void whenCriteoInit_GivenUspOptoutTrue_ThenChangedToFalse_VerifyFalseIsPassedToCdb() throws Exception {
+  public void whenCriteoInit_GivenUspOptoutTrue_ThenChangedToFalse_VerifyFalseIsPassedToCdb()
+      throws Exception {
     Criteo.Builder builder = CriteoUtil.getCriteoBuilder(TestAdUnits.BANNER_320_50);
     Criteo criteo = builder.usPrivacyOptOut(true).init();
     criteo.setUsPrivacyOptOut(false);
@@ -121,7 +125,8 @@ public class UserPrivacyFunctionalTest {
   }
 
   @Test
-  public void whenCriteoInit_GivenUspOptoutTrue_ThenChangedToFalseAfterFirstCall_VerifyFalseIsPassedToCdbOnTheSecondCall() throws Exception {
+  public void whenCriteoInit_GivenUspOptoutTrue_ThenChangedToFalseAfterFirstCall_VerifyFalseIsPassedToCdbOnTheSecondCall()
+      throws Exception {
     Criteo.Builder builder = CriteoUtil.getCriteoBuilder(TestAdUnits.BANNER_320_50);
     Criteo criteo = builder.usPrivacyOptOut(true).init();
 
@@ -154,7 +159,8 @@ public class UserPrivacyFunctionalTest {
   }
 
   @Test
-  public void whenCriteoInit_GivenMopubConsentNotProvided_ThenProvidedAfterFirstCall_VerifyItIsPassedToCdbOnTheSecondCall() throws Exception {
+  public void whenCriteoInit_GivenMopubConsentNotProvided_ThenProvidedAfterFirstCall_VerifyItIsPassedToCdbOnTheSecondCall()
+      throws Exception {
     Criteo.Builder builder = CriteoUtil.getCriteoBuilder(TestAdUnits.BANNER_320_50);
     Criteo criteo = builder.init();
 
@@ -173,7 +179,8 @@ public class UserPrivacyFunctionalTest {
   }
 
   @Test
-  public void whenCriteoInit_GivenMopubConsentThroughSetter_ThenCriteoCleared_ThenVerifyItIsStillPassedToCdb() throws Exception {
+  public void whenCriteoInit_GivenMopubConsentThroughSetter_ThenCriteoCleared_ThenVerifyItIsStillPassedToCdb()
+      throws Exception {
     // given
     Criteo.Builder builder = CriteoUtil.getCriteoBuilder(TestAdUnits.BANNER_320_50);
     Criteo criteo = builder.init();

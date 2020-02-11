@@ -42,9 +42,12 @@ public class PubSdkApiTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    when(context.getString(R.string.cdb_url)).thenReturn("http://localhost:" + mockServerRule.getPort());
-    when(context.getString(R.string.event_url)).thenReturn("http://localhost:" + mockServerRule.getPort());
-    when(context.getString(R.string.config_url)).thenReturn("http://localhost:" + mockServerRule.getPort());
+    when(context.getString(R.string.cdb_url))
+        .thenReturn("http://localhost:" + mockServerRule.getPort());
+    when(context.getString(R.string.event_url))
+        .thenReturn("http://localhost:" + mockServerRule.getPort());
+    when(context.getString(R.string.config_url))
+        .thenReturn("http://localhost:" + mockServerRule.getPort());
 
     api = new PubSdkApi(context);
   }

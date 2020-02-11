@@ -147,7 +147,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void prefetch_GivenMapperSplittingIntoChunks_ExecuteChunksIndependently() throws Exception {
+  public void prefetch_GivenMapperSplittingIntoChunks_ExecuteChunksIndependently()
+      throws Exception {
     // Remove concurrency. This would make this test really hard to follow.
     // We should wait for idle state of main thread every time because the async task post execution
     // is running on it.
@@ -217,7 +218,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void prefetch_GivenKillSwitchIsEnabled_ShouldNotCallCdbAndNotPopulateCache() throws Exception {
+  public void prefetch_GivenKillSwitchIsEnabled_ShouldNotCallCdbAndNotPopulateCache()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenKillSwitchIs(true);
@@ -230,7 +232,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void prefetch_GivenRemoteConfigWithKillSwitchEnabled_ShouldNotCallCdbAndNotPopulateCache() throws Exception {
+  public void prefetch_GivenRemoteConfigWithKillSwitchEnabled_ShouldNotCallCdbAndNotPopulateCache()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenRemoteConfigWithKillSwitchEnabled();
@@ -243,7 +246,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void prefetch_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo() throws Exception {
+  public void prefetch_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo()
+      throws Exception {
     callingCdb_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo(adUnit -> {
       BidManager bidManager = createBidManager();
       bidManager.prefetch(singletonList(adUnit));
@@ -251,14 +255,16 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo()
+      throws Exception {
     callingCdb_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo(adUnit -> {
       BidManager bidManager = createBidManager();
       bidManager.getBidForAdUnitAndPrefetch(adUnit);
     });
   }
 
-  private void callingCdb_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo(Consumer<AdUnit> callingCdb) {
+  private void callingCdb_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo(
+      Consumer<AdUnit> callingCdb) {
     DeviceInfo deviceInfo = mock(DeviceInfo.class);
     when(deviceInfo.getUserAgent()).thenReturn(completedFuture("expectedUserAgent"));
     doReturn(deviceInfo).when(dependencyProvider).provideDeviceInfo(any());
@@ -314,7 +320,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenNotExpiredValidCachedBid_ReturnItAndRemoveItFromCache() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenNotExpiredValidCachedBid_ReturnItAndRemoveItFromCache()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     Slot slot = givenNotExpiredValidCachedBid(cacheAdUnit);
@@ -327,7 +334,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenNotExpiredValidCachedBid_ShouldCallCdbAndPopulateCache() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenNotExpiredValidCachedBid_ShouldCallCdbAndPopulateCache()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenNotExpiredValidCachedBid(cacheAdUnit);
@@ -341,7 +349,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenAdUnitBeingLoaded_ShouldCallCdbAndPopulateCacheOnlyOnceForThePendingCall() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenAdUnitBeingLoaded_ShouldCallCdbAndPopulateCacheOnlyOnceForThePendingCall()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
 
@@ -385,7 +394,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenAdUnitBeingLoaded_ShouldCallCdbAndPopulateCacheOnlyOnceForThePendingCall2() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenAdUnitBeingLoaded_ShouldCallCdbAndPopulateCacheOnlyOnceForThePendingCall2()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     Slot slot = givenMockedCdbRespondingSlot();
@@ -428,7 +438,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenEmptyCache_ShouldCallCdbAndPopulateCache() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenEmptyCache_ShouldCallCdbAndPopulateCache()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     Slot slot = givenMockedCdbRespondingSlot();
@@ -443,7 +454,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenClockAtFixedTime_CacheShouldContainATimestampedBid() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenClockAtFixedTime_CacheShouldContainATimestampedBid()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     Slot slot = givenMockedCdbRespondingSlot();
@@ -471,7 +483,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenExpiredValidCachedBid_ShouldCallCdbAndPopulateCache() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenExpiredValidCachedBid_ShouldCallCdbAndPopulateCache()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenExpiredValidCachedBid(cacheAdUnit);
@@ -497,7 +510,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenNoBidCached_ShouldCallCdbAndPopulateCache() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenNoBidCached_ShouldCallCdbAndPopulateCache()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenNoBidCached(cacheAdUnit);
@@ -511,7 +525,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenNotExpiredSilentModeBidCached_ReturnNullAndDoNotRemoveIt() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenNotExpiredSilentModeBidCached_ReturnNullAndDoNotRemoveIt()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenNotExpiredSilentModeBidCached(cacheAdUnit);
@@ -524,7 +539,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenNotExpiredSilentModeBidCached_ShouldNotCallCdbAndNotPopulateCache() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenNotExpiredSilentModeBidCached_ShouldNotCallCdbAndNotPopulateCache()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenNotExpiredSilentModeBidCached(cacheAdUnit);
@@ -536,7 +552,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenExpiredSilentModeBidCached_ReturnNull() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenExpiredSilentModeBidCached_ReturnNull()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenExpiredSilentModeBidCached(cacheAdUnit);
@@ -548,7 +565,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenExpiredSilentModeBidCached_ShouldCallCdbAndPopulateCache() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenExpiredSilentModeBidCached_ShouldCallCdbAndPopulateCache()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenExpiredSilentModeBidCached(cacheAdUnit);
@@ -562,7 +580,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenNotExpiredUserLevelSilentMode_ShouldNotCallCdbAndNotPopulateCache() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenNotExpiredUserLevelSilentMode_ShouldNotCallCdbAndNotPopulateCache()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
 
@@ -577,7 +596,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenExpiredUserLevelSilentMode_ShouldCallCdbAndPopulateCache() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenExpiredUserLevelSilentMode_ShouldCallCdbAndPopulateCache()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     Slot slot = givenMockedCdbRespondingSlot();
@@ -593,7 +613,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenCdbCallAndCachedPopulatedWithUserLevelSilentMode_UserLevelSilentModeIsUpdated() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenCdbCallAndCachedPopulatedWithUserLevelSilentMode_UserLevelSilentModeIsUpdated()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     CdbResponse cdbResponse = givenMockedCdbResponse();
@@ -608,7 +629,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenFirstCdbCallWithoutUserLevelSilenceAndASecondFetchJustAfter_SecondFetchIsNotSilenced() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenFirstCdbCallWithoutUserLevelSilenceAndASecondFetchJustAfter_SecondFetchIsNotSilenced()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
 
@@ -633,7 +655,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenCdbGivingAnImmediateBid_ShouldPopulateCacheWithTtlSetToDefaultOne() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenCdbGivingAnImmediateBid_ShouldPopulateCacheWithTtlSetToDefaultOne()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
 
@@ -667,7 +690,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenKillSwitchIsEnabledAndNoSilentMode_ShouldNotCallCdbAndNotPopulateCache() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenKillSwitchIsEnabledAndNoSilentMode_ShouldNotCallCdbAndNotPopulateCache()
+      throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenKillSwitchIs(true);
@@ -679,7 +703,8 @@ public class BidManagerFunctionalTest {
     assertShouldNotCallCdbAndNotPopulateCache();
   }
 
-  private void assertShouldCallCdbAndPopulateCacheOnlyOnce(List<CacheAdUnit> requestedAdUnits, Slot slot) {
+  private void assertShouldCallCdbAndPopulateCacheOnlyOnce(List<CacheAdUnit> requestedAdUnits,
+      Slot slot) {
     verify(cache).add(slot);
     verify(api).loadCdb(argThat(cdb -> {
       assertEquals(requestedAdUnits, cdb.getAdUnits());

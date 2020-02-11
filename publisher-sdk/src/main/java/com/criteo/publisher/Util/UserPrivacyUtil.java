@@ -18,126 +18,130 @@ import org.json.JSONObject;
 // FIXME (ma.chentir) this class should be broken down into specific classes to handle each consent
 //  mechanism separately https://jira.criteois.com/browse/EE-823
 public class UserPrivacyUtil {
-    private static final String IAB_CONSENT_STRING_SHARED_PREFS_KEY = "IABConsent_ConsentString";
-    private static final String IAB_SUBJECT_TO_GDPR_SHARED_PREFS_KEY = "IABConsent_SubjectToGDPR";
-    private static final String IAB_VENDORS_SHARED_PREFS_KEY = "IABConsent_ParsedVendorConsents";
-    private static final String CONSENT_DATA_SHARED_PREFS_KEY = "consentData";
-    private static final String GDPR_APPLIES_SHARED_PREFS_KEY = "gdprApplies";
-    private static final String CONSENT_GIVEN_SHARED_PREFS_KEY = "consentGiven";
 
-    // Regex according to the CCPA IAB String format defined in
-    // https://iabtechlab.com/wp-content/uploads/2019/11/U.S.-Privacy-String-v1.0-IAB-Tech-Lab.pdf
-    private static final Pattern IAB_USPRIVACY_PATTERN = Pattern.compile("^1(Y|N|-|y|n){3}$");
+  private static final String IAB_CONSENT_STRING_SHARED_PREFS_KEY = "IABConsent_ConsentString";
+  private static final String IAB_SUBJECT_TO_GDPR_SHARED_PREFS_KEY = "IABConsent_SubjectToGDPR";
+  private static final String IAB_VENDORS_SHARED_PREFS_KEY = "IABConsent_ParsedVendorConsents";
+  private static final String CONSENT_DATA_SHARED_PREFS_KEY = "consentData";
+  private static final String GDPR_APPLIES_SHARED_PREFS_KEY = "gdprApplies";
+  private static final String CONSENT_GIVEN_SHARED_PREFS_KEY = "consentGiven";
 
-    // List of IAB Strings representing a positive consent
-    private static final List<String> IAB_USPRIVACY_WITH_CONSENT = Arrays.asList("1ynn", "1yny", "1---", "", "1yn-", "1-n-");
+  // Regex according to the CCPA IAB String format defined in
+  // https://iabtechlab.com/wp-content/uploads/2019/11/U.S.-Privacy-String-v1.0-IAB-Tech-Lab.pdf
+  private static final Pattern IAB_USPRIVACY_PATTERN = Pattern.compile("^1(Y|N|-|y|n){3}$");
 
-    private static final List<String> MOPUB_CONSENT_DECLINED_STRINGS = Arrays.asList("explicit_no", "potential_whitelist", "dnt");
+  // List of IAB Strings representing a positive consent
+  private static final List<String> IAB_USPRIVACY_WITH_CONSENT = Arrays
+      .asList("1ynn", "1yny", "1---", "", "1yn-", "1-n-");
 
-    // Key provided by the IAB CCPA Compliance Framework
-    private static final String IAB_USPRIVACY_SHARED_PREFS_KEY = "IABUSPrivacy_String";
+  private static final List<String> MOPUB_CONSENT_DECLINED_STRINGS = Arrays
+      .asList("explicit_no", "potential_whitelist", "dnt");
 
-    // Storage key for the binary optout (for CCPA)
-    private static final String OPTOUT_USPRIVACY_SHARED_PREFS_KEY = "USPrivacy_Optout";
+  // Key provided by the IAB CCPA Compliance Framework
+  private static final String IAB_USPRIVACY_SHARED_PREFS_KEY = "IABUSPrivacy_String";
 
-    private static final String MOPUB_CONSENT_SHARED_PREFS_KEY = "MoPubConsent_String";
+  // Storage key for the binary optout (for CCPA)
+  private static final String OPTOUT_USPRIVACY_SHARED_PREFS_KEY = "USPrivacy_Optout";
 
-    private final SharedPreferences sharedPreferences;
+  private static final String MOPUB_CONSENT_SHARED_PREFS_KEY = "MoPubConsent_String";
 
-    public UserPrivacyUtil(@NonNull Context context) {
-        this(PreferenceManager.getDefaultSharedPreferences(context));
+  private final SharedPreferences sharedPreferences;
+
+  public UserPrivacyUtil(@NonNull Context context) {
+    this(PreferenceManager.getDefaultSharedPreferences(context));
+  }
+
+  @VisibleForTesting
+  UserPrivacyUtil(@NonNull SharedPreferences sharedPreferences) {
+    this.sharedPreferences = sharedPreferences;
+  }
+
+  public JSONObject gdpr() {
+    String consentString = sharedPreferences.getString(IAB_CONSENT_STRING_SHARED_PREFS_KEY, "");
+    String subjectToGdpr = sharedPreferences.getString(IAB_SUBJECT_TO_GDPR_SHARED_PREFS_KEY, "");
+    String vendorConsents = sharedPreferences.getString(IAB_VENDORS_SHARED_PREFS_KEY, "");
+
+    JSONObject gdprConsent = null;
+    if (!TextUtils.isEmpty(consentString) &&
+        !TextUtils.isEmpty(subjectToGdpr) &&
+        !TextUtils.isEmpty(vendorConsents)) {
+      gdprConsent = new JSONObject();
+
+      try {
+        gdprConsent.put(CONSENT_DATA_SHARED_PREFS_KEY, consentString);
+        gdprConsent.put(GDPR_APPLIES_SHARED_PREFS_KEY, "1".equals(subjectToGdpr));
+        gdprConsent.put(CONSENT_GIVEN_SHARED_PREFS_KEY,
+            (vendorConsents.length() > 90 && vendorConsents.charAt(90) == '1'));
+      } catch (JSONException e) {
+        e.printStackTrace();
+      }
     }
+    return gdprConsent;
+  }
 
-    @VisibleForTesting
-    UserPrivacyUtil(@NonNull SharedPreferences sharedPreferences) {
-        this.sharedPreferences = sharedPreferences;
+  @NonNull
+  public String getIabUsPrivacyString() {
+    return sharedPreferences.getString(IAB_USPRIVACY_SHARED_PREFS_KEY, "");
+  }
+
+  public void storeUsPrivacyOptout(boolean uspOptout) {
+    Editor edit = sharedPreferences.edit();
+    edit.putString(OPTOUT_USPRIVACY_SHARED_PREFS_KEY, String.valueOf(uspOptout));
+    edit.apply();
+  }
+
+  @NonNull
+  public String getUsPrivacyOptout() {
+    return sharedPreferences.getString(OPTOUT_USPRIVACY_SHARED_PREFS_KEY, "");
+  }
+
+  /**
+   * Determine if CCPA consent is given.
+   *
+   * <p>
+   *
+   * <ul>
+   *   <li>IAB has priority over the binary string</li>
+   *   <li>If the IAB string is not well-formatted, we consider that the user has not opted-out</li>
+   * </ul>
+   * <p>
+   * More information can be found here: https://confluence.criteois.com/display/PP/CCPA+Buying+Policy
+   *
+   * @return {@code true} if consent is given, {@code false} otherwise
+   */
+  public boolean isCCPAConsentGivenOrNotApplicable() {
+    String iabUsPrivacy = getIabUsPrivacyString();
+    if (iabUsPrivacy.isEmpty()) {
+      return isBinaryConsentGiven();
     }
+    return isIABConsentGiven();
+  }
 
-    public JSONObject gdpr() {
-        String consentString = sharedPreferences.getString(IAB_CONSENT_STRING_SHARED_PREFS_KEY, "");
-        String subjectToGdpr = sharedPreferences.getString(IAB_SUBJECT_TO_GDPR_SHARED_PREFS_KEY, "");
-        String vendorConsents = sharedPreferences.getString(IAB_VENDORS_SHARED_PREFS_KEY, "");
+  private boolean isBinaryConsentGiven() {
+    String usPrivacyOptout = getUsPrivacyOptout();
+    return Boolean.parseBoolean(usPrivacyOptout) != true;
+  }
 
-        JSONObject gdprConsent = null;
-        if (!TextUtils.isEmpty(consentString) &&
-            !TextUtils.isEmpty(subjectToGdpr) &&
-            !TextUtils.isEmpty(vendorConsents)) {
-            gdprConsent = new JSONObject();
+  private boolean isIABConsentGiven() {
+    String iabUsPrivacy = getIabUsPrivacyString();
 
-            try {
-                gdprConsent.put(CONSENT_DATA_SHARED_PREFS_KEY, consentString);
-                gdprConsent.put(GDPR_APPLIES_SHARED_PREFS_KEY, "1".equals(subjectToGdpr));
-                gdprConsent.put(CONSENT_GIVEN_SHARED_PREFS_KEY, (vendorConsents.length() > 90 && vendorConsents.charAt(90) == '1'));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return gdprConsent;
-    }
+    return !IAB_USPRIVACY_PATTERN.matcher(iabUsPrivacy).matches() ||
+        IAB_USPRIVACY_WITH_CONSENT.contains(iabUsPrivacy.toLowerCase(Locale.ROOT));
+  }
 
-    @NonNull
-    public String getIabUsPrivacyString() {
-        return sharedPreferences.getString(IAB_USPRIVACY_SHARED_PREFS_KEY, "");
-    }
+  public boolean isMopubConsentGivenOrNotApplicable() {
+    String mopubConsent = getMopubConsent();
+    return !MOPUB_CONSENT_DECLINED_STRINGS.contains(mopubConsent.toLowerCase(Locale.ROOT));
+  }
 
-    public void storeUsPrivacyOptout(boolean uspOptout) {
-        Editor edit = sharedPreferences.edit();
-        edit.putString(OPTOUT_USPRIVACY_SHARED_PREFS_KEY, String.valueOf(uspOptout));
-        edit.apply();
-    }
+  public void storeMopubConsent(@Nullable String mopubConsent) {
+    Editor edit = sharedPreferences.edit();
+    edit.putString(MOPUB_CONSENT_SHARED_PREFS_KEY, mopubConsent);
+    edit.apply();
+  }
 
-    @NonNull
-    public String getUsPrivacyOptout() {
-        return sharedPreferences.getString(OPTOUT_USPRIVACY_SHARED_PREFS_KEY, "");
-    }
-
-    /**
-     * Determine if CCPA consent is given.
-     *
-     * <p>
-     *
-     * <ul>
-     *   <li>IAB has priority over the binary string</li>
-     *   <li>If the IAB string is not well-formatted, we consider that the user has not opted-out</li>
-     * </ul>
-     *
-     * More information can be found here: https://confluence.criteois.com/display/PP/CCPA+Buying+Policy
-     *
-     * @return {@code true} if consent is given, {@code false} otherwise
-     */
-    public boolean isCCPAConsentGivenOrNotApplicable() {
-        String iabUsPrivacy = getIabUsPrivacyString();
-        if (iabUsPrivacy.isEmpty()) {
-            return isBinaryConsentGiven();
-        }
-        return isIABConsentGiven();
-    }
-
-    private boolean isBinaryConsentGiven() {
-        String usPrivacyOptout = getUsPrivacyOptout();
-        return Boolean.parseBoolean(usPrivacyOptout) != true;
-    }
-
-    private boolean isIABConsentGiven() {
-        String iabUsPrivacy = getIabUsPrivacyString();
-
-        return !IAB_USPRIVACY_PATTERN.matcher(iabUsPrivacy).matches() ||
-                IAB_USPRIVACY_WITH_CONSENT.contains(iabUsPrivacy.toLowerCase(Locale.ROOT));
-    }
-
-    public boolean isMopubConsentGivenOrNotApplicable() {
-        String mopubConsent = getMopubConsent();
-        return !MOPUB_CONSENT_DECLINED_STRINGS.contains(mopubConsent.toLowerCase(Locale.ROOT));
-    }
-
-    public void storeMopubConsent(@Nullable String mopubConsent) {
-        Editor edit = sharedPreferences.edit();
-        edit.putString(MOPUB_CONSENT_SHARED_PREFS_KEY, mopubConsent);
-        edit.apply();
-    }
-
-    @NonNull
-    public String getMopubConsent() {
-        return sharedPreferences.getString(MOPUB_CONSENT_SHARED_PREFS_KEY, "");
-    }
+  @NonNull
+  public String getMopubConsent() {
+    return sharedPreferences.getString(MOPUB_CONSENT_SHARED_PREFS_KEY, "");
+  }
 }

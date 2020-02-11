@@ -11,9 +11,9 @@ public class RunOnUiThreadExecutor implements Executor {
 
   /**
    * Execute given command on the UI thread as soon as possible.
-   *
-   * If the current thread is already the UI one, then the given command is executed directly.
-   * Else, it is posted on UI thread for later execution.
+   * <p>
+   * If the current thread is already the UI one, then the given command is executed directly. Else,
+   * it is posted on UI thread for later execution.
    *
    * @param command to execute.
    */
@@ -28,13 +28,13 @@ public class RunOnUiThreadExecutor implements Executor {
 
   /**
    * Execute the given command asynchronously on the UI thread.
-   *
+   * <p>
    * In all cases, even if the current thread is the UI one, the given command is posted for later
    * execution.
-   *
+   * <p>
    * This may be useful in case of not controlled command to safely execute under locking
    * conditions. For instance:
-   * <code>
+   * <pre><code>
    *   private Lock _lock = new NonReentrantLock();
    *
    *   public void foo() {
@@ -48,7 +48,7 @@ public class RunOnUiThreadExecutor implements Executor {
    *     // ... do stuff
    *     _lock.unlock();
    *   }
-   * </code>
+   * </code></pre>
    *
    * @param command to execute.
    */

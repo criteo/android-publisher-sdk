@@ -38,7 +38,7 @@ public class ThreadingUtil {
 
     try {
       trackingCommandsExecutor.waitCommands();
-    } catch(InterruptedException e) {
+    } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
 
@@ -46,8 +46,8 @@ public class ThreadingUtil {
   }
 
   /**
-   * Blocks the current threads until the {@link MessageQueue} associated to the provided
-   * {@link Looper} is idle.
+   * Blocks the current threads until the {@link MessageQueue} associated to the provided {@link
+   * Looper} is idle.
    */
   public static void waitForMessageQueueToBeIdle() {
     CountDownLatch latch = new CountDownLatch(1);
@@ -65,7 +65,6 @@ public class ThreadingUtil {
       // If it is doing nothing when this method is called, the idle handler may never be called
       // and then block the execution of the program.
     });
-
 
     try {
       latch.await();

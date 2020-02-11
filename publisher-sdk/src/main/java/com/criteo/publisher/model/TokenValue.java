@@ -4,36 +4,37 @@ import android.support.annotation.NonNull;
 import com.criteo.publisher.Clock;
 
 public class TokenValue {
-    private static final int SECOND_TO_MILLI = 1000;
 
-    private final long tokenExpirationTime;
+  private static final int SECOND_TO_MILLI = 1000;
 
-    @NonNull
-    private final String displayUrl;
+  private final long tokenExpirationTime;
 
-    @NonNull
-    private final Clock clock;
+  @NonNull
+  private final String displayUrl;
 
-    public TokenValue(
-        long bidTime,
-        int bidTtl,
-        @NonNull String displayUrl,
-        @NonNull Clock clock) {
-        this.tokenExpirationTime = bidTime + bidTtl * SECOND_TO_MILLI;
-        this.displayUrl = displayUrl;
-        this.clock = clock;
-    }
+  @NonNull
+  private final Clock clock;
 
-    public long gettokenExpirationTime() {
-        return tokenExpirationTime;
-    }
+  public TokenValue(
+      long bidTime,
+      int bidTtl,
+      @NonNull String displayUrl,
+      @NonNull Clock clock) {
+    this.tokenExpirationTime = bidTime + bidTtl * SECOND_TO_MILLI;
+    this.displayUrl = displayUrl;
+    this.clock = clock;
+  }
 
-    @NonNull
-    public String getDisplayUrl() {
-        return displayUrl;
-    }
+  public long gettokenExpirationTime() {
+    return tokenExpirationTime;
+  }
 
-    public boolean isExpired() {
-        return gettokenExpirationTime() < clock.getCurrentTimeInMillis();
-    }
+  @NonNull
+  public String getDisplayUrl() {
+    return displayUrl;
+  }
+
+  public boolean isExpired() {
+    return gettokenExpirationTime() < clock.getCurrentTimeInMillis();
+  }
 }

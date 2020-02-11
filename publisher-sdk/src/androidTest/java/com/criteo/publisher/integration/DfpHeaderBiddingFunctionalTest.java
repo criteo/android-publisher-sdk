@@ -125,7 +125,8 @@ public class DfpHeaderBiddingFunctionalTest {
         validInterstitialAdUnit);
   }
 
-  private void whenGettingBid_GivenValidCpIdAndPrefetchValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(AdUnit adUnit)
+  private void whenGettingBid_GivenValidCpIdAndPrefetchValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(
+      AdUnit adUnit)
       throws Exception {
     givenInitializedCriteo(adUnit);
     waitForBids();
@@ -192,7 +193,8 @@ public class DfpHeaderBiddingFunctionalTest {
         invalidNativeAdUnit);
   }
 
-  private void whenGettingBid_GivenValidCpIdAndPrefetchInvalidAdUnit_CriteoMacroAreNotInjectedInDfpBuilder(AdUnit adUnit)
+  private void whenGettingBid_GivenValidCpIdAndPrefetchInvalidAdUnit_CriteoMacroAreNotInjectedInDfpBuilder(
+      AdUnit adUnit)
       throws Exception {
     givenInitializedCriteo(adUnit);
     waitForBids();
@@ -238,7 +240,8 @@ public class DfpHeaderBiddingFunctionalTest {
         demoInterstitialAdUnit);
   }
 
-  private void whenGettingTestBid_GivenValidCpIdAndPrefetchDemoAdUnit_CriteoMacroAreInjectedInDfpBuilder(AdUnit adUnit)
+  private void whenGettingTestBid_GivenValidCpIdAndPrefetchDemoAdUnit_CriteoMacroAreInjectedInDfpBuilder(
+      AdUnit adUnit)
       throws Exception {
     givenInitializedCriteo(adUnit);
     waitForBids();
@@ -299,21 +302,36 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Bundle bundle = builder.build().getCustomTargeting();
 
-    assertEquals(expectedProduct.title, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_TITLE)));
-    assertEquals(expectedProduct.description, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_DESCRIPTION)));
-    assertEquals(expectedProduct.imageUrl, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_IMAGE)));
-    assertEquals(expectedProduct.price, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PRICE)));
-    assertEquals(expectedProduct.clickUrl, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_CLICK)));
-    assertEquals(expectedProduct.callToAction, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_CTA)));
-    assertEquals(expectedAssets.advertiserDescription, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_ADVERTISER_NAME)));
-    assertEquals(expectedAssets.advertiserDomain, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_ADVERTISER_DOMAIN)));
-    assertEquals(expectedAssets.advertiserLogoUrl, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_ADVERTISER_LOGO)));
-    assertEquals(expectedAssets.advertiserLogoClickUrl, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_ADVERTISER_CLICK)));
-    assertEquals(expectedAssets.privacyOptOutClickUrl, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PRIVACY_LINK)));
-    assertEquals(expectedAssets.privacyOptOutImageUrl, decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PRIVACY_IMAGE)));
-    assertEquals(expectedAssets.impressionPixels.get(0), decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PIXEL_1)));
-    assertEquals(expectedAssets.impressionPixels.get(1), decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PIXEL_2)));
-    assertEquals(String.valueOf(expectedAssets.impressionPixels.size()), bundle.getString(MACRO_NATIVE_PIXEL_COUNT));
+    assertEquals(expectedProduct.title,
+        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_TITLE)));
+    assertEquals(expectedProduct.description,
+        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_DESCRIPTION)));
+    assertEquals(expectedProduct.imageUrl,
+        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_IMAGE)));
+    assertEquals(expectedProduct.price,
+        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PRICE)));
+    assertEquals(expectedProduct.clickUrl,
+        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_CLICK)));
+    assertEquals(expectedProduct.callToAction,
+        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_CTA)));
+    assertEquals(expectedAssets.advertiserDescription,
+        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_ADVERTISER_NAME)));
+    assertEquals(expectedAssets.advertiserDomain,
+        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_ADVERTISER_DOMAIN)));
+    assertEquals(expectedAssets.advertiserLogoUrl,
+        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_ADVERTISER_LOGO)));
+    assertEquals(expectedAssets.advertiserLogoClickUrl,
+        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_ADVERTISER_CLICK)));
+    assertEquals(expectedAssets.privacyOptOutClickUrl,
+        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PRIVACY_LINK)));
+    assertEquals(expectedAssets.privacyOptOutImageUrl,
+        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PRIVACY_IMAGE)));
+    assertEquals(expectedAssets.impressionPixels.get(0),
+        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PIXEL_1)));
+    assertEquals(expectedAssets.impressionPixels.get(1),
+        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PIXEL_2)));
+    assertEquals(String.valueOf(expectedAssets.impressionPixels.size()),
+        bundle.getString(MACRO_NATIVE_PIXEL_COUNT));
   }
 
   private String decodeDfpPayloadComponent(String component) throws Exception {
@@ -351,7 +369,8 @@ public class DfpHeaderBiddingFunctionalTest {
     // user.
     // TODO add a test that verify that users are properly redirected to the expected URL.
     String expectedClickUrl = URLEncoder.encode(expectedProduct.clickUrl, CHARSET.name());
-    String expectedPrivacyUrl = URLEncoder.encode(expectedAssets.privacyOptOutClickUrl, CHARSET.name());
+    String expectedPrivacyUrl = URLEncoder
+        .encode(expectedAssets.privacyOptOutClickUrl, CHARSET.name());
 
     String html = loadDfpHtmlNative(validNativeAdUnit);
 
@@ -372,7 +391,8 @@ public class DfpHeaderBiddingFunctionalTest {
   }
 
   @Test
-  public void loadingDfpBanner_GivenValidNative_HtmlInDfpViewShouldTriggerImpressionPixels() throws Exception {
+  public void loadingDfpBanner_GivenValidNative_HtmlInDfpViewShouldTriggerImpressionPixels()
+      throws Exception {
     List<String> expectedPixels = new ArrayList<>(STUB_NATIVE_ASSETS.impressionPixels);
 
     String html = loadDfpHtmlNative(validNativeAdUnit);
@@ -402,7 +422,8 @@ public class DfpHeaderBiddingFunctionalTest {
     assertDfpViewContainsDisplayUrl(cdbResultCaptor, html);
   }
 
-  private void assertDfpViewContainsDisplayUrl(ResultCaptor<CdbResponse> cdbResultCaptor, String html) {
+  private void assertDfpViewContainsDisplayUrl(ResultCaptor<CdbResponse> cdbResultCaptor,
+      String html) {
     // The DFP webview replace the & by &amp; in attribute values.
     // So we need to replace them back in order to compare its content to our display URL.
     // This is valid HTML. See https://www.w3.org/TR/xhtml1/guidelines.html#C_12
@@ -420,14 +441,16 @@ public class DfpHeaderBiddingFunctionalTest {
   }
 
   @Test
-  public void loadingDfpBanner_GivenInvalidInterstitial_DfpViewDoesNotContainCreative() throws Exception {
+  public void loadingDfpBanner_GivenInvalidInterstitial_DfpViewDoesNotContainCreative()
+      throws Exception {
     String html = loadDfpHtmlInterstitial(invalidInterstitialAdUnit);
 
     assertFalse(html.contains(STUB_CREATIVE_IMAGE));
   }
 
   @Test
-  public void loadingDfpBanner_GivenInvalidNative_DfpViewDoesNotContainProductImage() throws Exception {
+  public void loadingDfpBanner_GivenInvalidNative_DfpViewDoesNotContainProductImage()
+      throws Exception {
     String html = loadDfpHtmlNative(invalidNativeAdUnit);
 
     assertFalse(html.contains(STUB_CREATIVE_IMAGE));
@@ -441,7 +464,8 @@ public class DfpHeaderBiddingFunctionalTest {
     return loadDfpHtmlBannerOrNative(adUnit, createDfpNativeView());
   }
 
-  private String loadDfpHtmlBannerOrNative(AdUnit adUnit, PublisherAdView publisherAdView) throws Exception {
+  private String loadDfpHtmlBannerOrNative(AdUnit adUnit, PublisherAdView publisherAdView)
+      throws Exception {
     givenInitializedCriteo(adUnit);
     waitForBids();
 
@@ -536,6 +560,7 @@ public class DfpHeaderBiddingFunctionalTest {
     }
 
     private class SyncAdListener extends AdListener {
+
       @Override
       public void onAdLoaded() {
         isLoaded.countDown();

@@ -4,26 +4,26 @@ import android.support.annotation.NonNull;
 
 public class ScreenSize implements Comparable<ScreenSize> {
 
-    private int width;
-    private int height;
+  private int width;
+  private int height;
 
-    public ScreenSize(int width, int height) {
-        this.width = width;
-        this.height = height;
-    }
+  public ScreenSize(int width, int height) {
+    this.width = width;
+    this.height = height;
+  }
 
-    public int getWidth() {
-        return width;
-    }
+  public int getWidth() {
+    return width;
+  }
 
-    public int getHeight() {
-        return height;
-    }
+  public int getHeight() {
+    return height;
+  }
 
-    @Override
-    public int compareTo(@NonNull ScreenSize second) {
-        return width - second.width;
-    }
+  @Override
+  public int compareTo(@NonNull ScreenSize second) {
+    return width - second.width;
+  }
 
 
 }

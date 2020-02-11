@@ -34,7 +34,8 @@ public class AndroidUtilTest {
 
   @Test
   public void getOrientation_GivenDeviceInReversePortrait_ReturnPortrait() throws Exception {
-    activityRule.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
+    activityRule.getActivity()
+        .setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
     waitForOrientation();
 
     int orientation = androidUtil.getOrientation();
@@ -54,7 +55,8 @@ public class AndroidUtilTest {
 
   @Test
   public void getOrientation_GivenDeviceInReverseLandscape_ReturnLandscape() throws Exception {
-    activityRule.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+    activityRule.getActivity()
+        .setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
     waitForOrientation();
 
     int orientation = androidUtil.getOrientation();

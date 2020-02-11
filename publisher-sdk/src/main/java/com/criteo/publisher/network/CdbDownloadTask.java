@@ -140,7 +140,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
 
     String uspOptout = userPrivacyUtil.getUsPrivacyOptout();
     if (!uspOptout.isEmpty()) {
-        user.setUspOptout(uspOptout);
+      user.setUspOptout(uspOptout);
     }
 
     String mopubConsent = userPrivacyUtil.getMopubConsent();

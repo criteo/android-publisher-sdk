@@ -44,289 +44,289 @@ import org.mockito.MockitoAnnotations;
 
 public class BidManagerTests {
 
-    private static final String MAP_CRT_CPM = "crt_cpm";
-    private static final String MAP_CRT_DISPLAY_URL = "crt_displayUrl";
+  private static final String MAP_CRT_CPM = "crt_cpm";
+  private static final String MAP_CRT_DISPLAY_URL = "crt_displayUrl";
 
-    private String adUnitId = "someAdUnit";
-    private AdSize adSize = new AdSize(320, 50);
-    private AdUnit adUnit;
-    private String cpm = "0.10";
-    private Context context;
-    private String displayUrl = "https://www.example.com/lone?par1=abcd";
-    private Publisher publisher;
-    private User user;
-    private SdkCache sdkCache;
-    private DeviceInfo deviceInfo;
-    private TokenCache tokenCache = null;
-    private Slot testSlot;
+  private String adUnitId = "someAdUnit";
+  private AdSize adSize = new AdSize(320, 50);
+  private AdUnit adUnit;
+  private String cpm = "0.10";
+  private Context context;
+  private String displayUrl = "https://www.example.com/lone?par1=abcd";
+  private Publisher publisher;
+  private User user;
+  private SdkCache sdkCache;
+  private DeviceInfo deviceInfo;
+  private TokenCache tokenCache = null;
+  private Slot testSlot;
 
-    @Mock
-    private DependencyProvider dependencyProvider;
+  @Mock
+  private DependencyProvider dependencyProvider;
 
-    @Mock
-    private Config config;
+  @Mock
+  private Config config;
 
-    @Mock
-    private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
+  @Mock
+  private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
 
-    @Mock
-    private AndroidUtil androidUtil;
+  @Mock
+  private AndroidUtil androidUtil;
 
-    @Mock
-    private DeviceUtil deviceUtil;
+  @Mock
+  private DeviceUtil deviceUtil;
 
-    @Mock
-    private LoggingUtil loggingUtil;
+  @Mock
+  private LoggingUtil loggingUtil;
 
-    @Mock
-    private Clock clock;
+  @Mock
+  private Clock clock;
 
-    @Mock
-    private UserPrivacyUtil userPrivacyUtil;
+  @Mock
+  private UserPrivacyUtil userPrivacyUtil;
 
-    private AdUnitMapper adUnitMapper;
+  private AdUnitMapper adUnitMapper;
 
-    private PubSdkApi api;
+  private PubSdkApi api;
 
-    @Before
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
+  @Before
+  public void setup() {
+    MockitoAnnotations.initMocks(this);
 
-        adUnitMapper = new AdUnitMapper(androidUtil, deviceUtil);
-        api = new PubSdkApi(context);
+    adUnitMapper = new AdUnitMapper(androidUtil, deviceUtil);
+    api = new PubSdkApi(context);
 
-        adUnit = new BannerAdUnit(adUnitId, adSize);
+    adUnit = new BannerAdUnit(adUnitId, adSize);
 
-        CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
+    CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
 
-        context = mock(Context.class);
-        when(context.getPackageName()).thenReturn("TestThisPackage");
+    context = mock(Context.class);
+    when(context.getPackageName()).thenReturn("TestThisPackage");
 
-        // FIXME This seems useless because tests still works without.
-        when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_PORTRAIT);
+    // FIXME This seems useless because tests still works without.
+    when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_PORTRAIT);
 
-        publisher = new Publisher(context, "unitPublisherId");
-        user = mock(User.class);
-        sdkCache = mock(SdkCache.class);
+    publisher = new Publisher(context, "unitPublisherId");
+    user = mock(User.class);
+    sdkCache = mock(SdkCache.class);
 
-        deviceInfo = mock(DeviceInfo.class);
-        when(deviceInfo.getUserAgent()).thenReturn(completedFuture("Some fun user-agent that is probably webkit based 10.3"));
+    deviceInfo = mock(DeviceInfo.class);
+    when(deviceInfo.getUserAgent())
+        .thenReturn(completedFuture("Some fun user-agent that is probably webkit based 10.3"));
 
-        JSONObject slotJson = null;
-        try {
-            slotJson = new JSONObject("{\n" +
-                    "            \"placementId\": \"" + adUnitId + "\",\n" +
-                    "            \"cpm\": \"" + cpm + "\",\n" +
-                    "            \"currency\": \"USD\",\n" +
-                    "            \"width\": " + adSize.getWidth() + ",\n" +
-                    "            \"height\": " + adSize.getHeight() + ",\n" +
-                    "            \"ttl\": 3600,\n" +
-                    "            \"displayUrl\": \"" + displayUrl + "\"\n" +
-                    "        }");
-        } catch (Exception ex) {
-            // JSON threw
-        }
-
-        Assert.assertNotNull(slotJson);
-
-        testSlot = new Slot(slotJson);
-        when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
-
-        tokenCache = mock(TokenCache.class);
-
-        DependencyProvider.setInstance(dependencyProvider);
+    JSONObject slotJson = null;
+    try {
+      slotJson = new JSONObject("{\n" +
+          "            \"placementId\": \"" + adUnitId + "\",\n" +
+          "            \"cpm\": \"" + cpm + "\",\n" +
+          "            \"currency\": \"USD\",\n" +
+          "            \"width\": " + adSize.getWidth() + ",\n" +
+          "            \"height\": " + adSize.getHeight() + ",\n" +
+          "            \"ttl\": 3600,\n" +
+          "            \"displayUrl\": \"" + displayUrl + "\"\n" +
+          "        }");
+    } catch (Exception ex) {
+      // JSON threw
     }
 
-    @After
-    public void tearDown() {
-        DependencyProvider.setInstance(null);
-    }
+    Assert.assertNotNull(slotJson);
 
-    @Test
-    public void testKillSwitchOnForHeaderBidding() {
-        // setup
-        when(config.isKillSwitchEnabled()).thenReturn(true);
+    testSlot = new Slot(slotJson);
+    when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
 
-        BidManager bidManager = createBidManager();
+    tokenCache = mock(TokenCache.class);
 
-        PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-        bidManager.enrichBid(builder, adUnit);
+    DependencyProvider.setInstance(dependencyProvider);
+  }
 
-        PublisherAdRequest adRequest = builder.build();
-        Assert.assertFalse(adRequest.getKeywords().contains("crt_cpm"));
-    }
+  @After
+  public void tearDown() {
+    DependencyProvider.setInstance(null);
+  }
 
-    @Test
-    @Ignore("DeviceUtil.createDfpCompatibleDisplayUrl has an android.Util.Base64.coder that's unavailable in unit tests")
-    public void testKillSwitchOffForHeaderBidding() {
-        // setup
-        when(config.isKillSwitchEnabled()).thenReturn(false);
+  @Test
+  public void testKillSwitchOnForHeaderBidding() {
+    // setup
+    when(config.isKillSwitchEnabled()).thenReturn(true);
 
-        BidManager bidManager = createBidManager();
+    BidManager bidManager = createBidManager();
 
-        PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-        bidManager.enrichBid(builder, adUnit);
+    PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
+    bidManager.enrichBid(builder, adUnit);
 
-        PublisherAdRequest adRequest = builder.build();
-        Assert.assertTrue(adRequest.getKeywords().contains("crt_cpm"));
-        Assert.assertTrue(adRequest.getKeywords().contains("crt_displayurl"));
-    }
+    PublisherAdRequest adRequest = builder.build();
+    Assert.assertFalse(adRequest.getKeywords().contains("crt_cpm"));
+  }
 
-    @Test
-    public void testKillSwitchOnForStandAlone() {
-        // setup
-        when(config.isKillSwitchEnabled()).thenReturn(true);
+  @Test
+  @Ignore("DeviceUtil.createDfpCompatibleDisplayUrl has an android.Util.Base64.coder that's unavailable in unit tests")
+  public void testKillSwitchOffForHeaderBidding() {
+    // setup
+    when(config.isKillSwitchEnabled()).thenReturn(false);
 
-        BidManager bidManager = createBidManager();
+    BidManager bidManager = createBidManager();
 
-        //test
-        Slot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
-        Assert.assertNull(slot);
-    }
+    PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
+    bidManager.enrichBid(builder, adUnit);
 
-    @Test
-    public void testKillSwitchOffForStandAlone() {
-        // setup
-        when(config.isKillSwitchEnabled()).thenReturn(false);
+    PublisherAdRequest adRequest = builder.build();
+    Assert.assertTrue(adRequest.getKeywords().contains("crt_cpm"));
+    Assert.assertTrue(adRequest.getKeywords().contains("crt_displayurl"));
+  }
 
-        BidManager bidManager = createBidManager();
+  @Test
+  public void testKillSwitchOnForStandAlone() {
+    // setup
+    when(config.isKillSwitchEnabled()).thenReturn(true);
 
-        //test
-        Slot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
-        Assert.assertNotNull(slot);
-        Assert.assertEquals(testSlot, slot);
-    }
+    BidManager bidManager = createBidManager();
 
-    @Test
-    public void testKillSwitchOnForMediation() {
-        // setup
-        when(config.isKillSwitchEnabled()).thenReturn(true);
+    //test
+    Slot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    Assert.assertNull(slot);
+  }
 
-        BidManager bidManager = createBidManager();
+  @Test
+  public void testKillSwitchOffForStandAlone() {
+    // setup
+    when(config.isKillSwitchEnabled()).thenReturn(false);
 
-        BidResponse expectedResponse = new BidResponse();
+    BidManager bidManager = createBidManager();
 
-        //test
-        BidResponse bidResponse = bidManager.getBidForInhouseMediation(adUnit);
-        Assert.assertNotNull(bidResponse);
-        Assert.assertEquals(expectedResponse.getPrice(), bidResponse.getPrice(), 0.01);
-        Assert.assertEquals(expectedResponse.isBidSuccess(), bidResponse.isBidSuccess());
-        //can't compare the BidResponse.Token as it's a randomly generated UUID when inserting to token cache
-    }
+    //test
+    Slot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    Assert.assertNotNull(slot);
+    Assert.assertEquals(testSlot, slot);
+  }
 
-    @Test
-    public void testKillSwitchOffForMediation() {
-        // setup
-        when(config.isKillSwitchEnabled()).thenReturn(false);
+  @Test
+  public void testKillSwitchOnForMediation() {
+    // setup
+    when(config.isKillSwitchEnabled()).thenReturn(true);
 
-        CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
-        when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
+    BidManager bidManager = createBidManager();
 
-        BidManager bidManager = createBidManager();
+    BidResponse expectedResponse = new BidResponse();
 
-        BidResponse expectedResponse = new BidResponse(0.10d,
-                new BidToken(UUID.randomUUID(), new BannerAdUnit("banneradUnitId1", new AdSize(320, 50))), true);
+    //test
+    BidResponse bidResponse = bidManager.getBidForInhouseMediation(adUnit);
+    Assert.assertNotNull(bidResponse);
+    Assert.assertEquals(expectedResponse.getPrice(), bidResponse.getPrice(), 0.01);
+    Assert.assertEquals(expectedResponse.isBidSuccess(), bidResponse.isBidSuccess());
+    //can't compare the BidResponse.Token as it's a randomly generated UUID when inserting to token cache
+  }
 
-        //test
-        BidResponse bidResponse = bidManager.getBidForInhouseMediation(adUnit);
-        Assert.assertNotNull(bidResponse);
-        Assert.assertEquals(expectedResponse.getPrice(), bidResponse.getPrice(), 0.01);
-        Assert.assertEquals(expectedResponse.isBidSuccess(), bidResponse.isBidSuccess());
-        //can't compare the BidResponse.Token as it's a randomly generated UUID when inserting to token cache
-    }
+  @Test
+  public void testKillSwitchOffForMediation() {
+    // setup
+    when(config.isKillSwitchEnabled()).thenReturn(false);
 
-    @Test
-    public void testBidsAreNotSetOnNonBiddableObjects()
-    {
-        // setup
-        when(config.isKillSwitchEnabled()).thenReturn(false);
+    CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
+    when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
 
-        CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
-        when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
-        BidManager bidManager = createBidManager();
+    BidManager bidManager = createBidManager();
 
-        BannerAdUnit bannerAdUnit = new BannerAdUnit(adUnitId, new AdSize(320,50));
+    BidResponse expectedResponse = new BidResponse(0.10d,
+        new BidToken(UUID.randomUUID(), new BannerAdUnit("banneradUnitId1", new AdSize(320, 50))),
+        true);
 
-        // Test null does not crash
-        bidManager.enrichBid(null, bannerAdUnit);
+    //test
+    BidResponse bidResponse = bidManager.getBidForInhouseMediation(adUnit);
+    Assert.assertNotNull(bidResponse);
+    Assert.assertEquals(expectedResponse.getPrice(), bidResponse.getPrice(), 0.01);
+    Assert.assertEquals(expectedResponse.isBidSuccess(), bidResponse.isBidSuccess());
+    //can't compare the BidResponse.Token as it's a randomly generated UUID when inserting to token cache
+  }
 
-        // Test set
-        Set<String> set = new HashSet<>();
-        bidManager.enrichBid(set, bannerAdUnit);
+  @Test
+  public void testBidsAreNotSetOnNonBiddableObjects() {
+    // setup
+    when(config.isKillSwitchEnabled()).thenReturn(false);
 
-        Assert.assertEquals(0, set.size());
+    CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
+    when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
+    BidManager bidManager = createBidManager();
 
-        // Test string
-        String someString = "abcd123";
-        bidManager.enrichBid(someString, bannerAdUnit);
+    BannerAdUnit bannerAdUnit = new BannerAdUnit(adUnitId, new AdSize(320, 50));
 
-        // Test Object
-        Object someObject = new Object();
-        bidManager.enrichBid(someObject, bannerAdUnit);
-    }
+    // Test null does not crash
+    bidManager.enrichBid(null, bannerAdUnit);
 
-    @Test
-    public void testSetBidsOnMap()
-    {
-        // setup
-        when(config.isKillSwitchEnabled()).thenReturn(false);
+    // Test set
+    Set<String> set = new HashSet<>();
+    bidManager.enrichBid(set, bannerAdUnit);
 
-        CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
-        when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
+    Assert.assertEquals(0, set.size());
 
-        BidManager bidManager = createBidManager();
+    // Test string
+    String someString = "abcd123";
+    bidManager.enrichBid(someString, bannerAdUnit);
 
-        BannerAdUnit bannerAdUnit = new BannerAdUnit(adUnitId, new AdSize(320,50));
+    // Test Object
+    Object someObject = new Object();
+    bidManager.enrichBid(someObject, bannerAdUnit);
+  }
 
-        // Test Map
-        Map<String,String> map = new HashMap<>();
-        bidManager.enrichBid(map, bannerAdUnit);
+  @Test
+  public void testSetBidsOnMap() {
+    // setup
+    when(config.isKillSwitchEnabled()).thenReturn(false);
 
-        Assert.assertEquals(2, map.size());
-        Assert.assertEquals(cpm, map.get(MAP_CRT_CPM));
-        Assert.assertEquals(displayUrl, map.get(MAP_CRT_DISPLAY_URL));
+    CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
+    when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
 
-        // Test Dictionary
-        Dictionary<String, String> dict = new Hashtable<>();
-        bidManager.enrichBid(dict, bannerAdUnit);
+    BidManager bidManager = createBidManager();
 
-        Assert.assertEquals(2, dict.size());
-        Assert.assertEquals(cpm, dict.get(MAP_CRT_CPM));
-        Assert.assertEquals(displayUrl, dict.get(MAP_CRT_DISPLAY_URL));
+    BannerAdUnit bannerAdUnit = new BannerAdUnit(adUnitId, new AdSize(320, 50));
 
-        // Test nested custom class that implements map via a custom interface
-        SpecialMap specialHashMap = new SpecialHashMap();
-        bidManager.enrichBid(specialHashMap, bannerAdUnit);
+    // Test Map
+    Map<String, String> map = new HashMap<>();
+    bidManager.enrichBid(map, bannerAdUnit);
 
-        Assert.assertEquals(2, specialHashMap.size());
-        Assert.assertEquals(cpm, specialHashMap.get(MAP_CRT_CPM));
-        Assert.assertEquals(displayUrl, specialHashMap.get(MAP_CRT_DISPLAY_URL));
-    }
+    Assert.assertEquals(2, map.size());
+    Assert.assertEquals(cpm, map.get(MAP_CRT_CPM));
+    Assert.assertEquals(displayUrl, map.get(MAP_CRT_DISPLAY_URL));
 
-    @NonNull
-    private BidManager createBidManager() {
-        return new BidManager(
-            publisher,
-            tokenCache,
-            deviceInfo,
-            user,
-            sdkCache,
-            placementsWithCdbTasks,
-            config,
-            deviceUtil,
-            loggingUtil,
-            clock,
-            userPrivacyUtil,
-            adUnitMapper,
-            api
-        );
-    }
+    // Test Dictionary
+    Dictionary<String, String> dict = new Hashtable<>();
+    bidManager.enrichBid(dict, bannerAdUnit);
 
-    private interface SpecialMap extends Map
-    {
-    }
+    Assert.assertEquals(2, dict.size());
+    Assert.assertEquals(cpm, dict.get(MAP_CRT_CPM));
+    Assert.assertEquals(displayUrl, dict.get(MAP_CRT_DISPLAY_URL));
 
-    private class SpecialHashMap extends HashMap implements SpecialMap
-    {
-    }
+    // Test nested custom class that implements map via a custom interface
+    SpecialMap specialHashMap = new SpecialHashMap();
+    bidManager.enrichBid(specialHashMap, bannerAdUnit);
+
+    Assert.assertEquals(2, specialHashMap.size());
+    Assert.assertEquals(cpm, specialHashMap.get(MAP_CRT_CPM));
+    Assert.assertEquals(displayUrl, specialHashMap.get(MAP_CRT_DISPLAY_URL));
+  }
+
+  @NonNull
+  private BidManager createBidManager() {
+    return new BidManager(
+        publisher,
+        tokenCache,
+        deviceInfo,
+        user,
+        sdkCache,
+        placementsWithCdbTasks,
+        config,
+        deviceUtil,
+        loggingUtil,
+        clock,
+        userPrivacyUtil,
+        adUnitMapper,
+        api
+    );
+  }
+
+  private interface SpecialMap extends Map {
+
+  }
+
+  private class SpecialHashMap extends HashMap implements SpecialMap {
+
+  }
 }

@@ -139,7 +139,8 @@ public class DependencyProviderTest {
     provideBean_WhenProvidedTwice_ReturnsTheSame(DependencyProvider::provideThreadPoolExecutor);
   }
 
-  private <T> void provideBean_WhenProvidedTwice_ReturnsTheSame(Function<DependencyProvider, T> providing) {
+  private <T> void provideBean_WhenProvidedTwice_ReturnsTheSame(
+      Function<DependencyProvider, T> providing) {
     DependencyProvider instance = spy(DependencyProvider.getInstance());
     T bean1 = providing.apply(instance);
     T bean2 = providing.apply(instance);

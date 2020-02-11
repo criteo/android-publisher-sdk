@@ -7,84 +7,84 @@ import org.json.JSONObject;
 
 public final class CacheAdUnit {
 
-    private static final String PLACEMENT_ID = "placementId";
-    private static final String SIZES = "sizes";
-    private static final String IS_NATIVE = "isNative";
-    private static final String IS_INTERSTITIAL = "interstitial";
+  private static final String PLACEMENT_ID = "placementId";
+  private static final String SIZES = "sizes";
+  private static final String IS_NATIVE = "isNative";
+  private static final String IS_INTERSTITIAL = "interstitial";
 
-    private final String adUnitId;
-    private final AdSize adSize;
-    private final AdUnitType adUnitType;
+  private final String adUnitId;
+  private final AdSize adSize;
+  private final AdUnitType adUnitType;
 
-    public CacheAdUnit(AdSize adSize, String adUnitId, AdUnitType adUnitType) {
-        this.adSize = adSize;
-        this.adUnitId = adUnitId;
-        this.adUnitType = adUnitType;
+  public CacheAdUnit(AdSize adSize, String adUnitId, AdUnitType adUnitType) {
+    this.adSize = adSize;
+    this.adUnitId = adUnitId;
+    this.adUnitType = adUnitType;
+  }
+
+  public String getPlacementId() {
+    return adUnitId;
+  }
+
+  public AdSize getSize() {
+    return adSize;
+  }
+
+  public JSONObject toJson() throws JSONException {
+    JSONObject adUnitJson = new JSONObject();
+    JSONArray adUnitSizes = new JSONArray();
+    if (adSize != null) {
+      adUnitSizes.put(adSize.getFormattedSize());
+      adUnitJson.put(SIZES, adUnitSizes);
+    }
+    adUnitJson.put(PLACEMENT_ID, adUnitId);
+
+    switch (adUnitType) {
+      case CRITEO_INTERSTITIAL:
+        adUnitJson.put(IS_INTERSTITIAL, true);
+        break;
+      case CRITEO_CUSTOM_NATIVE:
+        adUnitJson.put(IS_NATIVE, true);
+        break;
     }
 
-    public String getPlacementId() {
-        return adUnitId;
+    return adUnitJson;
+  }
+
+  @Override
+  public String toString() {
+    return "CacheAdUnit{" +
+        "placementId='" + adUnitId + '\'' +
+        ", adSize=" + adSize +
+        ", adUnitType= " + adUnitType +
+        '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
 
-    public AdSize getSize() {
-        return adSize;
+    CacheAdUnit that = (CacheAdUnit) o;
+
+    if (adUnitId != null ? !adUnitId.equals(that.adUnitId) : that.adUnitId != null) {
+      return false;
     }
-
-    public JSONObject toJson() throws JSONException {
-        JSONObject adUnitJson = new JSONObject();
-        JSONArray adUnitSizes = new JSONArray();
-        if (adSize != null) {
-            adUnitSizes.put(adSize.getFormattedSize());
-            adUnitJson.put(SIZES, adUnitSizes);
-        }
-        adUnitJson.put(PLACEMENT_ID, adUnitId);
-
-        switch (adUnitType) {
-            case CRITEO_INTERSTITIAL:
-                adUnitJson.put(IS_INTERSTITIAL, true);
-                break;
-            case CRITEO_CUSTOM_NATIVE:
-                adUnitJson.put(IS_NATIVE, true);
-                break;
-        }
-
-        return adUnitJson;
+    if (adSize != null ? !adSize.equals(that.adSize) : that.adSize != null) {
+      return false;
     }
+    return adUnitType == that.adUnitType;
+  }
 
-    @Override
-    public String toString() {
-        return "CacheAdUnit{" +
-            "placementId='" + adUnitId + '\'' +
-            ", adSize=" + adSize +
-            ", adUnitType= " + adUnitType +
-            '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        CacheAdUnit that = (CacheAdUnit) o;
-
-        if (adUnitId != null ? !adUnitId.equals(that.adUnitId) : that.adUnitId != null) {
-            return false;
-        }
-        if (adSize != null ? !adSize.equals(that.adSize) : that.adSize != null) {
-            return false;
-        }
-        return adUnitType == that.adUnitType;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = adUnitId != null ? adUnitId.hashCode() : 0;
-        result = 31 * result + (adSize != null ? adSize.hashCode() : 0);
-        result = 31 * result + (adUnitType != null ? adUnitType.hashCode() : 0);
-        return result;
-    }
+  @Override
+  public int hashCode() {
+    int result = adUnitId != null ? adUnitId.hashCode() : 0;
+    result = 31 * result + (adSize != null ? adSize.hashCode() : 0);
+    result = 31 * result + (adUnitType != null ? adUnitType.hashCode() : 0);
+    return result;
+  }
 }

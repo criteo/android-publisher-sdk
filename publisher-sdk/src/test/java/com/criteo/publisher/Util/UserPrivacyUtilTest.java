@@ -1,10 +1,10 @@
 package com.criteo.publisher.Util;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.timeout;
-import static org.mockito.Mockito.verify;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.SharedPreferences;
@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class UserPrivacyUtilTest {
+
   @Mock
   private SharedPreferences sharedPreferences;
 
@@ -137,7 +138,8 @@ public class UserPrivacyUtilTest {
 
   @Test
   public void testGetMopubConsentValue() {
-    when(sharedPreferences.getString("MoPubConsent_String", "")).thenReturn("fake_mopub_consent_value");
+    when(sharedPreferences.getString("MoPubConsent_String", ""))
+        .thenReturn("fake_mopub_consent_value");
 
     String mopubConsent = userPrivacyUtil.getMopubConsent();
 
@@ -146,16 +148,16 @@ public class UserPrivacyUtilTest {
 
   @Test
   public void testIsMopubConsentGiven_True() {
-    assertMopubConsentGiven("EXPLICIT_YES",  true);
-    assertMopubConsentGiven("UNKNOWN",  true);
+    assertMopubConsentGiven("EXPLICIT_YES", true);
+    assertMopubConsentGiven("UNKNOWN", true);
     assertMopubConsentGiven("", true);
   }
 
   @Test
   public void testIsMopubConsentGiven_False() {
-    assertMopubConsentGiven("EXPLICIT_NO",  false);
-    assertMopubConsentGiven("POTENTIAL_WHITELIST",  false);
-    assertMopubConsentGiven("DNT",  false);
+    assertMopubConsentGiven("EXPLICIT_NO", false);
+    assertMopubConsentGiven("POTENTIAL_WHITELIST", false);
+    assertMopubConsentGiven("DNT", false);
   }
 
   private void assertMopubConsentGiven(String mopubConsentString, boolean consentGiven) {
@@ -188,7 +190,8 @@ public class UserPrivacyUtilTest {
     assertCCPAConsentGiven("", "true", false);
   }
 
-  private void assertCCPAConsentGiven(String iabUsPrivacyString, String usPrivacyOptout, boolean consentGiven) {
+  private void assertCCPAConsentGiven(String iabUsPrivacyString, String usPrivacyOptout,
+      boolean consentGiven) {
     givenUsPrivacySetup(iabUsPrivacyString, usPrivacyOptout);
     assertEquals(consentGiven, userPrivacyUtil.isCCPAConsentGivenOrNotApplicable());
   }

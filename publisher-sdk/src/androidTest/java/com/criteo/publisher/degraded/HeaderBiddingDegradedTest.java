@@ -18,8 +18,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class HeaderBiddingDegradedTest {
+
   @Rule
-  public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   @Mock
   private AdUnit adUnit;

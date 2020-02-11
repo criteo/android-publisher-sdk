@@ -27,132 +27,134 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class CriteoInterstitialTest {
-    @Rule
-    public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
 
-    @Mock
-    private CriteoInterstitialAdListener criteoInterstitialAdListener;
+  @Rule
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
-    private Criteo criteo;
+  @Mock
+  private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
-    private CriteoInterstitial criteoInterstitial;
-    private InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit("/140800857/None");
+  private Criteo criteo;
 
-    @Before
-    @UiThreadTest
-    public void setup() throws CriteoInitException {
-        MockitoAnnotations.initMocks(this);
+  private CriteoInterstitial criteoInterstitial;
+  private InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit("/140800857/None");
 
-        List<AdUnit> cacheAdUnits = new ArrayList<>();
-        cacheAdUnits.add(interstitialAdUnit);
-        Application app =
-                (Application) InstrumentationRegistry
-                        .getTargetContext()
-                        .getApplicationContext();
-        criteo = Criteo.init(app, "B-056946", cacheAdUnits);
-        criteoInterstitial = createInterstitial();
-        criteoInterstitial.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
-    }
+  @Before
+  @UiThreadTest
+  public void setup() throws CriteoInitException {
+    MockitoAnnotations.initMocks(this);
 
-    @Test
-    public void testInHouseLoadAdWithSameAdUnit() throws InterruptedException {
-        UUID uuid1 = UUID.nameUUIDFromBytes("TEST_STRING1".getBytes());
-        BidToken token1 = new BidToken(uuid1, interstitialAdUnit);
-        criteoInterstitial.loadAd(token1);
+    List<AdUnit> cacheAdUnits = new ArrayList<>();
+    cacheAdUnits.add(interstitialAdUnit);
+    Application app =
+        (Application) InstrumentationRegistry
+            .getTargetContext()
+            .getApplicationContext();
+    criteo = Criteo.init(app, "B-056946", cacheAdUnits);
+    criteoInterstitial = createInterstitial();
+    criteoInterstitial.setCriteoInterstitialAdListener(criteoInterstitialAdListener);
+  }
 
-        //wait for the loadAd process to be completed
-        Thread.sleep(500);
+  @Test
+  public void testInHouseLoadAdWithSameAdUnit() throws InterruptedException {
+    UUID uuid1 = UUID.nameUUIDFromBytes("TEST_STRING1".getBytes());
+    BidToken token1 = new BidToken(uuid1, interstitialAdUnit);
+    criteoInterstitial.loadAd(token1);
 
-        //Expected result , found no slot and called criteoInterstitialAdListener.onAdFetchFailed
-        verify(criteoInterstitialAdListener, times(0)).onAdReceived();
-        verify(criteoInterstitialAdListener, times(1))
-                .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
-    }
+    //wait for the loadAd process to be completed
+    Thread.sleep(500);
 
-    @Test
-    public void testInHouseLoadAdWithDifferentAdUnit() throws InterruptedException {
-        UUID uuid1 = UUID.nameUUIDFromBytes("TEST_STRING1".getBytes());
-        InterstitialAdUnit interstitialAdUnit2 = new InterstitialAdUnit("/140800857/None2");
-        BidToken token1 = new BidToken(uuid1, interstitialAdUnit2);
+    //Expected result , found no slot and called criteoInterstitialAdListener.onAdFetchFailed
+    verify(criteoInterstitialAdListener, times(0)).onAdReceived();
+    verify(criteoInterstitialAdListener, times(1))
+        .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+  }
 
-        criteoInterstitial.loadAd(token1);
-        waitForIdleState();
+  @Test
+  public void testInHouseLoadAdWithDifferentAdUnit() throws InterruptedException {
+    UUID uuid1 = UUID.nameUUIDFromBytes("TEST_STRING1".getBytes());
+    InterstitialAdUnit interstitialAdUnit2 = new InterstitialAdUnit("/140800857/None2");
+    BidToken token1 = new BidToken(uuid1, interstitialAdUnit2);
 
-        //Expected result , found no slot and called criteoInterstitialAdListener.onAdFetchFailed
-        verify(criteoInterstitialAdListener, never()).onAdReceived();
-        verify(criteoInterstitialAdListener, never())
-                .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
-    }
+    criteoInterstitial.loadAd(token1);
+    waitForIdleState();
 
-    @Test
-    public void testInHouseLoadAdWithEqualAdUnitButDifferentInstance() throws InterruptedException {
-        UUID uuid = UUID.nameUUIDFromBytes("TEST_STRING1".getBytes());
-        InterstitialAdUnit equalAdUnit = new InterstitialAdUnit("/140800857/None");
-        BidToken bidToken = new BidToken(uuid, equalAdUnit);
+    //Expected result , found no slot and called criteoInterstitialAdListener.onAdFetchFailed
+    verify(criteoInterstitialAdListener, never()).onAdReceived();
+    verify(criteoInterstitialAdListener, never())
+        .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+  }
 
-        criteoInterstitial.loadAd(bidToken);
-        waitForIdleState();
+  @Test
+  public void testInHouseLoadAdWithEqualAdUnitButDifferentInstance() throws InterruptedException {
+    UUID uuid = UUID.nameUUIDFromBytes("TEST_STRING1".getBytes());
+    InterstitialAdUnit equalAdUnit = new InterstitialAdUnit("/140800857/None");
+    BidToken bidToken = new BidToken(uuid, equalAdUnit);
 
-        //Expected result, found no slot and called criteoInterstitialAdListener.onAdFetchFailed
-        verify(criteoInterstitialAdListener, never()).onAdReceived();
-        verify(criteoInterstitialAdListener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
-    }
+    criteoInterstitial.loadAd(bidToken);
+    waitForIdleState();
 
-    @Test
-    public void testNotifyListenerAsyncWithNullSlot() throws InterruptedException {
-        criteoInterstitial.loadAd();
-        waitForIdleState();
+    //Expected result, found no slot and called criteoInterstitialAdListener.onAdFetchFailed
+    verify(criteoInterstitialAdListener, never()).onAdReceived();
+    verify(criteoInterstitialAdListener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+  }
 
-        //Expected result , found no slot and called criteoInterstitialAdListener.onAdFetchFailed
-        verify(criteoInterstitialAdListener, times(0)).onAdReceived();
-        verify(criteoInterstitialAdListener, times(1))
-                .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
-    }
+  @Test
+  public void testNotifyListenerAsyncWithNullSlot() throws InterruptedException {
+    criteoInterstitial.loadAd();
+    waitForIdleState();
 
-    @Test
-    public void loadAdForStandaloneTwice_GivenOnlyNoBid_ShouldNotifyListenerTwiceForFailure() throws Exception {
-        CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
+    //Expected result , found no slot and called criteoInterstitialAdListener.onAdFetchFailed
+    verify(criteoInterstitialAdListener, times(0)).onAdReceived();
+    verify(criteoInterstitialAdListener, times(1))
+        .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+  }
 
-        Criteo criteo = mock(Criteo.class, Answers.RETURNS_DEEP_STUBS);
-        when(criteo.getBidForAdUnit(interstitialAdUnit)).thenReturn(null);
-        when(criteo.getDeviceInfo().getUserAgent()).thenReturn(completedFuture(""));
+  @Test
+  public void loadAdForStandaloneTwice_GivenOnlyNoBid_ShouldNotifyListenerTwiceForFailure()
+      throws Exception {
+    CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
 
-        CriteoInterstitial interstitial = createInterstitial();
-        interstitial.setCriteoInterstitialAdListener(listener);
+    Criteo criteo = mock(Criteo.class, Answers.RETURNS_DEEP_STUBS);
+    when(criteo.getBidForAdUnit(interstitialAdUnit)).thenReturn(null);
+    when(criteo.getDeviceInfo().getUserAgent()).thenReturn(completedFuture(""));
 
-        runOnMainThreadAndWait(interstitial::loadAd);
-        waitForIdleState();
+    CriteoInterstitial interstitial = createInterstitial();
+    interstitial.setCriteoInterstitialAdListener(listener);
 
-        runOnMainThreadAndWait(interstitial::loadAd);
-        waitForIdleState();
+    runOnMainThreadAndWait(interstitial::loadAd);
+    waitForIdleState();
 
-        verify(listener, times(2)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
-    }
+    runOnMainThreadAndWait(interstitial::loadAd);
+    waitForIdleState();
 
-    @Test
-    public void isAdLoaded_GivenNewInstance_ReturnFalse() throws Exception {
-        CriteoInterstitial interstitial = createInterstitial();
+    verify(listener, times(2)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+  }
 
-        boolean isAdLoaded = interstitial.isAdLoaded();
+  @Test
+  public void isAdLoaded_GivenNewInstance_ReturnFalse() throws Exception {
+    CriteoInterstitial interstitial = createInterstitial();
 
-        assertFalse(isAdLoaded);
-    }
+    boolean isAdLoaded = interstitial.isAdLoaded();
 
-    private void waitForIdleState() {
-        ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
-    }
+    assertFalse(isAdLoaded);
+  }
 
-    private CriteoInterstitial createInterstitial() {
-        AtomicReference<CriteoInterstitial> interstitialRef = new AtomicReference<>();
+  private void waitForIdleState() {
+    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+  }
 
-        runOnMainThreadAndWait(() -> {
-           interstitialRef.set(new CriteoInterstitial(
-               InstrumentationRegistry.getContext(),
-               interstitialAdUnit,
-               criteo));
-        });
+  private CriteoInterstitial createInterstitial() {
+    AtomicReference<CriteoInterstitial> interstitialRef = new AtomicReference<>();
 
-        return interstitialRef.get();
-    }
+    runOnMainThreadAndWait(() -> {
+      interstitialRef.set(new CriteoInterstitial(
+          InstrumentationRegistry.getContext(),
+          interstitialAdUnit,
+          criteo));
+    });
+
+    return interstitialRef.get();
+  }
 
 }

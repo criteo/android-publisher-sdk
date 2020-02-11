@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-
 import com.criteo.publisher.BidResponse;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoUtil;
@@ -23,8 +22,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class InHouseDegradedTest {
+
   @Rule
-  public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   @Mock
   private AdUnit adUnit;

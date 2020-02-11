@@ -18,86 +18,87 @@ import com.criteo.publisher.tasks.CriteoInterstitialListenerCallTask;
 
 public class CriteoInterstitialEventController {
 
-    @Nullable
-    private final CriteoInterstitialAdListener criteoInterstitialAdListener;
+  @Nullable
+  private final CriteoInterstitialAdListener criteoInterstitialAdListener;
 
-    @Nullable
-    private final CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
+  @Nullable
+  private final CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
 
-    @NonNull
-    private final WebViewData webViewData;
+  @NonNull
+  private final WebViewData webViewData;
 
-    @NonNull
-    private final DeviceInfo deviceInfo;
+  @NonNull
+  private final DeviceInfo deviceInfo;
 
-    @NonNull
-    private final Criteo criteo;
+  @NonNull
+  private final Criteo criteo;
 
-    private final RunOnUiThreadExecutor executor;
+  private final RunOnUiThreadExecutor executor;
 
-    public CriteoInterstitialEventController(
-        @Nullable CriteoInterstitialAdListener listener,
-        @Nullable CriteoInterstitialAdDisplayListener adDisplayListener,
-        @NonNull WebViewData webViewData,
-        @NonNull Criteo criteo) {
-        this.criteoInterstitialAdListener = listener;
-        this.criteoInterstitialAdDisplayListener = adDisplayListener;
-        this.webViewData = webViewData;
-        this.criteo = criteo;
-        this.deviceInfo = criteo.getDeviceInfo();
-        this.executor = DependencyProvider.getInstance().provideRunOnUiThreadExecutor();
+  public CriteoInterstitialEventController(
+      @Nullable CriteoInterstitialAdListener listener,
+      @Nullable CriteoInterstitialAdDisplayListener adDisplayListener,
+      @NonNull WebViewData webViewData,
+      @NonNull Criteo criteo) {
+    this.criteoInterstitialAdListener = listener;
+    this.criteoInterstitialAdDisplayListener = adDisplayListener;
+    this.webViewData = webViewData;
+    this.criteo = criteo;
+    this.deviceInfo = criteo.getDeviceInfo();
+    this.executor = DependencyProvider.getInstance().provideRunOnUiThreadExecutor();
+  }
+
+  public boolean isAdLoaded() {
+    return webViewData.isLoaded();
+  }
+
+  public void refresh() {
+    webViewData.refresh();
+  }
+
+  public String getWebViewDataContent() {
+    return webViewData.getContent();
+  }
+
+  public void fetchAdAsync(@Nullable AdUnit adUnit) {
+    if (webViewData.isLoading()) {
+      return;
     }
 
-    public boolean isAdLoaded() {
-        return webViewData.isLoaded();
+    webViewData.downloadLoading();
+
+    Slot slot = criteo.getBidForAdUnit(adUnit);
+
+    if (slot == null) {
+      notifyFor(INVALID);
+      webViewData.downloadFailed();
+    } else {
+      notifyFor(VALID);
+      fetchCreativeAsync(slot.getDisplayUrl());
     }
+  }
 
-    public void refresh() {
-        webViewData.refresh();
+  public void fetchAdAsync(@Nullable BidToken bidToken) {
+    TokenValue tokenValue = criteo.getTokenValue(bidToken, AdUnitType.CRITEO_INTERSTITIAL);
+
+    if (tokenValue == null) {
+      notifyFor(INVALID);
+    } else {
+      notifyFor(VALID);
+      fetchCreativeAsync(tokenValue.getDisplayUrl());
     }
+  }
 
-    public String getWebViewDataContent() {
-        return webViewData.getContent();
-    }
+  private void notifyFor(@NonNull CriteoListenerCode code) {
+    executor
+        .executeAsync(new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener, code));
+  }
 
-    public void fetchAdAsync(@Nullable AdUnit adUnit) {
-        if (webViewData.isLoading()) {
-            return;
-        }
-
-        webViewData.downloadLoading();
-
-        Slot slot = criteo.getBidForAdUnit(adUnit);
-
-        if (slot == null) {
-            notifyFor(INVALID);
-            webViewData.downloadFailed();
-        } else {
-            notifyFor(VALID);
-            fetchCreativeAsync(slot.getDisplayUrl());
-        }
-    }
-
-    public void fetchAdAsync(@Nullable BidToken bidToken) {
-        TokenValue tokenValue = criteo.getTokenValue(bidToken, AdUnitType.CRITEO_INTERSTITIAL);
-
-        if (tokenValue == null) {
-            notifyFor(INVALID);
-        } else {
-            notifyFor(VALID);
-            fetchCreativeAsync(tokenValue.getDisplayUrl());
-        }
-    }
-
-    private void notifyFor(@NonNull CriteoListenerCode code) {
-        executor.executeAsync(new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener, code));
-    }
-
-    @VisibleForTesting
-    void fetchCreativeAsync(@NonNull String displayUrl) {
-        webViewData.fillWebViewHtmlContent(
-            displayUrl,
-            deviceInfo,
-            criteoInterstitialAdDisplayListener);
-    }
+  @VisibleForTesting
+  void fetchCreativeAsync(@NonNull String displayUrl) {
+    webViewData.fillWebViewHtmlContent(
+        displayUrl,
+        deviceInfo,
+        criteoInterstitialAdDisplayListener);
+  }
 }

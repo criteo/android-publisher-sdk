@@ -20,60 +20,63 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-public class  CdbDownloadTaskTest {
+public class CdbDownloadTaskTest {
 
-    @Rule
-    public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+  @Rule
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
-    private CdbDownloadTask cdbDownloadTask;
-    private List<CacheAdUnit> cacheAdUnits;
+  private CdbDownloadTask cdbDownloadTask;
+  private List<CacheAdUnit> cacheAdUnits;
 
-    @Mock
-    private NetworkResponseListener responseListener;
+  @Mock
+  private NetworkResponseListener responseListener;
 
-    @Mock
-    private Hashtable<CacheAdUnit, CdbDownloadTask> bidsInCdbTask;
+  @Mock
+  private Hashtable<CacheAdUnit, CdbDownloadTask> bidsInCdbTask;
 
-    @Mock
-    private DeviceUtil deviceUtil;
+  @Mock
+  private DeviceUtil deviceUtil;
 
-    @Mock
-    private DeviceInfo deviceInfo;
+  @Mock
+  private DeviceInfo deviceInfo;
 
-    @Mock
-    private LoggingUtil loggingUtil;
+  @Mock
+  private LoggingUtil loggingUtil;
 
-    @Mock
-    private PubSdkApi api;
+  @Mock
+  private PubSdkApi api;
 
-    private UserPrivacyUtil userPrivacyUtil;
+  private UserPrivacyUtil userPrivacyUtil;
 
-    @Before
-    public void setUp() {
-        MockitoAnnotations.initMocks(this);
-        userPrivacyUtil = new UserPrivacyUtil(InstrumentationRegistry.getContext().getApplicationContext());
-    }
-    @Test
-    public void checkCacheRemove() {
+  @Before
+  public void setUp() {
+    MockitoAnnotations.initMocks(this);
+    userPrivacyUtil = new UserPrivacyUtil(
+        InstrumentationRegistry.getContext().getApplicationContext());
+  }
 
-        cacheAdUnits = new ArrayList<>();
-        CacheAdUnit cacheAdUnit = new CacheAdUnit(new AdSize(320, 50), "UniqueId", AdUnitType.CRITEO_BANNER);
-        cacheAdUnits.add(cacheAdUnit);
+  @Test
+  public void checkCacheRemove() {
 
-        cdbDownloadTask = new CdbDownloadTask(
-            responseListener,
-            false,
-            true,
-            deviceInfo,
-            cacheAdUnits,
-            bidsInCdbTask,
-            deviceUtil,
-            loggingUtil,
-            userPrivacyUtil,
-            api
-        );
+    cacheAdUnits = new ArrayList<>();
+    CacheAdUnit cacheAdUnit = new CacheAdUnit(new AdSize(320, 50), "UniqueId",
+        AdUnitType.CRITEO_BANNER);
+    cacheAdUnits.add(cacheAdUnit);
 
-        cdbDownloadTask.onPostExecute(null);
-        Mockito.verify(bidsInCdbTask, Mockito.times(1)).remove(cacheAdUnit);
-    }
+    cdbDownloadTask = new CdbDownloadTask(
+        responseListener,
+        false,
+        true,
+        deviceInfo,
+        cacheAdUnits,
+        bidsInCdbTask,
+        deviceUtil,
+        loggingUtil,
+        userPrivacyUtil,
+        api
+    );
+
+    cdbDownloadTask.onPostExecute(null);
+    Mockito.verify(bidsInCdbTask, Mockito.times(1)).remove(cacheAdUnit);
+  }
 }

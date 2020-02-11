@@ -189,7 +189,8 @@ public class BearcatPrivacyFunctionalTest {
   }
 
   @Test
-  public void whenCriteoInit_GivenPrivacyStringsInLowercase_VerifyIfBearcatShouldBeCalled() throws Exception {
+  public void whenCriteoInit_GivenPrivacyStringsInLowercase_VerifyIfBearcatShouldBeCalled()
+      throws Exception {
     runTest(iabUsPrivacyString != null ? iabUsPrivacyString.toLowerCase(Locale.ROOT) : null,
         mopubConsentString != null ? mopubConsentString.toLowerCase(Locale.ROOT) : null);
   }

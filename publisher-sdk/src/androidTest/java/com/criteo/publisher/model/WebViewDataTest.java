@@ -15,30 +15,31 @@ import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
 public class WebViewDataTest {
-    @Rule
-    public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
 
-    private String data;
+  @Rule
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
-    private WebViewData webviewData;
+  private String data;
 
-    private Config config;
+  private WebViewData webviewData;
 
-    @Before
-    public void setup() {
-        MockitoAnnotations.initMocks(this);
-        DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-        config = new Config(InstrumentationRegistry.getContext());
-        doReturn(config).when(dependencyProvider).provideConfig(any());
-        webviewData = new WebViewData(config);
-    }
+  private Config config;
 
-    @Test
-    public void testSetContentWithData() {
-        data = "html";
-        webviewData.setContent(data);
+  @Before
+  public void setup() {
+    MockitoAnnotations.initMocks(this);
+    DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
+    config = new Config(InstrumentationRegistry.getContext());
+    doReturn(config).when(dependencyProvider).provideConfig(any());
+    webviewData = new WebViewData(config);
+  }
 
-        assertTrue(!TextUtils.isEmpty(webviewData.getContent()));
-        assertFalse(webviewData.getContent().contains(config.getAdTagDataMode()));
-    }
+  @Test
+  public void testSetContentWithData() {
+    data = "html";
+    webviewData.setContent(data);
+
+    assertTrue(!TextUtils.isEmpty(webviewData.getContent()));
+    assertFalse(webviewData.getContent().contains(config.getAdTagDataMode()));
+  }
 }

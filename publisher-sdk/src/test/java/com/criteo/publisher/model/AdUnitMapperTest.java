@@ -127,7 +127,8 @@ public class AdUnitMapperTest {
 
     List<List<CacheAdUnit>> validAdUnits = mapper.mapToChunks(singletonList(adUnit));
 
-    assertThat(validAdUnits).containsExactly(singletonList(new CacheAdUnit(size, "adUnit", CRITEO_BANNER)));
+    assertThat(validAdUnits)
+        .containsExactly(singletonList(new CacheAdUnit(size, "adUnit", CRITEO_BANNER)));
   }
 
   @Test
@@ -139,11 +140,13 @@ public class AdUnitMapperTest {
 
     List<List<CacheAdUnit>> validAdUnits = mapper.mapToChunks(singletonList(adUnit));
 
-    assertThat(validAdUnits).containsExactly(singletonList(new CacheAdUnit(nativeSize, "adUnit", CRITEO_CUSTOM_NATIVE)));
+    assertThat(validAdUnits).containsExactly(
+        singletonList(new CacheAdUnit(nativeSize, "adUnit", CRITEO_CUSTOM_NATIVE)));
   }
 
   @Test
-  public void convertValidAdUnits_GivenValidInterstitialAndDeviceInPortrait_MapItWithPortraitSize() throws Exception {
+  public void convertValidAdUnits_GivenValidInterstitialAndDeviceInPortrait_MapItWithPortraitSize()
+      throws Exception {
     AdSize portraitSize = new AdSize(10, 30);
     when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_PORTRAIT);
     when(deviceUtil.getSizePortrait()).thenReturn(portraitSize);
@@ -152,11 +155,13 @@ public class AdUnitMapperTest {
 
     List<List<CacheAdUnit>> validAdUnits = mapper.mapToChunks(singletonList(adUnit));
 
-    assertThat(validAdUnits).containsExactly(singletonList(new CacheAdUnit(portraitSize, "adUnit", CRITEO_INTERSTITIAL)));
+    assertThat(validAdUnits).containsExactly(
+        singletonList(new CacheAdUnit(portraitSize, "adUnit", CRITEO_INTERSTITIAL)));
   }
 
   @Test
-  public void convertValidAdUnits_GivenValidInterstitialAndDeviceInLandscape_MapItWithLandscapeSize() throws Exception {
+  public void convertValidAdUnits_GivenValidInterstitialAndDeviceInLandscape_MapItWithLandscapeSize()
+      throws Exception {
     AdSize landscapeSize = new AdSize(30, 10);
     when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_LANDSCAPE);
     when(deviceUtil.getSizeLandscape()).thenReturn(landscapeSize);
@@ -165,7 +170,8 @@ public class AdUnitMapperTest {
 
     List<List<CacheAdUnit>> validAdUnits = mapper.mapToChunks(singletonList(adUnit));
 
-    assertThat(validAdUnits).containsExactly(singletonList(new CacheAdUnit(landscapeSize, "adUnit", CRITEO_INTERSTITIAL)));
+    assertThat(validAdUnits).containsExactly(
+        singletonList(new CacheAdUnit(landscapeSize, "adUnit", CRITEO_INTERSTITIAL)));
   }
 
   @Test
@@ -201,7 +207,8 @@ public class AdUnitMapperTest {
   }
 
   @Test
-  public void convertValidAdUnit_GivenListVersionReturningChunkOfNothing_ReturnNull() throws Exception {
+  public void convertValidAdUnit_GivenListVersionReturningChunkOfNothing_ReturnNull()
+      throws Exception {
     mapper = spy(mapper);
     AdUnit adUnit = mock(AdUnit.class);
 
@@ -214,7 +221,8 @@ public class AdUnitMapperTest {
   }
 
   @Test
-  public void convertValidAdUnit_GivenListVersionReturningSingleton_ReturnTheSingleElement() throws Exception {
+  public void convertValidAdUnit_GivenListVersionReturningSingleton_ReturnTheSingleElement()
+      throws Exception {
     mapper = spy(mapper);
     AdUnit adUnit = mock(AdUnit.class);
     CacheAdUnit expectedAdUnit = new CacheAdUnit(new AdSize(1, 1), "adUnit", CRITEO_BANNER);
@@ -249,7 +257,8 @@ public class AdUnitMapperTest {
   }
 
   @Test
-  public void splitIntoChunks_GivenChunkSizeAndSampleOfElements_ReturnsSplitChunks() throws Exception {
+  public void splitIntoChunks_GivenChunkSizeAndSampleOfElements_ReturnsSplitChunks()
+      throws Exception {
     assertThat(splitIntoChunks(asList(1), 1))
         .containsExactly(asList(1));
 
@@ -258,7 +267,8 @@ public class AdUnitMapperTest {
   }
 
   @Test
-  public void splitIntoChunks_GivenChunkSizeAndSampleOfElements_ReturnsSplitChunks2() throws Exception {
+  public void splitIntoChunks_GivenChunkSizeAndSampleOfElements_ReturnsSplitChunks2()
+      throws Exception {
     assertThat(splitIntoChunks(asList(1), 2))
         .containsExactly(asList(1));
 

@@ -16,44 +16,45 @@ import com.mopub.mobileads.MoPubView;
 // TODO: Move this class to the test app repo
 public class MopubMediationActivity extends AppCompatActivity {
 
-    private static final String TAG = MopubActivity.class.getSimpleName();
-    private MoPubView publisherAdView;
-    private LinearLayout linearLayout;
+  private static final String TAG = MopubActivity.class.getSimpleName();
+  private MoPubView publisherAdView;
+  private LinearLayout linearLayout;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mopub_mediation);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_mopub_mediation);
 
-        initializeMoPubSdk(this);
+    initializeMoPubSdk(this);
 
-        linearLayout = ((LinearLayout) findViewById(R.id.AdLayout));
-        findViewById(R.id.buttonMopubMediationBanner).setOnClickListener((View v) -> onBannerClick());
-        findViewById(R.id.buttonMopubMediationInterstitial).setOnClickListener((View v) -> onInterstitialClick());
+    linearLayout = findViewById(R.id.AdLayout);
+    findViewById(R.id.buttonMopubMediationBanner).setOnClickListener((View v) -> onBannerClick());
+    findViewById(R.id.buttonMopubMediationInterstitial)
+        .setOnClickListener((View v) -> onInterstitialClick());
+  }
+
+  private void onBannerClick() {
+    linearLayout.setBackgroundColor(Color.RED);
+    linearLayout.removeAllViews();
+    linearLayout.setVisibility(View.VISIBLE);
+    publisherAdView = new MoPubView(this);
+    publisherAdView.setAdUnitId(MOPUB_BANNER_ADUNIT_ID);
+    publisherAdView.loadAd();
+    linearLayout.addView(publisherAdView);
+  }
+
+  private void onInterstitialClick() {
+    MoPubInterstitial mInterstitial = new MoPubInterstitial(this, MOPUB_INTERSTITIAL_ADUNIT_ID);
+    mInterstitial.setInterstitialAdListener(
+        new TestAppMoPubInterstitialAdListener(TAG, mInterstitial));
+    mInterstitial.load();
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    if (publisherAdView != null) {
+      publisherAdView.destroy();
     }
-
-    private void onBannerClick() {
-        linearLayout.setBackgroundColor(Color.RED);
-        linearLayout.removeAllViews();
-        linearLayout.setVisibility(View.VISIBLE);
-        publisherAdView = new MoPubView(this);
-        publisherAdView.setAdUnitId(MOPUB_BANNER_ADUNIT_ID);
-        publisherAdView.loadAd();
-        linearLayout.addView(publisherAdView);
-    }
-
-    private void onInterstitialClick() {
-        MoPubInterstitial mInterstitial = new MoPubInterstitial(this, MOPUB_INTERSTITIAL_ADUNIT_ID);
-        mInterstitial.setInterstitialAdListener(
-            new TestAppMoPubInterstitialAdListener(TAG, mInterstitial));
-        mInterstitial.load();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (publisherAdView != null) {
-            publisherAdView.destroy();
-        }
-    }
+  }
 }

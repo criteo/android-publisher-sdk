@@ -10,7 +10,8 @@ public class StubConstants {
   /**
    * Display URL that is always returned by CDB stub.
    */
-  public static final Pattern STUB_DISPLAY_URL = Pattern.compile("https://directbidder-uat-stubs.par.preprod.crto.in/delivery/ajs.php\\?width=[0-9]+(&|&amp;)height=[0-9]+");
+  public static final Pattern STUB_DISPLAY_URL = Pattern.compile(
+      "https://directbidder-uat-stubs.par.preprod.crto.in/delivery/ajs.php\\?width=[0-9]+(&|&amp;)height=[0-9]+");
 
   /**
    * Image that is shown in the AJS creative (see {@link #STUB_DISPLAY_URL}) returned by CDB stub.
@@ -19,8 +20,7 @@ public class StubConstants {
   public static final String STUB_CREATIVE_IMAGE = "https://publisherdirect.criteo.com/publishertag/preprodtest/creative_cas.png";
 
   /**
-   * Native assets that are always returned by CDB stub.
-   * See {@link #STUB_NATIVE_JSON}.
+   * Native assets that are always returned by CDB stub. See {@link #STUB_NATIVE_JSON}.
    */
   public static final NativeAssets STUB_NATIVE_ASSETS;
 

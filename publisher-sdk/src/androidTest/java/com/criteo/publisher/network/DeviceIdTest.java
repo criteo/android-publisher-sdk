@@ -30,12 +30,13 @@ import org.mockito.MockitoAnnotations;
  * package as it needs to access {@link PubSdkApi#loadCdb(CdbRequest, String)} method.
  */
 public class DeviceIdTest {
+
   private static final String FAKE_DEVICE_ID = "FAKE_DEVICE_ID";
   private static final String DEVICE_ID_LIMITED = "00000000-0000-0000-0000-000000000000";
   private final BannerAdUnit bannerAdUnit = new BannerAdUnit("banner", new AdSize(1, 2));
 
   @Rule
-  public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   @Mock
   private AdvertisingInfo advertisingInfo;

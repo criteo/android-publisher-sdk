@@ -1,8 +1,6 @@
 package com.criteo.publisher.degraded;
 
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
-import static com.criteo.publisher.ThreadingUtil.waitForMessageQueueToBeIdle;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -13,13 +11,13 @@ import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
-import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.CriteoUtil;
+import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
@@ -33,8 +31,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class StandaloneDegradedTest {
+
   @Rule
-  public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   private final BannerAdUnit bannerAdUnit = new BannerAdUnit("banner", new AdSize(1, 2));
   private final InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit("interstitial");
@@ -105,7 +104,8 @@ public class StandaloneDegradedTest {
   }
 
   @Test
-  public void whenLoadingTwiceAnInterstitial_ShouldCallBackListenerWithErrorNoFill() throws Exception {
+  public void whenLoadingTwiceAnInterstitial_ShouldCallBackListenerWithErrorNoFill()
+      throws Exception {
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
     AtomicReference<CriteoInterstitial> interstitial = new AtomicReference<>();
 

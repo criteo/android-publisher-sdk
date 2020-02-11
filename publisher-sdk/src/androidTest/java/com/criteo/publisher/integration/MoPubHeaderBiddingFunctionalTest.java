@@ -191,14 +191,16 @@ public class MoPubHeaderBiddingFunctionalTest {
   }
 
   @Test
-  public void loadingMoPubInterstitial_GivenValidInterstitial_MoPubViewContainsCreative() throws Exception {
+  public void loadingMoPubInterstitial_GivenValidInterstitial_MoPubViewContainsCreative()
+      throws Exception {
     String html = loadMoPubHtmlInterstitial(validInterstitialAdUnit);
 
     assertTrue(html.contains(STUB_CREATIVE_IMAGE));
   }
 
   @Test
-  public void loadingMoPubInterstitial_GivenDemoInterstitial_MoPubViewUsesDemoDisplayUrl() throws Exception {
+  public void loadingMoPubInterstitial_GivenDemoInterstitial_MoPubViewUsesDemoDisplayUrl()
+      throws Exception {
     ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult(context);
 
     String html = loadMoPubHtmlInterstitial(demoInterstitialAdUnit);
@@ -294,7 +296,8 @@ public class MoPubHeaderBiddingFunctionalTest {
   private MoPubInterstitial createMoPubInterstitial() {
     AtomicReference<MoPubInterstitial> moPubInterstitialRef = new AtomicReference<>();
     runOnMainThreadAndWait(() -> {
-      moPubInterstitialRef.set(new MoPubInterstitial(activityRule.getActivity(), MOPUB_INTERSTITIAL_ID));
+      moPubInterstitialRef
+          .set(new MoPubInterstitial(activityRule.getActivity(), MOPUB_INTERSTITIAL_ID));
     });
     return moPubInterstitialRef.get();
   }
@@ -351,6 +354,7 @@ public class MoPubHeaderBiddingFunctionalTest {
     }
 
     private class SyncBannerAdListener extends DefaultBannerAdListener {
+
       @Override
       public void onBannerLoaded(MoPubView banner) {
         onLoaded();
@@ -363,6 +367,7 @@ public class MoPubHeaderBiddingFunctionalTest {
     }
 
     private class SyncInterstitialAdListener extends DefaultInterstitialAdListener {
+
       @Override
       public void onInterstitialLoaded(MoPubInterstitial interstitial) {
         onLoaded();

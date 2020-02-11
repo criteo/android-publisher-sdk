@@ -23,7 +23,7 @@ import org.junit.Test;
 public class DeviceInfoIntegrationTest {
 
   @Rule
-  public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   private Context context;
   private Executor runOnUiThreadExecutor;
@@ -31,7 +31,8 @@ public class DeviceInfoIntegrationTest {
   @Before
   public void setUp() throws Exception {
     context = InstrumentationRegistry.getContext().getApplicationContext();
-    runOnUiThreadExecutor = mockedDependenciesRule.getDependencyProvider().provideRunOnUiThreadExecutor();
+    runOnUiThreadExecutor = mockedDependenciesRule.getDependencyProvider()
+        .provideRunOnUiThreadExecutor();
   }
 
   @Test
@@ -59,7 +60,8 @@ public class DeviceInfoIntegrationTest {
   }
 
   @Test
-  public void getUserAgent_GivenUninitializedDeviceInfoAndWaitForIdleState_ReturnsCompletedFuture() throws Exception {
+  public void getUserAgent_GivenUninitializedDeviceInfoAndWaitForIdleState_ReturnsCompletedFuture()
+      throws Exception {
     DeviceInfo deviceInfo = new DeviceInfo(context, runOnUiThreadExecutor);
 
     Future<String> userAgent = deviceInfo.getUserAgent();
@@ -69,7 +71,8 @@ public class DeviceInfoIntegrationTest {
   }
 
   @Test
-  public void getUserAgent_WhenOnMainThreadAndWaitForIdleState_DoNotBlockAndReturnCompletedFuture() throws Exception {
+  public void getUserAgent_WhenOnMainThreadAndWaitForIdleState_DoNotBlockAndReturnCompletedFuture()
+      throws Exception {
     DeviceInfo deviceInfo = new DeviceInfo(context, runOnUiThreadExecutor);
 
     new Handler(Looper.getMainLooper()).post(() -> {

@@ -74,6 +74,7 @@ public class CompletableFuture<T> implements Future<T> {
   }
 
   private class CompletableCallable implements Callable<T> {
+
     @Override
     public T call() throws Exception {
       isDone.await();

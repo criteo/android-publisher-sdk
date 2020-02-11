@@ -25,295 +25,300 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class SdkCacheTest {
-    @Mock
-    private Context context;
 
-    @Mock
-    private AdvertisingInfo advertisingInfo;
+  @Mock
+  private Context context;
 
-    private JSONArray slots;
-    private DeviceUtil deviceUtil;
-    private SdkCache cache;
+  @Mock
+  private AdvertisingInfo advertisingInfo;
 
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-        deviceUtil = new DeviceUtil(context, advertisingInfo);
-        cache = new SdkCache(deviceUtil);
+  private JSONArray slots;
+  private DeviceUtil deviceUtil;
+  private SdkCache cache;
+
+  @Before
+  public void setUp() throws Exception {
+    MockitoAnnotations.initMocks(this);
+    deviceUtil = new DeviceUtil(context, advertisingInfo);
+    cache = new SdkCache(deviceUtil);
+  }
+
+  @Test
+  public void cacheSize() throws JSONException {
+    initializeCache();
+    assertEquals(slots.length(), cache.getItemCount());
+  }
+
+  @Test
+  public void getAdUnitFromCacheTest() throws JSONException {
+    initializeCache();
+
+    for (int i = slots.length() - 1; i >= 0; i--) {
+      String placement = slots.getJSONObject(i).getString("placementId");
+      AdSize adSize = new AdSize(slots.getJSONObject(i).getInt("width"),
+          slots.getJSONObject(i).getInt("height"));
+      CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
+      Slot cachedSlot = cache.peekAdUnit(testAdUnit);
+      assertEquals(placement, cachedSlot.getPlacementId());
+      assertEquals(slots.getJSONObject(i).getString("currency"), cachedSlot.getCurrency());
+      assertEquals(slots.getJSONObject(i).getString("cpm"), cachedSlot.getCpm());
+      assertEquals(slots.getJSONObject(i).getString("displayUrl"), cachedSlot.getDisplayUrl());
+      assertEquals(slots.getJSONObject(i).getInt("width"), cachedSlot.getWidth());
+      assertEquals(slots.getJSONObject(i).getInt("height"), cachedSlot.getHeight());
     }
+  }
 
-    @Test
-    public void cacheSize() throws JSONException {
-        initializeCache();
-        assertEquals(slots.length(), cache.getItemCount());
+  @Test
+  public void getNotCachedAdUnitFromCacheTest() throws JSONException {
+    initializeCache();
+
+    String placement = "this/isnt/in/the/cache";
+    AdSize adSize = new AdSize(320, 50);
+    CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
+    Slot cachedSlot = cache.peekAdUnit(testAdUnit);
+    assertNull(cachedSlot);
+  }
+
+  @Test
+  public void peekAdUnitFromCacheTest() throws JSONException {
+    initializeCache();
+
+    for (int i = slots.length() - 1; i >= 0; i--) {
+      String placement = slots.getJSONObject(i).getString("placementId");
+      AdSize adSize = new AdSize(slots.getJSONObject(i).getInt("width"),
+          slots.getJSONObject(i).getInt("height"));
+      CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
+      Slot cachedSlot = cache.peekAdUnit(testAdUnit);
+      assertEquals(placement, cachedSlot.getPlacementId());
+      assertEquals(slots.getJSONObject(i).getString("currency"), cachedSlot.getCurrency());
+      assertEquals(slots.getJSONObject(i).getString("cpm"), cachedSlot.getCpm());
+      assertEquals(slots.getJSONObject(i).getString("displayUrl"), cachedSlot.getDisplayUrl());
+      assertEquals(slots.getJSONObject(i).getInt("width"), cachedSlot.getWidth());
+      assertEquals(slots.getJSONObject(i).getInt("height"), cachedSlot.getHeight());
     }
+  }
 
-    @Test
-    public void getAdUnitFromCacheTest() throws JSONException {
-        initializeCache();
+  @Test
+  public void peekNotCachedAdUnitFromCacheTest() throws JSONException {
+    initializeCache();
 
-        for(int i=slots.length() -1; i >=0 ;i--) {
-            String placement = slots.getJSONObject(i).getString("placementId");
-            AdSize adSize = new AdSize(slots.getJSONObject(i).getInt("width"), slots.getJSONObject(i).getInt("height"));
-            CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
-            Slot cachedSlot = cache.peekAdUnit(testAdUnit);
-            assertEquals(placement, cachedSlot.getPlacementId());
-            assertEquals(slots.getJSONObject(i).getString("currency"), cachedSlot.getCurrency());
-            assertEquals(slots.getJSONObject(i).getString("cpm"), cachedSlot.getCpm());
-            assertEquals(slots.getJSONObject(i).getString("displayUrl"), cachedSlot.getDisplayUrl());
-            assertEquals(slots.getJSONObject(i).getInt("width"), cachedSlot.getWidth());
-            assertEquals(slots.getJSONObject(i).getInt("height"), cachedSlot.getHeight());
-        }
+    String placement = "this/isnt/in/the/cache";
+    AdSize adSize = new AdSize(320, 50);
+    CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
+    Slot cachedSlot = cache.peekAdUnit(testAdUnit);
+    assertNull(cachedSlot);
+  }
+
+  @Test
+  public void removeAdUnitFromCacheTest() throws JSONException {
+    initializeCache();
+
+    for (int i = slots.length() - 1; i >= 0; i--) {
+      String placement = slots.getJSONObject(i).getString("placementId");
+      AdSize adSize = new AdSize(slots.getJSONObject(i).getInt("width"),
+          slots.getJSONObject(i).getInt("height"));
+      CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
+      Slot cachedSlot = cache.peekAdUnit(testAdUnit);
+      assertEquals(placement, cachedSlot.getPlacementId());
+      assertEquals(slots.getJSONObject(i).getString("currency"), cachedSlot.getCurrency());
+      assertEquals(slots.getJSONObject(i).getString("cpm"), cachedSlot.getCpm());
+      assertEquals(slots.getJSONObject(i).getString("displayUrl"), cachedSlot.getDisplayUrl());
+      assertEquals(slots.getJSONObject(i).getInt("width"), cachedSlot.getWidth());
+      assertEquals(slots.getJSONObject(i).getInt("height"), cachedSlot.getHeight());
+
+      cache.remove(testAdUnit);
+      assertNull(cache.peekAdUnit(testAdUnit));
+      assertEquals(i, cache.getItemCount());
     }
+  }
 
-    @Test
-    public void getNotCachedAdUnitFromCacheTest() throws JSONException {
-        initializeCache();
+  @Test
+  public void removeNotCachedAdUnitFromCacheTest() throws JSONException {
+    initializeCache();
 
-        String placement = "this/isnt/in/the/cache";
-        AdSize adSize = new AdSize(320, 50);
-        CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
-        Slot cachedSlot = cache.peekAdUnit(testAdUnit);
-        assertNull(cachedSlot);
+    String placement = "this/isnt/in/the/cache";
+    AdSize adSize = new AdSize(320, 50);
+    CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
+    int cacheSize = cache.getItemCount();
+    cache.remove(testAdUnit);
+    assertEquals(cacheSize, cache.getItemCount());
+  }
+
+  private void initializeCache() throws JSONException {
+    String json = "{\"slots\":[{\"placementId\":\"/140800857/Endeavour_320x50\",\"cpm\":\"1.12\",\"currency\":\"EUR\",\"width\":320,\"height\":50,\"ttl\":0,\"displayUrl\":\"https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js\"},{\"placementId\":\"/140800857/Endeavour_Interstitial_320x480\",\"cpm\":\"1.12\",\"currency\":\"EUR\",\"width\":320,\"height\":480,\"ttl\":0,\"displayUrl\":\"https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js\"}]}";
+    JSONObject element = new JSONObject(json);
+    slots = element.getJSONArray("slots");
+    cache = new SdkCache(deviceUtil);
+    for (int i = 0; i < slots.length(); i++) {
+      Slot slot = new Slot(slots.getJSONObject(i));
+      cache.add(slot);
     }
+  }
 
-    @Test
-    public void peekAdUnitFromCacheTest() throws JSONException {
-        initializeCache();
+  @Test
+  public void testCacheWithNativeSlot() {
+    String cdbStringResponse = "{\n" +
+        "    \"slots\": [{\n" +
+        "        \"placementId\": \"/140800857/Endeavour_Native\",\n" +
+        "        \"cpm\": \"0.04\",\n" +
+        "        \"currency\": \"USD\",\n" +
+        "        \"width\": 2,\n" +
+        "        \"height\": 2,\n" +
+        "        \"ttl\": 3600,\n" +
+        "        \"native\": {\n" +
+        "            \"products\": [{\n" +
+        "                \"title\": \"\\\"Stripe Pima Dress\\\" - $99\",\n" +
+        "                \"description\": \"We're All About Comfort.\",\n" +
+        "                \"price\": \"$99\",\n" +
+        "                \"clickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\",\n" +
+        "                \"callToAction\": \"\",\n" +
+        "                \"image\": {\n" +
+        "                    \"url\": \"https://pix.us.criteo.net/img/img?\",\n" +
+        "                    \"height\": 400,\n" +
+        "                    \"width\": 400\n" +
+        "                }\n" +
+        "            }],\n" +
+        "            \"advertiser\": {\n" +
+        "                \"description\": \"The Company Store\",\n" +
+        "                \"domain\": \"thecompanystore.com\",\n" +
+        "                \"logo\": {\n" +
+        "                    \"url\": \"https://pix.us.criteo.net/img/img\",\n" +
+        "                    \"height\": 200,\n" +
+        "                    \"width\": 200\n" +
+        "                },\n" +
+        "                \"logoClickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\"\n" +
+        "            },\n" +
+        "            \"privacy\": {\n" +
+        "                \"optoutClickUrl\": \"https://privacy.us.criteo.com/adcenter\",\n" +
+        "                \"optoutImageUrl\": \"https://static.criteo.net/flash/icon/nai_small.png\",\n" +
+        "                \"longLegalText\": \"\"\n" +
+        "            },\n" +
+        "            \"impressionPixels\": [{\n" +
+        "                \"url\": \"https://cat.sv.us.criteo.com/delivery/lgn.php?\"},{\n" +
+        "                \"url\": \"https://dog.da.us.criteo.com/delivery/lgn.php?\"\n" +
+        "            }]\n" +
+        "        }\n" +
+        "    }]\n" +
+        "}";
 
-        for(int i=slots.length() -1; i >=0 ;i--) {
-            String placement = slots.getJSONObject(i).getString("placementId");
-            AdSize adSize = new AdSize(slots.getJSONObject(i).getInt("width"), slots.getJSONObject(i).getInt("height"));
-            CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
-            Slot cachedSlot = cache.peekAdUnit(testAdUnit);
-            assertEquals(placement, cachedSlot.getPlacementId());
-            assertEquals(slots.getJSONObject(i).getString("currency"), cachedSlot.getCurrency());
-            assertEquals(slots.getJSONObject(i).getString("cpm"), cachedSlot.getCpm());
-            assertEquals(slots.getJSONObject(i).getString("displayUrl"), cachedSlot.getDisplayUrl());
-            assertEquals(slots.getJSONObject(i).getInt("width"), cachedSlot.getWidth());
-            assertEquals(slots.getJSONObject(i).getInt("height"), cachedSlot.getHeight());
-        }
+    try {
+      JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+      JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
+      Slot slot = new Slot(cdbSlot);
+      cache = new SdkCache(deviceUtil);
+      cache.add(slot);
+      assertEquals(1, cache.getItemCount());
+    } catch (Exception ex) {
+      Assert.fail("Json exception in test data : " + ex.getLocalizedMessage());
     }
+  }
 
-    @Test
-    public void peekNotCachedAdUnitFromCacheTest() throws JSONException {
-        initializeCache();
+  @Test
+  public void add_GivenValidNativeSlot_AddItInCache() {
+    AdSize size = new AdSize(1, 2);
+    Slot slot = givenNativeSlot(size, "myAdUnit");
 
-        String placement = "this/isnt/in/the/cache";
-        AdSize adSize = new AdSize(320, 50);
-        CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
-        Slot cachedSlot = cache.peekAdUnit(testAdUnit);
-        assertNull(cachedSlot);
-    }
+    CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_CUSTOM_NATIVE);
 
-    @Test
-    public void removeAdUnitFromCacheTest() throws JSONException {
-        initializeCache();
+    cache.add(slot);
+    Slot adUnit = cache.peekAdUnit(expectedKey);
 
-        for(int i=slots.length() -1; i >=0 ;i--) {
-            String placement = slots.getJSONObject(i).getString("placementId");
-            AdSize adSize = new AdSize(slots.getJSONObject(i).getInt("width"), slots.getJSONObject(i).getInt("height"));
-            CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
-            Slot cachedSlot = cache.peekAdUnit(testAdUnit);
-            assertEquals(placement, cachedSlot.getPlacementId());
-            assertEquals(slots.getJSONObject(i).getString("currency"), cachedSlot.getCurrency());
-            assertEquals(slots.getJSONObject(i).getString("cpm"), cachedSlot.getCpm());
-            assertEquals(slots.getJSONObject(i).getString("displayUrl"), cachedSlot.getDisplayUrl());
-            assertEquals(slots.getJSONObject(i).getInt("width"), cachedSlot.getWidth());
-            assertEquals(slots.getJSONObject(i).getInt("height"), cachedSlot.getHeight());
+    assertThat(adUnit).isSameAs(slot);
+  }
 
-            cache.remove(testAdUnit);
-            assertNull(cache.peekAdUnit(testAdUnit));
-            assertEquals(i, cache.getItemCount());
-        }
-    }
+  @Test
+  public void add_GivenValidBannerSlot_AddItInCache() {
+    AdSize size = new AdSize(1, 2);
 
-    @Test
-    public void removeNotCachedAdUnitFromCacheTest() throws JSONException {
-        initializeCache();
+    Slot slot = mock(Slot.class);
+    when(slot.isNative()).thenReturn(false);
+    when(slot.getWidth()).thenReturn(size.getWidth());
+    when(slot.getHeight()).thenReturn(size.getHeight());
+    when(slot.getPlacementId()).thenReturn("myAdUnit");
 
-        String placement = "this/isnt/in/the/cache";
-        AdSize adSize = new AdSize(320, 50);
-        CacheAdUnit testAdUnit = new CacheAdUnit(adSize, placement, CRITEO_BANNER);
-        int cacheSize = cache.getItemCount();
-        cache.remove(testAdUnit);
-        assertEquals(cacheSize, cache.getItemCount());
-    }
+    CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_BANNER);
 
-    private void initializeCache() throws JSONException {
-        String json = "{\"slots\":[{\"placementId\":\"/140800857/Endeavour_320x50\",\"cpm\":\"1.12\",\"currency\":\"EUR\",\"width\":320,\"height\":50,\"ttl\":0,\"displayUrl\":\"https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js\"},{\"placementId\":\"/140800857/Endeavour_Interstitial_320x480\",\"cpm\":\"1.12\",\"currency\":\"EUR\",\"width\":320,\"height\":480,\"ttl\":0,\"displayUrl\":\"https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js\"}]}";
-        JSONObject element = new JSONObject(json);
-        slots = element.getJSONArray("slots");
-        cache = new SdkCache(deviceUtil);
-        for (int i = 0; i < slots.length(); i++) {
-            Slot slot = new Slot(slots.getJSONObject(i));
-            cache.add(slot);
-        }
-    }
+    cache.add(slot);
+    Slot adUnit = cache.peekAdUnit(expectedKey);
 
-    @Test
-    public void testCacheWithNativeSlot() {
-        String cdbStringResponse = "{\n" +
-                "    \"slots\": [{\n" +
-                "        \"placementId\": \"/140800857/Endeavour_Native\",\n" +
-                "        \"cpm\": \"0.04\",\n" +
-                "        \"currency\": \"USD\",\n" +
-                "        \"width\": 2,\n" +
-                "        \"height\": 2,\n" +
-                "        \"ttl\": 3600,\n" +
-                "        \"native\": {\n" +
-                "            \"products\": [{\n" +
-                "                \"title\": \"\\\"Stripe Pima Dress\\\" - $99\",\n" +
-                "                \"description\": \"We're All About Comfort.\",\n" +
-                "                \"price\": \"$99\",\n" +
-                "                \"clickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\",\n" +
-                "                \"callToAction\": \"\",\n" +
-                "                \"image\": {\n" +
-                "                    \"url\": \"https://pix.us.criteo.net/img/img?\",\n" +
-                "                    \"height\": 400,\n" +
-                "                    \"width\": 400\n" +
-                "                }\n" +
-                "            }],\n" +
-                "            \"advertiser\": {\n" +
-                "                \"description\": \"The Company Store\",\n" +
-                "                \"domain\": \"thecompanystore.com\",\n" +
-                "                \"logo\": {\n" +
-                "                    \"url\": \"https://pix.us.criteo.net/img/img\",\n" +
-                "                    \"height\": 200,\n" +
-                "                    \"width\": 200\n" +
-                "                },\n" +
-                "                \"logoClickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\"\n" +
-                "            },\n" +
-                "            \"privacy\": {\n" +
-                "                \"optoutClickUrl\": \"https://privacy.us.criteo.com/adcenter\",\n" +
-                "                \"optoutImageUrl\": \"https://static.criteo.net/flash/icon/nai_small.png\",\n" +
-                "                \"longLegalText\": \"\"\n" +
-                "            },\n" +
-                "            \"impressionPixels\": [{\n" +
-                "                \"url\": \"https://cat.sv.us.criteo.com/delivery/lgn.php?\"},{\n" +
-                "                \"url\": \"https://dog.da.us.criteo.com/delivery/lgn.php?\"\n" +
-                "            }]\n" +
-                "        }\n" +
-                "    }]\n" +
-                "}";
+    assertThat(adUnit).isSameAs(slot);
+  }
 
-        try {
-            JSONObject cdbResponse = new JSONObject(cdbStringResponse);
-            JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
-            Slot slot = new Slot(cdbSlot);
-            cache = new SdkCache(deviceUtil);
-            cache.add(slot);
-            assertEquals(1, cache.getItemCount());
-        } catch (Exception ex) {
-            Assert.fail("Json exception in test data : "+ ex.getLocalizedMessage());
-        }
-    }
+  @Test
+  public void add_GivenValidInterstitialSlotInPortrait_AddItInCache() {
+    AdSize size = new AdSize(300, 400);
 
-    @Test
-    public void add_GivenValidNativeSlot_AddItInCache() {
-        AdSize size = new AdSize(1, 2);
-        Slot slot = givenNativeSlot(size, "myAdUnit");
+    Slot slot = mock(Slot.class);
+    when(slot.isNative()).thenReturn(false);
+    when(slot.getWidth()).thenReturn(size.getWidth());
+    when(slot.getHeight()).thenReturn(size.getHeight());
+    when(slot.getPlacementId()).thenReturn("myAdUnit");
 
-        CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_CUSTOM_NATIVE);
+    // FIXME this has side-effect. After fixing EE-608, this will have no meaning.
+    deviceUtil.setScreenSize(size.getWidth(), size.getHeight());
 
-        cache.add(slot);
-        Slot adUnit = cache.peekAdUnit(expectedKey);
+    CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_INTERSTITIAL);
 
-        assertThat(adUnit).isSameAs(slot);
-    }
+    cache.add(slot);
+    Slot adUnit = cache.peekAdUnit(expectedKey);
 
-    @Test
-    public void add_GivenValidBannerSlot_AddItInCache() {
-        AdSize size = new AdSize(1, 2);
+    assertThat(adUnit).isSameAs(slot);
+  }
 
-        Slot slot = mock(Slot.class);
-        when(slot.isNative()).thenReturn(false);
-        when(slot.getWidth()).thenReturn(size.getWidth());
-        when(slot.getHeight()).thenReturn(size.getHeight());
-        when(slot.getPlacementId()).thenReturn("myAdUnit");
+  @Test
+  public void add_GivenValidInterstitialSlotInLandscape_AddItInCache() {
+    AdSize size = new AdSize(400, 300);
 
-        CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_BANNER);
+    Slot slot = mock(Slot.class);
+    when(slot.isNative()).thenReturn(false);
+    when(slot.getWidth()).thenReturn(size.getWidth());
+    when(slot.getHeight()).thenReturn(size.getHeight());
+    when(slot.getPlacementId()).thenReturn("myAdUnit");
 
-        cache.add(slot);
-        Slot adUnit = cache.peekAdUnit(expectedKey);
+    // FIXME this has side-effect. After fixing EE-608, this will have no meaning.
+    deviceUtil.setScreenSize(size.getHeight(), size.getWidth());
 
-        assertThat(adUnit).isSameAs(slot);
-    }
+    CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_INTERSTITIAL);
 
-    @Test
-    public void add_GivenValidInterstitialSlotInPortrait_AddItInCache() {
-        AdSize size = new AdSize(300, 400);
+    cache.add(slot);
+    Slot adUnit = cache.peekAdUnit(expectedKey);
 
-        Slot slot = mock(Slot.class);
-        when(slot.isNative()).thenReturn(false);
-        when(slot.getWidth()).thenReturn(size.getWidth());
-        when(slot.getHeight()).thenReturn(size.getHeight());
-        when(slot.getPlacementId()).thenReturn("myAdUnit");
+    assertThat(adUnit).isSameAs(slot);
+  }
 
-        // FIXME this has side-effect. After fixing EE-608, this will have no meaning.
-        deviceUtil.setScreenSize(size.getWidth(), size.getHeight());
+  @Test
+  public void peekAdUnit_PeekingTwiceExistingSlot_ReturnTwiceTheSameSlotWithoutRemovingIt()
+      throws Exception {
+    AdSize size = new AdSize(1, 2);
+    Slot slot = givenNativeSlot(size, "myAdUnit");
+    CacheAdUnit key = new CacheAdUnit(size, "myAdUnit", CRITEO_CUSTOM_NATIVE);
 
-        CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_INTERSTITIAL);
+    cache.add(slot);
+    Slot slot1 = cache.peekAdUnit(key);
+    Slot slot2 = cache.peekAdUnit(key);
 
-        cache.add(slot);
-        Slot adUnit = cache.peekAdUnit(expectedKey);
+    assertThat(cache.getItemCount()).isEqualTo(1);
+    assertThat(slot1).isSameAs(slot);
+    assertThat(slot2).isSameAs(slot);
+  }
 
-        assertThat(adUnit).isSameAs(slot);
-    }
+  @Test
+  public void peekAdUnit_PeekingNonExistingSlot_ReturnNull() throws Exception {
+    AdSize size = new AdSize(1, 2);
+    CacheAdUnit key = new CacheAdUnit(size, "myAdUnit", CRITEO_CUSTOM_NATIVE);
 
-    @Test
-    public void add_GivenValidInterstitialSlotInLandscape_AddItInCache() {
-        AdSize size = new AdSize(400, 300);
+    Slot slot = cache.peekAdUnit(key);
 
-        Slot slot = mock(Slot.class);
-        when(slot.isNative()).thenReturn(false);
-        when(slot.getWidth()).thenReturn(size.getWidth());
-        when(slot.getHeight()).thenReturn(size.getHeight());
-        when(slot.getPlacementId()).thenReturn("myAdUnit");
+    assertThat(slot).isNull();
+  }
 
-        // FIXME this has side-effect. After fixing EE-608, this will have no meaning.
-        deviceUtil.setScreenSize(size.getHeight(), size.getWidth());
+  private static Slot givenNativeSlot(AdSize size, String placementId) {
+    Slot slot = mock(Slot.class);
+    when(slot.isNative()).thenReturn(true);
+    when(slot.getWidth()).thenReturn(size.getWidth());
+    when(slot.getHeight()).thenReturn(size.getHeight());
+    when(slot.getPlacementId()).thenReturn(placementId);
 
-        CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_INTERSTITIAL);
-
-        cache.add(slot);
-        Slot adUnit = cache.peekAdUnit(expectedKey);
-
-        assertThat(adUnit).isSameAs(slot);
-    }
-
-    @Test
-    public void peekAdUnit_PeekingTwiceExistingSlot_ReturnTwiceTheSameSlotWithoutRemovingIt() throws Exception {
-        AdSize size = new AdSize(1, 2);
-        Slot slot = givenNativeSlot(size, "myAdUnit");
-        CacheAdUnit key = new CacheAdUnit(size, "myAdUnit", CRITEO_CUSTOM_NATIVE);
-
-        cache.add(slot);
-        Slot slot1 = cache.peekAdUnit(key);
-        Slot slot2 = cache.peekAdUnit(key);
-
-        assertThat(cache.getItemCount()).isEqualTo(1);
-        assertThat(slot1).isSameAs(slot);
-        assertThat(slot2).isSameAs(slot);
-    }
-
-    @Test
-    public void peekAdUnit_PeekingNonExistingSlot_ReturnNull() throws Exception {
-        AdSize size = new AdSize(1, 2);
-        CacheAdUnit key = new CacheAdUnit(size, "myAdUnit", CRITEO_CUSTOM_NATIVE);
-
-        Slot slot = cache.peekAdUnit(key);
-
-        assertThat(slot).isNull();
-    }
-
-    private static Slot givenNativeSlot(AdSize size, String placementId) {
-        Slot slot = mock(Slot.class);
-        when(slot.isNative()).thenReturn(true);
-        when(slot.getWidth()).thenReturn(size.getWidth());
-        when(slot.getHeight()).thenReturn(size.getHeight());
-        when(slot.getPlacementId()).thenReturn(placementId);
-
-        return slot;
-    }
+    return slot;
+  }
 }

@@ -12,6 +12,7 @@ import android.widget.EditText;
 import com.criteo.publisher.Criteo;
 
 public class PrivacyConsentSelectorActivity extends AppCompatActivity {
+
   private static final String TAG = PrivacyConsentSelectorActivity.class.getSimpleName();
 
   private EditText ccpaIabEditText;

@@ -40,7 +40,8 @@ public class RunOnUiThreadExecutorTest {
   }
 
   @Test
-  public void executeAsync_GivenCommandWhenOnOtherThread_ExecuteItAsyncOnMainThread() throws Exception {
+  public void executeAsync_GivenCommandWhenOnOtherThread_ExecuteItAsyncOnMainThread()
+      throws Exception {
     CountDownLatch latch = new CountDownLatch(1);
     executor.executeAsync(() -> {
       assertSame(Thread.currentThread(), Looper.getMainLooper().getThread());
@@ -51,7 +52,8 @@ public class RunOnUiThreadExecutorTest {
   }
 
   @Test
-  public void executeAsync_GivenCommandWhenOnMainThread_ExecuteItAsyncOnMainThread() throws Exception {
+  public void executeAsync_GivenCommandWhenOnMainThread_ExecuteItAsyncOnMainThread()
+      throws Exception {
     CountDownLatch latch = new CountDownLatch(1);
     CountDownLatch latch2 = new CountDownLatch(1);
 

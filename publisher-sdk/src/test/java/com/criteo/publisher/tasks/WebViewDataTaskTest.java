@@ -162,7 +162,8 @@ public class WebViewDataTaskTest {
   }
 
   @Test
-  public void onPostExecution_GivenThrowingListenerAndInvalidCreative_DoesNotThrow() throws Exception {
+  public void onPostExecution_GivenThrowingListenerAndInvalidCreative_DoesNotThrow()
+      throws Exception {
     givenThrowingListener();
 
     assertThatCode(() -> {
@@ -171,7 +172,8 @@ public class WebViewDataTaskTest {
   }
 
   @Test
-  public void onPostExecution_GivenThrowingListenerAndValidCreative_DoesNotThrow() throws Exception {
+  public void onPostExecution_GivenThrowingListenerAndValidCreative_DoesNotThrow()
+      throws Exception {
     givenThrowingListener();
 
     assertThatCode(() -> {

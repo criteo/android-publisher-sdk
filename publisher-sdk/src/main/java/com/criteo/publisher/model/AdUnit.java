@@ -6,40 +6,40 @@ import com.criteo.publisher.Util.ObjectsUtil;
 
 public abstract class AdUnit {
 
-    private final String adUnitId;
+  private final String adUnitId;
 
-    @NonNull
-    private final AdUnitType adUnitType;
+  @NonNull
+  private final AdUnitType adUnitType;
 
-    protected AdUnit(String adUnitId, @NonNull AdUnitType adUnitType) {
-        this.adUnitId = adUnitId;
-        this.adUnitType = adUnitType;
+  protected AdUnit(String adUnitId, @NonNull AdUnitType adUnitType) {
+    this.adUnitId = adUnitId;
+    this.adUnitType = adUnitType;
+  }
+
+  public String getAdUnitId() {
+    return adUnitId;
+  }
+
+  @NonNull
+  public AdUnitType getAdUnitType() {
+    return adUnitType;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
-
-    public String getAdUnitId() {
-        return adUnitId;
+    if (o == null || getClass() != o.getClass()) {
+      return false;
     }
+    AdUnit adUnit = (AdUnit) o;
+    return ObjectsUtil.equals(adUnitId, adUnit.adUnitId) &&
+        adUnitType == adUnit.adUnitType;
+  }
 
-    @NonNull
-    public AdUnitType getAdUnitType() {
-        return adUnitType;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        AdUnit adUnit = (AdUnit) o;
-        return ObjectsUtil.equals(adUnitId, adUnit.adUnitId) &&
-                adUnitType == adUnit.adUnitType;
-    }
-
-    @Override
-    public int hashCode() {
-        return ObjectsUtil.hash(adUnitId, adUnitType);
-    }
+  @Override
+  public int hashCode() {
+    return ObjectsUtil.hash(adUnitId, adUnitType);
+  }
 }

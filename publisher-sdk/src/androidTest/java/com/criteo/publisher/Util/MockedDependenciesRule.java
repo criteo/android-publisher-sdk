@@ -20,20 +20,20 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 /**
- * Use this Rule when writing tests that require mocking global dependencies
- * See {@link com.criteo.publisher.degraded.StandaloneDegradedTest} for example.
+ * Use this Rule when writing tests that require mocking global dependencies See {@link
+ * com.criteo.publisher.degraded.StandaloneDegradedTest} for example.
  */
 public class MockedDependenciesRule implements TestRule {
 
   /**
    * Apply a timeout on all tests using this rule.
-   *
-   * Lot of tests are waiting for end of AsyncTasks or for third-parties' events. Those tests may
-   * be stuck and block the overall execution. In order to avoid any infinite blocking, long tests
-   * will be killed by this timeout rule.
-   *
+   * <p>
+   * Lot of tests are waiting for end of AsyncTasks or for third-parties' events. Those tests may be
+   * stuck and block the overall execution. In order to avoid any infinite blocking, long tests will
+   * be killed by this timeout rule.
+   * <p>
    * This timeout duration is roughly set and may have to be updated in the future.
-   *
+   * <p>
    * Warning: When debugging, this timeout may interrupt your work and be annoying. To deactivate
    * it, you may set the {@link #iAmDebuggingDoNotTimeoutMe} variable to <code>true</code>.
    */

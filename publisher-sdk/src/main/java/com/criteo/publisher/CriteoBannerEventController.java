@@ -27,86 +27,88 @@ import java.util.List;
 
 public class CriteoBannerEventController {
 
-    @NonNull
-    private final WeakReference<CriteoBannerView> view;
+  @NonNull
+  private final WeakReference<CriteoBannerView> view;
 
-    @Nullable
-    private final CriteoBannerAdListener adListener;
+  @Nullable
+  private final CriteoBannerAdListener adListener;
 
-    @NonNull
-    private final Criteo criteo;
+  @NonNull
+  private final Criteo criteo;
 
-    @NonNull
-    private final RunOnUiThreadExecutor executor;
+  @NonNull
+  private final RunOnUiThreadExecutor executor;
 
-    public CriteoBannerEventController(
-        @NonNull CriteoBannerView bannerView,
-        @NonNull Criteo criteo) {
-        this.view = new WeakReference<>(bannerView);
-        this.adListener = bannerView.getCriteoBannerAdListener();
-        this.criteo = criteo;
-        this.executor = DependencyProvider.getInstance().provideRunOnUiThreadExecutor();
+  public CriteoBannerEventController(
+      @NonNull CriteoBannerView bannerView,
+      @NonNull Criteo criteo) {
+    this.view = new WeakReference<>(bannerView);
+    this.adListener = bannerView.getCriteoBannerAdListener();
+    this.criteo = criteo;
+    this.executor = DependencyProvider.getInstance().provideRunOnUiThreadExecutor();
+  }
+
+  public void fetchAdAsync(@Nullable AdUnit adUnit) {
+    Slot slot = criteo.getBidForAdUnit(adUnit);
+
+    if (slot == null) {
+      notifyFor(INVALID);
+    } else {
+      notifyFor(VALID);
+      displayAd(slot.getDisplayUrl());
     }
+  }
 
-    public void fetchAdAsync(@Nullable AdUnit adUnit) {
-        Slot slot = criteo.getBidForAdUnit(adUnit);
+  public void fetchAdAsync(@Nullable BidToken bidToken) {
+    TokenValue tokenValue = criteo.getTokenValue(bidToken, AdUnitType.CRITEO_BANNER);
 
-        if (slot == null) {
-            notifyFor(INVALID);
-        } else {
-            notifyFor(VALID);
-            displayAd(slot.getDisplayUrl());
+    if (tokenValue == null) {
+      notifyFor(INVALID);
+    } else {
+      notifyFor(VALID);
+      displayAd(tokenValue.getDisplayUrl());
+    }
+  }
+
+  private void notifyFor(@NonNull CriteoListenerCode code) {
+    executor.executeAsync(new CriteoBannerListenerCallTask(adListener, view, code));
+  }
+
+  @VisibleForTesting
+  void displayAd(@NonNull String displayUrl) {
+    executor.executeAsync(new CriteoBannerLoadTask(
+        view, createWebViewClient(), criteo.getConfig(), displayUrl));
+  }
+
+  // WebViewClient is created here to prevent passing the AdListener everywhere.
+  // Setting this webViewClient to the WebView is done in the CriteoBannerLoadTask as all
+  // WebView methods need to run in the same UI thread
+  @VisibleForTesting
+  WebViewClient createWebViewClient() {
+    return new WebViewClient() {
+      @Override
+      public boolean shouldOverrideUrlLoading(WebView view, String url) {
+        Context context = view.getContext();
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        // this callback gets called after the user has clicked on the creative. In case of deeplink,
+        // if the target application is not installed on the device, an ActivityNotFoundException
+        // will be thrown. Therefore, an explicit check is made to ensure that there exists at least
+        // one package that can handle the intent
+        PackageManager packageManager = context.getPackageManager();
+        List<ResolveInfo> list = packageManager
+            .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+
+        if (list.size() > 0) {
+          context.startActivity(intent);
+
+          notifyFor(CLICK);
         }
-    }
 
-    public void fetchAdAsync(@Nullable BidToken bidToken) {
-        TokenValue tokenValue = criteo.getTokenValue(bidToken, AdUnitType.CRITEO_BANNER);
-
-        if (tokenValue == null) {
-            notifyFor(INVALID);
-        } else {
-            notifyFor(VALID);
-            displayAd(tokenValue.getDisplayUrl());
-        }
-    }
-
-    private void notifyFor(@NonNull CriteoListenerCode code) {
-        executor.executeAsync(new CriteoBannerListenerCallTask(adListener, view, code));
-    }
-
-    @VisibleForTesting
-    void displayAd(@NonNull String displayUrl) {
-        executor.executeAsync(new CriteoBannerLoadTask(
-            view, createWebViewClient(), criteo.getConfig(), displayUrl));
-    }
-
-    // WebViewClient is created here to prevent passing the AdListener everywhere.
-    // Setting this webViewClient to the WebView is done in the CriteoBannerLoadTask as all
-    // WebView methods need to run in the same UI thread
-    @VisibleForTesting
-    WebViewClient createWebViewClient() {
-        return new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                Context context = view.getContext();
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                // this callback gets called after the user has clicked on the creative. In case of deeplink,
-                // if the target application is not installed on the device, an ActivityNotFoundException
-                // will be thrown. Therefore, an explicit check is made to ensure that there exists at least
-                // one package that can handle the intent
-                PackageManager packageManager = context.getPackageManager();
-                List<ResolveInfo> list = packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-
-                if (list.size() > 0) {
-                    context.startActivity(intent);
-
-                    notifyFor(CLICK);
-                }
-
-                return true;
-            }
-        };
-    }
+        return true;
+      }
+    };
+  }
 
 }

@@ -28,218 +28,226 @@ import org.mockito.MockitoAnnotations;
 
 public class ConfigTest {
 
-    private Config config;
+  private Config config;
 
-    @Mock
-    private Context context;
+  @Mock
+  private Context context;
 
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private SharedPreferences sharedPreferences;
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  private SharedPreferences sharedPreferences;
 
-    @Before
-    public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+  @Before
+  public void setUp() throws Exception {
+    MockitoAnnotations.initMocks(this);
 
-        when(context.getSharedPreferences(any(), eq(Context.MODE_PRIVATE))).thenReturn(sharedPreferences);
-    }
+    when(context.getSharedPreferences(any(), eq(Context.MODE_PRIVATE)))
+        .thenReturn(sharedPreferences);
+  }
 
-    @Test
-    public void new_GivenEmptyLocalStorage_ContainsDefaultValues() {
-        when(sharedPreferences.getBoolean(any(), anyBoolean()))
-            .thenAnswer(invocation -> invocation.getArguments()[1]);
+  @Test
+  public void new_GivenEmptyLocalStorage_ContainsDefaultValues() {
+    when(sharedPreferences.getBoolean(any(), anyBoolean()))
+        .thenAnswer(invocation -> invocation.getArguments()[1]);
 
-        config = new Config(context);
+    config = new Config(context);
 
-        assertConfigContainsDefaultValues();
-    }
+    assertConfigContainsDefaultValues();
+  }
 
-    @Test
-    public void new_GivenInvalidValueInLocalStorage_DoesNotThrowAndUseDefaultValues() throws Exception {
-        when(sharedPreferences.getBoolean(any(), anyBoolean())).thenThrow(ClassCastException.class);
+  @Test
+  public void new_GivenInvalidValueInLocalStorage_DoesNotThrowAndUseDefaultValues()
+      throws Exception {
+    when(sharedPreferences.getBoolean(any(), anyBoolean())).thenThrow(ClassCastException.class);
 
-        config = new Config(context);
+    config = new Config(context);
 
-        assertConfigContainsDefaultValues();
-    }
+    assertConfigContainsDefaultValues();
+  }
 
-    @Test
-    public void isKillSwitchEnabled_GivenKillSwitchEnabledInLocalStorage_ReturnsEnabled() {
-        givenKillSwitchInLocalStorage(true);
+  @Test
+  public void isKillSwitchEnabled_GivenKillSwitchEnabledInLocalStorage_ReturnsEnabled() {
+    givenKillSwitchInLocalStorage(true);
 
-        config = new Config(context);
+    config = new Config(context);
 
-        assertTrue(config.isKillSwitchEnabled());
-    }
+    assertTrue(config.isKillSwitchEnabled());
+  }
 
-    @Test
-    public void isKillSwitchEnabled_GivenKillSwitchDisabledInLocalStorage_ReturnsDisabled() {
-        givenKillSwitchInLocalStorage(false);
+  @Test
+  public void isKillSwitchEnabled_GivenKillSwitchDisabledInLocalStorage_ReturnsDisabled() {
+    givenKillSwitchInLocalStorage(false);
 
-        config = new Config(context);
+    config = new Config(context);
 
-        assertFalse(config.isKillSwitchEnabled());
-    }
+    assertFalse(config.isKillSwitchEnabled());
+  }
 
-    @Test
-    public void refreshConfig_GivenMissingKillSwitch_ItIsUnchanged() throws Exception {
-        config = new Config(context);
+  @Test
+  public void refreshConfig_GivenMissingKillSwitch_ItIsUnchanged() throws Exception {
+    config = new Config(context);
 
-        JSONObject newConfig = givenFullNewPayload(config);
-        newConfig.remove("killSwitch");
+    JSONObject newConfig = givenFullNewPayload(config);
+    newConfig.remove("killSwitch");
 
-        refreshConfig_assertItIsUnchanged(newConfig, Config::isKillSwitchEnabled);
-    }
+    refreshConfig_assertItIsUnchanged(newConfig, Config::isKillSwitchEnabled);
+  }
 
-    @Test
-    public void refreshConfig_GivenMissingUrlMacro_ItIsUnchanged() throws Exception {
-        config = new Config(context);
+  @Test
+  public void refreshConfig_GivenMissingUrlMacro_ItIsUnchanged() throws Exception {
+    config = new Config(context);
 
-        JSONObject newConfig = givenFullNewPayload(config);
-        newConfig.remove("AndroidDisplayUrlMacro");
+    JSONObject newConfig = givenFullNewPayload(config);
+    newConfig.remove("AndroidDisplayUrlMacro");
 
-        refreshConfig_assertItIsUnchanged(newConfig, Config::getDisplayUrlMacro);
-    }
+    refreshConfig_assertItIsUnchanged(newConfig, Config::getDisplayUrlMacro);
+  }
 
-    @Test
-    public void refreshConfig_GivenMissingUrlMode_ItIsUnchanged() throws Exception {
-        config = new Config(context);
+  @Test
+  public void refreshConfig_GivenMissingUrlMode_ItIsUnchanged() throws Exception {
+    config = new Config(context);
 
-        JSONObject newConfig = givenFullNewPayload(config);
-        newConfig.remove("AndroidAdTagUrlMode");
+    JSONObject newConfig = givenFullNewPayload(config);
+    newConfig.remove("AndroidAdTagUrlMode");
 
-        refreshConfig_assertItIsUnchanged(newConfig, Config::getAdTagUrlMode);
-    }
+    refreshConfig_assertItIsUnchanged(newConfig, Config::getAdTagUrlMode);
+  }
 
-    @Test
-    public void refreshConfig_GivenMissingDataMacro_ItIsUnchanged() throws Exception {
-        config = new Config(context);
+  @Test
+  public void refreshConfig_GivenMissingDataMacro_ItIsUnchanged() throws Exception {
+    config = new Config(context);
 
-        JSONObject newConfig = givenFullNewPayload(config);
-        newConfig.remove("AndroidAdTagDataMacro");
+    JSONObject newConfig = givenFullNewPayload(config);
+    newConfig.remove("AndroidAdTagDataMacro");
 
-        refreshConfig_assertItIsUnchanged(newConfig, Config::getAdTagDataMacro);
-    }
+    refreshConfig_assertItIsUnchanged(newConfig, Config::getAdTagDataMacro);
+  }
 
-    @Test
-    public void refreshConfig_GivenMissingDataMode_ItIsUnchanged() throws Exception {
-        config = new Config(context);
+  @Test
+  public void refreshConfig_GivenMissingDataMode_ItIsUnchanged() throws Exception {
+    config = new Config(context);
 
-        JSONObject newConfig = givenFullNewPayload(config);
-        newConfig.remove("AndroidAdTagDataMode");
+    JSONObject newConfig = givenFullNewPayload(config);
+    newConfig.remove("AndroidAdTagDataMode");
 
-        refreshConfig_assertItIsUnchanged(newConfig, Config::getAdTagDataMode);
-    }
+    refreshConfig_assertItIsUnchanged(newConfig, Config::getAdTagDataMode);
+  }
 
-    @Test
-    public void refreshConfig_GivenInvalidKillSwitch_ItIsUnchanged() throws Exception {
-        config = new Config(context);
+  @Test
+  public void refreshConfig_GivenInvalidKillSwitch_ItIsUnchanged() throws Exception {
+    config = new Config(context);
 
-        JSONObject newConfig = givenFullNewPayload(config);
-        newConfig.put("killSwitch", "not a boolean");
+    JSONObject newConfig = givenFullNewPayload(config);
+    newConfig.put("killSwitch", "not a boolean");
 
-        refreshConfig_assertItIsUnchanged(newConfig, Config::isKillSwitchEnabled);
-    }
+    refreshConfig_assertItIsUnchanged(newConfig, Config::isKillSwitchEnabled);
+  }
 
-    private <T> void refreshConfig_assertItIsUnchanged(JSONObject newConfig, Function<Config, T> projection) {
-        T previousValue = projection.apply(config);
-        config.refreshConfig(newConfig);
-        T newValue = projection.apply(config);
+  private <T> void refreshConfig_assertItIsUnchanged(JSONObject newConfig,
+      Function<Config, T> projection) {
+    T previousValue = projection.apply(config);
+    config.refreshConfig(newConfig);
+    T newValue = projection.apply(config);
 
-        assertEquals(previousValue, newValue);
-    }
+    assertEquals(previousValue, newValue);
+  }
 
-    @Test
-    public void refreshConfig_GivenEnabledKillSwitch_ItIsPersisted() throws Exception {
-        Editor editor = mock(Editor.class);
-        when(sharedPreferences.edit()).thenReturn(editor);
+  @Test
+  public void refreshConfig_GivenEnabledKillSwitch_ItIsPersisted() throws Exception {
+    Editor editor = mock(Editor.class);
+    when(sharedPreferences.edit()).thenReturn(editor);
 
-        config = new Config(context);
+    config = new Config(context);
 
-        JSONObject newConfig = givenFullNewPayload(config);
-        newConfig.put("killSwitch", true);
+    JSONObject newConfig = givenFullNewPayload(config);
+    newConfig.put("killSwitch", true);
 
-        config.refreshConfig(newConfig);
+    config.refreshConfig(newConfig);
 
-        InOrder inOrder = inOrder(editor);
-        inOrder.verify(editor).putBoolean("CriteoCachedKillSwitch", true);
-        inOrder.verify(editor).apply();
-        inOrder.verifyNoMoreInteractions();
-    }
+    InOrder inOrder = inOrder(editor);
+    inOrder.verify(editor).putBoolean("CriteoCachedKillSwitch", true);
+    inOrder.verify(editor).apply();
+    inOrder.verifyNoMoreInteractions();
+  }
 
-    @Test
-    public void refreshConfig_GivenInvalidKillSwitch_ItIsNotPersisted() throws Exception {
-        config = new Config(context);
+  @Test
+  public void refreshConfig_GivenInvalidKillSwitch_ItIsNotPersisted() throws Exception {
+    config = new Config(context);
 
-        JSONObject newConfig = givenFullNewPayload(config);
-        newConfig.put("killSwitch", "not a boolean");
+    JSONObject newConfig = givenFullNewPayload(config);
+    newConfig.put("killSwitch", "not a boolean");
 
-        clearInvocations(sharedPreferences);
-        config.refreshConfig(newConfig);
+    clearInvocations(sharedPreferences);
+    config.refreshConfig(newConfig);
 
-        verifyZeroInteractions(sharedPreferences);
-    }
+    verifyZeroInteractions(sharedPreferences);
+  }
 
-    @Test
-    public void refreshConfig_GivenNewConfig_UpdateEverything() throws Exception {
-        config = new Config(context);
-        boolean killSwitchEnabled = config.isKillSwitchEnabled();
-        String displayUrlMacro = config.getDisplayUrlMacro();
-        String adTagUrlMode = config.getAdTagUrlMode();
-        String adTagDataMacro = config.getAdTagDataMacro();
-        String adTagDataMode = config.getAdTagDataMode();
+  @Test
+  public void refreshConfig_GivenNewConfig_UpdateEverything() throws Exception {
+    config = new Config(context);
+    boolean killSwitchEnabled = config.isKillSwitchEnabled();
+    String displayUrlMacro = config.getDisplayUrlMacro();
+    String adTagUrlMode = config.getAdTagUrlMode();
+    String adTagDataMacro = config.getAdTagDataMacro();
+    String adTagDataMode = config.getAdTagDataMode();
 
-        JSONObject newConfig = givenFullNewPayload(config);
+    JSONObject newConfig = givenFullNewPayload(config);
 
-        config.refreshConfig(newConfig);
+    config.refreshConfig(newConfig);
 
-        assertEquals(!config.isKillSwitchEnabled(), killSwitchEnabled);
-        assertEquals("new_" + displayUrlMacro, config.getDisplayUrlMacro());
-        assertEquals("new_" + adTagUrlMode, config.getAdTagUrlMode());
-        assertEquals("new_" + adTagDataMacro, config.getAdTagDataMacro());
-        assertEquals("new_" + adTagDataMode, config.getAdTagDataMode());
-    }
+    assertEquals(!config.isKillSwitchEnabled(), killSwitchEnabled);
+    assertEquals("new_" + displayUrlMacro, config.getDisplayUrlMacro());
+    assertEquals("new_" + adTagUrlMode, config.getAdTagUrlMode());
+    assertEquals("new_" + adTagDataMacro, config.getAdTagDataMacro());
+    assertEquals("new_" + adTagDataMode, config.getAdTagDataMode());
+  }
 
-    @Test
-    public void testRefreshConfig() throws Exception {
-        givenKillSwitchInLocalStorage(false);
+  @Test
+  public void testRefreshConfig() throws Exception {
+    givenKillSwitchInLocalStorage(false);
 
-        config = new Config(context);
+    config = new Config(context);
 
-        String newDisplayUrlMacro = "%%newDisplayUrl%%";
-        JSONObject json = new JSONObject();
-        json.put("killSwitch", true);
-        json.put("AndroidDisplayUrlMacro", newDisplayUrlMacro);
+    String newDisplayUrlMacro = "%%newDisplayUrl%%";
+    JSONObject json = new JSONObject();
+    json.put("killSwitch", true);
+    json.put("AndroidDisplayUrlMacro", newDisplayUrlMacro);
 
-        config.refreshConfig(json);
+    config.refreshConfig(json);
 
-        assertTrue(config.isKillSwitchEnabled());
-        assertNotNull(config.getAdTagUrlMode());
-        assertEquals(newDisplayUrlMacro, config.getDisplayUrlMacro());
-    }
+    assertTrue(config.isKillSwitchEnabled());
+    assertNotNull(config.getAdTagUrlMode());
+    assertEquals(newDisplayUrlMacro, config.getDisplayUrlMacro());
+  }
 
-    private JSONObject givenFullNewPayload(Config config) throws Exception {
-        return new JSONObject("{\n"
-            + "  \"killSwitch\": " + !config.isKillSwitchEnabled() + ",\n"
-            + "  \"AndroidDisplayUrlMacro\": " + quote("new_" + config.getDisplayUrlMacro()) + ",\n"
-            + "  \"AndroidAdTagUrlMode\": " + quote("new_" + config.getAdTagUrlMode()) + ",\n"
-            + "  \"AndroidAdTagDataMacro\": " + quote("new_" + config.getAdTagDataMacro()) + ",\n"
-            + "  \"AndroidAdTagDataMode\": " + quote("new_" + config.getAdTagDataMode()) + ",\n"
-            + "  \"iOSDisplayUrlMacro\": \"not used\",\n"
-            + "  \"iOSWidthMacro\": \"not used\",\n"
-            + "  \"iOSAdTagUrlMode\": \"not used\"\n"
-            + "}");
-    }
+  private JSONObject givenFullNewPayload(Config config) throws Exception {
+    return new JSONObject("{\n"
+        + "  \"killSwitch\": " + !config.isKillSwitchEnabled() + ",\n"
+        + "  \"AndroidDisplayUrlMacro\": " + quote("new_" + config.getDisplayUrlMacro()) + ",\n"
+        + "  \"AndroidAdTagUrlMode\": " + quote("new_" + config.getAdTagUrlMode()) + ",\n"
+        + "  \"AndroidAdTagDataMacro\": " + quote("new_" + config.getAdTagDataMacro()) + ",\n"
+        + "  \"AndroidAdTagDataMode\": " + quote("new_" + config.getAdTagDataMode()) + ",\n"
+        + "  \"iOSDisplayUrlMacro\": \"not used\",\n"
+        + "  \"iOSWidthMacro\": \"not used\",\n"
+        + "  \"iOSAdTagUrlMode\": \"not used\"\n"
+        + "}");
+  }
 
-    private void givenKillSwitchInLocalStorage(boolean isEnabled) {
-        when(sharedPreferences.getBoolean(eq("CriteoCachedKillSwitch"), anyBoolean())).thenReturn(isEnabled);
-    }
+  private void givenKillSwitchInLocalStorage(boolean isEnabled) {
+    when(sharedPreferences.getBoolean(eq("CriteoCachedKillSwitch"), anyBoolean()))
+        .thenReturn(isEnabled);
+  }
 
-    private void assertConfigContainsDefaultValues() {
-        assertFalse(config.isKillSwitchEnabled());
-        assertEquals("%%adTagData%%", config.getAdTagDataMacro());
-        assertEquals("%%displayUrl%%", config.getDisplayUrlMacro());
-        assertEquals("<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script src=\"%%displayUrl%%\"></script></body></html>", config.getAdTagUrlMode());
-        assertEquals("<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>", config.getAdTagDataMode());
-    }
+  private void assertConfigContainsDefaultValues() {
+    assertFalse(config.isKillSwitchEnabled());
+    assertEquals("%%adTagData%%", config.getAdTagDataMacro());
+    assertEquals("%%displayUrl%%", config.getDisplayUrlMacro());
+    assertEquals(
+        "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script src=\"%%displayUrl%%\"></script></body></html>",
+        config.getAdTagUrlMode());
+    assertEquals(
+        "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>",
+        config.getAdTagDataMode());
+  }
 
 }

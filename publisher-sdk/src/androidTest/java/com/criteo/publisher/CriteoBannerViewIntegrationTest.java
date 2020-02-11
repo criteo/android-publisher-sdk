@@ -17,47 +17,47 @@ import org.mockito.MockitoAnnotations;
 
 public class CriteoBannerViewIntegrationTest {
 
-    @Rule
-    public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
+  @Rule
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
-    @Mock
-    private CriteoBannerAdListener criteoBannerAdListener;
+  @Mock
+  private CriteoBannerAdListener criteoBannerAdListener;
 
-    private CriteoBannerView criteoBannerView;
+  private CriteoBannerView criteoBannerView;
 
-    private BannerAdUnit bannerAdUnit = TestAdUnits.BANNER_320_50;
+  private BannerAdUnit bannerAdUnit = TestAdUnits.BANNER_320_50;
 
-    @Before
-    public void setup() throws Exception {
-        MockitoAnnotations.initMocks(this);
+  @Before
+  public void setup() throws Exception {
+    MockitoAnnotations.initMocks(this);
 
-        runOnMainThreadAndWait(() -> {
-            criteoBannerView = new CriteoBannerView(
-                InstrumentationRegistry.getContext(),
-                bannerAdUnit);
-        });
+    runOnMainThreadAndWait(() -> {
+      criteoBannerView = new CriteoBannerView(
+          InstrumentationRegistry.getContext(),
+          bannerAdUnit);
+    });
 
-        criteoBannerView.setCriteoBannerAdListener(criteoBannerAdListener);
-    }
+    criteoBannerView.setCriteoBannerAdListener(criteoBannerAdListener);
+  }
 
-    @Test
-    public void loadAdInHouse_GivenSelfMadeToken_NotifyListenerForFailure() throws Exception {
-        givenInitializedCriteo(bannerAdUnit);
-        waitForIdleState();
+  @Test
+  public void loadAdInHouse_GivenSelfMadeToken_NotifyListenerForFailure() throws Exception {
+    givenInitializedCriteo(bannerAdUnit);
+    waitForIdleState();
 
-        // This should not be possible since BidToken is not part of the public API.
-        // But just in case, we may check that no publisher can attempt this.
-        BidToken token = new BidToken(UUID.randomUUID(), bannerAdUnit);
+    // This should not be possible since BidToken is not part of the public API.
+    // But just in case, we may check that no publisher can attempt this.
+    BidToken token = new BidToken(UUID.randomUUID(), bannerAdUnit);
 
-        criteoBannerView.loadAd(token);
-        waitForIdleState();
+    criteoBannerView.loadAd(token);
+    waitForIdleState();
 
-        verify(criteoBannerAdListener, never()).onAdReceived(criteoBannerView);
-        verify(criteoBannerAdListener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
-    }
+    verify(criteoBannerAdListener, never()).onAdReceived(criteoBannerView);
+    verify(criteoBannerAdListener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+  }
 
-    private void waitForIdleState() {
-        ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
-    }
+  private void waitForIdleState() {
+    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+  }
 
 }

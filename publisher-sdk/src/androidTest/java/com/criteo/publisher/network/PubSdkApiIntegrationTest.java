@@ -16,42 +16,42 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class PubSdkApiIntegrationTest {
 
-    @Rule
-    public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
+  @Rule
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
-    private int senderId;
-    private int limitedAdTracking;
-    private String gaid;
-    private String eventType;
-    private Context context;
-    private String appId;
-    private PubSdkApi api;
-
-
-    @Before
-    public void setup() {
-        context = InstrumentationRegistry.getContext().getApplicationContext();
-        appId = context.getApplicationContext().getPackageName();
-        senderId = 2379;
-        limitedAdTracking = 0;
-        gaid = "021a86de-ef82-4f69-867b-61ca66688c9c";
-        eventType = "Launch";
-        api = mockedDependenciesRule.getDependencyProvider().providePubSdkApi(context);
-    }
+  private int senderId;
+  private int limitedAdTracking;
+  private String gaid;
+  private String eventType;
+  private Context context;
+  private String appId;
+  private PubSdkApi api;
 
 
-    @Test
-    public void testPostAppEventWithNullGaid() {
-        JSONObject object = api
-            .postAppEvent(senderId, appId, gaid, eventType, limitedAdTracking, "");
-        assertNotNull(object);
-    }
+  @Before
+  public void setup() {
+    context = InstrumentationRegistry.getContext().getApplicationContext();
+    appId = context.getApplicationContext().getPackageName();
+    senderId = 2379;
+    limitedAdTracking = 0;
+    gaid = "021a86de-ef82-4f69-867b-61ca66688c9c";
+    eventType = "Launch";
+    api = mockedDependenciesRule.getDependencyProvider().providePubSdkApi(context);
+  }
 
-    @Test
-    public void testPostAppEventWithGaid() {
-        gaid = null;
-        JSONObject object = api
-            .postAppEvent(senderId, appId, gaid, eventType, limitedAdTracking, "");
-        assertNotNull(object);
-    }
+
+  @Test
+  public void testPostAppEventWithNullGaid() {
+    JSONObject object = api
+        .postAppEvent(senderId, appId, gaid, eventType, limitedAdTracking, "");
+    assertNotNull(object);
+  }
+
+  @Test
+  public void testPostAppEventWithGaid() {
+    gaid = null;
+    JSONObject object = api
+        .postAppEvent(senderId, appId, gaid, eventType, limitedAdTracking, "");
+    assertNotNull(object);
+  }
 }

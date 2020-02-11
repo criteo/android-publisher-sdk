@@ -42,7 +42,7 @@ import org.junit.Test;
 public class CriteoFunctionalTest {
 
   @Rule
-  public MockedDependenciesRule mockedDependenciesRule  = new MockedDependenciesRule();
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   @Rule
   public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(DummyActivity.class);
@@ -68,16 +68,20 @@ public class CriteoFunctionalTest {
   }
 
   @Test
-  public void init_GivenPrefetchCachedBannerAndReInitWithSameBanner_CdbIsNotCallTheSecondTime() throws Exception {
+  public void init_GivenPrefetchCachedBannerAndReInitWithSameBanner_CdbIsNotCallTheSecondTime()
+      throws Exception {
     init_GivenPrefetchCachedAdAndReInitWithSameAdUnit_CdbIsNotCallTheSecondTime(validBannerAdUnit);
   }
 
   @Test
-  public void init_GivenPrefetchCachedInterstitialAndReInitWithSameInterstitial_CdbIsNotCallTheSecondTime() throws Exception {
-    init_GivenPrefetchCachedAdAndReInitWithSameAdUnit_CdbIsNotCallTheSecondTime(validInterstitialAdUnit);
+  public void init_GivenPrefetchCachedInterstitialAndReInitWithSameInterstitial_CdbIsNotCallTheSecondTime()
+      throws Exception {
+    init_GivenPrefetchCachedAdAndReInitWithSameAdUnit_CdbIsNotCallTheSecondTime(
+        validInterstitialAdUnit);
   }
 
-  private void init_GivenPrefetchCachedAdAndReInitWithSameAdUnit_CdbIsNotCallTheSecondTime(AdUnit adUnit)
+  private void init_GivenPrefetchCachedAdAndReInitWithSameAdUnit_CdbIsNotCallTheSecondTime(
+      AdUnit adUnit)
       throws Exception {
     int dayTtl = 3600 * 24;
 
@@ -100,7 +104,8 @@ public class CriteoFunctionalTest {
   }
 
   @Test
-  public void init_GivenPrefetchAdUnitAndLaunchedActivity_CallConfigAndCdbAndBearcat() throws Exception {
+  public void init_GivenPrefetchAdUnitAndLaunchedActivity_CallConfigAndCdbAndBearcat()
+      throws Exception {
     givenInitializedCriteo(validBannerAdUnit);
 
     activityRule.launchActivity(new Intent());
@@ -117,7 +122,7 @@ public class CriteoFunctionalTest {
     BidManager bidManager = mock(BidManager.class);
     doReturn(bidManager).when(dependencyProvider).provideBidManager(any(), any());
 
-    doAnswer(answerVoid((List<AdUnit>  adUnits) -> {
+    doAnswer(answerVoid((List<AdUnit> adUnits) -> {
       assertTrue(adUnits.isEmpty());
       assertSame(Thread.currentThread(), Looper.getMainLooper().getThread());
     })).when(bidManager).prefetch(any());

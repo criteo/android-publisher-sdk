@@ -5,11 +5,11 @@ import org.junit.Test;
 
 public class NativeAdUnitTest {
 
-	@Test
-	public void equalsContract() {
-		EqualsVerifier.forClass(NativeAdUnit.class)
-				.withRedefinedSuperclass()
-				.verify();
-	}
+  @Test
+  public void equalsContract() {
+    EqualsVerifier.forClass(NativeAdUnit.class)
+        .withRedefinedSuperclass()
+        .verify();
+  }
 
 }

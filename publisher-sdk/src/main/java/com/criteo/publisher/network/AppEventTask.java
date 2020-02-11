@@ -12,82 +12,83 @@ import org.json.JSONObject;
 
 public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
 
-    private static final String TAG = "Criteo.AET";
-    private static final int SENDER_ID = 2379;
-    protected static final String THROTTLE = "throttleSec";
+  private static final String TAG = "Criteo.AET";
+  private static final int SENDER_ID = 2379;
+  protected static final String THROTTLE = "throttleSec";
 
-    @NonNull
-    private final Context mContext;
+  @NonNull
+  private final Context mContext;
 
-    @NonNull
-    private final AppEventResponseListener responseListener;
+  @NonNull
+  private final AppEventResponseListener responseListener;
 
-    @NonNull
-    private final DeviceUtil deviceUtil;
+  @NonNull
+  private final DeviceUtil deviceUtil;
 
-    @NonNull
-    private final PubSdkApi api;
+  @NonNull
+  private final PubSdkApi api;
 
-    @NonNull
-    private final DeviceInfo deviceInfo;
+  @NonNull
+  private final DeviceInfo deviceInfo;
 
-    public AppEventTask(
-        @NonNull Context context,
-        @NonNull AppEventResponseListener responseListener,
-        @NonNull DeviceUtil deviceUtil,
-        @NonNull PubSdkApi api,
-        @NonNull DeviceInfo deviceInfo
-    ) {
-        this.mContext = context;
-        this.responseListener = responseListener;
-        this.deviceUtil = deviceUtil;
-        this.api = api;
-        this.deviceInfo = deviceInfo;
+  public AppEventTask(
+      @NonNull Context context,
+      @NonNull AppEventResponseListener responseListener,
+      @NonNull DeviceUtil deviceUtil,
+      @NonNull PubSdkApi api,
+      @NonNull DeviceInfo deviceInfo
+  ) {
+    this.mContext = context;
+    this.responseListener = responseListener;
+    this.deviceUtil = deviceUtil;
+    this.api = api;
+    this.deviceInfo = deviceInfo;
+  }
+
+  @Override
+  protected JSONObject doInBackground(Object... objects) {
+    JSONObject jsonObject = null;
+
+    try {
+      jsonObject = doAppEventTask(objects);
+    } catch (Throwable tr) {
+      Log.e(TAG, "Internal AET exec error.", tr);
     }
 
-    @Override
-    protected JSONObject doInBackground(Object... objects) {
-        JSONObject jsonObject = null;
+    return jsonObject;
+  }
 
-        try {
-            jsonObject = doAppEventTask(objects);
-        } catch (Throwable tr) {
-            Log.e(TAG, "Internal AET exec error.", tr);
-        }
+  private JSONObject doAppEventTask(Object[] objects) throws Exception {
+    String eventType = (String) objects[0];
+    int limitedAdTracking = deviceUtil.isLimitAdTrackingEnabled();
+    String gaid = deviceUtil.getAdvertisingId();
+    String appId = mContext.getPackageName();
 
-        return jsonObject;
+    String userAgent = deviceInfo.getUserAgent().get();
+    JSONObject response = api
+        .postAppEvent(SENDER_ID, appId, gaid, eventType, limitedAdTracking, userAgent);
+    if (response != null) {
+      Log.d(TAG, response.toString());
     }
+    return response;
+  }
 
-    private JSONObject doAppEventTask(Object[] objects) throws Exception {
-        String eventType = (String) objects[0];
-        int limitedAdTracking = deviceUtil.isLimitAdTrackingEnabled();
-        String gaid = deviceUtil.getAdvertisingId();
-        String appId = mContext.getPackageName();
-
-        String userAgent = deviceInfo.getUserAgent().get();
-        JSONObject response = api.postAppEvent(SENDER_ID, appId, gaid, eventType, limitedAdTracking, userAgent);
-        if (response != null) {
-            Log.d(TAG, response.toString());
-        }
-        return response;
+  @Override
+  protected void onPostExecute(@Nullable JSONObject result) {
+    try {
+      doOnPostExecute(result);
+    } catch (Throwable tr) {
+      Log.e(TAG, "Internal AET PostExec error.", tr);
     }
+  }
 
-    @Override
-    protected void onPostExecute(@Nullable JSONObject result) {
-        try {
-            doOnPostExecute(result);
-        } catch (Throwable tr) {
-            Log.e(TAG, "Internal AET PostExec error.", tr);
-        }
+  private void doOnPostExecute(@Nullable JSONObject result) {
+    super.onPostExecute(result);
+
+    if (result != null && result.has(THROTTLE)) {
+      responseListener.setThrottle(result.optInt(THROTTLE, 0));
+    } else {
+      responseListener.setThrottle(0);
     }
-
-    private void doOnPostExecute(@Nullable JSONObject result) {
-        super.onPostExecute(result);
-
-        if (result != null && result.has(THROTTLE)) {
-            responseListener.setThrottle(result.optInt(THROTTLE, 0));
-        } else {
-            responseListener.setThrottle(0);
-        }
-    }
+  }
 }

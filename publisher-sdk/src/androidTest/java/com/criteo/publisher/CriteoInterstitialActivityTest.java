@@ -27,69 +27,69 @@ import org.junit.runner.RunWith;
 @RunWith(AndroidJUnit4.class)
 public class CriteoInterstitialActivityTest {
 
-    @Rule
-    public ActivityTestRule<CriteoInterstitialActivity> activityRule = new ActivityTestRule<>(
-            CriteoInterstitialActivity.class, true, false);
+  @Rule
+  public ActivityTestRule<CriteoInterstitialActivity> activityRule = new ActivityTestRule<>(
+      CriteoInterstitialActivity.class, true, false);
 
-    @Test
-    public void whenDeeplinkIsLoaded_GivenTargetAppIsNotInstalled_DontThrowActivityNotFound() {
-        CriteoResultReceiver criteoResultReceiver = mock(CriteoResultReceiver.class);
-        Intent intent = new Intent();
-        Bundle bundle = new Bundle();
-        bundle.putString(WEB_VIEW_DATA, "");
-        bundle.putParcelable(RESULT_RECEIVER, criteoResultReceiver);
-        intent.putExtras(bundle);
-        activityRule.launchActivity(intent);
+  @Test
+  public void whenDeeplinkIsLoaded_GivenTargetAppIsNotInstalled_DontThrowActivityNotFound() {
+    CriteoResultReceiver criteoResultReceiver = mock(CriteoResultReceiver.class);
+    Intent intent = new Intent();
+    Bundle bundle = new Bundle();
+    bundle.putString(WEB_VIEW_DATA, "");
+    bundle.putParcelable(RESULT_RECEIVER, criteoResultReceiver);
+    intent.putExtras(bundle);
+    activityRule.launchActivity(intent);
 
-        CriteoInterstitialActivity activity = activityRule.getActivity();
-        runOnMainThreadAndWait(() -> {
-            WebView webView = activity.getWebView();
-            WebViewClient webViewClient  = webView.getWebViewClient();
-            webViewClient.shouldOverrideUrlLoading(webView, "fake_deeplink://fakeappdispatch");
-        });
+    CriteoInterstitialActivity activity = activityRule.getActivity();
+    runOnMainThreadAndWait(() -> {
+      WebView webView = activity.getWebView();
+      WebViewClient webViewClient = webView.getWebViewClient();
+      webViewClient.shouldOverrideUrlLoading(webView, "fake_deeplink://fakeappdispatch");
+    });
+  }
+
+  @Test
+  public void testAppearAndDoNotDismiss() {
+    CriteoResultReceiver criteoResultReceiver = mock(CriteoResultReceiver.class);
+    Intent intent = new Intent();
+    Bundle bundle = new Bundle();
+    bundle.putString(WEB_VIEW_DATA, "html content");
+    bundle.putParcelable(RESULT_RECEIVER, criteoResultReceiver);
+    intent.putExtras(bundle);
+    activityRule.launchActivity(intent);
+
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+    InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
+      public void run() {
+        Collection resumedActivities = ActivityLifecycleMonitorRegistry.getInstance()
+            .getActivitiesInStage(RESUMED);
+        Collection closedActivities = ActivityLifecycleMonitorRegistry.getInstance()
+            .getActivitiesInStage(DESTROYED);
+        assertTrue(resumedActivities.contains(activityRule.getActivity()));
+        assertFalse(closedActivities.contains(activityRule.getActivity()));
+      }
+    });
+
+    try {
+      Thread.sleep(8000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
     }
 
-    @Test
-    public void testAppearAndDoNotDismiss() {
-        CriteoResultReceiver criteoResultReceiver = mock(CriteoResultReceiver.class);
-        Intent intent = new Intent();
-        Bundle bundle = new Bundle();
-        bundle.putString(WEB_VIEW_DATA, "html content");
-        bundle.putParcelable(RESULT_RECEIVER, criteoResultReceiver);
-        intent.putExtras(bundle);
-        activityRule.launchActivity(intent);
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-            public void run() {
-                Collection resumedActivities = ActivityLifecycleMonitorRegistry.getInstance()
-                        .getActivitiesInStage(RESUMED);
-                Collection closedActivities = ActivityLifecycleMonitorRegistry.getInstance()
-                        .getActivitiesInStage(DESTROYED);
-                assertTrue(resumedActivities.contains(activityRule.getActivity()));
-                assertFalse(closedActivities.contains(activityRule.getActivity()));
-            }
-        });
-
-        try {
-            Thread.sleep(8000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-            public void run() {
-                Collection closedActivities = ActivityLifecycleMonitorRegistry.getInstance()
-                        .getActivitiesInStage(DESTROYED);
-                assertFalse(closedActivities.contains(activityRule.getActivity()));
-            }
-        });
+    InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
+      public void run() {
+        Collection closedActivities = ActivityLifecycleMonitorRegistry.getInstance()
+            .getActivitiesInStage(DESTROYED);
+        assertFalse(closedActivities.contains(activityRule.getActivity()));
+      }
+    });
 
 
-    }
+  }
 
 }
