@@ -130,7 +130,8 @@ public class CriteoInterstitial {
   }
 
   @NonNull
-  private CriteoInterstitialEventController getOrCreateController() {
+  @VisibleForTesting
+  CriteoInterstitialEventController getOrCreateController() {
     if (criteoInterstitialEventController == null) {
       criteoInterstitialEventController = new CriteoInterstitialEventController(
           criteoInterstitialAdListener,

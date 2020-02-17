@@ -7,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.AdditionalAnswers.answerVoid;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -29,6 +30,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -145,6 +147,31 @@ public class CriteoInterstitialEventControllerTest {
   }
 
   @Test
+  public void fetchAdAsyncStandalone_GivenBidTwice_NotifyAdListenerForSuccessAndFetchCreativeTwice()
+      throws Exception {
+    AdUnit adUnit = mock(AdUnit.class);
+    Slot slot = mock(Slot.class);
+
+    when(criteo.getBidForAdUnit(adUnit)).thenReturn(slot);
+    when(slot.getDisplayUrl())
+        .thenReturn("http://my.creative1")
+        .thenReturn("http://my.creative2");
+
+    runOnMainThreadAndWait(() -> criteoInterstitialEventController.fetchAdAsync(adUnit));
+    waitForIdleState();
+
+    runOnMainThreadAndWait(() -> criteoInterstitialEventController.fetchAdAsync(adUnit));
+    waitForIdleState();
+
+    InOrder inOrder = inOrder(criteoInterstitialAdListener, criteoInterstitialEventController);
+    inOrder.verify(criteoInterstitialEventController).fetchCreativeAsync("http://my.creative1");
+    inOrder.verify(criteoInterstitialAdListener).onAdReceived();
+    inOrder.verify(criteoInterstitialEventController).fetchCreativeAsync("http://my.creative2");
+    inOrder.verify(criteoInterstitialAdListener).onAdReceived();
+    inOrder.verifyNoMoreInteractions();
+  }
+
+  @Test
   public void fetchAdAsyncInHouse_GivenNoBid_NotifyAdListenerForFailure() throws Exception {
     BidToken bidToken = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
     when(criteo.getTokenValue(bidToken, AdUnitType.CRITEO_INTERSTITIAL)).thenReturn(null);
@@ -172,6 +199,31 @@ public class CriteoInterstitialEventControllerTest {
     verify(criteoInterstitialAdListener).onAdReceived();
     verify(criteoInterstitialAdListener, never()).onAdFailedToReceive(ERROR_CODE_NO_FILL);
     verify(criteoInterstitialEventController).fetchCreativeAsync("http://my.creative");
+  }
+
+  @Test
+  public void fetchAdAsyncInHouse_GivenBidTwice_NotifyAdListenerForSuccessAndFetchCreativeTwice()
+      throws Exception {
+    BidToken bidToken = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
+    TokenValue tokenValue = mock(TokenValue.class);
+
+    when(criteo.getTokenValue(bidToken, AdUnitType.CRITEO_INTERSTITIAL)).thenReturn(tokenValue);
+    when(tokenValue.getDisplayUrl())
+        .thenReturn("http://my.creative1")
+        .thenReturn("http://my.creative2");
+
+    runOnMainThreadAndWait(() -> criteoInterstitialEventController.fetchAdAsync(bidToken));
+    waitForIdleState();
+
+    runOnMainThreadAndWait(() -> criteoInterstitialEventController.fetchAdAsync(bidToken));
+    waitForIdleState();
+
+    InOrder inOrder = inOrder(criteoInterstitialAdListener, criteoInterstitialEventController);
+    inOrder.verify(criteoInterstitialEventController).fetchCreativeAsync("http://my.creative1");
+    inOrder.verify(criteoInterstitialAdListener).onAdReceived();
+    inOrder.verify(criteoInterstitialEventController).fetchCreativeAsync("http://my.creative2");
+    inOrder.verify(criteoInterstitialAdListener).onAdReceived();
+    inOrder.verifyNoMoreInteractions();
   }
 
   private void waitForIdleState() {
