@@ -8,9 +8,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.AdditionalAnswers.answerVoid;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -31,6 +33,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Answers;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -116,7 +119,7 @@ public class CriteoBannerEventControllerTest {
   }
 
   @Test
-  public void fetchAdAsyncAdUnit_GivenBidNotifyListenerForSuccessAndDisplayAd() throws Exception {
+  public void fetchAdAsyncAdUnit_GivenBid_NotifyListenerForSuccessAndDisplayAd() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
     Slot slot = mock(Slot.class);
 
@@ -128,6 +131,30 @@ public class CriteoBannerEventControllerTest {
 
     verify(criteoBannerAdListener).onAdReceived(criteoBannerView);
     verify(criteoBannerEventController).displayAd("http://my.display.url");
+  }
+
+  @Test
+  public void fetchAdAsyncAdUnit_GivenBidTwice_NotifyListenerForSuccessAndDisplayAdTwice() throws Exception {
+    AdUnit adUnit = mock(AdUnit.class);
+    Slot slot = mock(Slot.class);
+
+    when(criteo.getBidForAdUnit(adUnit)).thenReturn(slot);
+    when(slot.getDisplayUrl())
+        .thenReturn("http://my.display.url1")
+        .thenReturn("http://my.display.url2");
+
+    runOnMainThreadAndWait(() -> criteoBannerEventController.fetchAdAsync(adUnit));
+    waitForIdleState();
+
+    runOnMainThreadAndWait(() -> criteoBannerEventController.fetchAdAsync(adUnit));
+    waitForIdleState();
+
+    InOrder inOrder = inOrder(criteoBannerAdListener, criteoBannerEventController);
+    inOrder.verify(criteoBannerEventController).displayAd("http://my.display.url1");
+    inOrder.verify(criteoBannerAdListener).onAdReceived(criteoBannerView);
+    inOrder.verify(criteoBannerEventController).displayAd("http://my.display.url2");
+    inOrder.verify(criteoBannerAdListener).onAdReceived(criteoBannerView);
+    inOrder.verifyNoMoreInteractions();
   }
 
   @Test
@@ -145,7 +172,7 @@ public class CriteoBannerEventControllerTest {
   }
 
   @Test
-  public void fetchAdAsyncToken_GivenBidNotifyListenerForSuccessAndDisplayAd() throws Exception {
+  public void fetchAdAsyncToken_GivenBid_NotifyListenerForSuccessAndDisplayAd() throws Exception {
     BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
     TokenValue tokenValue = mock(TokenValue.class);
 
@@ -160,11 +187,46 @@ public class CriteoBannerEventControllerTest {
   }
 
   @Test
+  public void fetchAdAsyncToken_GivenBidTwice_NotifyListenerForSuccessAndDisplayAdTwice() throws Exception {
+    BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
+    TokenValue tokenValue = mock(TokenValue.class);
+
+    when(criteo.getTokenValue(any(), any())).thenReturn(tokenValue);
+    when(tokenValue.getDisplayUrl())
+        .thenReturn("http://my.display.url1")
+        .thenReturn("http://my.display.url2");
+
+    runOnMainThreadAndWait(() -> criteoBannerEventController.fetchAdAsync(token));
+    waitForIdleState();
+
+    runOnMainThreadAndWait(() -> criteoBannerEventController.fetchAdAsync(token));
+    waitForIdleState();
+
+    InOrder inOrder = inOrder(criteoBannerAdListener, criteoBannerEventController);
+    inOrder.verify(criteoBannerEventController).displayAd("http://my.display.url1");
+    inOrder.verify(criteoBannerAdListener).onAdReceived(criteoBannerView);
+    inOrder.verify(criteoBannerEventController).displayAd("http://my.display.url2");
+    inOrder.verify(criteoBannerAdListener).onAdReceived(criteoBannerView);
+    inOrder.verifyNoMoreInteractions();
+  }
+
+  @Test
   public void displayAd_GivenDisplayUrl_LoadItInBanner() throws Exception {
     criteoBannerEventController.displayAd("http://my.display.url");
     waitForIdleState();
 
     verify(criteoBannerView).loadDataWithBaseURL(any(), any(), any(), any(), any());
+  }
+
+  @Test
+  public void displayAd_GivenDisplayUrlTwice_LoadItInBannerTwice() throws Exception {
+    criteoBannerEventController.displayAd("http://my.display1.url");
+    waitForIdleState();
+
+    criteoBannerEventController.displayAd("http://my.display2.url");
+    waitForIdleState();
+
+    verify(criteoBannerView, times(2)).loadDataWithBaseURL(any(), any(), any(), any(), any());
   }
 
   @Test

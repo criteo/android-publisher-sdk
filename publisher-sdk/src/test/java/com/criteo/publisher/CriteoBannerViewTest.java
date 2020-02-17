@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -59,6 +60,17 @@ public class CriteoBannerViewTest {
   }
 
   @Test
+  public void loadAdStandalone_GivenControllerAndLoadTwice_DelegateToItTwice() throws Exception {
+    doReturn(controller).when(bannerView).getOrCreateController();
+
+    bannerView.loadAd();
+    bannerView.loadAd();
+
+    verify(controller, times(2)).fetchAdAsync(bannerAdUnit);
+    verifyNoMoreInteractions(controller);
+  }
+
+  @Test
   public void loadAdStandalone_GivenNullAdUnitController_DelegateToIt() throws Exception {
     bannerView = spy(new CriteoBannerView(context, null));
     doReturn(controller).when(bannerView).getOrCreateController();
@@ -91,6 +103,17 @@ public class CriteoBannerViewTest {
     bannerView.loadAd(bidToken);
 
     verify(controller).fetchAdAsync(bidToken);
+    verifyNoMoreInteractions(controller);
+  }
+
+  @Test
+  public void loadAdInHouse_GivenControllerAndLoadTwice_DelegateToItTwice() throws Exception {
+    doReturn(controller).when(bannerView).getOrCreateController();
+
+    bannerView.loadAd(bidToken);
+    bannerView.loadAd(bidToken);
+
+    verify(controller, times(2)).fetchAdAsync(bidToken);
     verifyNoMoreInteractions(controller);
   }
 
