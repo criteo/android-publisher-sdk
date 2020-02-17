@@ -130,10 +130,32 @@ public class StandaloneFunctionalTest {
       throws Exception {
     givenInitializedSdk(validInterstitialAdUnit);
 
-    View interstitialView = whenLoadingAndDisplayingAnInterstitial(validInterstitialAdUnit);
+    CriteoInterstitial interstitial = createInterstitial(validInterstitialAdUnit);
+    CriteoSync sync = new CriteoSync(interstitial);
+    View interstitialView = whenLoadingAndDisplayingAnInterstitial(interstitial, sync);
     String html = webViewLookup.lookForHtmlContent(interstitialView).get();
 
     assertTrue(html.contains(STUB_CREATIVE_IMAGE));
+  }
+
+  @Test
+  public void whenLoadingAnInterstitial_GivenBidAvailableTwice_DisplayUrlIsProperlyLoadedInInterstitialActivityTwice()
+      throws Exception {
+    givenInitializedSdk(validInterstitialAdUnit);
+
+    CriteoInterstitial interstitial = createInterstitial(validInterstitialAdUnit);
+    CriteoSync sync = new CriteoSync(interstitial);
+
+    View interstitialView1 = whenLoadingAndDisplayingAnInterstitial(interstitial, sync);
+    String html1 = webViewLookup.lookForHtmlContent(interstitialView1).get();
+
+    sync.reset();
+
+    View interstitialView2 = whenLoadingAndDisplayingAnInterstitial(interstitial, sync);
+    String html2 = webViewLookup.lookForHtmlContent(interstitialView2).get();
+
+    assertTrue(html1.contains(STUB_CREATIVE_IMAGE));
+    assertTrue(html2.contains(STUB_CREATIVE_IMAGE));
   }
 
   @Test
@@ -186,11 +208,10 @@ public class StandaloneFunctionalTest {
     return bannerViewRef.get();
   }
 
-  private View whenLoadingAndDisplayingAnInterstitial(InterstitialAdUnit interstitialAdUnit)
+  private View whenLoadingAndDisplayingAnInterstitial(CriteoInterstitial interstitial, CriteoSync sync)
       throws Exception {
-    AtomicReference<CriteoSync> syncRef = new AtomicReference<>();
-
-    CriteoInterstitial interstitial = whenLoadingAnInterstitial(interstitialAdUnit, syncRef);
+    runOnMainThreadAndWait(interstitial::loadAd);
+    sync.waitForBid();
 
     assertTrue(interstitial.isAdLoaded());
 
@@ -198,29 +219,30 @@ public class StandaloneFunctionalTest {
       runOnMainThreadAndWait(interstitial::show);
     });
 
-    syncRef.get().waitForDisplay();
+    sync.waitForDisplay();
 
     return getRootView(activity.get());
   }
 
   private CriteoInterstitial whenLoadingAnInterstitial(InterstitialAdUnit interstitialAdUnit)
       throws Exception {
-    return whenLoadingAnInterstitial(interstitialAdUnit, new AtomicReference<>());
+    CriteoInterstitial interstitial = createInterstitial(interstitialAdUnit);
+
+    CriteoSync sync = new CriteoSync(interstitial);
+    runOnMainThreadAndWait(interstitial::loadAd);
+    sync.waitForBid();
+
+    return interstitial;
   }
 
-  private CriteoInterstitial whenLoadingAnInterstitial(InterstitialAdUnit interstitialAdUnit,
-      AtomicReference<CriteoSync> syncRef) throws Exception {
+  private CriteoInterstitial createInterstitial(InterstitialAdUnit adUnit) {
     AtomicReference<CriteoInterstitial> interstitialRef = new AtomicReference<>();
 
     runOnMainThreadAndWait(() -> {
-      CriteoInterstitial interstitial = new CriteoInterstitial(context, interstitialAdUnit);
-      syncRef.set(new CriteoSync(interstitial));
+      CriteoInterstitial interstitial = new CriteoInterstitial(context, adUnit);
       interstitialRef.set(interstitial);
-
-      interstitial.loadAd();
     });
 
-    syncRef.get().waitForBid();
     return interstitialRef.get();
   }
 
@@ -371,25 +393,42 @@ public class StandaloneFunctionalTest {
 
   private static final class CriteoSync {
 
-    private final CountDownLatch isLoaded;
-    private final CountDownLatch isDisplayed;
     private final Handler handler;
+    private final Runnable init;
+
+    private CountDownLatch isLoaded;
+    private CountDownLatch isDisplayed;
 
     CriteoSync(CriteoBannerView bannerView) {
-      this.isLoaded = new CountDownLatch(1);
-      this.isDisplayed = isLoaded;
       this.handler = new Handler(Looper.getMainLooper());
+      this.init = () -> {
+        this.isLoaded = new CountDownLatch(1);
+        this.isDisplayed = isLoaded;
+      };
+      reset();
       bannerView.setCriteoBannerAdListener(new SyncAdListener());
     }
 
     CriteoSync(CriteoInterstitial interstitial) {
-      this.isLoaded = new CountDownLatch(1);
-      this.isDisplayed = new CountDownLatch(1);
       this.handler = new Handler(Looper.getMainLooper());
+      this.init = () -> {
+        this.isLoaded = new CountDownLatch(2);
+        this.isDisplayed = new CountDownLatch(1);
+      };
+
+      reset();
 
       SyncAdListener listener = new SyncAdListener();
       interstitial.setCriteoInterstitialAdDisplayListener(listener);
       interstitial.setCriteoInterstitialAdListener(listener);
+    }
+
+    /**
+     * This method is not atomic. Do not use it on multiple threads.
+     */
+    void reset() {
+      emptyLatches();
+      init.run();
     }
 
     void waitForBid() throws InterruptedException {
@@ -413,8 +452,21 @@ public class StandaloneFunctionalTest {
     }
 
     private void onFailed() {
-      isLoaded.countDown();
-      isDisplayed.countDown();
+      emptyLatches();
+    }
+
+    private void emptyLatches() {
+      if (isLoaded != null) {
+        while (isLoaded.getCount() > 0) {
+          isLoaded.countDown();
+        }
+      }
+
+      if (isDisplayed != null) {
+        while (isDisplayed.getCount() > 0) {
+          isDisplayed.countDown();
+        }
+      }
     }
 
     private class SyncAdListener implements CriteoBannerAdListener,
@@ -428,6 +480,11 @@ public class StandaloneFunctionalTest {
 
       @Override
       public void onAdReadyToDisplay() {
+        onLoaded();
+      }
+
+      @Override
+      public void onAdReceived() {
         onLoaded();
       }
 
@@ -456,10 +513,6 @@ public class StandaloneFunctionalTest {
 
       @Override
       public void onAdClosed() {
-      }
-
-      @Override
-      public void onAdReceived() {
       }
     }
   }
