@@ -1,26 +1,19 @@
 package com.criteo.publisher.network;
 
-import android.content.Context;
-import com.criteo.publisher.R;
+import com.criteo.publisher.BuildConfig;
 
 public class NetworkConfiguration {
 
-  private final Context context;
-
-  public NetworkConfiguration(Context context) {
-    this.context = context;
-  }
-
   String getCdbUrl() {
-    return context.getString(R.string.cdb_url);
+    return BuildConfig.CDB_URL;
   }
 
   String getRemoteConfigUrl() {
-    return context.getString(R.string.config_url);
+    return BuildConfig.REMOTE_CONFIG_URL;
   }
 
   String getEventUrl() {
-    return context.getString(R.string.event_url);
+    return BuildConfig.EVENT_URL;
   }
 
 }

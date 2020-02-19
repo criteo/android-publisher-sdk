@@ -28,15 +28,21 @@ android {
             debuggable false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             consumerProguardFiles 'consumer-proguard.txt'
+
+            with loadConfig('release')
         }
         debug {
             minifyEnabled false
             debuggable true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             consumerProguardFiles 'consumer-proguard.txt'
+
+            with loadConfig('debug')
         }
         staging {
             initWith debug
+
+            with loadConfig('staging')
         }
     }
     testOptions {
@@ -111,5 +117,16 @@ publish {
                 artifact packageAarDebug
             }
         }
+    }
+}
+
+Closure loadConfig(String environment) {
+    def configFile = file('config.groovy')
+    def config = new ConfigSlurper(environment).parse(configFile.toURL())
+
+    return {
+        buildConfigField "String", "CDB_URL", "\"${config.cdbUrl}\""
+        buildConfigField "String", "REMOTE_CONFIG_URL", "\"${config.remoteConfigUrl}\""
+        buildConfigField "String", "EVENT_URL", "\"${config.eventUrl}\""
     }
 }

@@ -279,7 +279,7 @@ public class ConfigIntegrationTests {
 
   private PubSdkApi givenMockedRemoteConfig() {
     PubSdkApi api = mock(PubSdkApi.class);
-    when(mockedDependenciesRule.getDependencyProvider().providePubSdkApi(any()))
+    when(mockedDependenciesRule.getDependencyProvider().providePubSdkApi())
         .thenReturn(api);
     return api;
   }

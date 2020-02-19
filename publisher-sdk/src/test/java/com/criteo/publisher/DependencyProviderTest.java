@@ -44,12 +44,12 @@ public class DependencyProviderTest {
   @Test
   public void verifyDependencies() {
     // given
-    when(dependencyProvider.providePubSdkApi(any())).thenReturn(pubSdkApi);
+    when(dependencyProvider.providePubSdkApi()).thenReturn(pubSdkApi);
     when(dependencyProvider.provideAdvertisingInfo()).thenReturn(advertisingInfo);
     DependencyProvider.setInstance(dependencyProvider);
 
     // when, then
-    assertTrue(pubSdkApi == DependencyProvider.getInstance().providePubSdkApi(any()));
+    assertTrue(pubSdkApi == DependencyProvider.getInstance().providePubSdkApi());
     assertTrue(advertisingInfo == DependencyProvider.getInstance().provideAdvertisingInfo());
   }
 
@@ -95,8 +95,7 @@ public class DependencyProviderTest {
 
   @Test
   public void providePubSdkApi_WhenProvidedTwice_ReturnsTheSame() throws Exception {
-    provideBean_WhenProvidedTwice_ReturnsTheSame(provider ->
-        provider.providePubSdkApi(mock(Context.class)));
+    provideBean_WhenProvidedTwice_ReturnsTheSame(DependencyProvider::providePubSdkApi);
   }
 
   @Test

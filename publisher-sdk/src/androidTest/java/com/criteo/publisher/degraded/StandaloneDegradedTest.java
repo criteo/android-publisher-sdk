@@ -49,7 +49,7 @@ public class StandaloneDegradedTest {
     MockitoAnnotations.initMocks(this);
 
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-    when(dependencyProvider.providePubSdkApi(any())).thenReturn(api);
+    when(dependencyProvider.providePubSdkApi()).thenReturn(api);
 
     DegradedUtil.assumeIsDegraded();
 

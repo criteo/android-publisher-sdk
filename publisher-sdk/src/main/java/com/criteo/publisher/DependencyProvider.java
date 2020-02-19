@@ -53,21 +53,21 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public PubSdkApi providePubSdkApi(Context context) {
+  public PubSdkApi providePubSdkApi() {
     return getOrCreate(PubSdkApi.class, new Factory<PubSdkApi>() {
       @Override
       public PubSdkApi create() {
-        return new PubSdkApi(provideNetworkConfiguration(context));
+        return new PubSdkApi(provideNetworkConfiguration());
       }
     });
   }
 
   @NonNull
-  public NetworkConfiguration provideNetworkConfiguration(Context context) {
+  public NetworkConfiguration provideNetworkConfiguration() {
     return getOrCreate(NetworkConfiguration.class, new Factory<NetworkConfiguration>() {
       @Override
       public NetworkConfiguration create() {
-        return new NetworkConfiguration(context);
+        return new NetworkConfiguration();
       }
     });
   }
@@ -182,7 +182,7 @@ public class DependencyProvider {
             DependencyProvider.this.provideClock(),
             DependencyProvider.this.provideUserPrivacyUtil(context),
             DependencyProvider.this.provideAdUnitMapper(context),
-            DependencyProvider.this.providePubSdkApi(context)
+            DependencyProvider.this.providePubSdkApi()
         );
       }
     });
@@ -231,7 +231,7 @@ public class DependencyProvider {
             context,
             DependencyProvider.this.provideDeviceUtil(context),
             DependencyProvider.this.provideClock(),
-            DependencyProvider.this.providePubSdkApi(context),
+            DependencyProvider.this.providePubSdkApi(),
             DependencyProvider.this.provideUserPrivacyUtil(context),
             DependencyProvider.this.provideDeviceInfo(context)
         );

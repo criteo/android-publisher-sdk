@@ -50,7 +50,7 @@ public class DeviceIdTest {
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-    when(dependencyProvider.providePubSdkApi(any())).thenReturn(pubSdkApi);
+    when(dependencyProvider.providePubSdkApi()).thenReturn(pubSdkApi);
     when(dependencyProvider.provideAdvertisingInfo()).thenReturn(advertisingInfo);
     context = InstrumentationRegistry.getContext();
   }

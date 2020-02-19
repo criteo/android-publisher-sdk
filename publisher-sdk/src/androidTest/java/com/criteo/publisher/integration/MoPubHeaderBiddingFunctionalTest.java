@@ -182,7 +182,7 @@ public class MoPubHeaderBiddingFunctionalTest {
 
   @Test
   public void loadingMoPubBanner_GivenDemoBanner_MoPubViewUsesDemoDisplayUrl() throws Exception {
-    ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult(context);
+    ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
 
     String html = loadMoPubHtmlBanner(demoBannerAdUnit);
 
@@ -201,7 +201,7 @@ public class MoPubHeaderBiddingFunctionalTest {
   @Test
   public void loadingMoPubInterstitial_GivenDemoInterstitial_MoPubViewUsesDemoDisplayUrl()
       throws Exception {
-    ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult(context);
+    ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
 
     String html = loadMoPubHtmlInterstitial(demoInterstitialAdUnit);
 

@@ -44,7 +44,7 @@ public class UserPrivacyFunctionalTest {
     defaultSharedPreferences = PreferenceManager
         .getDefaultSharedPreferences(app.getApplicationContext());
 
-    doReturn(pubSdkApi).when(dependencyProvider).providePubSdkApi(any());
+    doReturn(pubSdkApi).when(dependencyProvider).providePubSdkApi();
   }
 
   @After

@@ -93,7 +93,7 @@ public class BidManagerFunctionalTest {
 
     dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
-    when(dependencyProvider.providePubSdkApi(any())).thenReturn(api);
+    when(dependencyProvider.providePubSdkApi()).thenReturn(api);
     when(dependencyProvider.provideClock()).thenReturn(clock);
 
     // Should be set to at least 1 because user-level silent mode is set the 0 included
@@ -870,7 +870,7 @@ public class BidManagerFunctionalTest {
         dependencyProvider.provideClock(),
         dependencyProvider.provideUserPrivacyUtil(context),
         dependencyProvider.provideAdUnitMapper(context),
-        dependencyProvider.providePubSdkApi(context)
+        dependencyProvider.providePubSdkApi()
     );
   }
 

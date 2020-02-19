@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="cdb_url">http://directbidder-test-app.par.preprod.crto.in</string>
-  <string name="config_url">https://pub-sdk-cfg.par.preprod.crto.in</string>
-  <string name="event_url">https://gum.par.preprod.crto.in</string>
   <string name="close_button">Close Button</string>
   <string name="shared_preferences">com.criteo.publisher.sdkSharedPreferences</string>
 </resources>

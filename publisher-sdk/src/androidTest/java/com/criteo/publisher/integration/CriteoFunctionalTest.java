@@ -63,8 +63,8 @@ public class CriteoFunctionalTest {
 
     dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
-    api = spy(dependencyProvider.providePubSdkApi(application));
-    doReturn(api).when(dependencyProvider).providePubSdkApi(any());
+    api = spy(dependencyProvider.providePubSdkApi());
+    doReturn(api).when(dependencyProvider).providePubSdkApi();
   }
 
   @Test

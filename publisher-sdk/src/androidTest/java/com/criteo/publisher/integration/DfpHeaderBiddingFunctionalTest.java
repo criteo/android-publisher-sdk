@@ -405,7 +405,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
   @Test
   public void loadingDfpBanner_GivenDemoBanner_DfpViewContainsDisplayUrl() throws Exception {
-    ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult(context);
+    ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
 
     String html = loadDfpHtmlBanner(demoBannerAdUnit);
 
@@ -415,7 +415,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
   @Test
   public void loadingDfpBanner_GivenDemoInterstitial_DfpViewContainsDisplayUrl() throws Exception {
-    ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult(context);
+    ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
 
     String html = loadDfpHtmlInterstitial(demoInterstitialAdUnit);
 

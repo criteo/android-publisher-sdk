@@ -368,7 +368,7 @@ public class CriteoInternalUnitTest {
     PubSdkApi api = mock(PubSdkApi.class);
 
     Context context = application.getApplicationContext();
-    when(dependencyProvider.providePubSdkApi(context)).thenReturn(api);
+    when(dependencyProvider.providePubSdkApi()).thenReturn(api);
 
     return api;
   }

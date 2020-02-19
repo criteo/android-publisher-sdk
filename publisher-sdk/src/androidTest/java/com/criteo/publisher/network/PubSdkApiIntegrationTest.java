@@ -36,7 +36,7 @@ public class PubSdkApiIntegrationTest {
     limitedAdTracking = 0;
     gaid = "021a86de-ef82-4f69-867b-61ca66688c9c";
     eventType = "Launch";
-    api = mockedDependenciesRule.getDependencyProvider().providePubSdkApi(context);
+    api = mockedDependenciesRule.getDependencyProvider().providePubSdkApi();
   }
 
 

@@ -136,8 +136,7 @@ public class BidManagerTest {
     userPrivacyUtil = mockedDependenciesRule.getDependencyProvider()
         .provideUserPrivacyUtil(context);
     adUnitMapper = mockedDependenciesRule.getDependencyProvider().provideAdUnitMapper(context);
-    api = mockedDependenciesRule.getDependencyProvider()
-        .providePubSdkApi(context.getApplicationContext());
+    api = mockedDependenciesRule.getDependencyProvider().providePubSdkApi();
     runOnUiThreadExecutor = mockedDependenciesRule.getDependencyProvider()
         .provideRunOnUiThreadExecutor();
   }

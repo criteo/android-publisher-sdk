@@ -47,7 +47,7 @@ public class BearcatFunctionalTest {
 
     dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
-    doReturn(api).when(dependencyProvider).providePubSdkApi(any());
+    doReturn(api).when(dependencyProvider).providePubSdkApi();
     context = InstrumentationRegistry.getContext().getApplicationContext();
   }
 
