@@ -128,5 +128,6 @@ Closure loadConfig(String environment) {
         buildConfigField "String", "CDB_URL", "\"${config.cdbUrl}\""
         buildConfigField "String", "REMOTE_CONFIG_URL", "\"${config.remoteConfigUrl}\""
         buildConfigField "String", "EVENT_URL", "\"${config.eventUrl}\""
+        buildConfigField "String", "PUBSDK_SHARED_PREFERENCES", "\"${config.pubSdkSharedPreferences}\""
     }
 }

@@ -1,3 +1,5 @@
+pubSdkSharedPreferences = 'com.criteo.publisher.sdkSharedPreferences'
+
 environments {
     debug {
         cdbUrl = 'http://directbidder-test-app.par.preprod.crto.in'

@@ -58,8 +58,9 @@ public class CriteoUtil {
   private static SharedPreferences getSharedPreferences() {
     Context context = InstrumentationRegistry.getTargetContext().getApplicationContext();
 
-    String sharedPreferencesName = context.getString(R.string.shared_preferences);
-    return context.getSharedPreferences(sharedPreferencesName, Context.MODE_PRIVATE);
+    return context.getSharedPreferences(
+        BuildConfig.PUBSDK_SHARED_PREFERENCES,
+        Context.MODE_PRIVATE);
   }
 
 }

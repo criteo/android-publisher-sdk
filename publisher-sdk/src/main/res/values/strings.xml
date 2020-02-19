@@ -1,4 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="close_button">Close Button</string>
-  <string name="shared_preferences">com.criteo.publisher.sdkSharedPreferences</string>
 </resources>

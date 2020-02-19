@@ -19,10 +19,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 import android.support.test.InstrumentationRegistry;
+import com.criteo.publisher.BuildConfig;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.CriteoUtil;
-import com.criteo.publisher.R;
 import com.criteo.publisher.ThreadingUtil;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.network.PubSdkApi;
@@ -312,9 +312,9 @@ public class ConfigIntegrationTests {
   }
 
   private SharedPreferences getSharedPreferences() {
-    String sharedPreferencesName = context.getString(R.string.shared_preferences);
     return context.getSharedPreferences(
-        sharedPreferencesName, Context.MODE_PRIVATE);
+        BuildConfig.PUBSDK_SHARED_PREFERENCES,
+        Context.MODE_PRIVATE);
   }
 
   private void waitForIdleState() {

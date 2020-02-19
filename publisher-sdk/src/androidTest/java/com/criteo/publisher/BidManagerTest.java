@@ -121,7 +121,8 @@ public class BidManagerTest {
   public void setup() {
     context = InstrumentationRegistry.getContext().getApplicationContext();
     SharedPreferences sharedPref = context.getSharedPreferences(
-        context.getString(R.string.shared_preferences), Context.MODE_PRIVATE);
+        BuildConfig.PUBSDK_SHARED_PREFERENCES,
+        Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = sharedPref.edit();
     editor.putBoolean("CriteoCachedKillSwitch", false);
     editor.apply();

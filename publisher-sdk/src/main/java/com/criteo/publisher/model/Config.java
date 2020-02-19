@@ -6,7 +6,7 @@ import android.content.SharedPreferences.Editor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import com.criteo.publisher.R;
+import com.criteo.publisher.BuildConfig;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -113,8 +113,9 @@ public class Config {
   }
 
   private static SharedPreferences getSharedPreferences(@NonNull Context context) {
-    String sharedPreferenceName = context.getString(R.string.shared_preferences);
-    return context.getSharedPreferences(sharedPreferenceName, Context.MODE_PRIVATE);
+    return context.getSharedPreferences(
+        BuildConfig.PUBSDK_SHARED_PREFERENCES,
+        Context.MODE_PRIVATE);
   }
 
   public boolean isKillSwitchEnabled() {
