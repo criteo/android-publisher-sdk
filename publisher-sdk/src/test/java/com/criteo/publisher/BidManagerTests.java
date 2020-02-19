@@ -51,7 +51,6 @@ public class BidManagerTests {
   private AdSize adSize = new AdSize(320, 50);
   private AdUnit adUnit;
   private String cpm = "0.10";
-  private Context context;
   private String displayUrl = "https://www.example.com/lone?par1=abcd";
   private Publisher publisher;
   private User user;
@@ -62,6 +61,9 @@ public class BidManagerTests {
 
   @Mock
   private DependencyProvider dependencyProvider;
+
+  @Mock
+  private Context context;
 
   @Mock
   private Config config;
@@ -86,6 +88,7 @@ public class BidManagerTests {
 
   private AdUnitMapper adUnitMapper;
 
+  @Mock
   private PubSdkApi api;
 
   @Before
@@ -93,13 +96,11 @@ public class BidManagerTests {
     MockitoAnnotations.initMocks(this);
 
     adUnitMapper = new AdUnitMapper(androidUtil, deviceUtil);
-    api = new PubSdkApi(context);
 
     adUnit = new BannerAdUnit(adUnitId, adSize);
 
     CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
 
-    context = mock(Context.class);
     when(context.getPackageName()).thenReturn("TestThisPackage");
 
     // FIXME This seems useless because tests still works without.

@@ -1,10 +1,8 @@
 package com.criteo.publisher.network;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import com.criteo.publisher.R;
 import com.criteo.publisher.Util.StreamUtil;
 import com.criteo.publisher.Util.TextUtils;
 import com.criteo.publisher.model.CdbRequest;
@@ -31,10 +29,10 @@ public class PubSdkApi {
   private static final String EVENT_TYPE = "eventType";
   private static final String LIMITED_AD_TRACKING = "limitedAdTracking";
 
-  private final Context context;
+  private final NetworkConfiguration networkConfiguration;
 
-  public PubSdkApi(Context context) {
-    this.context = context;
+  public PubSdkApi(NetworkConfiguration networkConfiguration) {
+    this.networkConfiguration = networkConfiguration;
   }
 
   @Nullable
@@ -49,8 +47,7 @@ public class PubSdkApi {
 
     JSONObject configResult = null;
     try {
-      URL url = new URL(
-          context.getString(R.string.config_url) + "/v2.0/api/config" + "?" + getParamsString(
+      URL url = new URL(networkConfiguration.getRemoteConfigUrl() + "/v2.0/api/config" + "?" + getParamsString(
               parameters));
       configResult = executeGet(url, null);
     } catch (IOException | JSONException e) {
@@ -63,7 +60,7 @@ public class PubSdkApi {
   @Nullable
   public CdbResponse loadCdb(@NonNull CdbRequest cdbRequest, @NonNull String userAgent) {
     try {
-      URL url = new URL(context.getString(R.string.cdb_url) + "/inapp/v2");
+      URL url = new URL(networkConfiguration.getCdbUrl() + "/inapp/v2");
       JSONObject cdbRequestJson = cdbRequest.toJson();
       JSONObject result = executePost(url, cdbRequestJson, userAgent);
       return CdbResponse.fromJson(result);
@@ -95,7 +92,7 @@ public class PubSdkApi {
     parameters.put(LIMITED_AD_TRACKING, String.valueOf(limitedAdTracking));
     try {
       URL url = new URL(
-          context.getString(R.string.event_url) + "/appevent/v1/" + senderId + "?"
+          networkConfiguration.getEventUrl() + "/appevent/v1/" + senderId + "?"
               + getParamsString(
               parameters));
       return executeGet(url, userAgent);

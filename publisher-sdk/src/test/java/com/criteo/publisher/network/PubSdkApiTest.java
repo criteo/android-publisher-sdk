@@ -9,9 +9,7 @@ import static org.mockserver.model.HttpResponse.response;
 import static org.mockserver.model.NottableString.not;
 import static org.mockserver.verify.VerificationTimes.once;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
-import com.criteo.publisher.R;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
 import java.nio.charset.StandardCharsets;
@@ -34,7 +32,7 @@ public class PubSdkApiTest {
   private MockServerClient mockServerClient;
 
   @Mock
-  private Context context;
+  private NetworkConfiguration networkConfiguration;
 
   private PubSdkApi api;
 
@@ -42,14 +40,14 @@ public class PubSdkApiTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    when(context.getString(R.string.cdb_url))
+    when(networkConfiguration.getCdbUrl())
         .thenReturn("http://localhost:" + mockServerRule.getPort());
-    when(context.getString(R.string.event_url))
+    when(networkConfiguration.getEventUrl())
         .thenReturn("http://localhost:" + mockServerRule.getPort());
-    when(context.getString(R.string.config_url))
+    when(networkConfiguration.getRemoteConfigUrl())
         .thenReturn("http://localhost:" + mockServerRule.getPort());
 
-    api = new PubSdkApi(context);
+    api = new PubSdkApi(networkConfiguration);
   }
 
   @Test

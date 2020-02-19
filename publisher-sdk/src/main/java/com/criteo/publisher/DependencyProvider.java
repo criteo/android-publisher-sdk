@@ -17,6 +17,7 @@ import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.User;
+import com.criteo.publisher.network.NetworkConfiguration;
 import com.criteo.publisher.network.PubSdkApi;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -56,7 +57,17 @@ public class DependencyProvider {
     return getOrCreate(PubSdkApi.class, new Factory<PubSdkApi>() {
       @Override
       public PubSdkApi create() {
-        return new PubSdkApi(context);
+        return new PubSdkApi(provideNetworkConfiguration(context));
+      }
+    });
+  }
+
+  @NonNull
+  public NetworkConfiguration provideNetworkConfiguration(Context context) {
+    return getOrCreate(NetworkConfiguration.class, new Factory<NetworkConfiguration>() {
+      @Override
+      public NetworkConfiguration create() {
+        return new NetworkConfiguration(context);
       }
     });
   }
