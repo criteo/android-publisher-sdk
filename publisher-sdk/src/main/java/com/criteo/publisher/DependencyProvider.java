@@ -171,7 +171,6 @@ public class DependencyProvider {
       public BidManager create() {
         return new BidManager(
             new Publisher(context, criteoPublisherId),
-            new TokenCache(),
             DependencyProvider.this.provideDeviceInfo(context),
             DependencyProvider.this.provideUser(context),
             new SdkCache(DependencyProvider.this.provideDeviceUtil(context)),
@@ -250,6 +249,20 @@ public class DependencyProvider {
     T newService = factory.create();
     services.put(klass, newService);
     return newService;
+  }
+
+  @NonNull
+  public InHouse provideInHouse(@NonNull Context context, @NonNull String criteoPublisherId) {
+    return getOrCreate(InHouse.class, new Factory<InHouse>() {
+      @Override
+      public InHouse create() {
+        return new InHouse(
+            DependencyProvider.this.provideBidManager(context, criteoPublisherId),
+            new TokenCache(),
+            DependencyProvider.this.provideClock()
+        );
+      }
+    });
   }
 
   private interface Factory<T> {

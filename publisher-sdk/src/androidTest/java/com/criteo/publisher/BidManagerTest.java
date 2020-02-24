@@ -84,8 +84,6 @@ public class BidManagerTest {
   private SdkCache sdkCache;
   private Config config;
 
-  private TokenCache tokenCache;
-
   private DeviceInfo deviceInfo;
 
   @Mock
@@ -130,7 +128,6 @@ public class BidManagerTest {
     api = dependencyProvider.providePubSdkApi();
     Executor runOnUiThreadExecutor = dependencyProvider.provideRunOnUiThreadExecutor();
 
-    tokenCache = new TokenCache();
     deviceInfo = new DeviceInfo(context, runOnUiThreadExecutor);
   }
 
@@ -334,9 +331,10 @@ public class BidManagerTest {
     slots.add(slot1);
 
     BidManager manager = createBidManager();
+    InHouse inHouse = createInHouse(manager);
 
     manager.setCacheAdUnits(slots);
-    BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
+    BidResponse bidResponse = inHouse.getBidResponse(adUnit);
     Assert.assertFalse(bidResponse.isBidSuccess());
   }
 
@@ -352,9 +350,10 @@ public class BidManagerTest {
     slots.add(slot1);
 
     BidManager manager = createBidManager();
+    InHouse inHouse = createInHouse(manager);
 
     manager.setCacheAdUnits(slots);
-    BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
+    BidResponse bidResponse = inHouse.getBidResponse(adUnit);
     Assert.assertFalse(bidResponse.isBidSuccess());
   }
 
@@ -376,9 +375,10 @@ public class BidManagerTest {
     slots.add(slot1);
 
     BidManager manager = createBidManager();
+    InHouse inHouse = createInHouse(manager);
 
     manager.setCacheAdUnits(slots);
-    BidResponse bidResponse = manager.getBidForInhouseMediation(adUnit);
+    BidResponse bidResponse = inHouse.getBidResponse(adUnit);
     Assert.assertTrue(bidResponse.isBidSuccess());
     Assert.assertEquals(10.0d, bidResponse.getPrice(), 0.0);
   }
@@ -610,7 +610,6 @@ public class BidManagerTest {
   private BidManager createBidManager() {
     return new BidManager(
           publisher,
-          tokenCache,
           deviceInfo,
           user,
           sdkCache,
@@ -623,5 +622,10 @@ public class BidManagerTest {
           adUnitMapper,
           api
       );
+  }
+
+  @NonNull
+  private InHouse createInHouse(BidManager manager) {
+    return new InHouse(manager, new TokenCache(), clock);
   }
 }

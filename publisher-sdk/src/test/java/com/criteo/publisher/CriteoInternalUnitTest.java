@@ -244,12 +244,12 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void getBidResponse_GivenBidManagerThrowing_DoNotThrowAndReturnNoBidResponse()
+  public void getBidResponse_GivenInHouseThrowing_DoNotThrowAndReturnNoBidResponse()
       throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
 
-    BidManager bidManager = givenMockedBidManager();
-    when(bidManager.getBidForInhouseMediation(adUnit)).thenThrow(RuntimeException.class);
+    InHouse inHouse = givenMockedInHouse();
+    when(inHouse.getBidResponse(adUnit)).thenThrow(RuntimeException.class);
 
     BidResponse noBid = new BidResponse(0., null, false);
 
@@ -264,8 +264,8 @@ public class CriteoInternalUnitTest {
     AdUnit adUnit = mock(AdUnit.class);
     BidResponse expectedBid = new BidResponse(42., new BidToken(UUID.randomUUID(), adUnit), true);
 
-    BidManager bidManager = givenMockedBidManager();
-    when(bidManager.getBidForInhouseMediation(adUnit)).thenReturn(expectedBid);
+    InHouse inHouse = givenMockedInHouse();
+    when(inHouse.getBidResponse(adUnit)).thenReturn(expectedBid);
 
     Criteo criteo = createCriteo();
     BidResponse bidResponse = criteo.getBidResponse(adUnit);
@@ -337,12 +337,12 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void getTokenValue_GivenBidManager_DelegateToIt() throws Exception {
+  public void getTokenValue_GivenInHouse_DelegateToIt() throws Exception {
     BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
     TokenValue expected = mock(TokenValue.class);
 
-    BidManager bidManager = givenMockedBidManager();
-    when(bidManager.getTokenValue(token, CRITEO_BANNER)).thenReturn(expected);
+    InHouse inHouse = givenMockedInHouse();
+    when(inHouse.getTokenValue(token, CRITEO_BANNER)).thenReturn(expected);
 
     CriteoInternal criteo = createCriteo();
     TokenValue tokenValue = criteo.getTokenValue(token, CRITEO_BANNER);
@@ -364,10 +364,18 @@ public class CriteoInternalUnitTest {
     return bidManager;
   }
 
+  private InHouse givenMockedInHouse() {
+    InHouse inHouse = mock(InHouse.class);
+
+    Context context = application.getApplicationContext();
+    when(dependencyProvider.provideInHouse(context, criteoPublisherId)).thenReturn(inHouse);
+
+    return inHouse;
+  }
+
   private PubSdkApi givenMockedPubSdkApi() {
     PubSdkApi api = mock(PubSdkApi.class);
 
-    Context context = application.getApplicationContext();
     when(dependencyProvider.providePubSdkApi()).thenReturn(api);
 
     return api;

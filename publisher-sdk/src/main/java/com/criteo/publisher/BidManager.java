@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
-import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.LoggingUtil;
@@ -25,7 +24,6 @@ import com.criteo.publisher.model.NativeAssets;
 import com.criteo.publisher.model.NativeProduct;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
-import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.CdbDownloadTask;
 import com.criteo.publisher.network.PubSdkApi;
@@ -78,7 +76,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
   private final AtomicLong cdbTimeToNextCall = new AtomicLong(0);
 
-  private final TokenCache tokenCache;
   private final Publisher publisher;
   private final User user;
   private DeviceInfo deviceInfo;
@@ -95,7 +92,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
   BidManager(
       @NonNull Publisher publisher,
-      @NonNull TokenCache tokenCache,
       @NonNull DeviceInfo deviceInfo,
       @NonNull User user,
       @NonNull SdkCache sdkCache,
@@ -109,7 +105,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
       @NonNull PubSdkApi api
   ) {
     this.publisher = publisher;
-    this.tokenCache = tokenCache;
     this.deviceInfo = deviceInfo;
     this.user = user;
     this.cache = sdkCache;
@@ -397,25 +392,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     }
   }
 
-  @NonNull
-  public BidResponse getBidForInhouseMediation(AdUnit adUnit) {
-    Slot slot = this.getBidForAdUnitAndPrefetch(adUnit);
-    if (slot == null) {
-      return new BidResponse();
-    }
-
-    TokenValue tokenValue = new TokenValue(
-        slot.getTimeOfDownload(),
-        slot.getTtl(),
-        slot.getDisplayUrl(),
-        clock
-    );
-
-    double price = slot.getCpmAsNumber();
-    return new BidResponse(price, tokenCache.add(tokenValue, adUnit), true);
-
-  }
-
   /**
    * This method is called back after the "useragent" is fetched
    *
@@ -429,11 +405,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
       startCdbDownloadTask(isConfigRequested, requestedAdUnits);
       isConfigRequested = false;
     }
-  }
-
-  @Nullable
-  public TokenValue getTokenValue(@Nullable BidToken bidToken, @NonNull AdUnitType adUnitType) {
-    return tokenCache.getTokenValue(bidToken, adUnitType);
   }
 
   private boolean killSwitchEngaged() {

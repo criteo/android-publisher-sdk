@@ -56,7 +56,6 @@ public class BidManagerTests {
   private User user;
   private SdkCache sdkCache;
   private DeviceInfo deviceInfo;
-  private TokenCache tokenCache = null;
   private Slot testSlot;
 
   @Mock
@@ -134,8 +133,6 @@ public class BidManagerTests {
     testSlot = new Slot(slotJson);
     when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
 
-    tokenCache = mock(TokenCache.class);
-
     DependencyProvider.setInstance(dependencyProvider);
   }
 
@@ -205,11 +202,12 @@ public class BidManagerTests {
     when(config.isKillSwitchEnabled()).thenReturn(true);
 
     BidManager bidManager = createBidManager();
+    InHouse inHouse = createInHouse(bidManager);
 
     BidResponse expectedResponse = new BidResponse();
 
     //test
-    BidResponse bidResponse = bidManager.getBidForInhouseMediation(adUnit);
+    BidResponse bidResponse = inHouse.getBidResponse(adUnit);
     Assert.assertNotNull(bidResponse);
     Assert.assertEquals(expectedResponse.getPrice(), bidResponse.getPrice(), 0.01);
     Assert.assertEquals(expectedResponse.isBidSuccess(), bidResponse.isBidSuccess());
@@ -225,13 +223,14 @@ public class BidManagerTests {
     when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
 
     BidManager bidManager = createBidManager();
+    InHouse inHouse = createInHouse(bidManager);
 
     BidResponse expectedResponse = new BidResponse(0.10d,
         new BidToken(UUID.randomUUID(), new BannerAdUnit("banneradUnitId1", new AdSize(320, 50))),
         true);
 
     //test
-    BidResponse bidResponse = bidManager.getBidForInhouseMediation(adUnit);
+    BidResponse bidResponse = inHouse.getBidResponse(adUnit);
     Assert.assertNotNull(bidResponse);
     Assert.assertEquals(expectedResponse.getPrice(), bidResponse.getPrice(), 0.01);
     Assert.assertEquals(expectedResponse.isBidSuccess(), bidResponse.isBidSuccess());
@@ -308,7 +307,6 @@ public class BidManagerTests {
   private BidManager createBidManager() {
     return new BidManager(
         publisher,
-        tokenCache,
         deviceInfo,
         user,
         sdkCache,
@@ -321,6 +319,11 @@ public class BidManagerTests {
         adUnitMapper,
         api
     );
+  }
+
+  @NonNull
+  private InHouse createInHouse(BidManager bidManager) {
+    return new InHouse(bidManager, mock(TokenCache.class), clock);
   }
 
   private interface SpecialMap extends Map {

@@ -70,9 +70,6 @@ public class BidManagerFunctionalTest {
   private Publisher publisher;
 
   @Mock
-  private TokenCache tokenCache;
-
-  @Mock
   private User user;
 
   @Mock
@@ -859,7 +856,6 @@ public class BidManagerFunctionalTest {
 
     return new BidManager(
         publisher,
-        tokenCache,
         dependencyProvider.provideDeviceInfo(context),
         user,
         cache,

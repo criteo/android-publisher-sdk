@@ -36,6 +36,9 @@ final class CriteoInternal extends Criteo {
   @NonNull
   private final UserPrivacyUtil userPrivacyUtil;
 
+  @NonNull
+  private final InHouse inHouse;
+
   CriteoInternal(
       Application application,
       List<AdUnit> adUnits,
@@ -66,6 +69,7 @@ final class CriteoInternal extends Criteo {
     config = dependencyProvider.provideConfig(context);
 
     bidManager = dependencyProvider.provideBidManager(context, criteoPublisherId);
+    inHouse = dependencyProvider.provideInHouse(context, criteoPublisherId);
 
     userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil(context);
     if (usPrivacyOptout != null) {
@@ -130,14 +134,14 @@ final class CriteoInternal extends Criteo {
     return response;
   }
 
-  private BidResponse doGetBidResponse(AdUnit adUnit) {
-    return bidManager.getBidForInhouseMediation(adUnit);
+  private BidResponse doGetBidResponse(@Nullable AdUnit adUnit) {
+    return inHouse.getBidResponse(adUnit);
   }
 
   @Nullable
   @Override
   TokenValue getTokenValue(@Nullable BidToken bidToken, @NonNull AdUnitType adUnitType) {
-    return bidManager.getTokenValue(bidToken, adUnitType);
+    return inHouse.getTokenValue(bidToken, adUnitType);
   }
 
   @NonNull
