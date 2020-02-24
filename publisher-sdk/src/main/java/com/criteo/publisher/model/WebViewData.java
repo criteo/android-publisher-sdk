@@ -2,7 +2,6 @@ package com.criteo.publisher.model;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.Util.WebViewLoadStatus;
@@ -11,8 +10,13 @@ import java.util.concurrent.Executor;
 
 public class WebViewData {
 
+  @NonNull
   private String content;
+
+  @NonNull
   private WebViewLoadStatus webViewLoadStatus;
+
+  @NonNull
   private final Config config;
 
   public WebViewData(@NonNull Config config) {
@@ -22,24 +26,19 @@ public class WebViewData {
   }
 
   public boolean isLoaded() {
-    return (webViewLoadStatus == WebViewLoadStatus.LOADED);
+    return webViewLoadStatus == WebViewLoadStatus.LOADED;
   }
 
-  public void setContent(String data) {
-    String dataWithTag = "";
-
-    if (!TextUtils.isEmpty(data)) {
-      dataWithTag = config.getAdTagDataMode();
-      dataWithTag = dataWithTag.replace(config.getAdTagDataMacro(), data);
-    }
-
-    this.content = dataWithTag;
+  public void setContent(@NonNull String data) {
+    String dataWithTag = config.getAdTagDataMode();
+    content = dataWithTag.replace(config.getAdTagDataMacro(), data);
   }
 
   public boolean isLoading() {
     return webViewLoadStatus == WebViewLoadStatus.LOADING;
   }
 
+  @NonNull
   public String getContent() {
     return content;
   }

@@ -3,11 +3,13 @@ package com.criteo.publisher;
 import static com.criteo.publisher.CriteoListenerCode.INVALID;
 import static com.criteo.publisher.CriteoListenerCode.VALID;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.RunOnUiThreadExecutor;
+import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Slot;
@@ -33,16 +35,22 @@ public class CriteoInterstitialEventController {
   @NonNull
   private final Criteo criteo;
 
+  @NonNull
+  private final InterstitialActivityHelper interstitialActivityHelper;
+
+  @NonNull
   private final RunOnUiThreadExecutor executor;
 
   public CriteoInterstitialEventController(
       @Nullable CriteoInterstitialAdListener listener,
       @Nullable CriteoInterstitialAdDisplayListener adDisplayListener,
       @NonNull WebViewData webViewData,
+      @NonNull InterstitialActivityHelper interstitialActivityHelper,
       @NonNull Criteo criteo) {
     this.criteoInterstitialAdListener = listener;
     this.criteoInterstitialAdDisplayListener = adDisplayListener;
     this.webViewData = webViewData;
+    this.interstitialActivityHelper = interstitialActivityHelper;
     this.criteo = criteo;
     this.deviceInfo = criteo.getDeviceInfo();
     this.executor = DependencyProvider.getInstance().provideRunOnUiThreadExecutor();
@@ -50,14 +58,6 @@ public class CriteoInterstitialEventController {
 
   public boolean isAdLoaded() {
     return webViewData.isLoaded();
-  }
-
-  public void refresh() {
-    webViewData.refresh();
-  }
-
-  public String getWebViewDataContent() {
-    return webViewData.getContent();
   }
 
   public void fetchAdAsync(@Nullable AdUnit adUnit) {
@@ -100,5 +100,20 @@ public class CriteoInterstitialEventController {
         displayUrl,
         deviceInfo,
         criteoInterstitialAdDisplayListener);
+  }
+
+  public void show(@NonNull Context context) {
+    if (!isAdLoaded()) {
+      return;
+    }
+
+    String webViewContent = webViewData.getContent();
+    interstitialActivityHelper.openActivity(context, webViewContent, criteoInterstitialAdListener);
+
+    if (criteoInterstitialAdListener != null) {
+      criteoInterstitialAdListener.onAdOpened();
+    }
+
+    webViewData.refresh();
   }
 }

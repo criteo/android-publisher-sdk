@@ -1,6 +1,9 @@
 package com.criteo.publisher;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -101,6 +104,23 @@ public class CriteoInterstitialTest {
     interstitial.loadAd(bidToken);
 
     verifyZeroInteractions(controller);
+  }
+
+  @Test
+  public void show_GivenController_DelegateToIt() throws Exception {
+    CriteoInterstitialEventController controller = givenMockedController();
+
+    interstitial.show();
+
+    verify(controller).show(context);
+  }
+
+  @Test
+  public void show_GivenThrowingController_DoesNotThrow() throws Exception {
+    CriteoInterstitialEventController controller = givenMockedController();
+    doThrow(RuntimeException.class).when(controller).show(any());
+
+    assertThatCode(interstitial::show).doesNotThrowAnyException();
   }
 
   private CriteoInterstitialEventController givenMockedController() {

@@ -2,9 +2,9 @@ package com.criteo.publisher;
 
 import static android.support.test.runner.lifecycle.Stage.DESTROYED;
 import static android.support.test.runner.lifecycle.Stage.RESUMED;
-import static com.criteo.publisher.CriteoInterstitial.RESULT_RECEIVER;
-import static com.criteo.publisher.CriteoInterstitial.WEB_VIEW_DATA;
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
+import static com.criteo.publisher.interstitial.InterstitialActivityHelper.RESULT_RECEIVER;
+import static com.criteo.publisher.interstitial.InterstitialActivityHelper.WEB_VIEW_DATA;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;

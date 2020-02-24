@@ -1,23 +1,18 @@
 package com.criteo.publisher;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
-import com.criteo.publisher.Util.CriteoResultReceiver;
 import com.criteo.publisher.Util.ObjectsUtil;
+import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.WebViewData;
 
 public class CriteoInterstitial {
 
   private static final String TAG = CriteoInterstitial.class.getSimpleName();
-  protected static final String WEB_VIEW_DATA = "webviewdata";
-  protected static final String RESULT_RECEIVER = "resultreceiver";
 
   private final InterstitialAdUnit interstitialAdUnit;
 
@@ -111,22 +106,7 @@ public class CriteoInterstitial {
   }
 
   private void doShow() {
-    if (isAdLoaded()) {
-      Intent intent = new Intent(context, CriteoInterstitialActivity.class);
-      intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-      Bundle bundle = new Bundle();
-      CriteoInterstitialEventController controller = getOrCreateController();
-      bundle.putString(WEB_VIEW_DATA, controller.getWebViewDataContent());
-      CriteoResultReceiver criteoResultReceiver = new CriteoResultReceiver(new Handler(),
-          criteoInterstitialAdListener);
-      bundle.putParcelable(RESULT_RECEIVER, criteoResultReceiver);
-      intent.putExtras(bundle);
-      if (criteoInterstitialAdListener != null) {
-        criteoInterstitialAdListener.onAdOpened();
-      }
-      controller.refresh();
-      context.startActivity(intent);
-    }
+    getOrCreateController().show(context);
   }
 
   @NonNull
@@ -137,6 +117,7 @@ public class CriteoInterstitial {
           criteoInterstitialAdListener,
           criteoInterstitialAdDisplayListener,
           new WebViewData(getCriteo().getConfig()),
+          new InterstitialActivityHelper(),
           getCriteo()
       );
     }

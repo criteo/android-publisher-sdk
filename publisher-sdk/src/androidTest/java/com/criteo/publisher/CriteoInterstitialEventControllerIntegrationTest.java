@@ -18,6 +18,7 @@ import android.os.Looper;
 import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Slot;
@@ -26,7 +27,6 @@ import com.criteo.publisher.model.WebViewData;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,7 +34,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class CriteoInterstitialEventControllerTest {
+public class CriteoInterstitialEventControllerIntegrationTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
@@ -48,6 +48,9 @@ public class CriteoInterstitialEventControllerTest {
 
   @Mock
   private CriteoInterstitialAdDisplayListener adDisplayListener;
+
+  @Mock
+  private InterstitialActivityHelper interstitialActivityHelper;
 
   @Mock
   private Criteo criteo;
@@ -64,16 +67,9 @@ public class CriteoInterstitialEventControllerTest {
         criteoInterstitialAdListener,
         adDisplayListener,
         webViewData,
+        interstitialActivityHelper,
         criteo
     ));
-  }
-
-  @Test
-  public void testUnload() {
-    criteoInterstitialEventController.refresh();
-
-    Assert.assertEquals("", webViewData.getContent());
-    Assert.assertEquals(false, webViewData.isLoaded());
   }
 
   @Test

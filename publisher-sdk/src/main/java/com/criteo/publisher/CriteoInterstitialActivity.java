@@ -1,11 +1,11 @@
 package com.criteo.publisher;
 
-import static com.criteo.publisher.CriteoInterstitial.RESULT_RECEIVER;
-import static com.criteo.publisher.CriteoInterstitial.WEB_VIEW_DATA;
 import static com.criteo.publisher.Util.CriteoResultReceiver.ACTION_CLOSED;
 import static com.criteo.publisher.Util.CriteoResultReceiver.ACTION_LEFT_CLICKED;
 import static com.criteo.publisher.Util.CriteoResultReceiver.INTERSTITIAL_ACTION;
 import static com.criteo.publisher.Util.CriteoResultReceiver.RESULT_CODE_SUCCESSFUL;
+import static com.criteo.publisher.interstitial.InterstitialActivityHelper.RESULT_RECEIVER;
+import static com.criteo.publisher.interstitial.InterstitialActivityHelper.WEB_VIEW_DATA;
 
 import android.app.Activity;
 import android.content.Intent;
