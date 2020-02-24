@@ -11,7 +11,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ResultReceiver;
@@ -80,11 +79,6 @@ public class CriteoInterstitialActivity extends Activity {
   private void prepareWebView() {
     webView.getSettings().setJavaScriptEnabled(true);
     webView.setWebViewClient(new InterstitialWebViewClient());
-  }
-
-  @Override
-  public void onConfigurationChanged(Configuration newConfig) {
-    super.onConfigurationChanged(newConfig);
   }
 
   @Override

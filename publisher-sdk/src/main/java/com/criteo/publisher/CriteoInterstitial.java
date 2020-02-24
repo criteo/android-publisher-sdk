@@ -106,7 +106,7 @@ public class CriteoInterstitial {
   }
 
   private void doShow() {
-    getOrCreateController().show(context);
+    getOrCreateController().show();
   }
 
   @NonNull
@@ -117,7 +117,7 @@ public class CriteoInterstitial {
           criteoInterstitialAdListener,
           criteoInterstitialAdDisplayListener,
           new WebViewData(getCriteo().getConfig()),
-          new InterstitialActivityHelper(),
+          new InterstitialActivityHelper(context.getApplicationContext()),
           getCriteo()
       );
     }

@@ -34,7 +34,7 @@ public class InterstitialActivityHelperTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    helper = spy(new InterstitialActivityHelper());
+    helper = spy(new InterstitialActivityHelper(context));
   }
 
   @Test
@@ -45,7 +45,7 @@ public class InterstitialActivityHelperTest {
     CriteoResultReceiver expectedReceiver = mock(CriteoResultReceiver.class);
     doReturn(expectedReceiver).when(helper).createReceiver(listener);
 
-    helper.openActivity(context, "myContent", listener);
+    helper.openActivity("myContent", listener);
 
     verify(context).startActivity(argThat(intent -> {
       assertEquals(expectedComponent, intent.getComponent());

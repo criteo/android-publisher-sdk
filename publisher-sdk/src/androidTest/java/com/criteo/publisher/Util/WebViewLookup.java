@@ -20,11 +20,9 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class WebViewLookup {
 
@@ -85,22 +83,27 @@ public class WebViewLookup {
   }
 
   public Future<Activity> lookForResumedActivity(CheckedRunnable action) {
-    BlockingQueue<Activity> queue = new LinkedBlockingQueue<>(1);
+    CompletableFuture<Activity> activityFuture = new CompletableFuture<>();
     ActivityLifecycleCallbacks lifecycleCallbacks = mock(ActivityLifecycleCallbacks.class);
-    doAnswer(answerVoid(queue::put)).when(lifecycleCallbacks).onActivityResumed(any());
+    doAnswer(answerVoid(activityFuture::complete)).when(lifecycleCallbacks).onActivityResumed(any());
 
     Application application = (Application) InstrumentationRegistry.getTargetContext()
         .getApplicationContext();
     application.registerActivityLifecycleCallbacks(lifecycleCallbacks);
 
     executor.submit(() -> {
-      action.run();
+      try {
+        action.run();
+      } catch (Exception e) {
+        activityFuture.completeExceptionally(e);
+      }
+
       return null;
     });
 
     return executor.submit(() -> {
       try {
-        return queue.take();
+        return activityFuture.get();
       } finally {
         application.unregisterActivityLifecycleCallbacks(lifecycleCallbacks);
       }

@@ -3,7 +3,6 @@ package com.criteo.publisher;
 import static com.criteo.publisher.CriteoListenerCode.INVALID;
 import static com.criteo.publisher.CriteoListenerCode.VALID;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
@@ -61,6 +60,11 @@ public class CriteoInterstitialEventController {
   }
 
   public void fetchAdAsync(@Nullable AdUnit adUnit) {
+    if (!interstitialActivityHelper.isAvailable()) {
+      notifyFor(INVALID);
+      return;
+    }
+
     if (webViewData.isLoading()) {
       return;
     }
@@ -89,7 +93,8 @@ public class CriteoInterstitialEventController {
     }
   }
 
-  private void notifyFor(@NonNull CriteoListenerCode code) {
+  @VisibleForTesting
+  void notifyFor(@NonNull CriteoListenerCode code) {
     executor
         .executeAsync(new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener, code));
   }
@@ -102,13 +107,13 @@ public class CriteoInterstitialEventController {
         criteoInterstitialAdDisplayListener);
   }
 
-  public void show(@NonNull Context context) {
+  public void show() {
     if (!isAdLoaded()) {
       return;
     }
 
     String webViewContent = webViewData.getContent();
-    interstitialActivityHelper.openActivity(context, webViewContent, criteoInterstitialAdListener);
+    interstitialActivityHelper.openActivity(webViewContent, criteoInterstitialAdListener);
 
     if (criteoInterstitialAdListener != null) {
       criteoInterstitialAdListener.onAdOpened();

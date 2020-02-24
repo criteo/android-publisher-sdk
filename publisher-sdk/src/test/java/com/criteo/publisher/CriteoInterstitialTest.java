@@ -1,7 +1,6 @@
 package com.criteo.publisher;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -112,13 +111,13 @@ public class CriteoInterstitialTest {
 
     interstitial.show();
 
-    verify(controller).show(context);
+    verify(controller).show();
   }
 
   @Test
   public void show_GivenThrowingController_DoesNotThrow() throws Exception {
     CriteoInterstitialEventController controller = givenMockedController();
-    doThrow(RuntimeException.class).when(controller).show(any());
+    doThrow(RuntimeException.class).when(controller).show();
 
     assertThatCode(interstitial::show).doesNotThrowAnyException();
   }
