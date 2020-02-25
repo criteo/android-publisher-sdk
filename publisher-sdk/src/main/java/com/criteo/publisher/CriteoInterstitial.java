@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import com.criteo.publisher.Util.ObjectsUtil;
-import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.WebViewData;
 
@@ -113,12 +112,14 @@ public class CriteoInterstitial {
   @VisibleForTesting
   CriteoInterstitialEventController getOrCreateController() {
     if (criteoInterstitialEventController == null) {
+      Criteo criteo = getCriteo();
+
       criteoInterstitialEventController = new CriteoInterstitialEventController(
           criteoInterstitialAdListener,
           criteoInterstitialAdDisplayListener,
-          new WebViewData(getCriteo().getConfig()),
-          new InterstitialActivityHelper(context.getApplicationContext()),
-          getCriteo()
+          new WebViewData(criteo.getConfig()),
+          criteo.getInterstitialActivityHelper(),
+          criteo
       );
     }
     return criteoInterstitialEventController;

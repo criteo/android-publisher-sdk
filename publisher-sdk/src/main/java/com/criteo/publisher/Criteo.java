@@ -7,6 +7,7 @@ import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
@@ -139,6 +140,9 @@ public abstract class Criteo {
 
   @NonNull
   abstract Config getConfig();
+
+  @NonNull
+  abstract InterstitialActivityHelper getInterstitialActivityHelper();
 
   public abstract void setUsPrivacyOptOut(boolean usPrivacyOptOut);
 

@@ -21,6 +21,7 @@ import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.cache.SdkCache;
+import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
@@ -79,6 +80,8 @@ public class BidManagerTest {
 
   private static final String TEST_CREATIVE = "https://rdi.us.criteo.com/delivery/r/ajs.php?did=5c87fcdb7cc0d71b24ee2ee6454eb810&u=%7CvsLBMQ0Ek4IxXQb0B5n7RyCAQymjqwh29YhNM9EzK9Q%3D%7C&c1=fYGSyyN4O4mkT2ynhzfwbdpiG7v0SMGpms6Tk24GWc957HzbzgL1jw-HVL5D0BjRx5ef3wBVfDXXmh9StLy8pf5kDJtrQLTLQrexjq5CZt9tEDx9mY8Y-eTV19PWOQoNjXkJ4_mhKqV0IfwHDIfLVDBWmsizVCoAtU1brQ2weeEkUU5-mDfn3qzTX3jPXszef5bC3pbiLJAK3QamQlglD1dkWYOkUwLAXxMjr2MXeBQk2YK-_qYz0fMVJG0xWJ-jVmsqdOw9A9rkGIgToRoUewB0VAu5eSkjSBoGs4yEbsnJ5Ssq5fquJMNvm6T77b8fzQI-eXgwoEfKkdAuCbj3gNrPBgzGZAJPGO-TYvJgs22Bljy-hNCk1E0E030zLtKo-XvAVRvZ5PswtwoccPSl6u1wiV8fMCXHx9QW9-fdXaVxzZe9AZB6w7pHxKUwiRK9";
   private static final String CRITEO_PUBLISHER_ID = "1000";
+
+  private Context context;
   private Publisher publisher;
   private User user;
   private SdkCache sdkCache;
@@ -106,7 +109,7 @@ public class BidManagerTest {
 
   @Before
   public void setup() {
-    Context context = InstrumentationRegistry.getContext().getApplicationContext();
+    context = InstrumentationRegistry.getContext().getApplicationContext();
     SharedPreferences sharedPref = context.getSharedPreferences(
         BuildConfig.PUBSDK_SHARED_PREFERENCES,
         Context.MODE_PRIVATE);
@@ -626,6 +629,6 @@ public class BidManagerTest {
 
   @NonNull
   private InHouse createInHouse(BidManager manager) {
-    return new InHouse(manager, new TokenCache(), clock);
+    return new InHouse(manager, new TokenCache(), clock, new InterstitialActivityHelper(context));
   }
 }

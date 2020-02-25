@@ -11,6 +11,7 @@ import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.TextUtils;
 import com.criteo.publisher.Util.UserPrivacyUtil;
+import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
@@ -38,6 +39,9 @@ final class CriteoInternal extends Criteo {
 
   @NonNull
   private final InHouse inHouse;
+
+  @NonNull
+  private final InterstitialActivityHelper interstitialActivityHelper;
 
   CriteoInternal(
       Application application,
@@ -70,6 +74,8 @@ final class CriteoInternal extends Criteo {
 
     bidManager = dependencyProvider.provideBidManager(context, criteoPublisherId);
     inHouse = dependencyProvider.provideInHouse(context, criteoPublisherId);
+
+    interstitialActivityHelper = dependencyProvider.provideInterstitialActivityHelper(context);
 
     userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil(context);
     if (usPrivacyOptout != null) {
@@ -154,6 +160,12 @@ final class CriteoInternal extends Criteo {
   @Override
   Config getConfig() {
     return config;
+  }
+
+  @NonNull
+  @Override
+  InterstitialActivityHelper getInterstitialActivityHelper() {
+    return interstitialActivityHelper;
   }
 
   @Override

@@ -12,6 +12,7 @@ import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.RunOnUiThreadExecutor;
 import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.cache.SdkCache;
+import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
@@ -259,8 +260,18 @@ public class DependencyProvider {
         return new InHouse(
             DependencyProvider.this.provideBidManager(context, criteoPublisherId),
             new TokenCache(),
-            DependencyProvider.this.provideClock()
-        );
+            DependencyProvider.this.provideClock(),
+            DependencyProvider.this.provideInterstitialActivityHelper(context));
+      }
+    });
+  }
+
+  @NonNull
+  public InterstitialActivityHelper provideInterstitialActivityHelper(@NonNull Context context) {
+    return getOrCreate(InterstitialActivityHelper.class, new Factory<InterstitialActivityHelper>() {
+      @Override
+      public InterstitialActivityHelper create() {
+        return new InterstitialActivityHelper(context);
       }
     });
   }

@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.RunOnUiThreadExecutor;
+import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
@@ -49,6 +50,12 @@ public class DummyCriteo extends Criteo {
     return new Config();
   }
 
+  @NonNull
+  @Override
+  InterstitialActivityHelper getInterstitialActivityHelper() {
+    return new DummyInterstitialActivityHelper();
+  }
+
   @Override
   public void setUsPrivacyOptOut(boolean usPrivacyOptOut) {
     // do nothing
@@ -77,4 +84,20 @@ public class DummyCriteo extends Criteo {
 
   }
 
+  private static class DummyInterstitialActivityHelper extends InterstitialActivityHelper {
+
+    DummyInterstitialActivityHelper() {
+      super(null);
+    }
+
+    @Override
+    public boolean isAvailable() {
+      return false;
+    }
+
+    @Override
+    public void openActivity(@NonNull String webViewContent,
+        @Nullable CriteoInterstitialAdListener listener) {
+    }
+  }
 }

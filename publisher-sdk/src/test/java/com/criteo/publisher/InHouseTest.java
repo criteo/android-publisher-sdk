@@ -3,9 +3,12 @@ package com.criteo.publisher;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 import java.util.UUID;
@@ -25,13 +28,16 @@ public class InHouseTest {
   @Mock
   private Clock clock;
 
+  @Mock
+  private InterstitialActivityHelper interstitialActivityHelper;
+
   private InHouse inHouse;
 
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    inHouse = new InHouse(bidManager, tokenCache, clock);
+    inHouse = new InHouse(bidManager, tokenCache, clock, interstitialActivityHelper);
   }
 
   @Test
@@ -54,7 +60,7 @@ public class InHouseTest {
   }
 
   @Test
-  public void getBidResponse_GivenBidManagerYieldNoBid_ReturnNoBid() throws Exception {
+  public void getBidResponse_GivenBidManagerYieldingNoBid_ReturnNoBid() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
 
     when(bidManager.getBidForAdUnitAndPrefetch(adUnit)).thenReturn(null);
@@ -65,7 +71,7 @@ public class InHouseTest {
   }
 
   @Test
-  public void getBidResponse_WhenBidManagerYieldBid_ReturnBid() throws Exception {
+  public void getBidResponse_GivenBidManagerYieldingBid_ReturnBid() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
     Slot slot = mock(Slot.class);
 
@@ -76,6 +82,17 @@ public class InHouseTest {
 
     assertThat(bidResponse.isBidSuccess()).isTrue();
     assertThat(bidResponse.getPrice()).isEqualTo(42.1337);
+  }
+
+  @Test
+  public void getBidResponse_GivenInterstitialAdUnitAndInterstitialNotAvailable_ReturnNoBidWithoutRequestingBidManager() throws Exception {
+    InterstitialAdUnit adUnit = new InterstitialAdUnit("myAdUnit");
+    when(interstitialActivityHelper.isAvailable()).thenReturn(false);
+
+    BidResponse bidResponse = inHouse.getBidResponse(adUnit);
+
+    assertIsNoBid(bidResponse);
+    verifyZeroInteractions(bidManager);
   }
 
   private void assertIsNoBid(BidResponse bidResponse) {

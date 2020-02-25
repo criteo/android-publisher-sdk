@@ -13,6 +13,7 @@ import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.cache.SdkCache;
+import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
@@ -323,7 +324,7 @@ public class BidManagerTests {
 
   @NonNull
   private InHouse createInHouse(BidManager bidManager) {
-    return new InHouse(bidManager, mock(TokenCache.class), clock);
+    return new InHouse(bidManager, mock(TokenCache.class), clock, new InterstitialActivityHelper(context));
   }
 
   private interface SpecialMap extends Map {
