@@ -29,7 +29,16 @@ public class InterstitialActivityHelper {
     Intent intent = createIntent();
     ResolveInfo resolvedInfo = context.getPackageManager()
         .resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
-    return resolvedInfo != null;
+    if (resolvedInfo == null) {
+      return false;
+    }
+
+    int identifier = context.getResources().getIdentifier(
+        "activity_criteo_interstitial",
+        "layout",
+        context.getPackageName());
+
+    return identifier != 0;
   }
 
   public void openActivity(

@@ -65,9 +65,30 @@ public class InterstitialActivityHelperUnitTest {
   }
 
   @Test
-  public void isAvailable_GivenResolvedActivity_ReturnTrue() throws Exception {
+  public void isAvailable_GivenNotFoundLayout_ReturnFalse() throws Exception {
+    when(context.getPackageName()).thenReturn("com.my.package");
+    when(context.getResources().getIdentifier(
+        "activity_criteo_interstitial",
+        "layout",
+        context.getPackageName()))
+        .thenReturn(0);
+
+    boolean available = helper.isAvailable();
+
+    assertThat(available).isFalse();
+  }
+
+  @Test
+  public void isAvailable_GivenResolvedActivityAndFoundLayout_ReturnTrue() throws Exception {
     when(context.getPackageManager().resolveActivity(any(), anyInt()))
         .thenReturn(mock(ResolveInfo.class));
+
+    when(context.getPackageName()).thenReturn("com.my.package");
+    when(context.getResources().getIdentifier(
+        "activity_criteo_interstitial",
+        "layout",
+        context.getPackageName()))
+        .thenReturn(42);
 
     boolean available = helper.isAvailable();
 
