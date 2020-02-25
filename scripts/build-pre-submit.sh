@@ -1,6 +1,11 @@
 #!/bin/bash -l
 
-echo "Setting up environment variables to log.."
-export CRITEO_LOGGING=true
-echo "Running a clean build on the mochi project for presubmit"
-./gradlew clean build assembleAndroidTest --info --stacktrace
+# Run this script to clean, build, and assemble android tests.
+# You do not need to set up any environment, as a docker container will execute it.
+
+set -Eeuo pipefail
+
+# Go at the root of the mochi directory
+cd "$(dirname "$0")/.."
+
+./scripts/do-docker-build.sh pre-submit
