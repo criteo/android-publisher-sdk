@@ -8,7 +8,7 @@ import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.Util.AppEventResponseListener;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.UserPrivacyUtil;
+import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.network.AppEventTask;
 import com.criteo.publisher.network.PubSdkApi;

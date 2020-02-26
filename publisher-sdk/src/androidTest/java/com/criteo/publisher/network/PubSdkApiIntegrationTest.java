@@ -3,9 +3,13 @@ package com.criteo.publisher.network;
 import static junit.framework.Assert.assertNotNull;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.privacy.UserPrivacyUtil;
+import com.criteo.publisher.privacy.gdpr.GdprData;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
@@ -26,7 +30,7 @@ public class PubSdkApiIntegrationTest {
   private Context context;
   private String appId;
   private PubSdkApi api;
-
+  private GdprData gdprData;
 
   @Before
   public void setup() {
@@ -37,6 +41,17 @@ public class PubSdkApiIntegrationTest {
     gaid = "021a86de-ef82-4f69-867b-61ca66688c9c";
     eventType = "Launch";
     api = mockedDependenciesRule.getDependencyProvider().providePubSdkApi();
+
+
+    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+    editor.putString("IABTCF_gdprApplies", "1");
+    editor.putString("IABTCF_VendorConsents", "0000000000000010000000000000000000000100000000000000000000000000000000000000000000000000001");
+    editor.putString("IABTCF_TCString", "ssds");
+    editor.putString("IABTCF_VendorConsents", "1");
+    editor.apply();
+
+    UserPrivacyUtil userPrivacyUtil = mockedDependenciesRule.getDependencyProvider().provideUserPrivacyUtil(context);
+    gdprData = userPrivacyUtil.getGdprData();
   }
 
 

@@ -2,6 +2,7 @@ package com.criteo.publisher.model;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import com.criteo.publisher.privacy.gdpr.GdprData;
 import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,7 +29,7 @@ public class CdbRequest {
   private final int profileId;
 
   @Nullable
-  private final JSONObject gdprConsent;
+  private final GdprData gdprData;
 
   @NonNull
   private final List<CacheAdUnit> adUnits;
@@ -38,13 +39,13 @@ public class CdbRequest {
       @NonNull User user,
       @NonNull String sdkVersion,
       int profileId,
-      @Nullable JSONObject gdprConsent,
+      @Nullable GdprData gdprData,
       @NonNull List<CacheAdUnit> adUnits) {
     this.publisher = publisher;
     this.user = user;
     this.sdkVersion = sdkVersion;
     this.profileId = profileId;
-    this.gdprConsent = gdprConsent;
+    this.gdprData = gdprData;
     this.adUnits = adUnits;
   }
 
@@ -68,8 +69,8 @@ public class CdbRequest {
   }
 
   @Nullable
-  public JSONObject getGdprConsent() {
-    return gdprConsent;
+  public GdprData getGdprData() {
+    return gdprData;
   }
 
   @NonNull
@@ -92,8 +93,8 @@ public class CdbRequest {
     if (jsonAdUnits.length() > 0) {
       json.put(SLOTS, jsonAdUnits);
     }
-    if (gdprConsent != null) {
-      json.put(GDPR_CONSENT, gdprConsent);
+    if (gdprData != null) {
+      json.put(GDPR_CONSENT, gdprData.toJSONObject());
     }
     return json;
   }
@@ -105,7 +106,7 @@ public class CdbRequest {
         ", user=" + user +
         ", sdkVersion='" + sdkVersion + '\'' +
         ", profileId=" + profileId +
-        ", gdprConsent=" + gdprConsent +
+        ", gdprConsent=" + gdprData +
         ", adUnits=" + adUnits +
         '}';
   }

@@ -1,4 +1,4 @@
-package com.criteo.publisher.Util;
+package com.criteo.publisher.privacy;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -7,24 +7,16 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
-import android.text.TextUtils;
+import com.criteo.publisher.privacy.gdpr.GdprData;
+import com.criteo.publisher.privacy.gdpr.GdprDataFetcher;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 // FIXME (ma.chentir) this class should be broken down into specific classes to handle each consent
 //  mechanism separately https://jira.criteois.com/browse/EE-823
 public class UserPrivacyUtil {
-
-  private static final String IAB_CONSENT_STRING_SHARED_PREFS_KEY = "IABConsent_ConsentString";
-  private static final String IAB_SUBJECT_TO_GDPR_SHARED_PREFS_KEY = "IABConsent_SubjectToGDPR";
-  private static final String IAB_VENDORS_SHARED_PREFS_KEY = "IABConsent_ParsedVendorConsents";
-  private static final String CONSENT_DATA_SHARED_PREFS_KEY = "consentData";
-  private static final String GDPR_APPLIES_SHARED_PREFS_KEY = "gdprApplies";
-  private static final String CONSENT_GIVEN_SHARED_PREFS_KEY = "consentGiven";
 
   // Regex according to the CCPA IAB String format defined in
   // https://iabtechlab.com/wp-content/uploads/2019/11/U.S.-Privacy-String-v1.0-IAB-Tech-Lab.pdf
@@ -47,36 +39,25 @@ public class UserPrivacyUtil {
 
   private final SharedPreferences sharedPreferences;
 
+  private GdprDataFetcher gdprDataFetcher;
+
   public UserPrivacyUtil(@NonNull Context context) {
-    this(PreferenceManager.getDefaultSharedPreferences(context));
+    this(
+        PreferenceManager.getDefaultSharedPreferences(context),
+        new GdprDataFetcher(context)
+    );
   }
 
   @VisibleForTesting
-  UserPrivacyUtil(@NonNull SharedPreferences sharedPreferences) {
+  UserPrivacyUtil(@NonNull SharedPreferences sharedPreferences,
+      @NonNull GdprDataFetcher gdprDataFetcher) {
     this.sharedPreferences = sharedPreferences;
+    this.gdprDataFetcher = gdprDataFetcher;
   }
 
-  public JSONObject gdpr() {
-    String consentString = sharedPreferences.getString(IAB_CONSENT_STRING_SHARED_PREFS_KEY, "");
-    String subjectToGdpr = sharedPreferences.getString(IAB_SUBJECT_TO_GDPR_SHARED_PREFS_KEY, "");
-    String vendorConsents = sharedPreferences.getString(IAB_VENDORS_SHARED_PREFS_KEY, "");
-
-    JSONObject gdprConsent = null;
-    if (!TextUtils.isEmpty(consentString) &&
-        !TextUtils.isEmpty(subjectToGdpr) &&
-        !TextUtils.isEmpty(vendorConsents)) {
-      gdprConsent = new JSONObject();
-
-      try {
-        gdprConsent.put(CONSENT_DATA_SHARED_PREFS_KEY, consentString);
-        gdprConsent.put(GDPR_APPLIES_SHARED_PREFS_KEY, "1".equals(subjectToGdpr));
-        gdprConsent.put(CONSENT_GIVEN_SHARED_PREFS_KEY,
-            (vendorConsents.length() > 90 && vendorConsents.charAt(90) == '1'));
-      } catch (JSONException e) {
-        e.printStackTrace();
-      }
-    }
-    return gdprConsent;
+  @Nullable
+  public GdprData getGdprData() {
+    return gdprDataFetcher.fetch();
   }
 
   @NonNull

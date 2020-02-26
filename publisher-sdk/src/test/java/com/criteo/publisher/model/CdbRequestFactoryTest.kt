@@ -1,11 +1,11 @@
 package com.criteo.publisher.model
 
 import com.criteo.publisher.Util.DeviceUtil
-import com.criteo.publisher.Util.UserPrivacyUtil
+import com.criteo.publisher.privacy.UserPrivacyUtil
+import com.criteo.publisher.privacy.gdpr.GdprData
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
-import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
@@ -141,10 +141,10 @@ class CdbRequestFactoryTest {
     @Test
     fun createRequest_GivenInput_BuildRequest() {
         val adUnits: List<CacheAdUnit> = mock()
-        val expectedGdpr: JSONObject = mock()
+        val expectedGdpr: GdprData = mock()
 
         whenever(user.sdkVersion).thenReturn("1.2.3")
-        whenever(userPrivacyUtil.gdpr()).thenReturn(expectedGdpr)
+        whenever(userPrivacyUtil.gdprData).thenReturn(expectedGdpr)
 
         val request = factory.createRequest(adUnits)
 
@@ -152,7 +152,7 @@ class CdbRequestFactoryTest {
         assertThat(request.publisher).isEqualTo(publisher)
         assertThat(request.sdkVersion).isEqualTo("1.2.3")
         assertThat(request.profileId).isEqualTo(SDK_PROFILE_ID)
-        assertThat(request.gdprConsent).isEqualTo(expectedGdpr)
+        assertThat(request.gdprData).isEqualTo(expectedGdpr)
         assertThat(request.adUnits).isEqualTo(adUnits)
     }
 

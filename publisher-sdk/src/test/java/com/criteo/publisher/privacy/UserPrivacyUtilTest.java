@@ -1,4 +1,4 @@
-package com.criteo.publisher.Util;
+package com.criteo.publisher.privacy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import com.criteo.publisher.privacy.gdpr.GdprDataFetcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -20,6 +21,9 @@ public class UserPrivacyUtilTest {
   private SharedPreferences sharedPreferences;
 
   @Mock
+  private GdprDataFetcher gdprDataFetcher;
+
+  @Mock
   private Editor editor;
 
   private UserPrivacyUtil userPrivacyUtil;
@@ -27,7 +31,7 @@ public class UserPrivacyUtilTest {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    userPrivacyUtil = new UserPrivacyUtil(sharedPreferences);
+    userPrivacyUtil = new UserPrivacyUtil(sharedPreferences, gdprDataFetcher);
   }
 
   @Test

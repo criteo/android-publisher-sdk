@@ -6,8 +6,8 @@ import android.preference.PreferenceManager;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import com.criteo.publisher.Util.MockedDependenciesRule;
-import com.criteo.publisher.Util.UserPrivacyUtil;
-import org.json.JSONObject;
+import com.criteo.publisher.privacy.gdpr.GdprData;
+import com.criteo.publisher.privacy.UserPrivacyUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -59,10 +59,10 @@ public class GdprUnitTest {
     //Criteo is 91st character and set to 1
     String vendorConsent = "0000000000000010000000000000000000000100000000000000000000000000000000000000000000000000001";
     initializeGdprParameters(subjectToGdpr, consentData, vendorConsent);
-    JSONObject gdprResponse = userPrivacyUtil.gdpr();
-    Assert.assertEquals(gdprResponse.optString("consentData"), consentData);
-    Assert.assertEquals(gdprResponse.optBoolean("gdprApplies"), true);
-    Assert.assertEquals(gdprResponse.optBoolean("consentGiven"), true);
+    GdprData gdprData = userPrivacyUtil.getGdprData();
+    Assert.assertEquals(consentData, gdprData.consentData());
+    Assert.assertEquals(true, gdprData.gdprApplies());
+    Assert.assertEquals(true, gdprData.consentGiven());
   }
 
   @Test
@@ -72,10 +72,10 @@ public class GdprUnitTest {
     //Criteo is 91st character and set to 0
     String vendorConsent = "0000000000000010000000000000000000000100000000000000000000000000000000000000000000000000000";
     initializeGdprParameters(subjectToGdpr, consentData, vendorConsent);
-    JSONObject gdprResponse = userPrivacyUtil.gdpr();
-    Assert.assertEquals(gdprResponse.optString("consentData"), consentData);
-    Assert.assertEquals(gdprResponse.optBoolean("gdprApplies"), true);
-    Assert.assertEquals(gdprResponse.optBoolean("consentGiven"), false);
+    GdprData gdprData = userPrivacyUtil.getGdprData();
+    Assert.assertEquals(consentData, gdprData.consentData());
+    Assert.assertEquals(true, gdprData.gdprApplies());
+    Assert.assertEquals(false, gdprData.consentGiven());
   }
 
   @Test
@@ -85,10 +85,10 @@ public class GdprUnitTest {
     //Vendor string is only 81 chars long
     String vendorConsent = "000000000000000000000000000000000000000000000000000000000000000000000000000000001";
     initializeGdprParameters(subjectToGdpr, consentData, vendorConsent);
-    JSONObject gdprResponse = userPrivacyUtil.gdpr();
-    Assert.assertEquals(gdprResponse.optString("consentData"), consentData);
-    Assert.assertEquals(gdprResponse.optBoolean("gdprApplies"), true);
-    Assert.assertEquals(gdprResponse.optBoolean("consentGiven"), false);
+    GdprData gdprData = userPrivacyUtil.getGdprData();
+    Assert.assertEquals(consentData, gdprData.consentData());
+    Assert.assertEquals(true, gdprData.gdprApplies());
+    Assert.assertEquals(false, gdprData.consentGiven());
   }
 
   @Test
@@ -98,10 +98,10 @@ public class GdprUnitTest {
     //Vendor string is only 90 chars long
     String vendorConsent = "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
     initializeGdprParameters(subjectToGdpr, consentData, vendorConsent);
-    JSONObject gdprResponse = userPrivacyUtil.gdpr();
-    Assert.assertEquals(gdprResponse.optString("consentData"), consentData);
-    Assert.assertEquals(gdprResponse.optBoolean("gdprApplies"), true);
-    Assert.assertEquals(gdprResponse.optBoolean("consentGiven"), false);
+    GdprData gdprData = userPrivacyUtil.getGdprData();
+    Assert.assertEquals(consentData, gdprData.consentData());
+    Assert.assertEquals(true, gdprData.gdprApplies());
+    Assert.assertEquals(false, gdprData.consentGiven());
   }
 
   @Test
@@ -110,7 +110,7 @@ public class GdprUnitTest {
     String vendorConsent = "0000000000000010000000000000000000000100000000000000000000000000000000000000000000000000001";
     //SubjectToGdpr property is missing
     initializeGdprParameters(null, consentData, vendorConsent);
-    JSONObject gdprResponse = userPrivacyUtil.gdpr();
-    Assert.assertNull(gdprResponse);
+    GdprData gdprData = userPrivacyUtil.getGdprData();
+    Assert.assertNull(gdprData);
   }
 }

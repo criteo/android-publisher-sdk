@@ -25,8 +25,9 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Util.MockedDependenciesRule;
-import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.bid.BidLifecycleListener;
+import com.criteo.publisher.privacy.gdpr.GdprData;
+import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
@@ -302,9 +303,9 @@ public class BidManagerFunctionalTest {
 
     when(user.getSdkVersion()).thenReturn("1.2.3");
 
-    JSONObject expectedGdpr = mock(JSONObject.class);
+    GdprData expectedGdpr = mock(GdprData.class);
     UserPrivacyUtil userPrivacyUtil = mock(UserPrivacyUtil.class);
-    when(userPrivacyUtil.gdpr()).thenReturn(expectedGdpr);
+    when(userPrivacyUtil.getGdprData()).thenReturn(expectedGdpr);
     when(userPrivacyUtil.getUsPrivacyOptout()).thenReturn("");
     when(userPrivacyUtil.getIabUsPrivacyString()).thenReturn("");
     when(userPrivacyUtil.getMopubConsent()).thenReturn("");
@@ -322,7 +323,7 @@ public class BidManagerFunctionalTest {
       assertEquals(singletonList(cacheAdUnit), cdb.getAdUnits());
       assertEquals("1.2.3", cdb.getSdkVersion());
       assertEquals(235, cdb.getProfileId());
-      assertEquals(expectedGdpr, cdb.getGdprConsent());
+      assertEquals(expectedGdpr, cdb.getGdprData());
 
       return true;
     }), eq("expectedUserAgent"));

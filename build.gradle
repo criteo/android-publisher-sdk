@@ -31,7 +31,9 @@ task clean(type: Delete) {
 
 // Share publication configuration for subProjects
 ext {
-    publishVersion = project.findProperty('version') ?: 'undefined'
+    version = "3.4.0"
+    publishVersion = project.findProperty('pubSdkVersion') ?: version
+
     publishRepositoryConfig = {
         repositories {
             maven {
@@ -46,6 +48,14 @@ ext {
                 with mavenCredentialsIfPresent()
             }
         }
+    }
+
+    getTimestamp = {
+        if (project.findProperty('appendTimestamp') == 'true') {
+            def date = new Date()
+            return "-${date.format('yyyyMMdd.HHmm')}"
+        }
+        return ""
     }
 }
 

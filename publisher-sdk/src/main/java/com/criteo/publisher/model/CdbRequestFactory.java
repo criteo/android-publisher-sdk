@@ -4,7 +4,7 @@ import static com.criteo.publisher.Util.TextUtils.isEmpty;
 
 import android.support.annotation.NonNull;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.UserPrivacyUtil;
+import com.criteo.publisher.privacy.UserPrivacyUtil;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -72,7 +72,7 @@ public class CdbRequestFactory {
         user,
         user.getSdkVersion(),
         PROFILE_ID,
-        userPrivacyUtil.gdpr(),
+        userPrivacyUtil.getGdprData(),
         requestedAdUnits
     );
   }

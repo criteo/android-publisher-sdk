@@ -21,7 +21,7 @@ import android.content.Context;
 import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.DirectMockRunOnUiThreadExecutor;
-import com.criteo.publisher.Util.UserPrivacyUtil;
+import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;

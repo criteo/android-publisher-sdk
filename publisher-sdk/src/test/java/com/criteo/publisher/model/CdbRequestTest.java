@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.criteo.publisher.privacy.gdpr.GdprData;
 import java.util.ArrayList;
 import java.util.List;
 import org.json.JSONObject;
@@ -25,6 +26,10 @@ public class CdbRequestTest {
 
   private int profileId;
 
+  @Mock
+  private GdprData gdprData;
+
+  @Mock
   private JSONObject gdprConsent;
 
   private List<CacheAdUnit> adUnits;
@@ -46,7 +51,7 @@ public class CdbRequestTest {
     JSONObject userJson = mock(JSONObject.class);
     when(user.toJson()).thenReturn(userJson);
 
-    gdprConsent = mock(JSONObject.class);
+    when(gdprData.toJSONObject()).thenReturn(gdprConsent);
 
     adUnits.add(new CacheAdUnit(new AdSize(1, 2), "myAdUnit", CRITEO_BANNER));
 
@@ -70,7 +75,7 @@ public class CdbRequestTest {
 
   @Test
   public void toJson_GivenNoGdpr_DoesNotMapIt() throws Exception {
-    gdprConsent = null;
+    gdprData = null;
 
     CdbRequest request = createRequest();
     JSONObject json = request.toJson();
@@ -79,7 +84,7 @@ public class CdbRequestTest {
   }
 
   private CdbRequest createRequest() {
-    return new CdbRequest(publisher, user, sdkVersion, profileId, gdprConsent, adUnits);
+    return new CdbRequest(publisher, user, sdkVersion, profileId, gdprData, adUnits);
   }
 
 }
