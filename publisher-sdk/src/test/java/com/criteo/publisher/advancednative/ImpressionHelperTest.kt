@@ -1,9 +1,12 @@
 package com.criteo.publisher.advancednative
 
+import com.criteo.publisher.Util.RunOnUiThreadExecutor
 import com.criteo.publisher.network.PubSdkApi
+import com.nhaarman.mockitokotlin2.doAnswer
 import com.nhaarman.mockitokotlin2.doThrow
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
@@ -17,6 +20,7 @@ import java.net.URI
 import java.net.URL
 import java.util.Arrays.asList
 import java.util.concurrent.Executor
+import java.util.concurrent.atomic.AtomicBoolean
 
 class ImpressionHelperTest {
 
@@ -25,13 +29,16 @@ class ImpressionHelperTest {
 
     private val executor = Executor { it.run() }
 
+    @Mock
+    private lateinit var runOnUiThreadExecutor: RunOnUiThreadExecutor
+
     private lateinit var helper: ImpressionHelper
 
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
 
-        helper = ImpressionHelper(api, executor)
+        helper = ImpressionHelper(api, executor, runOnUiThreadExecutor)
     }
 
     @Test
@@ -88,6 +95,27 @@ class ImpressionHelperTest {
 
         verify(api).executeRawGet(URL("http://my.pixel.2"))
         verify(api).executeRawGet(URL("http://my.pixel.3"))
+    }
+
+    @Test
+    fun notifyImpression_GivenListener_NotifyItWithUiExecutor() {
+        val isCalledFromExecutor = AtomicBoolean()
+        doAnswer {
+            isCalledFromExecutor.set(true)
+            val runnable = it.arguments[0] as Runnable
+            runnable.run()
+            isCalledFromExecutor.set(false)
+        }.whenever(runOnUiThreadExecutor).executeAsync(any<Runnable>())
+
+        val listener = mock<CriteoNativeAdListener> {
+            doAnswer {
+                assertThat(isCalledFromExecutor).isTrue
+            }.whenever(mock).onAdImpression()
+        }
+
+        helper.notifyImpression(listener)
+
+        verify(listener).onAdImpression()
     }
 
 }
