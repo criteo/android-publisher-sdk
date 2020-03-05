@@ -1,9 +1,6 @@
 package com.criteo.publisher.advancednative
 
-import com.nhaarman.mockitokotlin2.anyOrNull
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
 import org.junit.Test
@@ -59,6 +56,17 @@ class ImpressionTaskTest {
         task.onVisible()
 
         verify(helper).notifyImpression(listener);
+    }
+
+    @Test
+    fun onVisible_CalledTwice_WorkOnlyOnce() {
+        whenever(listenerRef.get()).thenReturn(mock())
+
+        task.onVisible()
+        task.onVisible()
+
+        verify(helper, times(1)).firePixels(any())
+        verify(helper, times(1)).notifyImpression(any())
     }
 
 }
