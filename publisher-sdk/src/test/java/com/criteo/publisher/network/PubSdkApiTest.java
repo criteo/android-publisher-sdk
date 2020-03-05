@@ -1,6 +1,7 @@
 package com.criteo.publisher.network;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockserver.model.HttpError.error;
@@ -12,6 +13,9 @@ import static org.mockserver.verify.VerificationTimes.once;
 import android.support.annotation.NonNull;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -34,18 +38,19 @@ public class PubSdkApiTest {
   @Mock
   private NetworkConfiguration networkConfiguration;
 
+  private URL serverUrl;
+
   private PubSdkApi api;
 
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    when(networkConfiguration.getCdbUrl())
-        .thenReturn("http://localhost:" + mockServerRule.getPort());
-    when(networkConfiguration.getEventUrl())
-        .thenReturn("http://localhost:" + mockServerRule.getPort());
-    when(networkConfiguration.getRemoteConfigUrl())
-        .thenReturn("http://localhost:" + mockServerRule.getPort());
+    serverUrl = new URL("http://localhost:" + mockServerRule.getPort());
+
+    when(networkConfiguration.getCdbUrl()).thenReturn(serverUrl.toString());
+    when(networkConfiguration.getEventUrl()).thenReturn(serverUrl.toString());
+    when(networkConfiguration.getRemoteConfigUrl()).thenReturn(serverUrl.toString());
 
     api = new PubSdkApi(networkConfiguration);
   }
@@ -232,6 +237,33 @@ public class PubSdkApiTest {
         .withQueryStringParameter("cpId", "myCpId")
         .withQueryStringParameter("appId", "myAppId")
         .withQueryStringParameter("sdkVersion", "myVersion"), once());
+  }
+
+  @Test
+  public void executeRawGet_GivenConnectionError_ThrowIt() throws Exception {
+    mockServerClient.when(request()).error(error().withDropConnection(true));
+
+    assertThatCode(() -> {
+      api.executeRawGet(serverUrl);
+    }).isInstanceOf(IOException.class);
+  }
+
+  @Test
+  public void executeRawGet_GivenHttpError_ReturnNull() throws Exception {
+    mockServerClient.when(request()).respond(response().withStatusCode(400));
+
+    InputStream response = api.executeRawGet(serverUrl);
+
+    assertThat(response).isNull();
+  }
+
+  @Test
+  public void executeRawGet_GivenOkResponse_ReturnIt() throws Exception {
+    mockServerClient.when(request()).respond(response("myResponse"));
+
+    InputStream response = api.executeRawGet(serverUrl);
+
+    assertThat(response).hasContent("myResponse");
   }
 
   @NonNull

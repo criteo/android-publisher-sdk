@@ -8,6 +8,7 @@ import com.criteo.publisher.Util.TextUtils;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -104,6 +105,17 @@ public class PubSdkApi {
   }
 
   @Nullable
+  public InputStream executeRawGet(URL url) throws IOException {
+    return executeRawGet(url, null);
+  }
+
+  @Nullable
+  private InputStream executeRawGet(URL url, @Nullable String userAgent) throws IOException {
+    HttpURLConnection urlConnection = prepareConnection(url, userAgent, "GET");
+    return readResponseStreamIfSuccess(urlConnection);
+  }
+
+  @Nullable
   private static JSONObject executePost(
       @NonNull URL url,
       @NonNull JSONObject requestJson,
@@ -111,19 +123,21 @@ public class PubSdkApi {
       throws IOException, JSONException {
     HttpURLConnection urlConnection = prepareConnection(url, userAgent, "POST");
     writePayload(urlConnection, requestJson);
-    return readResponseIfSuccess(urlConnection);
+
+    try (InputStream inputStream = readResponseStreamIfSuccess(urlConnection)) {
+      return readJson(inputStream);
+    }
   }
 
-  private static JSONObject executeGet(URL url, @Nullable String userAgent)
-      throws IOException, JSONException {
-    HttpURLConnection urlConnection = prepareConnection(url, userAgent, "GET");
-
-    return readResponseIfSuccess(urlConnection);
+  private JSONObject executeGet(URL url, @Nullable String userAgent) throws IOException, JSONException {
+    try (InputStream inputStream = executeRawGet(url, userAgent)) {
+      return readJson(inputStream);
+    }
   }
 
   @NonNull
   private static HttpURLConnection prepareConnection(@NonNull URL url,
-      @NonNull String userAgent, String method) throws IOException {
+      @Nullable String userAgent, String method) throws IOException {
     HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
     urlConnection.setRequestMethod(method);
     urlConnection.setReadTimeout(TIMEOUT_IN_MILLIS);
@@ -136,17 +150,25 @@ public class PubSdkApi {
   }
 
   @Nullable
-  private static JSONObject readResponseIfSuccess(@NonNull HttpURLConnection urlConnection)
-      throws IOException, JSONException {
+  private static InputStream readResponseStreamIfSuccess(@NonNull HttpURLConnection urlConnection) throws IOException {
     int status = urlConnection.getResponseCode();
     if (status == HttpURLConnection.HTTP_OK || status == HttpURLConnection.HTTP_NO_CONTENT) {
-      String response = StreamUtil.readStream(urlConnection.getInputStream());
-      if (!TextUtils.isEmpty(response)) {
-        return new JSONObject(response);
-      }
-      return new JSONObject();
+      return urlConnection.getInputStream();
     }
     return null;
+  }
+
+  @Nullable
+  private static JSONObject readJson(@Nullable InputStream inputStream) throws IOException, JSONException {
+    if (inputStream == null) {
+      return null;
+    }
+
+    String response = StreamUtil.readStream(inputStream);
+    if (!TextUtils.isEmpty(response)) {
+      return new JSONObject(response);
+    }
+    return new JSONObject();
   }
 
   private static void writePayload(
