@@ -19,14 +19,24 @@ public class CriteoNativeAd {
   @NonNull
   private final ImpressionTask impressionTask;
 
+  @NonNull
+  private final ClickDetection clickDetection;
+
+  @NonNull
+  private final NativeViewClickHandler clickOnProductHandler;
+
   public CriteoNativeAd(
       @NonNull NativeAssets assets,
       @NonNull VisibilityTracker visibilityTracker,
-      @NonNull ImpressionTask impressionTask
+      @NonNull ImpressionTask impressionTask,
+      @NonNull ClickDetection clickDetection,
+      @NonNull NativeViewClickHandler clickOnProductHandler
   ) {
     this.assets = assets;
     this.visibilityTracker = visibilityTracker;
     this.impressionTask = impressionTask;
+    this.clickDetection = clickDetection;
+    this.clickOnProductHandler = clickOnProductHandler;
   }
 
   @NonNull
@@ -84,6 +94,22 @@ public class CriteoNativeAd {
   @VisibleForTesting
   void watchForImpression(@NonNull View nativeView) {
     visibilityTracker.watch(nativeView, impressionTask);
+  }
+
+  /**
+   * Set the given views as a clickable region representing this ad product.
+   * <p>
+   * This method can be called many times on the same instance with different views. Click may be
+   * triggered several times.
+   * <p>
+   * It is not necessary to clean any state before calling this method, even if the given view was
+   * already watched.
+   *
+   * @param nativeView view to start watching for clicks
+   */
+  @VisibleForTesting
+  void setProductClickableView(@NonNull View nativeView) {
+    clickDetection.watch(nativeView, clickOnProductHandler);
   }
 
 }

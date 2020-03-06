@@ -12,12 +12,22 @@ public class NativeAdMapper {
   @NonNull
   private final ImpressionHelper impressionHelper;
 
+  @NonNull
+  private final ClickDetection clickDetection;
+
+  @NonNull
+  private final ClickHelper clickHelper;
+
   public NativeAdMapper(
       @NonNull VisibilityTracker visibilityTracker,
-      @NonNull ImpressionHelper impressionHelper
+      @NonNull ImpressionHelper impressionHelper,
+      @NonNull ClickDetection clickDetection,
+      @NonNull ClickHelper clickHelper
   ) {
     this.visibilityTracker = visibilityTracker;
     this.impressionHelper = impressionHelper;
+    this.clickDetection = clickDetection;
+    this.clickHelper = clickHelper;
   }
 
   @NonNull
@@ -30,7 +40,18 @@ public class NativeAdMapper {
         listenerRef,
         impressionHelper);
 
-    return new CriteoNativeAd(nativeAssets, visibilityTracker, impressionTask);
+    NativeViewClickHandler clickOnProductHandler = new AdViewClickHandler(
+        listenerRef,
+        clickHelper
+    );
+
+    return new CriteoNativeAd(
+        nativeAssets,
+        visibilityTracker,
+        impressionTask,
+        clickDetection,
+        clickOnProductHandler
+    );
   }
 
 }

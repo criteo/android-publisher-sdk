@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Please notice that you still need to provide tests validating the integrations in an async
  * context, and especially on the UI thread.
  */
-public final class DirectMockRunOnUiThreadExecutor extends RunOnUiThreadExecutor {
+public class DirectMockRunOnUiThreadExecutor extends RunOnUiThreadExecutor {
 
   private final AtomicInteger runningOnUiThreadCount = new AtomicInteger(0);
 

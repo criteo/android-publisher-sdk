@@ -10,6 +10,8 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.activity.TopActivityFinder;
+import com.criteo.publisher.advancednative.ClickDetection;
+import com.criteo.publisher.advancednative.ClickHelper;
 import com.criteo.publisher.advancednative.ImpressionHelper;
 import com.criteo.publisher.advancednative.NativeAdMapper;
 import com.criteo.publisher.advancednative.VisibilityChecker;
@@ -412,8 +414,9 @@ public class DependencyProvider {
                 providePubSdkApi(),
                 provideThreadPoolExecutor(),
                 provideRunOnUiThreadExecutor()
-            )
-        );
+            ),
+            provideClickDetection(),
+            new ClickHelper(provideRunOnUiThreadExecutor()));
       }
     });
   }
@@ -425,6 +428,17 @@ public class DependencyProvider {
       @Override
       public VisibilityTracker create() {
         return new VisibilityTracker(new VisibilityChecker());
+      }
+    });
+  }
+
+  @NonNull
+  public ClickDetection provideClickDetection() {
+    return getOrCreate(ClickDetection.class, new Factory<ClickDetection>() {
+      @NonNull
+      @Override
+      public ClickDetection create() {
+        return new ClickDetection();
       }
     });
   }

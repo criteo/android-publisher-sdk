@@ -29,6 +29,9 @@ class NativeAdMapperTest {
   private lateinit var visibilityTracker: VisibilityTracker
 
   @MockBean
+  private lateinit var clickDetection: ClickDetection
+
+  @MockBean
   private lateinit var api: PubSdkApi
 
   @Inject
@@ -76,12 +79,7 @@ class NativeAdMapperTest {
     val view1 = mock<View>()
     val view2 = mock<View>()
 
-    runOnUiThreadExecutor.stub {
-      on { executeAsync(any()) } doAnswer {
-        val command: Runnable = it.getArgument(0)
-        command.run()
-      }
-    }
+    givenDirectUiExecutor()
 
     //when
     val nativeAd = mapper.map(assets, WeakReference(listener))
@@ -106,6 +104,44 @@ class NativeAdMapperTest {
     verify(listener, times(1)).onAdImpression()
     verify(api, times(1)).executeRawGet(pixel1)
     verify(api, times(1)).executeRawGet(pixel2)
+  }
+
+  @Test
+  fun setProductClickableView_GivenDifferentViewsClickedManyTimes_NotifyListenerForClicks() {
+    val listener = mock<CriteoNativeAdListener>()
+
+    val assets = mock<NativeAssets>()
+
+    val view1 = mock<View>()
+    val view2 = mock<View>()
+
+    givenDirectUiExecutor()
+
+    //when
+    val nativeAd = mapper.map(assets, WeakReference(listener))
+    nativeAd.setProductClickableView(view1)
+    nativeAd.setProductClickableView(view2)
+
+    argumentCaptor<NativeViewClickHandler>().apply {
+      verify(clickDetection, times(2)).watch(any(), capture())
+
+      allValues.forEach {
+        it.onClick()
+        it.onClick()
+      }
+    }
+
+    // then
+    verify(listener, times(4)).onAdClicked()
+  }
+
+  private fun givenDirectUiExecutor() {
+    runOnUiThreadExecutor.stub {
+      on { executeAsync(any()) } doAnswer {
+        val command: Runnable = it.getArgument(0)
+        command.run()
+      }
+    }
   }
 
 }
