@@ -1,10 +1,11 @@
 package com.criteo.publisher.network;
 
-import android.support.test.InstrumentationRegistry;
-import com.criteo.publisher.Util.AdUnitType;
+import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
+import static org.mockito.Mockito.verify;
+
+import android.support.annotation.NonNull;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.LoggingUtil;
-import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.model.AdSize;
@@ -13,19 +14,14 @@ import com.criteo.publisher.model.DeviceInfo;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class CdbDownloadTaskTest {
 
-  @Rule
-  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
-
-  private CdbDownloadTask cdbDownloadTask;
   private List<CacheAdUnit> cacheAdUnits;
 
   @Mock
@@ -46,27 +42,52 @@ public class CdbDownloadTaskTest {
   @Mock
   private PubSdkApi api;
 
+  private boolean isConfigRequested;
+
+  private boolean isCdbRequested;
+
+  @Mock
   private UserPrivacyUtil userPrivacyUtil;
+
+  private final AtomicInteger adUnitId = new AtomicInteger(0);
 
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    userPrivacyUtil = new UserPrivacyUtil(
-        InstrumentationRegistry.getContext().getApplicationContext());
+
+    isConfigRequested = false;
+    isCdbRequested = true;
+
+    cacheAdUnits = new ArrayList<>();
   }
 
   @Test
-  public void checkCacheRemove() {
+  public void onPostExecute_GivenAdUnitsToLoadAndFailure_RemoveThemFromPendingTasks() {
+    CacheAdUnit adUnit1 = createAdUnit();
+    CacheAdUnit adUnit2 = createAdUnit();
 
-    cacheAdUnits = new ArrayList<>();
-    CacheAdUnit cacheAdUnit = new CacheAdUnit(new AdSize(320, 50), "UniqueId",
-        AdUnitType.CRITEO_BANNER);
-    cacheAdUnits.add(cacheAdUnit);
+    cacheAdUnits.add(adUnit1);
+    cacheAdUnits.add(adUnit2);
 
-    cdbDownloadTask = new CdbDownloadTask(
+    CdbDownloadTask cdbDownloadTask = createTask();
+    cdbDownloadTask.onPostExecute(null);
+
+    verify(bidsInCdbTask).remove(adUnit1);
+    verify(bidsInCdbTask).remove(adUnit2);
+  }
+
+  @NonNull
+  private CacheAdUnit createAdUnit() {
+    String adUnitId = "adUnit #" + this.adUnitId.incrementAndGet();
+    return new CacheAdUnit(new AdSize(320, 50), adUnitId, CRITEO_BANNER);
+  }
+
+  @NonNull
+  private CdbDownloadTask createTask() {
+    return new CdbDownloadTask(
         responseListener,
-        false,
-        true,
+        isConfigRequested,
+        isCdbRequested,
         deviceInfo,
         cacheAdUnits,
         bidsInCdbTask,
@@ -75,8 +96,5 @@ public class CdbDownloadTaskTest {
         userPrivacyUtil,
         api
     );
-
-    cdbDownloadTask.onPostExecute(null);
-    Mockito.verify(bidsInCdbTask, Mockito.times(1)).remove(cacheAdUnit);
   }
 }

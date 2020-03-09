@@ -60,6 +60,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     this.userPrivacyUtil = userPrivacyUtil;
   }
 
+  @Nullable
   @Override
   protected NetworkResult doInBackground(Object... objects) {
     NetworkResult result = null;
@@ -73,6 +74,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     return result;
   }
 
+  @Nullable
   private NetworkResult doCdbDownloadTask(Object[] objects) throws Exception {
     if (objects.length < 3) {
       return null;
@@ -164,7 +166,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
   }
 
   @Override
-  protected void onPostExecute(NetworkResult networkResult) {
+  protected void onPostExecute(@Nullable NetworkResult networkResult) {
     try {
       doOnPostExecute(networkResult);
     } catch (Throwable tr) {
@@ -172,9 +174,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     }
   }
 
-  private void doOnPostExecute(NetworkResult networkResult) {
-    super.onPostExecute(networkResult);
-
+  private void doOnPostExecute(@Nullable NetworkResult networkResult) {
     for (CacheAdUnit cacheAdUnit : cacheAdUnits) {
       bidsInCdbTask.remove(cacheAdUnit);
     }
