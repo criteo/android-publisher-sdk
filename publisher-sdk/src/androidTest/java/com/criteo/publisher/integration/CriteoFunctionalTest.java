@@ -116,7 +116,7 @@ public class CriteoFunctionalTest {
 
     verify(api).loadCdb(any(), any());
     verify(api).loadConfig(any());
-    verify(api).postAppEvent(anyInt(), any(), any(), any(), anyInt(), any());
+    verify(api).postAppEvent(anyInt(), any(), any(), any(), anyInt(), any(), any());
   }
 
   @Test

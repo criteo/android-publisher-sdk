@@ -12,6 +12,8 @@ import android.content.Context;
 import com.criteo.publisher.Util.AppEventResponseListener;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.model.DeviceInfo;
+import com.criteo.publisher.privacy.UserPrivacyUtil;
+import com.criteo.publisher.privacy.gdpr.GdprData;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -41,10 +43,16 @@ public class AppEventTaskTest {
   @Mock
   private DeviceInfo deviceInfo;
 
+  @Mock
+  private UserPrivacyUtil userPrivacyUtil;
+
+  @Mock
+  private GdprData gdprData;
+
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    appEventTask = new AppEventTask(context, responseListener, deviceUtil, api, deviceInfo);
+    appEventTask = new AppEventTask(context, responseListener, deviceUtil, api, deviceInfo, userPrivacyUtil);
     json = new JSONObject();
   }
 
@@ -72,10 +80,11 @@ public class AppEventTaskTest {
   @Test
   public void backgroundTask_GivenUserAgent_CallApiWithIt() throws Exception {
     when(deviceInfo.getUserAgent()).thenReturn(completedFuture("myUserAgent"));
+    when(userPrivacyUtil.getGdprData()).thenReturn(gdprData);
 
     appEventTask.doInBackground("eventType");
 
-    verify(api).postAppEvent(anyInt(), any(), any(), any(), anyInt(), eq("myUserAgent"));
+    verify(api).postAppEvent(anyInt(), any(), any(), any(), anyInt(), eq("myUserAgent"), eq(gdprData));
   }
 
 }

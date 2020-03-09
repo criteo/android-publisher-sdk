@@ -17,6 +17,7 @@ import com.criteo.publisher.model.RemoteConfigRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import com.criteo.publisher.privacy.gdpr.GdprData;
 import java.nio.charset.StandardCharsets;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -41,6 +42,9 @@ public class PubSdkApiTest {
 
   private URL serverUrl;
 
+  @Mock
+  private GdprData gdprData;
+
   private PubSdkApi api;
 
   @Before
@@ -53,12 +57,18 @@ public class PubSdkApiTest {
     when(networkConfiguration.getEventUrl()).thenReturn(serverUrl.toString());
     when(networkConfiguration.getRemoteConfigUrl()).thenReturn(serverUrl.toString());
 
+    when(gdprData.consentData()).thenReturn("fake_consent_data");
+    when(gdprData.consentGiven()).thenReturn(false);
+    when(gdprData.gdprApplies()).thenReturn(false);
+    when(gdprData.version()).thenReturn(1);
+    when(gdprData.toJSONObject()).thenCallRealMethod();
+
     api = new PubSdkApi(networkConfiguration);
   }
 
   @Test
   public void postAppEvent_GivenSenderId_SendGetRequest() throws Exception {
-    api.postAppEvent(42, "", null, "", 0, "");
+    api.postAppEvent(42, "", null, "", 0, "", gdprData);
 
     mockServerClient.verify(request()
         .withPath("/appevent/v1/42")
@@ -68,19 +78,20 @@ public class PubSdkApiTest {
 
   @Test
   public void postAppEvent_GivenRequest_SendThemInQueryString() throws Exception {
-    api.postAppEvent(42, "myApp", "myGaid", "myEvent", 1337, "");
+    api.postAppEvent(42, "myApp", "myGaid", "myEvent", 1337, "", gdprData);
 
     mockServerClient.verify(request()
         .withQueryStringParameter("appId", "myApp")
         .withQueryStringParameter("gaid", "myGaid")
         .withQueryStringParameter("eventType", "myEvent")
         .withQueryStringParameter("limitedAdTracking", "1337")
+        .withQueryStringParameter("gdprString", "eyJjb25zZW50RGF0YSI6ImZha2VfY29uc2VudF9kYXRhIiwiZ2RwckFwcGxpZXMiOmZhbHNlLCJjb25zZW50R2l2ZW4iOmZhbHNlLCJ2ZXJzaW9uIjoxfQ==")
     );
   }
 
   @Test
   public void postAppEvent_GivenNoGaid_IsNotPutInQueryString() throws Exception {
-    api.postAppEvent(42, "", null, "", 0, "");
+    api.postAppEvent(42, "", null, "", 0, "", gdprData);
 
     mockServerClient.verify(request()
         .withQueryStringParameter(not("gaid"))
@@ -88,8 +99,19 @@ public class PubSdkApiTest {
   }
 
   @Test
+  public void postAppEvent_GivenNoGdprData_IsNotPutInQueryString() throws Exception {
+    when(gdprData.consentData()).thenReturn("");
+
+    api.postAppEvent(42, "", "myGaid", "", 0, "", gdprData);
+
+    mockServerClient.verify(request()
+        .withQueryStringParameter(not("gdprString"))
+    );
+  }
+
+  @Test
   public void postAppEvent_GivenUserAgent_SetItInHttpHeader() throws Exception {
-    api.postAppEvent(42, "", null, "", 0, "myUserAgent");
+    api.postAppEvent(42, "", null, "", 0, "myUserAgent", gdprData);
 
     mockServerClient.verify(request()
         .withHeader("User-Agent", "myUserAgent")

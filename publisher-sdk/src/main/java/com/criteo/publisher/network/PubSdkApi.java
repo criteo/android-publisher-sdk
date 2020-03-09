@@ -2,15 +2,19 @@ package com.criteo.publisher.network;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
+import com.criteo.publisher.Util.Base64;
 import com.criteo.publisher.Util.StreamUtil;
 import com.criteo.publisher.Util.TextUtils;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.RemoteConfigRequest;
+import com.criteo.publisher.privacy.gdpr.GdprData;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -30,6 +34,7 @@ public class PubSdkApi {
   private static final String GAID = "gaid";
   private static final String EVENT_TYPE = "eventType";
   private static final String LIMITED_AD_TRACKING = "limitedAdTracking";
+  private static final String GDPR_STRING = "gdprString";
 
   private final NetworkConfiguration networkConfiguration;
 
@@ -71,18 +76,28 @@ public class PubSdkApi {
       @Nullable String gaid,
       @NonNull String eventType,
       int limitedAdTracking,
-      @NonNull String userAgent) {
+      @NonNull String userAgent,
+      @Nullable GdprData gdprData
+  ) {
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(APP_ID, appId);
 
-    // If device doesnt support Playservices , gaid value stays as null
+    // If device does not support Play Services, GAID value will be null
     if (gaid != null) {
       parameters.put(GAID, gaid);
     }
 
     parameters.put(EVENT_TYPE, eventType);
     parameters.put(LIMITED_AD_TRACKING, String.valueOf(limitedAdTracking));
+
+    if (gdprData != null) {
+      String gdprString = getGdprDataStringBase64(gdprData);
+      if (gdprString != null && !gdprString.isEmpty()) {
+        parameters.put(GDPR_STRING, gdprString);
+      }
+    }
+
     try {
       URL url = new URL(
           networkConfiguration.getEventUrl() + "/appevent/v1/" + senderId + "?"
@@ -94,6 +109,34 @@ public class PubSdkApi {
       e.printStackTrace();
       return null;
     }
+  }
+
+  /**
+   * @return a {@link String} representing the base64 encoded JSON string for GdprData object
+   */
+  @Nullable
+  @VisibleForTesting
+  String getGdprDataStringBase64(@NonNull GdprData gdprData) {
+    String gdprDataStr = null;
+    try {
+      gdprDataStr = gdprData.toJSONObject().toString();
+    } catch (JSONException e) {
+      Log.d(TAG, "Unable to convert gdprString to JSONObject when sending to GUM:" + e.getMessage());
+    }
+
+    if (gdprDataStr == null) {
+      return null;
+    }
+
+    String encoded = null;
+
+    try {
+      encoded = Base64.encodeToString(gdprDataStr.getBytes("UTF-8"), Base64.NO_WRAP);
+    } catch (UnsupportedEncodingException e) {
+      Log.d(TAG, "Unable to encode gdprString to base64:" + e.getMessage());
+    }
+
+    return encoded;
   }
 
   @Nullable

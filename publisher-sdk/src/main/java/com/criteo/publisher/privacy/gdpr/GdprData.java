@@ -14,9 +14,13 @@ import org.json.JSONObject;
 public abstract class GdprData {
 
   @VisibleForTesting
-  public static GdprData create(boolean gdprApplies, @NonNull String consentData,
-      boolean consentGiven, @NonNull Integer version) {
-    return new AutoValue_GdprData(gdprApplies, consentData, consentGiven, version);
+  public static GdprData create(
+      boolean consentGiven,
+      @NonNull String consentData,
+      boolean gdprApplies,
+      @NonNull Integer version
+  ) {
+    return new AutoValue_GdprData(consentGiven, consentData, gdprApplies, version);
   }
 
   public static TypeAdapter<GdprData> typeAdapter(Gson gson) {
@@ -37,11 +41,11 @@ public abstract class GdprData {
     return new JSONObject(s);
   }
 
-  public abstract boolean gdprApplies();
+  public abstract boolean consentGiven();
 
   public abstract String consentData();
 
-  public abstract boolean consentGiven();
+  public abstract boolean gdprApplies();
 
   public abstract Integer version();
 }

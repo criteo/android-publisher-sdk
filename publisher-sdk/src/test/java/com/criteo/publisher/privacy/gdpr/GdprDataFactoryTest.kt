@@ -27,7 +27,7 @@ class GdprDataFactoryTest(
     @Test
     fun testCreate_WithGdprAppliesTrue_And_ConsentGivenTrue() {
         // When
-        val gdprData = GdprData.create(gdprApplies, "fake_consent_data", consentGiven, 1)
+        val gdprData = GdprData.create(consentGiven, "fake_consent_data", gdprApplies, 1)
 
         // Then
         assertEquals(gdprApplies, gdprData.gdprApplies())
@@ -38,7 +38,7 @@ class GdprDataFactoryTest(
     @Test
     fun testToJSONObject() {
         // Given
-        val gdprData = GdprData.create(gdprApplies, "fake_consent_data", consentGiven, 1)
+        val gdprData = GdprData.create(consentGiven, "fake_consent_data", gdprApplies, 1)
 
         // When
         val jsonObject = gdprData.toJSONObject()

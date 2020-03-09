@@ -41,13 +41,11 @@ public class GdprDataFetcher {
     String vendorConsents = tcfStrategy.getVendorConsents();
 
     return GdprData.create(
-        "1".equals(subjectToGdpr),
-        consentString,
         (vendorConsents.length() > ZERO_BASED_CRITEO_VENDOR_ID
             && vendorConsents.charAt(ZERO_BASED_CRITEO_VENDOR_ID) == '1'),
+        consentString,
+        "1".equals(subjectToGdpr),
         tcfStrategy.getVersion()
     );
   }
-
-
 }

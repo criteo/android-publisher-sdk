@@ -8,6 +8,7 @@ import android.util.Log;
 import com.criteo.publisher.Util.AppEventResponseListener;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.model.DeviceInfo;
+import com.criteo.publisher.privacy.UserPrivacyUtil;
 import org.json.JSONObject;
 
 public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
@@ -31,18 +32,23 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
   @NonNull
   private final DeviceInfo deviceInfo;
 
+  @NonNull
+  private final UserPrivacyUtil userPrivacyUtil;
+
   public AppEventTask(
       @NonNull Context context,
       @NonNull AppEventResponseListener responseListener,
       @NonNull DeviceUtil deviceUtil,
       @NonNull PubSdkApi api,
-      @NonNull DeviceInfo deviceInfo
+      @NonNull DeviceInfo deviceInfo,
+      @NonNull UserPrivacyUtil userPrivacyUtil
   ) {
     this.mContext = context;
     this.responseListener = responseListener;
     this.deviceUtil = deviceUtil;
     this.api = api;
     this.deviceInfo = deviceInfo;
+    this.userPrivacyUtil = userPrivacyUtil;
   }
 
   @Override
@@ -65,8 +71,16 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
     String appId = mContext.getPackageName();
 
     String userAgent = deviceInfo.getUserAgent().get();
-    JSONObject response = api
-        .postAppEvent(SENDER_ID, appId, gaid, eventType, limitedAdTracking, userAgent);
+    JSONObject response = api.postAppEvent(
+        SENDER_ID,
+        appId,
+        gaid,
+        eventType,
+        limitedAdTracking,
+        userAgent,
+        userPrivacyUtil.getGdprData()
+    );
+
     if (response != null) {
       Log.d(TAG, response.toString());
     }

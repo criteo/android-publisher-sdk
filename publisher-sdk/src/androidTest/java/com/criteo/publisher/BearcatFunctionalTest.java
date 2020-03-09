@@ -20,6 +20,8 @@ import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.privacy.UserPrivacyUtil;
+import com.criteo.publisher.privacy.gdpr.GdprData;
 import com.criteo.publisher.test.activity.DummyActivity;
 import org.junit.Before;
 import org.junit.Rule;
@@ -38,8 +40,9 @@ public class BearcatFunctionalTest {
   @Mock
   private PubSdkApi api;
   private DependencyProvider dependencyProvider;
-
   private Context context;
+
+  private GdprData gdprData;
 
   @Before
   public void setUp() throws Exception {
@@ -49,6 +52,9 @@ public class BearcatFunctionalTest {
 
     doReturn(api).when(dependencyProvider).providePubSdkApi();
     context = InstrumentationRegistry.getContext().getApplicationContext();
+
+    UserPrivacyUtil userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil(context);
+    gdprData = userPrivacyUtil.getGdprData();
   }
 
   @Test
@@ -61,7 +67,8 @@ public class BearcatFunctionalTest {
     activityRule.launchActivity(new Intent());
     waitForIdleState();
 
-    verify(api).postAppEvent(anyInt(), any(), any(), any(), anyInt(), eq("expectedUserAgent"));
+    verify(api).postAppEvent(anyInt(), any(), any(), any(), anyInt(), eq("expectedUserAgent"),
+        eq(gdprData));
   }
 
   @Test
@@ -82,7 +89,8 @@ public class BearcatFunctionalTest {
         eq("myAdvertisingId"),
         eq("Launch"),
         eq(0),
-        any());
+        any(),
+        eq(gdprData));
   }
 
   @Test
@@ -104,7 +112,8 @@ public class BearcatFunctionalTest {
         eq("00000000-0000-0000-0000-000000000000"),
         any(),
         eq(1),
-        any());
+        any(),
+        eq(gdprData));
   }
 
   private void waitForIdleState() {

@@ -68,7 +68,7 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
 
   @NonNull
   private AppEventTask createEventTask() {
-    return new AppEventTask(mContext, this, deviceUtil, api, deviceInfo);
+    return new AppEventTask(mContext, this, deviceUtil, api, deviceInfo, userPrivacyUtil);
   }
 
   @Override
