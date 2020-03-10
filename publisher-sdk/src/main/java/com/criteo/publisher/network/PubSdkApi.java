@@ -7,6 +7,7 @@ import com.criteo.publisher.Util.StreamUtil;
 import com.criteo.publisher.Util.TextUtils;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.model.RemoteConfigRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -37,14 +38,11 @@ public class PubSdkApi {
   }
 
   @Nullable
-  public JSONObject loadConfig(
-      @NonNull String criteoPublisherId,
-      @NonNull String appId,
-      @NonNull String sdkVersion) {
+  public JSONObject loadConfig(@NonNull RemoteConfigRequest request) {
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(CRITEO_PUBLISHER_ID, criteoPublisherId);
-    parameters.put(APP_ID, appId);
-    parameters.put(SDK_VERSION, sdkVersion);
+    parameters.put(CRITEO_PUBLISHER_ID, request.getCriteoPublisherId());
+    parameters.put(APP_ID, request.getBundleId());
+    parameters.put(SDK_VERSION, request.getSdkVersion());
 
     JSONObject configResult = null;
     try {

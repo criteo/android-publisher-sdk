@@ -19,7 +19,6 @@ import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.MockedDependenciesRule;
-import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdSize;
@@ -29,13 +28,11 @@ import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.Config;
-import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.NativeAssets;
-import com.criteo.publisher.model.Publisher;
+import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.model.Slot;
-import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.CdbDownloadTask;
 import com.criteo.publisher.network.PubSdkApi;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
@@ -83,12 +80,8 @@ public class BidManagerTest {
   private static final String CRITEO_PUBLISHER_ID = "1000";
 
   private Context context;
-  private Publisher publisher;
-  private User user;
   private SdkCache sdkCache;
   private Config config;
-
-  private DeviceInfo deviceInfo;
 
   @Mock
   private AdvertisingInfo advertisingInfo;
@@ -100,8 +93,6 @@ public class BidManagerTest {
 
   private DeviceUtil deviceUtil;
 
-  private UserPrivacyUtil userPrivacyUtil;
-
   private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
 
   private AdUnitMapper adUnitMapper;
@@ -109,6 +100,8 @@ public class BidManagerTest {
   private PubSdkApi api;
 
   private CdbRequestFactory cdbRequestFactory;
+
+  private RemoteConfigRequestFactory remoteConfigRequestFactory;
 
   @Before
   public void setup() {
@@ -119,9 +112,7 @@ public class BidManagerTest {
     SharedPreferences.Editor editor = sharedPref.edit();
     editor.putBoolean("CriteoCachedKillSwitch", false);
     editor.apply();
-    publisher = new Publisher(context, CRITEO_PUBLISHER_ID);
     deviceUtil = new DeviceUtil(context, advertisingInfo);
-    user = new User(deviceUtil);
     sdkCache = new SdkCache(deviceUtil);
     config = new Config(context);
     placementsWithCdbTasks = new Hashtable<>();
@@ -129,13 +120,11 @@ public class BidManagerTest {
 
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
     clock = dependencyProvider.provideClock();
-    userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil(context);
     adUnitMapper = dependencyProvider.provideAdUnitMapper(context);
     api = dependencyProvider.providePubSdkApi();
     cdbRequestFactory = dependencyProvider.provideCdbRequestFactory(context, CRITEO_PUBLISHER_ID);
+    remoteConfigRequestFactory = dependencyProvider.provideRemoteConfigRequestFactory(context, CRITEO_PUBLISHER_ID);
     Executor runOnUiThreadExecutor = dependencyProvider.provideRunOnUiThreadExecutor();
-
-    deviceInfo = new DeviceInfo(context, runOnUiThreadExecutor);
   }
 
   @Test
@@ -617,8 +606,6 @@ public class BidManagerTest {
   @NonNull
   private BidManager createBidManager() {
     return new BidManager(
-        publisher,
-        user,
         sdkCache,
         placementsWithCdbTasks,
         config,
@@ -627,8 +614,8 @@ public class BidManagerTest {
         clock,
         adUnitMapper,
         api,
-        cdbRequestFactory
-    );
+        cdbRequestFactory,
+        remoteConfigRequestFactory);
   }
 
   @NonNull

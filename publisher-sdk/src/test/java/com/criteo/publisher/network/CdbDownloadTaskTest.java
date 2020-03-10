@@ -9,8 +9,7 @@ import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequestFactory;
-import com.criteo.publisher.model.Publisher;
-import com.criteo.publisher.model.User;
+import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -41,13 +40,10 @@ public class CdbDownloadTaskTest {
   private boolean isCdbRequested;
 
   @Mock
-  private User user;
-
-  @Mock
-  private Publisher publisher;
-
-  @Mock
   private CdbRequestFactory cdbRequestFactory;
+
+  @Mock
+  private RemoteConfigRequestFactory remoteConfigRequestFactory;
 
   private final AtomicInteger adUnitId = new AtomicInteger(0);
 
@@ -92,9 +88,7 @@ public class CdbDownloadTaskTest {
         bidsInCdbTask,
         loggingUtil,
         api,
-        user,
-        publisher,
-        cdbRequestFactory
-    );
+        cdbRequestFactory,
+        remoteConfigRequestFactory);
   }
 }

@@ -11,9 +11,9 @@ import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.Config;
-import com.criteo.publisher.model.Publisher;
+import com.criteo.publisher.model.RemoteConfigRequest;
+import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.model.Slot;
-import com.criteo.publisher.model.User;
 import java.util.Hashtable;
 import java.util.List;
 import org.json.JSONObject;
@@ -42,13 +42,10 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
   private final Hashtable<CacheAdUnit, CdbDownloadTask> bidsInCdbTask;
 
   @NonNull
-  private final User user;
-
-  @NonNull
-  private final Publisher publisher;
-
-  @NonNull
   private final CdbRequestFactory cdbRequestFactory;
+
+  @NonNull
+  private final RemoteConfigRequestFactory remoteConfigRequestFactory;
 
   public CdbDownloadTask(
       @NonNull NetworkResponseListener responseListener,
@@ -58,9 +55,8 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
       @NonNull Hashtable<CacheAdUnit, CdbDownloadTask> bidsInMap,
       @NonNull LoggingUtil loggingUtil,
       @NonNull PubSdkApi api,
-      @NonNull User user,
-      @NonNull Publisher publisher,
-      @NonNull CdbRequestFactory cdbRequestFactory) {
+      @NonNull CdbRequestFactory cdbRequestFactory,
+      @NonNull RemoteConfigRequestFactory remoteConfigRequestFactory) {
     this.responseListener = responseListener;
     this.isConfigRequested = isConfigRequested;
     this.isCdbRequested = isCdbRequested;
@@ -68,9 +64,8 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     this.bidsInCdbTask = bidsInMap;
     this.loggingUtil = loggingUtil;
     this.api = api;
-    this.user = user;
-    this.publisher = publisher;
     this.cdbRequestFactory = cdbRequestFactory;
+    this.remoteConfigRequestFactory = remoteConfigRequestFactory;
   }
 
   @Nullable
@@ -100,10 +95,8 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
       return null;
     }
 
-    JSONObject configResult = api.loadConfig(
-        publisher.getCriteoPublisherId(),
-        publisher.getBundleId(),
-        user.getSdkVersion());
+    RemoteConfigRequest request = remoteConfigRequestFactory.createRequest();
+    JSONObject configResult = api.loadConfig(request);
 
     // FIXME EE-792 Proper solution would be to separate the remote config and the CDB calls
     //  This will remove the is*Requested boolean, this ugly partial parsing and partial

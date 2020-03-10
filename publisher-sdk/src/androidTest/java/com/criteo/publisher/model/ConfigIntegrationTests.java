@@ -274,7 +274,7 @@ public class ConfigIntegrationTests {
 
   private void givenRemoteConfigWithResponse(JSONObject configJson) {
     PubSdkApi api = givenMockedRemoteConfig();
-    when(api.loadConfig(any(), any(), any())).thenReturn(configJson);
+    when(api.loadConfig(any())).thenReturn(configJson);
   }
 
   private PubSdkApi givenMockedRemoteConfig() {

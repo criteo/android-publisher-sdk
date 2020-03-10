@@ -3,11 +3,13 @@ package com.criteo.publisher.integration;
 import static com.criteo.publisher.CriteoUtil.TEST_CP_ID;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.AdditionalAnswers.answerVoid;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -113,7 +115,7 @@ public class CriteoFunctionalTest {
     waitForBids();
 
     verify(api).loadCdb(any(), any());
-    verify(api).loadConfig(any(), any(), any());
+    verify(api).loadConfig(any());
     verify(api).postAppEvent(anyInt(), any(), any(), any(), anyInt(), any());
   }
 
@@ -143,7 +145,13 @@ public class CriteoFunctionalTest {
     givenInitializedCriteo();
     waitForBids();
 
-    verify(api).loadConfig(TEST_CP_ID, "com.criteo.publisher.test", "1.2.3");
+    verify(api).loadConfig(argThat(request -> {
+      assertEquals(TEST_CP_ID, request.getCriteoPublisherId());
+      assertEquals("com.criteo.publisher.test", request.getBundleId());
+      assertEquals("1.2.3", request.getSdkVersion());
+
+      return true;
+    }));
   }
 
   private void waitForBids() {

@@ -1,7 +1,6 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
-import static com.criteo.publisher.Util.CompletableFuture.completedFuture;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -11,7 +10,6 @@ import android.support.annotation.NonNull;
 import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.LoggingUtil;
-import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdSize;
@@ -21,10 +19,8 @@ import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.Config;
-import com.criteo.publisher.model.DeviceInfo;
-import com.criteo.publisher.model.Publisher;
+import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.model.Slot;
-import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.CdbDownloadTask;
 import com.criteo.publisher.network.PubSdkApi;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
@@ -54,10 +50,7 @@ public class BidManagerTests {
   private AdUnit adUnit;
   private String cpm = "0.10";
   private String displayUrl = "https://www.example.com/lone?par1=abcd";
-  private Publisher publisher;
-  private User user;
   private SdkCache sdkCache;
-  private DeviceInfo deviceInfo;
   private Slot testSlot;
 
   @Mock
@@ -84,9 +77,6 @@ public class BidManagerTests {
   @Mock
   private Clock clock;
 
-  @Mock
-  private UserPrivacyUtil userPrivacyUtil;
-
   private AdUnitMapper adUnitMapper;
 
   @Mock
@@ -94,6 +84,9 @@ public class BidManagerTests {
 
   @Mock
   private CdbRequestFactory cdbRequestFactory;
+
+  @Mock
+  private RemoteConfigRequestFactory remoteConfigRequestFactory;
 
   @Before
   public void setup() {
@@ -110,13 +103,7 @@ public class BidManagerTests {
     // FIXME This seems useless because tests still works without.
     when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_PORTRAIT);
 
-    publisher = new Publisher(context, "unitPublisherId");
-    user = mock(User.class);
     sdkCache = mock(SdkCache.class);
-
-    deviceInfo = mock(DeviceInfo.class);
-    when(deviceInfo.getUserAgent())
-        .thenReturn(completedFuture("Some fun user-agent that is probably webkit based 10.3"));
 
     JSONObject slotJson = null;
     try {
@@ -311,8 +298,6 @@ public class BidManagerTests {
   @NonNull
   private BidManager createBidManager() {
     return new BidManager(
-        publisher,
-        user,
         sdkCache,
         placementsWithCdbTasks,
         config,
@@ -321,8 +306,8 @@ public class BidManagerTests {
         clock,
         adUnitMapper,
         api,
-        cdbRequestFactory
-    );
+        cdbRequestFactory,
+        remoteConfigRequestFactory);
   }
 
   @NonNull

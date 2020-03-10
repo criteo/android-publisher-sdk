@@ -22,9 +22,8 @@ import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.NativeAssets;
 import com.criteo.publisher.model.NativeProduct;
-import com.criteo.publisher.model.Publisher;
+import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.model.Slot;
-import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.CdbDownloadTask;
 import com.criteo.publisher.network.PubSdkApi;
 import java.util.Collections;
@@ -75,8 +74,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
   private final AtomicLong cdbTimeToNextCall = new AtomicLong(0);
 
-  private final Publisher publisher;
-  private final User user;
   private final Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
   private final DeviceUtil deviceUtil;
   private final LoggingUtil loggingUtil;
@@ -90,9 +87,10 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
   @NonNull
   private final CdbRequestFactory cdbRequestFactory;
 
+  @NonNull
+  private final RemoteConfigRequestFactory remoteConfigRequestFactory;
+
   BidManager(
-      @NonNull Publisher publisher,
-      @NonNull User user,
       @NonNull SdkCache sdkCache,
       @NonNull Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks,
       @NonNull Config config,
@@ -101,10 +99,9 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
       @NonNull Clock clock,
       @NonNull AdUnitMapper adUnitMapper,
       @NonNull PubSdkApi api,
-      @NonNull CdbRequestFactory cdbRequestFactory
+      @NonNull CdbRequestFactory cdbRequestFactory,
+      @NonNull RemoteConfigRequestFactory remoteConfigRequestFactory
   ) {
-    this.publisher = publisher;
-    this.user = user;
     this.cache = sdkCache;
     this.placementsWithCdbTasks = placementsWithCdbTasks;
     this.config = config;
@@ -114,6 +111,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     this.adUnitMapper = adUnitMapper;
     this.api = api;
     this.cdbRequestFactory = cdbRequestFactory;
+    this.remoteConfigRequestFactory = remoteConfigRequestFactory;
   }
 
   /**
@@ -144,9 +142,9 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         placementsWithCdbTasks,
         loggingUtil,
         api,
-        user,
-        publisher,
-        cdbRequestFactory);
+        cdbRequestFactory,
+        remoteConfigRequestFactory
+    );
 
     for (CacheAdUnit cacheAdUnit : prefetchCacheAdUnits) {
       placementsWithCdbTasks.put(cacheAdUnit, cdbDownloadTask);

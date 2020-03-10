@@ -18,6 +18,7 @@ import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
+import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.NetworkConfiguration;
 import com.criteo.publisher.network.PubSdkApi;
@@ -172,8 +173,6 @@ public class DependencyProvider {
       @Override
       public BidManager create() {
         return new BidManager(
-            DependencyProvider.this.providePublisher(context, criteoPublisherId),
-            DependencyProvider.this.provideUser(context),
             new SdkCache(DependencyProvider.this.provideDeviceUtil(context)),
             new Hashtable<>(),
             DependencyProvider.this.provideConfig(context),
@@ -182,8 +181,8 @@ public class DependencyProvider {
             DependencyProvider.this.provideClock(),
             DependencyProvider.this.provideAdUnitMapper(context),
             DependencyProvider.this.providePubSdkApi(),
-            DependencyProvider.this.provideCdbRequestFactory(context, criteoPublisherId)
-        );
+            DependencyProvider.this.provideCdbRequestFactory(context, criteoPublisherId),
+            DependencyProvider.this.provideRemoteConfigRequestFactory(context, criteoPublisherId));
       }
     });
   }
@@ -260,6 +259,19 @@ public class DependencyProvider {
             provideDeviceInfo(context),
             provideDeviceUtil(context),
             provideUserPrivacyUtil(context)
+        );
+      }
+    });
+  }
+
+  @NonNull
+  public RemoteConfigRequestFactory provideRemoteConfigRequestFactory(@NonNull Context context, @NonNull String criteoPublisherId) {
+    return getOrCreate(RemoteConfigRequestFactory.class, new Factory<RemoteConfigRequestFactory>() {
+      @Override
+      public RemoteConfigRequestFactory create() {
+        return new RemoteConfigRequestFactory(
+            provideUser(context),
+            providePublisher(context, criteoPublisherId)
         );
       }
     });

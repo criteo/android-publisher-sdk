@@ -124,7 +124,7 @@ public class BidManagerFunctionalTest {
   @Test
   public void prefetch_GivenNoAdUnit_ShouldUpdateConfig() throws Exception {
     JSONObject jsonConfig = mock(JSONObject.class);
-    when(api.loadConfig(any(), any(), any())).thenReturn(jsonConfig);
+    when(api.loadConfig(any())).thenReturn(jsonConfig);
 
     BidManager bidManager = spy(createBidManager());
     bidManager.prefetch(emptyList());
@@ -193,7 +193,7 @@ public class BidManagerFunctionalTest {
         .thenReturn(response1)
         .thenReturn(null)
         .thenReturn(response3);
-    when(api.loadConfig(any(), any(), any())).thenReturn(jsonConfig);
+    when(api.loadConfig(any())).thenReturn(jsonConfig);
 
     BidManager bidManager = spy(createBidManager());
     bidManager.prefetch(prefetchAdUnits);
@@ -815,7 +815,7 @@ public class BidManagerFunctionalTest {
   private void givenRemoteConfigWithKillSwitchEnabled() throws JSONException {
     JSONObject json = new JSONObject();
     json.put("killSwitch", true);
-    when(api.loadConfig(any(), any(), any())).thenReturn(json);
+    when(api.loadConfig(any())).thenReturn(json);
   }
 
   @NonNull
@@ -879,8 +879,6 @@ public class BidManagerFunctionalTest {
     Context context = InstrumentationRegistry.getContext();
 
     return new BidManager(
-        dependencyProvider.providePublisher(context, "myCpId"),
-        dependencyProvider.provideUser(context),
         cache,
         new Hashtable<>(),
         dependencyProvider.provideConfig(context),
@@ -889,8 +887,8 @@ public class BidManagerFunctionalTest {
         dependencyProvider.provideClock(),
         dependencyProvider.provideAdUnitMapper(context),
         dependencyProvider.providePubSdkApi(),
-        dependencyProvider.provideCdbRequestFactory(context, "myCpId")
-    );
+        dependencyProvider.provideCdbRequestFactory(context, "myCpId"),
+        dependencyProvider.provideRemoteConfigRequestFactory(context, "myCpId"));
   }
 
 }

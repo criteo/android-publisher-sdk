@@ -13,6 +13,7 @@ import static org.mockserver.verify.VerificationTimes.once;
 import android.support.annotation.NonNull;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.model.RemoteConfigRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -229,7 +230,12 @@ public class PubSdkApiTest {
 
   @Test
   public void loadConfig_GivenInput_SendGetRequestWithQueryParameters() throws Exception {
-    api.loadConfig("myCpId", "myAppId", "myVersion");
+    RemoteConfigRequest request = new RemoteConfigRequest(
+        "myCpId",
+        "myAppId",
+        "myVersion");
+
+    api.loadConfig(request);
 
     mockServerClient.verify(request()
         .withMethod("GET")
