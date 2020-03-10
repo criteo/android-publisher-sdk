@@ -20,10 +20,10 @@ import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.model.User;
+import com.criteo.publisher.network.BidRequestSender;
 import com.criteo.publisher.network.NetworkConfiguration;
 import com.criteo.publisher.network.PubSdkApi;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
@@ -174,15 +174,12 @@ public class DependencyProvider {
       public BidManager create() {
         return new BidManager(
             new SdkCache(DependencyProvider.this.provideDeviceUtil(context)),
-            new Hashtable<>(),
             DependencyProvider.this.provideConfig(context),
             DependencyProvider.this.provideDeviceUtil(context),
-            DependencyProvider.this.provideLoggingUtil(),
             DependencyProvider.this.provideClock(),
             DependencyProvider.this.provideAdUnitMapper(context),
-            DependencyProvider.this.providePubSdkApi(),
-            DependencyProvider.this.provideCdbRequestFactory(context, criteoPublisherId),
-            DependencyProvider.this.provideRemoteConfigRequestFactory(context, criteoPublisherId));
+            DependencyProvider.this.provideBidRequestSender(context, criteoPublisherId)
+        );
       }
     });
   }
@@ -272,6 +269,22 @@ public class DependencyProvider {
         return new RemoteConfigRequestFactory(
             provideUser(context),
             providePublisher(context, criteoPublisherId)
+        );
+      }
+    });
+  }
+
+  @NonNull
+  public BidRequestSender provideBidRequestSender(@NonNull Context context, @NonNull String criteoPublisherId) {
+    return getOrCreate(BidRequestSender.class, new Factory<BidRequestSender>() {
+      @Override
+      public BidRequestSender create() {
+        return new BidRequestSender(
+            provideCdbRequestFactory(context, criteoPublisherId),
+            provideRemoteConfigRequestFactory(context, criteoPublisherId),
+            providePubSdkApi(),
+            provideLoggingUtil(),
+            provideThreadPoolExecutor()
         );
       }
     });

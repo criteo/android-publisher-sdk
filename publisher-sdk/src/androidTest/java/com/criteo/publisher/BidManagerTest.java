@@ -1,15 +1,20 @@
 package com.criteo.publisher;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.annotation.UiThreadTest;
@@ -17,7 +22,6 @@ import android.support.test.runner.AndroidJUnit4;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
@@ -26,21 +30,15 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CacheAdUnit;
-import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.NativeAssets;
-import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.model.Slot;
-import com.criteo.publisher.network.CdbDownloadTask;
-import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.network.BidRequestSender;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.concurrent.Executor;
 import junit.framework.Assert;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -86,22 +84,13 @@ public class BidManagerTest {
   @Mock
   private AdvertisingInfo advertisingInfo;
 
-  @Mock
-  private LoggingUtil loggingUtil;
-
   private Clock clock;
 
   private DeviceUtil deviceUtil;
 
-  private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
-
   private AdUnitMapper adUnitMapper;
 
-  private PubSdkApi api;
-
-  private CdbRequestFactory cdbRequestFactory;
-
-  private RemoteConfigRequestFactory remoteConfigRequestFactory;
+  private BidRequestSender bidRequestSender;
 
   @Before
   public void setup() {
@@ -115,16 +104,12 @@ public class BidManagerTest {
     deviceUtil = new DeviceUtil(context, advertisingInfo);
     sdkCache = new SdkCache(deviceUtil);
     config = new Config(context);
-    placementsWithCdbTasks = new Hashtable<>();
     MockitoAnnotations.initMocks(this);
 
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
     clock = dependencyProvider.provideClock();
     adUnitMapper = dependencyProvider.provideAdUnitMapper(context);
-    api = dependencyProvider.providePubSdkApi();
-    cdbRequestFactory = dependencyProvider.provideCdbRequestFactory(context, CRITEO_PUBLISHER_ID);
-    remoteConfigRequestFactory = dependencyProvider.provideRemoteConfigRequestFactory(context, CRITEO_PUBLISHER_ID);
-    Executor runOnUiThreadExecutor = dependencyProvider.provideRunOnUiThreadExecutor();
+    bidRequestSender = spy(dependencyProvider.provideBidRequestSender(context, CRITEO_PUBLISHER_ID));
   }
 
   @Test
@@ -153,9 +138,8 @@ public class BidManagerTest {
     CacheAdUnit placementKey = new CacheAdUnit(adSize, bannerAdUnit.getAdUnitId(),
         AdUnitType.CRITEO_BANNER);
     manager.getBidForAdUnitAndPrefetch(bannerAdUnit);
-    CdbDownloadTask cdbDownloadTask = placementsWithCdbTasks.get(placementKey);
-    assertNotNull(cdbDownloadTask);
-    Assert.assertEquals(AsyncTask.Status.RUNNING, cdbDownloadTask.getStatus());
+
+    verify(bidRequestSender).sendBidRequest(eq(singletonList(placementKey)), any());
   }
 
   @Test
@@ -175,13 +159,9 @@ public class BidManagerTest {
         cacheAdUnit2.getSize());
 
     BidManager manager = createBidManager();
-    manager.prefetch(Arrays.asList(bannerAdUnit1, bannerAdUnit2));
-    CdbDownloadTask cdbDownloadTask1 = placementsWithCdbTasks.get(cacheAdUnit1);
-    CdbDownloadTask cdbDownloadTask2 = placementsWithCdbTasks.get(cacheAdUnit2);
-    assertNotNull(cdbDownloadTask1);
-    assertNotNull(cdbDownloadTask2);
-    Assert.assertEquals(AsyncTask.Status.RUNNING, cdbDownloadTask1.getStatus());
-    Assert.assertEquals(AsyncTask.Status.RUNNING, cdbDownloadTask2.getStatus());
+    manager.prefetch(asList(bannerAdUnit1, bannerAdUnit2));
+
+    verify(bidRequestSender).sendBidRequest(eq(asList(cacheAdUnit1, cacheAdUnit2)), any());
 
   }
 
@@ -607,15 +587,12 @@ public class BidManagerTest {
   private BidManager createBidManager() {
     return new BidManager(
         sdkCache,
-        placementsWithCdbTasks,
         config,
         deviceUtil,
-        loggingUtil,
         clock,
         adUnitMapper,
-        api,
-        cdbRequestFactory,
-        remoteConfigRequestFactory);
+        bidRequestSender
+    );
   }
 
   @NonNull

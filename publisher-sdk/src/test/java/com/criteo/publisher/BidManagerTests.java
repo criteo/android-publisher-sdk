@@ -9,7 +9,6 @@ import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdSize;
@@ -17,12 +16,9 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CacheAdUnit;
-import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.Config;
-import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.model.Slot;
-import com.criteo.publisher.network.CdbDownloadTask;
-import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.network.BidRequestSender;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -63,16 +59,10 @@ public class BidManagerTests {
   private Config config;
 
   @Mock
-  private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
-
-  @Mock
   private AndroidUtil androidUtil;
 
   @Mock
   private DeviceUtil deviceUtil;
-
-  @Mock
-  private LoggingUtil loggingUtil;
 
   @Mock
   private Clock clock;
@@ -80,13 +70,7 @@ public class BidManagerTests {
   private AdUnitMapper adUnitMapper;
 
   @Mock
-  private PubSdkApi api;
-
-  @Mock
-  private CdbRequestFactory cdbRequestFactory;
-
-  @Mock
-  private RemoteConfigRequestFactory remoteConfigRequestFactory;
+  private BidRequestSender bidRequestSender;
 
   @Before
   public void setup() {
@@ -299,15 +283,12 @@ public class BidManagerTests {
   private BidManager createBidManager() {
     return new BidManager(
         sdkCache,
-        placementsWithCdbTasks,
         config,
         deviceUtil,
-        loggingUtil,
         clock,
         adUnitMapper,
-        api,
-        cdbRequestFactory,
-        remoteConfigRequestFactory);
+        bidRequestSender
+    );
   }
 
   @NonNull

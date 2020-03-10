@@ -18,6 +18,7 @@ public class RemoteConfigRequestFactory {
     this.publisher = publisher;
   }
 
+  @NonNull
   public RemoteConfigRequest createRequest() {
     return new RemoteConfigRequest(
         publisher.getCriteoPublisherId(),

@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.Executor;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
@@ -123,6 +124,7 @@ public class CriteoInternalUnitTest {
     doReturn(mock(Config.class)).when(dependencyProvider).provideConfig(any());
     doReturn(new DirectMockRunOnUiThreadExecutor()).when(dependencyProvider)
         .provideRunOnUiThreadExecutor();
+    doReturn((Executor) Runnable::run).when(dependencyProvider).provideThreadPoolExecutor();
 
     Context applicationContext = mock(Context.class, Answers.RETURNS_DEEP_STUBS);
     when(application.getApplicationContext()).thenReturn(applicationContext);

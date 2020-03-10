@@ -1,9 +1,7 @@
 package com.criteo.publisher;
 
 import static android.content.ContentValues.TAG;
-import static java.util.Collections.emptyList;
 
-import android.os.AsyncTask;
 import android.support.annotation.GuardedBy;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,34 +9,27 @@ import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.Util.ReflectionUtil;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CacheAdUnit;
-import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.NativeAssets;
 import com.criteo.publisher.model.NativeProduct;
-import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.model.Slot;
-import com.criteo.publisher.network.CdbDownloadTask;
-import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.network.BidRequestSender;
 import java.util.Collections;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicLong;
-import org.json.JSONObject;
 
 public class BidManager implements NetworkResponseListener, ApplicationStoppedListener {
 
-  private static String MOPUB_ADVIEW_CLASS = "com.mopub.mobileads.MoPubView";
-  private static String MOPUB_INTERSTITIAL_CLASS = "com.mopub.mobileads.MoPubInterstitial";
-  private static String DFP_ADREQUEST_CLASS = "com.google.android.gms.ads.doubleclick.PublisherAdRequest$Builder";
+  private static final String MOPUB_ADVIEW_CLASS = "com.mopub.mobileads.MoPubView";
+  private static final String MOPUB_INTERSTITIAL_CLASS = "com.mopub.mobileads.MoPubInterstitial";
+  private static final String DFP_ADREQUEST_CLASS = "com.google.android.gms.ads.doubleclick.PublisherAdRequest$Builder";
 
   private static final String CRT_CPM = "crt_cpm";
   private static final String CRT_NATIVE_TITLE = "crtn_title";
@@ -74,84 +65,52 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
   private final AtomicLong cdbTimeToNextCall = new AtomicLong(0);
 
-  private final Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
+  @NonNull
   private final DeviceUtil deviceUtil;
-  private final LoggingUtil loggingUtil;
+
+  @NonNull
   private final Config config;
 
   @NonNull
   private final Clock clock;
+
+  @NonNull
   private final AdUnitMapper adUnitMapper;
-  private final PubSdkApi api;
 
   @NonNull
-  private final CdbRequestFactory cdbRequestFactory;
-
-  @NonNull
-  private final RemoteConfigRequestFactory remoteConfigRequestFactory;
+  private final BidRequestSender bidRequestSender;
 
   BidManager(
       @NonNull SdkCache sdkCache,
-      @NonNull Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks,
       @NonNull Config config,
       @NonNull DeviceUtil deviceUtil,
-      @NonNull LoggingUtil loggingUtil,
       @NonNull Clock clock,
       @NonNull AdUnitMapper adUnitMapper,
-      @NonNull PubSdkApi api,
-      @NonNull CdbRequestFactory cdbRequestFactory,
-      @NonNull RemoteConfigRequestFactory remoteConfigRequestFactory
+      @NonNull BidRequestSender bidRequestSender
   ) {
     this.cache = sdkCache;
-    this.placementsWithCdbTasks = placementsWithCdbTasks;
     this.config = config;
     this.deviceUtil = deviceUtil;
-    this.loggingUtil = loggingUtil;
     this.clock = clock;
     this.adUnitMapper = adUnitMapper;
-    this.api = api;
-    this.cdbRequestFactory = cdbRequestFactory;
-    this.remoteConfigRequestFactory = remoteConfigRequestFactory;
+    this.bidRequestSender = bidRequestSender;
   }
 
   /**
    * load data for next time
    */
   private void fetch(CacheAdUnit cacheAdUnit) {
-    if (placementsWithCdbTasks.containsKey(cacheAdUnit)) {
-      return;
-    }
-
     if (cdbTimeToNextCall.get() < clock.getCurrentTimeInMillis()) {
-      startCdbDownloadTask(false, Collections.singletonList(cacheAdUnit));
+      sendBidRequest(Collections.singletonList(cacheAdUnit));
     }
   }
 
-  /**
-   * Method to start new CdbDownload Asynctask
-   */
-  private void startCdbDownloadTask(boolean isConfigRequested,
-      List<CacheAdUnit> prefetchCacheAdUnits) {
-    boolean isCdbRequested = !killSwitchEngaged() && !prefetchCacheAdUnits.isEmpty();
-
-    CdbDownloadTask cdbDownloadTask = new CdbDownloadTask(
-        this,
-        isConfigRequested,
-        isCdbRequested,
-        prefetchCacheAdUnits,
-        placementsWithCdbTasks,
-        loggingUtil,
-        api,
-        cdbRequestFactory,
-        remoteConfigRequestFactory
-    );
-
-    for (CacheAdUnit cacheAdUnit : prefetchCacheAdUnits) {
-      placementsWithCdbTasks.put(cacheAdUnit, cdbDownloadTask);
+  private void sendBidRequest(List<CacheAdUnit> prefetchCacheAdUnits) {
+    if (killSwitchEngaged()) {
+      return;
     }
 
-    Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
-    cdbDownloadTask.executeOnExecutor(threadPoolExecutor);
+    bidRequestSender.sendBidRequest(prefetchCacheAdUnits, this);
   }
 
 
@@ -366,11 +325,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
   }
 
   @Override
-  public void refreshConfig(@NonNull JSONObject configJSONObject) {
-    config.refreshConfig(configJSONObject);
-  }
-
-  @Override
   public void setTimeToNextCall(int seconds) {
     if (seconds > 0) {
       this.cdbTimeToNextCall.set(clock.getCurrentTimeInMillis() + seconds * 1000);
@@ -379,12 +333,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
   @Override
   public void onApplicationStopped() {
-    for (CacheAdUnit key : placementsWithCdbTasks.keySet()) {
-      if (placementsWithCdbTasks.get(key) != null
-          && placementsWithCdbTasks.get(key).getStatus() == AsyncTask.Status.RUNNING) {
-        (placementsWithCdbTasks.get(key)).cancel(true);
-      }
-    }
+    bidRequestSender.cancelAllPendingTasks();
   }
 
   /**
@@ -395,10 +344,10 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
   public void prefetch(@NonNull List<AdUnit> adUnits) {
     List<List<CacheAdUnit>> requestedAdUnitsChunks = adUnitMapper.mapToChunks(adUnits);
 
-    startCdbDownloadTask(true /* isConfigRequested */, emptyList());
+    bidRequestSender.sendRemoteConfigRequest(config);
 
     for (List<CacheAdUnit> requestedAdUnits : requestedAdUnitsChunks) {
-      startCdbDownloadTask(false /* isConfigRequested */, requestedAdUnits);
+      sendBidRequest(requestedAdUnits);
     }
   }
 

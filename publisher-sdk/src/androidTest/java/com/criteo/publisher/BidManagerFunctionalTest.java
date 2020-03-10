@@ -39,7 +39,6 @@ import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.PubSdkApi;
 import java.util.Arrays;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
@@ -76,6 +75,9 @@ public class BidManagerFunctionalTest {
   private SdkCache cache;
 
   @Mock
+  private Config config;
+
+  @Mock
   private PubSdkApi api;
 
   @Mock
@@ -94,6 +96,7 @@ public class BidManagerFunctionalTest {
     when(dependencyProvider.provideClock()).thenReturn(clock);
     doReturn(publisher).when(dependencyProvider).providePublisher(any(), any());
     doReturn(user).when(dependencyProvider).provideUser(any());
+    doReturn(config).when(dependencyProvider).provideConfig(any());
 
     // Should be set to at least 1 because user-level silent mode is set the 0 included
     givenMockedClockSetTo(1);
@@ -130,7 +133,7 @@ public class BidManagerFunctionalTest {
     bidManager.prefetch(emptyList());
     waitForIdleState();
 
-    verify(bidManager).refreshConfig(jsonConfig);
+    verify(config).refreshConfig(jsonConfig);
     verify(api, never()).loadCdb(any(), any());
   }
 
@@ -199,13 +202,13 @@ public class BidManagerFunctionalTest {
     bidManager.prefetch(prefetchAdUnits);
     waitForIdleState();
 
-    InOrder inOrder = inOrder(bidManager, cache, api);
+    InOrder inOrder = inOrder(bidManager, cache, api, config);
 
     // First call with only config call
-    inOrder.verify(bidManager).refreshConfig(jsonConfig);
+    inOrder.verify(config).refreshConfig(jsonConfig);
 
     // First call to CDB
-    inOrder.verify(bidManager, never()).refreshConfig(any());
+    inOrder.verify(config, never()).refreshConfig(any());
     inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits1.equals(cdb.getAdUnits())), any());
     response1.getSlots().forEach(inOrder.verify(cache)::add);
     inOrder.verify(bidManager).setTimeToNextCall(1);
@@ -214,7 +217,7 @@ public class BidManagerFunctionalTest {
     inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits2.equals(cdb.getAdUnits())), any());
 
     // Third call in success but without the config call
-    inOrder.verify(bidManager, never()).refreshConfig(any());
+    inOrder.verify(config, never()).refreshConfig(any());
     inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits3.equals(cdb.getAdUnits())), any());
     response3.getSlots().forEach(inOrder.verify(cache)::add);
     inOrder.verify(bidManager).setTimeToNextCall(3);
@@ -880,15 +883,12 @@ public class BidManagerFunctionalTest {
 
     return new BidManager(
         cache,
-        new Hashtable<>(),
         dependencyProvider.provideConfig(context),
         dependencyProvider.provideDeviceUtil(context),
-        dependencyProvider.provideLoggingUtil(),
         dependencyProvider.provideClock(),
         dependencyProvider.provideAdUnitMapper(context),
-        dependencyProvider.providePubSdkApi(),
-        dependencyProvider.provideCdbRequestFactory(context, "myCpId"),
-        dependencyProvider.provideRemoteConfigRequestFactory(context, "myCpId"));
+        dependencyProvider.provideBidRequestSender(context, "myCpId")
+    );
   }
 
 }
