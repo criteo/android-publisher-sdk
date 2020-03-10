@@ -2,7 +2,6 @@ package com.criteo.publisher.network;
 
 import android.support.annotation.GuardedBy;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import com.criteo.publisher.Util.LoggingUtil;
@@ -190,16 +189,15 @@ public class BidRequestSender {
       CdbRequest cdbRequest = cdbRequestFactory.createRequest(requestedAdUnits);
       String userAgent = cdbRequestFactory.getUserAgent().get();
       CdbResponse cdbResponse = api.loadCdb(cdbRequest, userAgent);
-      logCdbResponse(cdbResponse);
 
       if (cdbResponse != null) {
-        listener.setCacheAdUnits(cdbResponse.getSlots());
-        listener.setTimeToNextCall(cdbResponse.getTimeToNextCall());
+        listener.onCdbResponse(cdbRequest, cdbResponse);
+        logCdbResponse(cdbResponse);
       }
     }
 
-    private void logCdbResponse(@Nullable CdbResponse response) {
-      if (loggingUtil.isLoggingEnabled() && response != null && response.getSlots().size() > 0) {
+    private void logCdbResponse(@NonNull CdbResponse response) {
+      if (loggingUtil.isLoggingEnabled() && !response.getSlots().isEmpty()) {
         StringBuilder builder = new StringBuilder();
         for (Slot slot : response.getSlots()) {
           builder.append(slot.toString());

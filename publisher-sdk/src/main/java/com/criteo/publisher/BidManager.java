@@ -5,6 +5,7 @@ import static android.content.ContentValues.TAG;
 import android.support.annotation.GuardedBy;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
@@ -15,6 +16,8 @@ import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CacheAdUnit;
+import com.criteo.publisher.model.CdbRequest;
+import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.NativeAssets;
 import com.criteo.publisher.model.NativeProduct;
@@ -305,8 +308,8 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     }
   }
 
-  @Override
-  public void setCacheAdUnits(@NonNull List<Slot> slots) {
+  @VisibleForTesting
+  void setCacheAdUnits(@NonNull List<Slot> slots) {
     long instant = clock.getCurrentTimeInMillis();
 
     synchronized (cacheLock) {
@@ -324,11 +327,17 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     }
   }
 
-  @Override
-  public void setTimeToNextCall(int seconds) {
+  @VisibleForTesting
+  void setTimeToNextCall(int seconds) {
     if (seconds > 0) {
       this.cdbTimeToNextCall.set(clock.getCurrentTimeInMillis() + seconds * 1000);
     }
+  }
+
+  @Override
+  public void onCdbResponse(@NonNull CdbRequest request, @NonNull CdbResponse response) {
+    setCacheAdUnits(response.getSlots());
+    setTimeToNextCall(response.getTimeToNextCall());
   }
 
   @Override

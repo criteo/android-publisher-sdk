@@ -118,13 +118,9 @@ class BidRequestSenderTest {
         val adUnit = createAdUnit()
         val adUnits = listOf(adUnit)
         val listener: NetworkResponseListener = mock()
-        val expectedSlots: List<Slot> = mock()
         val request: CdbRequest = mock()
         val userAgent = "myUserAgent"
-        val response: CdbResponse = mock() {
-            on { slots } doReturn expectedSlots
-            on { timeToNextCall } doReturn 42
-        }
+        val response: CdbResponse = mock()
 
         cdbRequestFactory.stub {
             on { createRequest(adUnits) } doReturn request
@@ -135,8 +131,7 @@ class BidRequestSenderTest {
 
         sender.sendBidRequest(adUnits, listener)
 
-        verify(listener).setCacheAdUnits(expectedSlots)
-        verify(listener).setTimeToNextCall(42)
+        verify(listener).onCdbResponse(request, response)
     }
 
     @Test

@@ -15,7 +15,9 @@ public class CdbResponse {
   private static final String TIME_TO_NEXT_CALL = "timeToNextCall";
   private static final String SLOTS = "slots";
 
+  @NonNull
   private final List<Slot> slots;
+
   private final int timeToNextCall;
 
   public CdbResponse(@NonNull JSONObject json) {
