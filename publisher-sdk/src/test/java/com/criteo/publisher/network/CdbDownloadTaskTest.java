@@ -11,6 +11,8 @@ import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.DeviceInfo;
+import com.criteo.publisher.model.Publisher;
+import com.criteo.publisher.model.User;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -48,6 +50,12 @@ public class CdbDownloadTaskTest {
 
   @Mock
   private UserPrivacyUtil userPrivacyUtil;
+
+  @Mock
+  private User user;
+
+  @Mock
+  private Publisher publisher;
 
   private final AtomicInteger adUnitId = new AtomicInteger(0);
 
@@ -94,7 +102,8 @@ public class CdbDownloadTaskTest {
         deviceUtil,
         loggingUtil,
         userPrivacyUtil,
-        api
-    );
+        api,
+        user,
+        publisher);
   }
 }

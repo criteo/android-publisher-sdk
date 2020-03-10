@@ -25,29 +25,59 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
 
   private static final String TAG = "Criteo.CDT";
 
+  /**
+   * Profile ID used by the SDK, so CDB and the Supply chain can recognize that the request come
+   * from the PublisherSDK.
+   */
+  private static final int PROFILE_ID = 235;
+
   private final boolean isConfigRequested;
+
   private boolean isCdbRequested;
+
+  @NonNull
   private final DeviceInfo deviceInfo;
+
+  @NonNull
   private final NetworkResponseListener responseListener;
+
+  @NonNull
   private final List<CacheAdUnit> cacheAdUnits;
+
+  @NonNull
   private final PubSdkApi api;
+
+  @NonNull
   private final DeviceUtil deviceUtil;
+
+  @NonNull
   private final LoggingUtil loggingUtil;
+
+  @NonNull
   private final Hashtable<CacheAdUnit, CdbDownloadTask> bidsInCdbTask;
+
+  @NonNull
   private final UserPrivacyUtil userPrivacyUtil;
 
+  @NonNull
+  private final User user;
+
+  @NonNull
+  private final Publisher publisher;
+
   public CdbDownloadTask(
-      NetworkResponseListener responseListener,
+      @NonNull NetworkResponseListener responseListener,
       boolean isConfigRequested,
       boolean isCdbRequested,
-      DeviceInfo deviceInfo,
-      List<CacheAdUnit> adUnits,
-      Hashtable<CacheAdUnit, CdbDownloadTask> bidsInMap,
-      DeviceUtil deviceUtil,
-      LoggingUtil loggingUtil,
-      UserPrivacyUtil userPrivacyUtil,
-      PubSdkApi api
-  ) {
+      @NonNull DeviceInfo deviceInfo,
+      @NonNull List<CacheAdUnit> adUnits,
+      @NonNull Hashtable<CacheAdUnit, CdbDownloadTask> bidsInMap,
+      @NonNull DeviceUtil deviceUtil,
+      @NonNull LoggingUtil loggingUtil,
+      @NonNull UserPrivacyUtil userPrivacyUtil,
+      @NonNull PubSdkApi api,
+      @NonNull User user,
+      @NonNull Publisher publisher) {
     this.responseListener = responseListener;
     this.isConfigRequested = isConfigRequested;
     this.isCdbRequested = isCdbRequested;
@@ -58,6 +88,8 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     this.loggingUtil = loggingUtil;
     this.api = api;
     this.userPrivacyUtil = userPrivacyUtil;
+    this.user = user;
+    this.publisher = publisher;
   }
 
   @Nullable
@@ -66,7 +98,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     NetworkResult result = null;
 
     try {
-      result = doCdbDownloadTask(objects);
+      result = doCdbDownloadTask();
     } catch (Throwable tr) {
       Log.e(TAG, "Internal CDT exec error.", tr);
     }
@@ -74,25 +106,15 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
     return result;
   }
 
-  @Nullable
-  private NetworkResult doCdbDownloadTask(Object[] objects) throws Exception {
-    if (objects.length < 3) {
-      return null;
-    }
-    int profile = (Integer) objects[0];
-    User user = (User) objects[1];
-    Publisher publisher = (Publisher) objects[2];
-    if (profile <= 0) {
-      return null;
-    }
-
-    JSONObject configResult = requestConfig(user, publisher);
-    CdbResponse cdbResponse = requestCdb(profile, user, publisher);
+  @NonNull
+  private NetworkResult doCdbDownloadTask() throws Exception {
+    JSONObject configResult = requestConfig();
+    CdbResponse cdbResponse = requestCdb();
     return new NetworkResult(cdbResponse, configResult);
   }
 
   @Nullable
-  private JSONObject requestConfig(User user, Publisher publisher) {
+  private JSONObject requestConfig() {
     if (!isConfigRequested) {
       return null;
     }
@@ -115,12 +137,12 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
   }
 
   @Nullable
-  private CdbResponse requestCdb(int profile, User user, Publisher publisher) throws Exception {
+  private CdbResponse requestCdb() throws Exception {
     if (!isCdbRequested) {
       return null;
     }
 
-    CdbRequest cdbRequest = buildCdbRequest(profile, user, publisher);
+    CdbRequest cdbRequest = buildCdbRequest();
     String userAgent = deviceInfo.getUserAgent().get();
     CdbResponse cdbResult = api.loadCdb(cdbRequest, userAgent);
     logCdbResponse(cdbResult);
@@ -129,7 +151,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
   }
 
   @NonNull
-  private CdbRequest buildCdbRequest(int profile, User user, Publisher publisher) {
+  private CdbRequest buildCdbRequest() {
     String advertisingId = deviceUtil.getAdvertisingId();
     if (!TextUtils.isEmpty(advertisingId)) {
       user.setDeviceId(advertisingId);
@@ -150,7 +172,7 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
       user.setMopubConsent(mopubConsent);
     }
 
-    return new CdbRequest(publisher, user, user.getSdkVersion(), profile,
+    return new CdbRequest(publisher, user, user.getSdkVersion(), PROFILE_ID,
         userPrivacyUtil.gdpr(), cacheAdUnits);
   }
 
@@ -179,14 +201,22 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
       bidsInCdbTask.remove(cacheAdUnit);
     }
 
-    if (responseListener != null && networkResult != null) {
-      if (networkResult.getConfig() != null) {
-        responseListener.refreshConfig(networkResult.getConfig());
-      }
-      if (networkResult.getCdbResponse() != null) {
-        responseListener.setCacheAdUnits(networkResult.getCdbResponse().getSlots());
-        responseListener.setTimeToNextCall(networkResult.getCdbResponse().getTimeToNextCall());
-      }
+    if (networkResult != null) {
+      handleConfigResponse(networkResult.getConfig());
+      handleCdbResponse(networkResult.getCdbResponse());
+    }
+  }
+
+  private void handleConfigResponse(@Nullable JSONObject config) {
+    if (config != null) {
+      responseListener.refreshConfig(config);
+    }
+  }
+
+  private void handleCdbResponse(@Nullable CdbResponse cdbResponse) {
+    if (cdbResponse != null) {
+      responseListener.setCacheAdUnits(cdbResponse.getSlots());
+      responseListener.setTimeToNextCall(cdbResponse.getTimeToNextCall());
     }
   }
 }

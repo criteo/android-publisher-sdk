@@ -68,7 +68,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
   private static final int DEFAULT_TTL_IN_SECONDS = 15 * 60;
 
   private static final int SECOND_TO_MILLI = 1000;
-  private static final int PROFILE_ID = 235;
 
   @NonNull
   @GuardedBy("cacheLock")
@@ -149,15 +148,16 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         deviceUtil,
         loggingUtil,
         userPrivacyUtil,
-        api
-    );
+        api,
+        user,
+        publisher);
 
     for (CacheAdUnit cacheAdUnit : prefetchCacheAdUnits) {
       placementsWithCdbTasks.put(cacheAdUnit, cdbDownloadTask);
     }
 
     Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
-    cdbDownloadTask.executeOnExecutor(threadPoolExecutor, PROFILE_ID, user, publisher);
+    cdbDownloadTask.executeOnExecutor(threadPoolExecutor);
   }
 
 
