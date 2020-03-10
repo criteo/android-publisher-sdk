@@ -19,6 +19,7 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CacheAdUnit;
+import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
@@ -90,6 +91,9 @@ public class BidManagerTests {
 
   @Mock
   private PubSdkApi api;
+
+  @Mock
+  private CdbRequestFactory cdbRequestFactory;
 
   @Before
   public void setup() {
@@ -308,7 +312,6 @@ public class BidManagerTests {
   private BidManager createBidManager() {
     return new BidManager(
         publisher,
-        deviceInfo,
         user,
         sdkCache,
         placementsWithCdbTasks,
@@ -316,9 +319,9 @@ public class BidManagerTests {
         deviceUtil,
         loggingUtil,
         clock,
-        userPrivacyUtil,
         adUnitMapper,
-        api
+        api,
+        cdbRequestFactory
     );
   }
 

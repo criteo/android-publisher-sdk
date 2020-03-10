@@ -92,6 +92,8 @@ public class BidManagerFunctionalTest {
 
     when(dependencyProvider.providePubSdkApi()).thenReturn(api);
     when(dependencyProvider.provideClock()).thenReturn(clock);
+    doReturn(publisher).when(dependencyProvider).providePublisher(any(), any());
+    doReturn(user).when(dependencyProvider).provideUser(any());
 
     // Should be set to at least 1 because user-level silent mode is set the 0 included
     givenMockedClockSetTo(1);
@@ -203,8 +205,8 @@ public class BidManagerFunctionalTest {
     inOrder.verify(bidManager).refreshConfig(jsonConfig);
 
     // First call to CDB
-    inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits1.equals(cdb.getAdUnits())), any());
     inOrder.verify(bidManager, never()).refreshConfig(any());
+    inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits1.equals(cdb.getAdUnits())), any());
     response1.getSlots().forEach(inOrder.verify(cache)::add);
     inOrder.verify(bidManager).setTimeToNextCall(1);
 
@@ -212,8 +214,8 @@ public class BidManagerFunctionalTest {
     inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits2.equals(cdb.getAdUnits())), any());
 
     // Third call in success but without the config call
-    inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits3.equals(cdb.getAdUnits())), any());
     inOrder.verify(bidManager, never()).refreshConfig(any());
+    inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits3.equals(cdb.getAdUnits())), any());
     response3.getSlots().forEach(inOrder.verify(cache)::add);
     inOrder.verify(bidManager).setTimeToNextCall(3);
 
@@ -877,18 +879,17 @@ public class BidManagerFunctionalTest {
     Context context = InstrumentationRegistry.getContext();
 
     return new BidManager(
-        publisher,
-        dependencyProvider.provideDeviceInfo(context),
-        user,
+        dependencyProvider.providePublisher(context, "myCpId"),
+        dependencyProvider.provideUser(context),
         cache,
         new Hashtable<>(),
         dependencyProvider.provideConfig(context),
         dependencyProvider.provideDeviceUtil(context),
         dependencyProvider.provideLoggingUtil(),
         dependencyProvider.provideClock(),
-        dependencyProvider.provideUserPrivacyUtil(context),
         dependencyProvider.provideAdUnitMapper(context),
-        dependencyProvider.providePubSdkApi()
+        dependencyProvider.providePubSdkApi(),
+        dependencyProvider.provideCdbRequestFactory(context, "myCpId")
     );
   }
 

@@ -14,6 +14,7 @@ import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnitMapper;
+import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
@@ -171,8 +172,7 @@ public class DependencyProvider {
       @Override
       public BidManager create() {
         return new BidManager(
-            new Publisher(context, criteoPublisherId),
-            DependencyProvider.this.provideDeviceInfo(context),
+            DependencyProvider.this.providePublisher(context, criteoPublisherId),
             DependencyProvider.this.provideUser(context),
             new SdkCache(DependencyProvider.this.provideDeviceUtil(context)),
             new Hashtable<>(),
@@ -180,9 +180,9 @@ public class DependencyProvider {
             DependencyProvider.this.provideDeviceUtil(context),
             DependencyProvider.this.provideLoggingUtil(),
             DependencyProvider.this.provideClock(),
-            DependencyProvider.this.provideUserPrivacyUtil(context),
             DependencyProvider.this.provideAdUnitMapper(context),
-            DependencyProvider.this.providePubSdkApi()
+            DependencyProvider.this.providePubSdkApi(),
+            DependencyProvider.this.provideCdbRequestFactory(context, criteoPublisherId)
         );
       }
     });
@@ -234,6 +234,32 @@ public class DependencyProvider {
             DependencyProvider.this.providePubSdkApi(),
             DependencyProvider.this.provideUserPrivacyUtil(context),
             DependencyProvider.this.provideDeviceInfo(context)
+        );
+      }
+    });
+  }
+
+  @NonNull
+  public Publisher providePublisher(@NonNull Context context, @NonNull String criteoPublisherId) {
+    return getOrCreate(Publisher.class, new Factory<Publisher>() {
+      @Override
+      public Publisher create() {
+        return new Publisher(context, criteoPublisherId);
+      }
+    });
+  }
+
+  @NonNull
+  public CdbRequestFactory provideCdbRequestFactory(@NonNull Context context, @NonNull String criteoPublisherId) {
+    return getOrCreate(CdbRequestFactory.class, new Factory<CdbRequestFactory>() {
+      @Override
+      public CdbRequestFactory create() {
+        return new CdbRequestFactory(
+            provideUser(context),
+            providePublisher(context, criteoPublisherId),
+            provideDeviceInfo(context),
+            provideDeviceUtil(context),
+            provideUserPrivacyUtil(context)
         );
       }
     });

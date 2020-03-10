@@ -14,13 +14,12 @@ import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.Util.ReflectionUtil;
-import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CacheAdUnit;
+import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.Config;
-import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.NativeAssets;
 import com.criteo.publisher.model.NativeProduct;
 import com.criteo.publisher.model.Publisher;
@@ -78,21 +77,21 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
   private final Publisher publisher;
   private final User user;
-  private DeviceInfo deviceInfo;
-  private Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
+  private final Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks;
   private final DeviceUtil deviceUtil;
   private final LoggingUtil loggingUtil;
   private final Config config;
 
   @NonNull
   private final Clock clock;
-  private final UserPrivacyUtil userPrivacyUtil;
   private final AdUnitMapper adUnitMapper;
   private final PubSdkApi api;
 
+  @NonNull
+  private final CdbRequestFactory cdbRequestFactory;
+
   BidManager(
       @NonNull Publisher publisher,
-      @NonNull DeviceInfo deviceInfo,
       @NonNull User user,
       @NonNull SdkCache sdkCache,
       @NonNull Hashtable<CacheAdUnit, CdbDownloadTask> placementsWithCdbTasks,
@@ -100,12 +99,11 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
       @NonNull DeviceUtil deviceUtil,
       @NonNull LoggingUtil loggingUtil,
       @NonNull Clock clock,
-      @NonNull UserPrivacyUtil userPrivacyUtil,
       @NonNull AdUnitMapper adUnitMapper,
-      @NonNull PubSdkApi api
+      @NonNull PubSdkApi api,
+      @NonNull CdbRequestFactory cdbRequestFactory
   ) {
     this.publisher = publisher;
-    this.deviceInfo = deviceInfo;
     this.user = user;
     this.cache = sdkCache;
     this.placementsWithCdbTasks = placementsWithCdbTasks;
@@ -113,9 +111,9 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     this.deviceUtil = deviceUtil;
     this.loggingUtil = loggingUtil;
     this.clock = clock;
-    this.userPrivacyUtil = userPrivacyUtil;
     this.adUnitMapper = adUnitMapper;
     this.api = api;
+    this.cdbRequestFactory = cdbRequestFactory;
   }
 
   /**
@@ -142,15 +140,13 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
         this,
         isConfigRequested,
         isCdbRequested,
-        deviceInfo,
         prefetchCacheAdUnits,
         placementsWithCdbTasks,
-        deviceUtil,
         loggingUtil,
-        userPrivacyUtil,
         api,
         user,
-        publisher);
+        publisher,
+        cdbRequestFactory);
 
     for (CacheAdUnit cacheAdUnit : prefetchCacheAdUnits) {
       placementsWithCdbTasks.put(cacheAdUnit, cdbDownloadTask);

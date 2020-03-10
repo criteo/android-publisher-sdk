@@ -4,13 +4,11 @@ import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
 import static org.mockito.Mockito.verify;
 
 import android.support.annotation.NonNull;
-import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
-import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.CacheAdUnit;
-import com.criteo.publisher.model.DeviceInfo;
+import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.User;
 import java.util.ArrayList;
@@ -33,12 +31,6 @@ public class CdbDownloadTaskTest {
   private Hashtable<CacheAdUnit, CdbDownloadTask> bidsInCdbTask;
 
   @Mock
-  private DeviceUtil deviceUtil;
-
-  @Mock
-  private DeviceInfo deviceInfo;
-
-  @Mock
   private LoggingUtil loggingUtil;
 
   @Mock
@@ -49,13 +41,13 @@ public class CdbDownloadTaskTest {
   private boolean isCdbRequested;
 
   @Mock
-  private UserPrivacyUtil userPrivacyUtil;
-
-  @Mock
   private User user;
 
   @Mock
   private Publisher publisher;
+
+  @Mock
+  private CdbRequestFactory cdbRequestFactory;
 
   private final AtomicInteger adUnitId = new AtomicInteger(0);
 
@@ -96,14 +88,13 @@ public class CdbDownloadTaskTest {
         responseListener,
         isConfigRequested,
         isCdbRequested,
-        deviceInfo,
         cacheAdUnits,
         bidsInCdbTask,
-        deviceUtil,
         loggingUtil,
-        userPrivacyUtil,
         api,
         user,
-        publisher);
+        publisher,
+        cdbRequestFactory
+    );
   }
 }

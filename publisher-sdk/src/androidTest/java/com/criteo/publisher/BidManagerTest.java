@@ -27,6 +27,7 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CacheAdUnit;
+import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.InterstitialAdUnit;
@@ -107,6 +108,8 @@ public class BidManagerTest {
 
   private PubSdkApi api;
 
+  private CdbRequestFactory cdbRequestFactory;
+
   @Before
   public void setup() {
     context = InstrumentationRegistry.getContext().getApplicationContext();
@@ -129,6 +132,7 @@ public class BidManagerTest {
     userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil(context);
     adUnitMapper = dependencyProvider.provideAdUnitMapper(context);
     api = dependencyProvider.providePubSdkApi();
+    cdbRequestFactory = dependencyProvider.provideCdbRequestFactory(context, CRITEO_PUBLISHER_ID);
     Executor runOnUiThreadExecutor = dependencyProvider.provideRunOnUiThreadExecutor();
 
     deviceInfo = new DeviceInfo(context, runOnUiThreadExecutor);
@@ -481,7 +485,8 @@ public class BidManagerTest {
           "            },\n" +
           "            \"privacy\": {\n" +
           "                \"optoutClickUrl\": \"https://privacy.us.criteo.com/adcenter\",\n" +
-          "                \"optoutImageUrl\": \"https://static.criteo.net/flash/icon/nai_small.png\",\n" +
+          "                \"optoutImageUrl\": \"https://static.criteo.net/flash/icon/nai_small.png\",\n"
+          +
           "                \"longLegalText\": \"Long Legal Text\"\n" +
           "            },\n" +
           "            \"impressionPixels\": [{\n" +
@@ -612,19 +617,18 @@ public class BidManagerTest {
   @NonNull
   private BidManager createBidManager() {
     return new BidManager(
-          publisher,
-          deviceInfo,
-          user,
-          sdkCache,
-          placementsWithCdbTasks,
-          config,
-          deviceUtil,
-          loggingUtil,
-          clock,
-          userPrivacyUtil,
-          adUnitMapper,
-          api
-      );
+        publisher,
+        user,
+        sdkCache,
+        placementsWithCdbTasks,
+        config,
+        deviceUtil,
+        loggingUtil,
+        clock,
+        adUnitMapper,
+        api,
+        cdbRequestFactory
+    );
   }
 
   @NonNull

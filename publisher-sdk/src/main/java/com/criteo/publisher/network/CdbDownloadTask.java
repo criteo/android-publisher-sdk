@@ -3,17 +3,14 @@ package com.criteo.publisher.network;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.util.Log;
-import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.NetworkResponseListener;
-import com.criteo.publisher.Util.UserPrivacyUtil;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
+import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.Config;
-import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
@@ -25,18 +22,9 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
 
   private static final String TAG = "Criteo.CDT";
 
-  /**
-   * Profile ID used by the SDK, so CDB and the Supply chain can recognize that the request come
-   * from the PublisherSDK.
-   */
-  private static final int PROFILE_ID = 235;
-
   private final boolean isConfigRequested;
 
   private boolean isCdbRequested;
-
-  @NonNull
-  private final DeviceInfo deviceInfo;
 
   @NonNull
   private final NetworkResponseListener responseListener;
@@ -48,16 +36,10 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
   private final PubSdkApi api;
 
   @NonNull
-  private final DeviceUtil deviceUtil;
-
-  @NonNull
   private final LoggingUtil loggingUtil;
 
   @NonNull
   private final Hashtable<CacheAdUnit, CdbDownloadTask> bidsInCdbTask;
-
-  @NonNull
-  private final UserPrivacyUtil userPrivacyUtil;
 
   @NonNull
   private final User user;
@@ -65,31 +47,30 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
   @NonNull
   private final Publisher publisher;
 
+  @NonNull
+  private final CdbRequestFactory cdbRequestFactory;
+
   public CdbDownloadTask(
       @NonNull NetworkResponseListener responseListener,
       boolean isConfigRequested,
       boolean isCdbRequested,
-      @NonNull DeviceInfo deviceInfo,
       @NonNull List<CacheAdUnit> adUnits,
       @NonNull Hashtable<CacheAdUnit, CdbDownloadTask> bidsInMap,
-      @NonNull DeviceUtil deviceUtil,
       @NonNull LoggingUtil loggingUtil,
-      @NonNull UserPrivacyUtil userPrivacyUtil,
       @NonNull PubSdkApi api,
       @NonNull User user,
-      @NonNull Publisher publisher) {
+      @NonNull Publisher publisher,
+      @NonNull CdbRequestFactory cdbRequestFactory) {
     this.responseListener = responseListener;
     this.isConfigRequested = isConfigRequested;
     this.isCdbRequested = isCdbRequested;
-    this.deviceInfo = deviceInfo;
     this.cacheAdUnits = adUnits;
     this.bidsInCdbTask = bidsInMap;
-    this.deviceUtil = deviceUtil;
     this.loggingUtil = loggingUtil;
     this.api = api;
-    this.userPrivacyUtil = userPrivacyUtil;
     this.user = user;
     this.publisher = publisher;
+    this.cdbRequestFactory = cdbRequestFactory;
   }
 
   @Nullable
@@ -142,38 +123,12 @@ public class CdbDownloadTask extends AsyncTask<Object, Void, NetworkResult> {
       return null;
     }
 
-    CdbRequest cdbRequest = buildCdbRequest();
-    String userAgent = deviceInfo.getUserAgent().get();
+    CdbRequest cdbRequest = cdbRequestFactory.createRequest(cacheAdUnits);
+    String userAgent = cdbRequestFactory.getUserAgent().get();
     CdbResponse cdbResult = api.loadCdb(cdbRequest, userAgent);
     logCdbResponse(cdbResult);
 
     return cdbResult;
-  }
-
-  @NonNull
-  private CdbRequest buildCdbRequest() {
-    String advertisingId = deviceUtil.getAdvertisingId();
-    if (!TextUtils.isEmpty(advertisingId)) {
-      user.setDeviceId(advertisingId);
-    }
-
-    String uspIab = userPrivacyUtil.getIabUsPrivacyString();
-    if (uspIab != null && !uspIab.isEmpty()) {
-      user.setUspIab(uspIab);
-    }
-
-    String uspOptout = userPrivacyUtil.getUsPrivacyOptout();
-    if (!uspOptout.isEmpty()) {
-      user.setUspOptout(uspOptout);
-    }
-
-    String mopubConsent = userPrivacyUtil.getMopubConsent();
-    if (!mopubConsent.isEmpty()) {
-      user.setMopubConsent(mopubConsent);
-    }
-
-    return new CdbRequest(publisher, user, user.getSdkVersion(), PROFILE_ID,
-        userPrivacyUtil.gdpr(), cacheAdUnits);
   }
 
   private void logCdbResponse(CdbResponse response) {
