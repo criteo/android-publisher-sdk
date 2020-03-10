@@ -1,6 +1,7 @@
 package com.criteo.publisher;
 
 import static android.content.ContentValues.TAG;
+import static java.util.Collections.emptyList;
 
 import android.os.AsyncTask;
 import android.support.annotation.GuardedBy;
@@ -399,11 +400,11 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
    */
   public void prefetch(@NonNull List<AdUnit> adUnits) {
     List<List<CacheAdUnit>> requestedAdUnitsChunks = adUnitMapper.mapToChunks(adUnits);
-    boolean isConfigRequested = true;
+
+    startCdbDownloadTask(true /* isConfigRequested */, emptyList());
 
     for (List<CacheAdUnit> requestedAdUnits : requestedAdUnitsChunks) {
-      startCdbDownloadTask(isConfigRequested, requestedAdUnits);
-      isConfigRequested = false;
+      startCdbDownloadTask(false /* isConfigRequested */, requestedAdUnits);
     }
   }
 
