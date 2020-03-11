@@ -26,6 +26,7 @@ import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.Util.UserPrivacyUtil;
+import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
@@ -38,6 +39,7 @@ import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.PubSdkApi;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -83,6 +85,9 @@ public class BidManagerFunctionalTest {
   @Mock
   private Clock clock;
 
+  @Mock
+  private BidLifecycleListener bidLifecycleListener;
+
   private int adUnitId = 0;
 
   @Before
@@ -97,6 +102,7 @@ public class BidManagerFunctionalTest {
     doReturn(publisher).when(dependencyProvider).providePublisher(any(), any());
     doReturn(user).when(dependencyProvider).provideUser(any());
     doReturn(config).when(dependencyProvider).provideConfig(any());
+    doReturn(bidLifecycleListener).when(dependencyProvider).provideBidLifecycleListener();
 
     // Should be set to at least 1 because user-level silent mode is set the 0 included
     givenMockedClockSetTo(1);
@@ -194,7 +200,7 @@ public class BidManagerFunctionalTest {
 
     when(api.loadCdb(any(), any()))
         .thenReturn(response1)
-        .thenReturn(null)
+        .thenThrow(IOException.class)
         .thenReturn(response3);
     when(api.loadConfig(any())).thenReturn(jsonConfig);
 
@@ -262,6 +268,7 @@ public class BidManagerFunctionalTest {
 
     clearInvocations(cache);
     clearInvocations(api);
+    clearInvocations(bidLifecycleListener);
 
     Slot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
 
@@ -288,7 +295,7 @@ public class BidManagerFunctionalTest {
   }
 
   private void callingCdb_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo(
-      Consumer<AdUnit> callingCdb) {
+      Consumer<AdUnit> callingCdb) throws Exception {
     DeviceInfo deviceInfo = mock(DeviceInfo.class);
     when(deviceInfo.getUserAgent()).thenReturn(completedFuture("expectedUserAgent"));
     doReturn(deviceInfo).when(dependencyProvider).provideDeviceInfo(any());
@@ -322,7 +329,7 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenNotValidAdUnit_ReturnNullAndDoNotCallCdb() {
+  public void getBidForAdUnitAndPrefetch_GivenNotValidAdUnit_ReturnNullAndDoNotCallCdb() throws Exception {
     AdUnit adUnit = givenMockedAdUnitMappingTo(null);
 
     BidManager bidManager = createBidManager();
@@ -334,7 +341,7 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenNullAdUnit_ReturnNullAndDoNotCallCdb() {
+  public void getBidForAdUnitAndPrefetch_GivenNullAdUnit_ReturnNullAndDoNotCallCdb() throws Exception {
     BidManager bidManager = createBidManager();
     Slot bid = bidManager.getBidForAdUnitAndPrefetch(null);
     waitForIdleState();
@@ -475,6 +482,24 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slot);
+  }
+
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenEmptyCacheAndApiError_ShouldNotifyListener()
+      throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+
+    givenNoLastBid(cacheAdUnit);
+
+    when(api.loadCdb(any(), any())).thenThrow(IOException.class);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    waitForIdleState();
+
+    verify(bidLifecycleListener).onCdbCallStarted(any());
+    verify(bidLifecycleListener).onCdbCallFailed(any(), any());
   }
 
   @Test
@@ -669,6 +694,7 @@ public class BidManagerFunctionalTest {
     // Count calls from this point
     clearInvocations(cache);
     clearInvocations(api);
+    clearInvocations(bidLifecycleListener);
 
     // Given a second fetch, without any clock change
     Slot slot = givenMockedCdbRespondingSlot();
@@ -728,17 +754,22 @@ public class BidManagerFunctionalTest {
   }
 
   private void assertShouldCallCdbAndPopulateCacheOnlyOnce(List<CacheAdUnit> requestedAdUnits,
-      Slot slot) {
+      Slot slot) throws Exception {
     verify(cache).add(slot);
     verify(api).loadCdb(argThat(cdb -> {
       assertEquals(requestedAdUnits, cdb.getAdUnits());
       return true;
     }), any());
+    verify(bidLifecycleListener).onCdbCallStarted(any());
+    verify(bidLifecycleListener).onCdbCallFinished(any(), any());
   }
 
-  private void assertShouldNotCallCdbAndNotPopulateCache() {
+  private void assertShouldNotCallCdbAndNotPopulateCache() throws Exception {
     verify(cache, never()).add(any());
     verify(api, never()).loadCdb(any(), any());
+    verify(bidLifecycleListener, never()).onCdbCallStarted(any());
+    verify(bidLifecycleListener, never()).onCdbCallFinished(any(), any());
+    verify(bidLifecycleListener, never()).onCdbCallFailed(any(), any());
   }
 
   private void waitForIdleState() {
@@ -843,7 +874,7 @@ public class BidManagerFunctionalTest {
     return waitingLatch;
   }
 
-  private Slot givenMockedCdbRespondingSlot() {
+  private Slot givenMockedCdbRespondingSlot() throws Exception {
     Slot slot = mock(Slot.class);
     when(slot.isValid()).thenReturn(true);
     CdbResponse response = givenMockedCdbResponse();
@@ -851,7 +882,7 @@ public class BidManagerFunctionalTest {
     return slot;
   }
 
-  private CdbResponse givenMockedCdbResponse() {
+  private CdbResponse givenMockedCdbResponse() throws Exception {
     CdbResponse response = mock(CdbResponse.class);
     when(api.loadCdb(any(), any())).thenReturn(response);
     return response;
@@ -887,7 +918,8 @@ public class BidManagerFunctionalTest {
         dependencyProvider.provideDeviceUtil(context),
         dependencyProvider.provideClock(),
         dependencyProvider.provideAdUnitMapper(context),
-        dependencyProvider.provideBidRequestSender(context, "myCpId")
+        dependencyProvider.provideBidRequestSender(context, "myCpId"),
+        dependencyProvider.provideBidLifecycleListener()
     );
   }
 

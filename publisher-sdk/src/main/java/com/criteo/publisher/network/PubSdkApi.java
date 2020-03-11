@@ -56,18 +56,12 @@ public class PubSdkApi {
     return configResult;
   }
 
-  @Nullable
-  public CdbResponse loadCdb(@NonNull CdbRequest cdbRequest, @NonNull String userAgent) {
-    try {
-      URL url = new URL(networkConfiguration.getCdbUrl() + "/inapp/v2");
-      JSONObject cdbRequestJson = cdbRequest.toJson();
-      JSONObject result = executePost(url, cdbRequestJson, userAgent);
-      return CdbResponse.fromJson(result);
-    } catch (IOException | JSONException e) {
-      Log.d(TAG, "Unable to process request to Cdb:" + e.getMessage());
-      e.printStackTrace();
-    }
-    return null;
+  @NonNull
+  public CdbResponse loadCdb(@NonNull CdbRequest cdbRequest, @NonNull String userAgent) throws Exception {
+    URL url = new URL(networkConfiguration.getCdbUrl() + "/inapp/v2");
+    JSONObject cdbRequestJson = cdbRequest.toJson();
+    JSONObject result = executePost(url, cdbRequestJson, userAgent);
+    return CdbResponse.fromJson(result);
   }
 
   @Nullable
@@ -107,13 +101,13 @@ public class PubSdkApi {
     return executeRawGet(url, null);
   }
 
-  @Nullable
+  @NonNull
   private InputStream executeRawGet(URL url, @Nullable String userAgent) throws IOException {
     HttpURLConnection urlConnection = prepareConnection(url, userAgent, "GET");
     return readResponseStreamIfSuccess(urlConnection);
   }
 
-  @Nullable
+  @NonNull
   private static JSONObject executePost(
       @NonNull URL url,
       @NonNull JSONObject requestJson,
@@ -147,21 +141,18 @@ public class PubSdkApi {
     return urlConnection;
   }
 
-  @Nullable
+  @NonNull
   private static InputStream readResponseStreamIfSuccess(@NonNull HttpURLConnection urlConnection) throws IOException {
     int status = urlConnection.getResponseCode();
     if (status == HttpURLConnection.HTTP_OK || status == HttpURLConnection.HTTP_NO_CONTENT) {
       return urlConnection.getInputStream();
+    } else {
+      throw new HttpResponseException(status);
     }
-    return null;
   }
 
-  @Nullable
-  private static JSONObject readJson(@Nullable InputStream inputStream) throws IOException, JSONException {
-    if (inputStream == null) {
-      return null;
-    }
-
+  @NonNull
+  private static JSONObject readJson(@NonNull InputStream inputStream) throws IOException, JSONException {
     String response = StreamUtil.readStream(inputStream);
     if (!TextUtils.isEmpty(response)) {
       return new JSONObject(response);

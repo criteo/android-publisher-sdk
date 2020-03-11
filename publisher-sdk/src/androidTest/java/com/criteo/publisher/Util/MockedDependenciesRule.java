@@ -84,7 +84,13 @@ public class MockedDependenciesRule implements TestRule {
     ResultCaptor<CdbResponse> captor = new ResultCaptor<>();
     PubSdkApi spyApi = spy(getDependencyProvider().providePubSdkApi());
     doReturn(spyApi).when(getDependencyProvider()).providePubSdkApi();
-    doAnswer(captor).when(spyApi).loadCdb(any(), any());
+
+    try {
+      doAnswer(captor).when(spyApi).loadCdb(any(), any());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
     return captor;
   }
 }

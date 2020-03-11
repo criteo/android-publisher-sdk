@@ -4,8 +4,7 @@ import android.support.annotation.GuardedBy;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
-import com.criteo.publisher.Util.LoggingUtil;
-import com.criteo.publisher.Util.NetworkResponseListener;
+import com.criteo.publisher.Util.CdbCallListener;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestFactory;
@@ -13,7 +12,6 @@ import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.RemoteConfigRequest;
 import com.criteo.publisher.model.RemoteConfigRequestFactory;
-import com.criteo.publisher.model.Slot;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -36,9 +34,6 @@ public class BidRequestSender {
   private final PubSdkApi api;
 
   @NonNull
-  private final LoggingUtil loggingUtil;
-
-  @NonNull
   private final Executor executor;
 
   @NonNull
@@ -50,12 +45,10 @@ public class BidRequestSender {
       @NonNull CdbRequestFactory cdbRequestFactory,
       @NonNull RemoteConfigRequestFactory remoteConfigRequestFactory,
       @NonNull PubSdkApi api,
-      @NonNull LoggingUtil loggingUtil,
       @NonNull Executor executor) {
     this.cdbRequestFactory = cdbRequestFactory;
     this.remoteConfigRequestFactory = remoteConfigRequestFactory;
     this.api = api;
-    this.loggingUtil = loggingUtil;
     this.executor = executor;
     this.pendingTasks = new ConcurrentHashMap<>();
   }
@@ -92,7 +85,7 @@ public class BidRequestSender {
    */
   public void sendBidRequest(
       @NonNull List<CacheAdUnit> adUnits,
-      @NonNull NetworkResponseListener listener) {
+      @NonNull CdbCallListener listener) {
     List<CacheAdUnit> requestedAdUnits = new ArrayList<>(adUnits);
     FutureTask<Void> task;
 
@@ -124,8 +117,8 @@ public class BidRequestSender {
   @NonNull
   private FutureTask<Void> createCdbCallTask(
       @NonNull List<CacheAdUnit> requestedAdUnits,
-      @NonNull NetworkResponseListener responseListener) {
-    CdbCall task = new CdbCall(requestedAdUnits, responseListener);
+      @NonNull CdbCallListener listener) {
+    CdbCall task = new CdbCall(requestedAdUnits, listener);
 
     Runnable withRemovedPendingTasksAfterExecution = new Runnable() {
       @Override
@@ -167,11 +160,11 @@ public class BidRequestSender {
     private final List<CacheAdUnit> requestedAdUnits;
 
     @NonNull
-    private final NetworkResponseListener listener;
+    private final CdbCallListener listener;
 
     private CdbCall(
         @NonNull List<CacheAdUnit> requestedAdUnits,
-        @NonNull NetworkResponseListener listener) {
+        @NonNull CdbCallListener listener) {
       this.requestedAdUnits = requestedAdUnits;
       this.listener = listener;
     }
@@ -188,22 +181,15 @@ public class BidRequestSender {
     private void doRun() throws Exception {
       CdbRequest cdbRequest = cdbRequestFactory.createRequest(requestedAdUnits);
       String userAgent = cdbRequestFactory.getUserAgent().get();
-      CdbResponse cdbResponse = api.loadCdb(cdbRequest, userAgent);
 
-      if (cdbResponse != null) {
+      listener.onCdbRequest(cdbRequest);
+
+      try {
+        CdbResponse cdbResponse = api.loadCdb(cdbRequest, userAgent);
         listener.onCdbResponse(cdbRequest, cdbResponse);
-        logCdbResponse(cdbResponse);
-      }
-    }
-
-    private void logCdbResponse(@NonNull CdbResponse response) {
-      if (loggingUtil.isLoggingEnabled() && !response.getSlots().isEmpty()) {
-        StringBuilder builder = new StringBuilder();
-        for (Slot slot : response.getSlots()) {
-          builder.append(slot.toString());
-          builder.append("\n");
-        }
-        Log.d(TAG, builder.toString());
+      } catch (Exception e) {
+        listener.onCdbError(cdbRequest, e);
+        throw e;
       }
     }
   }

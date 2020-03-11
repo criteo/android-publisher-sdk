@@ -103,6 +103,8 @@ public class PubSdkApiTest {
     CdbRequest cdbRequest = mock(CdbRequest.class);
     when(cdbRequest.toJson()).thenReturn(new JSONObject(json));
 
+    mockServerClient.when(request()).respond(response().withStatusCode(204));
+
     api.loadCdb(cdbRequest, "");
 
     mockServerClient.verify(request()
@@ -199,6 +201,8 @@ public class PubSdkApiTest {
   public void loadCdb_GivenUserAgent_SetItInHttpHeader() throws Exception {
     CdbRequest cdbRequest = givenEmptyCdbRequest();
 
+    mockServerClient.when(request()).respond(response().withStatusCode(204));
+
     api.loadCdb(cdbRequest, "myUserAgent");
 
     mockServerClient.verify(request()
@@ -207,25 +211,23 @@ public class PubSdkApiTest {
   }
 
   @Test
-  public void loadCdb_GivenConnectionError_ReturnNull() throws Exception {
+  public void loadCdb_GivenConnectionError_ThrowException() throws Exception {
     CdbRequest cdbRequest = givenEmptyCdbRequest();
 
     mockServerClient.when(request()).error(error().withDropConnection(true));
 
-    CdbResponse cdbResponse = api.loadCdb(cdbRequest, "");
-
-    assertThat(cdbResponse).isNull();
+    assertThatCode(() -> api.loadCdb(cdbRequest, ""))
+        .isInstanceOf(IOException.class);
   }
 
   @Test
-  public void loadCdb_GivenHttpError_ReturnNull() throws Exception {
+  public void loadCdb_GivenHttpError_ThrowException() throws Exception {
     CdbRequest cdbRequest = givenEmptyCdbRequest();
 
     mockServerClient.when(request()).respond(response().withStatusCode(400));
 
-    CdbResponse cdbResponse = api.loadCdb(cdbRequest, "");
-
-    assertThat(cdbResponse).isNull();
+    assertThatCode(() -> api.loadCdb(cdbRequest, ""))
+        .isInstanceOf(IOException.class);
   }
 
   @Test
@@ -249,18 +251,16 @@ public class PubSdkApiTest {
   public void executeRawGet_GivenConnectionError_ThrowIt() throws Exception {
     mockServerClient.when(request()).error(error().withDropConnection(true));
 
-    assertThatCode(() -> {
-      api.executeRawGet(serverUrl);
-    }).isInstanceOf(IOException.class);
+    assertThatCode(() -> api.executeRawGet(serverUrl))
+        .isInstanceOf(IOException.class);
   }
 
   @Test
-  public void executeRawGet_GivenHttpError_ReturnNull() throws Exception {
+  public void executeRawGet_GivenHttpError_ThrowIOException() throws Exception {
     mockServerClient.when(request()).respond(response().withStatusCode(400));
 
-    InputStream response = api.executeRawGet(serverUrl);
-
-    assertThat(response).isNull();
+    assertThatCode(() -> api.executeRawGet(serverUrl))
+        .isInstanceOf(IOException.class);
   }
 
   @Test

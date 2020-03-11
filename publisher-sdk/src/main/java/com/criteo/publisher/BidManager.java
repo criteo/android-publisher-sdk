@@ -9,9 +9,10 @@ import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
+import com.criteo.publisher.Util.CdbCallListener;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.NetworkResponseListener;
 import com.criteo.publisher.Util.ReflectionUtil;
+import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
@@ -28,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class BidManager implements NetworkResponseListener, ApplicationStoppedListener {
+public class BidManager implements ApplicationStoppedListener {
 
   private static final String MOPUB_ADVIEW_CLASS = "com.mopub.mobileads.MoPubView";
   private static final String MOPUB_INTERSTITIAL_CLASS = "com.mopub.mobileads.MoPubInterstitial";
@@ -83,13 +84,17 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
   @NonNull
   private final BidRequestSender bidRequestSender;
 
+  @NonNull
+  private final BidLifecycleListener bidLifecycleListener;
+
   BidManager(
       @NonNull SdkCache sdkCache,
       @NonNull Config config,
       @NonNull DeviceUtil deviceUtil,
       @NonNull Clock clock,
       @NonNull AdUnitMapper adUnitMapper,
-      @NonNull BidRequestSender bidRequestSender
+      @NonNull BidRequestSender bidRequestSender,
+      @NonNull BidLifecycleListener bidLifecycleListener
   ) {
     this.cache = sdkCache;
     this.config = config;
@@ -97,6 +102,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
     this.clock = clock;
     this.adUnitMapper = adUnitMapper;
     this.bidRequestSender = bidRequestSender;
+    this.bidLifecycleListener = bidLifecycleListener;
   }
 
   /**
@@ -113,7 +119,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
       return;
     }
 
-    bidRequestSender.sendBidRequest(prefetchCacheAdUnits, this);
+    bidRequestSender.sendBidRequest(prefetchCacheAdUnits, new CdbListener());
   }
 
 
@@ -296,6 +302,7 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
       if (isValidBid && isNotExpired) {
         return peekSlot;
       }
+
       return null;
     }
   }
@@ -335,12 +342,6 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
   }
 
   @Override
-  public void onCdbResponse(@NonNull CdbRequest request, @NonNull CdbResponse response) {
-    setCacheAdUnits(response.getSlots());
-    setTimeToNextCall(response.getTimeToNextCall());
-  }
-
-  @Override
   public void onApplicationStopped() {
     bidRequestSender.cancelAllPendingTasks();
   }
@@ -362,5 +363,25 @@ public class BidManager implements NetworkResponseListener, ApplicationStoppedLi
 
   private boolean killSwitchEngaged() {
     return config.isKillSwitchEnabled();
+  }
+
+  private class CdbListener implements CdbCallListener {
+
+    @Override
+    public void onCdbRequest(@NonNull CdbRequest request) {
+      bidLifecycleListener.onCdbCallStarted(request);
+    }
+
+    @Override
+    public void onCdbResponse(@NonNull CdbRequest request, @NonNull CdbResponse response) {
+      setCacheAdUnits(response.getSlots());
+      setTimeToNextCall(response.getTimeToNextCall());
+      bidLifecycleListener.onCdbCallFinished(request, response);
+    }
+
+    @Override
+    public void onCdbError(@NonNull CdbRequest request, @NonNull Exception exception) {
+      bidLifecycleListener.onCdbCallFailed(request, exception);
+    }
   }
 }

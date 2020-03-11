@@ -11,6 +11,8 @@ import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.RunOnUiThreadExecutor;
 import com.criteo.publisher.Util.UserPrivacyUtil;
+import com.criteo.publisher.bid.BidLifecycleListener;
+import com.criteo.publisher.bid.LoggingBidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnitMapper;
@@ -178,7 +180,8 @@ public class DependencyProvider {
             DependencyProvider.this.provideDeviceUtil(context),
             DependencyProvider.this.provideClock(),
             DependencyProvider.this.provideAdUnitMapper(context),
-            DependencyProvider.this.provideBidRequestSender(context, criteoPublisherId)
+            DependencyProvider.this.provideBidRequestSender(context, criteoPublisherId),
+            DependencyProvider.this.provideBidLifecycleListener()
         );
       }
     });
@@ -283,8 +286,19 @@ public class DependencyProvider {
             provideCdbRequestFactory(context, criteoPublisherId),
             provideRemoteConfigRequestFactory(context, criteoPublisherId),
             providePubSdkApi(),
-            provideLoggingUtil(),
             provideThreadPoolExecutor()
+        );
+      }
+    });
+  }
+
+  @NonNull
+  public BidLifecycleListener provideBidLifecycleListener() {
+    return getOrCreate(BidLifecycleListener.class, new Factory<BidLifecycleListener>() {
+      @Override
+      public BidLifecycleListener create() {
+        return new LoggingBidLifecycleListener(
+            provideLoggingUtil()
         );
       }
     });

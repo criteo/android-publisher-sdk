@@ -585,13 +585,16 @@ public class BidManagerTest {
 
   @NonNull
   private BidManager createBidManager() {
+    DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
+
     return new BidManager(
         sdkCache,
         config,
         deviceUtil,
         clock,
         adUnitMapper,
-        bidRequestSender
+        bidRequestSender,
+        dependencyProvider.provideBidLifecycleListener()
     );
   }
 

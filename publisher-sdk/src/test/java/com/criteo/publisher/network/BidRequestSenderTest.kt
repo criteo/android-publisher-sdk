@@ -1,9 +1,8 @@
 package com.criteo.publisher.network
 
 import com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER
+import com.criteo.publisher.Util.CdbCallListener
 import com.criteo.publisher.Util.CompletableFuture.completedFuture
-import com.criteo.publisher.Util.LoggingUtil
-import com.criteo.publisher.Util.NetworkResponseListener
 import com.criteo.publisher.model.*
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
@@ -12,7 +11,9 @@ import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
+import java.io.IOException
 import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
@@ -27,9 +28,6 @@ class BidRequestSenderTest {
 
     @Mock
     private lateinit var api: PubSdkApi
-
-    @Mock
-    private lateinit var loggingUtil: LoggingUtil
 
     private var executor = Executor(Runnable::run)
 
@@ -51,7 +49,6 @@ class BidRequestSenderTest {
                 cdbRequestFactory,
                 remoteConfigRequestFactory,
                 api,
-                loggingUtil,
                 executor
         )
     }
@@ -117,7 +114,7 @@ class BidRequestSenderTest {
     fun sendBidRequest_GivenAdUnitAndSuccessfulResponse_NotifyListener() {
         val adUnit = createAdUnit()
         val adUnits = listOf(adUnit)
-        val listener: NetworkResponseListener = mock()
+        val listener: CdbCallListener = mock()
         val request: CdbRequest = mock()
         val userAgent = "myUserAgent"
         val response: CdbResponse = mock()
@@ -131,7 +128,34 @@ class BidRequestSenderTest {
 
         sender.sendBidRequest(adUnits, listener)
 
-        verify(listener).onCdbResponse(request, response)
+        val inOrder = inOrder(listener)
+        inOrder.verify(listener).onCdbRequest(request)
+        inOrder.verify(listener).onCdbResponse(request, response)
+        inOrder.verifyNoMoreInteractions()
+    }
+
+    @Test
+    fun sendBidRequest_GivenAdUnitAndError_NotifyListener() {
+        val adUnit = createAdUnit()
+        val adUnits = listOf(adUnit)
+        val listener: CdbCallListener = mock()
+        val request: CdbRequest = mock()
+        val userAgent = "myUserAgent"
+        val exception = IOException()
+
+        cdbRequestFactory.stub {
+            on { createRequest(adUnits) } doReturn request
+            on { it.userAgent } doReturn completedFuture(userAgent)
+        }
+
+        whenever(api.loadCdb(request, userAgent)).doThrow(exception)
+
+        sender.sendBidRequest(adUnits, listener)
+
+        val inOrder = inOrder(listener)
+        inOrder.verify(listener).onCdbRequest(request)
+        inOrder.verify(listener).onCdbError(request, exception)
+        inOrder.verifyNoMoreInteractions()
     }
 
     @Test

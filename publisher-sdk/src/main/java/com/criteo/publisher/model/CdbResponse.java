@@ -1,7 +1,6 @@
 package com.criteo.publisher.model;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,11 +50,8 @@ public class CdbResponse {
     this.timeToNextCall = timeToNextCall;
   }
 
-  @Nullable
-  public static CdbResponse fromJson(@Nullable JSONObject json) {
-    if (json == null) {
-      return null;
-    }
+  @NonNull
+  public static CdbResponse fromJson(@NonNull JSONObject json) {
     return new CdbResponse(json);
   }
 

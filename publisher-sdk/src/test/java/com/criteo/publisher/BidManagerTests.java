@@ -9,6 +9,7 @@ import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdSize;
@@ -71,6 +72,9 @@ public class BidManagerTests {
 
   @Mock
   private BidRequestSender bidRequestSender;
+
+  @Mock
+  private BidLifecycleListener bidLifecycleListener;
 
   @Before
   public void setup() {
@@ -287,7 +291,8 @@ public class BidManagerTests {
         deviceUtil,
         clock,
         adUnitMapper,
-        bidRequestSender
+        bidRequestSender,
+        bidLifecycleListener
     );
   }
 
