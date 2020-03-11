@@ -64,4 +64,11 @@ public class CdbResponse {
     return timeToNextCall;
   }
 
+  @Override
+  public String toString() {
+    return "CdbResponse{" +
+        "slots=" + slots +
+        ", timeToNextCall=" + timeToNextCall +
+        '}';
+  }
 }

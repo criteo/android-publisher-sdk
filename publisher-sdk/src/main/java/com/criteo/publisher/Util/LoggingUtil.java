@@ -1,13 +1,10 @@
 package com.criteo.publisher.Util;
 
-import android.text.TextUtils;
+import com.criteo.publisher.BuildConfig;
 
 public class LoggingUtil {
 
-  private static final String CRITEO_LOGGING = "CRITEO_LOGGING";
-
   public boolean isLoggingEnabled() {
-    String log = System.getenv(CRITEO_LOGGING);
-    return !TextUtils.isEmpty(log) && Boolean.parseBoolean(log);
+    return BuildConfig.DEBUG_LOGGING;
   }
 }

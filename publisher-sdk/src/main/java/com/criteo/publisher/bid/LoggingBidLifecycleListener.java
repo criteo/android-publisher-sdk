@@ -5,7 +5,6 @@ import android.util.Log;
 import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
-import com.criteo.publisher.model.Slot;
 
 /**
  * Listener that logs debug messages given the different steps of a bid lifecycle.
@@ -23,26 +22,25 @@ public class LoggingBidLifecycleListener implements BidLifecycleListener {
 
   @Override
   public void onCdbCallStarted(@NonNull CdbRequest request) {
-    // TODO
+    log("onCdbCallStarted: %s", request);
   }
 
   @Override
   public void onCdbCallFinished(@NonNull CdbRequest request, @NonNull CdbResponse response) {
-    if (!isEnabled()) {
-      return;
-    }
-
-    StringBuilder builder = new StringBuilder();
-    for (Slot slot : response.getSlots()) {
-      builder.append(slot.toString());
-      builder.append("\n");
-    }
-    Log.d(TAG, builder.toString());
+    log("onCdbCallFinished: %s", response);
   }
 
   @Override
   public void onCdbCallFailed(@NonNull CdbRequest request, @NonNull Exception exception) {
-    // TODO
+    if (isEnabled()) {
+      Log.d(TAG, "onCdbCallFailed", exception);
+    }
+  }
+
+  private void log(String format, Object... args) {
+    if (isEnabled()) {
+      Log.d(TAG, String.format(format, args));
+    }
   }
 
   private boolean isEnabled() {

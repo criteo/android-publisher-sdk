@@ -98,4 +98,15 @@ public class CdbRequest {
     return json;
   }
 
+  @Override
+  public String toString() {
+    return "CdbRequest{" +
+        "publisher=" + publisher +
+        ", user=" + user +
+        ", sdkVersion='" + sdkVersion + '\'' +
+        ", profileId=" + profileId +
+        ", gdprConsent=" + gdprConsent +
+        ", adUnits=" + adUnits +
+        '}';
+  }
 }
