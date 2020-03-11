@@ -362,6 +362,7 @@ public class BidManagerFunctionalTest {
 
     assertEquals(slot, bid);
     verify(cache).remove(cacheAdUnit);
+    assertListenerIsNotifyForBidConsumed(cacheAdUnit, bid);
   }
 
   @Test
@@ -466,6 +467,7 @@ public class BidManagerFunctionalTest {
     Slot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
 
     assertNull(bid);
+    assertListenerIsNotNotifyForBidConsumed();
   }
 
   @Test
@@ -523,12 +525,13 @@ public class BidManagerFunctionalTest {
   public void getBidForAdUnitAndPrefetch_GivenExpiredValidCachedBid_ReturnNull() throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    givenExpiredValidCachedBid(cacheAdUnit);
+    Slot internalBid = givenExpiredValidCachedBid(cacheAdUnit);
 
     BidManager bidManager = createBidManager();
     Slot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
 
     assertNull(bid);
+    assertListenerIsNotifyForBidConsumed(cacheAdUnit, internalBid);
   }
 
   @Test
@@ -550,12 +553,13 @@ public class BidManagerFunctionalTest {
   public void getBidForAdUnitAndPrefetch_GivenNoBidCached_ReturnNull() throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    givenNoBidCached(cacheAdUnit);
+    Slot internalBid = givenNoBidCached(cacheAdUnit);
 
     BidManager bidManager = createBidManager();
     Slot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
 
     assertNull(bid);
+    assertListenerIsNotifyForBidConsumed(cacheAdUnit, internalBid);
   }
 
   @Test
@@ -585,6 +589,7 @@ public class BidManagerFunctionalTest {
 
     assertNull(bid);
     verify(cache, never()).remove(cacheAdUnit);
+    assertListenerIsNotNotifyForBidConsumed();
   }
 
   @Test
@@ -605,12 +610,13 @@ public class BidManagerFunctionalTest {
       throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    givenExpiredSilentModeBidCached(cacheAdUnit);
+    Slot internalBid = givenExpiredSilentModeBidCached(cacheAdUnit);
 
     BidManager bidManager = createBidManager();
     Slot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
 
     assertNull(bid);
+    assertListenerIsNotifyForBidConsumed(cacheAdUnit, internalBid);
   }
 
   @Test
@@ -772,6 +778,14 @@ public class BidManagerFunctionalTest {
     verify(bidLifecycleListener, never()).onCdbCallFailed(any(), any());
   }
 
+  private void assertListenerIsNotifyForBidConsumed(CacheAdUnit cacheAdUnit, Slot bid) {
+    verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, bid);
+  }
+
+  private void assertListenerIsNotNotifyForBidConsumed() {
+    verify(bidLifecycleListener, never()).onBidConsumed(any(), any());
+  }
+
   private void waitForIdleState() {
     waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
   }
@@ -791,7 +805,8 @@ public class BidManagerFunctionalTest {
     return slot;
   }
 
-  private void givenExpiredValidCachedBid(CacheAdUnit cacheAdUnit) {
+  @NonNull
+  private Slot givenExpiredValidCachedBid(CacheAdUnit cacheAdUnit) {
     long timeOfDownload = clock.getCurrentTimeInMillis() - 60_000;
     Slot slot = mock(Slot.class);
     when(slot.getCpmAsNumber()).thenReturn(1.);
@@ -799,14 +814,19 @@ public class BidManagerFunctionalTest {
     when(slot.getTtl()).thenReturn(60);
 
     when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
+
+    return slot;
   }
 
-  private void givenNoBidCached(CacheAdUnit cacheAdUnit) {
+  @NonNull
+  private Slot givenNoBidCached(CacheAdUnit cacheAdUnit) {
     Slot slot = mock(Slot.class);
     when(slot.getCpmAsNumber()).thenReturn(0.);
     when(slot.getTtl()).thenReturn(0);
 
     when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
+
+    return slot;
   }
 
   private void givenNoLastBid(CacheAdUnit cacheAdUnit) {
@@ -824,7 +844,8 @@ public class BidManagerFunctionalTest {
     when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
   }
 
-  private void givenExpiredSilentModeBidCached(CacheAdUnit cacheAdUnit) {
+  @NonNull
+  private Slot givenExpiredSilentModeBidCached(CacheAdUnit cacheAdUnit) {
     long timeOfDownload = clock.getCurrentTimeInMillis() - 60_000;
 
     Slot slot = mock(Slot.class);
@@ -833,6 +854,8 @@ public class BidManagerFunctionalTest {
     when(slot.getTtl()).thenReturn(60);
 
     when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
+
+    return slot;
   }
 
   @NonNull

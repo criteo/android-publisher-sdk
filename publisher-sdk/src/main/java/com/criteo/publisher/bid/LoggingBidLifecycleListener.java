@@ -3,8 +3,10 @@ package com.criteo.publisher.bid;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import com.criteo.publisher.Util.LoggingUtil;
+import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.model.Slot;
 
 /**
  * Listener that logs debug messages given the different steps of a bid lifecycle.
@@ -35,6 +37,11 @@ public class LoggingBidLifecycleListener implements BidLifecycleListener {
     if (isEnabled()) {
       Log.d(TAG, "onCdbCallFailed", exception);
     }
+  }
+
+  @Override
+  public void onBidConsumed(@NonNull CacheAdUnit adUnit, @NonNull Slot consumedBid) {
+    log("onBidConsumed: %s", consumedBid);
   }
 
   private void log(String format, Object... args) {

@@ -1,8 +1,10 @@
 package com.criteo.publisher.bid;
 
 import android.support.annotation.NonNull;
+import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.model.Slot;
 
 /**
  * Listener with callbacks invoked at different moment of a bid lifecycle.
@@ -44,5 +46,16 @@ public interface BidLifecycleListener {
    * @param exception Exception representing the failure of the call
    */
   void onCdbCallFailed(@NonNull CdbRequest request, @NonNull Exception exception);
+
+  /**
+   * Callback invoked when a bid is used and consumed.
+   * <p>
+   * Consumption means that the bid was popped out of the bid cache. So, depending on the bid
+   * status, this does not mean that it will be used by publishers (for instance no bid or silence).
+   *
+   * @param adUnit      ad unit representing the bid
+   * @param consumedBid bid that was consumed
+   */
+  void onBidConsumed(@NonNull CacheAdUnit adUnit, @NonNull Slot consumedBid);
 
 }

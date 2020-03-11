@@ -298,6 +298,7 @@ public class BidManager implements ApplicationStoppedListener {
 
       cache.remove(cacheAdUnit);
       fetch(cacheAdUnit);
+      bidLifecycleListener.onBidConsumed(cacheAdUnit, peekSlot);
 
       if (isValidBid && isNotExpired) {
         return peekSlot;
