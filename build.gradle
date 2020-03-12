@@ -33,19 +33,28 @@ task clean(type: Delete) {
 ext {
     publishVersion = project.findProperty('version') ?: 'undefined'
     publishRepositoryConfig = {
-        if (!project.hasProperty('publishUrl')) {
-            project.ext.set('publishUrl', 'http://nexus.criteo.preprod/content/repositories/criteo.android.releases/')
-        }
         repositories {
             maven {
-                name 'Nexus'
-                url publishUrl
-                if (System.getenv('MAVEN_USER')) {
-                    credentials {
-                        username = System.getenv('MAVEN_USER')
-                        password = System.getenv('MAVEN_PASSWORD')
-                    }
-                }
+                name 'NexusPreProd'
+                url 'http://nexus.criteo.preprod/content/repositories/criteo.android.releases/'
+                with mavenCredentialsIfPresent()
+            }
+
+            maven {
+                name 'NexusProd'
+                url 'http://nexus.criteo.prod/content/repositories/criteo.android.releases/'
+                with mavenCredentialsIfPresent()
+            }
+        }
+    }
+}
+
+Closure mavenCredentialsIfPresent() {
+    return {
+        if (System.getenv('MAVEN_USER')) {
+            credentials {
+                username = System.getenv('MAVEN_USER')
+                password = System.getenv('MAVEN_PASSWORD')
             }
         }
     }

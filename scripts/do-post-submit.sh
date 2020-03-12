@@ -10,9 +10,9 @@ set -Eeuo pipefail
 echo "Building and publishing artifacts to nexus"
 ORIGINAL_VERSION="3.4.0"
 VERSION="$ORIGINAL_VERSION-criteo-$(date -u +%Y%m%d%H%M%S)"
-NEXUS_URL="http://nexus.criteo.prod/content/repositories/criteo.android.releases/"
 
 ./scripts/do-pre-submit.sh
 
-# Only publish to Nexus acting as a PreProd environment
-./gradlew publishAllPublicationsToNexusRepository -Pversion="$VERSION" -PpublishUrl="$NEXUS_URL"
+# FIXME EE-944 Is pushing on prod instead of preprod nexus expected ?
+# Only publish to Nexus Prod acting as a PreProd environment
+./gradlew publishAllPublicationsToNexusProdRepository -Pversion="$VERSION"
