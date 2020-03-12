@@ -24,8 +24,10 @@ import static org.mockito.Mockito.when;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
+import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.bid.BidLifecycleListener;
+import com.criteo.publisher.model.CdbRequestSlot;
 import com.criteo.publisher.privacy.gdpr.GdprData;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.cache.SdkCache;
@@ -33,6 +35,7 @@ import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CacheAdUnit;
+import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
@@ -41,6 +44,7 @@ import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.PubSdkApi;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -216,16 +220,16 @@ public class BidManagerFunctionalTest {
 
     // First call to CDB
     inOrder.verify(config, never()).refreshConfig(any());
-    inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits1.equals(cdb.getAdUnits())), any());
+    inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits1.equals(getRequestedAdUnits(cdb))), any());
     response1.getSlots().forEach(inOrder.verify(cache)::add);
     inOrder.verify(bidManager).setTimeToNextCall(1);
 
     // Second call with error
-    inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits2.equals(cdb.getAdUnits())), any());
+    inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits2.equals(getRequestedAdUnits(cdb))), any());
 
     // Third call in success but without the config call
     inOrder.verify(config, never()).refreshConfig(any());
-    inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits3.equals(cdb.getAdUnits())), any());
+    inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits3.equals(getRequestedAdUnits(cdb))), any());
     response3.getSlots().forEach(inOrder.verify(cache)::add);
     inOrder.verify(bidManager).setTimeToNextCall(3);
 
@@ -320,7 +324,7 @@ public class BidManagerFunctionalTest {
     verify(api).loadCdb(argThat(cdb -> {
       assertEquals(publisher, cdb.getPublisher());
       assertEquals(user, cdb.getUser());
-      assertEquals(singletonList(cacheAdUnit), cdb.getAdUnits());
+      assertEquals(singletonList(cacheAdUnit), getRequestedAdUnits(cdb));
       assertEquals("1.2.3", cdb.getSdkVersion());
       assertEquals(235, cdb.getProfileId());
       assertEquals(expectedGdpr, cdb.getGdprData());
@@ -764,7 +768,7 @@ public class BidManagerFunctionalTest {
       Slot slot) throws Exception {
     verify(cache).add(slot);
     verify(api).loadCdb(argThat(cdb -> {
-      assertEquals(requestedAdUnits, cdb.getAdUnits());
+      assertEquals(requestedAdUnits, getRequestedAdUnits(cdb));
       return true;
     }), any());
     verify(bidLifecycleListener).onCdbCallStarted(any());
@@ -931,6 +935,29 @@ public class BidManagerFunctionalTest {
 
   private void givenMockedClockSetTo(long instant) {
     when(clock.getCurrentTimeInMillis()).thenReturn(instant);
+  }
+
+  @NonNull
+  private List<CacheAdUnit> getRequestedAdUnits(CdbRequest cdbRequest) {
+    List<CacheAdUnit> cacheAdUnits = new ArrayList<>();
+    cdbRequest.getSlots().forEach(slot -> cacheAdUnits.add(toAdUnit(slot)));
+    return cacheAdUnits;
+  }
+
+  @NonNull
+  private CacheAdUnit toAdUnit(CdbRequestSlot slot) {
+    String formattedSize = slot.getSizes().iterator().next();
+    String[] parts = formattedSize.split("x");
+    AdSize size = new AdSize(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
+
+    AdUnitType adUnitType = AdUnitType.CRITEO_BANNER;
+    if (slot.isInterstitial()) {
+      adUnitType = AdUnitType.CRITEO_INTERSTITIAL;
+    } else if (slot.isNativeAd()) {
+      adUnitType = AdUnitType.CRITEO_CUSTOM_NATIVE;
+    }
+
+    return new CacheAdUnit(size, slot.getPlacementId(), adUnitType);
   }
 
   private BidManager createBidManager() {

@@ -1,6 +1,5 @@
 package com.criteo.publisher.model;
 
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -32,7 +31,7 @@ public class CdbRequestTest {
   @Mock
   private JSONObject gdprConsent;
 
-  private List<CacheAdUnit> adUnits;
+  private List<CdbRequestSlot> slots;
 
   @Before
   public void setUp() throws Exception {
@@ -40,7 +39,7 @@ public class CdbRequestTest {
 
     sdkVersion = "1.2.3";
     profileId = 42;
-    adUnits = new ArrayList<>();
+    slots = new ArrayList<>();
   }
 
   @Test
@@ -53,12 +52,11 @@ public class CdbRequestTest {
 
     when(gdprData.toJSONObject()).thenReturn(gdprConsent);
 
-    adUnits.add(new CacheAdUnit(new AdSize(1, 2), "myAdUnit", CRITEO_BANNER));
+    CdbRequestSlot slot = mock(CdbRequestSlot.class);
+    JSONObject slotObject = mock(JSONObject.class);
+    when(slot.toJson()).thenReturn(slotObject);
 
-    String adUnitJson = "{\n"
-        + "  \"sizes\": [\"1x2\"],\n"
-        + "  \"placementId\": \"myAdUnit\"\n"
-        + "}";
+    slots.add(slot);
 
     CdbRequest request = createRequest();
     JSONObject json = request.toJson();
@@ -69,8 +67,7 @@ public class CdbRequestTest {
     assertThat(json.get("profileId")).isEqualTo(42);
     assertThat(json.get("gdprConsent")).isEqualTo(gdprConsent);
     assertThat(json.getJSONArray("slots").length()).isEqualTo(1);
-    assertThat(json.getJSONArray("slots").getJSONObject(0).toString())
-        .isEqualToIgnoringWhitespace(adUnitJson);
+    assertThat(json.getJSONArray("slots").get(0)).isEqualTo(slotObject);
   }
 
   @Test
@@ -84,7 +81,7 @@ public class CdbRequestTest {
   }
 
   private CdbRequest createRequest() {
-    return new CdbRequest(publisher, user, sdkVersion, profileId, gdprData, adUnits);
+    return new CdbRequest(publisher, user, sdkVersion, profileId, gdprData, slots);
   }
 
 }

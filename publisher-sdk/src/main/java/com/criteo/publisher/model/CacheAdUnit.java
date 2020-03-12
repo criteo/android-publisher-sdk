@@ -1,16 +1,8 @@
 package com.criteo.publisher.model;
 
 import com.criteo.publisher.Util.AdUnitType;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public final class CacheAdUnit {
-
-  private static final String PLACEMENT_ID = "placementId";
-  private static final String SIZES = "sizes";
-  private static final String IS_NATIVE = "isNative";
-  private static final String IS_INTERSTITIAL = "interstitial";
 
   private final String adUnitId;
   private final AdSize adSize;
@@ -26,29 +18,12 @@ public final class CacheAdUnit {
     return adUnitId;
   }
 
-  public AdSize getSize() {
-    return adSize;
+  public AdUnitType getAdUnitType() {
+    return adUnitType;
   }
 
-  public JSONObject toJson() throws JSONException {
-    JSONObject adUnitJson = new JSONObject();
-    JSONArray adUnitSizes = new JSONArray();
-    if (adSize != null) {
-      adUnitSizes.put(adSize.getFormattedSize());
-      adUnitJson.put(SIZES, adUnitSizes);
-    }
-    adUnitJson.put(PLACEMENT_ID, adUnitId);
-
-    switch (adUnitType) {
-      case CRITEO_INTERSTITIAL:
-        adUnitJson.put(IS_INTERSTITIAL, true);
-        break;
-      case CRITEO_CUSTOM_NATIVE:
-        adUnitJson.put(IS_NATIVE, true);
-        break;
-    }
-
-    return adUnitJson;
+  public AdSize getSize() {
+    return adSize;
   }
 
   @Override
@@ -87,4 +62,5 @@ public final class CacheAdUnit {
     result = 31 * result + (adUnitType != null ? adUnitType.hashCode() : 0);
     return result;
   }
+
 }

@@ -1,9 +1,13 @@
 package com.criteo.publisher.model
 
+import com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER
 import com.criteo.publisher.Util.DeviceUtil
+import com.criteo.publisher.bid.UniqueIdGenerator
+import com.nhaarman.mockitokotlin2.doReturn
 import com.criteo.publisher.privacy.UserPrivacyUtil
 import com.criteo.publisher.privacy.gdpr.GdprData
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.stub
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -14,10 +18,13 @@ import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import java.util.concurrent.Future
+import java.util.concurrent.atomic.AtomicInteger
 
 class CdbRequestFactoryTest {
 
-    private val SDK_PROFILE_ID = 235
+    private companion object {
+        const val SDK_PROFILE_ID = 235
+    }
 
     @Mock
     private lateinit var user: User
@@ -34,7 +41,12 @@ class CdbRequestFactoryTest {
     @Mock
     private lateinit var userPrivacyUtil: UserPrivacyUtil
 
+    @Mock
+    private lateinit var uniqueIdGenerator: UniqueIdGenerator
+
     private lateinit var factory: CdbRequestFactory
+
+    private val adUnitId = AtomicInteger()
 
     @Before
     fun setUp() {
@@ -45,7 +57,8 @@ class CdbRequestFactoryTest {
                 publisher,
                 deviceInfo,
                 deviceUtil,
-                userPrivacyUtil
+                userPrivacyUtil,
+                uniqueIdGenerator
         )
     }
 
@@ -140,11 +153,20 @@ class CdbRequestFactoryTest {
 
     @Test
     fun createRequest_GivenInput_BuildRequest() {
-        val adUnits: List<CacheAdUnit> = mock()
+        val adUnit = createAdUnit()
+        val adUnits: List<CacheAdUnit> = listOf(adUnit)
         val expectedGdpr: GdprData = mock()
+
+        val expectedSlot = CdbRequestSlot.create(
+            "impId",
+            adUnit.placementId,
+            adUnit.adUnitType,
+            adUnit.size
+        )
 
         whenever(user.sdkVersion).thenReturn("1.2.3")
         whenever(userPrivacyUtil.gdprData).thenReturn(expectedGdpr)
+        whenever(uniqueIdGenerator.generateId()).thenReturn("impId")
 
         val request = factory.createRequest(adUnits)
 
@@ -153,7 +175,41 @@ class CdbRequestFactoryTest {
         assertThat(request.sdkVersion).isEqualTo("1.2.3")
         assertThat(request.profileId).isEqualTo(SDK_PROFILE_ID)
         assertThat(request.gdprData).isEqualTo(expectedGdpr)
-        assertThat(request.adUnits).isEqualTo(adUnits)
+        assertThat(request.slots).containsExactlyInAnyOrder(expectedSlot)
+    }
+
+    @Test
+    fun createRequest_GivenAdUnits_MapThemToRequestSlotWithImpressionId() {
+        val adUnit1 = createAdUnit()
+        val adUnit2 = createAdUnit()
+        val adUnits: List<CacheAdUnit> = listOf(adUnit1, adUnit2)
+
+        val expectedSlot1 = CdbRequestSlot.create(
+            "impId1",
+            adUnit1.placementId,
+            adUnit1.adUnitType,
+            adUnit1.size
+        )
+
+        val expectedSlot2 = CdbRequestSlot.create(
+            "impId2",
+            adUnit2.placementId,
+            adUnit2.adUnitType,
+            adUnit2.size
+        )
+
+        uniqueIdGenerator.stub {
+            on { generateId() }.doReturn("impId1", "impId2")
+        }
+
+        val request = factory.createRequest(adUnits)
+
+        assertThat(request.slots).containsExactlyInAnyOrder(expectedSlot1, expectedSlot2)
+    }
+
+    private fun createAdUnit(): CacheAdUnit {
+        val id = "adUnit #" + adUnitId.incrementAndGet()
+        return CacheAdUnit(AdSize(1, 2), id, CRITEO_BANNER)
     }
 
 }

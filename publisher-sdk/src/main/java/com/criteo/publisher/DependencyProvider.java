@@ -11,6 +11,7 @@ import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.RunOnUiThreadExecutor;
 import com.criteo.publisher.bid.BidLifecycleListener;
+import com.criteo.publisher.bid.UniqueIdGenerator;
 import com.criteo.publisher.bid.LoggingBidLifecycleListener;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.cache.SdkCache;
@@ -258,8 +259,8 @@ public class DependencyProvider {
             providePublisher(context, criteoPublisherId),
             provideDeviceInfo(context),
             provideDeviceUtil(context),
-            provideUserPrivacyUtil(context)
-        );
+            provideUserPrivacyUtil(context),
+            new UniqueIdGenerator(provideClock()));
       }
     });
   }

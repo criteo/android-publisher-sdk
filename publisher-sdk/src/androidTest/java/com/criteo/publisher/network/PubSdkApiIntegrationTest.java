@@ -1,14 +1,22 @@
 package com.criteo.publisher.network;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
+import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
+import static java.util.Collections.singletonList;
+import static org.junit.Assert.assertNotNull;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.model.AdSize;
+import com.criteo.publisher.model.CacheAdUnit;
+import com.criteo.publisher.model.CdbRequest;
+import com.criteo.publisher.model.CdbRequestFactory;
+import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.privacy.gdpr.GdprData;
 import org.json.JSONObject;
@@ -28,8 +36,9 @@ public class PubSdkApiIntegrationTest {
   private int limitedAdTracking;
   private String gaid;
   private String eventType;
-  private Context context;
   private String appId;
+  private Context context;
+  private CdbRequestFactory cdbRequestFactory;
   private PubSdkApi api;
   private GdprData gdprData;
   private UserPrivacyUtil userPrivacyUtil;
@@ -42,7 +51,10 @@ public class PubSdkApiIntegrationTest {
     limitedAdTracking = 0;
     gaid = "021a86de-ef82-4f69-867b-61ca66688c9c";
     eventType = "Launch";
-    api = mockedDependenciesRule.getDependencyProvider().providePubSdkApi();
+
+    DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
+    cdbRequestFactory = dependencyProvider.provideCdbRequestFactory(context, "myCpId");
+    api = dependencyProvider.providePubSdkApi();
     userPrivacyUtil = mockedDependenciesRule.getDependencyProvider().provideUserPrivacyUtil(context);
   }
 
@@ -53,7 +65,7 @@ public class PubSdkApiIntegrationTest {
   }
 
   @Test
-  public void testPostAppEventWithNullGaid() {
+  public void postAppEvent_GivenNonNullGaid_ReturnInSuccess() {
     gaid = null;
 
     JSONObject object = api.postAppEvent(
@@ -70,7 +82,7 @@ public class PubSdkApiIntegrationTest {
   }
 
   @Test
-  public void testPostAppEventWithGaid() {
+  public void postAppEvent_GivenNullGaid_ReturnInSuccess() {
     JSONObject object = api.postAppEvent(
         senderId,
         appId,
@@ -82,6 +94,16 @@ public class PubSdkApiIntegrationTest {
     );
 
     assertNotNull(object);
+  }
+
+  @Test
+  public void loadCdb_GivenGeneratedRequest_ReturnInSuccess() throws Exception {
+    CacheAdUnit adUnit = new CacheAdUnit(new AdSize(1, 2), "ad1", CRITEO_BANNER);
+    CdbRequest request = cdbRequestFactory.createRequest(singletonList(adUnit));
+
+    CdbResponse response = api.loadCdb(request, "myUserAgent");
+
+    assertNotNull(response);
   }
 
   @Test

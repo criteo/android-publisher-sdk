@@ -5,6 +5,8 @@ import static com.criteo.publisher.Util.TextUtils.isEmpty;
 import android.support.annotation.NonNull;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
+import com.criteo.publisher.bid.UniqueIdGenerator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -31,18 +33,22 @@ public class CdbRequestFactory {
   @NonNull
   private final UserPrivacyUtil userPrivacyUtil;
 
+  @NonNull
+  private final UniqueIdGenerator uniqueIdGenerator;
+
   public CdbRequestFactory(
       @NonNull User user,
       @NonNull Publisher publisher,
       @NonNull DeviceInfo deviceInfo,
       @NonNull DeviceUtil deviceUtil,
-      @NonNull UserPrivacyUtil userPrivacyUtil
-  ) {
+      @NonNull UserPrivacyUtil userPrivacyUtil,
+      @NonNull UniqueIdGenerator uniqueIdGenerator) {
     this.user = user;
     this.publisher = publisher;
     this.deviceInfo = deviceInfo;
     this.deviceUtil = deviceUtil;
     this.userPrivacyUtil = userPrivacyUtil;
+    this.uniqueIdGenerator = uniqueIdGenerator;
   }
 
   @NonNull
@@ -73,7 +79,26 @@ public class CdbRequestFactory {
         user.getSdkVersion(),
         PROFILE_ID,
         userPrivacyUtil.getGdprData(),
-        requestedAdUnits
+        createRequestSlots(requestedAdUnits)
+    );
+  }
+
+  @NonNull
+  private List<CdbRequestSlot> createRequestSlots(List<CacheAdUnit> requestedAdUnits) {
+    List<CdbRequestSlot> slots = new ArrayList<>();
+    for (CacheAdUnit requestedAdUnit : requestedAdUnits) {
+      slots.add(createRequestSlot(requestedAdUnit));
+    }
+    return slots;
+  }
+
+  @NonNull
+  private CdbRequestSlot createRequestSlot(CacheAdUnit requestedAdUnit) {
+    return CdbRequestSlot.create(
+        uniqueIdGenerator.generateId(),
+        requestedAdUnit.getPlacementId(),
+        requestedAdUnit.getAdUnitType(),
+        requestedAdUnit.getSize()
     );
   }
 

@@ -32,7 +32,7 @@ public class CdbRequest {
   private final GdprData gdprData;
 
   @NonNull
-  private final List<CacheAdUnit> adUnits;
+  private final List<CdbRequestSlot> slots;
 
   public CdbRequest(
       @NonNull Publisher publisher,
@@ -40,13 +40,13 @@ public class CdbRequest {
       @NonNull String sdkVersion,
       int profileId,
       @Nullable GdprData gdprData,
-      @NonNull List<CacheAdUnit> adUnits) {
+      @NonNull List<CdbRequestSlot> slots) {
     this.publisher = publisher;
     this.user = user;
     this.sdkVersion = sdkVersion;
     this.profileId = profileId;
     this.gdprData = gdprData;
-    this.adUnits = adUnits;
+    this.slots = slots;
   }
 
   @NonNull
@@ -74,8 +74,8 @@ public class CdbRequest {
   }
 
   @NonNull
-  public List<CacheAdUnit> getAdUnits() {
-    return adUnits;
+  public List<CdbRequestSlot> getSlots() {
+    return slots;
   }
 
   @NonNull
@@ -87,8 +87,8 @@ public class CdbRequest {
     json.put(PROFILE_ID, profileId);
 
     JSONArray jsonAdUnits = new JSONArray();
-    for (CacheAdUnit adUnit : adUnits) {
-      jsonAdUnits.put(adUnit.toJson());
+    for (CdbRequestSlot slot : slots) {
+      jsonAdUnits.put(slot.toJson());
     }
     if (jsonAdUnits.length() > 0) {
       json.put(SLOTS, jsonAdUnits);
@@ -99,6 +99,7 @@ public class CdbRequest {
     return json;
   }
 
+  @NonNull
   @Override
   public String toString() {
     return "CdbRequest{" +
@@ -107,7 +108,7 @@ public class CdbRequest {
         ", sdkVersion='" + sdkVersion + '\'' +
         ", profileId=" + profileId +
         ", gdprConsent=" + gdprData +
-        ", adUnits=" + adUnits +
+        ", slots=" + slots +
         '}';
   }
 }
