@@ -97,12 +97,12 @@ dependencies {
 
 // Define artifacts to publish to Nexus
 
-task packageAarRelease(type: Zip, dependsOn: 'bundleRelease') {
+task packageAarRelease(type: Zip, dependsOn: 'assembleRelease') {
     from file("${project.buildDir}/outputs/aar/publisher-sdk-release.aar")
     classifier 'release'
 }
 
-task packageAarDebug(type: Zip, dependsOn: 'bundleDebug') {
+task packageAarDebug(type: Zip, dependsOn: 'assembleDebug') {
     from file("${project.buildDir}/outputs/aar/publisher-sdk-debug.aar")
     classifier 'debug'
 }

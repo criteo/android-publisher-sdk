@@ -86,13 +86,13 @@ class Apk extends Jar {
     String getExtension() { 'apk' }
 }
 
-task packageApkRelease(type: Apk, dependsOn: 'packageRelease') {
-    from file("${project.buildDir}/outputs/apk/app-release-unsigned.apk")
+task packageApkRelease(type: Apk, dependsOn: 'assembleRelease') {
+    from file("${project.buildDir}/outputs/apk/memoryLeaksHunt/app-memoryLeaksHunt-release-unsigned.apk")
     classifier 'release'
 }
 
-task packageApkDebug(type: Apk, dependsOn: 'packageDebug') {
-    from file("${project.buildDir}/outputs/apk/app-debug-unsigned.apk")
+task packageApkDebug(type: Apk, dependsOn: 'assembleDebug') {
+    from file("${project.buildDir}/outputs/apk/memoryLeaksHunt/app-memoryLeaksHunt-debug.apk")
     classifier 'debug'
 }
 

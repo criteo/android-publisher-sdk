@@ -13,4 +13,6 @@ VERSION="$ORIGINAL_VERSION-criteo-$(date -u +%Y%m%d%H%M%S)"
 NEXUS_URL="http://nexus.criteo.prod/content/repositories/criteo.android.releases/"
 
 ./scripts/do-pre-submit.sh
-./gradlew publish -Pversion="$VERSION" -PpublishUrl="$NEXUS_URL"
+
+# Only publish to Nexus acting as a PreProd environment
+./gradlew publishAllPublicationsToNexusRepository -Pversion="$VERSION" -PpublishUrl="$NEXUS_URL"
