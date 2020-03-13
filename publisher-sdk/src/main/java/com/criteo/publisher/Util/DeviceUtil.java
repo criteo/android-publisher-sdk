@@ -7,14 +7,10 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
 import com.criteo.publisher.model.AdSize;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.Locale;
 
 public class DeviceUtil {
@@ -91,23 +87,6 @@ public class DeviceUtil {
       Log.e("DeviceUtil", "Error trying to check limited ad tracking: " + e.getMessage());
     }
     return 0;
-  }
-
-  // FIXME(ma.chentir) this method does not belong here
-  public String createDfpCompatibleString(String stringToEncode) {
-    if (stringToEncode == null || stringToEncode.length() == 0) {
-      return null;
-    }
-
-    try {
-            byte[] byteUrl = stringToEncode.getBytes(Charset.forName("UTF-8"));
-      String base64Url = Base64.encodeToString(byteUrl, Base64.NO_WRAP);
-            String utf8 = Charset.forName("UTF-8").name();
-      return URLEncoder.encode(URLEncoder.encode(base64Url, utf8), utf8);
-    } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-    }
-    return null;
   }
 
   public boolean isVersionSupported() {

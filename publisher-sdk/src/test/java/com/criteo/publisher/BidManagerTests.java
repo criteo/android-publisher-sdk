@@ -288,7 +288,6 @@ public class BidManagerTests {
     return new BidManager(
         sdkCache,
         config,
-        deviceUtil,
         clock,
         adUnitMapper,
         bidRequestSender,

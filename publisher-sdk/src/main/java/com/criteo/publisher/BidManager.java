@@ -6,22 +6,19 @@ import android.support.annotation.GuardedBy;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
-import android.text.TextUtils;
 import android.util.Log;
 import com.criteo.publisher.Util.ApplicationStoppedListener;
 import com.criteo.publisher.Util.CdbCallListener;
-import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.ReflectionUtil;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
+import com.criteo.publisher.headerbidding.DfpHeaderBidding;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.Config;
-import com.criteo.publisher.model.NativeAssets;
-import com.criteo.publisher.model.NativeProduct;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.network.BidRequestSender;
 import java.util.Collections;
@@ -36,22 +33,6 @@ public class BidManager implements ApplicationStoppedListener {
   private static final String DFP_ADREQUEST_CLASS = "com.google.android.gms.ads.doubleclick.PublisherAdRequest$Builder";
 
   private static final String CRT_CPM = "crt_cpm";
-  private static final String CRT_NATIVE_TITLE = "crtn_title";
-  private static final String CRT_NATIVE_DESC = "crtn_desc";
-  private static final String CRT_NATIVE_PRICE = "crtn_price";
-  private static final String CRT_NATIVE_CLICK_URL = "crtn_clickurl";
-  private static final String CRT_NATIVE_CTA = "crtn_cta";
-  private static final String CRT_NATIVE_IMAGE_URL = "crtn_imageurl";
-  private static final String CRT_NATIVE_ADV_NAME = "crtn_advname";
-  private static final String CRT_NATIVE_ADV_DOMAIN = "crtn_advdomain";
-  private static final String CRT_NATIVE_ADV_LOGO_URL = "crtn_advlogourl";
-  private static final String CRT_NATIVE_ADV_URL = "crtn_advurl";
-  private static final String CRT_NATIVE_PR_URL = "crtn_prurl";
-  private static final String CRT_NATIVE_PR_IMAGE_URL = "crtn_primageurl";
-  private static final String CRT_NATIVE_PR_TEXT = "crtn_prtext";
-  private static final String CRT_NATIVE_PIXEL_URL = "crtn_pixurl_";
-  private static final String CRT_NATIVE_PIXEL_COUNT = "crtn_pixcount";
-  private static final String DFP_CRT_DISPLAY_URL = "crt_displayurl";
   private static final String MOPUB_CRT_DISPLAY_URL = "crt_displayUrl";
   private static final String MAP_CRT_DISPLAY_URL = "crt_displayUrl";
 
@@ -66,9 +47,6 @@ public class BidManager implements ApplicationStoppedListener {
   private final Object cacheLock = new Object();
 
   private final AtomicLong cdbTimeToNextCall = new AtomicLong(0);
-
-  @NonNull
-  private final DeviceUtil deviceUtil;
 
   @NonNull
   private final Config config;
@@ -88,7 +66,6 @@ public class BidManager implements ApplicationStoppedListener {
   BidManager(
       @NonNull SdkCache sdkCache,
       @NonNull Config config,
-      @NonNull DeviceUtil deviceUtil,
       @NonNull Clock clock,
       @NonNull AdUnitMapper adUnitMapper,
       @NonNull BidRequestSender bidRequestSender,
@@ -96,7 +73,6 @@ public class BidManager implements ApplicationStoppedListener {
   ) {
     this.cache = sdkCache;
     this.config = config;
-    this.deviceUtil = deviceUtil;
     this.clock = clock;
     this.adUnitMapper = adUnitMapper;
     this.bidRequestSender = bidRequestSender;
@@ -130,7 +106,7 @@ public class BidManager implements ApplicationStoppedListener {
           || object.getClass() == ReflectionUtil.getClassFromString(MOPUB_INTERSTITIAL_CLASS)) {
         enrichMoPubBid(object, adUnit);
       } else if (object.getClass() == ReflectionUtil.getClassFromString(DFP_ADREQUEST_CLASS)) {
-        enrichDfpBid(object, adUnit);
+        new DfpHeaderBidding(this).enrichBid(object, adUnit);
       } else if (object instanceof Map) {
         enrichMapBid((Map) object, adUnit);
       }
@@ -170,71 +146,6 @@ public class BidManager implements ApplicationStoppedListener {
     ReflectionUtil.callMethodOnObject(object, "setKeywords", keywords.toString());
   }
 
-  private void enrichDfpBid(Object object, AdUnit adUnit) {
-    Slot slot = getBidForAdUnitAndPrefetch(adUnit);
-    if (slot == null) {
-      return;
-    }
-
-    ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", CRT_CPM, slot.getCpm());
-
-    if (slot.isNative()) {
-      enrichNativeRequest(slot, object);
-
-    } else {
-      enrichDfpRequest(slot, object);
-    }
-  }
-
-  //Banner and Interstitial slot
-  private void enrichDfpRequest(Slot slot, Object object) {
-    ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", DFP_CRT_DISPLAY_URL,
-        deviceUtil.createDfpCompatibleString(slot.getDisplayUrl()));
-  }
-
-  //Native slot
-  private void enrichNativeRequest(Slot slot, Object object) {
-    NativeAssets nativeAssets = slot.getNativeAssets();
-    if (nativeAssets == null) {
-      return;
-    }
-
-    //reflect first product fields
-    List<NativeProduct> products = nativeAssets.getNativeProducts();
-    if (products != null && !products.isEmpty()) {
-      NativeProduct product = products.get(0);
-
-      checkAndReflect(object, product.getTitle(), CRT_NATIVE_TITLE);
-      checkAndReflect(object, product.getDescription(), CRT_NATIVE_DESC);
-      checkAndReflect(object, product.getPrice(), CRT_NATIVE_PRICE);
-      checkAndReflect(object, product.getClickUrl(), CRT_NATIVE_CLICK_URL);
-      checkAndReflect(object, product.getCallToAction(), CRT_NATIVE_CTA);
-      checkAndReflect(object, product.getImageUrl(), CRT_NATIVE_IMAGE_URL);
-    }
-
-    //reflect advertiser fields
-    checkAndReflect(object, nativeAssets.getAdvertiserDescription(), CRT_NATIVE_ADV_NAME);
-    checkAndReflect(object, nativeAssets.getAdvertiserDomain(), CRT_NATIVE_ADV_DOMAIN);
-    checkAndReflect(object, nativeAssets.getAdvertiserLogoUrl(), CRT_NATIVE_ADV_LOGO_URL);
-    checkAndReflect(object, nativeAssets.getAdvertiserLogoClickUrl(), CRT_NATIVE_ADV_URL);
-
-    //reflect privacy fields
-    checkAndReflect(object, nativeAssets.getPrivacyOptOutClickUrl(), CRT_NATIVE_PR_URL);
-    checkAndReflect(object, nativeAssets.getPrivacyOptOutImageUrl(), CRT_NATIVE_PR_IMAGE_URL);
-    checkAndReflect(object, nativeAssets.getPrivacyLongLegalText(), CRT_NATIVE_PR_TEXT);
-
-    //reflect impression pixels
-    List<String> impressionPixels = nativeAssets.getImpressionPixels();
-    if (impressionPixels != null) {
-      for (int i = 0; i < impressionPixels.size(); i++) {
-        checkAndReflect(object, impressionPixels.get(i), CRT_NATIVE_PIXEL_URL + i);
-      }
-
-      ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", CRT_NATIVE_PIXEL_COUNT,
-          impressionPixels.size() + "");
-    }
-  }
-
   /**
    * Returns the last fetched bid a fetch a new one for the next invocation.
    * <p>
@@ -265,7 +176,7 @@ public class BidManager implements ApplicationStoppedListener {
    * @return a valid bid that may be displayed or <code>null</code> that should be ignored
    */
   @Nullable
-  Slot getBidForAdUnitAndPrefetch(@Nullable AdUnit adUnit) {
+  public Slot getBidForAdUnitAndPrefetch(@Nullable AdUnit adUnit) {
     if (killSwitchEngaged()) {
       return null;
     }
@@ -306,13 +217,6 @@ public class BidManager implements ApplicationStoppedListener {
     }
   }
 
-
-  private void checkAndReflect(Object object, String fieldName, String enrichmentKey) {
-    if (!TextUtils.isEmpty(fieldName)) {
-      ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", enrichmentKey,
-          deviceUtil.createDfpCompatibleString(fieldName));
-    }
-  }
 
   @VisibleForTesting
   void setCacheAdUnits(@NonNull List<Slot> slots) {

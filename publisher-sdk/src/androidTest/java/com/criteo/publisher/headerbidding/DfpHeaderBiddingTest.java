@@ -1,36 +1,31 @@
-package com.criteo.publisher;
+package com.criteo.publisher.headerbidding;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import com.criteo.publisher.Util.AdvertisingInfo;
-import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.bid.BidLifecycleListener;
-import com.criteo.publisher.cache.SdkCache;
+import com.criteo.publisher.BidManager;
 import com.criteo.publisher.model.AdSize;
-import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.BannerAdUnit;
-import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.NativeAssets;
 import com.criteo.publisher.model.NativeProduct;
 import com.criteo.publisher.model.Slot;
-import com.criteo.publisher.network.BidRequestSender;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class BidManagerTest {
+/**
+ * This is an instrumented test because DFP use Android objects
+ */
+public class DfpHeaderBiddingTest {
 
   private static final String CRT_CPM = "crt_cpm";
+  private static final String CRT_DISPLAY_URL = "crt_displayurl";
   private static final String CRT_NATIVE_TITLE = "crtn_title";
   private static final String CRT_NATIVE_DESC = "crtn_desc";
   private static final String CRT_NATIVE_PRICE = "crtn_price";
@@ -47,29 +42,29 @@ public class BidManagerTest {
   private static final String CRT_NATIVE_PIXEL_URL = "crtn_pixurl_";
   private static final String CRT_NATIVE_PIXEL_COUNT = "crtn_pixcount";
 
-  private static final String DFP_CRT_DISPLAY_URL = "crt_displayurl";
+  @Mock
+  private BidManager bidManager;
 
-  private DeviceUtil deviceUtil;
+  private DfpHeaderBidding headerBidding;
 
   @Before
-  public void setup() {
+  public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    deviceUtil = new DeviceUtil(mock(Context.class), mock(AdvertisingInfo.class));
+    headerBidding = new DfpHeaderBidding(bidManager);
   }
 
   @Test
   public void enrichBid_GivenDfpBuilderAndNoBidAvailable_DoNotEnrich() throws Exception {
     BannerAdUnit adUnit = new BannerAdUnit("adUnit", new AdSize(1, 2));
 
-    BidManager manager = spy(createBidManager());
-    doReturn(null).when(manager).getBidForAdUnitAndPrefetch(adUnit);
+    when(bidManager.getBidForAdUnitAndPrefetch(adUnit)).thenReturn(null);
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-    manager.enrichBid(builder, adUnit);
+    headerBidding.enrichBid(builder, adUnit);
     PublisherAdRequest request = builder.build();
 
-    assertNull(request.getCustomTargeting().getString(DFP_CRT_DISPLAY_URL));
+    assertNull(request.getCustomTargeting().getString(CRT_DISPLAY_URL));
   }
 
   @Test
@@ -81,17 +76,16 @@ public class BidManagerTest {
     when(slot.getCpm()).thenReturn("0.10");
     when(slot.getDisplayUrl()).thenReturn("http://display.url");
 
-    BidManager manager = spy(createBidManager());
-    doReturn(slot).when(manager).getBidForAdUnitAndPrefetch(adUnit);
+    when(bidManager.getBidForAdUnitAndPrefetch(adUnit)).thenReturn(slot);
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-    manager.enrichBid(builder, adUnit);
+    headerBidding.enrichBid(builder, adUnit);
     PublisherAdRequest request = builder.build();
     Bundle customTargeting = request.getCustomTargeting();
 
     assertEquals(2, customTargeting.size());
     assertEquals("0.10", customTargeting.get(CRT_CPM));
-    assertEquals(encodeForDfp("http://display.url"), customTargeting.get(DFP_CRT_DISPLAY_URL));
+    assertEquals(encodeForDfp("http://display.url"), customTargeting.get(CRT_DISPLAY_URL));
   }
 
   @Test
@@ -127,11 +121,10 @@ public class BidManagerTest {
     when(slot.getCpm()).thenReturn("0.42");
     when(slot.getNativeAssets()).thenReturn(nativeAssets);
 
-    BidManager manager = spy(createBidManager());
-    doReturn(slot).when(manager).getBidForAdUnitAndPrefetch(adUnit);
+    when(bidManager.getBidForAdUnitAndPrefetch(adUnit)).thenReturn(slot);
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-    manager.enrichBid(builder, adUnit);
+    headerBidding.enrichBid(builder, adUnit);
     PublisherAdRequest request = builder.build();
     Bundle customTargeting = request.getCustomTargeting();
 
@@ -201,21 +194,22 @@ public class BidManagerTest {
     assertEquals("2", customTargeting.get(CRT_NATIVE_PIXEL_COUNT));
   }
 
-  private String encodeForDfp(String displayUrl) {
-    return deviceUtil.createDfpCompatibleString(displayUrl);
+  @Test
+  public void createDfpCompatibleString_GivenNull_ReturnNull() {
+    assertNull(headerBidding.createDfpCompatibleString(null));
   }
 
-  @NonNull
-  private BidManager createBidManager() {
-    return new BidManager(
-        mock(SdkCache.class),
-        mock(Config.class),
-        deviceUtil,
-        mock(Clock.class),
-        mock(AdUnitMapper.class),
-        mock(BidRequestSender.class),
-        mock(BidLifecycleListener.class)
-    );
+  @Test
+  public void createDfpCompatibleString_GivenExpectedInput_ReturnExpectedOutput() {
+    String displayUrl = "https://ads.us.criteo.com/delivery/r/ajs.php?did=5c560a19383b7ad93bb37508deb03a00&u=%7CHX1eM0zpPitVbf0xT24vaM6U4AiY1TeYgfjDUVVbdu4%3D%7C&c1=eG9IAZIK2MKnlif_A3VZ1-8PEx5_bFVofQVrPPiKhda8JkCsKWBsD2zYvC_F9owWsiKQANPjzJs2iM3m5bCHei3w1zNKxtB3Cx_TBleNKtL5VK1aqyK68XTa0A43qlwLNaStT5NXB3Mz7kx6fDZ20Rh6eAGAW2F9SXVN_7xiLgP288-4OqtK-R7pziZDS04LRUhkL7ohLmAFFyVuwQTREHbpx-4NoonsiQRHKn7ZkuIqZR_rqEewHQ2YowxbI3EOowxo6OV50faWCc7QO5M388FHv8NxeOgOH03LHZT_a2PEKF1xh0-G_qdu5wiyGjJYyPEoNVxB0OaEnDaFVtM7cVaHDm4jrjKlfFhtIGuJb8mg2EeHN0mhUL_0eyv9xWUUQ6osYh3B-jiawHq4592kDDCpS2kYYeqR073IOoRNFNRCR7Fnl0yhIA";
+    String expectedEncodedValue = "aHR0cHM6Ly9hZHMudXMuY3JpdGVvLmNvbS9kZWxpdmVyeS9yL2Fqcy5waHA%252FZGlkPTVjNTYwYTE5MzgzYjdhZDkzYmIzNzUwOGRlYjAzYTAwJnU9JTdDSFgxZU0wenBQaXRWYmYweFQyNHZhTTZVNEFpWTFUZVlnZmpEVVZWYmR1NCUzRCU3QyZjMT1lRzlJQVpJSzJNS25saWZfQTNWWjEtOFBFeDVfYkZWb2ZRVnJQUGlLaGRhOEprQ3NLV0JzRDJ6WXZDX0Y5b3dXc2lLUUFOUGp6SnMyaU0zbTViQ0hlaTN3MXpOS3h0QjNDeF9UQmxlTkt0TDVWSzFhcXlLNjhYVGEwQTQzcWx3TE5hU3RUNU5YQjNNejdreDZmRFoyMFJoNmVBR0FXMkY5U1hWTl83eGlMZ1AyODgtNE9xdEstUjdwemlaRFMwNExSVWhrTDdvaExtQUZGeVZ1d1FUUkVIYnB4LTROb29uc2lRUkhLbjdaa3VJcVpSX3JxRWV3SFEyWW93eGJJM0VPb3d4bzZPVjUwZmFXQ2M3UU81TTM4OEZIdjhOeGVPZ09IMDNMSFpUX2EyUEVLRjF4aDAtR19xZHU1d2l5R2pKWXlQRW9OVnhCME9hRW5EYUZWdE03Y1ZhSERtNGpyaktsZkZodElHdUpiOG1nMkVlSE4wbWhVTF8wZXl2OXhXVVVRNm9zWWgzQi1qaWF3SHE0NTkya0REQ3BTMmtZWWVxUjA3M0lPb1JORk5SQ1I3Rm5sMHloSUE%253D";
+
+    String encodedValue = headerBidding.createDfpCompatibleString(displayUrl);
+    assertEquals(encodedValue, expectedEncodedValue);
+  }
+
+  private String encodeForDfp(String displayUrl) {
+    return headerBidding.createDfpCompatibleString(displayUrl);
   }
 
 }

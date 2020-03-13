@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -27,12 +26,6 @@ public class DeviceUtilTest {
   public void setup() throws Exception {
     MockitoAnnotations.initMocks(this);
     deviceUtil = new DeviceUtil(context, info);
-  }
-
-  @Test
-  public void testCreateDfpCompatibleWithNullDisplayUrl() {
-    String displayUrl = null;
-    Assert.assertNull(deviceUtil.createDfpCompatibleString(displayUrl));
   }
 
   @Test

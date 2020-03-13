@@ -967,7 +967,6 @@ public class BidManagerFunctionalTest {
     return new BidManager(
         cache,
         dependencyProvider.provideConfig(context),
-        dependencyProvider.provideDeviceUtil(context),
         dependencyProvider.provideClock(),
         dependencyProvider.provideAdUnitMapper(context),
         dependencyProvider.provideBidRequestSender(context, "myCpId"),

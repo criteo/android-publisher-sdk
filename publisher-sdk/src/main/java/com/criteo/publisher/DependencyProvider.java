@@ -178,7 +178,6 @@ public class DependencyProvider {
         return new BidManager(
             new SdkCache(DependencyProvider.this.provideDeviceUtil(context)),
             DependencyProvider.this.provideConfig(context),
-            DependencyProvider.this.provideDeviceUtil(context),
             DependencyProvider.this.provideClock(),
             DependencyProvider.this.provideAdUnitMapper(context),
             DependencyProvider.this.provideBidRequestSender(context, criteoPublisherId),
