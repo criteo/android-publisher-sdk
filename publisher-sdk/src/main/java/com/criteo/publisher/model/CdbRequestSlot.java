@@ -41,7 +41,6 @@ public abstract class CdbRequestSlot {
   }
 
   @NonNull
-  @VisibleForTesting
   @SerializedName("impId")
   public abstract String getImpressionId();
 
