@@ -32,17 +32,7 @@ class CsmBidLifecycleListenerTest {
 
   @Test
   fun onCdbCallStarted_GivenMultipleSlots_UpdateAllStartTimeOfMetricsById() {
-    val slot1: CdbRequestSlot = mock() {
-      on { impressionId } doReturn "id1"
-    }
-
-    val slot2: CdbRequestSlot = mock() {
-      on { impressionId } doReturn "id2"
-    }
-
-    val request: CdbRequest = mock() {
-      on { slots } doReturn listOf(slot1, slot2)
-    }
+    val request = givenCdbRequestWithSlots("id1", "id2")
 
     clock.stub {
       on { currentTimeInMillis } doReturn 42
@@ -50,16 +40,52 @@ class CsmBidLifecycleListenerTest {
 
     listener.onCdbCallStarted(request)
 
+    assertRepositoryIsUpdatedByIds("id1", "id2") {
+      verify(it).setCdbCallStartAbsolute(42)
+    }
+  }
+
+  @Test
+  fun onCdbCallFinished_GivenMultipleRequestSlots_UpdateAllEndTimeOfMetricsById() {
+    val request = givenCdbRequestWithSlots("id1", "id2")
+
+    clock.stub {
+      on { currentTimeInMillis } doReturn 1337
+    }
+
+    listener.onCdbCallFinished(request, mock())
+
+    assertRepositoryIsUpdatedByIds("id1", "id2") {
+      verify(it).setCdbCallEndAbsolute(1337)
+    }
+  }
+
+  private fun givenCdbRequestWithSlots(vararg impressionIds: String): CdbRequest {
+    val slots = impressionIds.map { impressionId ->
+      mock<CdbRequestSlot>() {
+        on { getImpressionId() } doReturn impressionId
+      }
+    }.toList()
+
+    return mock() {
+      on { getSlots() } doReturn slots
+    }
+  }
+
+  private fun assertRepositoryIsUpdatedByIds(
+      vararg impressionIds: String,
+      verifier: (MetricBuilder) -> Unit
+  ) {
     argumentCaptor<String> {
-      verify(repository, times(2)).updateById(capture(), check {
+      verify(repository, times(impressionIds.size)).updateById(capture(), check {
         val metricBuilder: MetricBuilder = mock()
 
         it.update(metricBuilder)
 
-        verify(metricBuilder).setCdbCallStartAbsolute(42)
+        verifier(metricBuilder)
       })
 
-      assertThat(allValues).containsExactlyInAnyOrder("id1", "id2")
+      assertThat(allValues).containsExactlyInAnyOrder(*impressionIds)
     }
   }
 

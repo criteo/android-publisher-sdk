@@ -30,19 +30,24 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
   public void onCdbCallStarted(@NonNull CdbRequest request) {
     long currentTimeInMillis = clock.getCurrentTimeInMillis();
 
-    for (CdbRequestSlot requestSlot : request.getSlots()) {
-      repository.updateById(requestSlot.getImpressionId(), new MetricUpdater() {
-        @Override
-        public void update(@NonNull MetricBuilder builder) {
-          builder.setCdbCallStartAbsolute(currentTimeInMillis);
-        }
-      });
-    }
+    updateByCdbRequestIds(request, new MetricUpdater() {
+      @Override
+      public void update(@NonNull MetricBuilder builder) {
+        builder.setCdbCallStartAbsolute(currentTimeInMillis);
+      }
+    });
   }
 
   @Override
   public void onCdbCallFinished(@NonNull CdbRequest request, @NonNull CdbResponse response) {
+    long currentTimeInMillis = clock.getCurrentTimeInMillis();
 
+    updateByCdbRequestIds(request, new MetricUpdater() {
+      @Override
+      public void update(@NonNull MetricBuilder builder) {
+        builder.setCdbCallEndAbsolute(currentTimeInMillis);
+      }
+    });
   }
 
   @Override
@@ -53,6 +58,12 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
   @Override
   public void onBidConsumed(@NonNull CacheAdUnit adUnit, @NonNull Slot consumedBid) {
 
+  }
+
+  private void updateByCdbRequestIds(@NonNull CdbRequest request, @NonNull MetricUpdater updater) {
+    for (CdbRequestSlot requestSlot : request.getSlots()) {
+      repository.updateById(requestSlot.getImpressionId(), updater);
+    }
   }
 
 }

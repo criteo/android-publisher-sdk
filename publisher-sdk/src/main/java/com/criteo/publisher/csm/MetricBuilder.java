@@ -6,4 +6,7 @@ public class MetricBuilder {
     // TODO EE-885
   }
 
+  public void setCdbCallEndAbsolute(long absoluteTimeInMillis) {
+    // TODO EE-885
+  }
 }
