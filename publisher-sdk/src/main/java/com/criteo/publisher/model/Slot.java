@@ -1,5 +1,6 @@
 package com.criteo.publisher.model;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 import com.criteo.publisher.Util.URLUtil;
 import org.json.JSONException;
@@ -29,9 +30,6 @@ public class Slot {
   private double cpmValue;
   private NativeAssets nativeAssets;
   private boolean isNative;
-
-  public Slot() {
-  }
 
   public Slot(JSONObject json) {
     placementId = json.optString(PLACEMENT_ID, null);
@@ -74,36 +72,16 @@ public class Slot {
     return placementId;
   }
 
-  public void setPlacementId(String placementId) {
-    this.placementId = placementId;
-  }
-
   public String getCpm() {
     return cpm;
-  }
-
-  public void setCpm(String cpm) {
-    this.cpm = cpm;
   }
 
   public int getWidth() {
     return width;
   }
 
-  public void setWidth(int width) {
-    this.width = width;
-  }
-
   public int getHeight() {
     return height;
-  }
-
-  public void setHeight(int height) {
-    this.height = height;
-  }
-
-  public String getFormattedSize() {
-    return width + "x" + height;
   }
 
   public String getCurrency() {
@@ -144,14 +122,11 @@ public class Slot {
     return displayUrl;
   }
 
-  public void setDisplayUrl(String displayUrl) {
-    this.displayUrl = displayUrl;
-  }
-
   public NativeAssets getNativeAssets() {
     return this.nativeAssets;
   }
 
+  @NonNull
   @Override
   public String toString() {
     return "Slot{" +
@@ -186,12 +161,12 @@ public class Slot {
       if (this.nativeAssets == null) {
         return false;
       } else {
-        return this.nativeAssets.nativeProducts != null
-            && this.nativeAssets.nativeProducts.size() != 0
-            && !this.nativeAssets.privacyOptOutImageUrl.equals("")
-            && !this.nativeAssets.privacyOptOutClickUrl.equals("")
-            && this.nativeAssets.impressionPixels != null
-            && this.nativeAssets.impressionPixels.size() != 0;
+        return this.nativeAssets.getNativeProducts() != null
+            && this.nativeAssets.getNativeProducts().size() != 0
+            && !this.nativeAssets.getPrivacyOptOutImageUrl().equals("")
+            && !this.nativeAssets.getPrivacyOptOutClickUrl().equals("")
+            && this.nativeAssets.getImpressionPixels() != null
+            && this.nativeAssets.getImpressionPixels().size() != 0;
       }
     }
     return true;

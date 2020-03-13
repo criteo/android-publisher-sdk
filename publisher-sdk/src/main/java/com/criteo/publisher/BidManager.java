@@ -202,38 +202,39 @@ public class BidManager implements ApplicationStoppedListener {
     }
 
     //reflect first product fields
-    if (nativeAssets.nativeProducts != null && nativeAssets.nativeProducts.size() > 0) {
-      NativeProduct product = nativeAssets.nativeProducts.get(0);
+    List<NativeProduct> products = nativeAssets.getNativeProducts();
+    if (products != null && !products.isEmpty()) {
+      NativeProduct product = products.get(0);
 
-      checkAndReflect(object, product.title, CRT_NATIVE_TITLE);
-      checkAndReflect(object, product.description, CRT_NATIVE_DESC);
-      checkAndReflect(object, product.price, CRT_NATIVE_PRICE);
-      checkAndReflect(object, product.clickUrl, CRT_NATIVE_CLICK_URL);
-      checkAndReflect(object, product.callToAction, CRT_NATIVE_CTA);
-      checkAndReflect(object, product.imageUrl, CRT_NATIVE_IMAGE_URL);
+      checkAndReflect(object, product.getTitle(), CRT_NATIVE_TITLE);
+      checkAndReflect(object, product.getDescription(), CRT_NATIVE_DESC);
+      checkAndReflect(object, product.getPrice(), CRT_NATIVE_PRICE);
+      checkAndReflect(object, product.getClickUrl(), CRT_NATIVE_CLICK_URL);
+      checkAndReflect(object, product.getCallToAction(), CRT_NATIVE_CTA);
+      checkAndReflect(object, product.getImageUrl(), CRT_NATIVE_IMAGE_URL);
     }
 
     //reflect advertiser fields
-    checkAndReflect(object, nativeAssets.advertiserDescription, CRT_NATIVE_ADV_NAME);
-    checkAndReflect(object, nativeAssets.advertiserDomain, CRT_NATIVE_ADV_DOMAIN);
-    checkAndReflect(object, nativeAssets.advertiserLogoUrl, CRT_NATIVE_ADV_LOGO_URL);
-    checkAndReflect(object, nativeAssets.advertiserLogoClickUrl, CRT_NATIVE_ADV_URL);
+    checkAndReflect(object, nativeAssets.getAdvertiserDescription(), CRT_NATIVE_ADV_NAME);
+    checkAndReflect(object, nativeAssets.getAdvertiserDomain(), CRT_NATIVE_ADV_DOMAIN);
+    checkAndReflect(object, nativeAssets.getAdvertiserLogoUrl(), CRT_NATIVE_ADV_LOGO_URL);
+    checkAndReflect(object, nativeAssets.getAdvertiserLogoClickUrl(), CRT_NATIVE_ADV_URL);
 
     //reflect privacy fields
-    checkAndReflect(object, nativeAssets.privacyOptOutClickUrl, CRT_NATIVE_PR_URL);
-    checkAndReflect(object, nativeAssets.privacyOptOutImageUrl, CRT_NATIVE_PR_IMAGE_URL);
-    checkAndReflect(object, nativeAssets.privacyLongLegalText, CRT_NATIVE_PR_TEXT);
+    checkAndReflect(object, nativeAssets.getPrivacyOptOutClickUrl(), CRT_NATIVE_PR_URL);
+    checkAndReflect(object, nativeAssets.getPrivacyOptOutImageUrl(), CRT_NATIVE_PR_IMAGE_URL);
+    checkAndReflect(object, nativeAssets.getPrivacyLongLegalText(), CRT_NATIVE_PR_TEXT);
 
     //reflect impression pixels
-    if (nativeAssets.impressionPixels != null && nativeAssets.impressionPixels.size() > 0) {
-      for (int i = 0; i < nativeAssets.impressionPixels.size(); i++) {
-        checkAndReflect(object, nativeAssets.impressionPixels.get(i), CRT_NATIVE_PIXEL_URL + i);
+    List<String> impressionPixels = nativeAssets.getImpressionPixels();
+    if (impressionPixels != null) {
+      for (int i = 0; i < impressionPixels.size(); i++) {
+        checkAndReflect(object, impressionPixels.get(i), CRT_NATIVE_PIXEL_URL + i);
       }
+
+      ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", CRT_NATIVE_PIXEL_COUNT,
+          impressionPixels.size() + "");
     }
-
-    ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", CRT_NATIVE_PIXEL_COUNT,
-        nativeAssets.impressionPixels.size() + "");
-
   }
 
   /**

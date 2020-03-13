@@ -23,17 +23,17 @@ public class NativeAssets {
   private static final String HEIGHT = "height";
   private static final String WIDTH = "width";
 
-  public List<NativeProduct> nativeProducts;
-  public String advertiserDescription;
-  public String advertiserDomain;
-  public String advertiserLogoUrl;
-  public int advertiserLogoHeight;
-  public int advertiserLogoWidth;
-  public String advertiserLogoClickUrl;
-  public String privacyOptOutClickUrl;
-  public String privacyOptOutImageUrl;
-  public String privacyLongLegalText;
-  public List<String> impressionPixels;
+  private List<NativeProduct> nativeProducts;
+  private String advertiserDescription;
+  private String advertiserDomain;
+  private String advertiserLogoUrl;
+  private int advertiserLogoHeight;
+  private int advertiserLogoWidth;
+  private String advertiserLogoClickUrl;
+  private String privacyOptOutClickUrl;
+  private String privacyOptOutImageUrl;
+  private String privacyLongLegalText;
+  private List<String> impressionPixels;
 
   public NativeAssets(JSONObject jsonNative) throws JSONException {
     // products
@@ -74,6 +74,42 @@ public class NativeAssets {
         this.impressionPixels.add(impressionPixels.getJSONObject(i).optString(NATIVE_URL));
       }
     }
+  }
+
+  public List<NativeProduct> getNativeProducts() {
+    return nativeProducts;
+  }
+
+  public String getAdvertiserDescription() {
+    return advertiserDescription;
+  }
+
+  public String getAdvertiserDomain() {
+    return advertiserDomain;
+  }
+
+  public String getAdvertiserLogoUrl() {
+    return advertiserLogoUrl;
+  }
+
+  public String getAdvertiserLogoClickUrl() {
+    return advertiserLogoClickUrl;
+  }
+
+  public String getPrivacyOptOutClickUrl() {
+    return privacyOptOutClickUrl;
+  }
+
+  public String getPrivacyOptOutImageUrl() {
+    return privacyOptOutImageUrl;
+  }
+
+  public String getPrivacyLongLegalText() {
+    return privacyLongLegalText;
+  }
+
+  public List<String> getImpressionPixels() {
+    return impressionPixels;
   }
 
   @Override

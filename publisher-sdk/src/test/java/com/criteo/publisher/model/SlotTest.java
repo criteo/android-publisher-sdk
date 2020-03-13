@@ -168,20 +168,20 @@ public class SlotTest {
       Slot slot = new Slot(cdbSlot);
       Assert.assertNotNull(slot.getNativeAssets());
       Assert.assertEquals("\"Stripe Pima Dress\" - $99",
-          slot.getNativeAssets().nativeProducts.get(0).title);
+          slot.getNativeAssets().getNativeProducts().get(0).getTitle());
       Assert.assertEquals("We're All About Comfort.",
-          slot.getNativeAssets().nativeProducts.get(0).description);
-      Assert.assertEquals("$99", slot.getNativeAssets().nativeProducts.get(0).price);
-      Assert.assertEquals("The Company Store", slot.getNativeAssets().advertiserDescription);
+          slot.getNativeAssets().getNativeProducts().get(0).getDescription());
+      Assert.assertEquals("$99", slot.getNativeAssets().getNativeProducts().get(0).getPrice());
+      Assert.assertEquals("The Company Store", slot.getNativeAssets().getAdvertiserDescription());
       Assert.assertEquals("https://pix.us.criteo.net/img/img",
-          slot.getNativeAssets().advertiserLogoUrl);
+          slot.getNativeAssets().getAdvertiserLogoUrl());
       Assert.assertEquals("https://privacy.us.criteo.com/adcenter",
-          slot.getNativeAssets().privacyOptOutClickUrl);
-      Assert.assertEquals(2, slot.getNativeAssets().impressionPixels.size());
+          slot.getNativeAssets().getPrivacyOptOutClickUrl());
+      Assert.assertEquals(2, slot.getNativeAssets().getImpressionPixels().size());
       Assert.assertEquals("https://cat.sv.us.criteo.com/delivery/lgn.php?",
-          slot.getNativeAssets().impressionPixels.get(0));
+          slot.getNativeAssets().getImpressionPixels().get(0));
       Assert.assertEquals("https://dog.da.us.criteo.com/delivery/lgn.php?",
-          slot.getNativeAssets().impressionPixels.get(1));
+          slot.getNativeAssets().getImpressionPixels().get(1));
       Assert.assertTrue(slot.isNative());
       Assert.assertTrue(slot.isValid());
     } catch (Exception ex) {
@@ -369,7 +369,7 @@ public class SlotTest {
       Assert.assertNotNull(slot.getNativeAssets());
       Assert.assertEquals(3600, slot.getTtl());
       Assert.assertEquals("/140800857/Endeavour_Native", slot.getPlacementId());
-      Assert.assertEquals("The Company Store", slot.getNativeAssets().advertiserDescription);
+      Assert.assertEquals("The Company Store", slot.getNativeAssets().getAdvertiserDescription());
       Assert.assertFalse(slot.isValid());
     } catch (Exception ex) {
       Assert.fail("Json exception in test data : " + ex.getLocalizedMessage());
@@ -418,7 +418,7 @@ public class SlotTest {
       Assert.assertNotNull(slot.getNativeAssets());
       Assert.assertEquals(3600, slot.getTtl());
       Assert.assertEquals("/140800857/Endeavour_Native", slot.getPlacementId());
-      Assert.assertEquals("The Company Store", slot.getNativeAssets().advertiserDescription);
+      Assert.assertEquals("The Company Store", slot.getNativeAssets().getAdvertiserDescription());
       Assert.assertFalse(slot.isValid());
     } catch (Exception ex) {
       Assert.fail("Json exception in test data : " + ex.getLocalizedMessage());
@@ -478,7 +478,7 @@ public class SlotTest {
       Assert.assertNotNull(slot.getNativeAssets());
       Assert.assertEquals(3600, slot.getTtl());
       Assert.assertEquals("/140800857/Endeavour_Native", slot.getPlacementId());
-      Assert.assertEquals("The Company Store", slot.getNativeAssets().advertiserDescription);
+      Assert.assertEquals("The Company Store", slot.getNativeAssets().getAdvertiserDescription());
       Assert.assertFalse(slot.isValid());
     } catch (Exception ex) {
       Assert.fail("Json exception in test data : " + ex.getLocalizedMessage());
@@ -534,7 +534,7 @@ public class SlotTest {
       Assert.assertNotNull(slot.getNativeAssets());
       Assert.assertEquals(3600, slot.getTtl());
       Assert.assertEquals("/140800857/Endeavour_Native", slot.getPlacementId());
-      Assert.assertEquals("The Company Store", slot.getNativeAssets().advertiserDescription);
+      Assert.assertEquals("The Company Store", slot.getNativeAssets().getAdvertiserDescription());
       Assert.assertFalse(slot.isValid());
     } catch (Exception ex) {
       Assert.fail("Json exception in test data : " + ex.getLocalizedMessage());
@@ -553,19 +553,19 @@ public class SlotTest {
     Assert.assertTrue(slot.getCpmAsNumber() >= 0.0d);
     Assert.assertNotNull(slot.getNativeAssets());
     // it contains at least one product
-    Assert.assertNotNull(slot.getNativeAssets().nativeProducts);
-    Assert.assertTrue(slot.getNativeAssets().nativeProducts.size() > 0);
+    Assert.assertNotNull(slot.getNativeAssets().getNativeProducts());
+    Assert.assertTrue(slot.getNativeAssets().getNativeProducts().size() > 0);
     // it contains at least one impression pixel
-    Assert.assertNotNull(slot.getNativeAssets().impressionPixels);
-    Assert.assertTrue(slot.getNativeAssets().impressionPixels.size() > 0);
+    Assert.assertNotNull(slot.getNativeAssets().getImpressionPixels());
+    Assert.assertTrue(slot.getNativeAssets().getImpressionPixels().size() > 0);
     // it contains the opt out click url and an opt out image
     // checking if the string is a valid url or not is beyond the scope of the SDK for now
-    Assert.assertNotNull(slot.getNativeAssets().privacyOptOutClickUrl);
-    Assert.assertTrue(slot.getNativeAssets().privacyOptOutClickUrl.length() > 0);
-    Assert.assertFalse("".equals(slot.getNativeAssets().privacyOptOutClickUrl));
-    Assert.assertNotNull(slot.getNativeAssets().privacyOptOutImageUrl);
-    Assert.assertTrue(slot.getNativeAssets().privacyOptOutImageUrl.length() > 0);
-    Assert.assertFalse("".equals(slot.getNativeAssets().privacyOptOutImageUrl));
+    Assert.assertNotNull(slot.getNativeAssets().getPrivacyOptOutClickUrl());
+    Assert.assertTrue(slot.getNativeAssets().getPrivacyOptOutClickUrl().length() > 0);
+    Assert.assertFalse("".equals(slot.getNativeAssets().getPrivacyOptOutClickUrl()));
+    Assert.assertNotNull(slot.getNativeAssets().getPrivacyOptOutImageUrl());
+    Assert.assertTrue(slot.getNativeAssets().getPrivacyOptOutImageUrl().length() > 0);
+    Assert.assertFalse("".equals(slot.getNativeAssets().getPrivacyOptOutImageUrl()));
   }
 
   @Test

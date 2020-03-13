@@ -15,14 +15,14 @@ public class NativeProduct {
   private static final String HEIGHT = "height";
   private static final String WIDTH = "width";
 
-  public String title;
-  public String description;
-  public String price;
-  public String clickUrl;
-  public String callToAction;
-  public String imageUrl;
-  public int imageHeight;
-  public int imageWidth;
+  private String title;
+  private String description;
+  private String price;
+  private String clickUrl;
+  private String callToAction;
+  private String imageUrl;
+  private int imageHeight;
+  private int imageWidth;
 
   public NativeProduct(JSONObject jsonProduct) throws JSONException {
     this.title = jsonProduct.optString(TITLE);
@@ -35,6 +35,30 @@ public class NativeProduct {
       this.imageHeight = jsonProduct.getJSONObject(IMAGE).optInt(HEIGHT);
       this.imageWidth = jsonProduct.getJSONObject(IMAGE).optInt(WIDTH);
     }
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public String getPrice() {
+    return price;
+  }
+
+  public String getClickUrl() {
+    return clickUrl;
+  }
+
+  public String getCallToAction() {
+    return callToAction;
+  }
+
+  public String getImageUrl() {
+    return imageUrl;
   }
 
   @Override
@@ -52,4 +76,5 @@ public class NativeProduct {
     }
     return false;
   }
+
 }
