@@ -9,6 +9,8 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import java.io.IOException
+import java.net.SocketTimeoutException
 
 class CsmBidLifecycleListenerTest {
 
@@ -40,6 +42,7 @@ class CsmBidLifecycleListenerTest {
 
     listener.onCdbCallStarted(request)
 
+
     assertRepositoryIsUpdatedByIds("id1", "id2") {
       verify(it).setCdbCallStartAbsolute(42)
     }
@@ -57,6 +60,32 @@ class CsmBidLifecycleListenerTest {
 
     assertRepositoryIsUpdatedByIds("id1", "id2") {
       verify(it).setCdbCallEndAbsolute(1337)
+    }
+  }
+
+  @Test
+  fun onCdbCallFailed_GivenNotATimeoutException_DoNothing() {
+    val request: CdbRequest = mock() {
+      on { slots } doReturn listOf(mock(), mock())
+    }
+
+    listener.onCdbCallFailed(request, mock<IOException>())
+
+    verifyZeroInteractions(repository)
+  }
+
+  @Test
+  fun onCdbCallFailed_GivenTimeoutExceptionAndMultipleRequestSlots_UpdateAllEndTimeOfMetricsById() {
+    val request = givenCdbRequestWithSlots("id1", "id2")
+
+    clock.stub {
+      on { currentTimeInMillis } doReturn 1337
+    }
+
+    listener.onCdbCallFailed(request, mock<SocketTimeoutException>())
+
+    assertRepositoryIsUpdatedByIds("id1", "id2") {
+      verify(it).setCdbCallTimeoutAbsolute(1337)
     }
   }
 

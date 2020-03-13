@@ -9,6 +9,7 @@ import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestSlot;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.Slot;
+import java.net.SocketTimeoutException;
 
 public class CsmBidLifecycleListener implements BidLifecycleListener {
 
@@ -52,12 +53,22 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
 
   @Override
   public void onCdbCallFailed(@NonNull CdbRequest request, @NonNull Exception exception) {
+    if (!(exception instanceof SocketTimeoutException)) {
+      return;
+    }
 
+    long currentTimeInMillis = clock.getCurrentTimeInMillis();
+
+    updateByCdbRequestIds(request, new MetricUpdater() {
+      @Override
+      public void update(@NonNull MetricBuilder builder) {
+        builder.setCdbCallTimeoutAbsolute(currentTimeInMillis);
+      }
+    });
   }
 
   @Override
   public void onBidConsumed(@NonNull CacheAdUnit adUnit, @NonNull Slot consumedBid) {
-
   }
 
   private void updateByCdbRequestIds(@NonNull CdbRequest request, @NonNull MetricUpdater updater) {

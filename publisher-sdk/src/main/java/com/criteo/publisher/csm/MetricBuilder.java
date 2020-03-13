@@ -9,4 +9,8 @@ public class MetricBuilder {
   public void setCdbCallEndAbsolute(long absoluteTimeInMillis) {
     // TODO EE-885
   }
+
+  public void setCdbCallTimeoutAbsolute(long absoluteTimeInMillis) {
+    // TODO EE-885
+  }
 }
