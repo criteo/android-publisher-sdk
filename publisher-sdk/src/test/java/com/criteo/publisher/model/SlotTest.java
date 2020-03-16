@@ -2,11 +2,15 @@ package com.criteo.publisher.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -16,6 +20,7 @@ public class SlotTest {
   private static final String CPM = "cpm";
   private static final String DISPLAY_URL = "displayUrl";
   private static final String PLACEMENT_ID = "placementId";
+  private static final String TTL = "ttl";
 
   private Slot slot;
   private JSONObject response;
@@ -28,8 +33,8 @@ public class SlotTest {
 
   @Test
   public void noBidTest() throws JSONException {
-    response.put("cpm", "0");
-    response.put("ttl", 0);
+    response.put(CPM, "0");
+    response.put(TTL, 0);
     Slot result = new Slot(response);
     assertEquals("0", result.getCpm());
     assertEquals(0, result.getTtl());
@@ -38,8 +43,8 @@ public class SlotTest {
   @Test
   public void silentModeTest() throws JSONException {
     int ttlval = 50 * 60;
-    response.put("cpm", "0");
-    response.put("ttl", ttlval);
+    response.put(CPM, "0");
+    response.put(TTL, ttlval);
     Slot result = new Slot(response);
     assertEquals("0", result.getCpm());
     assertEquals(ttlval, result.getTtl());
@@ -49,8 +54,8 @@ public class SlotTest {
   public void bidCachingTest() throws JSONException {
     String cpmval = "1.5";
     int ttlval = 50 * 60;
-    response.put("cpm", cpmval);
-    response.put("ttl", ttlval);
+    response.put(CPM, cpmval);
+    response.put(TTL, ttlval);
     Slot result = new Slot(response);
     assertEquals(cpmval, result.getCpm());
     assertEquals(ttlval, result.getTtl());
@@ -61,20 +66,20 @@ public class SlotTest {
     response.put(CPM, "10.0");
     response.put(DISPLAY_URL, "https://www.criteo.com/");
     slot = new Slot(response);
-    Assert.assertTrue(slot.isValid());
+    assertTrue(slot.isValid());
   }
 
   @Test
   public void testSlotWithNullDisplayUrlNullCmp() {
     slot = new Slot(response);
-    Assert.assertFalse(slot.isValid());
+    assertFalse(slot.isValid());
   }
 
   @Test
   public void testSlotWithNullDisplayUrl() throws JSONException {
     response.put(CPM, "10.0");
     slot = new Slot(response);
-    Assert.assertFalse(slot.isValid());
+    assertFalse(slot.isValid());
   }
 
   @Test
@@ -82,14 +87,14 @@ public class SlotTest {
     response.put(CPM, "10.0");
     response.put(DISPLAY_URL, "");
     slot = new Slot(response);
-    Assert.assertFalse(slot.isValid());
+    assertFalse(slot.isValid());
   }
 
   @Test
   public void testSlotWithNullCmp() throws JSONException {
     response.put(DISPLAY_URL, "https://www.criteo.com/");
     slot = new Slot(response);
-    Assert.assertTrue(slot.isValid());
+    assertTrue(slot.isValid());
   }
 
   @Test
@@ -97,7 +102,7 @@ public class SlotTest {
     response.put(DISPLAY_URL, "https://www.criteo.com/");
     response.put(CPM, "abc");
     slot = new Slot(response);
-    Assert.assertFalse(slot.isValid());
+    assertFalse(slot.isValid());
   }
 
   @Test
@@ -105,7 +110,7 @@ public class SlotTest {
     response.put(DISPLAY_URL, "https://www.criteo.com/");
     response.put(CPM, "-10.0");
     slot = new Slot(response);
-    Assert.assertFalse(slot.isValid());
+    assertFalse(slot.isValid());
   }
 
   @Test
@@ -113,11 +118,11 @@ public class SlotTest {
     response.put(DISPLAY_URL, "https://www.criteo.com/");
     response.put(CPM, "");
     slot = new Slot(response);
-    Assert.assertFalse(slot.isValid());
+    assertFalse(slot.isValid());
   }
 
   @Test
-  public void testJsonParsingWithNative() {
+  public void testJsonParsingWithNative() throws Exception{
     String cdbStringResponse = "{\n" +
         "    \"slots\": [{\n" +
         "        \"placementId\": \"/140800857/Endeavour_Native\",\n" +
@@ -162,59 +167,50 @@ public class SlotTest {
         "    }]\n" +
         "}";
 
-    try {
-      JSONObject cdbResponse = new JSONObject(cdbStringResponse);
-      JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
-      Slot slot = new Slot(cdbSlot);
-      Assert.assertNotNull(slot.getNativeAssets());
-      Assert.assertEquals("\"Stripe Pima Dress\" - $99",
-          slot.getNativeAssets().getNativeProducts().get(0).getTitle());
-      Assert.assertEquals("We're All About Comfort.",
-          slot.getNativeAssets().getNativeProducts().get(0).getDescription());
-      Assert.assertEquals("$99", slot.getNativeAssets().getNativeProducts().get(0).getPrice());
-      Assert.assertEquals("The Company Store", slot.getNativeAssets().getAdvertiserDescription());
-      Assert.assertEquals("https://pix.us.criteo.net/img/img",
-          slot.getNativeAssets().getAdvertiserLogoUrl());
-      Assert.assertEquals("https://privacy.us.criteo.com/adcenter",
-          slot.getNativeAssets().getPrivacyOptOutClickUrl());
-      Assert.assertEquals(2, slot.getNativeAssets().getImpressionPixels().size());
-      Assert.assertEquals("https://cat.sv.us.criteo.com/delivery/lgn.php?",
-          slot.getNativeAssets().getImpressionPixels().get(0));
-      Assert.assertEquals("https://dog.da.us.criteo.com/delivery/lgn.php?",
-          slot.getNativeAssets().getImpressionPixels().get(1));
-      Assert.assertTrue(slot.isNative());
-      Assert.assertTrue(slot.isValid());
-    } catch (Exception ex) {
-      Assert.fail("Json exception in test data : " + ex.getLocalizedMessage());
-    }
+    JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+    JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
+    Slot slot = new Slot(cdbSlot);
+    assertNotNull(slot.getNativeAssets());
+    assertEquals("\"Stripe Pima Dress\" - $99",
+        slot.getNativeAssets().getNativeProducts().get(0).getTitle());
+    assertEquals("We're All About Comfort.",
+        slot.getNativeAssets().getNativeProducts().get(0).getDescription());
+    assertEquals("$99", slot.getNativeAssets().getNativeProducts().get(0).getPrice());
+    assertEquals("The Company Store", slot.getNativeAssets().getAdvertiserDescription());
+    assertEquals("https://pix.us.criteo.net/img/img",
+        slot.getNativeAssets().getAdvertiserLogoUrl());
+    assertEquals("https://privacy.us.criteo.com/adcenter",
+        slot.getNativeAssets().getPrivacyOptOutClickUrl());
+    assertEquals(2, slot.getNativeAssets().getImpressionPixels().size());
+    assertEquals("https://cat.sv.us.criteo.com/delivery/lgn.php?",
+        slot.getNativeAssets().getImpressionPixels().get(0));
+    assertEquals("https://dog.da.us.criteo.com/delivery/lgn.php?",
+        slot.getNativeAssets().getImpressionPixels().get(1));
+    assertTrue(slot.isNative());
+    assertTrue(slot.isValid());
   }
 
   @Test
-  public void testParsingWithoutNative() {
-    try {
-      String cdbStringResponse = "{\"slots\":[{\"placementId\":\"/140800857/Endeavour_320x50\",\"cpm\":\"1.12\",\"currency\":\"EUR\",\"width\":320,\"height\":50,\"ttl\":555,\"displayUrl\":\"https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js\"}]}";
-      JSONObject cdbResponse = new JSONObject(cdbStringResponse);
-      JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
-      Slot slot = new Slot(cdbSlot);
-      Assert.assertEquals("/140800857/Endeavour_320x50", slot.getPlacementId());
-      Assert.assertEquals("1.12", slot.getCpm());
-      Assert.assertEquals("EUR", slot.getCurrency());
-      Assert.assertEquals(320, slot.getWidth());
-      Assert.assertEquals(50, slot.getHeight());
-      Assert.assertEquals(555, slot.getTtl());
-      Assert.assertEquals("https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js",
-          slot.getDisplayUrl());
-      Assert.assertFalse(slot.isNative());
-      Assert.assertNull(slot.getNativeAssets());
-      Assert.assertTrue(slot.isValid());
-    } catch (Exception ex) {
-      Assert.fail("Json exception in test data : " + ex.getLocalizedMessage());
-    }
+  public void testParsingWithoutNative() throws Exception{
+    String cdbStringResponse = "{\"slots\":[{\"placementId\":\"/140800857/Endeavour_320x50\",\"cpm\":\"1.12\",\"currency\":\"EUR\",\"width\":320,\"height\":50,\"ttl\":555,\"displayUrl\":\"https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js\"}]}";
+    JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+    JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
+    Slot slot = new Slot(cdbSlot);
+    assertEquals("/140800857/Endeavour_320x50", slot.getPlacementId());
+    assertEquals("1.12", slot.getCpm());
+    assertEquals("EUR", slot.getCurrency());
+    assertEquals(320, slot.getWidth());
+    assertEquals(50, slot.getHeight());
+    assertEquals(555, slot.getTtl());
+    assertEquals("https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js",
+        slot.getDisplayUrl());
+    assertFalse(slot.isNative());
+    assertNull(slot.getNativeAssets());
+    assertTrue(slot.isValid());
   }
 
   @Test
-  public void testEquality() {
-
+  public void testEquality() throws Exception {
     String cdbStringResponse = "{\n" +
         "    \"slots\": [{\n" +
         "        \"placementId\": \"/140800857/Endeavour_Native\",\n" +
@@ -258,19 +254,16 @@ public class SlotTest {
         "        }\n" +
         "    }]\n" +
         "}";
-    try {
-      JSONObject cdbResponse = new JSONObject(cdbStringResponse);
-      JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
-      Slot slot = new Slot(cdbSlot);
-      Slot expectedSlot = new Slot(cdbSlot);
-      assertEquals(expectedSlot, slot);
-    } catch (Exception ex) {
-      Assert.fail("Json exception in test data : " + ex.getLocalizedMessage());
-    }
+
+    JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+    JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
+    Slot slot = new Slot(cdbSlot);
+    Slot expectedSlot = new Slot(cdbSlot);
+    assertEquals(expectedSlot, slot);
   }
 
   @Test
-  public void testJsonParsingForNativeWithoutImpressionPixels() {
+  public void testJsonParsingForNativeWithoutImpressionPixels() throws Exception{
     String cdbStringResponse = "{\n" +
         "    \"slots\": [{\n" +
         "        \"placementId\": \"/140800857/Endeavour_Native\",\n" +
@@ -312,22 +305,18 @@ public class SlotTest {
         "    }]\n" +
         "}";
 
-    try {
-      JSONObject cdbResponse = new JSONObject(cdbStringResponse);
-      JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
-      Slot slot = new Slot(cdbSlot);
-      Assert.assertTrue(slot.isNative());
-      Assert.assertNotNull(slot.getNativeAssets());
-      Assert.assertEquals(3600, slot.getTtl());
-      Assert.assertEquals("/140800857/Endeavour_Native", slot.getPlacementId());
-      Assert.assertFalse(slot.isValid());
-    } catch (Exception ex) {
-      Assert.fail("Json exception in test data : " + ex.getLocalizedMessage());
-    }
+    JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+    JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
+    Slot slot = new Slot(cdbSlot);
+    assertTrue(slot.isNative());
+    assertNotNull(slot.getNativeAssets());
+    assertEquals(3600, slot.getTtl());
+    assertEquals("/140800857/Endeavour_Native", slot.getPlacementId());
+    assertFalse(slot.isValid());
   }
 
   @Test
-  public void testJsonParsingForNativeWithZeroProducts() {
+  public void testJsonParsingForNativeWithZeroProducts() throws Exception{
     String cdbStringResponse = "{\n" +
         "    \"slots\": [{\n" +
         "        \"placementId\": \"/140800857/Endeavour_Native\",\n" +
@@ -361,23 +350,19 @@ public class SlotTest {
         "    }]\n" +
         "}";
 
-    try {
-      JSONObject cdbResponse = new JSONObject(cdbStringResponse);
-      JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
-      Slot slot = new Slot(cdbSlot);
-      Assert.assertTrue(slot.isNative());
-      Assert.assertNotNull(slot.getNativeAssets());
-      Assert.assertEquals(3600, slot.getTtl());
-      Assert.assertEquals("/140800857/Endeavour_Native", slot.getPlacementId());
-      Assert.assertEquals("The Company Store", slot.getNativeAssets().getAdvertiserDescription());
-      Assert.assertFalse(slot.isValid());
-    } catch (Exception ex) {
-      Assert.fail("Json exception in test data : " + ex.getLocalizedMessage());
-    }
+    JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+    JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
+    Slot slot = new Slot(cdbSlot);
+    assertTrue(slot.isNative());
+    assertNotNull(slot.getNativeAssets());
+    assertEquals(3600, slot.getTtl());
+    assertEquals("/140800857/Endeavour_Native", slot.getPlacementId());
+    assertEquals("The Company Store", slot.getNativeAssets().getAdvertiserDescription());
+    assertFalse(slot.isValid());
   }
 
   @Test
-  public void testJsonParsingForNativeWithoutProducts() {
+  public void testJsonParsingForNativeWithoutProducts() throws Exception {
     String cdbStringResponse = "{\n" +
         "    \"slots\": [{\n" +
         "        \"placementId\": \"/140800857/Endeavour_Native\",\n" +
@@ -410,23 +395,19 @@ public class SlotTest {
         "    }]\n" +
         "}";
 
-    try {
-      JSONObject cdbResponse = new JSONObject(cdbStringResponse);
-      JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
-      Slot slot = new Slot(cdbSlot);
-      Assert.assertTrue(slot.isNative());
-      Assert.assertNotNull(slot.getNativeAssets());
-      Assert.assertEquals(3600, slot.getTtl());
-      Assert.assertEquals("/140800857/Endeavour_Native", slot.getPlacementId());
-      Assert.assertEquals("The Company Store", slot.getNativeAssets().getAdvertiserDescription());
-      Assert.assertFalse(slot.isValid());
-    } catch (Exception ex) {
-      Assert.fail("Json exception in test data : " + ex.getLocalizedMessage());
-    }
+    JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+    JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
+    Slot slot = new Slot(cdbSlot);
+    assertTrue(slot.isNative());
+    assertNotNull(slot.getNativeAssets());
+    assertEquals(3600, slot.getTtl());
+    assertEquals("/140800857/Endeavour_Native", slot.getPlacementId());
+    assertEquals("The Company Store", slot.getNativeAssets().getAdvertiserDescription());
+    assertFalse(slot.isValid());
   }
 
   @Test
-  public void testJsonParsingForNativeWithoutPrivacyLogo() {
+  public void testJsonParsingForNativeWithoutPrivacyLogo() throws Exception{
     String cdbStringResponse = "{\n" +
         "    \"slots\": [{\n" +
         "        \"placementId\": \"/140800857/Endeavour_Native\",\n" +
@@ -470,23 +451,19 @@ public class SlotTest {
         "    }]\n" +
         "}";
 
-    try {
-      JSONObject cdbResponse = new JSONObject(cdbStringResponse);
-      JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
-      Slot slot = new Slot(cdbSlot);
-      Assert.assertTrue(slot.isNative());
-      Assert.assertNotNull(slot.getNativeAssets());
-      Assert.assertEquals(3600, slot.getTtl());
-      Assert.assertEquals("/140800857/Endeavour_Native", slot.getPlacementId());
-      Assert.assertEquals("The Company Store", slot.getNativeAssets().getAdvertiserDescription());
-      Assert.assertFalse(slot.isValid());
-    } catch (Exception ex) {
-      Assert.fail("Json exception in test data : " + ex.getLocalizedMessage());
-    }
+    JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+    JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
+    Slot slot = new Slot(cdbSlot);
+    assertTrue(slot.isNative());
+    assertNotNull(slot.getNativeAssets());
+    assertEquals(3600, slot.getTtl());
+    assertEquals("/140800857/Endeavour_Native", slot.getPlacementId());
+    assertEquals("The Company Store", slot.getNativeAssets().getAdvertiserDescription());
+    assertFalse(slot.isValid());
   }
 
   @Test
-  public void testJsonParsingForNativeWithoutImpressionPixelsAndPrivacyLogo() {
+  public void testJsonParsingForNativeWithoutImpressionPixelsAndPrivacyLogo() throws Exception{
     String cdbStringResponse = "{\n" +
         "    \"slots\": [{\n" +
         "        \"placementId\": \"/140800857/Endeavour_Native\",\n" +
@@ -526,63 +503,59 @@ public class SlotTest {
         "    }]\n" +
         "}";
 
-    try {
-      JSONObject cdbResponse = new JSONObject(cdbStringResponse);
-      JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
-      Slot slot = new Slot(cdbSlot);
-      Assert.assertTrue(slot.isNative());
-      Assert.assertNotNull(slot.getNativeAssets());
-      Assert.assertEquals(3600, slot.getTtl());
-      Assert.assertEquals("/140800857/Endeavour_Native", slot.getPlacementId());
-      Assert.assertEquals("The Company Store", slot.getNativeAssets().getAdvertiserDescription());
-      Assert.assertFalse(slot.isValid());
-    } catch (Exception ex) {
-      Assert.fail("Json exception in test data : " + ex.getLocalizedMessage());
-    }
+    JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+    JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
+    Slot slot = new Slot(cdbSlot);
+    assertTrue(slot.isNative());
+    assertNotNull(slot.getNativeAssets());
+    assertEquals(3600, slot.getTtl());
+    assertEquals("/140800857/Endeavour_Native", slot.getPlacementId());
+    assertEquals("The Company Store", slot.getNativeAssets().getAdvertiserDescription());
+    assertFalse(slot.isValid());
   }
 
   @Test
-  public void testValidityWhenSlotIsNative() {
+  public void testValidityWhenSlotIsNative() throws Exception{
     Slot slot = new Slot(getNativeJSONSlot());
-    Assert.assertTrue(slot.isValid());
-    Assert.assertTrue(slot.isNative());
+    assertTrue(slot.isValid());
+    assertTrue(slot.isNative());
     // if a slot claims it is native and valid then all the following conditions have to be met
     // it contains a cpm
-    Assert.assertNotNull(slot.getCpm());
-    Assert.assertTrue(slot.getCpm().length() > 0);
-    Assert.assertTrue(slot.getCpmAsNumber() >= 0.0d);
-    Assert.assertNotNull(slot.getNativeAssets());
+    assertNotNull(slot.getCpm());
+    assertTrue(slot.getCpm().length() > 0);
+    assertTrue(slot.getCpmAsNumber() >= 0.0d);
+    assertNotNull(slot.getNativeAssets());
     // it contains at least one product
-    Assert.assertNotNull(slot.getNativeAssets().getNativeProducts());
-    Assert.assertTrue(slot.getNativeAssets().getNativeProducts().size() > 0);
+    assertNotNull(slot.getNativeAssets().getNativeProducts());
+    assertTrue(slot.getNativeAssets().getNativeProducts().size() > 0);
     // it contains at least one impression pixel
-    Assert.assertNotNull(slot.getNativeAssets().getImpressionPixels());
-    Assert.assertTrue(slot.getNativeAssets().getImpressionPixels().size() > 0);
+    assertNotNull(slot.getNativeAssets().getImpressionPixels());
+    assertTrue(slot.getNativeAssets().getImpressionPixels().size() > 0);
     // it contains the opt out click url and an opt out image
     // checking if the string is a valid url or not is beyond the scope of the SDK for now
-    Assert.assertNotNull(slot.getNativeAssets().getPrivacyOptOutClickUrl());
-    Assert.assertTrue(slot.getNativeAssets().getPrivacyOptOutClickUrl().length() > 0);
-    Assert.assertFalse("".equals(slot.getNativeAssets().getPrivacyOptOutClickUrl()));
-    Assert.assertNotNull(slot.getNativeAssets().getPrivacyOptOutImageUrl());
-    Assert.assertTrue(slot.getNativeAssets().getPrivacyOptOutImageUrl().length() > 0);
-    Assert.assertFalse("".equals(slot.getNativeAssets().getPrivacyOptOutImageUrl()));
+    assertNotNull(slot.getNativeAssets().getPrivacyOptOutClickUrl());
+    assertTrue(slot.getNativeAssets().getPrivacyOptOutClickUrl().length() > 0);
+    assertNotEquals("", slot.getNativeAssets().getPrivacyOptOutClickUrl());
+    assertNotNull(slot.getNativeAssets().getPrivacyOptOutImageUrl());
+    assertTrue(slot.getNativeAssets().getPrivacyOptOutImageUrl().length() > 0);
+    assertNotEquals("", slot.getNativeAssets().getPrivacyOptOutImageUrl());
   }
 
   @Test
-  public void testValidity() {
+  public void testValidity() throws Exception{
     Slot slot = new Slot(getJSONSlot());
-    Assert.assertTrue(slot.isValid());
-    Assert.assertFalse(slot.isNative());
+    assertTrue(slot.isValid());
+    assertFalse(slot.isNative());
     // if a slot claims it is NOT native and valid then all the following conditions have to be met
     // it contains a cpm
-    Assert.assertNotNull(slot.getCpm());
-    Assert.assertTrue(slot.getCpm().length() > 0);
-    Assert.assertTrue(slot.getCpmAsNumber() >= 0.0d);
-    Assert.assertNull(slot.getNativeAssets());
+    assertNotNull(slot.getCpm());
+    assertTrue(slot.getCpm().length() > 0);
+    assertTrue(slot.getCpmAsNumber() >= 0.0d);
+    assertNull(slot.getNativeAssets());
     // it contains a displayUrl
-    Assert.assertNotNull(slot.getDisplayUrl());
-    Assert.assertTrue(slot.getDisplayUrl().length() > 0);
-    Assert.assertFalse("".equals(slot.getDisplayUrl()));
+    assertNotNull(slot.getDisplayUrl());
+    assertTrue(slot.getDisplayUrl().length() > 0);
+    assertNotEquals("", slot.getDisplayUrl());
   }
 
   @Test
@@ -701,7 +674,7 @@ public class SlotTest {
     assertThat(slot.getTtl()).isZero();
   }
 
-  private JSONObject getNativeJSONSlot() {
+  private JSONObject getNativeJSONSlot() throws Exception{
     String cdbStringResponse = "{\n" +
         "    \"slots\": [{\n" +
         "        \"placementId\": \"/140800857/Endeavour_Native\",\n" +
@@ -745,25 +718,14 @@ public class SlotTest {
         "        }\n" +
         "    }]\n" +
         "}";
-    try {
-      JSONObject cdbResponse = new JSONObject(cdbStringResponse);
-      JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
-      return cdbSlot;
-    } catch (Exception ex) {
-      Assert.fail("Json exception in test data : " + ex.getLocalizedMessage());
-    }
-    return null;
+
+    JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+    return cdbResponse.getJSONArray("slots").getJSONObject(0);
   }
 
-  private JSONObject getJSONSlot() {
-    try {
-      String cdbStringResponse = "{\"slots\":[{\"placementId\":\"/140800857/Endeavour_320x50\",\"cpm\":\"1.12\",\"currency\":\"EUR\",\"width\":320,\"height\":50,\"ttl\":555,\"displayUrl\":\"https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js\"}]}";
-      JSONObject cdbResponse = new JSONObject(cdbStringResponse);
-      JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
-      return cdbSlot;
-    } catch (Exception ex) {
-      Assert.fail("Json exception in test data : " + ex.getLocalizedMessage());
-    }
-    return null;
+  private JSONObject getJSONSlot() throws Exception{
+    String cdbStringResponse = "{\"slots\":[{\"placementId\":\"/140800857/Endeavour_320x50\",\"cpm\":\"1.12\",\"currency\":\"EUR\",\"width\":320,\"height\":50,\"ttl\":555,\"displayUrl\":\"https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js\"}]}";
+    JSONObject cdbResponse = new JSONObject(cdbStringResponse);
+    return cdbResponse.getJSONArray("slots").getJSONObject(0);
   }
 }
