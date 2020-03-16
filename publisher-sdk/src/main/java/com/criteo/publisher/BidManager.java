@@ -60,8 +60,6 @@ public class BidManager implements ApplicationStoppedListener {
    */
   private static final int DEFAULT_TTL_IN_SECONDS = 15 * 60;
 
-  private static final int SECOND_TO_MILLI = 1000;
-
   @NonNull
   @GuardedBy("cacheLock")
   private final SdkCache cache;
@@ -287,9 +285,8 @@ public class BidManager implements ApplicationStoppedListener {
 
       double cpm = (peekSlot.getCpmAsNumber() == null ? 0.0 : peekSlot.getCpmAsNumber());
       long ttl = peekSlot.getTtl();
-      long expiryTimeMillis = ttl * SECOND_TO_MILLI + peekSlot.getTimeOfDownload();
 
-      boolean isNotExpired = expiryTimeMillis > clock.getCurrentTimeInMillis();
+      boolean isNotExpired = !peekSlot.isExpired(clock);
       boolean isValidBid = (cpm > 0) && (ttl > 0);
       boolean isSilentBid = (cpm == 0) && (ttl > 0);
 

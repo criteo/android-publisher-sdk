@@ -797,13 +797,9 @@ public class BidManagerFunctionalTest {
 
   @NonNull
   private Slot givenNotExpiredValidCachedBid(CacheAdUnit cacheAdUnit) {
-    // not expired := tod + ttl * 1000 > clock
-    // not expired := tod > clock - ttl * 1000
-    // not expired := tod > clock - 60000
-    long timeOfDownload = clock.getCurrentTimeInMillis() - 60_000 + 1;
     Slot slot = mock(Slot.class);
     when(slot.getCpmAsNumber()).thenReturn(1.);
-    when(slot.getTimeOfDownload()).thenReturn(timeOfDownload);
+    when(slot.isExpired(clock)).thenReturn(false);
     when(slot.getTtl()).thenReturn(60);
 
     when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
@@ -812,11 +808,10 @@ public class BidManagerFunctionalTest {
 
   @NonNull
   private Slot givenExpiredValidCachedBid(CacheAdUnit cacheAdUnit) {
-    long timeOfDownload = clock.getCurrentTimeInMillis() - 60_000;
     Slot slot = mock(Slot.class);
     when(slot.getCpmAsNumber()).thenReturn(1.);
-    when(slot.getTimeOfDownload()).thenReturn(timeOfDownload);
     when(slot.getTtl()).thenReturn(60);
+    when(slot.isExpired(clock)).thenReturn(true);
 
     when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
 
@@ -828,6 +823,7 @@ public class BidManagerFunctionalTest {
     Slot slot = mock(Slot.class);
     when(slot.getCpmAsNumber()).thenReturn(0.);
     when(slot.getTtl()).thenReturn(0);
+    when(slot.isExpired(clock)).thenReturn(false);
 
     when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
 
@@ -839,24 +835,20 @@ public class BidManagerFunctionalTest {
   }
 
   private void givenNotExpiredSilentModeBidCached(CacheAdUnit cacheAdUnit) {
-    long timeOfDownload = clock.getCurrentTimeInMillis() - 60_000 + 1;
-
     Slot slot = mock(Slot.class);
     when(slot.getCpmAsNumber()).thenReturn(0.);
-    when(slot.getTimeOfDownload()).thenReturn(timeOfDownload);
     when(slot.getTtl()).thenReturn(60);
+    when(slot.isExpired(clock)).thenReturn(false);
 
     when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
   }
 
   @NonNull
   private Slot givenExpiredSilentModeBidCached(CacheAdUnit cacheAdUnit) {
-    long timeOfDownload = clock.getCurrentTimeInMillis() - 60_000;
-
     Slot slot = mock(Slot.class);
     when(slot.getCpmAsNumber()).thenReturn(0.);
-    when(slot.getTimeOfDownload()).thenReturn(timeOfDownload);
     when(slot.getTtl()).thenReturn(60);
+    when(slot.isExpired(clock)).thenReturn(true);
 
     when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
 

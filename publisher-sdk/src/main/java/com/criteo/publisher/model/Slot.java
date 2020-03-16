@@ -3,6 +3,7 @@ package com.criteo.publisher.model;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import com.criteo.publisher.Clock;
 import com.criteo.publisher.Util.URLUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,6 +20,8 @@ public class Slot {
   private static final String NATIVE = "native";
   private static final String TTL = "ttl";
   private static final String DISPLAY_URL = "displayUrl";
+
+  private static final int SECOND_TO_MILLI = 1000;
 
   @Nullable
   private final String impressionId;
@@ -135,6 +138,11 @@ public class Slot {
 
   public NativeAssets getNativeAssets() {
     return this.nativeAssets;
+  }
+
+  public boolean isExpired(@NonNull Clock clock) {
+    long expiryTimeMillis = ttl * SECOND_TO_MILLI + timeOfDownload;
+    return expiryTimeMillis <= clock.getCurrentTimeInMillis();
   }
 
   @NonNull

@@ -1,10 +1,8 @@
 package com.criteo.publisher.csm
 
 import com.criteo.publisher.Clock
-import com.criteo.publisher.model.CdbRequest
-import com.criteo.publisher.model.CdbRequestSlot
-import com.criteo.publisher.model.CdbResponse
-import com.criteo.publisher.model.Slot
+import com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER
+import com.criteo.publisher.model.*
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -123,6 +121,56 @@ class CsmBidLifecycleListenerTest {
     assertRepositoryIsUpdatedByIds("id1", "id2") {
       verify(it).setCdbCallTimeoutAbsolute(1337)
     }
+  }
+
+  @Test
+  fun onBidConsumed_GivenNotExpiredBid_SetElapsedTimeAndReadyToSend() {
+    val adUnit = CacheAdUnit(AdSize(1, 2), "myAdUnit", CRITEO_BANNER)
+
+    val slot = mock<Slot>() {
+      on { impressionId } doReturn "id"
+      on { isExpired(clock) } doReturn false
+    }
+
+    clock.stub {
+      on { currentTimeInMillis } doReturn 42
+    }
+
+    listener.onBidConsumed(adUnit, slot)
+
+    assertRepositoryIsUpdatedById("id") {
+      verify(it).setElapsedAbsolute(42)
+      verify(it).setReadyToSend()
+    }
+  }
+
+  @Test
+  fun onBidConsumed_GivenExpiredBid_SetReadyToSend() {
+    val adUnit = CacheAdUnit(AdSize(1, 2), "myAdUnit", CRITEO_BANNER)
+
+    val slot = mock<Slot>() {
+      on { impressionId } doReturn "id"
+      on { isExpired(clock) } doReturn true
+    }
+
+    listener.onBidConsumed(adUnit, slot)
+
+    assertRepositoryIsUpdatedById("id") {
+      verify(it).setReadyToSend()
+    }
+  }
+
+  @Test
+  fun onBidConsumed_GivenBidWithoutImpressionId_DoNothing() {
+    val adUnit = CacheAdUnit(AdSize(1, 2), "myAdUnit", CRITEO_BANNER)
+
+    val slot = mock<Slot>() {
+      on { impressionId } doReturn null
+    }
+
+    listener.onBidConsumed(adUnit, slot)
+
+    verifyZeroInteractions(repository)
   }
 
   private fun givenCdbRequestWithSlots(vararg impressionIds: String): CdbRequest {

@@ -79,6 +79,24 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
 
   @Override
   public void onBidConsumed(@NonNull CacheAdUnit adUnit, @NonNull Slot consumedBid) {
+    String impressionId = consumedBid.getImpressionId();
+    if (impressionId == null) {
+      return;
+    }
+
+    boolean isNotExpired = !consumedBid.isExpired(clock);
+    long currentTimeInMillis = clock.getCurrentTimeInMillis();
+
+    repository.updateById(impressionId, new MetricUpdater() {
+      @Override
+      public void update(@NonNull MetricBuilder builder) {
+        if (isNotExpired) {
+          builder.setElapsedAbsolute(currentTimeInMillis);
+        }
+
+        builder.setReadyToSend();
+      }
+    });
   }
 
   private void updateByCdbRequestIds(@NonNull CdbRequest request, @NonNull MetricUpdater updater) {

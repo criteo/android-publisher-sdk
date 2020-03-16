@@ -20,4 +20,12 @@ public class MetricBuilder {
     // TODO EE-885
   }
 
+  public void setReadyToSend() {
+    // TODO EE-885
+  }
+
+  public void setElapsedAbsolute(long absoluteTimeInMillis) {
+    // TODO EE-885
+  }
+
 }

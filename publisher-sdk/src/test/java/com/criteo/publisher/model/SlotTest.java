@@ -7,7 +7,10 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.criteo.publisher.Clock;
 import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -689,6 +692,45 @@ public class SlotTest {
     Slot slot = new Slot(new JSONObject(json));
 
     assertThat(slot.getImpressionId()).isEqualTo("5e296936d48e8392e3382c45a8d9a389");
+  }
+
+  @Test
+  public void isExpired_GivenClockBeforeExpirationPoint_ReturnFalse() throws Exception {
+    Clock clock = mock(Clock.class);
+    when(clock.getCurrentTimeInMillis()).thenReturn(10_000L);
+
+    Slot slot = new Slot((getJSONSlot()));
+    slot.setTtl(2);
+    slot.setTimeOfDownload(9000);
+    boolean expired = slot.isExpired(clock);
+
+    assertThat(expired).isFalse();
+  }
+
+  @Test
+  public void isExpired_GivenClockAfterExpirationPoint_ReturnTrue() throws Exception {
+    Clock clock = mock(Clock.class);
+    when(clock.getCurrentTimeInMillis()).thenReturn(10_000L);
+
+    Slot slot = new Slot((getJSONSlot()));
+    slot.setTtl(2);
+    slot.setTimeOfDownload(3000);
+    boolean expired = slot.isExpired(clock);
+
+    assertThat(expired).isTrue();
+  }
+
+  @Test
+  public void isExpired_GivenClockAtExpirationPoint_ReturnTrue() throws Exception {
+    Clock clock = mock(Clock.class);
+    when(clock.getCurrentTimeInMillis()).thenReturn(10_000L);
+
+    Slot slot = new Slot((getJSONSlot()));
+    slot.setTtl(2);
+    slot.setTimeOfDownload(8000);
+    boolean expired = slot.isExpired(clock);
+
+    assertThat(expired).isTrue();
   }
 
   private JSONObject getNativeJSONSlot() throws Exception{
