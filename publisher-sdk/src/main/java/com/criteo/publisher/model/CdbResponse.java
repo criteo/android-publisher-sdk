@@ -1,6 +1,7 @@
 package com.criteo.publisher.model;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +20,18 @@ public class CdbResponse {
 
   private final int timeToNextCall;
 
-  public CdbResponse(@NonNull JSONObject json) {
+  public CdbResponse(
+      @NonNull List<Slot> slots,
+      int timeToNextCall
+  ) {
+    this.slots = slots;
+    this.timeToNextCall = timeToNextCall;
+  }
+
+  @NonNull
+  public static CdbResponse fromJson(@NonNull JSONObject json) {
     int timeToNextCall = 0;
-    slots = new ArrayList<>();
+    List<Slot> slots = new ArrayList<>();
 
     if (json.has(TIME_TO_NEXT_CALL)) {
       try {
@@ -30,6 +40,7 @@ public class CdbResponse {
         Log.d(TAG, "Exception while reading cdb time to next call" + ex.getMessage());
       }
     }
+
     if (json.has(SLOTS)) {
       JSONArray array = new JSONArray();
       try {
@@ -47,12 +58,7 @@ public class CdbResponse {
       }
     }
 
-    this.timeToNextCall = timeToNextCall;
-  }
-
-  @NonNull
-  public static CdbResponse fromJson(@NonNull JSONObject json) {
-    return new CdbResponse(json);
+    return new CdbResponse(slots, timeToNextCall);
   }
 
   @NonNull
@@ -64,6 +70,17 @@ public class CdbResponse {
     return timeToNextCall;
   }
 
+  @Nullable
+  public Slot getSlotByImpressionId(@NonNull String impressionId) {
+    for (Slot slot : slots) {
+      if (impressionId.equals(slot.getImpressionId())) {
+        return slot;
+      }
+    }
+    return null;
+  }
+
+  @NonNull
   @Override
   public String toString() {
     return "CdbResponse{" +

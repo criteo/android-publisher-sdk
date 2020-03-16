@@ -3,6 +3,8 @@ package com.criteo.publisher.csm
 import com.criteo.publisher.Clock
 import com.criteo.publisher.model.CdbRequest
 import com.criteo.publisher.model.CdbRequestSlot
+import com.criteo.publisher.model.CdbResponse
+import com.criteo.publisher.model.Slot
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -60,6 +62,40 @@ class CsmBidLifecycleListenerTest {
 
     assertRepositoryIsUpdatedByIds("id1", "id2") {
       verify(it).setCdbCallEndAbsolute(1337)
+      verify(it, never()).setImpressionId(anyOrNull())
+    }
+  }
+
+  @Test
+  fun onCdbCallFinished_GivenRequestSlotsWithMatchingResponseSlot_UpdateImpressionIdOfValidOnes() {
+    val request = givenCdbRequestWithSlots("id1", "id2", "id3")
+
+    val invalidSlot = mock<Slot>() {
+      on { isValid } doReturn false
+    }
+
+    val validSlot = mock<Slot>() {
+      on { isValid } doReturn true
+    }
+
+    val response = mock<CdbResponse>() {
+      on { getSlotByImpressionId("id1") } doReturn null
+      on { getSlotByImpressionId("id2") } doReturn invalidSlot
+      on { getSlotByImpressionId("id3") } doReturn validSlot
+    }
+
+    listener.onCdbCallFinished(request, response)
+
+    assertRepositoryIsUpdatedById("id1") {
+      verify(it, never()).setImpressionId(anyOrNull())
+    }
+
+    assertRepositoryIsUpdatedById("id2") {
+      verify(it, never()).setImpressionId(anyOrNull())
+    }
+
+    assertRepositoryIsUpdatedById("id3") {
+      verify(it).setImpressionId("id3")
     }
   }
 
@@ -106,15 +142,26 @@ class CsmBidLifecycleListenerTest {
       verifier: (MetricBuilder) -> Unit
   ) {
     argumentCaptor<String> {
-      verify(repository, times(impressionIds.size)).updateById(capture(), check {
-        val metricBuilder: MetricBuilder = mock()
-
-        it.update(metricBuilder)
-
-        verifier(metricBuilder)
-      })
+      verify(repository, times(impressionIds.size)).updateById(capture(), verifier.asArgChecker())
 
       assertThat(allValues).containsExactlyInAnyOrder(*impressionIds)
+    }
+  }
+
+  private fun assertRepositoryIsUpdatedById(
+      impressionId: String,
+      verifier: (MetricBuilder) -> Unit
+  ) {
+    verify(repository).updateById(eq(impressionId), verifier.asArgChecker())
+  }
+
+  private fun ((MetricBuilder) -> Unit).asArgChecker(): MetricRepository.MetricUpdater {
+    return check {
+      val metricBuilder: MetricBuilder = mock()
+
+      it.update(metricBuilder)
+
+      this(metricBuilder)
     }
   }
 

@@ -43,12 +43,22 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
   public void onCdbCallFinished(@NonNull CdbRequest request, @NonNull CdbResponse response) {
     long currentTimeInMillis = clock.getCurrentTimeInMillis();
 
-    updateByCdbRequestIds(request, new MetricUpdater() {
+    for (CdbRequestSlot requestSlot : request.getSlots()) {
+      String impressionId = requestSlot.getImpressionId();
+      Slot responseSlot = response.getSlotByImpressionId(impressionId);
+      boolean isImpressionIdUpdated = responseSlot != null && responseSlot.isValid();
+
+      repository.updateById(impressionId, new MetricUpdater() {
       @Override
       public void update(@NonNull MetricBuilder builder) {
         builder.setCdbCallEndAbsolute(currentTimeInMillis);
+
+        if (isImpressionIdUpdated) {
+          builder.setImpressionId(impressionId);
+        }
       }
     });
+    }
   }
 
   @Override

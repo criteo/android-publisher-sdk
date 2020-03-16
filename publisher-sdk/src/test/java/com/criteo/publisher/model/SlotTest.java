@@ -563,7 +563,7 @@ public class SlotTest {
     // One is missing a displayUrl and the other has a negative cpm
     // Neither bid should be added to the cache
     String json = "{\"slots\":[{\"placementId\":\"/140800857/Endeavour_320x50\",\"cpm\":\"0.00\",\"currency\":\"EUR\",\"width\":320,\"height\":50,\"ttl\":0,\"displayUrl\":\"\"},{\"placementId\":\"/140800857/Endeavour_Interstitial_320x480\",\"cpm\":\"-1.00\",\"currency\":\"EUR\",\"width\":320,\"height\":480,\"ttl\":0,\"displayUrl\":\"https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js\"}]}";
-    List<Slot> slots = new CdbResponse(new JSONObject(json)).getSlots();
+    List<Slot> slots = CdbResponse.fromJson(new JSONObject(json)).getSlots();
 
     for (Slot slot : slots) {
       assertThat(slot.isValid()).isFalse();
@@ -617,7 +617,7 @@ public class SlotTest {
         "    }]\n" +
         "}";
 
-    List<Slot> slots = new CdbResponse(new JSONObject(cdbStringResponse)).getSlots();
+    List<Slot> slots = CdbResponse.fromJson(new JSONObject(cdbStringResponse)).getSlots();
 
     for (Slot slot : slots) {
       assertThat(slot.isValid()).isFalse();
@@ -672,6 +672,23 @@ public class SlotTest {
     Slot slot = new Slot(new JSONObject(json));
 
     assertThat(slot.getTtl()).isZero();
+  }
+
+  @Test
+  public void getImpressionId_GivenAnImpressionId_ReturnIt() throws Exception {
+    String json = "{\n"
+        + "  \"placementId\": \"myAdUnit\",\n"
+        + "  \"cpm\": \"20.00\",\n"
+        + "  \"currency\": \"USD\",\n"
+        + "  \"width\": 100,\n"
+        + "  \"height\": 100,\n"
+        + "  \"displayUrl\": \"http://criteo.com\",\n"
+        + "  \"impId\": \"5e296936d48e8392e3382c45a8d9a389\"\n"
+        + "}";
+
+    Slot slot = new Slot(new JSONObject(json));
+
+    assertThat(slot.getImpressionId()).isEqualTo("5e296936d48e8392e3382c45a8d9a389");
   }
 
   private JSONObject getNativeJSONSlot() throws Exception{

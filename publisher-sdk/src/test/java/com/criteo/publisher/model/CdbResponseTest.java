@@ -1,7 +1,11 @@
 package com.criteo.publisher.model;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,20 +46,20 @@ public class CdbResponseTest {
   @Test
   public void testValidTimeToCallInCdbResponse() throws JSONException {
     this.cdbResponse.put(TIME_TO_NEXT_CALL, 300);
-    CdbResponse cdbResponse = new CdbResponse(this.cdbResponse);
+    CdbResponse cdbResponse = CdbResponse.fromJson(this.cdbResponse);
     assertEquals(300, cdbResponse.getTimeToNextCall());
   }
 
   @Test
   public void testInValidTimeToCallInCdbResponse() throws JSONException {
     this.cdbResponse.put(TIME_TO_NEXT_CALL, "xyz");
-    CdbResponse cdbResponse = new CdbResponse(this.cdbResponse);
+    CdbResponse cdbResponse = CdbResponse.fromJson(this.cdbResponse);
     assertEquals(0, cdbResponse.getTimeToNextCall());
   }
 
   @Test
   public void testValidSlotInCdbResponse() throws JSONException {
-    CdbResponse cdbResponse = new CdbResponse(this.cdbResponse);
+    CdbResponse cdbResponse = CdbResponse.fromJson(this.cdbResponse);
     assertEquals(bid.getString(PLACEMENT_ID), cdbResponse.getSlots().get(0).getPlacementId());
     assertEquals(bid.getString(CPM), cdbResponse.getSlots().get(0).getCpm());
     assertEquals(bid.getString(CURRENCY), cdbResponse.getSlots().get(0).getCurrency());
@@ -67,21 +71,58 @@ public class CdbResponseTest {
   }
 
   @Test
-  public void new_GivenUserLevelSilent_ContainsTimeToNextCallAndEmptySlot() throws Exception {
+  public void fromJson_GivenUserLevelSilent_ContainsTimeToNextCallAndEmptySlot() throws Exception {
     String json = "{\"slots\":[],\"timeToNextCall\":30}";
-    CdbResponse cdbResponse = new CdbResponse(new JSONObject(json));
+    CdbResponse cdbResponse = CdbResponse.fromJson(new JSONObject(json));
 
     assertThat(cdbResponse.getTimeToNextCall()).isEqualTo(30);
     assertThat(cdbResponse.getSlots()).isEmpty();
   }
 
   @Test
-  public void new_GivenEmptyJson_ContainsNoSlotAndNoTimeToNextCall() throws Exception {
+  public void fromJson_GivenEmptyJson_ContainsNoSlotAndNoTimeToNextCall() throws Exception {
     String json = "{}";
-    CdbResponse cdbResponse = new CdbResponse(new JSONObject(json));
+    CdbResponse cdbResponse = CdbResponse.fromJson(new JSONObject(json));
 
     assertThat(cdbResponse.getTimeToNextCall()).isEqualTo(0);
     assertThat(cdbResponse.getSlots()).isEmpty();
+  }
+
+  @Test
+  public void getSlotByImpressionId_GivenEmptySlots_ReturnNull() throws Exception {
+    CdbResponse cdbResponse = new CdbResponse(emptyList(), 0);
+
+    assertThat(cdbResponse.getSlotByImpressionId("id")).isNull();
+  }
+
+  @Test
+  public void getSlotByImpressionId_GivenSlotsThatDoesNotMatchGivenId_ReturnNull() throws Exception {
+    Slot slot1 = mock(Slot.class);
+    Slot slot2 = mock(Slot.class);
+    Slot slot3 = mock(Slot.class);
+
+    when(slot1.getImpressionId()).thenReturn("impId1");
+    when(slot2.getImpressionId()).thenReturn(null);
+    when(slot3.getImpressionId()).thenReturn("impId3");
+
+    CdbResponse cdbResponse = new CdbResponse(asList(slot1, slot2, slot3), 0);
+
+    assertThat(cdbResponse.getSlotByImpressionId("id")).isNull();
+  }
+
+  @Test
+  public void getSlotByImpressionId_GivenSlotsMatchingGivenId_ReturnSlot() throws Exception {
+    Slot slot1 = mock(Slot.class);
+    Slot slot2 = mock(Slot.class);
+    Slot slot3 = mock(Slot.class);
+
+    when(slot1.getImpressionId()).thenReturn("impId1");
+    when(slot2.getImpressionId()).thenReturn(null);
+    when(slot3.getImpressionId()).thenReturn("id");
+
+    CdbResponse cdbResponse = new CdbResponse(asList(slot1, slot2, slot3), 0);
+
+    assertThat(cdbResponse.getSlotByImpressionId("id")).isEqualTo(slot3);
   }
 
 }

@@ -1,6 +1,7 @@
 package com.criteo.publisher.model;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import com.criteo.publisher.Util.URLUtil;
 import org.json.JSONException;
@@ -14,9 +15,13 @@ public class Slot {
   private static final String HEIGHT = "height";
   private static final String WIDTH = "width";
   private static final String PLACEMENT_ID = "placementId";
+  private static final String IMPRESSION_ID = "impId";
   private static final String NATIVE = "native";
   private static final String TTL = "ttl";
   private static final String DISPLAY_URL = "displayUrl";
+
+  @Nullable
+  private final String impressionId;
 
   private String cpm;
   private String currency;
@@ -32,6 +37,7 @@ public class Slot {
   private boolean isNative;
 
   public Slot(JSONObject json) {
+    impressionId = json.optString(IMPRESSION_ID, null);
     placementId = json.optString(PLACEMENT_ID, null);
     if (json.has(CPM)) {
       try {
@@ -62,6 +68,11 @@ public class Slot {
         this.nativeAssets = null;
       }
     }
+  }
+
+  @Nullable
+  public String getImpressionId() {
+    return impressionId;
   }
 
   public boolean isNative() {
@@ -202,4 +213,5 @@ public class Slot {
     }
     return false;
   }
+
 }
