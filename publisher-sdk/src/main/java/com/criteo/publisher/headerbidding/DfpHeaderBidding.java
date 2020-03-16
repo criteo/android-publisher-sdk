@@ -3,14 +3,16 @@ package com.criteo.publisher.headerbidding;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import android.util.Log;
 import com.criteo.publisher.BidManager;
 import com.criteo.publisher.Util.Base64;
-import com.criteo.publisher.Util.ReflectionUtil;
 import com.criteo.publisher.Util.TextUtils;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.NativeAssets;
 import com.criteo.publisher.model.NativeProduct;
 import com.criteo.publisher.model.Slot;
+import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
+import com.google.android.gms.ads.doubleclick.PublisherAdRequest.Builder;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
@@ -43,26 +45,35 @@ public class DfpHeaderBidding {
     this.bidManager = bidManager;
   }
 
+  public boolean canHandle(@NonNull Object object) {
+    return SafeDfpBuilder.isDfpBuilder(object);
+  }
+
   public void enrichBid(@NonNull Object object, @Nullable AdUnit adUnit) {
+    if (!canHandle(object)) {
+      return;
+    }
+
     Slot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
     if (slot == null) {
       return;
     }
 
-    ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", CRT_CPM, slot.getCpm());
+    SafeDfpBuilder builder = new SafeDfpBuilder((Builder) object);
+    builder.addCustomTargeting(CRT_CPM, slot.getCpm());
 
     if (slot.isNative()) {
-      enrichNativeRequest(object, slot);
+      enrichNativeRequest(builder, slot);
     } else {
-      enrichDfpRequest(object, slot);
+      enrichDfpRequest(builder, slot);
     }
   }
 
-  private void enrichDfpRequest(@NonNull Object object, @NonNull Slot slot) {
-    checkAndReflect(object, slot.getDisplayUrl(), CRT_DISPLAY_URL);
+  private void enrichDfpRequest(@NonNull SafeDfpBuilder builder, @NonNull Slot slot) {
+    checkAndReflect(builder, slot.getDisplayUrl(), CRT_DISPLAY_URL);
   }
 
-  private void enrichNativeRequest(@NonNull Object object, @NonNull Slot slot) {
+  private void enrichNativeRequest(@NonNull SafeDfpBuilder builder, @NonNull Slot slot) {
     NativeAssets nativeAssets = slot.getNativeAssets();
     if (nativeAssets == null) {
       return;
@@ -74,45 +85,43 @@ public class DfpHeaderBidding {
     if (products != null && !products.isEmpty()) {
       NativeProduct product = products.get(0);
 
-      checkAndReflect(object, product.getTitle(), CRT_NATIVE_TITLE);
-      checkAndReflect(object, product.getDescription(), CRT_NATIVE_DESC);
-      checkAndReflect(object, product.getPrice(), CRT_NATIVE_PRICE);
-      checkAndReflect(object, product.getClickUrl(), CRT_NATIVE_CLICK_URL);
-      checkAndReflect(object, product.getCallToAction(), CRT_NATIVE_CTA);
-      checkAndReflect(object, product.getImageUrl(), CRT_NATIVE_IMAGE_URL);
+      checkAndReflect(builder, product.getTitle(), CRT_NATIVE_TITLE);
+      checkAndReflect(builder, product.getDescription(), CRT_NATIVE_DESC);
+      checkAndReflect(builder, product.getPrice(), CRT_NATIVE_PRICE);
+      checkAndReflect(builder, product.getClickUrl(), CRT_NATIVE_CLICK_URL);
+      checkAndReflect(builder, product.getCallToAction(), CRT_NATIVE_CTA);
+      checkAndReflect(builder, product.getImageUrl(), CRT_NATIVE_IMAGE_URL);
     }
 
     // Inject advertiser fields
-    checkAndReflect(object, nativeAssets.getAdvertiserDescription(), CRT_NATIVE_ADV_NAME);
-    checkAndReflect(object, nativeAssets.getAdvertiserDomain(), CRT_NATIVE_ADV_DOMAIN);
-    checkAndReflect(object, nativeAssets.getAdvertiserLogoUrl(), CRT_NATIVE_ADV_LOGO_URL);
-    checkAndReflect(object, nativeAssets.getAdvertiserLogoClickUrl(), CRT_NATIVE_ADV_URL);
+    checkAndReflect(builder, nativeAssets.getAdvertiserDescription(), CRT_NATIVE_ADV_NAME);
+    checkAndReflect(builder, nativeAssets.getAdvertiserDomain(), CRT_NATIVE_ADV_DOMAIN);
+    checkAndReflect(builder, nativeAssets.getAdvertiserLogoUrl(), CRT_NATIVE_ADV_LOGO_URL);
+    checkAndReflect(builder, nativeAssets.getAdvertiserLogoClickUrl(), CRT_NATIVE_ADV_URL);
 
     // Inject privacy fields
-    checkAndReflect(object, nativeAssets.getPrivacyOptOutClickUrl(), CRT_NATIVE_PR_URL);
-    checkAndReflect(object, nativeAssets.getPrivacyOptOutImageUrl(), CRT_NATIVE_PR_IMAGE_URL);
-    checkAndReflect(object, nativeAssets.getPrivacyLongLegalText(), CRT_NATIVE_PR_TEXT);
+    checkAndReflect(builder, nativeAssets.getPrivacyOptOutClickUrl(), CRT_NATIVE_PR_URL);
+    checkAndReflect(builder, nativeAssets.getPrivacyOptOutImageUrl(), CRT_NATIVE_PR_IMAGE_URL);
+    checkAndReflect(builder, nativeAssets.getPrivacyLongLegalText(), CRT_NATIVE_PR_TEXT);
 
     // Inject impression pixels
     List<String> impressionPixels = nativeAssets.getImpressionPixels();
     if (impressionPixels != null) {
       for (int i = 0; i < impressionPixels.size(); i++) {
-        checkAndReflect(object, impressionPixels.get(i), CRT_NATIVE_PIXEL_URL + i);
+        checkAndReflect(builder, impressionPixels.get(i), CRT_NATIVE_PIXEL_URL + i);
       }
 
-      ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", CRT_NATIVE_PIXEL_COUNT,
-          impressionPixels.size() + "");
+      builder.addCustomTargeting(CRT_NATIVE_PIXEL_COUNT, impressionPixels.size() + "");
     }
   }
 
   private void checkAndReflect(
-      @NonNull Object object,
+      @NonNull SafeDfpBuilder builder,
       @Nullable String value,
-      @NonNull String enrichmentKey
+      @NonNull String key
   ) {
     if (!TextUtils.isEmpty(value)) {
-      ReflectionUtil.callMethodOnObject(object, "addCustomTargeting", enrichmentKey,
-          createDfpCompatibleString(value));
+      builder.addCustomTargeting(key, createDfpCompatibleString(value));
     }
   }
 
@@ -136,6 +145,32 @@ public class DfpHeaderBidding {
   @VisibleForTesting
   String base64(byte[] input) {
     return Base64.encodeToString(input, Base64.NO_WRAP);
+  }
+
+  private static class SafeDfpBuilder {
+
+    @NonNull
+    private final PublisherAdRequest.Builder builder;
+
+    private SafeDfpBuilder(@NonNull Builder builder) {
+      this.builder = builder;
+    }
+
+    static boolean isDfpBuilder(@NonNull Object candidate) {
+      try {
+        return candidate instanceof Builder;
+      } catch (LinkageError e) {
+        return false;
+      }
+    }
+
+    void addCustomTargeting(String key, String value) {
+      try {
+        builder.addCustomTargeting(key, value);
+      } catch (LinkageError e) {
+        Log.d(SafeDfpBuilder.class.getSimpleName(), "Error while adding custom target", e);
+      }
+    }
   }
 
 }

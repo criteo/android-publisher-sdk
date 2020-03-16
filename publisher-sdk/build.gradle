@@ -3,6 +3,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'kotlin-android'
 
 def support_version = "28.0.0"
+def admob_version = "15.0.1"
 
 android {
     compileSdkVersion 28
@@ -66,6 +67,10 @@ configurations.all {
 dependencies {
     implementation "com.android.support:support-core-utils:$support_version"
 
+    compileOnly("com.google.android.gms:play-services-ads:$admob_version") {
+        exclude group: "com.android.support"
+    }
+
     implementation "com.google.auto.value:auto-value-annotations:1.6.6"
     annotationProcessor "com.google.auto.value:auto-value:1.6.6"
 
@@ -78,7 +83,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     testImplementation 'org.json:json:20140107'
     testImplementation 'org.mockito:mockito-core:2.7.0'
-    testImplementation 'com.google.android.gms:play-services-ads:15.0.1'
     testImplementation 'nl.jqno.equalsverifier:equalsverifier:3.1.10'
     testImplementation 'org.assertj:assertj-core:3.11.1'
     testImplementation 'org.mock-server:mockserver-netty:5.8.1'
@@ -90,7 +94,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
     androidTestImplementation 'org.mockito:mockito-android:3.3.0'
-    androidTestImplementation 'com.google.android.gms:play-services-ads:15.0.1'
+    androidTestImplementation "com.google.android.gms:play-services-ads:$admob_version"
 
     androidTestImplementation('com.mopub:mopub-sdk-banner:5.6.0@aar') {
         transitive = true

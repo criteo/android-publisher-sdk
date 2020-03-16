@@ -20,7 +20,6 @@ import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.network.BidRequestSender;
-import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,7 +31,6 @@ import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -119,36 +117,6 @@ public class BidManagerTests {
   @After
   public void tearDown() {
     DependencyProvider.setInstance(null);
-  }
-
-  @Test
-  public void testKillSwitchOnForHeaderBidding() {
-    // setup
-    when(config.isKillSwitchEnabled()).thenReturn(true);
-
-    BidManager bidManager = createBidManager();
-
-    PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-    bidManager.enrichBid(builder, adUnit);
-
-    PublisherAdRequest adRequest = builder.build();
-    Assert.assertFalse(adRequest.getKeywords().contains("crt_cpm"));
-  }
-
-  @Test
-  @Ignore("DeviceUtil.createDfpCompatibleDisplayUrl has an android.Util.Base64.coder that's unavailable in unit tests")
-  public void testKillSwitchOffForHeaderBidding() {
-    // setup
-    when(config.isKillSwitchEnabled()).thenReturn(false);
-
-    BidManager bidManager = createBidManager();
-
-    PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-    bidManager.enrichBid(builder, adUnit);
-
-    PublisherAdRequest adRequest = builder.build();
-    Assert.assertTrue(adRequest.getKeywords().contains("crt_cpm"));
-    Assert.assertTrue(adRequest.getKeywords().contains("crt_displayurl"));
   }
 
   @Test

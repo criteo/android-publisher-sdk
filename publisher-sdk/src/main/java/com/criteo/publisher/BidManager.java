@@ -30,7 +30,6 @@ public class BidManager implements ApplicationStoppedListener {
 
   private static final String MOPUB_ADVIEW_CLASS = "com.mopub.mobileads.MoPubView";
   private static final String MOPUB_INTERSTITIAL_CLASS = "com.mopub.mobileads.MoPubInterstitial";
-  private static final String DFP_ADREQUEST_CLASS = "com.google.android.gms.ads.doubleclick.PublisherAdRequest$Builder";
 
   private static final String CRT_CPM = "crt_cpm";
   private static final String MOPUB_CRT_DISPLAY_URL = "crt_displayUrl";
@@ -63,6 +62,9 @@ public class BidManager implements ApplicationStoppedListener {
   @NonNull
   private final BidLifecycleListener bidLifecycleListener;
 
+  @NonNull
+  private final DfpHeaderBidding dfpHeaderBidding;
+
   BidManager(
       @NonNull SdkCache sdkCache,
       @NonNull Config config,
@@ -77,6 +79,8 @@ public class BidManager implements ApplicationStoppedListener {
     this.adUnitMapper = adUnitMapper;
     this.bidRequestSender = bidRequestSender;
     this.bidLifecycleListener = bidLifecycleListener;
+
+    this.dfpHeaderBidding = new DfpHeaderBidding(this);
   }
 
   /**
@@ -105,8 +109,8 @@ public class BidManager implements ApplicationStoppedListener {
       if (object.getClass() == ReflectionUtil.getClassFromString(MOPUB_ADVIEW_CLASS)
           || object.getClass() == ReflectionUtil.getClassFromString(MOPUB_INTERSTITIAL_CLASS)) {
         enrichMoPubBid(object, adUnit);
-      } else if (object.getClass() == ReflectionUtil.getClassFromString(DFP_ADREQUEST_CLASS)) {
-        new DfpHeaderBidding(this).enrichBid(object, adUnit);
+      } else if (dfpHeaderBidding.canHandle(object)) {
+        dfpHeaderBidding.enrichBid(object, adUnit);
       } else if (object instanceof Map) {
         enrichMapBid((Map) object, adUnit);
       }

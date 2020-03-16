@@ -2,13 +2,17 @@ package com.criteo.publisher.headerbidding;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import android.os.Bundle;
 import com.criteo.publisher.BidManager;
 import com.criteo.publisher.model.AdSize;
+import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.NativeAssets;
 import com.criteo.publisher.model.NativeProduct;
@@ -52,6 +56,31 @@ public class DfpHeaderBiddingTest {
     MockitoAnnotations.initMocks(this);
 
     headerBidding = new DfpHeaderBidding(bidManager);
+  }
+
+  @Test
+  public void isHandling_GivenSimpleObject_ReturnFalse() throws Exception {
+    boolean handling = headerBidding.canHandle(mock(Object.class));
+
+    assertFalse(handling);
+  }
+
+  @Test
+  public void isHandling_GivenDfpBuilder_ReturnTrue() throws Exception {
+    PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
+
+    boolean handling = headerBidding.canHandle(builder);
+
+    assertTrue(handling);
+  }
+
+  @Test
+  public void enrichBid_GivenNotHandledObject_DoNothing() throws Exception {
+    Object builder = mock(Object.class);
+
+    headerBidding.enrichBid(builder, mock(AdUnit.class));
+
+    verifyNoMoreInteractions(bidManager);
   }
 
   @Test
