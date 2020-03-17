@@ -33,8 +33,8 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
 
     updateByCdbRequestIds(request, new MetricUpdater() {
       @Override
-      public void update(@NonNull MetricBuilder builder) {
-        builder.setCdbCallStartAbsolute(currentTimeInMillis);
+      public void update(@NonNull Metric.Builder builder) {
+        builder.setCdbCallStartTimestamp(currentTimeInMillis);
       }
     });
   }
@@ -50,8 +50,8 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
 
       repository.updateById(impressionId, new MetricUpdater() {
       @Override
-      public void update(@NonNull MetricBuilder builder) {
-        builder.setCdbCallEndAbsolute(currentTimeInMillis);
+      public void update(@NonNull Metric.Builder builder) {
+        builder.setCdbCallEndTimestamp(currentTimeInMillis);
 
         if (isImpressionIdUpdated) {
           builder.setImpressionId(impressionId);
@@ -71,9 +71,9 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
 
     updateByCdbRequestIds(request, new MetricUpdater() {
       @Override
-      public void update(@NonNull MetricBuilder builder) {
-        builder.setCdbCallTimeoutAbsolute(currentTimeInMillis);
-        builder.setReadyToSend();
+      public void update(@NonNull Metric.Builder builder) {
+        builder.setCdbCallTimeoutTimestamp(currentTimeInMillis);
+        builder.setReadyToSend(true);
       }
     });
   }
@@ -90,12 +90,12 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
 
     repository.updateById(impressionId, new MetricUpdater() {
       @Override
-      public void update(@NonNull MetricBuilder builder) {
+      public void update(@NonNull Metric.Builder builder) {
         if (isNotExpired) {
-          builder.setElapsedAbsolute(currentTimeInMillis);
+          builder.setElapsedTimestamp(currentTimeInMillis);
         }
 
-        builder.setReadyToSend();
+        builder.setReadyToSend(true);
       }
     });
   }

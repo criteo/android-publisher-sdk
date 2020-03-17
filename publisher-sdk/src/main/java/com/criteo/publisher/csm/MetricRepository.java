@@ -9,7 +9,7 @@ public class MetricRepository {
   }
 
   interface MetricUpdater {
-    void update(@NonNull MetricBuilder metricBuilder);
+    void update(@NonNull Metric.Builder metricBuilder);
   }
 
 }

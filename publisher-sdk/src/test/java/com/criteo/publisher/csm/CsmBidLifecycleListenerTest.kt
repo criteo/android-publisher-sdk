@@ -44,7 +44,7 @@ class CsmBidLifecycleListenerTest {
 
 
     assertRepositoryIsUpdatedByIds("id1", "id2") {
-      verify(it).setCdbCallStartAbsolute(42)
+      verify(it).setCdbCallStartTimestamp(42)
     }
   }
 
@@ -59,7 +59,7 @@ class CsmBidLifecycleListenerTest {
     listener.onCdbCallFinished(request, mock())
 
     assertRepositoryIsUpdatedByIds("id1", "id2") {
-      verify(it).setCdbCallEndAbsolute(1337)
+      verify(it).setCdbCallEndTimestamp(1337)
       verify(it, never()).setImpressionId(anyOrNull())
     }
   }
@@ -119,8 +119,8 @@ class CsmBidLifecycleListenerTest {
     listener.onCdbCallFailed(request, mock<SocketTimeoutException>())
 
     assertRepositoryIsUpdatedByIds("id1", "id2") {
-      verify(it).setCdbCallTimeoutAbsolute(1337)
-      verify(it).setReadyToSend()
+      verify(it).setCdbCallTimeoutTimestamp(1337)
+      verify(it).setReadyToSend(true)
     }
   }
 
@@ -140,8 +140,8 @@ class CsmBidLifecycleListenerTest {
     listener.onBidConsumed(adUnit, slot)
 
     assertRepositoryIsUpdatedById("id") {
-      verify(it).setElapsedAbsolute(42)
-      verify(it).setReadyToSend()
+      verify(it).setElapsedTimestamp(42)
+      verify(it).setReadyToSend(true)
     }
   }
 
@@ -157,7 +157,7 @@ class CsmBidLifecycleListenerTest {
     listener.onBidConsumed(adUnit, slot)
 
     assertRepositoryIsUpdatedById("id") {
-      verify(it).setReadyToSend()
+      verify(it).setReadyToSend(true)
     }
   }
 
@@ -188,7 +188,7 @@ class CsmBidLifecycleListenerTest {
 
   private fun assertRepositoryIsUpdatedByIds(
       vararg impressionIds: String,
-      verifier: (MetricBuilder) -> Unit
+      verifier: (Metric.Builder) -> Unit
   ) {
     argumentCaptor<String> {
       verify(repository, times(impressionIds.size)).updateById(capture(), verifier.asArgChecker())
@@ -199,14 +199,14 @@ class CsmBidLifecycleListenerTest {
 
   private fun assertRepositoryIsUpdatedById(
       impressionId: String,
-      verifier: (MetricBuilder) -> Unit
+      verifier: (Metric.Builder) -> Unit
   ) {
     verify(repository).updateById(eq(impressionId), verifier.asArgChecker())
   }
 
-  private fun ((MetricBuilder) -> Unit).asArgChecker(): MetricRepository.MetricUpdater {
+  private fun ((Metric.Builder) -> Unit).asArgChecker(): MetricRepository.MetricUpdater {
     return check {
-      val metricBuilder: MetricBuilder = mock()
+      val metricBuilder: Metric.Builder = mock()
 
       it.update(metricBuilder)
 
