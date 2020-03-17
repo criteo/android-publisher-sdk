@@ -3,14 +3,20 @@ package com.criteo.publisher.csm;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
 
 @AutoValue
-abstract class Metric {
+public abstract class Metric {
 
   @NonNull
-  static Metric.Builder builder() {
+  public static Metric.Builder builder() {
     return new AutoValue_Metric.Builder()
         .setReadyToSend(false);
+  }
+
+  public static TypeAdapter<Metric> typeAdapter(Gson gson) {
+    return new AutoValue_Metric.GsonTypeAdapter(gson);
   }
 
   @Nullable

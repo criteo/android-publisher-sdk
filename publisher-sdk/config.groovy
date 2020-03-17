@@ -1,4 +1,5 @@
 pubSdkSharedPreferences = 'com.criteo.publisher.sdkSharedPreferences'
+csmDirectory = 'criteo_metrics'
 debugLogging = false
 
 environments {
