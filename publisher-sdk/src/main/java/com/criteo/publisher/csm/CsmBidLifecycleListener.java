@@ -73,6 +73,7 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
       @Override
       public void update(@NonNull MetricBuilder builder) {
         builder.setCdbCallTimeoutAbsolute(currentTimeInMillis);
+        builder.setReadyToSend();
       }
     });
   }

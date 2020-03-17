@@ -120,6 +120,7 @@ class CsmBidLifecycleListenerTest {
 
     assertRepositoryIsUpdatedByIds("id1", "id2") {
       verify(it).setCdbCallTimeoutAbsolute(1337)
+      verify(it).setReadyToSend()
     }
   }
 
