@@ -14,7 +14,6 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.network.PubSdkApi;
-import com.criteo.publisher.privacy.gdpr.GdprData;
 import com.criteo.publisher.test.activity.DummyActivity;
 import java.util.Arrays;
 import java.util.Collection;
@@ -213,11 +212,11 @@ public class BearcatPrivacyFunctionalTest {
     if (callBearcat) {
       verify(pubSdkApi)
           .postAppEvent(any(Integer.class), any(String.class), any(String.class), any(String.class),
-              any(Integer.class), any(), any(GdprData.class));
+              any(Integer.class), any(), any());
     } else {
       verify(pubSdkApi, never())
           .postAppEvent(any(Integer.class), any(String.class), any(String.class), any(String.class),
-              any(Integer.class), any(), any(GdprData.class));
+              any(Integer.class), any(), any());
     }
   }
 
