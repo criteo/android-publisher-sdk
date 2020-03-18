@@ -63,6 +63,8 @@ public class CriteoInterstitialEventControllerIntegrationTest {
     webViewData = new WebViewData(config);
     webViewData.setContent("html content");
 
+    when(interstitialActivityHelper.isAvailable()).thenReturn(true);
+
     criteoInterstitialEventController = spy(new CriteoInterstitialEventController(
         criteoInterstitialAdListener,
         adDisplayListener,
