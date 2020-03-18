@@ -7,11 +7,13 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.AdditionalAnswers.answerVoid;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -27,15 +29,13 @@ import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.bid.BidLifecycleListener;
-import com.criteo.publisher.model.CdbRequestSlot;
-import com.criteo.publisher.privacy.gdpr.GdprData;
-import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
+import com.criteo.publisher.model.CdbRequestSlot;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
@@ -43,6 +43,8 @@ import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.privacy.UserPrivacyUtil;
+import com.criteo.publisher.privacy.gdpr.GdprData;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -263,6 +265,12 @@ public class BidManagerFunctionalTest {
   @Test
   public void prefetch_GivenRemoteConfigWithKillSwitchEnabled_WhenGettingBidShouldNotCallCdbAndNotPopulateCacheAndReturnNull()
       throws Exception {
+    Config config = givenKillSwitchIs(false);
+    doAnswer(answerVoid((JSONObject json) -> {
+      Boolean killSwitch = Config.parseKillSwitch(json);
+      when(config.isKillSwitchEnabled()).thenReturn(killSwitch);
+    })).when(config).refreshConfig(any());
+
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenRemoteConfigWithKillSwitchEnabled();
@@ -860,10 +868,11 @@ public class BidManagerFunctionalTest {
     return new CacheAdUnit(new AdSize(1, 1), "adUnit" + adUnitId++, CRITEO_BANNER);
   }
 
-  private void givenKillSwitchIs(boolean isEnabled) {
+  private Config givenKillSwitchIs(boolean isEnabled) {
     Config config = mock(Config.class);
     when(config.isKillSwitchEnabled()).thenReturn(isEnabled);
     doReturn(config).when(dependencyProvider).provideConfig(any());
+    return config;
   }
 
   private void givenRemoteConfigWithKillSwitchEnabled() throws JSONException {
