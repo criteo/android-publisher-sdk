@@ -103,7 +103,7 @@ publish {
             apk(MavenPublication) {
                 groupId 'com.criteo.pubsdk_android'
                 artifactId 'publisher-app'
-                version rootProject.publishVersion
+                version "${rootProject.publishVersion}${rootProject.getTimestamp()}"
                 artifact packageApkRelease
                 artifact packageApkDebug
             }
