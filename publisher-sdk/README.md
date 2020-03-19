@@ -11,6 +11,14 @@ The tests in this project are organised according to the following convention:
  are post-fixed with `FunctionTests`. The rest are post-fixed with `IntegrationTests`.
 
 # Release
+## Release steps
+Releasing a new version of the PubSDK involves a few steps:
+
+1. Publishing the new version of the AAR on Azure
+2. Publishing new versions of _android-google-mediation_ and _android-mopub-mediation_ that depend
+on the newly released version of PubSDK. Please refer to the README of each of those projects for
+additional release information.
+
 ## Internal releases on Nexus
 Each new version is published on the internal Nexus repository on post-submit. No manual action is needed
 at this point.
