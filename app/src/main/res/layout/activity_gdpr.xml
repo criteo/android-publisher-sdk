@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical">
+
+  <TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="TCF 2.0"
+    android:layout_marginTop="8dp"
+    android:layout_marginLeft="8dp"
+    />
+
+  <EditText
+    android:id="@+id/consentStringV2"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="4dp"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:layout_marginBottom="16dp"
+    android:hint="@string/hint_tcf_consent_string"
+    android:padding="8dp" />
+
+  <EditText
+    android:id="@+id/vendorConsentsV2"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:hint="@string/hint_tcf_vendor_consents"
+    android:padding="8dp" />
+
+  <EditText
+    android:id="@+id/gdprAppliesV2"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:hint="@string/hint_tcf_gdpr_applies"
+    android:padding="8dp" />
+
+  <TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="TCF 1.0"
+    android:layout_marginTop="16dp"
+    android:layout_marginLeft="8dp"
+    />
+
+  <EditText
+    android:id="@+id/consentStringV1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="4dp"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:layout_marginBottom="16dp"
+    android:hint="@string/hint_tcf_consent_string"
+    android:padding="8dp" />
+
+  <EditText
+    android:id="@+id/vendorConsentsV1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:hint="@string/hint_tcf_vendor_consents"
+    android:padding="8dp" />
+
+  <EditText
+    android:id="@+id/gdprAppliesV1"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:hint="@string/hint_tcf_gdpr_applies"
+    android:padding="8dp" />
+
+  <Button
+    android:id="@+id/saveTcfData"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/btn_save"/>
+
+</LinearLayout>

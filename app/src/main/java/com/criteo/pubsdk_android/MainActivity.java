@@ -52,6 +52,11 @@ public class MainActivity extends AppCompatActivity {
       startActivity(intent);
     });
 
+    findViewById(R.id.buttonTcfSelector).setOnClickListener((View v) -> {
+      Intent intent = new Intent(getApplicationContext(), GdprActivity.class);
+      startActivity(intent);
+    });
+
     Log.d(TAG, "onCreate:" + calendar.getTimeInMillis());
 
   }

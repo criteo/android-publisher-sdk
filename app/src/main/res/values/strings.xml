@@ -21,9 +21,14 @@
   <string name="btn_in_house_mediation">In-house Mediation</string>
   <string name="btn_mopub">Mopub</string>
   <string name="btn_mopub_mediation">Mopub-Mediation</string>
-  <string name="btn_privacy_consent_selector">Privacy Consent Selector</string>
+  <string name="btn_ccpa_consent_selector">CCPA Consent Selector</string>
+  <string name="btn_tcf_consent_selector">TCF Consent Selector</string>
   <string name="hint_ccpa_iab">CCPA IAB String</string>
   <string name="hint_ccpa_mopub">CCPA Mopub String</string>
   <string name="ccpa_binary_value">CCPA Binary Value</string>
+
+  <string name="hint_tcf_consent_string">Consent String</string>
+  <string name="hint_tcf_vendor_consents">Vendor Consents String</string>
+  <string name="hint_tcf_gdpr_applies">GDPR applies</string>
   <string name="btn_save">Save</string>
 </resources>
