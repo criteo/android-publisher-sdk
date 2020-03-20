@@ -9,6 +9,7 @@ import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.SoftReference;
 
 /**
  * The {@link SyncMetricFile} internally uses {@link AtomicFile} to ensure atomicity of any write
@@ -35,34 +36,55 @@ class SyncMetricFile {
   @NonNull
   private final MetricParser parser;
 
+  @NonNull
+  private volatile SoftReference<Metric> metricInMemory;
+
   SyncMetricFile(
       @NonNull AtomicFile file,
       @NonNull MetricParser parser
   ) {
     this.file = file;
     this.parser = parser;
+    this.metricInMemory = new SoftReference<>(null);
   }
 
   Metric read() throws IOException {
     synchronized (fileLock) {
-      return readMetric();
+      Metric inMemory = metricInMemory.get();
+      if (inMemory != null) {
+        return inMemory;
+      }
+
+      Metric inFile = readFromFile();
+      metricInMemory = new SoftReference<>(inFile);
+      return inFile;
+    }
+  }
+
+  private void write(Metric metric) throws IOException {
+    synchronized (fileLock) {
+      // Invalidate in-memory version. This is to prevent any inconsistency in case of IO error.
+      metricInMemory = new SoftReference<>(null);
+
+      writeInFile(metric);
+      metricInMemory = new SoftReference<>(metric);
     }
   }
 
   void update(MetricUpdater updater) throws IOException {
     synchronized (fileLock) {
-      Metric metric = readMetric();
+      Metric metric = read();
 
       Metric.Builder builder = metric.toBuilder();
       updater.update(builder);
       Metric newMetric = builder.build();
 
-      writeMetric(newMetric);
+      write(newMetric);
     }
   }
 
   @NonNull
-  private Metric readMetric() throws IOException {
+  private Metric readFromFile() throws IOException {
     if (!file.getBaseFile().exists()) {
       return Metric.builder().build();
     }
@@ -73,7 +95,7 @@ class SyncMetricFile {
     }
   }
 
-  private void writeMetric(@NonNull Metric metric) throws IOException {
+  private void writeInFile(@NonNull Metric metric) throws IOException {
     try (FileOutputStream fos = file.startWrite();
         BufferedOutputStream bos = new BufferedOutputStream(fos)) {
       try {

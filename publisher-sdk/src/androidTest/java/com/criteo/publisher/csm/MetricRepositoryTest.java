@@ -329,10 +329,11 @@ public class MetricRepositoryTest {
   @Test
   public void getAllStoredMetrics_GivenAnIoExceptionDuringOneRead_IgnoreIt() throws Exception {
     parser = spy(parser);
-    givenNewRepository();
 
     repository.updateById("id1", builder -> { });
     repository.updateById("id2", builder -> { });
+
+    givenNewRepository();
 
     doThrow(IOException.class)
         .doCallRealMethod()
@@ -347,9 +348,10 @@ public class MetricRepositoryTest {
   @Test
   public void updateById_GivenIoExceptionDuringReadOfExistingMetric_DoNotUpdateMetric() throws Exception {
     parser = spy(parser);
-    givenNewRepository();
 
     repository.updateById("id1", builder -> { });
+
+    givenNewRepository();
 
     doThrow(IOException.class).when(parser).read(any());
 
