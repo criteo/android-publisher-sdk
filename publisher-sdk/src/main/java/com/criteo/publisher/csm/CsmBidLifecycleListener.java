@@ -33,6 +33,11 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
   }
 
   @Override
+  public void onSdkInitialized() {
+    sendingQueueProducer.pushAllInQueue(repository);
+  }
+
+  @Override
   public void onCdbCallStarted(@NonNull CdbRequest request) {
     long currentTimeInMillis = clock.getCurrentTimeInMillis();
 

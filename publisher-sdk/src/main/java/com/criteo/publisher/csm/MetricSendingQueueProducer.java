@@ -11,6 +11,20 @@ class MetricSendingQueueProducer {
     this.queue = queue;
   }
 
+  void pushAllInQueue(@NonNull MetricRepository repository) {
+    repository.moveAllWith(new MetricMover() {
+      @Override
+      public boolean shouldMove(@NonNull Metric metric) {
+        return true;
+      }
+
+      @Override
+      public boolean offerToDestination(@NonNull Metric metric) {
+        return queue.offer(metric);
+      }
+    });
+  }
+
   void pushAllReadyToSendInQueue(@NonNull MetricRepository repository) {
     repository.moveAllWith(new MetricMover() {
       /**

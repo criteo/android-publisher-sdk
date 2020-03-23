@@ -10,13 +10,14 @@ import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.TextUtils;
+import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
-import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
+import com.criteo.publisher.privacy.UserPrivacyUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -91,6 +92,9 @@ final class CriteoInternal extends Criteo {
     AppEvents appEvents = dependencyProvider.provideAppEvents(context);
     AppLifecycleUtil lifecycleCallback = new AppLifecycleUtil(appEvents, bidManager);
     application.registerActivityLifecycleCallbacks(lifecycleCallback);
+
+    BidLifecycleListener bidLifecycleListener = dependencyProvider.provideBidLifecycleListener();
+    bidLifecycleListener.onSdkInitialized();
 
     prefetchAdUnits(dependencyProvider.provideRunOnUiThreadExecutor(), adUnits);
   }

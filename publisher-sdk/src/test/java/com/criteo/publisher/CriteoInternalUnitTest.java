@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -21,13 +22,14 @@ import android.content.Context;
 import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.DirectMockRunOnUiThreadExecutor;
-import com.criteo.publisher.privacy.UserPrivacyUtil;
+import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.privacy.UserPrivacyUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,6 +39,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -77,6 +80,19 @@ public class CriteoInternalUnitTest {
 
     assertThatThrownBy(this::createCriteo).isInstanceOf(IllegalArgumentException.class);
     verifyZeroInteractions(api);
+  }
+
+  @Test
+  public void whenCreatingNewCriteo_GivenBidManagerAndBidLifecycleListener_ShouldCallListenerBeforePrefetch()
+      throws Exception {
+    BidLifecycleListener listener = givenMockedBidLifecycleListener();
+    BidManager bidManager = givenMockedBidManager();
+
+    createCriteo();
+
+    InOrder inOrder = inOrder(listener, bidManager);
+    inOrder.verify(listener).onSdkInitialized();
+    inOrder.verify(bidManager).prefetch(any());
   }
 
   @Test
@@ -355,6 +371,14 @@ public class CriteoInternalUnitTest {
   private void givenMockedUserPrivacyUtil() {
     Context context = application.getApplicationContext();
     when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
+  }
+
+  private BidLifecycleListener givenMockedBidLifecycleListener() {
+    BidLifecycleListener listener = mock(BidLifecycleListener.class);
+
+    when(dependencyProvider.provideBidLifecycleListener()).thenReturn(listener);
+
+    return listener;
   }
 
   private BidManager givenMockedBidManager() {

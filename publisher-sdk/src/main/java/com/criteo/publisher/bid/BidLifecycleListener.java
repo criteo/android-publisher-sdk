@@ -15,6 +15,11 @@ import com.criteo.publisher.model.Slot;
 public interface BidLifecycleListener {
 
   /**
+   * Callback invoked when the SDK is initialized.
+   */
+  void onSdkInitialized();
+
+  /**
    * Callback invoked when a CDB call is about to start.
    *
    * @param request Request sent to CDB

@@ -23,6 +23,11 @@ public class LoggingBidLifecycleListener implements BidLifecycleListener {
   }
 
   @Override
+  public void onSdkInitialized() {
+    log("onSdkInitialized");
+  }
+
+  @Override
   public void onCdbCallStarted(@NonNull CdbRequest request) {
     log("onCdbCallStarted: %s", request);
   }

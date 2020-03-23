@@ -37,6 +37,13 @@ class CsmBidLifecycleListenerTest {
   }
 
   @Test
+  fun onSdkInitialized_PushAllMetricsInQueue() {
+    listener.onSdkInitialized()
+
+    verify(sendingQueueProducer).pushAllInQueue(repository)
+  }
+
+  @Test
   fun onCdbCallStarted_GivenMultipleSlots_UpdateAllStartTimeOfMetricsById() {
     val request = givenCdbRequestWithSlots("id1", "id2")
 

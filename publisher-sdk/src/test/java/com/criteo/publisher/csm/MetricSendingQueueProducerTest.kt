@@ -26,6 +26,25 @@ class MetricSendingQueueProducerTest {
   }
 
   @Test
+  fun pushAllInQueue_GivenAnyMetric_PushAndMoveThem() {
+    val metric1 = Metric.builder()
+        .setReadyToSend(false)
+        .build()
+
+    val metric2 = Metric.builder()
+        .setReadyToSend(true)
+        .build()
+
+    givenMetricInRepository(metric1, metric2)
+
+    producer.pushAllInQueue(repository)
+
+    verify(queue).offer(metric1)
+    verify(queue).offer(metric2)
+    assertOnlyThoseMetricsAreMoved(metric1, metric2)
+  }
+
+  @Test
   fun pushAllReadyToSendInQueue_GivenNoMetricReadyToSend_DoNothingAndKeepThem() {
     val shouldNotBeSent = Metric.builder()
         .setReadyToSend(false)
@@ -52,10 +71,6 @@ class MetricSendingQueueProducerTest {
         .build()
 
     givenMetricInRepository(shouldNotBeSent, shouldBeSent)
-
-    queue.stub {
-      on { offer(any()) } doReturn true
-    }
 
     producer.pushAllReadyToSendInQueue(repository)
 
