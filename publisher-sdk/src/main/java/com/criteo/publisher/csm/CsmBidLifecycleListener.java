@@ -107,12 +107,10 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
   }
 
   private void onCdbCallTimeout(@NonNull CdbRequest request) {
-    long currentTimeInMillis = clock.getCurrentTimeInMillis();
-
     updateByCdbRequestIds(request, new MetricUpdater() {
       @Override
       public void update(@NonNull Metric.Builder builder) {
-        builder.setCdbCallTimeoutTimestamp(currentTimeInMillis);
+        builder.setCdbCallTimeout(true);
         builder.setReadyToSend(true);
       }
     });

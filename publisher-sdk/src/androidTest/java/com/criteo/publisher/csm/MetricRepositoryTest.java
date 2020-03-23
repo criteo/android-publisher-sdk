@@ -63,7 +63,7 @@ public class MetricRepositoryTest {
   public void getAllStoredMetrics_GivenUpdatesAndThenNewRepository_ReturnPreviousResult() throws Exception {
     repository.updateById("id1", builder -> {
       builder.setCdbCallStartTimestamp(42L);
-      builder.setCdbCallTimeoutTimestamp(1337L);
+      builder.setCdbCallTimeout(true);
     });
 
     repository.updateById("id2", builder -> {
@@ -170,7 +170,7 @@ public class MetricRepositoryTest {
   public void updateById_GivenManyIdsUpdated_RepositoryContainsMultipleMetrics() throws Exception {
     Metric expected1 = Metric.builder()
         .setCdbCallStartTimestamp(42L)
-        .setCdbCallTimeoutTimestamp(1337L)
+        .setCdbCallTimeout(true)
         .build();
 
     Metric expected2 = Metric.builder()
@@ -179,7 +179,7 @@ public class MetricRepositoryTest {
 
     repository.updateById("id1", builder -> {
       builder.setCdbCallStartTimestamp(42L);
-      builder.setCdbCallTimeoutTimestamp(1337L);
+      builder.setCdbCallTimeout(true);
     });
 
     repository.updateById("id2", builder -> {

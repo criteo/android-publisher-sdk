@@ -58,7 +58,7 @@ class MetricParserTest {
     val metric = Metric.builder()
         .setCdbCallStartTimestamp(42L)
         .setCdbCallEndTimestamp(1337L)
-        .setCdbCallTimeoutTimestamp(1L)
+        .setCdbCallTimeout(true)
         .setElapsedTimestamp(2L)
         .setImpressionId("impId")
         .setReadyToSend(true)
@@ -69,7 +69,7 @@ class MetricParserTest {
     assertThat(json).isEqualToIgnoringWhitespace("""{
       "cdbCallStartTimestamp": 42,
       "cdbCallEndTimestamp": 1337,
-      "cdbCallTimeoutTimestamp": 1,
+      "cdbCallTimeout": true,
       "elapsedTimestamp": 2,
       "impressionId": "impId",
       "readyToSend": true
@@ -83,6 +83,7 @@ class MetricParserTest {
     val json = parser.writeIntoString(metric)
 
     assertThat(json).isEqualToIgnoringWhitespace("""{
+      "cdbCallTimeout": false,
       "readyToSend": false
     }""".trimIndent())
   }

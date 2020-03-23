@@ -256,7 +256,7 @@ class CsmBidLifecycleListenerTest {
 
   private fun assertTimeoutErrorIsReceived(impressionId: String) {
     assertRepositoryIsUpdatedById(impressionId) {
-      verify(it).setCdbCallTimeoutTimestamp(clock.currentTimeInMillis)
+      verify(it).setCdbCallTimeout(true)
       verify(it).setReadyToSend(true)
       verifyNoMoreInteractions(it)
     }
