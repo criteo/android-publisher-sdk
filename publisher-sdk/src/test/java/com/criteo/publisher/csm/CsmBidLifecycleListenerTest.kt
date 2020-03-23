@@ -60,24 +60,55 @@ class CsmBidLifecycleListenerTest {
   }
 
   @Test
-  fun onCdbCallFinished_GivenMultipleRequestSlots_UpdateAllEndTimeOfMetricsById() {
-    val request = givenCdbRequestWithSlots("id1", "id2")
+  fun onCdbCallFinished_GivenOnlyNoBid_PushReadyToSendInQueue() {
+    val request = givenCdbRequestWithSlots("id")
 
-    clock.stub {
-      on { currentTimeInMillis } doReturn 1337
+    val response = mock<CdbResponse>() {
+      on { getSlotByImpressionId(any()) } doReturn null
     }
 
-    listener.onCdbCallFinished(request, mock())
+    listener.onCdbCallFinished(request, response)
 
-    assertRepositoryIsUpdatedByIds("id1", "id2") {
-      verify(it).setCdbCallEndTimestamp(1337)
-      verify(it, never()).setImpressionId(anyOrNull())
-    }
+    verify(sendingQueueProducer).pushAllReadyToSendInQueue(repository)
   }
 
   @Test
-  fun onCdbCallFinished_GivenRequestSlotsWithMatchingResponseSlot_UpdateImpressionIdOfValidOnes() {
-    val request = givenCdbRequestWithSlots("id1", "id2", "id3")
+  fun onCdbCallFinished_GivenOnlyInvalidBid_PushReadyToSendInQueue() {
+    val request = givenCdbRequestWithSlots("id")
+
+    val invalidSlot = mock<Slot>() {
+      on { isValid } doReturn false
+    }
+
+    val response = mock<CdbResponse>() {
+      on { getSlotByImpressionId(any()) } doReturn invalidSlot
+    }
+
+    listener.onCdbCallFinished(request, response)
+
+    verify(sendingQueueProducer).pushAllReadyToSendInQueue(repository)
+  }
+
+  @Test
+  fun onCdbCallFinished_GivenOnlyValidBid_DoNotPushReadyToSendInQueue() {
+    val request = givenCdbRequestWithSlots("id")
+
+    val validSlot = mock<Slot>() {
+      on { isValid } doReturn true
+    }
+
+    val response = mock<CdbResponse>() {
+      on { getSlotByImpressionId(any()) } doReturn validSlot
+    }
+
+    listener.onCdbCallFinished(request, response)
+
+    verify(sendingQueueProducer, never()).pushAllReadyToSendInQueue(repository)
+  }
+
+  @Test
+  fun onCdbCallFinished_GivenNoBidAndInvalidBidAndValidBidReceived_UpdateThemByIdAccordingly() {
+    val request = givenCdbRequestWithSlots("noBidId", "invalidId", "validId")
 
     val invalidSlot = mock<Slot>() {
       on { isValid } doReturn false
@@ -88,39 +119,35 @@ class CsmBidLifecycleListenerTest {
     }
 
     val response = mock<CdbResponse>() {
-      on { getSlotByImpressionId("id1") } doReturn null
-      on { getSlotByImpressionId("id2") } doReturn invalidSlot
-      on { getSlotByImpressionId("id3") } doReturn validSlot
+      on { getSlotByImpressionId("noBidId") } doReturn null
+      on { getSlotByImpressionId("invalidId") } doReturn invalidSlot
+      on { getSlotByImpressionId("validId") } doReturn validSlot
+    }
+
+    clock.stub {
+      on { currentTimeInMillis } doReturn 1337
     }
 
     listener.onCdbCallFinished(request, response)
 
-    assertRepositoryIsUpdatedById("id1") {
-      verify(it, never()).setImpressionId(anyOrNull())
-    }
-
-    assertRepositoryIsUpdatedById("id2") {
-      verify(it, never()).setImpressionId(anyOrNull())
-    }
-
-    assertRepositoryIsUpdatedById("id3") {
-      verify(it).setImpressionId("id3")
-    }
+    assertNoBidSlotIsReceived("noBidId")
+    assertInvalidBidSlotIsReceived("invalidId")
+    assertValidBidSlotIsReceived("validId")
+    verify(sendingQueueProducer).pushAllReadyToSendInQueue(repository)
   }
 
   @Test
-  fun onCdbCallFailed_GivenNotATimeoutException_DoNothing() {
-    val request: CdbRequest = mock() {
-      on { slots } doReturn listOf(mock(), mock())
-    }
+  fun onCdbCallFailed_GivenNotATimeoutException_UpdateAllForNetworkError() {
+    val request = givenCdbRequestWithSlots("id1", "id2")
 
     listener.onCdbCallFailed(request, mock<IOException>())
 
-    verifyZeroInteractions(repository)
+    assertNetworkErrorIsReceived("id1")
+    assertNetworkErrorIsReceived("id2")
   }
 
   @Test
-  fun onCdbCallFailed_GivenTimeoutExceptionAndMultipleRequestSlots_UpdateAllEndTimeOfMetricsById() {
+  fun onCdbCallFailed_GivenTimeoutExceptionAndMultipleRequestSlots_UpdateAllByIdForTimeout() {
     val request = givenCdbRequestWithSlots("id1", "id2")
 
     clock.stub {
@@ -129,10 +156,8 @@ class CsmBidLifecycleListenerTest {
 
     listener.onCdbCallFailed(request, mock<SocketTimeoutException>())
 
-    assertRepositoryIsUpdatedByIds("id1", "id2") {
-      verify(it).setCdbCallTimeoutTimestamp(1337)
-      verify(it).setReadyToSend(true)
-    }
+    assertTimeoutErrorIsReceived("id1")
+    assertTimeoutErrorIsReceived("id2")
 
     verify(sendingQueueProducer).pushAllReadyToSendInQueue(repository)
   }
@@ -219,6 +244,40 @@ class CsmBidLifecycleListenerTest {
       verifier: (Metric.Builder) -> Unit
   ) {
     verify(repository).updateById(eq(impressionId), verifier.asArgChecker())
+  }
+
+  private fun assertValidBidSlotIsReceived(impressionId: String) {
+    assertRepositoryIsUpdatedById(impressionId) {
+      verify(it).setCdbCallEndTimestamp(clock.currentTimeInMillis)
+      verify(it).setImpressionId(impressionId)
+      verifyNoMoreInteractions(it)
+    }
+  }
+
+  private fun assertTimeoutErrorIsReceived(impressionId: String) {
+    assertRepositoryIsUpdatedById(impressionId) {
+      verify(it).setCdbCallTimeoutTimestamp(clock.currentTimeInMillis)
+      verify(it).setReadyToSend(true)
+      verifyNoMoreInteractions(it)
+    }
+  }
+
+  private fun assertNetworkErrorIsReceived(impressionId: String) =
+      assertInvalidBidSlotIsReceived(impressionId)
+
+  private fun assertInvalidBidSlotIsReceived(impressionId: String) {
+    assertRepositoryIsUpdatedById(impressionId) {
+      verify(it).setReadyToSend(true)
+      verifyNoMoreInteractions(it)
+    }
+  }
+
+  private fun assertNoBidSlotIsReceived(impressionId: String) {
+    assertRepositoryIsUpdatedById(impressionId) {
+      verify(it).setCdbCallEndTimestamp(clock.currentTimeInMillis)
+      verify(it).setReadyToSend(true)
+      verifyNoMoreInteractions(it)
+    }
   }
 
   private fun ((Metric.Builder) -> Unit).asArgChecker(): MetricRepository.MetricUpdater {

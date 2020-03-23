@@ -51,32 +51,62 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
 
   @Override
   public void onCdbCallFinished(@NonNull CdbRequest request, @NonNull CdbResponse response) {
+    boolean shouldPushInQueue = false;
     long currentTimeInMillis = clock.getCurrentTimeInMillis();
 
     for (CdbRequestSlot requestSlot : request.getSlots()) {
       String impressionId = requestSlot.getImpressionId();
       Slot responseSlot = response.getSlotByImpressionId(impressionId);
-      boolean isImpressionIdUpdated = responseSlot != null && responseSlot.isValid();
+      boolean isNoBid = responseSlot == null;
+      boolean isInvalidBid = responseSlot != null && !responseSlot.isValid();
+
+      if (isNoBid || isInvalidBid) {
+        shouldPushInQueue = true;
+      }
 
       repository.updateById(impressionId, new MetricUpdater() {
-      @Override
-      public void update(@NonNull Metric.Builder builder) {
-        builder.setCdbCallEndTimestamp(currentTimeInMillis);
-
-        if (isImpressionIdUpdated) {
-          builder.setImpressionId(impressionId);
+        @Override
+        public void update(@NonNull Metric.Builder builder) {
+          if (isNoBid) {
+            builder.setCdbCallEndTimestamp(currentTimeInMillis);
+            builder.setReadyToSend(true);
+          } else if (isInvalidBid) {
+            builder.setReadyToSend(true);
+          } else /* if isValidBid */ {
+            builder.setCdbCallEndTimestamp(currentTimeInMillis);
+            builder.setImpressionId(impressionId);
+          }
         }
-      }
-    });
+      });
+    }
+
+    if (shouldPushInQueue) {
+      sendingQueueProducer.pushAllReadyToSendInQueue(repository);
     }
   }
 
   @Override
   public void onCdbCallFailed(@NonNull CdbRequest request, @NonNull Exception exception) {
-    if (!(exception instanceof SocketTimeoutException)) {
-      return;
+    boolean isTimeout = exception instanceof SocketTimeoutException;
+    if (isTimeout) {
+      onCdbCallTimeout(request);
+    } else {
+      onCdbCallNetworkError(request);
     }
 
+    sendingQueueProducer.pushAllReadyToSendInQueue(repository);
+  }
+
+  private void onCdbCallNetworkError(CdbRequest request) {
+    updateByCdbRequestIds(request, new MetricUpdater() {
+      @Override
+      public void update(@NonNull Metric.Builder builder) {
+        builder.setReadyToSend(true);
+      }
+    });
+  }
+
+  private void onCdbCallTimeout(@NonNull CdbRequest request) {
     long currentTimeInMillis = clock.getCurrentTimeInMillis();
 
     updateByCdbRequestIds(request, new MetricUpdater() {
@@ -86,8 +116,6 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
         builder.setReadyToSend(true);
       }
     });
-
-    sendingQueueProducer.pushAllReadyToSendInQueue(repository);
   }
 
   @Override
