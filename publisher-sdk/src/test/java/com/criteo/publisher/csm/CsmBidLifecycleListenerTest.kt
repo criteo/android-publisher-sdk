@@ -18,6 +18,9 @@ class CsmBidLifecycleListenerTest {
   private lateinit var repository: MetricRepository
 
   @Mock
+  private lateinit var sendingQueueProducer: MetricSendingQueueProducer
+
+  @Mock
   private lateinit var clock: Clock
 
   private lateinit var listener: CsmBidLifecycleListener
@@ -28,6 +31,7 @@ class CsmBidLifecycleListenerTest {
 
     listener = CsmBidLifecycleListener(
         repository,
+        sendingQueueProducer,
         clock
     )
   }
@@ -122,6 +126,8 @@ class CsmBidLifecycleListenerTest {
       verify(it).setCdbCallTimeoutTimestamp(1337)
       verify(it).setReadyToSend(true)
     }
+
+    verify(sendingQueueProducer).pushAllReadyToSendInQueue(repository)
   }
 
   @Test
@@ -143,6 +149,8 @@ class CsmBidLifecycleListenerTest {
       verify(it).setElapsedTimestamp(42)
       verify(it).setReadyToSend(true)
     }
+
+    verify(sendingQueueProducer).pushAllReadyToSendInQueue(repository)
   }
 
   @Test
@@ -159,6 +167,8 @@ class CsmBidLifecycleListenerTest {
     assertRepositoryIsUpdatedById("id") {
       verify(it).setReadyToSend(true)
     }
+
+    verify(sendingQueueProducer).pushAllReadyToSendInQueue(repository)
   }
 
   @Test

@@ -17,13 +17,18 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
   private final MetricRepository repository;
 
   @NonNull
+  private final MetricSendingQueueProducer sendingQueueProducer;
+
+  @NonNull
   private final Clock clock;
 
   public CsmBidLifecycleListener(
       @NonNull MetricRepository repository,
+      @NonNull MetricSendingQueueProducer sendingQueueProducer,
       @NonNull Clock clock
   ) {
     this.repository = repository;
+    this.sendingQueueProducer = sendingQueueProducer;
     this.clock = clock;
   }
 
@@ -76,6 +81,8 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
         builder.setReadyToSend(true);
       }
     });
+
+    sendingQueueProducer.pushAllReadyToSendInQueue(repository);
   }
 
   @Override
@@ -98,6 +105,8 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
         builder.setReadyToSend(true);
       }
     });
+
+    sendingQueueProducer.pushAllReadyToSendInQueue(repository);
   }
 
   private void updateByCdbRequestIds(@NonNull CdbRequest request, @NonNull MetricUpdater updater) {
