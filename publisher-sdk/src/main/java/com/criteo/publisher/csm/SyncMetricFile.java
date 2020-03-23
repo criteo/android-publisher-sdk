@@ -2,6 +2,7 @@ package com.criteo.publisher.csm;
 
 import android.support.annotation.GuardedBy;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.AtomicFile;
 import com.criteo.publisher.csm.MetricRepository.MetricUpdater;
 import java.io.BufferedInputStream;
@@ -61,7 +62,8 @@ class SyncMetricFile {
     }
   }
 
-  private void write(Metric metric) throws IOException {
+  @VisibleForTesting
+  void write(Metric metric) throws IOException {
     synchronized (fileLock) {
       // Invalidate in-memory version. This is to prevent any inconsistency in case of IO error.
       metricInMemory = new SoftReference<>(null);
@@ -80,6 +82,51 @@ class SyncMetricFile {
       Metric newMetric = builder.build();
 
       write(newMetric);
+    }
+  }
+
+  /**
+   * Move the metric represented by this instance with the given move definition.
+   * <p>
+   * The metric file is read, deleted and moved into the destination. If the move is a success, then
+   * the file of this metric is kept deleted. If the move is not a success because the destination
+   * rejected it or there was an error, then it is rollback, and the file is rewritten on disk. If
+   * there is an error during rollback or a crash just before it, then this data is lost.
+   * <p>
+   * If done the other way (deleting after inserting into destination), then there would be a
+   * potential risk of duplication of this metric file. In the context of metrics, it is preferable
+   * to lose some data rather than producing duplicate ones.
+   *
+   * @param mover definition of the move to do
+   * @throws IOException in case of error during read or rollback
+   */
+  void moveWith(MetricMover mover) throws IOException {
+    synchronized (fileLock) {
+      Metric metric = read();
+
+      if (!mover.shouldMove(metric)) {
+        return;
+      }
+
+      delete();
+      boolean success = false;
+      try {
+        if (mover.offerToDestination(metric)) {
+          success = true;
+        }
+      } finally {
+        if (!success) {
+          write(metric);
+        }
+      }
+    }
+  }
+
+  @VisibleForTesting
+  void delete() {
+    synchronized (fileLock) {
+      metricInMemory = new SoftReference<>(null);
+      file.delete();
     }
   }
 

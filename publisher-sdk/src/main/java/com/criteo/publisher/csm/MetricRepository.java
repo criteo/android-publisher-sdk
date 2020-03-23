@@ -47,6 +47,30 @@ class MetricRepository {
   }
 
   /**
+   * Move all metrics with the given mover
+   * <p>
+   * A snapshot of all existing metrics is made. All metrics from this snapshot are read, filtered,
+   * delete and move with the given mover. If a final move is unsuccessful, the individual operation
+   * is rollback.
+   * <p>
+   * Each individual operations are done atomically but if an update is done in parallel, then the
+   * outcome is not deterministic. In any case, the repository stay consistent.
+   *
+   * @param mover the definition of the move to handle
+   */
+  void moveAllWith(@NonNull MetricMover mover) {
+    Collection<File> files = directory.listFiles();
+
+    for (File metricFile : files) {
+      try {
+        getOrCreateMetricFile(metricFile).moveWith(mover);
+      } catch (IOException e) {
+        Log.d(TAG, "Error while reading metric", e);
+      }
+    }
+  }
+
+  /**
    * Returns all stored metric into this repository.
    * <p>
    * Individual metrics are read atomically, however the overall metrics are not read at the same

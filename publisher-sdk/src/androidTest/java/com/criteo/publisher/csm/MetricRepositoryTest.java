@@ -5,11 +5,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -454,6 +458,115 @@ public class MetricRepositoryTest {
 
     assertEquals(1, metrics.size());
     assertTrue(metrics.contains(expectedMetric));
+  }
+
+  @Test
+  public void updateById_AfterAMovedMetric_GetANewMetricToUpdate() throws Exception {
+    MetricMover mover = mock(MetricMover.class);
+    when(mover.shouldMove(any())).thenReturn(true);
+    when(mover.offerToDestination(any())).thenReturn(true);
+
+    repository.updateById("id", builder -> builder.setImpressionId("1"));
+    repository.moveAllWith(mover);
+
+    repository.updateById("id", builder -> {
+      assertEquals(builder.build(), Metric.builder().build());
+    });
+  }
+
+  @Test
+  public void moveAllWith_GivenEmptyRepository_DoNothing() throws Exception {
+    MetricMover mover = mock(MetricMover.class);
+
+    repository.moveAllWith(mover);
+
+    verifyNoInteractions(mover);
+  }
+
+  @Test
+  public void moveAllWith_GivenRepositoryWithMetricAndSuccessfulMove_RemoveAll() throws Exception {
+    MetricMover mover = mock(MetricMover.class);
+    when(mover.shouldMove(any())).thenReturn(true);
+    when(mover.offerToDestination(any())).thenReturn(true);
+
+    repository.updateById("id1", builder -> {});
+    givenNewRepository();
+    repository.updateById("id2", builder -> {});
+
+    repository.moveAllWith(mover);
+
+    Collection<Metric> metrics = repository.getAllStoredMetrics();
+
+    verify(mover, times(2)).shouldMove(any());
+    verify(mover, times(2)).offerToDestination(any());
+    assertTrue(metrics.isEmpty());
+  }
+
+  @Test
+  public void moveAllWith_GivenRepositoryWithMetricAndUnsuccessfulMove_RollbackAll() throws Exception {
+    MetricMover mover = mock(MetricMover.class);
+    when(mover.shouldMove(any())).thenReturn(true);
+    when(mover.offerToDestination(any())).thenReturn(false);
+
+    repository.updateById("id1", builder -> builder.setImpressionId("impId1"));
+    givenNewRepository();
+    repository.updateById("id2", builder -> builder.setImpressionId("impId2"));
+
+    repository.moveAllWith(mover);
+
+    Collection<Metric> metrics = repository.getAllStoredMetrics();
+
+    assertEquals(2, metrics.size());
+    assertTrue(metrics.contains(Metric.builder().setImpressionId("impId1").build()));
+    assertTrue(metrics.contains(Metric.builder().setImpressionId("impId2").build()));
+  }
+
+  @Test
+  public void moveAllWith_GivenRepositoryWithSuccessfulAndUnsuccessfulMove_RemoveMovedOnes() throws Exception {
+    MetricMover mover = mock(MetricMover.class);
+    when(mover.shouldMove(any())).thenReturn(true);
+    when(mover.offerToDestination(any())).thenReturn(false).thenReturn(true);
+
+    repository.updateById("id1", builder -> builder.setImpressionId("impId1"));
+    givenNewRepository();
+    repository.updateById("id2", builder -> builder.setImpressionId("impId2"));
+
+    repository.moveAllWith(mover);
+
+    Collection<Metric> metrics = repository.getAllStoredMetrics();
+
+    assertEquals(1, metrics.size());
+    assertTrue(metrics.contains(Metric.builder().setImpressionId("impId1").build()));
+  }
+
+  @Test
+  public void moveAllWith_GivenErrorWhenReadingMetric_IgnoreErrorAndDeleteOthers() throws Exception {
+    MetricMover mover = mock(MetricMover.class);
+    when(mover.shouldMove(any())).thenReturn(true);
+    when(mover.offerToDestination(any())).thenReturn(true);
+
+    parser = spy(parser);
+
+    repository.updateById("id1", builder -> builder.setImpressionId("impId1"));
+    repository.updateById("id2", builder -> builder.setImpressionId("impId2"));
+    givenNewRepository();
+
+    doThrow(IOException.class)
+        .doCallRealMethod()
+        .when(parser).read(any());
+
+    repository.moveAllWith(mover);
+
+    Collection<Metric> metrics = repository.getAllStoredMetrics();
+
+    verify(mover, times(1)).shouldMove(any());
+    verify(mover).shouldMove(argThat(metric -> {
+      assertEquals(Metric.builder().setImpressionId("impId2").build(), metric);
+      return true;
+    }));
+
+    assertEquals(1, metrics.size());
+    assertTrue(metrics.contains(Metric.builder().setImpressionId("impId1").build()));
   }
 
   private void waitForPotentialIO() {
