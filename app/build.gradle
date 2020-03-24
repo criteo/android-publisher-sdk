@@ -34,14 +34,6 @@ android.applicationVariants.all { variant ->
     }
 }
 
-configurations.all {
-    resolutionStrategy {
-        force "com.android.support:support-annotations:$support_version"
-        force "com.android.support:support-v4:$support_version"
-        force "com.android.support:customtabs:$support_version"
-    }
-}
-
 dependencies {
     implementation project(':publisher-sdk')
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -50,16 +42,20 @@ dependencies {
     implementation "com.android.support:design:$support_version"
 
     // For Google AdMob
-    implementation 'com.google.android.gms:play-services-ads:15.0.1'
+    implementation("com.google.android.gms:play-services-ads:15.0.1") {
+        exclude group: "com.android.support"
+    }
 
     // For MoPub banners
     implementation('com.mopub:mopub-sdk-banner:5.6.0@aar') {
         transitive = true
+        exclude group: "com.android.support"
     }
 
     // For MoPub interstitials
     implementation('com.mopub:mopub-sdk-interstitial:5.6.0@aar') {
         transitive = true
+        exclude group: "com.android.support"
     }
 
     memoryLeaksHuntImplementation('com.squareup.leakcanary:leakcanary-android:2.1')

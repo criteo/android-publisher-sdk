@@ -24,16 +24,6 @@ groovyHelper.addPublication(project, "release") {
     it.artifactId 'criteo-publisher-sdk'
 }
 
-configurations.all {
-    resolutionStrategy {
-        // This is needed because of the MoPub SDK. See https://stackoverflow.com/a/49350617
-        // This is caused by an incompatibility with the android support library. Indeed, MoPub SDK
-        // may use the version 28 which is different than the one used by the Publisher SDK. A
-        // solution is to force the resolution of the lib to the version used by the SDK.
-        force "com.android.support:support-v4:$support_version"
-    }
-}
-
 dependencies {
     implementation "com.android.support:support-core-utils:$support_version"
 
@@ -64,14 +54,18 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
     androidTestImplementation 'org.mockito:mockito-android:3.3.0'
-    androidTestImplementation "com.google.android.gms:play-services-ads:$admob_version"
+    androidTestImplementation("com.google.android.gms:play-services-ads:$admob_version") {
+        exclude group: "com.android.support"
+    }
 
     androidTestImplementation('com.mopub:mopub-sdk-banner:5.6.0@aar') {
         transitive = true
+        exclude group: "com.android.support"
     }
 
     // Debug is needed because MoPub need some activities to be declare in the AndroidManifest.xml
     debugImplementation('com.mopub:mopub-sdk-interstitial:5.6.0@aar') {
         transitive = true
+        exclude group: "com.android.support"
     }
 }
