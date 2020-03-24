@@ -25,13 +25,6 @@ internal fun RepositoryHandler.addDefaultInputRepository() {
   }
 }
 
-internal fun Project.addNexusRepositories() {
-  publishing {
-    addNexusProdRepository()
-    addNexusPreProdRepository()
-  }
-}
-
 internal fun PublishingExtension.addNexusPreProdRepository() {
   repositories {
     maven {

@@ -16,6 +16,5 @@ allprojects {
 }
 
 ext {
-    sdkVersion = groovyHelper.sdkVersion(project)
     sdkPublicationVersion = groovyHelper.sdkPublicationVersion(project)
 }
