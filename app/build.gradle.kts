@@ -33,32 +33,27 @@ android.applicationVariants.all {
     }
 }
 
-val support_version = "28.0.0"
-val kotlin_version = "1.3.61"
-
 dependencies {
     implementation(project(":publisher-sdk"))
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
-    implementation("com.android.support:appcompat-v7:$support_version")
-    implementation("com.android.support.constraint:constraint-layout:1.1.3")
-    implementation("com.android.support:design:$support_version")
 
-    // For Google AdMob
-    implementation("com.google.android.gms:play-services-ads:15.0.1") {
-        exclude(group = "com.android.support")
+    implementation(Deps.Kotlin.Stdlib)
+    implementation(Deps.Android.Support.AppCompatV7)
+    implementation(Deps.Android.Support.Constraint.ConstraintLayout)
+    implementation(Deps.Android.Support.Design)
+
+    implementation(Deps.Google.AdMob) {
+        exclude(group = Deps.Android.Support.group)
     }
 
-    // For MoPub banners
-    implementation("com.mopub:mopub-sdk-banner:5.6.0@aar") {
+    implementation(Deps.MoPub.Banner) {
         isTransitive = true
-        exclude(group = "com.android.support")
+        exclude(group = Deps.Android.Support.group)
     }
 
-    // For MoPub interstitials
-    implementation("com.mopub:mopub-sdk-interstitial:5.6.0@aar") {
+    implementation(Deps.MoPub.Interstitial) {
         isTransitive = true
-        exclude(group = "com.android.support")
+        exclude(group = Deps.Android.Support.group)
     }
 
-    "memoryLeaksHuntImplementation"("com.squareup.leakcanary:leakcanary-android:2.1")
+    "memoryLeaksHuntImplementation"(Deps.Square.LeakCanary)
 }

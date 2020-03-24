@@ -4,10 +4,6 @@ plugins {
     kotlin("android")
 }
 
-val support_version = "28.0.0"
-val kotlin_version = "1.3.61"
-val admob_version = "15.0.1"
-
 androidLibModule() {
     addStringBuildConfigField("cdbUrl")
     addStringBuildConfigField("remoteConfigUrl")
@@ -26,47 +22,46 @@ addPublication("release") {
 }
 
 dependencies {
-    implementation("com.android.support:support-core-utils:$support_version")
+    implementation(Deps.Android.Support.SupportCoreUtils)
 
-    compileOnly("com.google.android.gms:play-services-ads:$admob_version") {
-        exclude(group = "com.android.support")
+    compileOnly(Deps.Google.AdMob) {
+        exclude(group = Deps.Android.Support.group)
     }
 
-    implementation("com.google.auto.value:auto-value-annotations:1.6.6")
-    annotationProcessor("com.google.auto.value:auto-value:1.6.6")
+    implementation(Deps.AutoValue.Annotation)
+    annotationProcessor(Deps.AutoValue.AutoValue)
 
-    implementation("com.ryanharter.auto.value:auto-value-gson-runtime:1.3.0")
-    annotationProcessor("com.ryanharter.auto.value:auto-value-gson-extension:1.3.0")
+    implementation(Deps.AutoValue.GsonRuntime)
+    annotationProcessor(Deps.AutoValue.GsonExtension)
 
     // Optional @GsonTypeAdapterFactory support
-    annotationProcessor("com.ryanharter.auto.value:auto-value-gson-factory:1.3.0")
+    annotationProcessor(Deps.AutoValue.GsonFactory)
 
-    testImplementation("junit:junit:4.12")
-    testImplementation("org.json:json:20140107")
-    testImplementation("org.mockito:mockito-core:2.7.0")
-    testImplementation("nl.jqno.equalsverifier:equalsverifier:3.1.10")
-    testImplementation("org.assertj:assertj-core:3.11.1")
-    testImplementation("org.mock-server:mockserver-netty:5.8.1")
-    testImplementation("org.mock-server:mockserver-client-java:5.8.1")
-    testImplementation("org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
-    testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0")
+    testImplementation(Deps.JUnit.JUnit)
+    testImplementation(Deps.Mockito.Core)
+    testImplementation(Deps.EqualsVerifier.EqualsVerifier)
+    testImplementation(Deps.AssertJ.AssertJ)
+    testImplementation(Deps.MockServer.Netty)
+    testImplementation(Deps.MockServer.Client)
+    testImplementation(Deps.Kotlin.Stdlib)
+    testImplementation(Deps.Kotlin.JUnit)
+    testImplementation(Deps.Mockito.Kotlin)
 
-    androidTestImplementation("com.android.support.test:runner:1.0.2")
-    androidTestImplementation("com.android.support.test:rules:1.0.2")
-    androidTestImplementation("org.mockito:mockito-android:3.3.0")
-    androidTestImplementation("com.google.android.gms:play-services-ads:$admob_version") {
-        exclude(group = "com.android.support")
+    androidTestImplementation(Deps.Android.Test.Runner)
+    androidTestImplementation(Deps.Android.Test.Rules)
+    androidTestImplementation(Deps.Mockito.Android)
+    androidTestImplementation(Deps.Google.AdMob) {
+        exclude(group = Deps.Android.Support.group)
     }
 
-    androidTestImplementation("com.mopub:mopub-sdk-banner:5.6.0@aar") {
+    androidTestImplementation(Deps.MoPub.Banner) {
         isTransitive = true
-        exclude(group = "com.android.support")
+        exclude(group = Deps.Android.Support.group)
     }
 
     // Debug is needed because MoPub need some activities to be declare in the AndroidManifest.xml
-    debugImplementation("com.mopub:mopub-sdk-interstitial:5.6.0@aar") {
+    debugImplementation(Deps.MoPub.Interstitial) {
         isTransitive = true
-        exclude(group = "com.android.support")
+        exclude(group = Deps.Android.Support.group)
     }
 }
