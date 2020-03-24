@@ -18,6 +18,22 @@ android {
     }
 }
 
+// Export APK for all build types (release, staging, debug)
+android.applicationVariants.all { variant ->
+    outputs.all {
+        groovyHelper.addPublication(project, variant.name + "Apk") {
+            it.groupId = "com.criteo.pubsdk_android"
+            it.artifactId = "publisher-app"
+            it.pom.packaging = "apk"
+
+            it.artifact(outputFile) {
+                classifier = variant.buildType.name
+                builtBy(assembleProvider)
+            }
+        }
+    }
+}
+
 configurations.all {
     resolutionStrategy {
         force "com.android.support:support-annotations:$support_version"
@@ -48,27 +64,3 @@ dependencies {
 
     memoryLeaksHuntImplementation('com.squareup.leakcanary:leakcanary-android:2.1')
 }
-
-// Define artifacts to publish to Nexus
-
-class Apk extends Jar {
-    String getExtension() { 'apk' }
-}
-
-task packageApkRelease(type: Apk, dependsOn: 'assembleRelease') {
-    from file("${project.buildDir}/outputs/apk/memoryLeaksHunt/app-memoryLeaksHunt-release-unsigned.apk")
-    classifier 'release'
-}
-
-task packageApkDebug(type: Apk, dependsOn: 'assembleDebug') {
-    from file("${project.buildDir}/outputs/apk/memoryLeaksHunt/app-memoryLeaksHunt-debug.apk")
-    classifier 'debug'
-}
-
-groovyHelper.addPublication(project, "apk") {
-    it.groupId 'com.criteo.pubsdk_android'
-    it.artifactId 'publisher-app'
-    it.artifact packageApkRelease
-    it.artifact packageApkDebug
-}
-

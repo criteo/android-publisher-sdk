@@ -16,6 +16,14 @@ groovyHelper.androidLibModule(project) {
     it.addBooleanBuildConfigField("debugLogging")
 }
 
+groovyHelper.addAzureRepository(project)
+
+groovyHelper.addPublication(project, "release") {
+    it.from components.release
+    it.groupId 'com.criteo.publisher'
+    it.artifactId 'criteo-publisher-sdk'
+}
+
 configurations.all {
     resolutionStrategy {
         // This is needed because of the MoPub SDK. See https://stackoverflow.com/a/49350617
@@ -67,12 +75,3 @@ dependencies {
         transitive = true
     }
 }
-
-groovyHelper.addAzureRepository(project)
-
-groovyHelper.addPublication(project, "release") {
-    it.from components.release
-    it.groupId 'com.criteo.publisher'
-    it.artifactId 'criteo-publisher-sdk'
-}
-
