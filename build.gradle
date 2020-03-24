@@ -1,71 +1,21 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
     ext.kotlin_version = '1.3.61'
 
-    repositories {
-        google()
-        jcenter()
-        maven { url "https://s3.amazonaws.com/moat-sdk-builds" }
-    }
+    new GroovyHelper().addDefaultInputRepository(it)
+
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
     }
 }
+
+def groovyHelper = new GroovyHelper()
 
 allprojects {
-    repositories {
-        google()
-        jcenter()
-        maven { url "https://s3.amazonaws.com/moat-sdk-builds" }
-    }
+    groovyHelper.addDefaultInputRepository(it)
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
-}
-
-// Share publication configuration for subProjects
 ext {
-    version = "3.4.0"
-    publishVersion = project.findProperty('pubSdkVersion') ?: version
-
-    publishRepositoryConfig = {
-        repositories {
-            maven {
-                name 'NexusPreProd'
-                url 'http://nexus.criteo.preprod/content/repositories/criteo.android.releases/'
-                with mavenCredentialsIfPresent()
-            }
-
-            maven {
-                name 'NexusProd'
-                url 'http://nexus.criteo.prod/content/repositories/criteo.android.releases/'
-                with mavenCredentialsIfPresent()
-            }
-        }
-    }
-
-    getTimestamp = {
-        if (project.findProperty('appendTimestamp') == 'true') {
-            def date = new Date()
-            return "-${date.format('yyyyMMdd.HHmm')}"
-        }
-        return ""
-    }
-}
-
-Closure mavenCredentialsIfPresent() {
-    return {
-        if (System.getenv('MAVEN_USER')) {
-            credentials {
-                username = System.getenv('MAVEN_USER')
-                password = System.getenv('MAVEN_PASSWORD')
-            }
-        }
-    }
+    sdkVersion = groovyHelper.sdkVersion(project)
+    sdkPublicationVersion = groovyHelper.sdkPublicationVersion(project)
 }

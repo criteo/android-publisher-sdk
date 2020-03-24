@@ -2,6 +2,8 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 apply plugin: 'kotlin-android'
 
+def groovyHelper = new GroovyHelper()
+
 def support_version = "28.0.0"
 def admob_version = "15.0.1"
 
@@ -12,7 +14,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
-        versionName "${rootProject.publishVersion}"
+        versionName "${rootProject.sdkVersion}"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -106,19 +108,20 @@ dependencies {
     }
 }
 
-def azureLocalRepository = "${buildDir}/azure-${rootProject.publishVersion}"
+def azureLocalRepository = "${buildDir}/azure-${rootProject.sdkPublicationVersion}"
 
 afterEvaluate {
     publishing {
-        with rootProject.publishRepositoryConfig
         publications {
             release(MavenPublication) {
                 from components.release
                 groupId 'com.criteo.publisher'
                 artifactId 'criteo-publisher-sdk'
-                version "${rootProject.publishVersion}${rootProject.getTimestamp()}"
+                version "${rootProject.sdkPublicationVersion}"
             }
         }
+
+        groovyHelper.addNexusRepositories(it)
 
         repositories {
             maven {
@@ -133,7 +136,7 @@ afterEvaluate {
 task uploadToAzure {
     doLast {
         exec {
-            commandLine "bash", "../scripts/azureDeploy.sh", "${rootProject.publishVersion}", "$azureLocalRepository"
+            commandLine "bash", "../scripts/azureDeploy.sh", "${rootProject.sdkPublicationVersion}", "$azureLocalRepository"
         }
     }
 }
