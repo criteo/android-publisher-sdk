@@ -54,7 +54,7 @@ private fun MavenArtifactRepository.withMavenCredentialsIfPresent() {
   }
 }
 
-internal fun Project.addAzureRepository() {
+fun Project.addAzureRepository() {
   val localRepository = "${project.buildDir}/azure-${project.sdkPublicationVersion()}"
 
   project.afterEvaluate {

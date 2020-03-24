@@ -8,5 +8,4 @@
 set -Eeuo pipefail
 
 echo "Running a clean build on the mochi project for presubmit"
-# Deactivate temporarily for migration from Groovy -> Kotlin of gradle files
-# ./gradlew clean build assembleAndroidTest --info --stacktrace
+./gradlew clean build assembleAndroidTest --info --stacktrace
