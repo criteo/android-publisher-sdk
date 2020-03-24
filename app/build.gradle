@@ -65,17 +65,10 @@ task packageApkDebug(type: Apk, dependsOn: 'assembleDebug') {
     classifier 'debug'
 }
 
-publish {
-    publishing {
-        publications {
-            apk(MavenPublication) {
-                groupId 'com.criteo.pubsdk_android'
-                artifactId 'publisher-app'
-                version "${rootProject.sdkPublicationVersion}"
-                artifact packageApkRelease
-                artifact packageApkDebug
-            }
-        }
-    }
+groovyHelper.addPublication(project, "apk") {
+    it.groupId 'com.criteo.pubsdk_android'
+    it.artifactId 'publisher-app'
+    it.artifact packageApkRelease
+    it.artifact packageApkDebug
 }
 

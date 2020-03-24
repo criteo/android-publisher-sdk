@@ -1,9 +1,9 @@
+import groovy.lang.Closure
 import org.gradle.api.Project
 import org.gradle.api.initialization.dsl.ScriptHandler
+import org.gradle.api.publish.maven.MavenPublication
 
 class GroovyHelper() {
-
-  fun sdkPublicationVersion(project: Project) = project.sdkPublicationVersion()
 
   fun addDefaultInputRepository(project: Project) = project.addDefaultInputRepository()
 
@@ -14,5 +14,7 @@ class GroovyHelper() {
   fun androidAppModule(project: Project, applicationId: String) = project.androidAppModule(applicationId)
 
   fun androidLibModule(project: Project) = project.androidLibModule()
+
+  fun addPublication(project: Project, name: String, closure: Closure<MavenPublication>) = project.addPublication(name, closure::call)
 
 }

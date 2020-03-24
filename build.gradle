@@ -14,7 +14,3 @@ def groovyHelper = new GroovyHelper()
 allprojects {
     groovyHelper.addDefaultInputRepository(it)
 }
-
-ext {
-    sdkPublicationVersion = groovyHelper.sdkPublicationVersion(project)
-}

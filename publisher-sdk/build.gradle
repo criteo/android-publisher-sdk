@@ -77,17 +77,10 @@ dependencies {
 
 groovyHelper.addAzureRepository(project)
 
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                from components.release
-                groupId 'com.criteo.publisher'
-                artifactId 'criteo-publisher-sdk'
-                version "${rootProject.sdkPublicationVersion}"
-            }
-        }
-    }
+groovyHelper.addPublication(project, "release") {
+    it.from components.release
+    it.groupId 'com.criteo.publisher'
+    it.artifactId 'criteo-publisher-sdk'
 }
 
 Closure loadConfig(String environment) {
