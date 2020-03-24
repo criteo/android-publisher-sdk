@@ -108,7 +108,8 @@ dependencies {
     }
 }
 
-def azureLocalRepository = "${buildDir}/azure-${rootProject.sdkPublicationVersion}"
+groovyHelper.addNexusRepositories(project)
+groovyHelper.addAzureRepository(project)
 
 afterEvaluate {
     publishing {
@@ -120,30 +121,6 @@ afterEvaluate {
                 version "${rootProject.sdkPublicationVersion}"
             }
         }
-
-        groovyHelper.addNexusRepositories(it)
-
-        repositories {
-            maven {
-                // TODO EE-915 Find a way to make the upload from Gradle rather than relying on bash script
-                name = "azure"
-                url = "file://$azureLocalRepository"
-            }
-        }
-    }
-}
-
-task uploadToAzure {
-    doLast {
-        exec {
-            commandLine "bash", "../scripts/azureDeploy.sh", "${rootProject.sdkPublicationVersion}", "$azureLocalRepository"
-        }
-    }
-}
-
-tasks.withType(PublishToMavenRepository).all {
-    if (name.contains("Azure")) {
-        it.finalizedBy uploadToAzure
     }
 }
 

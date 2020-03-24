@@ -3,6 +3,11 @@ import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.initialization.dsl.ScriptHandler
 import org.gradle.api.publish.PublishingExtension
+import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
+import org.gradle.api.tasks.Exec
+import org.gradle.kotlin.dsl.getValue
+import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.registering
 
 fun Project.addDefaultInputRepository() {
   repositories.addDefaultInputRepository()
@@ -20,9 +25,11 @@ internal fun RepositoryHandler.addDefaultInputRepository() {
   }
 }
 
-internal fun PublishingExtension.addNexusRepositories() {
+internal fun Project.addNexusRepositories() {
+  publishing {
     addNexusProdRepository()
     addNexusPreProdRepository()
+  }
 }
 
 internal fun PublishingExtension.addNexusPreProdRepository() {
@@ -50,6 +57,41 @@ private fun MavenArtifactRepository.withMavenCredentialsIfPresent() {
     credentials {
       username = System.getenv("MAVEN_USER")
       password = System.getenv("MAVEN_PASSWORD")
+    }
+  }
+}
+
+internal fun Project.addAzureRepository() {
+  val localRepository = "${project.buildDir}/azure-${project.sdkPublicationVersion()}"
+
+  project.afterEvaluate {
+    publishing {
+      repositories {
+        maven {
+          // TODO EE-915 Find a way to make the upload from Gradle rather than relying on bash script
+          name = "azure"
+          setUrl("file://$localRepository")
+        }
+      }
+    }
+  }
+
+  val uploadToAzure by project.tasks.registering(Exec::class) {
+    val scriptPath = project.rootDir.toPath()
+        .resolve("./scripts/azureDeploy.sh")
+        .toAbsolutePath()
+        .toString()
+
+    commandLine(
+        "bash",
+        scriptPath,
+        project.sdkPublicationVersion(),
+        localRepository)
+  }
+
+  project.tasks.withType(PublishToMavenRepository::class.java).all {
+    if (name.contains("Azure")) {
+      finalizedBy(uploadToAzure)
     }
   }
 }

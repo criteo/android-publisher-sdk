@@ -98,10 +98,10 @@ task packageApkDebug(type: Apk, dependsOn: 'assembleDebug') {
     classifier 'debug'
 }
 
+groovyHelper.addNexusRepositories(project)
+
 publish {
     publishing {
-        groovyHelper.addNexusRepositories(it)
-
         publications {
             apk(MavenPublication) {
                 groupId 'com.criteo.pubsdk_android'
