@@ -59,7 +59,7 @@ public class CriteoUtil {
     Context context = InstrumentationRegistry.getTargetContext().getApplicationContext();
 
     return context.getSharedPreferences(
-        BuildConfig.PUBSDK_SHARED_PREFERENCES,
+        BuildConfig.pubSdkSharedPreferences,
         Context.MODE_PRIVATE);
   }
 

@@ -114,7 +114,7 @@ public class Config {
 
   private static SharedPreferences getSharedPreferences(@NonNull Context context) {
     return context.getSharedPreferences(
-        BuildConfig.PUBSDK_SHARED_PREFERENCES,
+        BuildConfig.pubSdkSharedPreferences,
         Context.MODE_PRIVATE);
   }
 

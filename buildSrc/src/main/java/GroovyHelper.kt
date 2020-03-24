@@ -13,7 +13,7 @@ class GroovyHelper() {
 
   fun androidAppModule(project: Project, applicationId: String) = project.androidAppModule(applicationId)
 
-  fun androidLibModule(project: Project) = project.androidLibModule()
+  fun androidLibModule(project: Project, closure: Closure<AndroidModule>) = project.androidLibModule(closure::call)
 
   fun addPublication(project: Project, name: String, closure: Closure<MavenPublication>) = project.addPublication(name, closure::call)
 

@@ -5,6 +5,6 @@ import com.criteo.publisher.BuildConfig;
 public class LoggingUtil {
 
   public boolean isLoggingEnabled() {
-    return BuildConfig.DEBUG_LOGGING;
+    return BuildConfig.debugLogging;
   }
 }

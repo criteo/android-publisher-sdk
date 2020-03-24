@@ -7,20 +7,13 @@ def groovyHelper = new GroovyHelper()
 def support_version = "28.0.0"
 def admob_version = "15.0.1"
 
-groovyHelper.androidLibModule(project)
-
-android {
-    buildTypes {
-        release {
-            with loadConfig('release')
-        }
-        debug {
-            with loadConfig('debug')
-        }
-        staging {
-            with loadConfig('staging')
-        }
-    }
+groovyHelper.androidLibModule(project) {
+    it.addStringBuildConfigField("cdbUrl")
+    it.addStringBuildConfigField("remoteConfigUrl")
+    it.addStringBuildConfigField("eventUrl")
+    it.addStringBuildConfigField("pubSdkSharedPreferences")
+    it.addStringBuildConfigField("csmDirectory")
+    it.addBooleanBuildConfigField("debugLogging")
 }
 
 configurations.all {
@@ -81,19 +74,5 @@ groovyHelper.addPublication(project, "release") {
     it.from components.release
     it.groupId 'com.criteo.publisher'
     it.artifactId 'criteo-publisher-sdk'
-}
-
-Closure loadConfig(String environment) {
-    def configFile = file('config.groovy')
-    def config = new ConfigSlurper(environment).parse(configFile.toURL())
-
-    return {
-        buildConfigField "String", "CDB_URL", "\"${config.cdbUrl}\""
-        buildConfigField "String", "REMOTE_CONFIG_URL", "\"${config.remoteConfigUrl}\""
-        buildConfigField "String", "EVENT_URL", "\"${config.eventUrl}\""
-        buildConfigField "String", "PUBSDK_SHARED_PREFERENCES", "\"${config.pubSdkSharedPreferences}\""
-        buildConfigField "String", "CSM_DIRECTORY", "\"${config.csmDirectory}\""
-        buildConfigField "boolean", "DEBUG_LOGGING", "${config.debugLogging}"
-    }
 }
 

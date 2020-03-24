@@ -1,19 +1,74 @@
 import com.android.build.gradle.internal.dsl.BuildType
+import groovy.util.ConfigObject
+import groovy.util.ConfigSlurper
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
+import kotlin.reflect.KClass
 
-fun Project.androidAppModule(applicationId: String) {
+class AndroidModule(private val project: Project) {
+
+  private val configByName = mutableMapOf<String, ConfigObject?>()
+
+  fun addStringBuildConfigField(name: String) {
+    addBuildConfigField(name, String::class)
+  }
+
+  fun addBooleanBuildConfigField(name: String) {
+    addBuildConfigField(name, Boolean::class)
+  }
+
+  fun <T : Any> addBuildConfigField(name: String, klass: KClass<T>) {
+    project.androidBase {
+      buildTypes.all {
+        getConfig(getName())?.let {
+          when (klass) {
+            String::class -> addStringField(name, it)
+            Boolean::class -> addBooleanField(name, it)
+            else -> {
+              throw UnsupportedOperationException()
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private fun BuildType.addStringField(name: String, config: ConfigObject) {
+    buildConfigField("String", name, "\"${config[name]}\"")
+  }
+
+  private fun BuildType.addBooleanField(name: String, config: ConfigObject) {
+    buildConfigField("boolean", name, "${config[name]}")
+  }
+
+  private fun getConfig(name: String): ConfigObject? {
+    return configByName.computeIfAbsent(name) {
+      val configFile = project.file("config.groovy")
+      if (configFile.exists()) {
+        ConfigSlurper(it).parse(configFile.toURL())
+      } else {
+        null
+      }
+    }
+  }
+}
+
+fun Project.androidAppModule(applicationId: String, configure: AndroidModule.() -> Unit = {}) {
   defaultAndroidModule()
 
   androidApp {
     defaultConfig.applicationId = applicationId
   }
+
+  configure(AndroidModule(this))
 }
 
-fun Project.androidLibModule() {
+fun Project.androidLibModule(configure: AndroidModule.() -> Unit = {}) {
   defaultAndroidModule()
+
+  configure(AndroidModule(this))
 }
 
 private fun Project.defaultAndroidModule() {

@@ -59,7 +59,7 @@ class MetricDirectory {
   @VisibleForTesting
   @NonNull
   File getDirectoryFile() {
-    return context.getDir(BuildConfig.CSM_DIRECTORY, Context.MODE_PRIVATE);
+    return context.getDir(BuildConfig.csmDirectory, Context.MODE_PRIVATE);
   }
 
 }

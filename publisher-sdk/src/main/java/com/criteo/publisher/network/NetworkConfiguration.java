@@ -5,15 +5,15 @@ import com.criteo.publisher.BuildConfig;
 public class NetworkConfiguration {
 
   String getCdbUrl() {
-    return BuildConfig.CDB_URL;
+    return BuildConfig.cdbUrl;
   }
 
   String getRemoteConfigUrl() {
-    return BuildConfig.REMOTE_CONFIG_URL;
+    return BuildConfig.remoteConfigUrl;
   }
 
   String getEventUrl() {
-    return BuildConfig.EVENT_URL;
+    return BuildConfig.eventUrl;
   }
 
 }

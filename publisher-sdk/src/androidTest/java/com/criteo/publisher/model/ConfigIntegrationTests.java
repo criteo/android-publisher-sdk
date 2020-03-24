@@ -313,7 +313,7 @@ public class ConfigIntegrationTests {
 
   private SharedPreferences getSharedPreferences() {
     return context.getSharedPreferences(
-        BuildConfig.PUBSDK_SHARED_PREFERENCES,
+        BuildConfig.pubSdkSharedPreferences,
         Context.MODE_PRIVATE);
   }
 
