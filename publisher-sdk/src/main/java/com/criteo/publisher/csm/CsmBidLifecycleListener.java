@@ -11,6 +11,12 @@ import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.Slot;
 import java.net.SocketTimeoutException;
 
+/**
+ * Update metrics files accordingly to received events.
+ * <p>
+ * This follows specifications given by <a href="https://confluence.criteois.com/display/PUBSDK/Publisher+SDK+-+Client+Side+Metrics">Client
+ * Side Metrics</a>.
+ */
 public class CsmBidLifecycleListener implements BidLifecycleListener {
 
   @NonNull
@@ -32,11 +38,23 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
     this.clock = clock;
   }
 
+  /**
+   * SDK initialization is caused either by a fresh or restart of the application. As a consequence,
+   * the in-memory bid-cache is lost and the metrics associated to the previously cached bids will
+   * never be updated again. In this case, all previously stored metrics are moved to the sending
+   * queue.
+   */
   @Override
   public void onSdkInitialized() {
     sendingQueueProducer.pushAllInQueue(repository);
   }
 
+  /**
+   * On CDB call start, each requested slot is tracked by a new metric. The metrics marks the
+   * timestamp of this event and wait for further updates.
+   *
+   * @param request Request sent to CDB
+   */
   @Override
   public void onCdbCallStarted(@NonNull CdbRequest request) {
     long currentTimeInMillis = clock.getCurrentTimeInMillis();
@@ -49,6 +67,23 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
     });
   }
 
+  /**
+   * When the CDB call ends successfully, metrics corresponding to requested slots are updated
+   * accordingly to the response.
+   * <p>
+   * If there is no response for a slot, then it is a no bid. The metric marks the timestamp of this
+   * event and, as no consumption of this no-bid is expected, the metric is tagged as finished and
+   * ready to send.
+   * <p>
+   * If there is a matching invalid slot, then it is considered as an error. The metric is not
+   * longer updated and is flagged as ready to send.
+   * <p>
+   * If there is a matching valid slot, then it is a consumable bid. The metric marks the timestamp
+   * of this event, and waits for further updates (via consumption).
+   *
+   * @param request Request that was sent to CDB
+   * @param response Response coming from CDB
+   */
   @Override
   public void onCdbCallFinished(@NonNull CdbRequest request, @NonNull CdbResponse response) {
     boolean shouldPushInQueue = false;
@@ -85,6 +120,16 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
     }
   }
 
+  /**
+   * On CDB call failed, metrics corresponding to the requested slots are updated.
+   * <p>
+   * If the failure is a timeout, then all metrics are flagged as having a timeout.
+   * <p>
+   * Then, since no further updates are expected, all metrics are flagged as ready to send.
+   *
+   * @param request Request that was sent to CDB
+   * @param exception Exception representing the failure of the call
+   */
   @Override
   public void onCdbCallFailed(@NonNull CdbRequest request, @NonNull Exception exception) {
     boolean isTimeout = exception instanceof SocketTimeoutException;
@@ -116,6 +161,18 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
     });
   }
 
+  /**
+   * On bid consumption, the metric associated to the bid is updated.
+   * <p>
+   * If the bid has not expired, then the bid managed to go from CDB to the user. The metric marks
+   * the timestamp of this event.
+   * <p>
+   * Since this is the end of the bid lifecycle, the metric does not expect further updates and is
+   * flagged as ready to send.
+   *
+   * @param adUnit ad unit representing the bid
+   * @param consumedBid bid that was consumed
+   */
   @Override
   public void onBidConsumed(@NonNull CacheAdUnit adUnit, @NonNull Slot consumedBid) {
     String impressionId = consumedBid.getImpressionId();
