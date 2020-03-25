@@ -1,11 +1,14 @@
 package com.criteo.publisher;
 
+import android.os.Build.VERSION_CODES;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.MessageQueue;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import java.util.concurrent.CountDownLatch;
 
+@RequiresApi(api = VERSION_CODES.M)
 public class ThreadingUtil {
 
   public static void runOnMainThreadAndWait(@NonNull Runnable runnable) {

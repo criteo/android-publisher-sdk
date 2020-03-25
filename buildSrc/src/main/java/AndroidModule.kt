@@ -133,10 +133,12 @@ private fun Project.defaultAndroidModule() {
     }
   }
 
-  afterEvaluate {
-    publishing {
-      addNexusPreProdRepository()
-      addNexusProdRepository()
+  if (hasPublishing()) {
+    afterEvaluate {
+      publishing {
+        addNexusPreProdRepository()
+        addNexusProdRepository()
+      }
     }
   }
 }

@@ -9,6 +9,8 @@ import static org.mockito.Mockito.mock;
 import android.app.Activity;
 import android.app.Application;
 import android.app.Application.ActivityLifecycleCallbacks;
+import android.os.Build.VERSION_CODES;
+import android.support.annotation.RequiresApi;
 import android.support.test.InstrumentationRegistry;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+@RequiresApi(api = VERSION_CODES.N)
 public class WebViewLookup {
 
   private static final String GET_OUTER_HTML = "(function() { return encodeURIComponent(document.getElementsByTagName('html')[0].outerHTML); })();";

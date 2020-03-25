@@ -19,8 +19,7 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 /**
- * Use this Rule when writing tests that require mocking global dependencies See {@link
- * com.criteo.publisher.degraded.StandaloneDegradedTest} for example.
+ * Use this Rule when writing tests that require mocking global dependencies.
  */
 public class MockedDependenciesRule implements TestRule {
 

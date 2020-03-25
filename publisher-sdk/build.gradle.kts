@@ -47,6 +47,7 @@ dependencies {
     testImplementation(Deps.Kotlin.JUnit)
     testImplementation(Deps.Mockito.Kotlin)
 
+    androidTestImplementation(project(":test-utils"))
     androidTestImplementation(Deps.Android.Test.Runner)
     androidTestImplementation(Deps.Android.Test.Rules)
     androidTestImplementation(Deps.Mockito.Android)

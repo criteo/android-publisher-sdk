@@ -12,3 +12,6 @@ internal fun Project.androidApp(configure: AppExtension.() -> Unit): Unit =
 
 internal fun Project.publishing(configure: PublishingExtension.() -> Unit): Unit =
     (this as ExtensionAware).extensions.configure("publishing", configure)
+
+internal fun Project.hasPublishing(): Boolean =
+    hasProperty("publishing")

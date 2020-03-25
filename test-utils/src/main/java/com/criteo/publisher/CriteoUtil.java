@@ -31,8 +31,7 @@ public class CriteoUtil {
     Criteo.setInstance(null);
   }
 
-  public static Criteo.Builder getCriteoBuilder(AdUnit... preloadedAdUnits)
-      throws CriteoInitException {
+  public static Criteo.Builder getCriteoBuilder(AdUnit... preloadedAdUnits) {
     Application app = (Application) InstrumentationRegistry.getTargetContext()
         .getApplicationContext();
 
@@ -40,8 +39,7 @@ public class CriteoUtil {
     Criteo.setInstance(null);
 
     List<AdUnit> adUnits = Arrays.asList(preloadedAdUnits);
-    Criteo.Builder builder = new Criteo.Builder(app, TEST_CP_ID).adUnits(adUnits);
-    return builder;
+    return new Criteo.Builder(app, TEST_CP_ID).adUnits(adUnits);
   }
 
   /**
