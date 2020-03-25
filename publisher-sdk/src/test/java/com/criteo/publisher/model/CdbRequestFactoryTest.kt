@@ -50,7 +50,6 @@ class CdbRequestFactoryTest {
     fun setUp() {
         MockitoAnnotations.initMocks(this)
 
-        whenever(deviceUtil.deviceModel).thenReturn("deviceModel")
         whenever(userPrivacyUtil.mopubConsent).thenReturn("mopubConsent")
         whenever(userPrivacyUtil.iabUsPrivacyString).thenReturn("iabUsPrivacyString")
         whenever(userPrivacyUtil.usPrivacyOptout).thenReturn("usPrivacyoptout")

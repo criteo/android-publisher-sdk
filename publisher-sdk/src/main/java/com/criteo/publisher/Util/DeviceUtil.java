@@ -53,18 +53,7 @@ public class DeviceUtil {
   public AdSize getSizeLandscape() {
     return sizeLandscape;
   }
-
-  @NonNull
-  public String getDeviceModel() {
-    String manufacturer = Build.MANUFACTURER;
-    String model = Build.MODEL;
-    if (model.toLowerCase(Locale.ROOT).startsWith(manufacturer.toLowerCase(Locale.ROOT))) {
-      return model;
-    } else {
-      return manufacturer + " " + model;
-    }
-  }
-
+  
   @Nullable
   public String getAdvertisingId() {
     try {

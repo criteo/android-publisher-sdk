@@ -29,11 +29,6 @@ public class DeviceUtilIntegrationTest {
   // TODO Create Intrumentation Test , change settings as Limited and test
 
   @Test
-  public void getDeviceModelTest() {
-    assertNotNull(deviceUtil.getDeviceModel());
-  }
-
-  @Test
   public void isVersionSupported_GivenDeviceAboveOrEqual19_ReturnsTrue() {
     if (VERSION.SDK_INT < 19) {
       throw new AssumptionViolatedException("Version of device should be >= 19");

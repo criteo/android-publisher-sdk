@@ -343,7 +343,6 @@ public class BidManagerFunctionalTest {
 
     User expectedUser = User.create(
         deviceUtil.getAdvertisingId(),
-        deviceUtil.getDeviceModel(),
         null,
         null,
         null

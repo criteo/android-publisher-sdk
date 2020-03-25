@@ -57,7 +57,6 @@ public class CdbRequestFactory {
   public CdbRequest createRequest(List<CacheAdUnit> requestedAdUnits) {
     User user = User.create(
         deviceUtil.getAdvertisingId(),
-        deviceUtil.getDeviceModel(),
         getNotEmptyOrNullValue(userPrivacyUtil.getMopubConsent()),
         getNotEmptyOrNullValue(userPrivacyUtil.getIabUsPrivacyString()),
         getNotEmptyOrNullValue(userPrivacyUtil.getUsPrivacyOptout())
