@@ -27,4 +27,9 @@ public class BuildConfigWrapper {
   public String getEventUrl() {
     return BuildConfig.eventUrl;
   }
+
+  @NonNull
+  public boolean isDebug() {
+    return BuildConfig.DEBUG;
+  }
 }

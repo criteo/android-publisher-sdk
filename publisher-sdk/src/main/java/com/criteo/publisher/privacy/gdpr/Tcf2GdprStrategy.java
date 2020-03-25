@@ -1,7 +1,8 @@
 package com.criteo.publisher.privacy.gdpr;
 
-import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
+import com.criteo.publisher.Util.SafeSharedPreferences;
 
 /**
  * https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/tree/master/TCFv2
@@ -10,29 +11,38 @@ public class Tcf2GdprStrategy implements TcfGdprStrategy {
 
   private static final int GDPR_APPLIES_UNSET = -1;
 
-  private final SharedPreferences sharedPreferences;
+  @VisibleForTesting
+  static final String IAB_TCString_Key = "IABTCF_TCString";
 
-  public Tcf2GdprStrategy(SharedPreferences sharedPreferences) {
-    this.sharedPreferences = sharedPreferences;
+  @VisibleForTesting
+  static final String IAB_GDPR_APPLIES_KEY = "IABTCF_gdprApplies";
+
+  @VisibleForTesting
+  static final String IABTCF_VendorConsents = "IABTCF_VendorConsents";
+
+  private final SafeSharedPreferences safeSharedPreferences;
+
+  public Tcf2GdprStrategy(SafeSharedPreferences safeSharedPreferences) {
+    this.safeSharedPreferences = safeSharedPreferences;
   }
 
   @Override
   @NonNull
   public String getConsentString() {
-    return sharedPreferences.getString("IABTCF_TCString", "");
+    return safeSharedPreferences.getString(IAB_TCString_Key, "");
   }
 
   @Override
   @NonNull
   public String getSubjectToGdpr() {
-    int gdprApplies = sharedPreferences.getInt("IABTCF_gdprApplies", GDPR_APPLIES_UNSET);
+    int gdprApplies = safeSharedPreferences.getInt(IAB_GDPR_APPLIES_KEY, GDPR_APPLIES_UNSET);
     return String.valueOf(gdprApplies);
   }
 
   @Override
   @NonNull
   public String getVendorConsents() {
-    return sharedPreferences.getString("IABTCF_VendorConsents", "");
+    return safeSharedPreferences.getString(IABTCF_VendorConsents, "");
   }
 
   @Override

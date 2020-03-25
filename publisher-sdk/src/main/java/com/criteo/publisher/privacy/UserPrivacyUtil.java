@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import com.criteo.publisher.Util.SafeSharedPreferences;
 import com.criteo.publisher.privacy.gdpr.GdprData;
 import com.criteo.publisher.privacy.gdpr.GdprDataFetcher;
 import java.util.Arrays;
@@ -30,12 +31,17 @@ public class UserPrivacyUtil {
       .asList("explicit_no", "potential_whitelist", "dnt");
 
   // Key provided by the IAB CCPA Compliance Framework
-  private static final String IAB_USPRIVACY_SHARED_PREFS_KEY = "IABUSPrivacy_String";
+  @VisibleForTesting
+  static final String IAB_USPRIVACY_SHARED_PREFS_KEY = "IABUSPrivacy_String";
 
   // Storage key for the binary optout (for CCPA)
-  private static final String OPTOUT_USPRIVACY_SHARED_PREFS_KEY = "USPrivacy_Optout";
+  @VisibleForTesting
+  static final String OPTOUT_USPRIVACY_SHARED_PREFS_KEY = "USPrivacy_Optout";
 
-  private static final String MOPUB_CONSENT_SHARED_PREFS_KEY = "MoPubConsent_String";
+  @VisibleForTesting
+  static final String MOPUB_CONSENT_SHARED_PREFS_KEY = "MoPubConsent_String";
+
+  private final SafeSharedPreferences safeSharedPreferences;
 
   private final SharedPreferences sharedPreferences;
 
@@ -49,9 +55,12 @@ public class UserPrivacyUtil {
   }
 
   @VisibleForTesting
-  UserPrivacyUtil(@NonNull SharedPreferences sharedPreferences,
-      @NonNull GdprDataFetcher gdprDataFetcher) {
+  UserPrivacyUtil(
+      @NonNull SharedPreferences sharedPreferences,
+      @NonNull GdprDataFetcher gdprDataFetcher
+  ) {
     this.sharedPreferences = sharedPreferences;
+    this.safeSharedPreferences = new SafeSharedPreferences(sharedPreferences);
     this.gdprDataFetcher = gdprDataFetcher;
   }
 
@@ -62,7 +71,7 @@ public class UserPrivacyUtil {
 
   @NonNull
   public String getIabUsPrivacyString() {
-    return sharedPreferences.getString(IAB_USPRIVACY_SHARED_PREFS_KEY, "");
+    return safeSharedPreferences.getString(IAB_USPRIVACY_SHARED_PREFS_KEY, "");
   }
 
   public void storeUsPrivacyOptout(boolean uspOptout) {
@@ -73,7 +82,7 @@ public class UserPrivacyUtil {
 
   @NonNull
   public String getUsPrivacyOptout() {
-    return sharedPreferences.getString(OPTOUT_USPRIVACY_SHARED_PREFS_KEY, "");
+    return safeSharedPreferences.getString(OPTOUT_USPRIVACY_SHARED_PREFS_KEY, "");
   }
 
   /**
@@ -123,6 +132,6 @@ public class UserPrivacyUtil {
 
   @NonNull
   public String getMopubConsent() {
-    return sharedPreferences.getString(MOPUB_CONSENT_SHARED_PREFS_KEY, "");
+    return safeSharedPreferences.getString(MOPUB_CONSENT_SHARED_PREFS_KEY, "");
   }
 }

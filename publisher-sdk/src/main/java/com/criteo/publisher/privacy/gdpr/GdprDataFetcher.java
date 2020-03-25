@@ -5,6 +5,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import com.criteo.publisher.Util.SafeSharedPreferences;
 
 public class GdprDataFetcher {
 
@@ -20,7 +21,11 @@ public class GdprDataFetcher {
   private final TcfStrategyResolver tcfStrategyResolver;
 
   public GdprDataFetcher(@NonNull Context context) {
-    this(new TcfStrategyResolver(PreferenceManager.getDefaultSharedPreferences(context)));
+    this(
+        new TcfStrategyResolver(
+            new SafeSharedPreferences(PreferenceManager.getDefaultSharedPreferences(context))
+        )
+    );
   }
 
   @VisibleForTesting

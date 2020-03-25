@@ -1,6 +1,6 @@
 package com.criteo.publisher.privacy.gdpr
 
-import android.content.SharedPreferences
+import com.criteo.publisher.Util.SafeSharedPreferences
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.Test
@@ -12,13 +12,13 @@ class TcfStrategyResolvedTests {
     @Test
     fun testResolveTcfStrategy_WhenBothConsentStringsAreProvided_Tcf2IsSelected() {
         // Given
-        val sharedPreferences = mock<SharedPreferences> {
+        val safeSharedPreferences = mock<SafeSharedPreferences> {
             on { getString("IABTCF_TCString", "") } doReturn "non_empty"
             on { getInt("IABTCF_gdprApplies", -1) } doReturn 0
             on { getString("IABTCF_VendorConsents", "") } doReturn "non_empty"
         }
 
-        val tcfStrategyResolver = TcfStrategyResolver(sharedPreferences)
+        val tcfStrategyResolver = TcfStrategyResolver(safeSharedPreferences)
 
         // When
         val tcfStrategy = tcfStrategyResolver.resolveTcfStrategy()
@@ -32,7 +32,7 @@ class TcfStrategyResolvedTests {
     @Test
     fun testResolveTcfStrategy_WhenTCF2ConsentStringsIsProvied_Tcf2IsSelected() {
         // Given
-        val sharedPreferences = mock<SharedPreferences> {
+        val safeSharedPreferences = mock<SafeSharedPreferences> {
             on { getString("IABTCF_TCString", "") } doReturn "non_empty"
             on { getInt("IABTCF_gdprApplies", -1) } doReturn 0
             on { getString("IABTCF_VendorConsents", "") } doReturn "non_empty"
@@ -40,7 +40,7 @@ class TcfStrategyResolvedTests {
             on { getString("IABConsent_ParsedVendorConsents", "") } doReturn "non_empty"
         }
 
-        val tcfStrategyResolver = TcfStrategyResolver(sharedPreferences)
+        val tcfStrategyResolver = TcfStrategyResolver(safeSharedPreferences)
 
         // When
         val tcfStrategy = tcfStrategyResolver.resolveTcfStrategy()
@@ -54,7 +54,7 @@ class TcfStrategyResolvedTests {
     @Test
     fun testResolveTcfStrategy_WhenTCF1ConsentStringsIsProvied_Tcf1IsSelected() {
         // Given
-        val sharedPreferences = mock<SharedPreferences> {
+        val safeSharedPreferences = mock<SafeSharedPreferences> {
             on { getString("IABTCF_TCString", "") } doReturn ""
             on { getInt("IABTCF_gdprApplies", -1) } doReturn 0
             on { getString("IABTCF_VendorConsents", "") } doReturn ""
@@ -63,7 +63,7 @@ class TcfStrategyResolvedTests {
             on { getString("IABConsent_ParsedVendorConsents", "") } doReturn "non_empty"
         }
 
-        val tcfStrategyResolver = TcfStrategyResolver(sharedPreferences)
+        val tcfStrategyResolver = TcfStrategyResolver(safeSharedPreferences)
 
         // When
         val tcfStrategy = tcfStrategyResolver.resolveTcfStrategy()
@@ -78,7 +78,7 @@ class TcfStrategyResolvedTests {
     @Test
     fun testResolveTcfStrategy_WhenNoConsentStringIsProvided_StrategyIsNull() {
         // Given
-        val sharedPreferences = mock<SharedPreferences> {
+        val safeSharedPreferences = mock<SafeSharedPreferences> {
             on { getString("IABTCF_TCString", "") } doReturn ""
             on { getInt("IABTCF_gdprApplies", -1) } doReturn 0
             on { getString("IABTCF_VendorConsents", "") } doReturn ""
@@ -87,7 +87,7 @@ class TcfStrategyResolvedTests {
             on { getString("IABConsent_ParsedVendorConsents", "") } doReturn ""
         }
 
-        val tcfStrategyResolver = TcfStrategyResolver(sharedPreferences)
+        val tcfStrategyResolver = TcfStrategyResolver(safeSharedPreferences)
 
         // When
         val tcfStrategy = tcfStrategyResolver.resolveTcfStrategy()
