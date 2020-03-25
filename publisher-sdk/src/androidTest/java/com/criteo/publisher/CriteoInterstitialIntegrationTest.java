@@ -1,8 +1,9 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
-import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
+import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 import static com.criteo.publisher.Util.CompletableFuture.completedFuture;
+import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -11,7 +12,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import android.support.test.InstrumentationRegistry;
-import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.concurrent.ThreadingUtil;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import java.util.UUID;
 import org.junit.Before;
@@ -92,7 +94,7 @@ public class CriteoInterstitialIntegrationTest {
   }
 
   private void waitForIdleState() {
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
   }
 
   private CriteoInterstitial createInterstitial() {

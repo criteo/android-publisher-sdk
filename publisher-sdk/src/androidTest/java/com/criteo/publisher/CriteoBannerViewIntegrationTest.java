@@ -1,12 +1,14 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
-import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
+import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
+import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import android.support.test.InstrumentationRegistry;
-import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.concurrent.ThreadingUtil;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.BannerAdUnit;
 import java.util.UUID;
 import org.junit.Before;
@@ -57,7 +59,7 @@ public class CriteoBannerViewIntegrationTest {
   }
 
   private void waitForIdleState() {
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
   }
 
 }

@@ -1,4 +1,4 @@
-package com.criteo.publisher;
+package com.criteo.publisher.concurrent;
 
 import android.support.annotation.NonNull;
 import java.util.Queue;

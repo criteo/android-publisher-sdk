@@ -1,6 +1,6 @@
-package com.criteo.publisher.Util;
+package com.criteo.publisher.view;
 
-import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
+import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 import static org.mockito.AdditionalAnswers.answerVoid;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import com.criteo.publisher.Util.CompletableFuture;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;

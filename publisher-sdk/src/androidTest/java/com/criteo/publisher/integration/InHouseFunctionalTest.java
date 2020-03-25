@@ -2,7 +2,8 @@ package com.criteo.publisher.integration;
 
 import static com.criteo.publisher.CriteoErrorCode.ERROR_CODE_NO_FILL;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
-import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
+import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
+import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -16,8 +17,8 @@ import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.TestAdUnits;
-import com.criteo.publisher.ThreadingUtil;
-import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.concurrent.ThreadingUtil;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -105,7 +106,7 @@ public class InHouseFunctionalTest {
   }
 
   private void waitForIdleState() {
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
   }
 
   private Criteo givenInitializedSdk(AdUnit... adUnits) throws CriteoInitException {

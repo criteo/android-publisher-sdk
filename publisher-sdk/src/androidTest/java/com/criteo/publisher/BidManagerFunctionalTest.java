@@ -1,8 +1,10 @@
 package com.criteo.publisher;
 
-import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
+import static com.criteo.publisher.CriteoUtil.clearSharedPreferences;
+import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
 import static com.criteo.publisher.Util.CompletableFuture.completedFuture;
+import static com.criteo.publisher.concurrent.ThreadingUtil.waitForMessageQueueToBeIdle;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
@@ -29,7 +31,8 @@ import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.BuildConfigWrapper;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.concurrent.ThreadingUtil;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.model.AdSize;
@@ -107,7 +110,7 @@ public class BidManagerFunctionalTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    CriteoUtil.clearSharedPreferences();
+    clearSharedPreferences();
 
     dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
@@ -135,7 +138,7 @@ public class BidManagerFunctionalTest {
 
   @After
   public void tearDown() throws Exception {
-    CriteoUtil.clearSharedPreferences();
+    clearSharedPreferences();
   }
 
   @Test
@@ -192,7 +195,7 @@ public class BidManagerFunctionalTest {
     // is running on it.
     when(dependencyProvider.provideThreadPoolExecutor()).thenReturn(runnable -> {
       runnable.run();
-      ThreadingUtil.waitForMessageQueueToBeIdle();
+      waitForMessageQueueToBeIdle();
     });
 
     List<AdUnit> prefetchAdUnits = Arrays.asList(

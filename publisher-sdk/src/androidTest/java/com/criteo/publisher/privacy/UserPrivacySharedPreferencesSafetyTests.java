@@ -10,7 +10,7 @@ import android.preference.PreferenceManager;
 import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.Util.BuildConfigWrapper;
-import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;

@@ -2,6 +2,7 @@ package com.criteo.publisher.model;
 
 import static com.criteo.publisher.CriteoUtil.clearCriteo;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
+import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -23,8 +24,8 @@ import com.criteo.publisher.BuildConfig;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.CriteoUtil;
-import com.criteo.publisher.ThreadingUtil;
-import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.concurrent.ThreadingUtil;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.network.PubSdkApi;
 import org.json.JSONObject;
 import org.junit.After;
@@ -318,6 +319,6 @@ public class ConfigIntegrationTests {
   }
 
   private void waitForIdleState() {
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
   }
 }

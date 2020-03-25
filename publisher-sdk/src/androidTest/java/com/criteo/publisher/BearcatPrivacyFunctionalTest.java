@@ -1,5 +1,7 @@
 package com.criteo.publisher;
 
+import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
+import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
@@ -12,7 +14,8 @@ import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
-import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.concurrent.ThreadingUtil;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
 import java.util.Arrays;
@@ -203,11 +206,11 @@ public class BearcatPrivacyFunctionalTest {
     writeIntoDefaultSharedPrefs("USPrivacy_Optout", binaryOptout);
     writeIntoDefaultSharedPrefs("MoPubConsent_String", mopubConsentString);
 
-    CriteoUtil.givenInitializedCriteo(TestAdUnits.BANNER_320_50);
+    givenInitializedCriteo(TestAdUnits.BANNER_320_50);
 
     activityRule.launchActivity(new Intent());
 
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     if (callBearcat) {
       verify(pubSdkApi)

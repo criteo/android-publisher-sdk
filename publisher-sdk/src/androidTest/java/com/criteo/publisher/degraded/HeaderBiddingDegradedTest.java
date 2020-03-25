@@ -1,5 +1,6 @@
 package com.criteo.publisher.degraded;
 
+import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -7,7 +8,7 @@ import static org.mockito.Mockito.when;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.DependencyProvider;
-import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.network.PubSdkApi;
 import org.junit.Before;
@@ -38,7 +39,7 @@ public class HeaderBiddingDegradedTest {
 
     DegradedUtil.assumeIsDegraded();
 
-    criteo = CriteoUtil.givenInitializedCriteo();
+    criteo = givenInitializedCriteo();
   }
 
   @Test

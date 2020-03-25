@@ -1,4 +1,4 @@
-package com.criteo.publisher.Util;
+package com.criteo.publisher.mock;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -7,8 +7,7 @@ import static org.mockito.Mockito.spy;
 
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.MockableDependencyProvider;
-import com.criteo.publisher.TrackingCommandsExecutor;
-import com.criteo.publisher.mock.ResultCaptor;
+import com.criteo.publisher.concurrent.TrackingCommandsExecutor;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.network.PubSdkApi;
 import java.util.concurrent.Executor;

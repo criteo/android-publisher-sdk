@@ -1,8 +1,8 @@
 package com.criteo.publisher.manual;
 
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
-import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
-import static com.criteo.publisher.ThreadingUtil.waitForAllThreads;
+import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
+import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 
 import android.content.Context;
 import android.support.test.rule.ActivityTestRule;
@@ -12,7 +12,7 @@ import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.Util.CompletableFuture;
-import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.test.activity.DummyActivity;
 import org.junit.Before;

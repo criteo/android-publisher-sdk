@@ -1,6 +1,8 @@
 package com.criteo.publisher.network;
 
-import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
+import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
+import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
+import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
@@ -12,9 +14,9 @@ import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.DependencyProvider;
-import com.criteo.publisher.ThreadingUtil;
+import com.criteo.publisher.concurrent.ThreadingUtil;
 import com.criteo.publisher.Util.AdvertisingInfo;
-import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbRequest;
@@ -61,8 +63,8 @@ public class DeviceIdTest {
     when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(null);
     when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(false);
 
-    CriteoUtil.givenInitializedCriteo(bannerAdUnit);
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    givenInitializedCriteo(bannerAdUnit);
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
@@ -75,8 +77,8 @@ public class DeviceIdTest {
     when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(null);
     when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(true);
 
-    CriteoUtil.givenInitializedCriteo(bannerAdUnit);
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    givenInitializedCriteo(bannerAdUnit);
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
@@ -89,8 +91,8 @@ public class DeviceIdTest {
     when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(FAKE_DEVICE_ID);
     when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(false);
 
-    CriteoUtil.givenInitializedCriteo(bannerAdUnit);
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    givenInitializedCriteo(bannerAdUnit);
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
@@ -105,8 +107,8 @@ public class DeviceIdTest {
     when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(FAKE_DEVICE_ID);
     when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(true);
 
-    CriteoUtil.givenInitializedCriteo(bannerAdUnit);
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    givenInitializedCriteo(bannerAdUnit);
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
@@ -121,15 +123,15 @@ public class DeviceIdTest {
     when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(null);
     when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(false);
 
-    CriteoUtil.givenInitializedCriteo();
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    givenInitializedCriteo();
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     runOnMainThreadAndWait(() -> {
       CriteoBannerView bannerView = new CriteoBannerView(context, bannerAdUnit);
       bannerView.loadAd();
     });
 
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
@@ -142,15 +144,15 @@ public class DeviceIdTest {
     when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(FAKE_DEVICE_ID);
     when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(false);
 
-    CriteoUtil.givenInitializedCriteo();
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    givenInitializedCriteo();
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     runOnMainThreadAndWait(() -> {
       CriteoBannerView bannerView = new CriteoBannerView(context, bannerAdUnit);
       bannerView.loadAd();
     });
 
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
@@ -163,15 +165,15 @@ public class DeviceIdTest {
     when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(null);
     when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(true);
 
-    CriteoUtil.givenInitializedCriteo();
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    givenInitializedCriteo();
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     runOnMainThreadAndWait(() -> {
       CriteoBannerView bannerView = new CriteoBannerView(context, bannerAdUnit);
       bannerView.loadAd();
     });
 
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
@@ -184,15 +186,15 @@ public class DeviceIdTest {
     when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(FAKE_DEVICE_ID);
     when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(true);
 
-    CriteoUtil.givenInitializedCriteo();
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    givenInitializedCriteo();
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     runOnMainThreadAndWait(() -> {
       CriteoBannerView bannerView = new CriteoBannerView(context, bannerAdUnit);
       bannerView.loadAd();
     });
 
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 

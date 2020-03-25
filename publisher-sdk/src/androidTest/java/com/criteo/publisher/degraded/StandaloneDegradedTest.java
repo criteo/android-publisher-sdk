@@ -1,6 +1,7 @@
 package com.criteo.publisher.degraded;
 
-import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
+import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
+import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -18,7 +19,7 @@ import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.DependencyProvider;
-import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
@@ -55,7 +56,7 @@ public class StandaloneDegradedTest {
 
     context = InstrumentationRegistry.getContext();
 
-    CriteoUtil.givenInitializedCriteo();
+    givenInitializedCriteo();
   }
 
   @Test

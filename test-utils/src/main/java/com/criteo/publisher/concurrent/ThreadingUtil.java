@@ -1,4 +1,4 @@
-package com.criteo.publisher;
+package com.criteo.publisher.concurrent;
 
 import android.os.Build.VERSION_CODES;
 import android.os.Handler;

@@ -1,5 +1,6 @@
 package com.criteo.publisher.model;
 
+import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -10,8 +11,8 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.test.InstrumentationRegistry;
-import com.criteo.publisher.ThreadingUtil;
-import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.concurrent.ThreadingUtil;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.Util.UserAgentCallback;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -40,10 +41,10 @@ public class DeviceInfoIntegrationTest {
     DeviceInfo deviceInfo = spy(new DeviceInfo(context, runOnUiThreadExecutor));
 
     deviceInfo.getUserAgent().get();
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     deviceInfo.initialize();
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     verify(deviceInfo, times(1)).resolveUserAgent();
   }
@@ -65,7 +66,7 @@ public class DeviceInfoIntegrationTest {
     DeviceInfo deviceInfo = new DeviceInfo(context, runOnUiThreadExecutor);
 
     Future<String> userAgent = deviceInfo.getUserAgent();
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
 
     assertNotNull(userAgent.get());
   }

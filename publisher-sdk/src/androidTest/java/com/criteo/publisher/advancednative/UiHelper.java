@@ -1,6 +1,6 @@
 package com.criteo.publisher.advancednative;
 
-import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
+import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 
 import android.app.Activity;
 import android.content.Context;

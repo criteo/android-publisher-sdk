@@ -4,7 +4,7 @@ import static junit.framework.Assert.assertFalse;
 
 import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
