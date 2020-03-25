@@ -6,7 +6,9 @@ import android.support.annotation.NonNull;
 /**
  * https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/tree/master/TCFv2
  */
-public class Tcf2GdprStrategy extends TcfGdprStrategy {
+public class Tcf2GdprStrategy implements TcfGdprStrategy {
+
+  private static final int GDPR_APPLIES_UNSET = -1;
 
   private final SharedPreferences sharedPreferences;
 
@@ -23,7 +25,8 @@ public class Tcf2GdprStrategy extends TcfGdprStrategy {
   @Override
   @NonNull
   public String getSubjectToGdpr() {
-    return sharedPreferences.getString("IABTCF_gdprApplies", "");
+    int gdprApplies = sharedPreferences.getInt("IABTCF_gdprApplies", GDPR_APPLIES_UNSET);
+    return String.valueOf(gdprApplies);
   }
 
   @Override
@@ -36,5 +39,17 @@ public class Tcf2GdprStrategy extends TcfGdprStrategy {
   @NonNull
   public Integer getVersion() {
     return 2;
+  }
+
+  @Override
+  public boolean isProvided() {
+    String subjectToGdpr = getSubjectToGdpr();
+    String consentString = getConsentString();
+    String vendorConsents = getVendorConsents();
+    boolean isSubjectToGdprEmpty = Integer.valueOf(subjectToGdpr).equals(GDPR_APPLIES_UNSET);
+    boolean isConsentStringEmpty = consentString.isEmpty();
+    boolean isVendorConsentsEmpty = vendorConsents.isEmpty();
+
+    return !isSubjectToGdprEmpty && !isConsentStringEmpty && !isVendorConsentsEmpty;
   }
 }

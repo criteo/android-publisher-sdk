@@ -110,7 +110,7 @@ public class PubSdkApiIntegrationTest {
   public void testGetGdprDataString_WhenUsingTcf2() {
     // Given
     setupGdprDataWithTcf2(
-      "1",
+      "0",
       "0000000000000010000000000000000000000100000000000000000000000000000000000000000000000000001",
       "ssds"
     );
@@ -133,7 +133,7 @@ public class PubSdkApiIntegrationTest {
   public void testPostAppEvent_WhenUsingEmptyGdprData() {
     // Given
     setupGdprDataWithTcf2(
-        "",
+        "-1",
         "",
         ""
     );
@@ -196,7 +196,7 @@ public class PubSdkApiIntegrationTest {
 
   private void setupGdprDataWithTcf2(String subjectToGdpr, String vendorConsents, String consentString) {
     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-    editor.putString("IABTCF_gdprApplies", consentString);
+    editor.putInt("IABTCF_gdprApplies", Integer.valueOf(subjectToGdpr));
     editor.putString("IABTCF_VendorConsents", vendorConsents);
     editor.putString("IABTCF_TCString", consentString);
     editor.apply();

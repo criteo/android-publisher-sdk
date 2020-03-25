@@ -2,27 +2,18 @@ package com.criteo.publisher.privacy.gdpr;
 
 import android.support.annotation.NonNull;
 
-public abstract class TcfGdprStrategy {
+public interface TcfGdprStrategy {
   @NonNull
-  abstract String getConsentString();
-
-  @NonNull
-  abstract String getSubjectToGdpr();
+  String getConsentString();
 
   @NonNull
-  abstract String getVendorConsents();
+  String getSubjectToGdpr();
 
   @NonNull
-  abstract Integer getVersion();
+  String getVendorConsents();
 
-  boolean isProvided() {
-    String subjectToGdpr = getSubjectToGdpr();
-    String consentString = getConsentString();
-    String vendorConsents = getVendorConsents();
-    boolean isSubjectToGdprEmpty = subjectToGdpr.isEmpty();
-    boolean isConsentStringEmpty = consentString.isEmpty();
-    boolean isVendorConsentsEmpty = vendorConsents.isEmpty();
+  @NonNull
+  Integer getVersion();
 
-    return !isSubjectToGdprEmpty && !isConsentStringEmpty && !isVendorConsentsEmpty;
-  }
+  boolean isProvided();
 }
