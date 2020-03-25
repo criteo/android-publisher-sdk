@@ -16,7 +16,8 @@ public class RemoteConfigRequest {
   public RemoteConfigRequest(
       @NonNull String criteoPublisherId,
       @NonNull String bundleId,
-      @NonNull String sdkVersion) {
+      @NonNull String sdkVersion
+  ) {
     this.criteoPublisherId = criteoPublisherId;
     this.bundleId = bundleId;
     this.sdkVersion = sdkVersion;

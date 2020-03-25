@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import com.criteo.publisher.Util.Base64;
+import com.criteo.publisher.Util.BuildConfigWrapper;
 import com.criteo.publisher.Util.StreamUtil;
 import com.criteo.publisher.Util.TextUtils;
 import com.criteo.publisher.model.CdbRequest;
@@ -36,10 +37,10 @@ public class PubSdkApi {
   private static final String LIMITED_AD_TRACKING = "limitedAdTracking";
   private static final String GDPR_STRING = "gdprString";
 
-  private final NetworkConfiguration networkConfiguration;
+  private final BuildConfigWrapper buildConfigWrapper;
 
-  public PubSdkApi(NetworkConfiguration networkConfiguration) {
-    this.networkConfiguration = networkConfiguration;
+  public PubSdkApi(@NonNull BuildConfigWrapper buildConfigWrapper) {
+    this.buildConfigWrapper = buildConfigWrapper;
   }
 
   @Nullable
@@ -51,7 +52,7 @@ public class PubSdkApi {
 
     JSONObject configResult = null;
     try {
-      URL url = new URL(networkConfiguration.getRemoteConfigUrl() + "/v2.0/api/config" + "?" + getParamsString(
+      URL url = new URL(buildConfigWrapper.getRemoteConfigUrl() + "/v2.0/api/config" + "?" + getParamsString(
               parameters));
       configResult = executeGet(url, null);
     } catch (IOException | JSONException e) {
@@ -63,7 +64,7 @@ public class PubSdkApi {
 
   @NonNull
   public CdbResponse loadCdb(@NonNull CdbRequest cdbRequest, @NonNull String userAgent) throws Exception {
-    URL url = new URL(networkConfiguration.getCdbUrl() + "/inapp/v2");
+    URL url = new URL(buildConfigWrapper.getCdbUrl() + "/inapp/v2");
     JSONObject cdbRequestJson = cdbRequest.toJson();
     JSONObject result = executePost(url, cdbRequestJson, userAgent);
     return CdbResponse.fromJson(result);
@@ -100,7 +101,7 @@ public class PubSdkApi {
 
     try {
       URL url = new URL(
-          networkConfiguration.getEventUrl() + "/appevent/v1/" + senderId + "?"
+          buildConfigWrapper.getEventUrl() + "/appevent/v1/" + senderId + "?"
               + getParamsString(
               parameters));
       return executeGet(url, userAgent);

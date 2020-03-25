@@ -1,8 +1,9 @@
 package com.criteo.publisher.model;
 
-import static com.criteo.publisher.Util.TextUtils.isEmpty;
+import static com.criteo.publisher.Util.TextUtils.getNotEmptyOrNullValue;
 
 import android.support.annotation.NonNull;
+import com.criteo.publisher.Util.BuildConfigWrapper;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.bid.UniqueIdGenerator;
@@ -19,9 +20,6 @@ public class CdbRequestFactory {
   private static final int PROFILE_ID = 235;
 
   @NonNull
-  private final User user;
-
-  @NonNull
   private final Publisher publisher;
 
   @NonNull
@@ -36,47 +34,39 @@ public class CdbRequestFactory {
   @NonNull
   private final UniqueIdGenerator uniqueIdGenerator;
 
+  @NonNull
+  private final BuildConfigWrapper buildConfigWrapper;
+
   public CdbRequestFactory(
-      @NonNull User user,
       @NonNull Publisher publisher,
       @NonNull DeviceInfo deviceInfo,
       @NonNull DeviceUtil deviceUtil,
       @NonNull UserPrivacyUtil userPrivacyUtil,
-      @NonNull UniqueIdGenerator uniqueIdGenerator) {
-    this.user = user;
+      @NonNull UniqueIdGenerator uniqueIdGenerator,
+      @NonNull BuildConfigWrapper buildConfigWrapper
+  ) {
     this.publisher = publisher;
     this.deviceInfo = deviceInfo;
     this.deviceUtil = deviceUtil;
     this.userPrivacyUtil = userPrivacyUtil;
     this.uniqueIdGenerator = uniqueIdGenerator;
+    this.buildConfigWrapper = buildConfigWrapper;
   }
 
   @NonNull
   public CdbRequest createRequest(List<CacheAdUnit> requestedAdUnits) {
-    String advertisingId = deviceUtil.getAdvertisingId();
-    if (!isEmpty(advertisingId)) {
-      user.setDeviceId(advertisingId);
-    }
-
-    String uspIab = userPrivacyUtil.getIabUsPrivacyString();
-    if (!isEmpty(uspIab)) {
-      user.setUspIab(uspIab);
-    }
-
-    String uspOptout = userPrivacyUtil.getUsPrivacyOptout();
-    if (!isEmpty(uspOptout)) {
-      user.setUspOptout(uspOptout);
-    }
-
-    String mopubConsent = userPrivacyUtil.getMopubConsent();
-    if (!isEmpty(mopubConsent)) {
-      user.setMopubConsent(mopubConsent);
-    }
+    User user = User.create(
+        deviceUtil.getAdvertisingId(),
+        deviceUtil.getDeviceModel(),
+        getNotEmptyOrNullValue(userPrivacyUtil.getMopubConsent()),
+        getNotEmptyOrNullValue(userPrivacyUtil.getIabUsPrivacyString()),
+        getNotEmptyOrNullValue(userPrivacyUtil.getUsPrivacyOptout())
+    );
 
     return new CdbRequest(
         publisher,
         user,
-        user.getSdkVersion(),
+        buildConfigWrapper.getSdkVersion(),
         PROFILE_ID,
         userPrivacyUtil.getGdprData(),
         createRequestSlots(requestedAdUnits)
@@ -106,5 +96,4 @@ public class CdbRequestFactory {
   public Future<String> getUserAgent() {
     return deviceInfo.getUserAgent();
   }
-
 }

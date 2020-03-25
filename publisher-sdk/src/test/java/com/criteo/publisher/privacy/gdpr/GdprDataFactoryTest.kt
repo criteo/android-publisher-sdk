@@ -1,6 +1,5 @@
 package com.criteo.publisher.privacy.gdpr
 
-import com.criteo.publisher.privacy.gdpr.GdprData
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -44,10 +43,9 @@ class GdprDataFactoryTest(
         val jsonObject = gdprData.toJSONObject()
 
         // Then
-        assertEquals(gdprApplies, jsonObject!!.optBoolean("gdprApplies"))
+        assertEquals(gdprApplies, jsonObject.optBoolean("gdprApplies"))
         assertEquals(consentGiven, jsonObject.optBoolean("consentGiven"))
         assertEquals("fake_consent_data", jsonObject.optString("consentData"))
         assertEquals(1, jsonObject.optInt("version"))
-
     }
 }

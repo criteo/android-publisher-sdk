@@ -27,4 +27,13 @@ public class TextUtilsTest {
     assertThat(isEmpty).isFalse();
   }
 
+  @Test
+  public void notEmptyOrNull_ReturnNonEmptyValue() throws Exception {
+    assertThat(TextUtils.getNotEmptyOrNullValue("not_empty")).isEqualTo("not_empty");
+  }
+
+  @Test
+  public void notEmptyOrNull_ReturnNullValue() throws Exception {
+    assertThat(TextUtils.getNotEmptyOrNullValue("")).isNull();
+  }
 }

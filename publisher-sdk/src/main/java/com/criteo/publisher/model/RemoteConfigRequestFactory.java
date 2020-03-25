@@ -1,21 +1,22 @@
 package com.criteo.publisher.model;
 
 import android.support.annotation.NonNull;
+import com.criteo.publisher.Util.BuildConfigWrapper;
 
 public class RemoteConfigRequestFactory {
 
   @NonNull
-  private final User user;
-
-  @NonNull
   private final Publisher publisher;
 
+  @NonNull
+  private final BuildConfigWrapper buildConfigWrapper;
+
   public RemoteConfigRequestFactory(
-      @NonNull User user,
-      @NonNull Publisher publisher
+      @NonNull Publisher publisher,
+      @NonNull BuildConfigWrapper buildConfigWrapper
   ) {
-    this.user = user;
     this.publisher = publisher;
+    this.buildConfigWrapper = buildConfigWrapper;
   }
 
   @NonNull
@@ -23,7 +24,7 @@ public class RemoteConfigRequestFactory {
     return new RemoteConfigRequest(
         publisher.getCriteoPublisherId(),
         publisher.getBundleId(),
-        user.getSdkVersion()
+        buildConfigWrapper.getSdkVersion()
     );
   }
 }

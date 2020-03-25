@@ -1,5 +1,6 @@
 package com.criteo.publisher.model
 
+import com.criteo.publisher.Util.BuildConfigWrapper
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.stub
 import com.nhaarman.mockitokotlin2.whenever
@@ -12,26 +13,22 @@ import org.mockito.MockitoAnnotations
 class RemoteConfigRequestFactoryTest {
 
     @Mock
-    private lateinit var user: User
+    private lateinit var publisher: Publisher
 
     @Mock
-    private lateinit var publisher: Publisher
+    private lateinit var buildConfigWrapper: BuildConfigWrapper
 
     private lateinit var factory: RemoteConfigRequestFactory
 
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-
-        factory = RemoteConfigRequestFactory(
-                user,
-                publisher
-        )
+        factory = RemoteConfigRequestFactory(publisher, buildConfigWrapper)
     }
 
     @Test
     fun createRequest_GivenInput_CreateRemoteConfigRequest() {
-        whenever(user.sdkVersion).thenReturn("1.2.3")
+        whenever(buildConfigWrapper.sdkVersion).thenReturn("1.2.3")
 
         publisher.stub {
             on { bundleId } doReturn "my.bundle"

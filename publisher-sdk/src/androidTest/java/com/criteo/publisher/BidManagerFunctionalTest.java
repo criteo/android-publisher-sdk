@@ -27,6 +27,8 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Util.AdUnitType;
+import com.criteo.publisher.Util.BuildConfigWrapper;
+import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
@@ -95,6 +97,11 @@ public class BidManagerFunctionalTest {
   @Mock
   private BidLifecycleListener bidLifecycleListener;
 
+  @Mock
+  private BuildConfigWrapper buildConfigWrapper;
+
+  private DeviceUtil deviceUtil;
+
   private int adUnitId = 0;
 
   @Before
@@ -104,12 +111,15 @@ public class BidManagerFunctionalTest {
 
     dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
+    Context context = InstrumentationRegistry.getContext();
+    deviceUtil = dependencyProvider.provideDeviceUtil(context);
+
     when(dependencyProvider.providePubSdkApi()).thenReturn(api);
     when(dependencyProvider.provideClock()).thenReturn(clock);
     doReturn(publisher).when(dependencyProvider).providePublisher(any(), any());
-    doReturn(user).when(dependencyProvider).provideUser(any());
     doReturn(config).when(dependencyProvider).provideConfig(any());
     doReturn(bidLifecycleListener).when(dependencyProvider).provideBidLifecycleListener();
+    doReturn(buildConfigWrapper).when(dependencyProvider).provideBuildConfigWrapper();
 
     // Should be set to at least 1 because user-level silent mode is set the 0 included
     givenMockedClockSetTo(1);
@@ -222,16 +232,19 @@ public class BidManagerFunctionalTest {
 
     // First call to CDB
     inOrder.verify(config, never()).refreshConfig(any());
-    inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits1.equals(getRequestedAdUnits(cdb))), any());
+    inOrder.verify(api)
+        .loadCdb(argThat(cdb -> requestedAdUnits1.equals(getRequestedAdUnits(cdb))), any());
     response1.getSlots().forEach(inOrder.verify(cache)::add);
     inOrder.verify(bidManager).setTimeToNextCall(1);
 
     // Second call with error
-    inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits2.equals(getRequestedAdUnits(cdb))), any());
+    inOrder.verify(api)
+        .loadCdb(argThat(cdb -> requestedAdUnits2.equals(getRequestedAdUnits(cdb))), any());
 
     // Third call in success but without the config call
     inOrder.verify(config, never()).refreshConfig(any());
-    inOrder.verify(api).loadCdb(argThat(cdb -> requestedAdUnits3.equals(getRequestedAdUnits(cdb))), any());
+    inOrder.verify(api)
+        .loadCdb(argThat(cdb -> requestedAdUnits3.equals(getRequestedAdUnits(cdb))), any());
     response3.getSlots().forEach(inOrder.verify(cache)::add);
     inOrder.verify(bidManager).setTimeToNextCall(3);
 
@@ -313,14 +326,13 @@ public class BidManagerFunctionalTest {
     when(deviceInfo.getUserAgent()).thenReturn(completedFuture("expectedUserAgent"));
     doReturn(deviceInfo).when(dependencyProvider).provideDeviceInfo(any());
 
-    when(user.getSdkVersion()).thenReturn("1.2.3");
-
     GdprData expectedGdpr = mock(GdprData.class);
     UserPrivacyUtil userPrivacyUtil = mock(UserPrivacyUtil.class);
     when(userPrivacyUtil.getGdprData()).thenReturn(expectedGdpr);
     when(userPrivacyUtil.getUsPrivacyOptout()).thenReturn("");
     when(userPrivacyUtil.getIabUsPrivacyString()).thenReturn("");
     when(userPrivacyUtil.getMopubConsent()).thenReturn("");
+    when(buildConfigWrapper.getSdkVersion()).thenReturn("1.2.3");
     doReturn(userPrivacyUtil).when(dependencyProvider).provideUserPrivacyUtil(any());
 
     CacheAdUnit cacheAdUnit = sampleAdUnit();
@@ -329,9 +341,17 @@ public class BidManagerFunctionalTest {
     callingCdb.accept(adUnit);
     waitForIdleState();
 
+    User expectedUser = User.create(
+        deviceUtil.getAdvertisingId(),
+        deviceUtil.getDeviceModel(),
+        null,
+        null,
+        null
+    );
+
     verify(api).loadCdb(argThat(cdb -> {
       assertEquals(publisher, cdb.getPublisher());
-      assertEquals(user, cdb.getUser());
+      assertEquals(expectedUser, cdb.getUser());
       assertEquals(singletonList(cacheAdUnit), getRequestedAdUnits(cdb));
       assertEquals("1.2.3", cdb.getSdkVersion());
       assertEquals(235, cdb.getProfileId());
@@ -342,7 +362,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenNotValidAdUnit_ReturnNullAndDoNotCallCdb() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenNotValidAdUnit_ReturnNullAndDoNotCallCdb()
+      throws Exception {
     AdUnit adUnit = givenMockedAdUnitMappingTo(null);
 
     BidManager bidManager = createBidManager();
@@ -354,7 +375,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void getBidForAdUnitAndPrefetch_GivenNullAdUnit_ReturnNullAndDoNotCallCdb() throws Exception {
+  public void getBidForAdUnitAndPrefetch_GivenNullAdUnit_ReturnNullAndDoNotCallCdb()
+      throws Exception {
     BidManager bidManager = createBidManager();
     Slot bid = bidManager.getBidForAdUnitAndPrefetch(null);
     waitForIdleState();

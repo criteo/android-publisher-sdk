@@ -27,12 +27,12 @@ import com.criteo.publisher.BidManager;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.TestAdUnits;
+import com.criteo.publisher.Util.BuildConfigWrapper;
 import com.criteo.publisher.Util.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.InterstitialAdUnit;
-import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
 import java.util.Collections;
@@ -40,6 +40,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 public class CriteoFunctionalTest {
 
@@ -58,8 +60,13 @@ public class CriteoFunctionalTest {
 
   private DependencyProvider dependencyProvider;
 
+  @Mock
+  private BuildConfigWrapper buildConfigWrapper;
+
   @Before
   public void setUp() throws Exception {
+    MockitoAnnotations.initMocks(this);
+
     application = (Application) InstrumentationRegistry.getTargetContext()
         .getApplicationContext();
 
@@ -67,6 +74,8 @@ public class CriteoFunctionalTest {
 
     api = spy(dependencyProvider.providePubSdkApi());
     doReturn(api).when(dependencyProvider).providePubSdkApi();
+
+    doReturn(buildConfigWrapper).when(dependencyProvider).provideBuildConfigWrapper();
   }
 
   @Test
@@ -137,12 +146,8 @@ public class CriteoFunctionalTest {
 
   @Test
   public void init_GivenCpIdAppIdAndVersion_CallConfigWithThose() throws Exception {
-    User user = mock(User.class);
-    when(user.getSdkVersion()).thenReturn("1.2.3");
-
-    doReturn(user).when(dependencyProvider).provideUser(any());
-
     givenInitializedCriteo();
+    when(buildConfigWrapper.getSdkVersion()).thenReturn("1.2.3");
     waitForBids();
 
     verify(api).loadConfig(argThat(request -> {

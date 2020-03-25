@@ -11,6 +11,7 @@ import static org.mockserver.model.NottableString.not;
 import static org.mockserver.verify.VerificationTimes.once;
 
 import android.support.annotation.NonNull;
+import com.criteo.publisher.Util.BuildConfigWrapper;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.RemoteConfigRequest;
@@ -38,7 +39,7 @@ public class PubSdkApiTest {
   private MockServerClient mockServerClient;
 
   @Mock
-  private NetworkConfiguration networkConfiguration;
+  private BuildConfigWrapper buildConfigWrapper;
 
   private URL serverUrl;
 
@@ -53,9 +54,9 @@ public class PubSdkApiTest {
 
     serverUrl = new URL("http://localhost:" + mockServerRule.getPort());
 
-    when(networkConfiguration.getCdbUrl()).thenReturn(serverUrl.toString());
-    when(networkConfiguration.getEventUrl()).thenReturn(serverUrl.toString());
-    when(networkConfiguration.getRemoteConfigUrl()).thenReturn(serverUrl.toString());
+    when(buildConfigWrapper.getCdbUrl()).thenReturn(serverUrl.toString());
+    when(buildConfigWrapper.getEventUrl()).thenReturn(serverUrl.toString());
+    when(buildConfigWrapper.getRemoteConfigUrl()).thenReturn(serverUrl.toString());
 
     when(gdprData.consentData()).thenReturn("fake_consent_data");
     when(gdprData.consentGiven()).thenReturn(false);
@@ -63,7 +64,7 @@ public class PubSdkApiTest {
     when(gdprData.version()).thenReturn(1);
     when(gdprData.toJSONObject()).thenCallRealMethod();
 
-    api = new PubSdkApi(networkConfiguration);
+    api = new PubSdkApi(buildConfigWrapper);
   }
 
   @Test

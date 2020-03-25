@@ -99,15 +99,6 @@ public class DependencyProviderTest {
   }
 
   @Test
-  public void provideUser_WhenProvidedTwice_ReturnsTheSame() throws Exception {
-    provideBean_WhenProvidedTwice_ReturnsTheSame(provider -> {
-      doReturn(mock(DeviceUtil.class)).when(provider).provideDeviceUtil(any());
-
-      return provider.provideUser(mock(Context.class));
-    });
-  }
-
-  @Test
   public void provideDeviceInfo_WhenProvidedTwice_ReturnsTheSame() throws Exception {
     provideBean_WhenProvidedTwice_ReturnsTheSame(provider ->
         provider.provideDeviceInfo(mock(Context.class)));
@@ -136,6 +127,11 @@ public class DependencyProviderTest {
   @Test
   public void provideThreadPoolExecutor_WhenProvidedTwice_ReturnsTheSame() throws Exception {
     provideBean_WhenProvidedTwice_ReturnsTheSame(DependencyProvider::provideThreadPoolExecutor);
+  }
+
+  @Test
+  public void provideBuildConfigWrapper_WhenProvidedTwice_ReturnsTheSame() throws Exception {
+    provideBean_WhenProvidedTwice_ReturnsTheSame(DependencyProvider::provideBuildConfigWrapper);
   }
 
   private <T> void provideBean_WhenProvidedTwice_ReturnsTheSame(

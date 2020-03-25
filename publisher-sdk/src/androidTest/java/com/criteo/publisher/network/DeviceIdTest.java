@@ -2,6 +2,7 @@ package com.criteo.publisher.network;
 
 import static com.criteo.publisher.ThreadingUtil.runOnMainThreadAndWait;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -66,7 +67,7 @@ public class DeviceIdTest {
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
-    assertEquals("", fetchDeviceIdSentInCdbRequest(cdbArgumentCaptor.getValue()));
+    assertDeviceIdNotInCdbRequest(cdbArgumentCaptor.getValue());
   }
 
   @Test
@@ -133,7 +134,7 @@ public class DeviceIdTest {
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
-    assertEquals("", fetchDeviceIdSentInCdbRequest(cdbArgumentCaptor.getValue()));
+    assertDeviceIdNotInCdbRequest(cdbArgumentCaptor.getValue());
   }
 
   @Test
@@ -200,8 +201,18 @@ public class DeviceIdTest {
   }
 
   private String fetchDeviceIdSentInCdbRequest(CdbRequest cdb) throws Exception {
-    JSONObject cdbJSONObject = cdb.toJson();
-    JSONObject userJSONObject = (JSONObject) cdbJSONObject.get("user");
-    return (String) userJSONObject.get("deviceId");
+    JSONObject userJsonObject = getUserJsonObject(cdb);
+    return (String) userJsonObject.get("deviceId");
+  }
+
+  private void assertDeviceIdNotInCdbRequest(CdbRequest cdb) throws Exception {
+    JSONObject userJsonObject = getUserJsonObject(cdb);
+    assertFalse(userJsonObject.has("deviceId"));
+  }
+
+  private JSONObject getUserJsonObject(CdbRequest cdb) throws Exception {
+    JSONObject cdbJsonObject = cdb.toJson();
+    JSONObject userJsonObject = (JSONObject) cdbJsonObject.get("user");
+    return userJsonObject;
   }
 }

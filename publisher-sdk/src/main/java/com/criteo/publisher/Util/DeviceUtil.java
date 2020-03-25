@@ -54,6 +54,7 @@ public class DeviceUtil {
     return sizeLandscape;
   }
 
+  @NonNull
   public String getDeviceModel() {
     String manufacturer = Build.MANUFACTURER;
     String model = Build.MODEL;

@@ -1,6 +1,7 @@
 package com.criteo.publisher.model
 
 import com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER
+import com.criteo.publisher.Util.BuildConfigWrapper
 import com.criteo.publisher.Util.DeviceUtil
 import com.criteo.publisher.bid.UniqueIdGenerator
 import com.nhaarman.mockitokotlin2.doReturn
@@ -12,10 +13,7 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.any
 import org.mockito.Mock
-import org.mockito.Mockito.never
-import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import java.util.concurrent.Future
 import java.util.concurrent.atomic.AtomicInteger
@@ -25,9 +23,6 @@ class CdbRequestFactoryTest {
     private companion object {
         const val SDK_PROFILE_ID = 235
     }
-
-    @Mock
-    private lateinit var user: User
 
     @Mock
     private lateinit var publisher: Publisher
@@ -44,6 +39,9 @@ class CdbRequestFactoryTest {
     @Mock
     private lateinit var uniqueIdGenerator: UniqueIdGenerator
 
+    @Mock
+    private lateinit var buildConfigWrapper: BuildConfigWrapper
+
     private lateinit var factory: CdbRequestFactory
 
     private val adUnitId = AtomicInteger()
@@ -52,13 +50,18 @@ class CdbRequestFactoryTest {
     fun setUp() {
         MockitoAnnotations.initMocks(this)
 
+        whenever(deviceUtil.deviceModel).thenReturn("deviceModel")
+        whenever(userPrivacyUtil.mopubConsent).thenReturn("mopubConsent")
+        whenever(userPrivacyUtil.iabUsPrivacyString).thenReturn("iabUsPrivacyString")
+        whenever(userPrivacyUtil.usPrivacyOptout).thenReturn("usPrivacyoptout")
+
         factory = CdbRequestFactory(
-                user,
                 publisher,
                 deviceInfo,
                 deviceUtil,
                 userPrivacyUtil,
-                uniqueIdGenerator
+                uniqueIdGenerator,
+                buildConfigWrapper
         )
     }
 
@@ -72,84 +75,6 @@ class CdbRequestFactoryTest {
         assertThat(userAgent).isSameAs(expected)
     }
 
-    @Test
-    fun createRequest_GivenNonEmptyDeviceId_SetItInUser() {
-        whenever(deviceUtil.advertisingId).thenReturn("myId")
-
-        factory.createRequest(emptyList())
-
-        verify(user).setDeviceId("myId")
-    }
-
-    @Test
-    fun createRequest_GivenNullDeviceId_DoesNotSetItInUser() {
-        whenever(deviceUtil.advertisingId).thenReturn(null)
-
-        factory.createRequest(emptyList())
-
-        verify(user, never()).setDeviceId(any())
-    }
-
-    @Test
-    fun createRequest_GivenEmptyDeviceId_DoNotSetItInUser() {
-        whenever(deviceUtil.advertisingId).thenReturn("")
-
-        factory.createRequest(emptyList())
-
-        verify(user, never()).setDeviceId(any())
-    }
-
-    @Test
-    fun createRequest_GivenNonEmptyUsPrivacyString_SetItInUser() {
-        whenever(userPrivacyUtil.iabUsPrivacyString).thenReturn("myPrivacy")
-
-        factory.createRequest(emptyList())
-
-        verify(user).uspIab = "myPrivacy"
-    }
-
-    @Test
-    fun createRequest_GivenEmptyUsPrivacyString_DoNotSetItInUser() {
-        whenever(userPrivacyUtil.iabUsPrivacyString).thenReturn("")
-
-        factory.createRequest(emptyList())
-
-        verify(user, never()).uspIab = any()
-    }
-
-    @Test
-    fun createRequest_GivenNonEmptyUsPrivacyOptOut_SetItInUser() {
-        whenever(userPrivacyUtil.usPrivacyOptout).thenReturn("myPrivacy")
-
-        factory.createRequest(emptyList())
-
-        verify(user).uspOptout = "myPrivacy"
-    }
-
-    @Test
-    fun createRequest_GivenEmptyUsPrivacyOptOut_DoNotSetItInUser() {
-        whenever(userPrivacyUtil.usPrivacyOptout).thenReturn("")
-        factory.createRequest(emptyList())
-        verify(user, never()).uspOptout = any()
-    }
-
-    @Test
-    fun createRequest_GivenNonEmptyMoPubConsent_SetItInUser() {
-        whenever(userPrivacyUtil.mopubConsent).thenReturn("myPrivacy")
-
-        factory.createRequest(emptyList())
-
-        verify(user).mopubConsent = "myPrivacy"
-    }
-
-    @Test
-    fun createRequest_GivenEmptyMoPubConsent_DoNotSetItInUser() {
-        whenever(userPrivacyUtil.mopubConsent).thenReturn("")
-
-        factory.createRequest(emptyList())
-
-        verify(user, never()).mopubConsent = any()
-    }
 
     @Test
     fun createRequest_GivenInput_BuildRequest() {
@@ -164,18 +89,67 @@ class CdbRequestFactoryTest {
             adUnit.size
         )
 
-        whenever(user.sdkVersion).thenReturn("1.2.3")
+        whenever(buildConfigWrapper.sdkVersion).thenReturn("1.2.3")
         whenever(userPrivacyUtil.gdprData).thenReturn(expectedGdpr)
         whenever(uniqueIdGenerator.generateId()).thenReturn("impId")
 
         val request = factory.createRequest(adUnits)
 
-        assertThat(request.user).isEqualTo(user)
         assertThat(request.publisher).isEqualTo(publisher)
         assertThat(request.sdkVersion).isEqualTo("1.2.3")
         assertThat(request.profileId).isEqualTo(SDK_PROFILE_ID)
         assertThat(request.gdprData).isEqualTo(expectedGdpr)
         assertThat(request.slots).containsExactlyInAnyOrder(expectedSlot)
+    }
+
+    @Test
+    fun givenOneRequestWithNonEmptyPrivacyValue_AndOneRequestWithEmptyPrivacyValues_VerifyRequestsAreDifferent() {
+        // request 1
+        val adUnit = createAdUnit()
+        val adUnits: List<CacheAdUnit> = listOf(adUnit)
+        val expectedGdpr: GdprData = mock()
+
+        val expectedSlot = CdbRequestSlot.create(
+                "impId",
+                adUnit.placementId,
+                adUnit.adUnitType,
+                adUnit.size
+        )
+
+        whenever(buildConfigWrapper.sdkVersion).thenReturn("1.2.3")
+
+        userPrivacyUtil.stub {
+            on { gdprData } doReturn expectedGdpr
+            on { usPrivacyOptout } doReturn "usPrivacyOptout"
+            on { iabUsPrivacyString } doReturn "iabUsPrivacyString"
+            on { mopubConsent } doReturn "mopubConsent"
+        }
+
+        whenever(uniqueIdGenerator.generateId()).thenReturn("impId")
+
+        var request = factory.createRequest(adUnits)
+
+        assertThat(request.publisher).isEqualTo(publisher)
+        assertThat(request.sdkVersion).isEqualTo("1.2.3")
+        assertThat(request.profileId).isEqualTo(SDK_PROFILE_ID)
+        assertThat(request.gdprData).isEqualTo(expectedGdpr)
+        assertThat(request.user.uspIab()).isEqualTo("iabUsPrivacyString")
+        assertThat(request.user.uspOptout()).isEqualTo("usPrivacyOptout")
+        assertThat(request.user.mopubConsent()).isEqualTo("mopubConsent")
+        assertThat(request.slots).containsExactlyInAnyOrder(expectedSlot)
+
+        // request 2
+        userPrivacyUtil.stub {
+            on { usPrivacyOptout } doReturn ""
+            on { iabUsPrivacyString } doReturn ""
+            on { mopubConsent } doReturn ""
+        }
+
+        request = factory.createRequest(adUnits)
+
+        assertThat(request.user.uspIab()).isNull()
+        assertThat(request.user.uspOptout()).isNull()
+        assertThat(request.user.mopubConsent()).isNull()
     }
 
     @Test

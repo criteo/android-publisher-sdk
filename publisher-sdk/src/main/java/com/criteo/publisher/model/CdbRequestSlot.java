@@ -3,7 +3,6 @@ package com.criteo.publisher.model;
 import static java.util.Collections.singletonList;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.CustomAdapterFactory;
 import com.google.auto.value.AutoValue;

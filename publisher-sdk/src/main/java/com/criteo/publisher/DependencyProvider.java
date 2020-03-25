@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.AndroidUtil;
+import com.criteo.publisher.Util.BuildConfigWrapper;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.RunOnUiThreadExecutor;
@@ -22,9 +23,7 @@ import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.RemoteConfigRequestFactory;
-import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.BidRequestSender;
-import com.criteo.publisher.network.NetworkConfiguration;
 import com.criteo.publisher.network.PubSdkApi;
 import java.util.HashMap;
 import java.util.Map;
@@ -63,17 +62,7 @@ public class DependencyProvider {
     return getOrCreate(PubSdkApi.class, new Factory<PubSdkApi>() {
       @Override
       public PubSdkApi create() {
-        return new PubSdkApi(provideNetworkConfiguration());
-      }
-    });
-  }
-
-  @NonNull
-  public NetworkConfiguration provideNetworkConfiguration() {
-    return getOrCreate(NetworkConfiguration.class, new Factory<NetworkConfiguration>() {
-      @Override
-      public NetworkConfiguration create() {
-        return new NetworkConfiguration();
+        return new PubSdkApi(provideBuildConfigWrapper());
       }
     });
   }
@@ -188,16 +177,6 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public User provideUser(@NonNull Context context) {
-    return getOrCreate(User.class, new Factory<User>() {
-      @Override
-      public User create() {
-        return new User(DependencyProvider.this.provideDeviceUtil(context));
-      }
-    });
-  }
-
-  @NonNull
   public DeviceInfo provideDeviceInfo(Context context) {
     return getOrCreate(DeviceInfo.class, new Factory<DeviceInfo>() {
       @Override
@@ -249,17 +228,28 @@ public class DependencyProvider {
   }
 
   @NonNull
+  public BuildConfigWrapper provideBuildConfigWrapper() {
+    return getOrCreate(BuildConfigWrapper.class, new Factory<BuildConfigWrapper>() {
+      @Override
+      public BuildConfigWrapper create() {
+        return new BuildConfigWrapper();
+      }
+    });
+  }
+
+  @NonNull
   public CdbRequestFactory provideCdbRequestFactory(@NonNull Context context, @NonNull String criteoPublisherId) {
     return getOrCreate(CdbRequestFactory.class, new Factory<CdbRequestFactory>() {
       @Override
       public CdbRequestFactory create() {
         return new CdbRequestFactory(
-            provideUser(context),
             providePublisher(context, criteoPublisherId),
             provideDeviceInfo(context),
             provideDeviceUtil(context),
             provideUserPrivacyUtil(context),
-            new UniqueIdGenerator(provideClock()));
+            new UniqueIdGenerator(provideClock()),
+            provideBuildConfigWrapper()
+        );
       }
     });
   }
@@ -270,8 +260,8 @@ public class DependencyProvider {
       @Override
       public RemoteConfigRequestFactory create() {
         return new RemoteConfigRequestFactory(
-            provideUser(context),
-            providePublisher(context, criteoPublisherId)
+            providePublisher(context, criteoPublisherId),
+            provideBuildConfigWrapper()
         );
       }
     });
