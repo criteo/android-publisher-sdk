@@ -109,6 +109,7 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
             builder.setReadyToSend(true);
           } else /* if isValidBid */ {
             builder.setCdbCallEndTimestamp(currentTimeInMillis);
+            builder.setCachedBidUsed(true);
             builder.setImpressionId(impressionId);
           }
         }

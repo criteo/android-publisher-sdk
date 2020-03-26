@@ -59,6 +59,7 @@ class MetricParserTest {
         .setCdbCallStartTimestamp(42L)
         .setCdbCallEndTimestamp(1337L)
         .setCdbCallTimeout(true)
+        .setCachedBidUsed(true)
         .setElapsedTimestamp(2L)
         .setImpressionId("impId")
         .setReadyToSend(true)
@@ -70,6 +71,7 @@ class MetricParserTest {
       "cdbCallStartTimestamp": 42,
       "cdbCallEndTimestamp": 1337,
       "cdbCallTimeout": true,
+      "cachedBidUsed": true,
       "elapsedTimestamp": 2,
       "impressionId": "impId",
       "readyToSend": true
@@ -84,6 +86,7 @@ class MetricParserTest {
 
     assertThat(json).isEqualToIgnoringWhitespace("""{
       "cdbCallTimeout": false,
+      "cachedBidUsed": false,
       "readyToSend": false
     }""".trimIndent())
   }

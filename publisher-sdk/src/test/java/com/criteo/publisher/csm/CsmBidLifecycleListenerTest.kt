@@ -249,6 +249,7 @@ class CsmBidLifecycleListenerTest {
   private fun assertValidBidSlotIsReceived(impressionId: String) {
     assertRepositoryIsUpdatedById(impressionId) {
       verify(it).setCdbCallEndTimestamp(clock.currentTimeInMillis)
+      verify(it).setCachedBidUsed(true);
       verify(it).setImpressionId(impressionId)
       verifyNoMoreInteractions(it)
     }

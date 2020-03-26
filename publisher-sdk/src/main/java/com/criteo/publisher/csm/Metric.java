@@ -13,7 +13,8 @@ public abstract class Metric {
   public static Metric.Builder builder() {
     return new AutoValue_Metric.Builder()
         .setReadyToSend(false)
-        .setCdbCallTimeout(false);
+        .setCdbCallTimeout(false)
+        .setCachedBidUsed(false);
   }
 
   public static TypeAdapter<Metric> typeAdapter(Gson gson) {
@@ -27,6 +28,8 @@ public abstract class Metric {
   abstract Long getCdbCallEndTimestamp();
 
   abstract boolean isCdbCallTimeout();
+
+  abstract boolean isCachedBidUsed();
 
   @Nullable
   abstract Long getElapsedTimestamp();
@@ -45,6 +48,7 @@ public abstract class Metric {
     abstract Builder setCdbCallStartTimestamp(Long absoluteTimeInMillis);
     abstract Builder setCdbCallEndTimestamp(Long absoluteTimeInMillis);
     abstract Builder setCdbCallTimeout(boolean isTimeout);
+    abstract Builder setCachedBidUsed(boolean isCachedBidUsed);
     abstract Builder setElapsedTimestamp(Long absoluteTimeInMillis);
     abstract Builder setImpressionId(String impressionId);
     abstract Builder setReadyToSend(boolean isReadyToSend);
