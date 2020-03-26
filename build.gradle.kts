@@ -1,3 +1,4 @@
+/*
 buildscript {
     ext.kotlin_version = '1.3.61'
 
@@ -14,3 +15,4 @@ def groovyHelper = new GroovyHelper()
 allprojects {
     groovyHelper.addDefaultInputRepository(it)
 }
+*/

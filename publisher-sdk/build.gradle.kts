@@ -1,3 +1,4 @@
+/*
 apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 apply plugin: 'kotlin-android'
@@ -69,3 +70,4 @@ dependencies {
         exclude group: "com.android.support"
     }
 }
+*/

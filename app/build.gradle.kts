@@ -1,3 +1,4 @@
+/*
 apply plugin: 'com.android.application'
 apply plugin: 'maven-publish'
 apply plugin: 'kotlin-android'
@@ -60,3 +61,4 @@ dependencies {
 
     memoryLeaksHuntImplementation('com.squareup.leakcanary:leakcanary-android:2.1')
 }
+*/
