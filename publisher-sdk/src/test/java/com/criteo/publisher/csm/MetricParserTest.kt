@@ -25,17 +25,26 @@ class MetricParserTest {
   }
 
   @Test
-  fun read_GivenJsonNotMatchingMetric_IgnoreThem() {
-    val metric = parser.read("{\"unknownKey\": {}}".toInputStream())
+  fun read_GivenJsonWithoutImpressionId_ThrowIOException() {
+    assertThatCode {
+      parser.read("{}".toInputStream())
+    }.isInstanceOf(IOException::class.java)
+  }
 
-    assertThat(metric).isEqualTo(Metric.builder().build())
+  @Test
+  fun read_GivenJsonNotMatchingMetric_IgnoreThem() {
+    val metric = parser.read("""{
+      "impressionId": "id",
+      "unknownKey": {}
+    }""".trimIndent().toInputStream())
+
+    assertThat(metric).isEqualTo(Metric.builder("id").build())
   }
 
   @Test
   fun read_GivenJsonFromWrite_ReturnEqualMetric() {
-    val expectedMetric = Metric.builder()
+    val expectedMetric = Metric.builder("impId")
         .setCdbCallStartTimestamp(42L)
-        .setImpressionId("impId")
         .build()
 
     val json = parser.writeIntoString(expectedMetric)
@@ -46,7 +55,7 @@ class MetricParserTest {
 
   @Test
   fun read_GivenStream_DoNotCloseIt() {
-    val stream = spy("{}".toInputStream())
+    val stream = spy("""{"impressionId": "id"}""".toInputStream())
 
     parser.read(stream)
 
@@ -55,13 +64,12 @@ class MetricParserTest {
 
   @Test
   fun write_GivenObjectFullySet_ReturnJson() {
-    val metric = Metric.builder()
+    val metric = Metric.builder("impId")
         .setCdbCallStartTimestamp(42L)
         .setCdbCallEndTimestamp(1337L)
         .setCdbCallTimeout(true)
         .setCachedBidUsed(true)
         .setElapsedTimestamp(2L)
-        .setImpressionId("impId")
         .setReadyToSend(true)
         .build()
 
@@ -80,20 +88,21 @@ class MetricParserTest {
 
   @Test
   fun write_GivenEmptyObject_ReturnEmptyJson() {
-    val metric = Metric.builder().build()
+    val metric = Metric.builder("impId").build()
 
     val json = parser.writeIntoString(metric)
 
     assertThat(json).isEqualToIgnoringWhitespace("""{
       "cdbCallTimeout": false,
       "cachedBidUsed": false,
+      "impressionId": "impId",
       "readyToSend": false
     }""".trimIndent())
   }
 
   @Test
   fun write_GivenStreamThatThrowsWhenWriting_ThrowIoException() {
-    val metric = Metric.builder().build()
+    val metric = Metric.builder("id").build()
     val stream = mock<OutputStream> {
       on { write(any<Int>()) } doThrow(IOException::class)
       on { write(any<ByteArray>()) } doThrow(IOException::class)
@@ -108,7 +117,7 @@ class MetricParserTest {
 
   @Test
   fun write_GivenStream_DoNotCloseIt() {
-    val metric = Metric.builder().build()
+    val metric = Metric.builder("id").build()
     val stream = mock<OutputStream>()
 
     parser.write(metric, stream)

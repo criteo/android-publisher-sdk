@@ -22,12 +22,12 @@ class SyncMetricFileTest {
   fun setUp() {
     MockitoAnnotations.initMocks(this)
 
-    metricFile = spy(SyncMetricFile(atomicFile, parser))
+    metricFile = spy(SyncMetricFile("id", atomicFile, parser))
   }
 
   @Test
   fun moveWith_GivenUnwantedMove_DoNothing() {
-    val metric = Metric.builder().build()
+    val metric = Metric.builder("id").build()
     doReturn(metric).whenever(metricFile).read()
 
     val move = mock<MetricMover> {
@@ -42,7 +42,7 @@ class SyncMetricFileTest {
 
   @Test
   fun moveWith_GivenWantedAndSuccessfulMove_RemoveFromFileThenInjectToDestination() {
-    val metric = Metric.builder().build()
+    val metric = Metric.builder("id").build()
     doReturn(metric).whenever(metricFile).read()
 
     val move = mock<MetricMover> {
@@ -60,7 +60,7 @@ class SyncMetricFileTest {
 
   @Test
   fun moveWith_GivenWantedButUnsuccessfulMove_RemoveFromFileThenInjectToDestinationThenRollback() {
-    val metric = Metric.builder().build()
+    val metric = Metric.builder("id").build()
     doReturn(metric).whenever(metricFile).read()
     doNothing().whenever(metricFile).write(metric)
 
@@ -80,7 +80,7 @@ class SyncMetricFileTest {
 
   @Test
   fun moveWith_GivenWantedMoveAndExceptionDuringMove_RemoveFromFileThenInjectToDestinationThenRollback() {
-    val metric = Metric.builder().build()
+    val metric = Metric.builder("id").build()
     doReturn(metric).whenever(metricFile).read()
     doNothing().whenever(metricFile).write(metric)
 

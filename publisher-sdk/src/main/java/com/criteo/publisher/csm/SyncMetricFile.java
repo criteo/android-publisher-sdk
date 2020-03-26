@@ -22,6 +22,9 @@ import java.lang.ref.SoftReference;
  */
 class SyncMetricFile {
 
+  @NonNull
+  private final String impressionId;
+
   /**
    * This file is protected at runtime by {@link #fileLock}. Although, there is no locking
    * mechanism between different VMs (so different apps). It is expected that the given file is in
@@ -41,9 +44,11 @@ class SyncMetricFile {
   private volatile SoftReference<Metric> metricInMemory;
 
   SyncMetricFile(
+      @NonNull String impressionId,
       @NonNull AtomicFile file,
       @NonNull MetricParser parser
   ) {
+    this.impressionId = impressionId;
     this.file = file;
     this.parser = parser;
     this.metricInMemory = new SoftReference<>(null);
@@ -133,7 +138,7 @@ class SyncMetricFile {
   @NonNull
   private Metric readFromFile() throws IOException {
     if (!file.getBaseFile().exists()) {
-      return Metric.builder().build();
+      return Metric.builder(impressionId).build();
     }
 
     try (InputStream is = file.openRead();

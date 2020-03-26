@@ -250,7 +250,6 @@ class CsmBidLifecycleListenerTest {
     assertRepositoryIsUpdatedById(impressionId) {
       verify(it).setCdbCallEndTimestamp(clock.currentTimeInMillis)
       verify(it).setCachedBidUsed(true);
-      verify(it).setImpressionId(impressionId)
       verifyNoMoreInteractions(it)
     }
   }

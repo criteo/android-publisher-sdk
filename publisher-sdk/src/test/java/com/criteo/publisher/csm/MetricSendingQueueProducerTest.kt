@@ -27,11 +27,11 @@ class MetricSendingQueueProducerTest {
 
   @Test
   fun pushAllInQueue_GivenAnyMetric_PushAndMoveThem() {
-    val metric1 = Metric.builder()
+    val metric1 = Metric.builder("id1")
         .setReadyToSend(false)
         .build()
 
-    val metric2 = Metric.builder()
+    val metric2 = Metric.builder("id2")
         .setReadyToSend(true)
         .build()
 
@@ -46,7 +46,7 @@ class MetricSendingQueueProducerTest {
 
   @Test
   fun pushAllReadyToSendInQueue_GivenNoMetricReadyToSend_DoNothingAndKeepThem() {
-    val shouldNotBeSent = Metric.builder()
+    val shouldNotBeSent = Metric.builder("id")
         .setReadyToSend(false)
         .build()
 
@@ -60,13 +60,11 @@ class MetricSendingQueueProducerTest {
 
   @Test
   fun pushAllReadyToSendInQueue_GivenMetricReadyToSend_MoveOnlyThem() {
-    val shouldNotBeSent = Metric.builder()
-        .setImpressionId("id1")
+    val shouldNotBeSent = Metric.builder("id1")
         .setReadyToSend(false)
         .build()
 
-    val shouldBeSent = Metric.builder()
-        .setImpressionId("id2")
+    val shouldBeSent = Metric.builder("id2")
         .setReadyToSend(true)
         .build()
 

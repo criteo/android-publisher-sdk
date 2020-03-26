@@ -46,20 +46,49 @@ class MetricDirectory {
 
   @NonNull
   File createMetricFile(@NonNull String impressionId) {
-    String metricFilename = impressionId + METRIC_FILE_EXTENSION;
+    String metricFilename = getMetricFilenameFromImpressionId(impressionId);
     return new File(getDirectoryFile(), metricFilename);
   }
 
   @NonNull
   SyncMetricFile createSyncMetricFile(@NonNull File metricFile) {
+    String impressionId = getImpressionIdFromMetricFilename(metricFile);
     AtomicFile atomicFile = new AtomicFile(metricFile);
-    return new SyncMetricFile(atomicFile, parser);
+    return new SyncMetricFile(impressionId, atomicFile, parser);
   }
 
   @VisibleForTesting
   @NonNull
   File getDirectoryFile() {
     return context.getDir(BuildConfig.csmDirectory, Context.MODE_PRIVATE);
+  }
+
+  /**
+   * Produce a metric filename from the given impression id.
+   *
+   * @param impressionId impression id to transform
+   * @return filename for that impression id
+   * @see #getImpressionIdFromMetricFilename(File)
+   */
+  @NonNull
+  private String getMetricFilenameFromImpressionId(@NonNull String impressionId) {
+    return impressionId + METRIC_FILE_EXTENSION;
+  }
+
+  /**
+   * Produce an impression id from the given metric filename.
+   * <p>
+   * This is the dual of {@link #getMetricFilenameFromImpressionId(String)}: The impression ID is a
+   * string, and the metric filename is the impression ID with an extension. To find again the
+   * impression ID from the filename, then this methods only have to remove the extension.
+   *
+   * @param metricFile file representing the metric
+   * @return impression ID of the given file
+   */
+  @NonNull
+  private String getImpressionIdFromMetricFilename(@NonNull File metricFile) {
+    String metricFilename = metricFile.getName();
+    return metricFilename.substring(0, metricFilename.length() - METRIC_FILE_EXTENSION.length());
   }
 
 }

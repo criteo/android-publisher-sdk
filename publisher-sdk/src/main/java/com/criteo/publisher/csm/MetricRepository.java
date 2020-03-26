@@ -104,6 +104,7 @@ class MetricRepository {
    * @param metricFile underlying file to synchronized
    * @return unique instance of synchronized and atomic file over given one
    */
+  @NonNull
   private SyncMetricFile getOrCreateMetricFile(@NonNull File metricFile) {
     SyncMetricFile oldMetric = metricFileById.get(metricFile);
     if (oldMetric == null) {

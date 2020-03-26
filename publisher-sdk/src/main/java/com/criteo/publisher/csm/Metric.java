@@ -10,11 +10,8 @@ import com.google.gson.TypeAdapter;
 public abstract class Metric {
 
   @NonNull
-  public static Metric.Builder builder() {
-    return new AutoValue_Metric.Builder()
-        .setReadyToSend(false)
-        .setCdbCallTimeout(false)
-        .setCachedBidUsed(false);
+  public static Metric.Builder builder(String impressionId) {
+    return builder().setImpressionId(impressionId);
   }
 
   public static TypeAdapter<Metric> typeAdapter(Gson gson) {
@@ -34,7 +31,7 @@ public abstract class Metric {
   @Nullable
   abstract Long getElapsedTimestamp();
 
-  @Nullable
+  @NonNull
   abstract String getImpressionId();
 
   abstract boolean isReadyToSend();
@@ -50,9 +47,28 @@ public abstract class Metric {
     abstract Builder setCdbCallTimeout(boolean isTimeout);
     abstract Builder setCachedBidUsed(boolean isCachedBidUsed);
     abstract Builder setElapsedTimestamp(Long absoluteTimeInMillis);
-    abstract Builder setImpressionId(String impressionId);
     abstract Builder setReadyToSend(boolean isReadyToSend);
     abstract Metric build();
+
+    /**
+     * @hidden
+     * @deprecated this should only be used for deserialization
+     */
+    @Deprecated
+    abstract Builder setImpressionId(String impressionId);
+  }
+
+  /**
+   * @hidden
+   * @deprecated this should only be used for deserialization
+   */
+  @Deprecated
+  @NonNull
+  public static Metric.Builder builder() {
+    return new AutoValue_Metric.Builder()
+        .setReadyToSend(false)
+        .setCdbCallTimeout(false)
+        .setCachedBidUsed(false);
   }
 
 }

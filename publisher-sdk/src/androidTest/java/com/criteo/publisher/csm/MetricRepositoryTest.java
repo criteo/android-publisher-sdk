@@ -67,7 +67,7 @@ public class MetricRepositoryTest {
     });
 
     repository.updateById("id2", builder -> {
-      builder.setImpressionId("impId");
+      builder.setCdbCallEndTimestamp(1337L);
     });
 
     Collection<Metric> metrics1 = repository.getAllStoredMetrics();
@@ -79,7 +79,7 @@ public class MetricRepositoryTest {
 
   @Test
   public void updateById_GivenNoOpUpdateOperation_RepositoryContainOneNewMetric() throws Exception {
-    Metric expected = Metric.builder()
+    Metric expected = Metric.builder("id")
         .build();
 
     repository.updateById("id", builder -> {
@@ -94,7 +94,7 @@ public class MetricRepositoryTest {
 
   @Test
   public void updateById_GivenOneUpdateOperation_RepositoryContainOneUpdatedMetric() throws Exception {
-    Metric expected = Metric.builder()
+    Metric expected = Metric.builder("id")
         .setCdbCallStartTimestamp(42L)
         .build();
 
@@ -110,22 +110,22 @@ public class MetricRepositoryTest {
 
   @Test
   public void updateById_GivenManyUpdateOperations_RepositoryContainMetricWithAllUpdates() throws Exception {
-    Metric expected = Metric.builder()
+    Metric expected = Metric.builder("impId")
         .setCdbCallStartTimestamp(42L)
         .setCdbCallEndTimestamp(1337L)
-        .setImpressionId("impId")
+        .setCdbCallTimeout(true)
         .build();
 
-    repository.updateById("id", builder -> {
+    repository.updateById("impId", builder -> {
       builder.setCdbCallStartTimestamp(42L);
     });
 
-    repository.updateById("id", builder -> {
+    repository.updateById("impId", builder -> {
       builder.setCdbCallEndTimestamp(1337L);
     });
 
-    repository.updateById("id", builder -> {
-      builder.setImpressionId("impId");
+    repository.updateById("impId", builder -> {
+      builder.setCdbCallTimeout(true);
     });
 
     Collection<Metric> metrics = repository.getAllStoredMetrics();
@@ -136,26 +136,26 @@ public class MetricRepositoryTest {
 
   @Test
   public void updateById_GivenManyUpdateOperationsWithNewRepository_RepositoryContainMetricWithAllUpdates() throws Exception {
-    Metric expected = Metric.builder()
+    Metric expected = Metric.builder("impId")
         .setCdbCallStartTimestamp(42L)
         .setCdbCallEndTimestamp(1337L)
-        .setImpressionId("impId")
+        .setCdbCallTimeout(true)
         .build();
 
-    repository.updateById("id", builder -> {
+    repository.updateById("impId", builder -> {
       builder.setCdbCallStartTimestamp(42L);
     });
 
     givenNewRepository();
 
-    repository.updateById("id", builder -> {
+    repository.updateById("impId", builder -> {
       builder.setCdbCallEndTimestamp(1337L);
     });
 
     givenNewRepository();
 
-    repository.updateById("id", builder -> {
-      builder.setImpressionId("impId");
+    repository.updateById("impId", builder -> {
+      builder.setCdbCallTimeout(true);
     });
 
     givenNewRepository();
@@ -168,13 +168,13 @@ public class MetricRepositoryTest {
 
   @Test
   public void updateById_GivenManyIdsUpdated_RepositoryContainsMultipleMetrics() throws Exception {
-    Metric expected1 = Metric.builder()
+    Metric expected1 = Metric.builder("id1")
         .setCdbCallStartTimestamp(42L)
         .setCdbCallTimeout(true)
         .build();
 
-    Metric expected2 = Metric.builder()
-        .setImpressionId("impId")
+    Metric expected2 = Metric.builder("id2")
+        .setCdbCallEndTimestamp(1337L)
         .build();
 
     repository.updateById("id1", builder -> {
@@ -183,7 +183,7 @@ public class MetricRepositoryTest {
     });
 
     repository.updateById("id2", builder -> {
-      builder.setImpressionId("impId");
+      builder.setCdbCallEndTimestamp(1337L);
     });
 
     Collection<Metric> metrics = repository.getAllStoredMetrics();
@@ -195,7 +195,7 @@ public class MetricRepositoryTest {
 
   @Test
   public void updateById_GivenReadDuringAnUpdate_ReadOccurBeforeOrAfterTheUpdate() throws Exception {
-    Metric expected = Metric.builder()
+    Metric expected = Metric.builder("id1")
         .setCdbCallStartTimestamp(1337L)
         .build();
 
@@ -273,7 +273,7 @@ public class MetricRepositoryTest {
     Collection<Metric> metrics = repository.getAllStoredMetrics();
 
     assertEquals(1, metrics.size());
-    assertTrue(metrics.contains(Metric.builder()
+    assertTrue(metrics.contains(Metric.builder("id")
         .setCdbCallStartTimestamp(0L)
         .build()));
   }
@@ -304,7 +304,7 @@ public class MetricRepositoryTest {
     ExecutorService executor = Executors.newFixedThreadPool(1);
     RuntimeException expectedException = new RuntimeException();
 
-    Metric expectedMetric = Metric.builder()
+    Metric expectedMetric = Metric.builder("id")
         .setCdbCallStartTimestamp(42L)
         .build();
 
@@ -381,7 +381,7 @@ public class MetricRepositoryTest {
 
   @Test
   public void updateById_GivenIoExceptionDuringFirstWriteOfNewMetricThenWriteNormally_CreateNewMetric() throws Exception {
-    Metric expectedMetric = Metric.builder()
+    Metric expectedMetric = Metric.builder("id1")
         .setCdbCallStartTimestamp(42L)
         .build();
 
@@ -398,7 +398,7 @@ public class MetricRepositoryTest {
     });
 
     repository.updateById("id1", builder -> {
-      assertEquals(Metric.builder().build(), builder.build());
+      assertEquals(Metric.builder("id1").build(), builder.build());
       builder.setCdbCallStartTimestamp(42L);
     });
 
@@ -410,7 +410,7 @@ public class MetricRepositoryTest {
 
   @Test
   public void updateById_GivenIoExceptionDuringWriteOfOldMetric_DoNotUpdateMetric() throws Exception {
-    Metric expectedMetric = Metric.builder().build();
+    Metric expectedMetric = Metric.builder("id1").build();
 
     parser = spy(parser);
     givenNewRepository();
@@ -431,7 +431,7 @@ public class MetricRepositoryTest {
 
   @Test
   public void updateById_GivenIoExceptionDuringFirstWriteOfOldMetricThenWriteNormally_UpdateMetric() throws Exception {
-    Metric expectedMetric = Metric.builder()
+    Metric expectedMetric = Metric.builder("id1")
         .setCdbCallStartTimestamp(42L)
         .build();
 
@@ -450,7 +450,7 @@ public class MetricRepositoryTest {
     });
 
     repository.updateById("id1", builder -> {
-      assertEquals(Metric.builder().build(), builder.build());
+      assertEquals(Metric.builder("id1").build(), builder.build());
       builder.setCdbCallStartTimestamp(42L);
     });
 
@@ -466,11 +466,11 @@ public class MetricRepositoryTest {
     when(mover.shouldMove(any())).thenReturn(true);
     when(mover.offerToDestination(any())).thenReturn(true);
 
-    repository.updateById("id", builder -> builder.setImpressionId("1"));
+    repository.updateById("id", builder -> builder.setCdbCallStartTimestamp(1L));
     repository.moveAllWith(mover);
 
     repository.updateById("id", builder -> {
-      assertEquals(builder.build(), Metric.builder().build());
+      assertEquals(builder.build(), Metric.builder("id").build());
     });
   }
 
@@ -508,17 +508,17 @@ public class MetricRepositoryTest {
     when(mover.shouldMove(any())).thenReturn(true);
     when(mover.offerToDestination(any())).thenReturn(false);
 
-    repository.updateById("id1", builder -> builder.setImpressionId("impId1"));
+    repository.updateById("id1", builder -> {});
     givenNewRepository();
-    repository.updateById("id2", builder -> builder.setImpressionId("impId2"));
+    repository.updateById("id2", builder -> {});
 
     repository.moveAllWith(mover);
 
     Collection<Metric> metrics = repository.getAllStoredMetrics();
 
     assertEquals(2, metrics.size());
-    assertTrue(metrics.contains(Metric.builder().setImpressionId("impId1").build()));
-    assertTrue(metrics.contains(Metric.builder().setImpressionId("impId2").build()));
+    assertTrue(metrics.contains(Metric.builder("id1").build()));
+    assertTrue(metrics.contains(Metric.builder("id2").build()));
   }
 
   @Test
@@ -527,16 +527,16 @@ public class MetricRepositoryTest {
     when(mover.shouldMove(any())).thenReturn(true);
     when(mover.offerToDestination(any())).thenReturn(false).thenReturn(true);
 
-    repository.updateById("id1", builder -> builder.setImpressionId("impId1"));
+    repository.updateById("id1", builder -> {});
     givenNewRepository();
-    repository.updateById("id2", builder -> builder.setImpressionId("impId2"));
+    repository.updateById("id2", builder -> {});
 
     repository.moveAllWith(mover);
 
     Collection<Metric> metrics = repository.getAllStoredMetrics();
 
     assertEquals(1, metrics.size());
-    assertTrue(metrics.contains(Metric.builder().setImpressionId("impId1").build()));
+    assertTrue(metrics.contains(Metric.builder("id1").build()));
   }
 
   @Test
@@ -547,8 +547,8 @@ public class MetricRepositoryTest {
 
     parser = spy(parser);
 
-    repository.updateById("id1", builder -> builder.setImpressionId("impId1"));
-    repository.updateById("id2", builder -> builder.setImpressionId("impId2"));
+    repository.updateById("id1", builder -> {});
+    repository.updateById("id2", builder -> {});
     givenNewRepository();
 
     doThrow(IOException.class)
@@ -561,12 +561,12 @@ public class MetricRepositoryTest {
 
     verify(mover, times(1)).shouldMove(any());
     verify(mover).shouldMove(argThat(metric -> {
-      assertEquals(Metric.builder().setImpressionId("impId2").build(), metric);
+      assertEquals(Metric.builder("id2").build(), metric);
       return true;
     }));
 
     assertEquals(1, metrics.size());
-    assertTrue(metrics.contains(Metric.builder().setImpressionId("impId1").build()));
+    assertTrue(metrics.contains(Metric.builder("id1").build()));
   }
 
   private void waitForPotentialIO() {
