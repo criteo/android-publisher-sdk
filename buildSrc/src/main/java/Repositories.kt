@@ -25,6 +25,24 @@ internal fun RepositoryHandler.addDefaultInputRepository() {
   }
 }
 
+/**
+ * Add a local repository in the build directory for development and testing purpose.
+ * Compared to the maven local repository, this has the advantage to be cleaned by cleaning tasks
+ * and has no side effect on other working directory.
+ */
+internal fun Project.addDevRepository() {
+  val devRepository = "${project.buildDir}/dev-${project.sdkPublicationVersion()}"
+
+  publishing {
+    repositories {
+      maven {
+        name = "Dev"
+        setUrl("file://$devRepository")
+      }
+    }
+  }
+}
+
 internal fun PublishingExtension.addNexusPreProdRepository() {
   repositories {
     maven {

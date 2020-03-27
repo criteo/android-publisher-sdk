@@ -136,6 +136,7 @@ private fun Project.defaultAndroidModule() {
   if (hasPublishing()) {
     afterEvaluate {
       publishing {
+        addDevRepository()
         addNexusPreProdRepository()
         addNexusProdRepository()
       }
