@@ -1,8 +1,8 @@
 package com.criteo.publisher.network;
 
-import static junit.framework.Assert.assertEquals;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
 import static java.util.Collections.singletonList;
+import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 
@@ -79,7 +79,7 @@ public class PubSdkApiIntegrationTest {
   public void postAppEvent_GivenNonNullGaid_ReturnInSuccess() {
     gaid = null;
 
-    JSONObject object = api.postAppEvent(
+    api.postAppEvent(
         senderId,
         appId,
         gaid,
@@ -89,12 +89,12 @@ public class PubSdkApiIntegrationTest {
         gdprData
     );
 
-    assertNotNull(object);
+    // nothing to assert, no thrown exception means success
   }
 
   @Test
   public void postAppEvent_GivenNullGaid_ReturnInSuccess() {
-    JSONObject object = api.postAppEvent(
+    api.postAppEvent(
         senderId,
         appId,
         gaid,
@@ -104,7 +104,7 @@ public class PubSdkApiIntegrationTest {
         gdprData
     );
 
-    assertNotNull(object);
+    // nothing to assert, no thrown exception means success
   }
 
   @Test
