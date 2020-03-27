@@ -11,12 +11,8 @@ class AndroidModule(private val project: Project) {
 
   private val configByName = mutableMapOf<String, ConfigObject?>()
 
-  fun addStringBuildConfigField(name: String) {
-    addBuildConfigField(name, String::class)
-  }
-
-  fun addBooleanBuildConfigField(name: String) {
-    addBuildConfigField(name, Boolean::class)
+  inline fun <reified T : Any> addBuildConfigField(name: String) {
+    addBuildConfigField(name, T::class)
   }
 
   fun <T : Any> addBuildConfigField(name: String, klass: KClass<T>) {
@@ -25,7 +21,8 @@ class AndroidModule(private val project: Project) {
         getConfig(getName())?.let {
           when (klass) {
             String::class -> addStringField(name, it)
-            Boolean::class -> addBooleanField(name, it)
+            Boolean::class -> addPrimitiveField(name, "boolean", it)
+            Int::class -> addPrimitiveField(name, "int", it)
             else -> {
               throw UnsupportedOperationException()
             }
@@ -39,8 +36,8 @@ class AndroidModule(private val project: Project) {
     buildConfigField("String", name, "\"${config[name]}\"")
   }
 
-  private fun BuildType.addBooleanField(name: String, config: ConfigObject) {
-    buildConfigField("boolean", name, "${config[name]}")
+  private fun BuildType.addPrimitiveField(name: String, type: String, config: ConfigObject) {
+    buildConfigField(type, name, "${config[name]}")
   }
 
   private fun getConfig(name: String): ConfigObject? {

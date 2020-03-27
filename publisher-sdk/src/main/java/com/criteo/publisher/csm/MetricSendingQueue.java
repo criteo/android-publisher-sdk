@@ -1,5 +1,7 @@
 package com.criteo.publisher.csm;
 
+import java.util.List;
+
 interface MetricSendingQueue {
 
   /**
@@ -13,5 +15,16 @@ interface MetricSendingQueue {
    * @return <code>true</code> if element was successfully inserted, else <code>false</code>
    */
   boolean offer(Metric metric);
+
+  /**
+   * Retrieves and removes up to <code>max</code> elements from this queue.
+   * <p>
+   * If the queue size is less than <code>max</code>, then fewer elements are returned, then the
+   * queue becomes empty.
+   *
+   * @param max max number of element to poll from the queue
+   * @return at most <code>max</code> first elements of the queue
+   */
+  List<Metric> poll(int max);
 
 }

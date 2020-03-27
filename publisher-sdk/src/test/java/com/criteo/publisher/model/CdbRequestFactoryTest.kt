@@ -4,9 +4,9 @@ import com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER
 import com.criteo.publisher.Util.BuildConfigWrapper
 import com.criteo.publisher.Util.DeviceUtil
 import com.criteo.publisher.bid.UniqueIdGenerator
-import com.nhaarman.mockitokotlin2.doReturn
 import com.criteo.publisher.privacy.UserPrivacyUtil
 import com.criteo.publisher.privacy.gdpr.GdprData
+import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
 import com.nhaarman.mockitokotlin2.whenever
@@ -19,10 +19,6 @@ import java.util.concurrent.Future
 import java.util.concurrent.atomic.AtomicInteger
 
 class CdbRequestFactoryTest {
-
-    private companion object {
-        const val SDK_PROFILE_ID = 235
-    }
 
     @Mock
     private lateinit var publisher: Publisher
@@ -88,7 +84,11 @@ class CdbRequestFactoryTest {
             adUnit.size
         )
 
-        whenever(buildConfigWrapper.sdkVersion).thenReturn("1.2.3")
+        buildConfigWrapper.stub {
+            on { sdkVersion } doReturn "1.2.3"
+            on { profileId } doReturn 42
+        }
+
         whenever(userPrivacyUtil.gdprData).thenReturn(expectedGdpr)
         whenever(uniqueIdGenerator.generateId()).thenReturn("impId")
 
@@ -96,7 +96,7 @@ class CdbRequestFactoryTest {
 
         assertThat(request.publisher).isEqualTo(publisher)
         assertThat(request.sdkVersion).isEqualTo("1.2.3")
-        assertThat(request.profileId).isEqualTo(SDK_PROFILE_ID)
+        assertThat(request.profileId).isEqualTo(42)
         assertThat(request.gdprData).isEqualTo(expectedGdpr)
         assertThat(request.slots).containsExactlyInAnyOrder(expectedSlot)
     }
@@ -115,7 +115,10 @@ class CdbRequestFactoryTest {
                 adUnit.size
         )
 
-        whenever(buildConfigWrapper.sdkVersion).thenReturn("1.2.3")
+        buildConfigWrapper.stub {
+            on { sdkVersion } doReturn "1.2.3"
+            on { profileId } doReturn 1337
+        }
 
         userPrivacyUtil.stub {
             on { gdprData } doReturn expectedGdpr
@@ -130,7 +133,7 @@ class CdbRequestFactoryTest {
 
         assertThat(request.publisher).isEqualTo(publisher)
         assertThat(request.sdkVersion).isEqualTo("1.2.3")
-        assertThat(request.profileId).isEqualTo(SDK_PROFILE_ID)
+        assertThat(request.profileId).isEqualTo(1337)
         assertThat(request.gdprData).isEqualTo(expectedGdpr)
         assertThat(request.user.uspIab()).isEqualTo("iabUsPrivacyString")
         assertThat(request.user.uspOptout()).isEqualTo("usPrivacyOptout")

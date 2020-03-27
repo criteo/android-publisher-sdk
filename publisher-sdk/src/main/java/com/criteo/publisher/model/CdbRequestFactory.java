@@ -5,19 +5,13 @@ import static com.criteo.publisher.Util.TextUtils.getNotEmptyOrNullValue;
 import android.support.annotation.NonNull;
 import com.criteo.publisher.Util.BuildConfigWrapper;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.bid.UniqueIdGenerator;
+import com.criteo.publisher.privacy.UserPrivacyUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
 public class CdbRequestFactory {
-
-  /**
-   * Profile ID used by the SDK, so CDB and the Supply chain can recognize that the request come
-   * from the PublisherSDK.
-   */
-  private static final int PROFILE_ID = 235;
 
   @NonNull
   private final Publisher publisher;
@@ -66,7 +60,7 @@ public class CdbRequestFactory {
         publisher,
         user,
         buildConfigWrapper.getSdkVersion(),
-        PROFILE_ID,
+        buildConfigWrapper.getProfileId(),
         userPrivacyUtil.getGdprData(),
         createRequestSlots(requestedAdUnits)
     );

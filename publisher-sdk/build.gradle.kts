@@ -5,12 +5,14 @@ plugins {
 }
 
 androidLibModule() {
-    addStringBuildConfigField("cdbUrl")
-    addStringBuildConfigField("remoteConfigUrl")
-    addStringBuildConfigField("eventUrl")
-    addStringBuildConfigField("pubSdkSharedPreferences")
-    addStringBuildConfigField("csmDirectory")
-    addBooleanBuildConfigField("debugLogging")
+    addBuildConfigField<String>("cdbUrl")
+    addBuildConfigField<String>("remoteConfigUrl")
+    addBuildConfigField<String>("eventUrl")
+    addBuildConfigField<String>("pubSdkSharedPreferences")
+    addBuildConfigField<String>("csmDirectory")
+    addBuildConfigField<Boolean>("debugLogging")
+    addBuildConfigField<Int>("profileId")
+    addBuildConfigField<Int>("csmBatchSize")
 }
 
 addAzureRepository()
@@ -37,6 +39,7 @@ dependencies {
     // Optional @GsonTypeAdapterFactory support
     annotationProcessor(Deps.AutoValue.GsonFactory)
 
+    testImplementation(project(":test-utils"))
     testImplementation(Deps.JUnit.JUnit)
     testImplementation(Deps.Mockito.Core)
     testImplementation(Deps.EqualsVerifier.EqualsVerifier)
