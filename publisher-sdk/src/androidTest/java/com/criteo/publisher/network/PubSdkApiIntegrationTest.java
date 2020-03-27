@@ -4,6 +4,7 @@ import static junit.framework.Assert.assertEquals;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -12,6 +13,7 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.Util.MockedDependenciesRule;
+import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
@@ -62,6 +64,15 @@ public class PubSdkApiIntegrationTest {
   public void tearDown() {
     cleanupTcf1();
     cleanupTcf2();
+  }
+
+  @Test
+  public void postCsm_GivenMetric_ReturnInSuccess() throws Exception {
+    MetricRequest request = mock(MetricRequest.class);
+
+    api.postCsm(request);
+
+    // nothing to assert, no thrown exception means success
   }
 
   @Test

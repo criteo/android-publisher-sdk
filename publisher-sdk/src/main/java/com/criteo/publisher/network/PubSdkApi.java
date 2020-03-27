@@ -6,8 +6,10 @@ import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import com.criteo.publisher.Util.Base64;
 import com.criteo.publisher.Util.BuildConfigWrapper;
+import com.criteo.publisher.Util.JsonSerializer;
 import com.criteo.publisher.Util.StreamUtil;
 import com.criteo.publisher.Util.TextUtils;
+import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.RemoteConfigRequest;
@@ -37,10 +39,18 @@ public class PubSdkApi {
   private static final String LIMITED_AD_TRACKING = "limitedAdTracking";
   private static final String GDPR_STRING = "gdprString";
 
+  @NonNull
   private final BuildConfigWrapper buildConfigWrapper;
 
-  public PubSdkApi(@NonNull BuildConfigWrapper buildConfigWrapper) {
+  @NonNull
+  private final JsonSerializer jsonSerializer;
+
+  public PubSdkApi(
+      @NonNull BuildConfigWrapper buildConfigWrapper,
+      @NonNull JsonSerializer jsonSerializer
+  ) {
     this.buildConfigWrapper = buildConfigWrapper;
+    this.jsonSerializer = jsonSerializer;
   }
 
   @Nullable
@@ -145,6 +155,18 @@ public class PubSdkApi {
     return executeRawGet(url, null);
   }
 
+  public void postCsm(@NonNull MetricRequest request) throws IOException{
+    URL url = new URL(buildConfigWrapper.getCdbUrl() + "/csm");
+    HttpURLConnection urlConnection = prepareConnection(url, null, "POST");
+
+    urlConnection.setDoOutput(true);
+    try (OutputStream outputStream = urlConnection.getOutputStream()) {
+      jsonSerializer.write(request, outputStream);
+    }
+
+    readResponseStreamIfSuccess(urlConnection).close();
+  }
+
   @NonNull
   private InputStream executeRawGet(URL url, @Nullable String userAgent) throws IOException {
     HttpURLConnection urlConnection = prepareConnection(url, userAgent, "GET");
@@ -207,7 +229,7 @@ public class PubSdkApi {
   private static void writePayload(
       @NonNull HttpURLConnection urlConnection,
       @NonNull JSONObject requestJson) throws IOException {
-        byte[] payload = requestJson.toString().getBytes(Charset.forName("UTF-8"));
+    byte[] payload = requestJson.toString().getBytes(Charset.forName("UTF-8"));
 
     urlConnection.setDoOutput(true);
     try (OutputStream outputStream = urlConnection.getOutputStream()) {

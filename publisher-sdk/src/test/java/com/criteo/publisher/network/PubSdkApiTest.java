@@ -2,6 +2,10 @@ package com.criteo.publisher.network;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.AdditionalAnswers.answerVoid;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockserver.model.HttpError.error;
@@ -12,13 +16,16 @@ import static org.mockserver.verify.VerificationTimes.once;
 
 import android.support.annotation.NonNull;
 import com.criteo.publisher.Util.BuildConfigWrapper;
+import com.criteo.publisher.Util.JsonSerializer;
+import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.RemoteConfigRequest;
+import com.criteo.publisher.privacy.gdpr.GdprData;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
-import com.criteo.publisher.privacy.gdpr.GdprData;
 import java.nio.charset.StandardCharsets;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -46,6 +53,9 @@ public class PubSdkApiTest {
   @Mock
   private GdprData gdprData;
 
+  @Mock
+  private JsonSerializer serializer;
+
   private PubSdkApi api;
 
   @Before
@@ -64,7 +74,45 @@ public class PubSdkApiTest {
     when(gdprData.version()).thenReturn(1);
     when(gdprData.toJSONObject()).thenCallRealMethod();
 
-    api = new PubSdkApi(buildConfigWrapper);
+    api = new PubSdkApi(buildConfigWrapper, serializer);
+  }
+
+  @Test
+  public void postCsm_GivenSerializedRequest_SendItWithPost() throws Exception {
+    MetricRequest request = mock(MetricRequest.class);
+    String json = "{\"expectedJson\": 42}";
+
+    doAnswer(answerVoid((Object ignored, OutputStream stream) -> {
+      stream.write(json.getBytes(StandardCharsets.UTF_8));
+    })).when(serializer).write(eq(request), any());
+
+    mockServerClient.when(request()).respond(response().withStatusCode(204));
+
+    api.postCsm(request);
+
+    mockServerClient.verify(request()
+        .withPath("/csm")
+        .withMethod("POST")
+        .withContentType(MediaType.TEXT_PLAIN)
+        .withBody(json, StandardCharsets.UTF_8), once());
+  }
+
+  @Test
+  public void postCsm_GivenConnectionError_ReturnFailedFuture() throws Exception {
+    MetricRequest request = mock(MetricRequest.class);
+
+    mockServerClient.when(request()).error(error().withDropConnection(true));
+
+    assertThatCode(() -> api.postCsm(request)).isInstanceOf(IOException.class);
+  }
+
+  @Test
+  public void postCsm_GivenHttpError_ReturnFailedFuture() throws Exception {
+    MetricRequest request = mock(MetricRequest.class);
+
+    mockServerClient.when(request()).respond(response().withStatusCode(400));
+
+    assertThatCode(() -> api.postCsm(request)).isInstanceOf(IOException.class);
   }
 
   @Test

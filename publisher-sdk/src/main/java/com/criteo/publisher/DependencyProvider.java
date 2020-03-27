@@ -9,12 +9,12 @@ import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.BuildConfigWrapper;
 import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.Util.JsonSerializer;
 import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.RunOnUiThreadExecutor;
 import com.criteo.publisher.bid.BidLifecycleListener;
-import com.criteo.publisher.bid.UniqueIdGenerator;
 import com.criteo.publisher.bid.LoggingBidLifecycleListener;
-import com.criteo.publisher.privacy.UserPrivacyUtil;
+import com.criteo.publisher.bid.UniqueIdGenerator;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnitMapper;
@@ -25,6 +25,7 @@ import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.network.BidRequestSender;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.privacy.UserPrivacyUtil;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -62,7 +63,10 @@ public class DependencyProvider {
     return getOrCreate(PubSdkApi.class, new Factory<PubSdkApi>() {
       @Override
       public PubSdkApi create() {
-        return new PubSdkApi(provideBuildConfigWrapper());
+        return new PubSdkApi(
+            provideBuildConfigWrapper(),
+            new JsonSerializer()
+        );
       }
     });
   }
