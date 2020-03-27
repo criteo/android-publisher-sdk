@@ -8,6 +8,8 @@ import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.annotations.SerializedName;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @AutoValue
@@ -15,13 +17,17 @@ public abstract class MetricRequest {
 
   @NonNull
   static MetricRequest create(
-      @NonNull Metric metric,
+      @NonNull Collection<Metric> metrics,
       @NonNull String sdkVersion,
       int profileId
   ) {
-    MetricRequestFeedback feedback = MetricRequestFeedback.create(metric);
+    List<MetricRequestFeedback> feedbacks = new ArrayList<>();
+    for (Metric metric : metrics) {
+      feedbacks.add(MetricRequestFeedback.create(metric));
+    }
+
     return new AutoValue_MetricRequest(
-        singletonList(feedback),
+        feedbacks,
         sdkVersion,
         profileId
     );
