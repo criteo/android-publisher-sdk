@@ -17,14 +17,13 @@ android {
 }
 
 // Export APK for all build types (release, staging, debug)
-android.applicationVariants.all {
-    val publicationName = name + "Apk"
-    outputs.all {
-        addPublication(publicationName) {
-            groupId = "com.criteo.pubsdk_android"
-            artifactId = "publisher-app"
-            pom.packaging = "apk"
+addPublication("Apk") {
+    groupId = "com.criteo.pubsdk_android"
+    artifactId = "publisher-app"
+    pom.packaging = "apk"
 
+    android.applicationVariants.all {
+        outputs.all {
             artifact(outputFile) {
                 classifier = buildType.name
                 builtBy(assembleProvider)
