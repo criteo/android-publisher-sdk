@@ -109,10 +109,6 @@ class SyncMetricFile {
     synchronized (fileLock) {
       Metric metric = read();
 
-      if (!mover.shouldMove(metric)) {
-        return;
-      }
-
       delete();
       boolean success = false;
       try {

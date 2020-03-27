@@ -95,10 +95,6 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
       boolean isNoBid = responseSlot == null;
       boolean isInvalidBid = responseSlot != null && !responseSlot.isValid();
 
-      if (isNoBid || isInvalidBid) {
-        shouldPushInQueue = true;
-      }
-
       repository.updateById(impressionId, new MetricUpdater() {
         @Override
         public void update(@NonNull Metric.Builder builder) {
@@ -113,10 +109,10 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
           }
         }
       });
-    }
 
-    if (shouldPushInQueue) {
-      sendingQueueProducer.pushAllReadyToSendInQueue(repository);
+      if (isNoBid || isInvalidBid) {
+        sendingQueueProducer.pushInQueue(repository, impressionId);
+      }
     }
   }
 
@@ -139,7 +135,10 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
       onCdbCallNetworkError(request);
     }
 
-    sendingQueueProducer.pushAllReadyToSendInQueue(repository);
+    for (CdbRequestSlot slot : request.getSlots()) {
+      String impressionId = slot.getImpressionId();
+      sendingQueueProducer.pushInQueue(repository, impressionId);
+    }
   }
 
   private void onCdbCallNetworkError(CdbRequest request) {
@@ -194,7 +193,7 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
       }
     });
 
-    sendingQueueProducer.pushAllReadyToSendInQueue(repository);
+    sendingQueueProducer.pushInQueue(repository, impressionId);
   }
 
   private void updateByCdbRequestIds(@NonNull CdbRequest request, @NonNull MetricUpdater updater) {

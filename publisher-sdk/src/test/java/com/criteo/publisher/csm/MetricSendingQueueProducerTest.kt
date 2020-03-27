@@ -39,55 +39,31 @@ class MetricSendingQueueProducerTest {
 
     producer.pushAllInQueue(repository)
 
-    verify(queue).offer(metric1)
-    verify(queue).offer(metric2)
     assertOnlyThoseMetricsAreMoved(metric1, metric2)
   }
 
   @Test
-  fun pushAllReadyToSendInQueue_GivenNoMetricReadyToSend_DoNothingAndKeepThem() {
-    val shouldNotBeSent = Metric.builder("id")
-        .setReadyToSend(false)
-        .build()
-
-    givenMetricInRepository(shouldNotBeSent)
-
-    producer.pushAllReadyToSendInQueue(repository)
-
-    verifyZeroInteractions(queue)
-    assertOnlyThoseMetricsAreMoved()
-  }
-
-  @Test
-  fun pushAllReadyToSendInQueue_GivenMetricReadyToSend_MoveOnlyThem() {
-    val shouldNotBeSent = Metric.builder("id1")
-        .setReadyToSend(false)
-        .build()
-
-    val shouldBeSent = Metric.builder("id2")
-        .setReadyToSend(true)
-        .build()
+  fun pushInQueue_GivenMetricId_MoveMetricMatchingId() {
+    val shouldNotBeSent = Metric.builder("id1").build()
+    val shouldBeSent = Metric.builder("id2").build()
 
     givenMetricInRepository(shouldNotBeSent, shouldBeSent)
 
-    producer.pushAllReadyToSendInQueue(repository)
+    producer.pushInQueue(repository, "id2")
 
-    verify(queue).offer(shouldBeSent)
-    verify(queue, never()).offer(shouldNotBeSent)
     assertOnlyThoseMetricsAreMoved(shouldBeSent)
   }
 
   private fun givenMetricInRepository(vararg metrics: Metric) {
     repository.stub {
       doAnswer { invocationOnMock: InvocationOnMock ->
-        val move: MetricMover = invocationOnMock.getArgument(0)
+        val impressionId: String = invocationOnMock.getArgument(0)
+        val move: MetricMover = invocationOnMock.getArgument(1)
 
-        metrics.forEach {
-          if (move.shouldMove(it)) {
-            move.offerToDestination(it)
-          }
+        metrics.firstOrNull { it.impressionId == impressionId }?.let {
+          move.offerToDestination(it)
         }
-      }.whenever(mock).moveAllWith(any())
+      }.whenever(mock).moveById(any(), any())
 
       on { allStoredMetrics } doReturn metrics.asList()
     }
@@ -97,15 +73,15 @@ class MetricSendingQueueProducerTest {
     val allMetrics = repository.allStoredMetrics
     val notMovedMetrics = allMetrics.minus(movedMetrics)
 
-    verify(repository).moveAllWith(check { move ->
-      movedMetrics.forEach {
-        assertThat(move.shouldMove(it)).isTrue()
-      }
+    movedMetrics.forEach {
+      verify(repository).moveById(eq(it.impressionId), any())
+      verify(queue).offer(it)
+    }
 
-      notMovedMetrics.forEach {
-        assertThat(move.shouldMove(it)).isFalse()
-      }
-    })
+    notMovedMetrics.forEach {
+      verify(repository, never()).moveById(eq(it.impressionId), any())
+      verify(queue, never()).offer(it)
+    }
   }
 
 }

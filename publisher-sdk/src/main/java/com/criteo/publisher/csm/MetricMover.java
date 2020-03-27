@@ -8,18 +8,9 @@ import android.support.annotation.NonNull;
 interface MetricMover {
 
   /**
-   * Indicate if the given metric should be drained from its original container.
-   *
-   * @param metric metric to determine
-   * @return true if it should be drained, else false
-   */
-  boolean shouldMove(@NonNull Metric metric);
-
-  /**
    * Try to push the given metric into the destination container.
    * <p>
-   * At this point, the {@link #shouldMove(Metric)} method already gave its approval for draining
-   * the given metric. And it is effectively extracted from its original container.
+   * At this point, the given metric is effectively extracted from its original container.
    * <p>
    * Implementation should commit the move to the destination container. If the move is a success,
    * then <code>true</code> should be returned. Else <code>false</code> is returned to indicate a

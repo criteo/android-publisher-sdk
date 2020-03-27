@@ -12,37 +12,16 @@ class MetricSendingQueueProducer {
   }
 
   void pushAllInQueue(@NonNull MetricRepository repository) {
-    repository.moveAllWith(new MetricMover() {
-      @Override
-      public boolean shouldMove(@NonNull Metric metric) {
-        return true;
-      }
-
-      @Override
-      public boolean offerToDestination(@NonNull Metric metric) {
-        return queue.offer(metric);
-      }
-    });
+    for (Metric metric : repository.getAllStoredMetrics()) {
+      pushInQueue(repository, metric.getImpressionId());
+    }
   }
 
-  void pushAllReadyToSendInQueue(@NonNull MetricRepository repository) {
-    repository.moveAllWith(new MetricMover() {
-      /**
-       * Indicate that all metric that are {@linkplain Metric#isReadyToSend() ready to
-       * send} should be moved.
-       * <p>
-       * This needs to be confirmed there because this move runs on all metric of the
-       * repository. This move is bulked because {@link Metric#getImpressionId()} is
-       * nullable and so the caller couldn't know the ID of metrics to move.
-       *
-       * @param metric metric to determine
-       * @return true if metric is ready to send
-       */
-      @Override
-      public boolean shouldMove(@NonNull Metric metric) {
-        return metric.isReadyToSend();
-      }
-
+  void pushInQueue(
+      @NonNull MetricRepository repository,
+      @NonNull String impressionId
+  ) {
+    repository.moveById(impressionId, new MetricMover() {
       @Override
       public boolean offerToDestination(@NonNull Metric metric) {
         return queue.offer(metric);

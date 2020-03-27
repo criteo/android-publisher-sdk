@@ -47,26 +47,25 @@ class MetricRepository {
   }
 
   /**
-   * Move all metrics with the given mover
+   * Atomically move the metric matching the given id with the given mover.
    * <p>
-   * A snapshot of all existing metrics is made. All metrics from this snapshot are read, filtered,
-   * delete and move with the given mover. If a final move is unsuccessful, the individual operation
-   * is rollback.
-   * <p>
-   * Each individual operations are done atomically but if an update is done in parallel, then the
-   * outcome is not deterministic. In any case, the repository stay consistent.
+   * The metric is read, deleted and moved with the given mover. If a final move is unsuccessful,
+   * the operation is rollback.
    *
+   * As the metric is first deleted, and then moved, this means that in case of crashes, the data
+   * may be lost. This is expected since no metric duplications are allowed.
+   *
+   * @param impressionId ID of the metric to move
    * @param mover the definition of the move to handle
    */
-  void moveAllWith(@NonNull MetricMover mover) {
-    Collection<File> files = directory.listFiles();
+  public void moveById(@NonNull String impressionId, @NonNull MetricMover mover) {
+    File metricFile = directory.createMetricFile(impressionId);
+    SyncMetricFile syncMetricFile = getOrCreateMetricFile(metricFile);
 
-    for (File metricFile : files) {
-      try {
-        getOrCreateMetricFile(metricFile).moveWith(mover);
-      } catch (IOException e) {
-        Log.d(TAG, "Error while reading metric", e);
-      }
+    try {
+      syncMetricFile.moveWith(mover);
+    } catch (IOException e) {
+      Log.d(TAG, "Error while moving metric", e);
     }
   }
 

@@ -69,7 +69,7 @@ class CsmBidLifecycleListenerTest {
 
     listener.onCdbCallFinished(request, response)
 
-    verify(sendingQueueProducer).pushAllReadyToSendInQueue(repository)
+    verify(sendingQueueProducer).pushInQueue(repository, "id")
   }
 
   @Test
@@ -86,7 +86,7 @@ class CsmBidLifecycleListenerTest {
 
     listener.onCdbCallFinished(request, response)
 
-    verify(sendingQueueProducer).pushAllReadyToSendInQueue(repository)
+    verify(sendingQueueProducer).pushInQueue(repository, "id")
   }
 
   @Test
@@ -103,7 +103,7 @@ class CsmBidLifecycleListenerTest {
 
     listener.onCdbCallFinished(request, response)
 
-    verify(sendingQueueProducer, never()).pushAllReadyToSendInQueue(repository)
+    verify(sendingQueueProducer, never()).pushInQueue(any(), any())
   }
 
   @Test
@@ -133,7 +133,10 @@ class CsmBidLifecycleListenerTest {
     assertNoBidSlotIsReceived("noBidId")
     assertInvalidBidSlotIsReceived("invalidId")
     assertValidBidSlotIsReceived("validId")
-    verify(sendingQueueProducer).pushAllReadyToSendInQueue(repository)
+
+    verify(sendingQueueProducer).pushInQueue(repository, "noBidId")
+    verify(sendingQueueProducer).pushInQueue(repository, "invalidId")
+    verifyNoMoreInteractions(sendingQueueProducer)
   }
 
   @Test
@@ -159,7 +162,8 @@ class CsmBidLifecycleListenerTest {
     assertTimeoutErrorIsReceived("id1")
     assertTimeoutErrorIsReceived("id2")
 
-    verify(sendingQueueProducer).pushAllReadyToSendInQueue(repository)
+    verify(sendingQueueProducer).pushInQueue(repository, "id1")
+    verify(sendingQueueProducer).pushInQueue(repository, "id2")
   }
 
   @Test
@@ -182,7 +186,7 @@ class CsmBidLifecycleListenerTest {
       verify(it).setReadyToSend(true)
     }
 
-    verify(sendingQueueProducer).pushAllReadyToSendInQueue(repository)
+    verify(sendingQueueProducer).pushInQueue(repository, "id")
   }
 
   @Test
@@ -200,7 +204,7 @@ class CsmBidLifecycleListenerTest {
       verify(it).setReadyToSend(true)
     }
 
-    verify(sendingQueueProducer).pushAllReadyToSendInQueue(repository)
+    verify(sendingQueueProducer).pushInQueue(repository, "id")
   }
 
   @Test

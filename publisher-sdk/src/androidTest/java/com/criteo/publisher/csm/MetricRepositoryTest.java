@@ -463,11 +463,10 @@ public class MetricRepositoryTest {
   @Test
   public void updateById_AfterAMovedMetric_GetANewMetricToUpdate() throws Exception {
     MetricMover mover = mock(MetricMover.class);
-    when(mover.shouldMove(any())).thenReturn(true);
     when(mover.offerToDestination(any())).thenReturn(true);
 
     repository.updateById("id", builder -> builder.setCdbCallStartTimestamp(1L));
-    repository.moveAllWith(mover);
+    repository.moveById("id", mover);
 
     repository.updateById("id", builder -> {
       assertEquals(builder.build(), Metric.builder("id").build());
@@ -475,98 +474,58 @@ public class MetricRepositoryTest {
   }
 
   @Test
-  public void moveAllWith_GivenEmptyRepository_DoNothing() throws Exception {
+  public void moveById_GivenRepositoryWithMetricAndSuccessfulMove_RemoveMetric() throws Exception {
     MetricMover mover = mock(MetricMover.class);
-
-    repository.moveAllWith(mover);
-
-    verifyNoInteractions(mover);
-  }
-
-  @Test
-  public void moveAllWith_GivenRepositoryWithMetricAndSuccessfulMove_RemoveAll() throws Exception {
-    MetricMover mover = mock(MetricMover.class);
-    when(mover.shouldMove(any())).thenReturn(true);
     when(mover.offerToDestination(any())).thenReturn(true);
 
-    repository.updateById("id1", builder -> {});
+    repository.updateById("id", builder -> {});
     givenNewRepository();
-    repository.updateById("id2", builder -> {});
 
-    repository.moveAllWith(mover);
+    repository.moveById("id", mover);
 
     Collection<Metric> metrics = repository.getAllStoredMetrics();
 
-    verify(mover, times(2)).shouldMove(any());
-    verify(mover, times(2)).offerToDestination(any());
+    verify(mover, times(1)).offerToDestination(any());
     assertTrue(metrics.isEmpty());
   }
 
   @Test
-  public void moveAllWith_GivenRepositoryWithMetricAndUnsuccessfulMove_RollbackAll() throws Exception {
+  public void moveById_GivenRepositoryWithMetricAndUnsuccessfulMove_RollbackMetric() throws Exception {
     MetricMover mover = mock(MetricMover.class);
-    when(mover.shouldMove(any())).thenReturn(true);
     when(mover.offerToDestination(any())).thenReturn(false);
 
-    repository.updateById("id1", builder -> {});
+    repository.updateById("id", builder -> builder.setCdbCallStartTimestamp(2L));
     givenNewRepository();
-    repository.updateById("id2", builder -> {});
 
-    repository.moveAllWith(mover);
-
-    Collection<Metric> metrics = repository.getAllStoredMetrics();
-
-    assertEquals(2, metrics.size());
-    assertTrue(metrics.contains(Metric.builder("id1").build()));
-    assertTrue(metrics.contains(Metric.builder("id2").build()));
-  }
-
-  @Test
-  public void moveAllWith_GivenRepositoryWithSuccessfulAndUnsuccessfulMove_RemoveMovedOnes() throws Exception {
-    MetricMover mover = mock(MetricMover.class);
-    when(mover.shouldMove(any())).thenReturn(true);
-    when(mover.offerToDestination(any())).thenReturn(false).thenReturn(true);
-
-    repository.updateById("id1", builder -> {});
-    givenNewRepository();
-    repository.updateById("id2", builder -> {});
-
-    repository.moveAllWith(mover);
+    repository.moveById("id", mover);
 
     Collection<Metric> metrics = repository.getAllStoredMetrics();
 
     assertEquals(1, metrics.size());
-    assertTrue(metrics.contains(Metric.builder("id1").build()));
+    assertTrue(metrics.contains(Metric.builder("id")
+        .setCdbCallStartTimestamp(2L)
+        .build()));
   }
 
   @Test
-  public void moveAllWith_GivenErrorWhenReadingMetric_IgnoreErrorAndDeleteOthers() throws Exception {
+  public void moveById_GivenErrorWhenReadingMetric_IgnoreErrorAndDoNotMove() throws Exception {
     MetricMover mover = mock(MetricMover.class);
-    when(mover.shouldMove(any())).thenReturn(true);
     when(mover.offerToDestination(any())).thenReturn(true);
 
     parser = spy(parser);
 
-    repository.updateById("id1", builder -> {});
-    repository.updateById("id2", builder -> {});
+    repository.updateById("id", builder -> {});
     givenNewRepository();
 
     doThrow(IOException.class)
-        .doCallRealMethod()
         .when(parser).read(any());
 
-    repository.moveAllWith(mover);
+    repository.moveById("id", mover);
 
     Collection<Metric> metrics = repository.getAllStoredMetrics();
 
-    verify(mover, times(1)).shouldMove(any());
-    verify(mover).shouldMove(argThat(metric -> {
-      assertEquals(Metric.builder("id2").build(), metric);
-      return true;
-    }));
-
     assertEquals(1, metrics.size());
-    assertTrue(metrics.contains(Metric.builder("id1").build()));
+    assertTrue(metrics.contains(Metric.builder("id").build()));
   }
 
   private void waitForPotentialIO() {

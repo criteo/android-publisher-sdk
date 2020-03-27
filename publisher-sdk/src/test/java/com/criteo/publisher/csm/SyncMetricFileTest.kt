@@ -26,27 +26,11 @@ class SyncMetricFileTest {
   }
 
   @Test
-  fun moveWith_GivenUnwantedMove_DoNothing() {
+  fun moveWith_GivenSuccessfulMove_RemoveFromFileThenInjectToDestination() {
     val metric = Metric.builder("id").build()
     doReturn(metric).whenever(metricFile).read()
 
     val move = mock<MetricMover> {
-      on { shouldMove(metric) } doReturn false
-    }
-
-    metricFile.moveWith(move)
-
-    verify(metricFile, never()).delete()
-    verify(move, never()).offerToDestination(any())
-  }
-
-  @Test
-  fun moveWith_GivenWantedAndSuccessfulMove_RemoveFromFileThenInjectToDestination() {
-    val metric = Metric.builder("id").build()
-    doReturn(metric).whenever(metricFile).read()
-
-    val move = mock<MetricMover> {
-      on { shouldMove(metric) } doReturn true
       on { offerToDestination(metric) } doReturn true
     }
 
@@ -59,13 +43,12 @@ class SyncMetricFileTest {
   }
 
   @Test
-  fun moveWith_GivenWantedButUnsuccessfulMove_RemoveFromFileThenInjectToDestinationThenRollback() {
+  fun moveWith_GivenUnsuccessfulMove_RemoveFromFileThenInjectToDestinationThenRollback() {
     val metric = Metric.builder("id").build()
     doReturn(metric).whenever(metricFile).read()
     doNothing().whenever(metricFile).write(metric)
 
     val move = mock<MetricMover> {
-      on { shouldMove(metric) } doReturn true
       on { offerToDestination(metric) } doReturn false
     }
 
@@ -79,7 +62,7 @@ class SyncMetricFileTest {
   }
 
   @Test
-  fun moveWith_GivenWantedMoveAndExceptionDuringMove_RemoveFromFileThenInjectToDestinationThenRollback() {
+  fun moveWith_GivenExceptionDuringMove_RemoveFromFileThenInjectToDestinationThenRollback() {
     val metric = Metric.builder("id").build()
     doReturn(metric).whenever(metricFile).read()
     doNothing().whenever(metricFile).write(metric)
@@ -87,7 +70,6 @@ class SyncMetricFileTest {
     val exception = RuntimeException()
 
     val move = mock<MetricMover> {
-      on { shouldMove(metric) } doReturn true
       on { offerToDestination(metric) } doThrow exception
     }
 
