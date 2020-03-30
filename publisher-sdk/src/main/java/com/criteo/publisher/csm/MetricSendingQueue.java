@@ -1,5 +1,6 @@
 package com.criteo.publisher.csm;
 
+import android.support.annotation.NonNull;
 import java.util.List;
 
 interface MetricSendingQueue {
@@ -14,7 +15,7 @@ interface MetricSendingQueue {
    * @param metric metric to insert into this queue
    * @return <code>true</code> if element was successfully inserted, else <code>false</code>
    */
-  boolean offer(Metric metric);
+  boolean offer(@NonNull Metric metric);
 
   /**
    * Retrieves and removes up to <code>max</code> elements from this queue.
@@ -25,6 +26,7 @@ interface MetricSendingQueue {
    * @param max max number of element to poll from the queue
    * @return at most <code>max</code> first elements of the queue
    */
+  @NonNull
   List<Metric> poll(int max);
 
 }

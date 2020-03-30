@@ -54,5 +54,5 @@ dependencies {
         exclude(group = Deps.Android.Support.group)
     }
 
-    "memoryLeaksHuntImplementation"(Deps.Square.LeakCanary)
+    "memoryLeaksHuntImplementation"(Deps.Square.LeakCanary.LeakCanary)
 }

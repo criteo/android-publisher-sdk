@@ -25,6 +25,7 @@ addPublication("release") {
 
 dependencies {
     implementation(Deps.Android.Support.SupportCoreUtils)
+    implementation(Deps.Square.Tape.Tape)
 
     compileOnly(Deps.Google.AdMob) {
         exclude(group = Deps.Android.Support.group)

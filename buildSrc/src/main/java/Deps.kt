@@ -93,9 +93,17 @@ object Deps {
   }
 
   object Square {
-    private const val version = "2.1"
+    object LeakCanary {
+      private const val version = "2.1"
 
-    const val LeakCanary = "com.squareup.leakcanary:leakcanary-android:$version"
+      const val LeakCanary = "com.squareup.leakcanary:leakcanary-android:$version"
+    }
+
+    object Tape {
+      private const val version = "1.2.3"
+
+      const val Tape = "com.squareup:tape:$version"
+    }
   }
 
 }
