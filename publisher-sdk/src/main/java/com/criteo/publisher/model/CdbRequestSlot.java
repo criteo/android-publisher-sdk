@@ -3,11 +3,10 @@ package com.criteo.publisher.model;
 import static java.util.Collections.singletonList;
 
 import android.support.annotation.NonNull;
+import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.Util.AdUnitType;
-import com.criteo.publisher.Util.CustomAdapterFactory;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.annotations.SerializedName;
 import java.util.Collection;
@@ -59,10 +58,7 @@ public abstract class CdbRequestSlot {
 
   @NonNull
   public JSONObject toJson() throws JSONException {
-    String s = new GsonBuilder()
-        .registerTypeAdapterFactory(CustomAdapterFactory.create())
-        .create()
-        .toJson(this);
+    String s = DependencyProvider.getInstance().provideGson().toJson(this);
 
     return new JSONObject(s);
   }

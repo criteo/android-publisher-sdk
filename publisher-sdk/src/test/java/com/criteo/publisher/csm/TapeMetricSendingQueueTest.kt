@@ -72,7 +72,7 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
       TapeImplementation.EMPTY_QUEUE_FILE -> {
         val newFile = tempFolder.newFile()
         createFileObjectQueueFromNewFile(newFile)
-        createFileObjectQueue(newFile, MetricParser())
+        createFileObjectQueueFromFile(newFile)
       }
       TapeImplementation.IN_MEMORY -> {
         InMemoryObjectQueue()
@@ -82,7 +82,12 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
 
   private fun createFileObjectQueueFromNewFile(newFile: File = tempFolder.newFile()): ObjectQueue<Metric> {
     newFile.delete()
-    return createFileObjectQueue(newFile, MetricParser())
+    return createFileObjectQueueFromFile(newFile)
+  }
+
+  private fun createFileObjectQueueFromFile(file: File): ObjectQueue<Metric> {
+    val metricParser = mockedDependenciesRule.dependencyProvider.provideMetricParser()
+    return createFileObjectQueue(file, metricParser)
   }
 
   @Test

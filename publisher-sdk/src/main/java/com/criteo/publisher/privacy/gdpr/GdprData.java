@@ -3,10 +3,9 @@ package com.criteo.publisher.privacy.gdpr;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
-import com.criteo.publisher.Util.CustomAdapterFactory;
+import com.criteo.publisher.DependencyProvider;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,10 +32,7 @@ public abstract class GdprData {
    */
   @NonNull
   public JSONObject toJSONObject() throws JSONException {
-    String s = new GsonBuilder()
-        .registerTypeAdapterFactory(CustomAdapterFactory.create())
-        .create()
-        .toJson(this);
+    String s = DependencyProvider.getInstance().provideGson().toJson(this);
 
     return new JSONObject(s);
   }

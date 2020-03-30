@@ -2,7 +2,6 @@ package com.criteo.publisher.Util;
 
 import android.support.annotation.NonNull;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -13,10 +12,8 @@ public class JsonSerializer {
   @NonNull
   private final Gson gson;
 
-  public JsonSerializer() {
-    gson = new GsonBuilder()
-        .registerTypeAdapterFactory(CustomAdapterFactory.create())
-        .create();
+  public JsonSerializer(@NonNull Gson gson) {
+    this.gson = gson;
   }
 
   /**

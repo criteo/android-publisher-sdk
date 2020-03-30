@@ -8,6 +8,7 @@ import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.Util.BuildConfigWrapper;
+import com.criteo.publisher.Util.CustomAdapterFactory;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.JsonSerializer;
 import com.criteo.publisher.Util.LoggingUtil;
@@ -16,6 +17,7 @@ import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.bid.LoggingBidLifecycleListener;
 import com.criteo.publisher.bid.UniqueIdGenerator;
 import com.criteo.publisher.cache.SdkCache;
+import com.criteo.publisher.csm.MetricParser;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CdbRequestFactory;
@@ -26,6 +28,8 @@ import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.network.BidRequestSender;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -65,7 +69,7 @@ public class DependencyProvider {
       public PubSdkApi create() {
         return new PubSdkApi(
             provideBuildConfigWrapper(),
-            new JsonSerializer()
+            provideJsonSerializer()
         );
       }
     });
@@ -331,6 +335,41 @@ public class DependencyProvider {
       @Override
       public InterstitialActivityHelper create() {
         return new InterstitialActivityHelper(context);
+      }
+    });
+  }
+
+  @NonNull
+  public MetricParser provideMetricParser() {
+    return getOrCreate(MetricParser.class, new Factory<MetricParser>() {
+      @Override
+      public MetricParser create() {
+        return new MetricParser(
+            provideGson(),
+            provideJsonSerializer()
+        );
+      }
+    });
+  }
+
+  @NonNull
+  public JsonSerializer provideJsonSerializer() {
+    return getOrCreate(JsonSerializer.class, new Factory<JsonSerializer>() {
+      @Override
+      public JsonSerializer create() {
+        return new JsonSerializer(provideGson());
+      }
+    });
+  }
+
+  @NonNull
+  public Gson provideGson() {
+    return getOrCreate(Gson.class, new Factory<Gson>() {
+      @Override
+      public Gson create() {
+        return new GsonBuilder()
+            .registerTypeAdapterFactory(CustomAdapterFactory.create())
+            .create();
       }
     });
   }

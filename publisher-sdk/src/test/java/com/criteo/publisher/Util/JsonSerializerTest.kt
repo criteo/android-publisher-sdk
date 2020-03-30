@@ -1,14 +1,26 @@
 package com.criteo.publisher.Util
 
+import com.criteo.publisher.mock.MockedDependenciesRule
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThatCode
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.io.IOException
 import java.io.OutputStream
 
 class JsonSerializerTest {
 
-  private val serializer = JsonSerializer()
+  @Rule
+  @JvmField
+  val mockedDependenciesRule = MockedDependenciesRule()
+
+  private lateinit var serializer: JsonSerializer
+
+  @Before
+  fun setUp() {
+    serializer = mockedDependenciesRule.dependencyProvider.provideJsonSerializer()
+  }
 
   @Test
   fun write_GivenStreamThatThrowsWhenWriting_ThrowIoException() {

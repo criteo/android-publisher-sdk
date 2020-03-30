@@ -2,10 +2,9 @@ package com.criteo.publisher.model;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import com.criteo.publisher.Util.CustomAdapterFactory;
+import com.criteo.publisher.DependencyProvider;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,10 +38,7 @@ public abstract class User {
    */
   @NonNull
   public JSONObject toJson() throws JSONException {
-    String s = new GsonBuilder()
-        .registerTypeAdapterFactory(CustomAdapterFactory.create())
-        .create()
-        .toJson(this);
+    String s = DependencyProvider.getInstance().provideGson().toJson(this);
 
     return new JSONObject(s);
   }

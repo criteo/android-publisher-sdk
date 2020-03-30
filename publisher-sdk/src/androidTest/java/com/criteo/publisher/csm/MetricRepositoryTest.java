@@ -5,19 +5,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.csm.MetricRepository.MetricUpdater;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,9 +29,13 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class MetricRepositoryTest {
+
+  @Rule
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   private MetricDirectory directory;
 
@@ -42,7 +45,7 @@ public class MetricRepositoryTest {
 
   @Before
   public void setUp() throws Exception {
-    parser = new MetricParser();
+    parser = mockedDependenciesRule.getDependencyProvider().provideMetricParser();
 
     givenNewRepository();
   }

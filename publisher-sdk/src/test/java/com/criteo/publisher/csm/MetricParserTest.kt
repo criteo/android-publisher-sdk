@@ -1,14 +1,26 @@
 package com.criteo.publisher.csm
 
+import com.criteo.publisher.mock.MockedDependenciesRule
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.io.*
 
 class MetricParserTest {
 
-  private val parser = MetricParser()
+  @Rule
+  @JvmField
+  val mockedDependenciesRule = MockedDependenciesRule()
+
+  private lateinit var parser: MetricParser
+
+  @Before
+  fun setUp() {
+    parser = mockedDependenciesRule.dependencyProvider.provideMetricParser()
+  }
 
   @Test
   fun read_GivenEmptyInputStream_ThrowEOF() {

@@ -2,13 +2,25 @@ package com.criteo.publisher.csm
 
 import com.criteo.publisher.Util.JsonSerializer
 import com.criteo.publisher.Util.writeIntoString
+import com.criteo.publisher.mock.MockedDependenciesRule
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.ObjectAssert
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 class MetricRequestTest {
 
-  private val serializer = JsonSerializer()
+  @Rule
+  @JvmField
+  val mockedDependenciesRule = MockedDependenciesRule()
+
+  private lateinit var serializer: JsonSerializer
+
+  @Before
+  fun setUp() {
+    serializer = mockedDependenciesRule.dependencyProvider.provideJsonSerializer()
+  }
 
   @Test
   fun create_GivenNoMetric_ReturnEmptyRequest() {
