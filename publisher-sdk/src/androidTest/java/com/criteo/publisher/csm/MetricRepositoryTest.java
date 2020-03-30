@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -39,14 +40,13 @@ public class MetricRepositoryTest {
 
   private MetricDirectory directory;
 
+  @Inject
   private MetricParser parser;
 
   private MetricRepository repository;
 
   @Before
   public void setUp() throws Exception {
-    parser = mockedDependenciesRule.getDependencyProvider().provideMetricParser();
-
     givenNewRepository();
   }
 

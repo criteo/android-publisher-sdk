@@ -5,6 +5,8 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
+import android.os.Build.VERSION_CODES;
+import android.support.annotation.RequiresApi;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.MockableDependencyProvider;
 import com.criteo.publisher.concurrent.TrackingCommandsExecutor;
@@ -12,15 +14,15 @@ import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.network.PubSdkApi;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
-import org.junit.rules.TestRule;
-import org.junit.rules.Timeout;
-import org.junit.runner.Description;
+import org.junit.internal.runners.statements.FailOnTimeout;
+import org.junit.rules.MethodRule;
+import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
 /**
  * Use this Rule when writing tests that require mocking global dependencies.
  */
-public class MockedDependenciesRule implements TestRule {
+public class MockedDependenciesRule implements MethodRule {
 
   /**
    * Apply a timeout on all tests using this rule.
@@ -34,9 +36,8 @@ public class MockedDependenciesRule implements TestRule {
    * Warning: When debugging, this timeout may interrupt your work and be annoying. To deactivate
    * it, you may set the {@link #iAmDebuggingDoNotTimeoutMe} variable to <code>true</code>.
    */
-  private final Timeout timeout = Timeout.builder()
-      .withTimeout(20, TimeUnit.SECONDS)
-      .build();
+  private final FailOnTimeout.Builder timeout = FailOnTimeout.builder()
+      .withTimeout(20, TimeUnit.SECONDS);
 
   private final boolean iAmDebuggingDoNotTimeoutMe = false;
 
@@ -44,30 +45,42 @@ public class MockedDependenciesRule implements TestRule {
   private TrackingCommandsExecutor trackingCommandsExecutor = null;
 
   @Override
-  public Statement apply(Statement base, Description description) {
-    try {
-      return new Statement() {
-        @Override
-        public void evaluate() throws Throwable {
-          DependencyProvider originalDependencyProvider = DependencyProvider.getInstance();
-          Executor oldExecutor = originalDependencyProvider.provideThreadPoolExecutor();
-          trackingCommandsExecutor = new TrackingCommandsExecutor(oldExecutor);
-          dependencyProvider = spy(originalDependencyProvider);
-          MockableDependencyProvider.setInstance(dependencyProvider);
-          doReturn(trackingCommandsExecutor).when(dependencyProvider).provideThreadPoolExecutor();
-          doReturn(trackingCommandsExecutor).when(dependencyProvider).provideSerialExecutor();
+  public Statement apply(Statement base, FrameworkMethod method, Object target) {
+    return new Statement() {
+      @RequiresApi(api = VERSION_CODES.O)
+      @Override
+      public void evaluate() throws Throwable {
+        try {
+          setUpDependencyProvider();
+          injectDependencies(target);
 
           if (iAmDebuggingDoNotTimeoutMe) {
             base.evaluate();
           } else {
-            timeout.apply(base, description).evaluate();
+            timeout.build(base).evaluate();
           }
+        } finally {
+          // clean after self and ensures no side effects for subsequent tests
+          MockableDependencyProvider.setInstance(null);
         }
-      };
-    } finally {
-      // clean after self and ensures no side effects for subsequent tests
-      MockableDependencyProvider.setInstance(null);
-    }
+      }
+    };
+  }
+
+  private void setUpDependencyProvider() {
+    DependencyProvider originalDependencyProvider = DependencyProvider.getInstance();
+    Executor oldExecutor = originalDependencyProvider.provideThreadPoolExecutor();
+    trackingCommandsExecutor = new TrackingCommandsExecutor(oldExecutor);
+    dependencyProvider = spy(originalDependencyProvider);
+    MockableDependencyProvider.setInstance(dependencyProvider);
+    doReturn(trackingCommandsExecutor).when(dependencyProvider).provideThreadPoolExecutor();
+    doReturn(trackingCommandsExecutor).when(dependencyProvider).provideSerialExecutor();
+  }
+
+  @RequiresApi(api = VERSION_CODES.O)
+  private void injectDependencies(Object target) {
+    DependenciesAnnotationInjection injection = new DependenciesAnnotationInjection(dependencyProvider);
+    injection.process(target);
   }
 
   public DependencyProvider getDependencyProvider() {

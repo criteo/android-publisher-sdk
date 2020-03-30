@@ -3,11 +3,11 @@ package com.criteo.publisher.Util
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThatCode
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.io.IOException
 import java.io.OutputStream
+import javax.inject.Inject
 
 class JsonSerializerTest {
 
@@ -15,12 +15,8 @@ class JsonSerializerTest {
   @JvmField
   val mockedDependenciesRule = MockedDependenciesRule()
 
+  @Inject
   private lateinit var serializer: JsonSerializer
-
-  @Before
-  fun setUp() {
-    serializer = mockedDependenciesRule.dependencyProvider.provideJsonSerializer()
-  }
 
   @Test
   fun write_GivenStreamThatThrowsWhenWriting_ThrowIoException() {

@@ -4,10 +4,10 @@ import com.criteo.publisher.mock.MockedDependenciesRule
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.io.*
+import javax.inject.Inject
 
 class MetricParserTest {
 
@@ -15,12 +15,8 @@ class MetricParserTest {
   @JvmField
   val mockedDependenciesRule = MockedDependenciesRule()
 
+  @Inject
   private lateinit var parser: MetricParser
-
-  @Before
-  fun setUp() {
-    parser = mockedDependenciesRule.dependencyProvider.provideMetricParser()
-  }
 
   @Test
   fun read_GivenEmptyInputStream_ThrowEOF() {

@@ -17,6 +17,7 @@ import org.junit.runners.Parameterized
 import org.mockito.AdditionalAnswers.delegatesTo
 import org.mockito.MockitoAnnotations
 import java.io.File
+import javax.inject.Inject
 
 @RunWith(Parameterized::class)
 class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementation) {
@@ -42,6 +43,9 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
       IN_MEMORY
     }
   }
+
+  @Inject
+  private lateinit var metricParser: MetricParser
 
   private lateinit var tapeQueue: ObjectQueue<Metric>
 
@@ -72,7 +76,7 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
       TapeImplementation.EMPTY_QUEUE_FILE -> {
         val newFile = tempFolder.newFile()
         createFileObjectQueueFromNewFile(newFile)
-        createFileObjectQueueFromFile(newFile)
+        createFileObjectQueue(newFile, metricParser)
       }
       TapeImplementation.IN_MEMORY -> {
         InMemoryObjectQueue()
@@ -82,12 +86,7 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
 
   private fun createFileObjectQueueFromNewFile(newFile: File = tempFolder.newFile()): ObjectQueue<Metric> {
     newFile.delete()
-    return createFileObjectQueueFromFile(newFile)
-  }
-
-  private fun createFileObjectQueueFromFile(file: File): ObjectQueue<Metric> {
-    val metricParser = mockedDependenciesRule.dependencyProvider.provideMetricParser()
-    return createFileObjectQueue(file, metricParser)
+    return createFileObjectQueue(newFile, metricParser)
   }
 
   @Test

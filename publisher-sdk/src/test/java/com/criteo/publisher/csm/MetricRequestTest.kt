@@ -5,9 +5,9 @@ import com.criteo.publisher.Util.writeIntoString
 import com.criteo.publisher.mock.MockedDependenciesRule
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.ObjectAssert
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import javax.inject.Inject
 
 class MetricRequestTest {
 
@@ -15,12 +15,8 @@ class MetricRequestTest {
   @JvmField
   val mockedDependenciesRule = MockedDependenciesRule()
 
+  @Inject
   private lateinit var serializer: JsonSerializer
-
-  @Before
-  fun setUp() {
-    serializer = mockedDependenciesRule.dependencyProvider.provideJsonSerializer()
-  }
 
   @Test
   fun create_GivenNoMetric_ReturnEmptyRequest() {

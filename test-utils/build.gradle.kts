@@ -14,4 +14,10 @@ dependencies {
   implementation(Deps.Android.Support.Annotations)
   implementation(Deps.Android.Test.Runner)
   implementation(Deps.Android.Test.Rules)
+
+  api(Deps.Javax.Inject.Inject)
+
+  testImplementation(Deps.Kotlin.Stdlib)
+  testImplementation(Deps.Mockito.Kotlin)
+  testImplementation(Deps.AssertJ.AssertJ)
 }
