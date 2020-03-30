@@ -11,10 +11,7 @@ import kotlin.test.assertEquals
 class GdprDataFetcherTest(
         private val gdprApplies: String,
         /** interpretation of gdprApplies as Boolean according to expected GdprDataFetcher#fetch logic */
-        private val assertGdprApplies: Boolean,
-        private val vendorConsents: String,
-        /** interpretation of vendorConsents a Boolean according to expected GdprDataFetcher#fetch logic */
-        private val assertVendorConsents: Boolean
+        private val assertGdprApplies: Boolean
 ) {
 
     companion object {
@@ -22,10 +19,10 @@ class GdprDataFetcherTest(
         @Parameterized.Parameters
         fun data(): Collection<Array<Any>> {
             return listOf(
-                    arrayOf("1", true, "0000000000000010000000000000000000000100000000000000000000000000000000000000000000000000001", true),
-                    arrayOf("0", false, "0000000000000010000000000000000000000100000000000000000000000000000000000000000000000000000", false),
-                    arrayOf("0", false, "0000000000000010000000000000000000000100000000000000000000000000000000000000000000000000001", true),
-                    arrayOf("1", true, "0000000000000010000000000000000000000100000000000000000000000000000000000000000000000000000", false)
+                    arrayOf("1", true),
+                    arrayOf("0", false),
+                    arrayOf("0", false),
+                    arrayOf("1", true)
             )
         }
     }
@@ -36,7 +33,6 @@ class GdprDataFetcherTest(
         val tcfGdprStrategy = mock<TcfGdprStrategy> {
             on { subjectToGdpr } doReturn gdprApplies
             on { consentString } doReturn "fake_consent_string"
-            on { vendorConsents } doReturn vendorConsents
         }
 
         val tcfStrategyResolver = mock<TcfStrategyResolver> {
@@ -50,7 +46,6 @@ class GdprDataFetcherTest(
 
         // Then
         assertEquals(assertGdprApplies, gdprData!!.gdprApplies())
-        assertEquals(assertVendorConsents, gdprData.consentGiven())
         assertEquals("fake_consent_string", gdprData.consentData())
     }
 }

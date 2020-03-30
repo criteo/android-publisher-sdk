@@ -15,7 +15,6 @@ class Tcf2GdprStrategyTest {
         val safeSharedPreferences = mock<SafeSharedPreferences> {
             on { getString("IABTCF_TCString", "") } doReturn "fake_consent_string"
             on { getInt("IABTCF_gdprApplies", -1) } doReturn 0
-            on { getString("IABTCF_VendorConsents", "") } doReturn "fake_parsed_vendor_consent"
         }
 
         // When
@@ -24,7 +23,6 @@ class Tcf2GdprStrategyTest {
         // Then
         assertEquals("fake_consent_string", tcf2Strategy.consentString)
         assertEquals("0", tcf2Strategy.subjectToGdpr)
-        assertEquals("fake_parsed_vendor_consent", tcf2Strategy.vendorConsents)
     }
 
     @Test
@@ -33,7 +31,6 @@ class Tcf2GdprStrategyTest {
         val safeSharedPreferences = mock<SafeSharedPreferences> {
             on { getString("IABTCF_TCString", "") } doReturn "fake_consent_string"
             on { getInt("IABTCF_gdprApplies", -1) } doReturn 0
-            on { getString("IABTCF_VendorConsents", "") } doReturn "fake_parsed_vendor_consent"
         }
 
         // When
@@ -49,7 +46,6 @@ class Tcf2GdprStrategyTest {
         val safeSharedPreferences = mock<SafeSharedPreferences> {
             on { getString("IABTCF_TCString", "") } doReturn ""
             on { getInt("IABTCF_gdprApplies", -1) } doReturn 0
-            on { getString("IABTCF_VendorConsents", "") } doReturn "fake_parsed_vendor_consent"
         }
 
         // When
@@ -65,7 +61,6 @@ class Tcf2GdprStrategyTest {
         val safeSharedPreferences = mock<SafeSharedPreferences> {
             on { getString("IABTCF_TCString", "") } doReturn "fake_consent_string"
             on { getInt("IABTCF_gdprApplies", -1) } doReturn -1
-            on { getString("IABTCF_VendorConsents", "") } doReturn "fake_parsed_vendor_consent"
         }
 
         // When
@@ -81,7 +76,6 @@ class Tcf2GdprStrategyTest {
         val safeSharedPreferences = mock<SafeSharedPreferences> {
             on { getString("IABTCF_TCString", "") } doReturn "fake_consent_string"
             on { getInt("IABTCF_gdprApplies", -1) } doReturn -1
-            on { getString("IABTCF_VendorConsents", "") } doReturn ""
         }
 
         // When

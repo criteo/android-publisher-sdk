@@ -15,12 +15,11 @@ public abstract class GdprData {
 
   @VisibleForTesting
   public static GdprData create(
-      boolean consentGiven,
       @NonNull String consentData,
       boolean gdprApplies,
       @NonNull Integer version
   ) {
-    return new AutoValue_GdprData(consentGiven, consentData, gdprApplies, version);
+    return new AutoValue_GdprData(consentData, gdprApplies, version);
   }
 
   public static TypeAdapter<GdprData> typeAdapter(Gson gson) {
@@ -40,8 +39,6 @@ public abstract class GdprData {
 
     return new JSONObject(s);
   }
-
-  public abstract boolean consentGiven();
 
   public abstract String consentData();
 

@@ -155,7 +155,7 @@ public class PubSdkApi {
     return executeRawGet(url, null);
   }
 
-  public void postCsm(@NonNull MetricRequest request) throws IOException{
+  public void postCsm(@NonNull MetricRequest request) throws IOException {
     URL url = new URL(buildConfigWrapper.getCdbUrl() + "/csm");
     HttpURLConnection urlConnection = prepareConnection(url, null, "POST");
 

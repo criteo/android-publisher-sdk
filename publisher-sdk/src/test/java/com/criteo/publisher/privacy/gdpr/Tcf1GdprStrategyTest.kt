@@ -16,7 +16,6 @@ class Tcf1GdprStrategyTest {
         val safeSharedPreferences = mock<SafeSharedPreferences> {
            on { getString("IABConsent_ConsentString", "") } doReturn "fake_consent_string"
             on { getString("IABConsent_SubjectToGDPR", "") } doReturn "fake_subject_to_gdpr"
-            on { getString("IABConsent_ParsedVendorConsents", "") } doReturn "fake_parsed_vendor_consent"
         }
 
         // When
@@ -25,7 +24,6 @@ class Tcf1GdprStrategyTest {
         // Then
         assertEquals("fake_consent_string", tcf1Strategy.consentString)
         assertEquals("fake_subject_to_gdpr", tcf1Strategy.subjectToGdpr)
-        assertEquals("fake_parsed_vendor_consent", tcf1Strategy.vendorConsents)
     }
 
     @Test
@@ -34,7 +32,6 @@ class Tcf1GdprStrategyTest {
         val safeSharedPreferences = mock<SafeSharedPreferences> {
             on { getString("IABConsent_ConsentString", "") } doReturn "fake_consent_string"
             on { getString("IABConsent_SubjectToGDPR", "") } doReturn "fake_subject_to_gdpr"
-            on { getString("IABConsent_ParsedVendorConsents", "") } doReturn "fake_parsed_vendor_consent"
         }
 
         // When
@@ -50,7 +47,6 @@ class Tcf1GdprStrategyTest {
         val safeSharedPreferences = mock<SafeSharedPreferences> {
             on { getString("IABConsent_ConsentString", "") } doReturn ""
             on { getString("IABConsent_SubjectToGDPR", "") } doReturn "fake_subject_to_gdpr"
-            on { getString("IABConsent_ParsedVendorConsents", "") } doReturn "fake_parsed_vendor_consent"
         }
 
         // When
@@ -66,23 +62,6 @@ class Tcf1GdprStrategyTest {
         val safeSharedPreferences = mock<SafeSharedPreferences> {
             on { getString("IABConsent_ConsentString", "") } doReturn "fake_consent_string"
             on { getString("IABConsent_SubjectToGDPR", "") } doReturn ""
-            on { getString("IABConsent_ParsedVendorConsents", "") } doReturn "fake_parsed_vendor_consent"
-        }
-
-        // When
-        val tcf1Strategy = Tcf1GdprStrategy(safeSharedPreferences)
-
-        // Then
-        assertFalse { tcf1Strategy.isProvided }
-    }
-
-    @Test
-    fun testIsProvided_False_ParsedVendorNotProvided() {
-        // Given
-        val safeSharedPreferences = mock<SafeSharedPreferences> {
-            on { getString("IABConsent_ConsentString", "") } doReturn "fake_consent_string"
-            on { getString("IABConsent_SubjectToGDPR", "") } doReturn "fake_subject_to_gdpr"
-            on { getString("IABConsent_ParsedVendorConsents", "") } doReturn ""
         }
 
         // When

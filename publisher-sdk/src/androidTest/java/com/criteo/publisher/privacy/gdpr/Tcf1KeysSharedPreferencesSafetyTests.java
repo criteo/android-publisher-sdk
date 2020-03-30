@@ -49,11 +49,9 @@ public class Tcf1KeysSharedPreferencesSafetyTests {
   public void tearDown() {
     SharedPreferences.Editor editor = sharedPreferences.edit();
     editor.remove(Tcf1GdprStrategy.IAB_CONSENT_STRING_KEY);
-    editor.remove(Tcf1GdprStrategy.IAB_VENDOR_CONSENTS_KEY);
     editor.remove(Tcf1GdprStrategy.IAB_SUBJECT_TO_GDPR_KEY);
     editor.remove(Tcf2GdprStrategy.IAB_TCString_Key);
     editor.remove(Tcf2GdprStrategy.IAB_GDPR_APPLIES_KEY);
-    editor.remove(Tcf2GdprStrategy.IABTCF_VendorConsents);
     editor.apply();
   }
 
@@ -61,18 +59,14 @@ public class Tcf1KeysSharedPreferencesSafetyTests {
   public void testRobustnessWhenAllKeysHaveBadType() {
     SharedPreferences.Editor editor = sharedPreferences.edit();
     editor.putInt(Tcf1GdprStrategy.IAB_CONSENT_STRING_KEY, 1);
-    editor.putInt(Tcf1GdprStrategy.IAB_VENDOR_CONSENTS_KEY, 1);
     editor.putInt(Tcf1GdprStrategy.IAB_SUBJECT_TO_GDPR_KEY, 1);
     editor.putInt(Tcf2GdprStrategy.IAB_TCString_Key, 1);
     editor.putString(Tcf2GdprStrategy.IAB_GDPR_APPLIES_KEY, "");
-    editor.putInt(Tcf2GdprStrategy.IABTCF_VendorConsents, 1);
     editor.apply();
 
     assertEquals("", tcf1GdprStrategy.getConsentString());
     assertEquals("", tcf1GdprStrategy.getSubjectToGdpr());
-    assertEquals("", tcf1GdprStrategy.getVendorConsents());
     assertEquals("", tcf2GdprStrategy.getConsentString());
     assertEquals("-1", tcf2GdprStrategy.getSubjectToGdpr());
-    assertEquals("", tcf2GdprStrategy.getVendorConsents());
   }
 }

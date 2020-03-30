@@ -17,9 +17,6 @@ public class Tcf2GdprStrategy implements TcfGdprStrategy {
   @VisibleForTesting
   static final String IAB_GDPR_APPLIES_KEY = "IABTCF_gdprApplies";
 
-  @VisibleForTesting
-  static final String IABTCF_VendorConsents = "IABTCF_VendorConsents";
-
   private final SafeSharedPreferences safeSharedPreferences;
 
   public Tcf2GdprStrategy(SafeSharedPreferences safeSharedPreferences) {
@@ -41,12 +38,6 @@ public class Tcf2GdprStrategy implements TcfGdprStrategy {
 
   @Override
   @NonNull
-  public String getVendorConsents() {
-    return safeSharedPreferences.getString(IABTCF_VendorConsents, "");
-  }
-
-  @Override
-  @NonNull
   public Integer getVersion() {
     return 2;
   }
@@ -55,11 +46,9 @@ public class Tcf2GdprStrategy implements TcfGdprStrategy {
   public boolean isProvided() {
     String subjectToGdpr = getSubjectToGdpr();
     String consentString = getConsentString();
-    String vendorConsents = getVendorConsents();
     boolean isSubjectToGdprEmpty = Integer.valueOf(subjectToGdpr).equals(GDPR_APPLIES_UNSET);
     boolean isConsentStringEmpty = consentString.isEmpty();
-    boolean isVendorConsentsEmpty = vendorConsents.isEmpty();
 
-    return !isSubjectToGdprEmpty && !isConsentStringEmpty && !isVendorConsentsEmpty;
+    return !isSubjectToGdprEmpty && !isConsentStringEmpty;
   }
 }

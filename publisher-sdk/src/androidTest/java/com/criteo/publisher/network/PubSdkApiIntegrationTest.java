@@ -122,7 +122,6 @@ public class PubSdkApiIntegrationTest {
     // Given
     setupGdprDataWithTcf2(
       "0",
-      "0000000000000010000000000000000000000100000000000000000000000000000000000000000000000000001",
       "ssds"
     );
     gdprData = userPrivacyUtil.getGdprData();
@@ -145,12 +144,10 @@ public class PubSdkApiIntegrationTest {
     // Given
     setupGdprDataWithTcf2(
         "-1",
-        "",
         ""
     );
 
     setupGdprDataWithTcf1(
-        "",
         "",
         ""
     );
@@ -177,7 +174,6 @@ public class PubSdkApiIntegrationTest {
     // Given
     setupGdprDataWithTcf1(
         "1",
-        "0000000000000010000000000000000000000100000000000000000000000000000000000000000000000000001",
         "ssds"
     );
     gdprData = userPrivacyUtil.getGdprData();
@@ -197,18 +193,16 @@ public class PubSdkApiIntegrationTest {
     gdprData = userPrivacyUtil.getGdprData();
   }
 
-  private void setupGdprDataWithTcf1(String gdprApplies, String vendorConsents, String tcString) {
+  private void setupGdprDataWithTcf1(String gdprApplies, String tcString) {
     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
     editor.putString("IABConsent_SubjectToGDPR", gdprApplies);
-    editor.putString("IABConsent_ParsedVendorConsents", vendorConsents);
     editor.putString("IABConsent_ConsentString", tcString);
     editor.apply();
   }
 
-  private void setupGdprDataWithTcf2(String subjectToGdpr, String vendorConsents, String consentString) {
+  private void setupGdprDataWithTcf2(String subjectToGdpr, String consentString) {
     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
     editor.putInt("IABTCF_gdprApplies", Integer.valueOf(subjectToGdpr));
-    editor.putString("IABTCF_VendorConsents", vendorConsents);
     editor.putString("IABTCF_TCString", consentString);
     editor.apply();
   }
@@ -217,14 +211,12 @@ public class PubSdkApiIntegrationTest {
     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
     editor.remove("IABConsent_ConsentString");
     editor.remove("IABConsent_SubjectToGDPR");
-    editor.remove("IABConsent_ParsedVendorConsents");
     editor.apply();
   }
 
   private void cleanupTcf2() {
     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
     editor.remove("IABTCF_gdprApplies");
-    editor.remove("IABTCF_VendorConsents");
     editor.remove("IABTCF_TCString");
     editor.apply();
   }

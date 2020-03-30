@@ -24,14 +24,6 @@
     android:padding="8dp" />
 
   <EditText
-    android:id="@+id/vendorConsentsV2"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="16dp"
-    android:hint="@string/hint_tcf_vendor_consents"
-    android:padding="8dp" />
-
-  <EditText
     android:id="@+id/gdprAppliesV2"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -58,13 +50,6 @@
     android:hint="@string/hint_tcf_consent_string"
     android:padding="8dp" />
 
-  <EditText
-    android:id="@+id/vendorConsentsV1"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="16dp"
-    android:hint="@string/hint_tcf_vendor_consents"
-    android:padding="8dp" />
 
   <EditText
     android:id="@+id/gdprAppliesV1"

@@ -10,9 +10,6 @@ public interface TcfGdprStrategy {
   String getSubjectToGdpr();
 
   @NonNull
-  String getVendorConsents();
-
-  @NonNull
   Integer getVersion();
 
   boolean isProvided();

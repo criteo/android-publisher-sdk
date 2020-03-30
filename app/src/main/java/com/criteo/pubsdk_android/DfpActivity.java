@@ -41,9 +41,7 @@ public class DfpActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_dfp);
-    String consentDatagiven = "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111";
     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-    editor.putString("IABConsent_ParsedVendorConsents", consentDatagiven);
     editor.putString("IABConsent_SubjectToGDPR", "1");
     editor.putString("IABConsent_ConsentString", "1");
     editor.apply();

@@ -69,7 +69,6 @@ public class PubSdkApiTest {
     when(buildConfigWrapper.getRemoteConfigUrl()).thenReturn(serverUrl.toString());
 
     when(gdprData.consentData()).thenReturn("fake_consent_data");
-    when(gdprData.consentGiven()).thenReturn(false);
     when(gdprData.gdprApplies()).thenReturn(false);
     when(gdprData.version()).thenReturn(1);
     when(gdprData.toJSONObject()).thenCallRealMethod();
@@ -134,7 +133,7 @@ public class PubSdkApiTest {
         .withQueryStringParameter("gaid", "myGaid")
         .withQueryStringParameter("eventType", "myEvent")
         .withQueryStringParameter("limitedAdTracking", "1337")
-        .withQueryStringParameter("gdprString", "eyJjb25zZW50RGF0YSI6ImZha2VfY29uc2VudF9kYXRhIiwiZ2RwckFwcGxpZXMiOmZhbHNlLCJjb25zZW50R2l2ZW4iOmZhbHNlLCJ2ZXJzaW9uIjoxfQ==")
+        .withQueryStringParameter("gdprString", "eyJjb25zZW50RGF0YSI6ImZha2VfY29uc2VudF9kYXRhIiwiZ2RwckFwcGxpZXMiOmZhbHNlLCJ2ZXJzaW9uIjoxfQ==")
     );
   }
 
