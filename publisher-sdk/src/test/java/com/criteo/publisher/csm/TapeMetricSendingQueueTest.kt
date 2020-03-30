@@ -2,6 +2,7 @@ package com.criteo.publisher.csm
 
 import com.criteo.publisher.Util.BuildConfigWrapper
 import com.criteo.publisher.csm.TapeMetricSendingQueue.createFileObjectQueue
+import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.nhaarman.mockitokotlin2.*
 import com.squareup.tape.FileException
@@ -44,6 +45,9 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
     }
   }
 
+  @MockBean
+  private lateinit var buildConfigWrapper: BuildConfigWrapper
+
   @Inject
   private lateinit var metricParser: MetricParser
 
@@ -55,12 +59,8 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
   fun setUp() {
     MockitoAnnotations.initMocks(this)
 
-    val buildConfigWrapper = mock<BuildConfigWrapper>() {
+    buildConfigWrapper.stub {
       on { isDebug } doReturn false
-    }
-
-    mockedDependenciesRule.dependencyProvider.stub {
-      on { provideBuildConfigWrapper() } doReturn buildConfigWrapper
     }
 
     tapeQueue = mock(defaultAnswer = delegatesTo(createObjectQueue()))
