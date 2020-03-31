@@ -3,7 +3,7 @@ package com.criteo.publisher.csm;
 import android.support.annotation.NonNull;
 import java.util.List;
 
-interface MetricSendingQueue {
+abstract class MetricSendingQueue {
 
   /**
    * Inserts the specified element into this queue if it is possible to do
@@ -15,7 +15,7 @@ interface MetricSendingQueue {
    * @param metric metric to insert into this queue
    * @return <code>true</code> if element was successfully inserted, else <code>false</code>
    */
-  boolean offer(@NonNull Metric metric);
+  abstract boolean offer(@NonNull Metric metric);
 
   /**
    * Retrieves and removes up to <code>max</code> elements from this queue.
@@ -27,6 +27,13 @@ interface MetricSendingQueue {
    * @return at most <code>max</code> first elements of the queue
    */
   @NonNull
-  List<Metric> poll(int max);
+  abstract List<Metric> poll(int max);
+
+  /**
+   * Return the size in bytes of all metric elements stored in this queue.
+   *
+   * @return total size in bytes of stored metrics
+   */
+  abstract int getTotalSize();
 
 }

@@ -50,4 +50,11 @@ public class BuildConfigWrapper {
   public int getMaxSizeOfCsmMetricsFolder() {
     return BuildConfig.maxSizeOfCsmMetricsFolder;
   }
+
+  /**
+   * Maximum size (in bytes) of metric elements stored in the metric sending queue.
+   */
+  public int getMaxSizeOfCsmMetricSendingQueue() {
+    return BuildConfig.maxSizeOfCsmMetricSendingQueue;
+  }
 }

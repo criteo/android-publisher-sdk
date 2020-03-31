@@ -16,6 +16,7 @@ import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.mockito.AdditionalAnswers.delegatesTo
+import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import java.io.File
 import javax.inject.Inject
@@ -60,11 +61,10 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
     MockitoAnnotations.initMocks(this)
 
     buildConfigWrapper.stub {
-      on { isDebug } doReturn false
+      on { isDebug } doReturn true
     }
 
-    tapeQueue = mock(defaultAnswer = delegatesTo(createObjectQueue()))
-
+    tapeQueue = spy(createObjectQueue())
     queue = TapeMetricSendingQueue(tapeQueue)
   }
 
@@ -84,13 +84,50 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
     }
   }
 
+  private fun givenMockedTapeQueue() {
+    tapeQueue = mock()
+    queue = TapeMetricSendingQueue(tapeQueue)
+  }
+
   private fun createFileObjectQueueFromNewFile(newFile: File = tempFolder.newFile()): ObjectQueue<Metric> {
     newFile.delete()
     return createFileObjectQueue(newFile, metricParser)
   }
 
   @Test
+  fun getTotalSize_GivenNewQueue_ReturnASmallSize() {
+    val size = queue.totalSize
+
+    // The queue needs a little bit of metadata even in case if empty.
+    assertThat(size).isLessThan(20)
+  }
+
+  @Test
+  fun getTotalSize_AfterFewOperations_ReturnSizeGreaterThanEstimation() {
+    val estimatedSizePerMetric = 170
+
+    (0 until 1000).forEach {
+      queue.offer(mockMetric(it))
+    }
+
+    queue.poll(1000)
+
+    (0 until 200).forEach {
+      queue.offer(mockMetric(it))
+    }
+
+    val size = queue.totalSize
+
+    if (tapeImplementation == TapeImplementation.IN_MEMORY) {
+      assertThat(size).isZero()
+    } else {
+      assertThat(size).isGreaterThan(estimatedSizePerMetric * 200)
+    }
+  }
+
+  @Test
   fun offer_GivenAcceptedMetric_ReturnTrue() {
+    givenMockedTapeQueue()
     val metric = mockMetric()
 
     doNothing().whenever(tapeQueue).add(any())
@@ -103,6 +140,8 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
 
   @Test
   fun offer_GivenExceptionWhileAddingMetric_ReturnFalse() {
+    givenDeactivatedPreconditionUtils()
+    givenMockedTapeQueue()
     val metric = mockMetric()
 
     doThrow(FileException::class).whenever(tapeQueue).add(any())
@@ -151,7 +190,7 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
     val metrics = queue.poll(2)
 
     assertThat(metrics).containsExactly(metric1, metric2)
-    verify(tapeQueue, times(2)).remove()
+    assertThat(tapeQueue.size()).isEqualTo(0)
   }
 
   @Test
@@ -163,11 +202,12 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
     val metrics = queue.poll(2)
 
     assertThat(metrics).containsExactly(metric1)
-    verify(tapeQueue, times(1)).remove()
+    assertThat(tapeQueue.size()).isEqualTo(0)
   }
 
   @Test
   fun poll_GivenExceptionWhileReadingFromTape_SilenceTheExceptionAndReturnEmptyList() {
+    givenDeactivatedPreconditionUtils()
     doThrow(FileException::class).whenever(tapeQueue).peek()
 
     val metrics = queue.poll(1)
@@ -177,6 +217,7 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
 
   @Test
   fun poll_GivenExceptionWhileRemovingFromTape_SilenceTheExceptionAndReturnEmptyList() {
+    givenMockedTapeQueue()
     doThrow(FileException::class).whenever(tapeQueue).remove()
 
     val metrics = queue.poll(1)
@@ -184,8 +225,18 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
     assertThat(metrics).isEmpty()
   }
 
+  private fun givenDeactivatedPreconditionUtils() {
+    buildConfigWrapper.stub {
+      on { isDebug } doReturn false
+    }
+  }
+
   private fun mockMetric(id: Int = 1): Metric {
-    return Metric.builder("id$id").build()
+    return Metric.builder("id$id")
+        .setCdbCallStartTimestamp(42L)
+        .setCdbCallEndTimestamp(1337L)
+        .setElapsedTimestamp(1024L)
+        .build()
   }
 
 }

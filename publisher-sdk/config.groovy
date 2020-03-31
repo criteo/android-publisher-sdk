@@ -17,6 +17,10 @@ csmBatchSize = 5
 // 48KB represents ~300 metrics (with ~164 bytes/metric) which already represent an extreme case.
 maxSizeOfCsmMetricsFolder = 48 * 1024
 
+// Maximum size (in bytes) of metric elements stored in the metric sending queue.
+// 60KB represents ~360 metrics (with ~170 bytes/metric) which already represent an extreme case.
+maxSizeOfCsmMetricSendingQueue = 60 * 1024
+
 environments {
     debug {
         cdbUrl = 'http://directbidder-test-app.par.preprod.crto.in'
