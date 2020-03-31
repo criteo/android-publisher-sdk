@@ -602,6 +602,7 @@ public class FileMetricRepositoryTest {
     givenNewRepository();
 
     doThrow(IOException.class)
+        .doCallRealMethod()
         .when(parser).read(any());
 
     repository.moveById("id", mover);
