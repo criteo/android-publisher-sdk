@@ -13,6 +13,7 @@ androidLibModule() {
     addBuildConfigField<Boolean>("debugLogging")
     addBuildConfigField<Int>("profileId")
     addBuildConfigField<Int>("csmBatchSize")
+    addBuildConfigField<Int>("maxSizeOfCsmMetricsFolder")
 }
 
 addAzureRepository()

@@ -43,4 +43,11 @@ public class BuildConfigWrapper {
   public int getCsmBatchSize() {
     return BuildConfig.csmBatchSize;
   }
+
+  /**
+   * Maximum size (in bytes) of metric elements stored in the metrics folder.
+   */
+  public int getMaxSizeOfCsmMetricsFolder() {
+    return BuildConfig.maxSizeOfCsmMetricsFolder;
+  }
 }

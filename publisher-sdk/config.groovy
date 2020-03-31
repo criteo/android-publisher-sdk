@@ -13,6 +13,10 @@ csmDirectory = 'criteo_metrics'
 // The batch size of metric files sent, at most, in each CSM requests.
 csmBatchSize = 5
 
+// Maximum size (in bytes) of metric elements stored in the metrics folder.
+// 48KB represents ~300 metrics (with ~164 bytes/metric) which already represent an extreme case.
+maxSizeOfCsmMetricsFolder = 48 * 1024
+
 environments {
     debug {
         cdbUrl = 'http://directbidder-test-app.par.preprod.crto.in'

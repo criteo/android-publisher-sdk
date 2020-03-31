@@ -2,6 +2,7 @@ package com.criteo.publisher.csm;
 
 import static com.criteo.publisher.csm.MetricDirectoryHelper.clear;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,6 +54,86 @@ public class FileMetricRepositoryTest {
   @After
   public void tearDown() throws Exception {
     clear(directory);
+  }
+
+  @Test
+  public void getTotalSize_GivenEmptyRepository_ReturnZero() throws Exception {
+    int size = repository.getTotalSize();
+
+    assertEquals(0, size);
+  }
+
+  @Test
+  public void getTotalSize_GivenSomeOperations_ReturnSizeGreaterThanEstimation() throws Exception {
+    repository.updateById("id1", builder -> {
+      builder.setCdbCallStartTimestamp(42L)
+          .setCdbCallEndTimestamp(1337L)
+          .setElapsedTimestamp(1024L)
+          .setReadyToSend(true);
+    });
+
+    repository.updateById("id2", builder -> {});
+
+    givenNewRepository();
+
+    repository.updateById("id3", builder -> {
+      builder.setCdbCallStartTimestamp(42L)
+          .setCdbCallEndTimestamp(1337L)
+          .setElapsedTimestamp(1024L)
+          .setReadyToSend(true);
+
+    });
+
+    repository.moveById("id1", metric -> true);
+    repository.moveById("id2", metric -> true);
+    repository.moveById("id3", metric -> true);
+
+    for (int i = 0; i < 100; i++) {
+      repository.updateById("id" + i, builder -> {
+        builder.setCdbCallStartTimestamp(42L)
+            .setCdbCallEndTimestamp(1337L)
+            .setElapsedTimestamp(1024L)
+            .setReadyToSend(true);
+      });
+    }
+
+    givenNewRepository();
+
+    int estimatedSizePerMetric = 164;
+    int size = repository.getTotalSize();
+
+    // Metric DTO will tend to grow
+    assertTrue(size >= 100 * estimatedSizePerMetric);
+  }
+
+  @Test
+  public void contains_GivenEmptyRepository_ReturnFalse() throws Exception {
+    boolean contained = repository.contains("id");
+
+    assertFalse(contained);
+  }
+
+  @Test
+  public void contains_AfterAnUpdate_ReturnTrue() throws Exception {
+    repository.updateById("id1", builder -> {});
+    givenNewRepository();
+    repository.updateById("id2", builder -> {});
+
+    assertTrue(repository.contains("id1"));
+    assertTrue(repository.contains("id2"));
+  }
+
+  @Test
+  public void contains_AfterAMove_ReturnFalse() throws Exception {
+    repository.updateById("id1", builder -> {});
+    repository.updateById("id2", builder -> {});
+
+    repository.moveById("id1", builder -> true);
+    givenNewRepository();
+    repository.moveById("id2", builder -> true);
+
+    assertFalse(repository.contains("id1"));
+    assertFalse(repository.contains("id2"));
   }
 
   @Test

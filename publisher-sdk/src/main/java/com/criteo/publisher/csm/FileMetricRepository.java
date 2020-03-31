@@ -2,6 +2,7 @@ package com.criteo.publisher.csm;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
+import com.criteo.publisher.Util.PreconditionsUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -64,6 +65,29 @@ class FileMetricRepository extends MetricRepository {
       }
     }
     return metrics;
+  }
+
+  @Override
+  int getTotalSize() {
+    int size = 0;
+    Collection<File> files = directory.listFiles();
+    for (File file : files) {
+      long fileSize;
+      try {
+        fileSize = file.length();
+      } catch (SecurityException e) {
+        PreconditionsUtil.throwOrLog(e);
+        fileSize = 0;
+      }
+      size += fileSize;
+    }
+    return size;
+  }
+
+  @Override
+  boolean contains(@NonNull String impressionId) {
+    File metricFile = directory.createMetricFile(impressionId);
+    return directory.listFiles().contains(metricFile);
   }
 
   /**

@@ -44,6 +44,21 @@ public abstract class MetricRepository {
   @NonNull
   abstract Collection<Metric> getAllStoredMetrics();
 
+  /**
+   * Return the size in bytes of all metric elements stored in this repository.
+   *
+   * @return total size in bytes of stored metrics
+   */
+  abstract int getTotalSize();
+
+  /**
+   * Indicate if this repository contains a metric associated to the given ID.
+   *
+   * @param impressionId ID of metric to look for
+   * @return <code>true</code> if this contains a metric with that ID, else <code>false</code>
+   */
+  abstract boolean contains(@NonNull String impressionId);
+
   interface MetricUpdater {
 
     void update(@NonNull Metric.Builder metricBuilder);
