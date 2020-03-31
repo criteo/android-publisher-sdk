@@ -1,7 +1,6 @@
 package com.criteo.publisher.csm
 
 import com.nhaarman.mockitokotlin2.*
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock

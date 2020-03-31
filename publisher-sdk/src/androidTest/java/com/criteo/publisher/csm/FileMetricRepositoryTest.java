@@ -33,7 +33,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class MetricRepositoryTest {
+public class FileMetricRepositoryTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
@@ -43,7 +43,7 @@ public class MetricRepositoryTest {
   @Inject
   private MetricParser parser;
 
-  private MetricRepository repository;
+  private FileMetricRepository repository;
 
   @Before
   public void setUp() throws Exception {
@@ -542,7 +542,7 @@ public class MetricRepositoryTest {
   private void givenNewRepository() {
     Context context = InstrumentationRegistry.getContext().getApplicationContext();
     directory = new MetricDirectory(context, parser);
-    repository = new MetricRepository(directory);
+    repository = new FileMetricRepository(directory);
   }
 
 }
