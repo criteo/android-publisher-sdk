@@ -1,6 +1,7 @@
 package com.criteo.publisher.csm
 
 import com.criteo.publisher.Util.BuildConfigWrapper
+import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.network.PubSdkApi
 import com.nhaarman.mockitokotlin2.*
@@ -25,7 +26,7 @@ class MetricSendingQueueConsumerTest {
   @Mock
   private lateinit var api: PubSdkApi
 
-  @Mock
+  @MockBean
   private lateinit var buildConfigWrapper: BuildConfigWrapper
 
   @Mock
@@ -40,10 +41,6 @@ class MetricSendingQueueConsumerTest {
     buildConfigWrapper.stub {
       on { sdkVersion } doReturn "1"
       on { isDebug } doReturn false
-    }
-
-    mockedDependenciesRule.dependencyProvider.stub {
-      on { provideBuildConfigWrapper() } doReturn buildConfigWrapper
     }
 
     givenExecutor(Executor { it.run() })
@@ -76,6 +73,21 @@ class MetricSendingQueueConsumerTest {
   }
 
   @Test
+  fun sendMetricBatch_GivenNoMetricsInBatch_DoNotSendAnything() {
+    buildConfigWrapper.stub {
+      on { csmBatchSize } doReturn 42
+    }
+
+    queue.stub {
+      on { poll(42) } doReturn listOf()
+    }
+
+    consumer.sendMetricBatch()
+
+    verify(api, never()).postCsm(any())
+  }
+
+  @Test
   fun sendMetricBatch_GivenSomeMetricsInBatch_SendThemAsyncWithApi() {
     val metric1 = Metric.builder("id1").build()
     val metric2 = Metric.builder("id2").build()
@@ -103,6 +115,10 @@ class MetricSendingQueueConsumerTest {
 
   @Test
   fun sendMetricBatch_GivenExecutor_CallApiInExecutor() {
+    queue.stub {
+      on { poll(any()) } doReturn listOf(Metric.builder("id1").build())
+    }
+
     var isInExecutor = false
     givenExecutor(Executor {
       isInExecutor = true

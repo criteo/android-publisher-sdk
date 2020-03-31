@@ -80,6 +80,9 @@ class MetricSendingQueueConsumer {
 
     private void doRun() throws IOException {
       Collection<Metric> metrics = queue.poll(buildConfigWrapper.getCsmBatchSize());
+      if (metrics.isEmpty()) {
+        return;
+      }
 
       boolean success = false;
       try {
