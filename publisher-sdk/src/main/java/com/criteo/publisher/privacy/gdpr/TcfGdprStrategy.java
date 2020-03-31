@@ -2,7 +2,7 @@ package com.criteo.publisher.privacy.gdpr;
 
 import android.support.annotation.NonNull;
 
-public interface TcfGdprStrategy {
+interface TcfGdprStrategy {
   @NonNull
   String getConsentString();
 

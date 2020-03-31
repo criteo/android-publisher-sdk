@@ -38,7 +38,7 @@ public class GdprDataFetcher {
 
     return GdprData.create(
         consentString,
-        "1".equals(subjectToGdpr),
+        subjectToGdpr.isEmpty() ? null : "1".equals(subjectToGdpr),
         tcfStrategy.getVersion()
     );
   }

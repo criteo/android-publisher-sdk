@@ -7,7 +7,7 @@ import com.criteo.publisher.Util.SafeSharedPreferences;
 /**
  * https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/tree/master/TCFv2
  */
-public class Tcf2GdprStrategy implements TcfGdprStrategy {
+class Tcf2GdprStrategy implements TcfGdprStrategy {
 
   private static final int GDPR_APPLIES_UNSET = -1;
 
@@ -33,7 +33,7 @@ public class Tcf2GdprStrategy implements TcfGdprStrategy {
   @NonNull
   public String getSubjectToGdpr() {
     int gdprApplies = safeSharedPreferences.getInt(IAB_GDPR_APPLIES_KEY, GDPR_APPLIES_UNSET);
-    return String.valueOf(gdprApplies);
+    return gdprApplies != GDPR_APPLIES_UNSET ? String.valueOf(gdprApplies) : "";
   }
 
   @Override
@@ -46,9 +46,9 @@ public class Tcf2GdprStrategy implements TcfGdprStrategy {
   public boolean isProvided() {
     String subjectToGdpr = getSubjectToGdpr();
     String consentString = getConsentString();
-    boolean isSubjectToGdprEmpty = Integer.valueOf(subjectToGdpr).equals(GDPR_APPLIES_UNSET);
+    boolean isSubjectToGdprEmpty = subjectToGdpr.isEmpty();
     boolean isConsentStringEmpty = consentString.isEmpty();
 
-    return !isSubjectToGdprEmpty && !isConsentStringEmpty;
+    return !isSubjectToGdprEmpty || !isConsentStringEmpty;
   }
 }

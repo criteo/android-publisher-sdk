@@ -20,9 +20,7 @@ class GdprDataFetcherTest(
         fun data(): Collection<Array<Any>> {
             return listOf(
                     arrayOf("1", true),
-                    arrayOf("0", false),
-                    arrayOf("0", false),
-                    arrayOf("1", true)
+                    arrayOf("0", false)
             )
         }
     }

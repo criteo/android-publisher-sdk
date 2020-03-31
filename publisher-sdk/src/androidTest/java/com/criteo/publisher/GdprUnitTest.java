@@ -104,6 +104,6 @@ public class GdprUnitTest {
 
     GdprData gdprData = userPrivacyUtil.getGdprData();
 
-    Assert.assertNull(gdprData);
+    Assert.assertNotNull(gdprData);
   }
 }

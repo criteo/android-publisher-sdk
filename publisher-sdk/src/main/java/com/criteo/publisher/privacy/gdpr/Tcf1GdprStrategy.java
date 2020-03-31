@@ -7,7 +7,7 @@ import com.criteo.publisher.Util.SafeSharedPreferences;
 /**
  * https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/Mobile%20In-App%20Consent%20APIs%20v1.0%20Final.md
  */
-public class Tcf1GdprStrategy implements TcfGdprStrategy {
+class Tcf1GdprStrategy implements TcfGdprStrategy {
 
   @VisibleForTesting
   static final String IAB_CONSENT_STRING_KEY = "IABConsent_ConsentString";
@@ -46,6 +46,6 @@ public class Tcf1GdprStrategy implements TcfGdprStrategy {
     boolean isSubjectToGdprEmpty = subjectToGdpr.isEmpty();
     boolean isConsentStringEmpty = consentString.isEmpty();
 
-    return !isSubjectToGdprEmpty && !isConsentStringEmpty;
+    return !isSubjectToGdprEmpty || !isConsentStringEmpty;
   }
 }

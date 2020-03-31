@@ -1,6 +1,7 @@
 package com.criteo.publisher.privacy.gdpr;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import com.criteo.publisher.Util.CustomAdapterFactory;
 import com.google.auto.value.AutoValue;
@@ -16,7 +17,7 @@ public abstract class GdprData {
   @VisibleForTesting
   public static GdprData create(
       @NonNull String consentData,
-      boolean gdprApplies,
+      @Nullable Boolean gdprApplies,
       @NonNull Integer version
   ) {
     return new AutoValue_GdprData(consentData, gdprApplies, version);
@@ -42,7 +43,8 @@ public abstract class GdprData {
 
   public abstract String consentData();
 
-  public abstract boolean gdprApplies();
+  @Nullable
+  public abstract Boolean gdprApplies();
 
   public abstract Integer version();
 }
