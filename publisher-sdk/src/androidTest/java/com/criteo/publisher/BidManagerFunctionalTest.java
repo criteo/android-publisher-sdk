@@ -335,8 +335,10 @@ public class BidManagerFunctionalTest {
     when(userPrivacyUtil.getUsPrivacyOptout()).thenReturn("");
     when(userPrivacyUtil.getIabUsPrivacyString()).thenReturn("");
     when(userPrivacyUtil.getMopubConsent()).thenReturn("");
-    when(buildConfigWrapper.getSdkVersion()).thenReturn("1.2.3");
     doReturn(userPrivacyUtil).when(dependencyProvider).provideUserPrivacyUtil(any());
+
+    when(buildConfigWrapper.getSdkVersion()).thenReturn("1.2.3");
+    when(buildConfigWrapper.getProfileId()).thenReturn(235);
 
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
