@@ -12,6 +12,7 @@ import com.criteo.publisher.Util.CdbCallListener;
 import com.criteo.publisher.Util.ReflectionUtil;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
+import com.criteo.publisher.csm.MetricSendingQueueConsumer;
 import com.criteo.publisher.headerbidding.DfpHeaderBidding;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
@@ -63,6 +64,9 @@ public class BidManager implements ApplicationStoppedListener {
   private final BidLifecycleListener bidLifecycleListener;
 
   @NonNull
+  private final MetricSendingQueueConsumer metricSendingQueueConsumer;
+
+  @NonNull
   private final DfpHeaderBidding dfpHeaderBidding;
 
   BidManager(
@@ -71,7 +75,8 @@ public class BidManager implements ApplicationStoppedListener {
       @NonNull Clock clock,
       @NonNull AdUnitMapper adUnitMapper,
       @NonNull BidRequestSender bidRequestSender,
-      @NonNull BidLifecycleListener bidLifecycleListener
+      @NonNull BidLifecycleListener bidLifecycleListener,
+      @NonNull MetricSendingQueueConsumer metricSendingQueueConsumer
   ) {
     this.cache = sdkCache;
     this.config = config;
@@ -79,6 +84,7 @@ public class BidManager implements ApplicationStoppedListener {
     this.adUnitMapper = adUnitMapper;
     this.bidRequestSender = bidRequestSender;
     this.bidLifecycleListener = bidLifecycleListener;
+    this.metricSendingQueueConsumer = metricSendingQueueConsumer;
 
     this.dfpHeaderBidding = new DfpHeaderBidding(this);
   }
@@ -98,6 +104,7 @@ public class BidManager implements ApplicationStoppedListener {
     }
 
     bidRequestSender.sendBidRequest(prefetchCacheAdUnits, new CdbListener());
+    metricSendingQueueConsumer.sendMetricBatch();
   }
 
 

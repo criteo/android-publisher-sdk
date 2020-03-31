@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.Executor;
 
-class MetricSendingQueueConsumer {
+public class MetricSendingQueueConsumer {
 
   @NonNull
   private final MetricSendingQueue queue;
@@ -22,7 +22,7 @@ class MetricSendingQueueConsumer {
   @NonNull
   private final Executor executor;
 
-  MetricSendingQueueConsumer(
+  public MetricSendingQueueConsumer(
       @NonNull MetricSendingQueue queue,
       @NonNull PubSdkApi api,
       @NonNull BuildConfigWrapper buildConfigWrapper,
@@ -44,7 +44,7 @@ class MetricSendingQueueConsumer {
    * is terminated while the batch is being sent to the CSM backed. This is to ensure that the same
    * metric will never be sent to CSM backend twice.
    */
-  void sendMetricBatch() {
+  public void sendMetricBatch() {
     executor.execute(new MetricSendingTask(queue, api, buildConfigWrapper));
   }
 

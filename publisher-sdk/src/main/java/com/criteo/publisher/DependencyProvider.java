@@ -18,6 +18,9 @@ import com.criteo.publisher.bid.LoggingBidLifecycleListener;
 import com.criteo.publisher.bid.UniqueIdGenerator;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.csm.MetricParser;
+import com.criteo.publisher.csm.MetricSendingQueue;
+import com.criteo.publisher.csm.MetricSendingQueueConsumer;
+import com.criteo.publisher.csm.MetricSendingQueueFactory;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CdbRequestFactory;
@@ -178,7 +181,8 @@ public class DependencyProvider {
             DependencyProvider.this.provideClock(),
             DependencyProvider.this.provideAdUnitMapper(context),
             DependencyProvider.this.provideBidRequestSender(context, criteoPublisherId),
-            DependencyProvider.this.provideBidLifecycleListener()
+            DependencyProvider.this.provideBidLifecycleListener(),
+            DependencyProvider.this.provideMetricSendingQueueConsumer()
         );
       }
     });
@@ -340,6 +344,26 @@ public class DependencyProvider {
   }
 
   @NonNull
+  public MetricSendingQueueConsumer provideMetricSendingQueueConsumer() {
+    return getOrCreate(MetricSendingQueueConsumer.class, new Factory<MetricSendingQueueConsumer>() {
+      @Override
+      public MetricSendingQueueConsumer create() {
+        return new MetricSendingQueueConsumer(
+            provideMetricSendingQueue(),
+            providePubSdkApi(),
+            provideBuildConfigWrapper(),
+            provideThreadPoolExecutor()
+        );
+      }
+    });
+  }
+
+  @NonNull
+  public MetricSendingQueue provideMetricSendingQueue() {
+    return getOrCreate(MetricSendingQueue.class, new MetricSendingQueueFactory());
+  }
+
+  @NonNull
   public MetricParser provideMetricParser() {
     return getOrCreate(MetricParser.class, new Factory<MetricParser>() {
       @Override
@@ -374,7 +398,7 @@ public class DependencyProvider {
     });
   }
 
-  private interface Factory<T> {
+  public interface Factory<T> {
 
     T create();
   }

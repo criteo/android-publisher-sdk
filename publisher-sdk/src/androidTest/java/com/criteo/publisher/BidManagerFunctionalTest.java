@@ -1,9 +1,9 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.CriteoUtil.clearSharedPreferences;
-import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
 import static com.criteo.publisher.Util.CompletableFuture.completedFuture;
+import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static com.criteo.publisher.concurrent.ThreadingUtil.waitForMessageQueueToBeIdle;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -31,10 +31,11 @@ import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.BuildConfigWrapper;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.concurrent.ThreadingUtil;
-import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
+import com.criteo.publisher.csm.MetricSendingQueueConsumer;
+import com.criteo.publisher.mock.MockBean;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
@@ -79,29 +80,29 @@ public class BidManagerFunctionalTest {
 
   private DependencyProvider dependencyProvider;
 
-  @Mock
+  @MockBean
   private Publisher publisher;
-
-  @Mock
-  private User user;
 
   @Mock
   private SdkCache cache;
 
-  @Mock
+  @MockBean
   private Config config;
 
-  @Mock
+  @MockBean
   private PubSdkApi api;
 
-  @Mock
+  @MockBean
   private Clock clock;
 
-  @Mock
+  @MockBean
   private BidLifecycleListener bidLifecycleListener;
 
-  @Mock
+  @MockBean
   private BuildConfigWrapper buildConfigWrapper;
+
+  @MockBean
+  private MetricSendingQueueConsumer metricSendingQueueConsumer;
 
   private DeviceUtil deviceUtil;
 
@@ -116,13 +117,6 @@ public class BidManagerFunctionalTest {
 
     Context context = InstrumentationRegistry.getContext();
     deviceUtil = dependencyProvider.provideDeviceUtil(context);
-
-    when(dependencyProvider.providePubSdkApi()).thenReturn(api);
-    when(dependencyProvider.provideClock()).thenReturn(clock);
-    doReturn(publisher).when(dependencyProvider).providePublisher(any(), any());
-    doReturn(config).when(dependencyProvider).provideConfig(any());
-    doReturn(bidLifecycleListener).when(dependencyProvider).provideBidLifecycleListener();
-    doReturn(buildConfigWrapper).when(dependencyProvider).provideBuildConfigWrapper();
 
     // Should be set to at least 1 because user-level silent mode is set the 0 included
     givenMockedClockSetTo(1);
@@ -740,6 +734,7 @@ public class BidManagerFunctionalTest {
     clearInvocations(cache);
     clearInvocations(api);
     clearInvocations(bidLifecycleListener);
+    clearInvocations(metricSendingQueueConsumer);
 
     // Given a second fetch, without any clock change
     Slot slot = givenMockedCdbRespondingSlot();
@@ -807,6 +802,7 @@ public class BidManagerFunctionalTest {
     }), any());
     verify(bidLifecycleListener).onCdbCallStarted(any());
     verify(bidLifecycleListener).onCdbCallFinished(any(), any());
+    verify(metricSendingQueueConsumer).sendMetricBatch();
   }
 
   private void assertShouldNotCallCdbAndNotPopulateCache() throws Exception {
@@ -996,7 +992,8 @@ public class BidManagerFunctionalTest {
         dependencyProvider.provideClock(),
         dependencyProvider.provideAdUnitMapper(context),
         dependencyProvider.provideBidRequestSender(context, "myCpId"),
-        dependencyProvider.provideBidLifecycleListener()
+        dependencyProvider.provideBidLifecycleListener(),
+        dependencyProvider.provideMetricSendingQueueConsumer()
     );
   }
 

@@ -3,7 +3,7 @@ package com.criteo.publisher.csm;
 import android.support.annotation.NonNull;
 import java.util.List;
 
-abstract class MetricSendingQueue {
+public abstract class MetricSendingQueue {
 
   /**
    * Inserts the specified element into this queue if it is possible to do
