@@ -33,6 +33,7 @@ public class MetricSendingQueueFactory implements Factory<MetricSendingQueue> {
     this.buildConfigWrapper = buildConfigWrapper;
   }
 
+  @NonNull
   @Override
   public MetricSendingQueue create() {
     File file = new File(context.getFilesDir(), buildConfigWrapper.getCsmQueueFilename());

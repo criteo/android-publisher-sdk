@@ -11,6 +11,7 @@ import org.junit.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnit
+import java.io.File
 import java.io.FilenameFilter
 
 class MetricDirectoryUnitTest {
@@ -38,7 +39,7 @@ class MetricDirectoryUnitTest {
   @Test
   fun listFiles_GivenDirectoryReturningNull_ReturnEmpty() {
     directory = spy(directory) {
-      on { directoryFile } doReturn mock()
+      doReturn(mock<File>()).whenever(mock).directoryFile
     }
 
     directory.directoryFile.stub {

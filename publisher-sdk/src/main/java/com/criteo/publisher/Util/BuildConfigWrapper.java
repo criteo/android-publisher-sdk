@@ -65,4 +65,12 @@ public class BuildConfigWrapper {
   public String getCsmQueueFilename() {
     return BuildConfig.csmQueueFilename;
   }
+
+  /**
+   * The relative path in application folder of the folder used to store metric files
+   */
+  @NonNull
+  public String getCsmDirectoryName() {
+    return BuildConfig.csmDirectoryName;
+  }
 }

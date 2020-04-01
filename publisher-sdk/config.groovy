@@ -7,7 +7,7 @@ profileId = 235
  */
 
 // The relative path in application folder of the folder used to store metric files
-csmDirectory = 'criteo_metrics'
+csmDirectoryName = 'criteo_metrics'
 
 // The relative path in application folder of the sending queue file
 csmQueueFilename = 'criteo_metrics_queue'

@@ -18,6 +18,8 @@ import com.criteo.publisher.bid.LoggingBidLifecycleListener;
 import com.criteo.publisher.bid.UniqueIdGenerator;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.csm.MetricParser;
+import com.criteo.publisher.csm.MetricRepository;
+import com.criteo.publisher.csm.MetricRepositoryFactory;
 import com.criteo.publisher.csm.MetricSendingQueue;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
 import com.criteo.publisher.csm.MetricSendingQueueFactory;
@@ -68,6 +70,7 @@ public class DependencyProvider {
   @NonNull
   public PubSdkApi providePubSdkApi() {
     return getOrCreate(PubSdkApi.class, new Factory<PubSdkApi>() {
+      @NonNull
       @Override
       public PubSdkApi create() {
         return new PubSdkApi(
@@ -81,6 +84,7 @@ public class DependencyProvider {
   @NonNull
   public AdvertisingInfo provideAdvertisingInfo() {
     return getOrCreate(AdvertisingInfo.class, new Factory<AdvertisingInfo>() {
+      @NonNull
       @Override
       public AdvertisingInfo create() {
         return new AdvertisingInfo();
@@ -91,6 +95,7 @@ public class DependencyProvider {
   @NonNull
   public AndroidUtil provideAndroidUtil(@NonNull Context context) {
     return getOrCreate(AndroidUtil.class, new Factory<AndroidUtil>() {
+      @NonNull
       @Override
       public AndroidUtil create() {
         return new AndroidUtil(context);
@@ -101,6 +106,7 @@ public class DependencyProvider {
   @NonNull
   public DeviceUtil provideDeviceUtil(@NonNull Context context) {
     return getOrCreate(DeviceUtil.class, new Factory<DeviceUtil>() {
+      @NonNull
       @Override
       public DeviceUtil create() {
         return new DeviceUtil(context, DependencyProvider.this.provideAdvertisingInfo());
@@ -111,6 +117,7 @@ public class DependencyProvider {
   @NonNull
   public LoggingUtil provideLoggingUtil() {
     return getOrCreate(LoggingUtil.class, new Factory<LoggingUtil>() {
+      @NonNull
       @Override
       public LoggingUtil create() {
         return new LoggingUtil();
@@ -131,6 +138,7 @@ public class DependencyProvider {
   @NonNull
   public RunOnUiThreadExecutor provideRunOnUiThreadExecutor() {
     return getOrCreate(RunOnUiThreadExecutor.class, new Factory<RunOnUiThreadExecutor>() {
+      @NonNull
       @Override
       public RunOnUiThreadExecutor create() {
         return new RunOnUiThreadExecutor();
@@ -141,6 +149,7 @@ public class DependencyProvider {
   @NonNull
   public Config provideConfig(Context context) {
     return getOrCreate(Config.class, new Factory<Config>() {
+      @NonNull
       @Override
       public Config create() {
         return new Config(context);
@@ -151,6 +160,7 @@ public class DependencyProvider {
   @NonNull
   public Clock provideClock() {
     return getOrCreate(Clock.class, new Factory<Clock>() {
+      @NonNull
       @Override
       public Clock create() {
         return new EpochClock();
@@ -161,6 +171,7 @@ public class DependencyProvider {
   @NonNull
   public UserPrivacyUtil provideUserPrivacyUtil(@NonNull Context context) {
     return getOrCreate(UserPrivacyUtil.class, new Factory<UserPrivacyUtil>() {
+      @NonNull
       @Override
       public UserPrivacyUtil create() {
         return new UserPrivacyUtil(context);
@@ -173,6 +184,7 @@ public class DependencyProvider {
       @NonNull Context context,
       @NonNull String criteoPublisherId) {
     return getOrCreate(BidManager.class, new Factory<BidManager>() {
+      @NonNull
       @Override
       public BidManager create() {
         return new BidManager(
@@ -191,6 +203,7 @@ public class DependencyProvider {
   @NonNull
   public DeviceInfo provideDeviceInfo(Context context) {
     return getOrCreate(DeviceInfo.class, new Factory<DeviceInfo>() {
+      @NonNull
       @Override
       public DeviceInfo create() {
         return new DeviceInfo(
@@ -203,6 +216,7 @@ public class DependencyProvider {
   @NonNull
   public AdUnitMapper provideAdUnitMapper(Context context) {
     return getOrCreate(AdUnitMapper.class, new Factory<AdUnitMapper>() {
+      @NonNull
       @Override
       public AdUnitMapper create() {
         return new AdUnitMapper(
@@ -215,6 +229,7 @@ public class DependencyProvider {
   @NonNull
   public AppEvents provideAppEvents(@NonNull Context context) {
     return getOrCreate(AppEvents.class, new Factory<AppEvents>() {
+      @NonNull
       @Override
       public AppEvents create() {
         return new AppEvents(
@@ -232,6 +247,7 @@ public class DependencyProvider {
   @NonNull
   public Publisher providePublisher(@NonNull Context context, @NonNull String criteoPublisherId) {
     return getOrCreate(Publisher.class, new Factory<Publisher>() {
+      @NonNull
       @Override
       public Publisher create() {
         return new Publisher(context, criteoPublisherId);
@@ -242,6 +258,7 @@ public class DependencyProvider {
   @NonNull
   public BuildConfigWrapper provideBuildConfigWrapper() {
     return getOrCreate(BuildConfigWrapper.class, new Factory<BuildConfigWrapper>() {
+      @NonNull
       @Override
       public BuildConfigWrapper create() {
         return new BuildConfigWrapper();
@@ -252,6 +269,7 @@ public class DependencyProvider {
   @NonNull
   public CdbRequestFactory provideCdbRequestFactory(@NonNull Context context, @NonNull String criteoPublisherId) {
     return getOrCreate(CdbRequestFactory.class, new Factory<CdbRequestFactory>() {
+      @NonNull
       @Override
       public CdbRequestFactory create() {
         return new CdbRequestFactory(
@@ -269,6 +287,7 @@ public class DependencyProvider {
   @NonNull
   public RemoteConfigRequestFactory provideRemoteConfigRequestFactory(@NonNull Context context, @NonNull String criteoPublisherId) {
     return getOrCreate(RemoteConfigRequestFactory.class, new Factory<RemoteConfigRequestFactory>() {
+      @NonNull
       @Override
       public RemoteConfigRequestFactory create() {
         return new RemoteConfigRequestFactory(
@@ -282,6 +301,7 @@ public class DependencyProvider {
   @NonNull
   public BidRequestSender provideBidRequestSender(@NonNull Context context, @NonNull String criteoPublisherId) {
     return getOrCreate(BidRequestSender.class, new Factory<BidRequestSender>() {
+      @NonNull
       @Override
       public BidRequestSender create() {
         return new BidRequestSender(
@@ -297,6 +317,7 @@ public class DependencyProvider {
   @NonNull
   public BidLifecycleListener provideBidLifecycleListener() {
     return getOrCreate(BidLifecycleListener.class, new Factory<BidLifecycleListener>() {
+      @NonNull
       @Override
       public BidLifecycleListener create() {
         return new LoggingBidLifecycleListener(
@@ -322,6 +343,7 @@ public class DependencyProvider {
   @NonNull
   public InHouse provideInHouse(@NonNull Context context, @NonNull String criteoPublisherId) {
     return getOrCreate(InHouse.class, new Factory<InHouse>() {
+      @NonNull
       @Override
       public InHouse create() {
         return new InHouse(
@@ -336,6 +358,7 @@ public class DependencyProvider {
   @NonNull
   public InterstitialActivityHelper provideInterstitialActivityHelper(@NonNull Context context) {
     return getOrCreate(InterstitialActivityHelper.class, new Factory<InterstitialActivityHelper>() {
+      @NonNull
       @Override
       public InterstitialActivityHelper create() {
         return new InterstitialActivityHelper(context);
@@ -346,6 +369,7 @@ public class DependencyProvider {
   @NonNull
   public MetricSendingQueueConsumer provideMetricSendingQueueConsumer(@NonNull Context context) {
     return getOrCreate(MetricSendingQueueConsumer.class, new Factory<MetricSendingQueueConsumer>() {
+      @NonNull
       @Override
       public MetricSendingQueueConsumer create() {
         return new MetricSendingQueueConsumer(
@@ -368,8 +392,18 @@ public class DependencyProvider {
   }
 
   @NonNull
+  public MetricRepository provideMetricRepository(@NonNull Context context) {
+    return getOrCreate(MetricRepository.class, new MetricRepositoryFactory(
+        context,
+        provideMetricParser(),
+        provideBuildConfigWrapper()
+    ));
+  }
+
+  @NonNull
   public MetricParser provideMetricParser() {
     return getOrCreate(MetricParser.class, new Factory<MetricParser>() {
+      @NonNull
       @Override
       public MetricParser create() {
         return new MetricParser(
@@ -383,6 +417,7 @@ public class DependencyProvider {
   @NonNull
   public JsonSerializer provideJsonSerializer() {
     return getOrCreate(JsonSerializer.class, new Factory<JsonSerializer>() {
+      @NonNull
       @Override
       public JsonSerializer create() {
         return new JsonSerializer(provideGson());
@@ -393,6 +428,7 @@ public class DependencyProvider {
   @NonNull
   public Gson provideGson() {
     return getOrCreate(Gson.class, new Factory<Gson>() {
+      @NonNull
       @Override
       public Gson create() {
         return new GsonBuilder()
@@ -403,7 +439,7 @@ public class DependencyProvider {
   }
 
   public interface Factory<T> {
-
+    @NonNull
     T create();
   }
 

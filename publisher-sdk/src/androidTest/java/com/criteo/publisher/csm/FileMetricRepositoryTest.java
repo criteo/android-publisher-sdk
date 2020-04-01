@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
+import com.criteo.publisher.Util.BuildConfigWrapper;
 import com.criteo.publisher.csm.MetricRepository.MetricUpdater;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import java.io.IOException;
@@ -40,6 +41,9 @@ public class FileMetricRepositoryTest {
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   private MetricDirectory directory;
+
+  @Inject
+  private BuildConfigWrapper buildConfigWrapper;
 
   @Inject
   private MetricParser parser;
@@ -623,7 +627,7 @@ public class FileMetricRepositoryTest {
 
   private void givenNewRepository() {
     Context context = InstrumentationRegistry.getContext().getApplicationContext();
-    directory = new MetricDirectory(context, parser);
+    directory = new MetricDirectory(context, buildConfigWrapper, parser);
     repository = new FileMetricRepository(directory);
   }
 
