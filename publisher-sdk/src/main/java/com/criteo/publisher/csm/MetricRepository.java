@@ -17,7 +17,7 @@ public abstract class MetricRepository {
    * @param impressionId ID of the metric to update
    * @param updater function representing the update to apply
    */
-  abstract void updateById(@NonNull String impressionId, @NonNull MetricUpdater updater);
+  abstract void addOrUpdateById(@NonNull String impressionId, @NonNull MetricUpdater updater);
 
   /**
    * Atomically move the metric matching the given id with the given mover.

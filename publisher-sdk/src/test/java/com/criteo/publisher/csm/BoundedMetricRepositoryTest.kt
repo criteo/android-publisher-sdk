@@ -83,9 +83,9 @@ class BoundedMetricRepositoryTest {
       on { maxSizeOfCsmMetricsFolder } doReturn 6
     }
 
-    repository.updateById("id", updater)
+    repository.addOrUpdateById("id", updater)
 
-    verify(delegate).updateById("id", updater)
+    verify(delegate).addOrUpdateById("id", updater)
   }
 
   @Test
@@ -101,9 +101,9 @@ class BoundedMetricRepositoryTest {
       on { maxSizeOfCsmMetricsFolder } doReturn 6
     }
 
-    repository.updateById("id", updater)
+    repository.addOrUpdateById("id", updater)
 
-    verify(delegate).updateById("id", updater)
+    verify(delegate).addOrUpdateById("id", updater)
   }
 
   @Test
@@ -119,9 +119,9 @@ class BoundedMetricRepositoryTest {
       on { maxSizeOfCsmMetricsFolder } doReturn 6
     }
 
-    repository.updateById("id", updater)
+    repository.addOrUpdateById("id", updater)
 
-    verify(delegate, never()).updateById("id", updater)
+    verify(delegate, never()).addOrUpdateById("id", updater)
   }
 
 }

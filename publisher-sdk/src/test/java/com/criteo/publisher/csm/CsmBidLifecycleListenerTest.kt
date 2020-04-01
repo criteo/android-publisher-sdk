@@ -237,7 +237,7 @@ class CsmBidLifecycleListenerTest {
       verifier: (Metric.Builder) -> Unit
   ) {
     argumentCaptor<String> {
-      verify(repository, times(impressionIds.size)).updateById(capture(), verifier.asArgChecker())
+      verify(repository, times(impressionIds.size)).addOrUpdateById(capture(), verifier.asArgChecker())
 
       assertThat(allValues).containsExactlyInAnyOrder(*impressionIds)
     }
@@ -247,7 +247,7 @@ class CsmBidLifecycleListenerTest {
       impressionId: String,
       verifier: (Metric.Builder) -> Unit
   ) {
-    verify(repository).updateById(eq(impressionId), verifier.asArgChecker())
+    verify(repository).addOrUpdateById(eq(impressionId), verifier.asArgChecker())
   }
 
   private fun assertValidBidSlotIsReceived(impressionId: String) {

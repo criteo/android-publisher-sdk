@@ -95,7 +95,7 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
       boolean isNoBid = responseSlot == null;
       boolean isInvalidBid = responseSlot != null && !responseSlot.isValid();
 
-      repository.updateById(impressionId, new MetricUpdater() {
+      repository.addOrUpdateById(impressionId, new MetricUpdater() {
         @Override
         public void update(@NonNull Metric.Builder builder) {
           if (isNoBid) {
@@ -182,7 +182,7 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
     boolean isNotExpired = !consumedBid.isExpired(clock);
     long currentTimeInMillis = clock.getCurrentTimeInMillis();
 
-    repository.updateById(impressionId, new MetricUpdater() {
+    repository.addOrUpdateById(impressionId, new MetricUpdater() {
       @Override
       public void update(@NonNull Metric.Builder builder) {
         if (isNotExpired) {
@@ -198,7 +198,7 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
 
   private void updateByCdbRequestIds(@NonNull CdbRequest request, @NonNull MetricUpdater updater) {
     for (CdbRequestSlot requestSlot : request.getSlots()) {
-      repository.updateById(requestSlot.getImpressionId(), updater);
+      repository.addOrUpdateById(requestSlot.getImpressionId(), updater);
     }
   }
 

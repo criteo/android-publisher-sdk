@@ -21,14 +21,14 @@ class BoundedMetricRepository extends MetricRepository {
   }
 
   @Override
-  void updateById(@NonNull String impressionId, @NonNull MetricUpdater updater) {
+  void addOrUpdateById(@NonNull String impressionId, @NonNull MetricUpdater updater) {
     if (getTotalSize() >= buildConfigWrapper.getMaxSizeOfCsmMetricsFolder()) {
       if (!contains(impressionId)) {
         return;
       }
     }
 
-    delegate.updateById(impressionId, updater);
+    delegate.addOrUpdateById(impressionId, updater);
   }
 
   @Override

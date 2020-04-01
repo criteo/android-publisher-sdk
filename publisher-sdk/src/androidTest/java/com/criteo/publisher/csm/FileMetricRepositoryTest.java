@@ -65,18 +65,18 @@ public class FileMetricRepositoryTest {
 
   @Test
   public void getTotalSize_GivenSomeOperations_ReturnSizeGreaterThanEstimation() throws Exception {
-    repository.updateById("id1", builder -> {
+    repository.addOrUpdateById("id1", builder -> {
       builder.setCdbCallStartTimestamp(42L)
           .setCdbCallEndTimestamp(1337L)
           .setElapsedTimestamp(1024L)
           .setReadyToSend(true);
     });
 
-    repository.updateById("id2", builder -> {});
+    repository.addOrUpdateById("id2", builder -> {});
 
     givenNewRepository();
 
-    repository.updateById("id3", builder -> {
+    repository.addOrUpdateById("id3", builder -> {
       builder.setCdbCallStartTimestamp(42L)
           .setCdbCallEndTimestamp(1337L)
           .setElapsedTimestamp(1024L)
@@ -89,7 +89,7 @@ public class FileMetricRepositoryTest {
     repository.moveById("id3", metric -> true);
 
     for (int i = 0; i < 100; i++) {
-      repository.updateById("id" + i, builder -> {
+      repository.addOrUpdateById("id" + i, builder -> {
         builder.setCdbCallStartTimestamp(42L)
             .setCdbCallEndTimestamp(1337L)
             .setElapsedTimestamp(1024L)
@@ -115,9 +115,9 @@ public class FileMetricRepositoryTest {
 
   @Test
   public void contains_AfterAnUpdate_ReturnTrue() throws Exception {
-    repository.updateById("id1", builder -> {});
+    repository.addOrUpdateById("id1", builder -> {});
     givenNewRepository();
-    repository.updateById("id2", builder -> {});
+    repository.addOrUpdateById("id2", builder -> {});
 
     assertTrue(repository.contains("id1"));
     assertTrue(repository.contains("id2"));
@@ -125,8 +125,8 @@ public class FileMetricRepositoryTest {
 
   @Test
   public void contains_AfterAMove_ReturnFalse() throws Exception {
-    repository.updateById("id1", builder -> {});
-    repository.updateById("id2", builder -> {});
+    repository.addOrUpdateById("id1", builder -> {});
+    repository.addOrUpdateById("id2", builder -> {});
 
     repository.moveById("id1", builder -> true);
     givenNewRepository();
@@ -145,12 +145,12 @@ public class FileMetricRepositoryTest {
 
   @Test
   public void getAllStoredMetrics_GivenUpdatesAndThenNewRepository_ReturnPreviousResult() throws Exception {
-    repository.updateById("id1", builder -> {
+    repository.addOrUpdateById("id1", builder -> {
       builder.setCdbCallStartTimestamp(42L);
       builder.setCdbCallTimeout(true);
     });
 
-    repository.updateById("id2", builder -> {
+    repository.addOrUpdateById("id2", builder -> {
       builder.setCdbCallEndTimestamp(1337L);
     });
 
@@ -166,7 +166,7 @@ public class FileMetricRepositoryTest {
     Metric expected = Metric.builder("id")
         .build();
 
-    repository.updateById("id", builder -> {
+    repository.addOrUpdateById("id", builder -> {
       /* no op */
     });
 
@@ -182,7 +182,7 @@ public class FileMetricRepositoryTest {
         .setCdbCallStartTimestamp(42L)
         .build();
 
-    repository.updateById("id", builder -> {
+    repository.addOrUpdateById("id", builder -> {
       builder.setCdbCallStartTimestamp(42L);
     });
 
@@ -200,15 +200,15 @@ public class FileMetricRepositoryTest {
         .setCdbCallTimeout(true)
         .build();
 
-    repository.updateById("impId", builder -> {
+    repository.addOrUpdateById("impId", builder -> {
       builder.setCdbCallStartTimestamp(42L);
     });
 
-    repository.updateById("impId", builder -> {
+    repository.addOrUpdateById("impId", builder -> {
       builder.setCdbCallEndTimestamp(1337L);
     });
 
-    repository.updateById("impId", builder -> {
+    repository.addOrUpdateById("impId", builder -> {
       builder.setCdbCallTimeout(true);
     });
 
@@ -226,19 +226,19 @@ public class FileMetricRepositoryTest {
         .setCdbCallTimeout(true)
         .build();
 
-    repository.updateById("impId", builder -> {
+    repository.addOrUpdateById("impId", builder -> {
       builder.setCdbCallStartTimestamp(42L);
     });
 
     givenNewRepository();
 
-    repository.updateById("impId", builder -> {
+    repository.addOrUpdateById("impId", builder -> {
       builder.setCdbCallEndTimestamp(1337L);
     });
 
     givenNewRepository();
 
-    repository.updateById("impId", builder -> {
+    repository.addOrUpdateById("impId", builder -> {
       builder.setCdbCallTimeout(true);
     });
 
@@ -261,12 +261,12 @@ public class FileMetricRepositoryTest {
         .setCdbCallEndTimestamp(1337L)
         .build();
 
-    repository.updateById("id1", builder -> {
+    repository.addOrUpdateById("id1", builder -> {
       builder.setCdbCallStartTimestamp(42L);
       builder.setCdbCallTimeout(true);
     });
 
-    repository.updateById("id2", builder -> {
+    repository.addOrUpdateById("id2", builder -> {
       builder.setCdbCallEndTimestamp(1337L);
     });
 
@@ -286,12 +286,12 @@ public class FileMetricRepositoryTest {
     ExecutorService executor = Executors.newFixedThreadPool(3);
     CountDownLatch isInUpdate = new CountDownLatch(2);
 
-    repository.updateById("id1", builder -> {
+    repository.addOrUpdateById("id1", builder -> {
       builder.setCdbCallStartTimestamp(0L);
     });
 
     Future<?> future1 = executor.submit(() -> {
-      repository.updateById("id1", builder -> {
+      repository.addOrUpdateById("id1", builder -> {
         builder.setCdbCallStartTimestamp(42L);
         isInUpdate.countDown();
         waitForPotentialIO();
@@ -300,7 +300,7 @@ public class FileMetricRepositoryTest {
     });
 
     Future<?> future2 = executor.submit(() -> {
-      repository.updateById("id2", builder -> {
+      repository.addOrUpdateById("id2", builder -> {
         builder.setCdbCallStartTimestamp(1L);
         isInUpdate.countDown();
         waitForPotentialIO();
@@ -334,7 +334,7 @@ public class FileMetricRepositoryTest {
       long finalI = i + 1;
       futures.add(executor.submit(() -> {
         barrier.await();
-        repository.updateById("id", builder -> {
+        repository.addOrUpdateById("id", builder -> {
           builder.setCdbCallStartTimestamp(finalI);
         });
         return null;
@@ -350,7 +350,7 @@ public class FileMetricRepositoryTest {
       future.get();
     }
 
-    repository.updateById("id", builder -> {
+    repository.addOrUpdateById("id", builder -> {
       builder.setCdbCallStartTimestamp(0L);
     });
 
@@ -369,7 +369,7 @@ public class FileMetricRepositoryTest {
 
     try {
       executor.submit(() -> {
-        repository.updateById("id", builder -> {
+        repository.addOrUpdateById("id", builder -> {
           throw expectedException;
         });
       }).get();
@@ -392,13 +392,13 @@ public class FileMetricRepositoryTest {
         .setCdbCallStartTimestamp(42L)
         .build();
 
-    repository.updateById("id", builder -> {
+    repository.addOrUpdateById("id", builder -> {
       builder.setCdbCallStartTimestamp(42L);
     });
 
     try {
       executor.submit(() -> {
-        repository.updateById("id", builder -> {
+        repository.addOrUpdateById("id", builder -> {
           builder.setCdbCallStartTimestamp(1337L);
           throw expectedException;
         });
@@ -418,8 +418,8 @@ public class FileMetricRepositoryTest {
   public void getAllStoredMetrics_GivenAnIoExceptionDuringOneRead_IgnoreIt() throws Exception {
     parser = spy(parser);
 
-    repository.updateById("id1", builder -> { });
-    repository.updateById("id2", builder -> { });
+    repository.addOrUpdateById("id1", builder -> { });
+    repository.addOrUpdateById("id2", builder -> { });
 
     givenNewRepository();
 
@@ -437,14 +437,14 @@ public class FileMetricRepositoryTest {
   public void updateById_GivenIoExceptionDuringReadOfExistingMetric_DoNotUpdateMetric() throws Exception {
     parser = spy(parser);
 
-    repository.updateById("id1", builder -> { });
+    repository.addOrUpdateById("id1", builder -> { });
 
     givenNewRepository();
 
     doThrow(IOException.class).when(parser).read(any());
 
     MetricUpdater updater = mock(MetricUpdater.class);
-    repository.updateById("id1", updater);
+    repository.addOrUpdateById("id1", updater);
 
     verify(updater, never()).update(any());
   }
@@ -456,7 +456,7 @@ public class FileMetricRepositoryTest {
 
     doThrow(IOException.class).when(parser).write(any(), any());
 
-    repository.updateById("id1", builder -> { });
+    repository.addOrUpdateById("id1", builder -> { });
 
     Collection<Metric> metrics = repository.getAllStoredMetrics();
 
@@ -477,11 +477,11 @@ public class FileMetricRepositoryTest {
         .when(parser)
         .write(any(), any());
 
-    repository.updateById("id1", builder -> {
+    repository.addOrUpdateById("id1", builder -> {
       builder.setCdbCallStartTimestamp(1337L);
     });
 
-    repository.updateById("id1", builder -> {
+    repository.addOrUpdateById("id1", builder -> {
       assertEquals(Metric.builder("id1").build(), builder.build());
       builder.setCdbCallStartTimestamp(42L);
     });
@@ -499,11 +499,11 @@ public class FileMetricRepositoryTest {
     parser = spy(parser);
     givenNewRepository();
 
-    repository.updateById("id1", builder -> { });
+    repository.addOrUpdateById("id1", builder -> { });
 
     doThrow(IOException.class).when(parser).write(any(), any());
 
-    repository.updateById("id1", builder -> {
+    repository.addOrUpdateById("id1", builder -> {
       builder.setCdbCallStartTimestamp(42L);
     });
 
@@ -522,18 +522,18 @@ public class FileMetricRepositoryTest {
     parser = spy(parser);
     givenNewRepository();
 
-    repository.updateById("id1", builder -> { });
+    repository.addOrUpdateById("id1", builder -> { });
 
     doThrow(IOException.class)
         .doCallRealMethod()
         .when(parser)
         .write(any(), any());
 
-    repository.updateById("id1", builder -> {
+    repository.addOrUpdateById("id1", builder -> {
       builder.setCdbCallStartTimestamp(1337L);
     });
 
-    repository.updateById("id1", builder -> {
+    repository.addOrUpdateById("id1", builder -> {
       assertEquals(Metric.builder("id1").build(), builder.build());
       builder.setCdbCallStartTimestamp(42L);
     });
@@ -549,10 +549,10 @@ public class FileMetricRepositoryTest {
     MetricMover mover = mock(MetricMover.class);
     when(mover.offerToDestination(any())).thenReturn(true);
 
-    repository.updateById("id", builder -> builder.setCdbCallStartTimestamp(1L));
+    repository.addOrUpdateById("id", builder -> builder.setCdbCallStartTimestamp(1L));
     repository.moveById("id", mover);
 
-    repository.updateById("id", builder -> {
+    repository.addOrUpdateById("id", builder -> {
       assertEquals(builder.build(), Metric.builder("id").build());
     });
   }
@@ -562,7 +562,7 @@ public class FileMetricRepositoryTest {
     MetricMover mover = mock(MetricMover.class);
     when(mover.offerToDestination(any())).thenReturn(true);
 
-    repository.updateById("id", builder -> {});
+    repository.addOrUpdateById("id", builder -> {});
     givenNewRepository();
 
     repository.moveById("id", mover);
@@ -578,7 +578,7 @@ public class FileMetricRepositoryTest {
     MetricMover mover = mock(MetricMover.class);
     when(mover.offerToDestination(any())).thenReturn(false);
 
-    repository.updateById("id", builder -> builder.setCdbCallStartTimestamp(2L));
+    repository.addOrUpdateById("id", builder -> builder.setCdbCallStartTimestamp(2L));
     givenNewRepository();
 
     repository.moveById("id", mover);
@@ -598,7 +598,7 @@ public class FileMetricRepositoryTest {
 
     parser = spy(parser);
 
-    repository.updateById("id", builder -> {});
+    repository.addOrUpdateById("id", builder -> {});
     givenNewRepository();
 
     doThrow(IOException.class)

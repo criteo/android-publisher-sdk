@@ -27,7 +27,7 @@ class FileMetricRepository extends MetricRepository {
   }
 
   @Override
-  void updateById(@NonNull String impressionId, @NonNull MetricUpdater updater) {
+  void addOrUpdateById(@NonNull String impressionId, @NonNull MetricUpdater updater) {
     File metricFile = directory.createMetricFile(impressionId);
     SyncMetricFile syncMetricFile = getOrCreateMetricFile(metricFile);
 
