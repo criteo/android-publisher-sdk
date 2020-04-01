@@ -19,14 +19,13 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
-import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.BuildConfig;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.CriteoUtil;
-import com.criteo.publisher.concurrent.ThreadingUtil;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.network.PubSdkApi;
+import javax.inject.Inject;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -40,11 +39,14 @@ public class ConfigIntegrationTests {
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
+  @Inject
   private Context context;
+
+  @Inject
+  private Application application;
 
   @Before
   public void setup() {
-    context = InstrumentationRegistry.getTargetContext().getApplicationContext();
     givenEmptyLocalStorage();
   }
 
@@ -139,7 +141,7 @@ public class ConfigIntegrationTests {
   @Test
   public void refreshConfig_GivenRemoteConfigInError_DoesNotUpdateConfig() throws Exception {
     Config config = mock(Config.class);
-    doReturn(config).when(mockedDependenciesRule.getDependencyProvider()).provideConfig(any());
+    doReturn(config).when(mockedDependenciesRule.getDependencyProvider()).provideConfig();
 
     givenRemoteConfigInError();
 
@@ -153,7 +155,7 @@ public class ConfigIntegrationTests {
   public void refreshConfig_GivenRemoteConfigWithGoodResponse_UpdateConfig() throws Exception {
     Config config = mock(Config.class);
     when(config.isKillSwitchEnabled()).thenReturn(false);
-    doReturn(config).when(mockedDependenciesRule.getDependencyProvider()).provideConfig(any());
+    doReturn(config).when(mockedDependenciesRule.getDependencyProvider()).provideConfig();
 
     JSONObject response = mock(JSONObject.class);
     givenRemoteConfigWithResponse(response);
@@ -169,7 +171,7 @@ public class ConfigIntegrationTests {
       throws Exception {
     Config config = mock(Config.class);
     when(config.isKillSwitchEnabled()).thenReturn(true);
-    doReturn(config).when(mockedDependenciesRule.getDependencyProvider()).provideConfig(any());
+    doReturn(config).when(mockedDependenciesRule.getDependencyProvider()).provideConfig();
 
     JSONObject response = mock(JSONObject.class);
     givenRemoteConfigWithResponse(response);
@@ -184,11 +186,9 @@ public class ConfigIntegrationTests {
   public void sdkInit_GivenContext_ProvidedConfigIsUsed() throws CriteoInitException {
     clearCriteo();
 
-    Application app = (Application) InstrumentationRegistry.getTargetContext()
-        .getApplicationContext();
-    Criteo.init(app, CriteoUtil.TEST_CP_ID, null);
+    Criteo.init(application, CriteoUtil.TEST_CP_ID, null);
 
-    verify(mockedDependenciesRule.getDependencyProvider(), atLeastOnce()).provideConfig(app);
+    verify(mockedDependenciesRule.getDependencyProvider(), atLeastOnce()).provideConfig();
   }
 
   @Test
@@ -258,7 +258,7 @@ public class ConfigIntegrationTests {
   }
 
   private Config getConfig() {
-    return mockedDependenciesRule.getDependencyProvider().provideConfig(context);
+    return mockedDependenciesRule.getDependencyProvider().provideConfig();
   }
 
   private void givenRemoteConfigInError() {

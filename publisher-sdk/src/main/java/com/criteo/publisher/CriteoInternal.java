@@ -1,7 +1,6 @@
 package com.criteo.publisher;
 
 import android.app.Application;
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -9,7 +8,6 @@ import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.TextUtils;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
@@ -47,38 +45,28 @@ final class CriteoInternal extends Criteo {
   CriteoInternal(
       Application application,
       List<AdUnit> adUnits,
-      String criteoPublisherId,
       @Nullable Boolean usPrivacyOptout,
       @Nullable String mopubConsent,
       DependencyProvider dependencyProvider) {
-
-    if (application == null) {
-      throw new IllegalArgumentException("Application reference is required.");
-    }
-
-    if (TextUtils.isEmpty(criteoPublisherId)) {
-      throw new IllegalArgumentException("Criteo Publisher Id is required.");
-    }
 
     if (adUnits == null) {
       adUnits = new ArrayList<>();
     }
 
-    Context context = application.getApplicationContext();
-    DeviceUtil deviceUtil = dependencyProvider.provideDeviceUtil(context);
-    deviceUtil.createSupportedScreenSizes(application);
+    DeviceUtil deviceUtil = dependencyProvider.provideDeviceUtil();
+    deviceUtil.createSupportedScreenSizes();
 
-    deviceInfo = dependencyProvider.provideDeviceInfo(context);
+    deviceInfo = dependencyProvider.provideDeviceInfo();
     deviceInfo.initialize();
 
-    config = dependencyProvider.provideConfig(context);
+    config = dependencyProvider.provideConfig();
 
-    bidManager = dependencyProvider.provideBidManager(context, criteoPublisherId);
-    inHouse = dependencyProvider.provideInHouse(context, criteoPublisherId);
+    bidManager = dependencyProvider.provideBidManager();
+    inHouse = dependencyProvider.provideInHouse();
 
-    interstitialActivityHelper = dependencyProvider.provideInterstitialActivityHelper(context);
+    interstitialActivityHelper = dependencyProvider.provideInterstitialActivityHelper();
 
-    userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil(context);
+    userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil();
     if (usPrivacyOptout != null) {
       userPrivacyUtil.storeUsPrivacyOptout(usPrivacyOptout);
     }
@@ -89,7 +77,7 @@ final class CriteoInternal extends Criteo {
       userPrivacyUtil.storeMopubConsent(mopubConsent);
     }
 
-    AppEvents appEvents = dependencyProvider.provideAppEvents(context);
+    AppEvents appEvents = dependencyProvider.provideAppEvents();
     AppLifecycleUtil lifecycleCallback = new AppLifecycleUtil(appEvents, bidManager);
     application.registerActivityLifecycleCallbacks(lifecycleCallback);
 

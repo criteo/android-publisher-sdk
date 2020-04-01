@@ -1,8 +1,8 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
-import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static com.criteo.publisher.Util.CompletableFuture.completedFuture;
+import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
@@ -12,9 +12,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import android.content.Context;
 import android.content.Intent;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.mock.MockedDependenciesRule;
@@ -40,7 +38,6 @@ public class BearcatFunctionalTest {
   @Mock
   private PubSdkApi api;
   private DependencyProvider dependencyProvider;
-  private Context context;
 
   private GdprData gdprData;
 
@@ -51,16 +48,15 @@ public class BearcatFunctionalTest {
     dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
     doReturn(api).when(dependencyProvider).providePubSdkApi();
-    context = InstrumentationRegistry.getContext().getApplicationContext();
 
-    UserPrivacyUtil userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil(context);
+    UserPrivacyUtil userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil();
     gdprData = userPrivacyUtil.getGdprData();
   }
 
   @Test
   public void init_GivenUserAgentAndLaunchedActivity_SendInitEventWithUserAgent() throws Exception {
-    DeviceInfo deviceInfo = spy(dependencyProvider.provideDeviceInfo(context));
-    doReturn(deviceInfo).when(dependencyProvider).provideDeviceInfo(any());
+    DeviceInfo deviceInfo = spy(dependencyProvider.provideDeviceInfo());
+    doReturn(deviceInfo).when(dependencyProvider).provideDeviceInfo();
     doReturn(completedFuture("expectedUserAgent")).when(deviceInfo).getUserAgent();
 
     givenInitializedCriteo();

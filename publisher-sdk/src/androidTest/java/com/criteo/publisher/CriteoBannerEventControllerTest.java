@@ -16,9 +16,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import android.app.Application;
+import android.content.Context;
 import android.os.Looper;
-import android.support.test.InstrumentationRegistry;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.criteo.publisher.Util.AdUnitType;
@@ -29,6 +28,7 @@ import com.criteo.publisher.model.TokenValue;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,6 +52,9 @@ public class CriteoBannerEventControllerTest {
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private Criteo criteo;
+
+  @Inject
+  private Context context;
 
   @Before
   public void setUp() throws Exception {
@@ -233,9 +236,7 @@ public class CriteoBannerEventControllerTest {
   public void whenDeeplinkIsLoaded_GivenTargetAppIsNotInstalled_DontThrowActivityNotFound() {
     runOnMainThreadAndWait(() -> {
       WebViewClient webViewClient = criteoBannerEventController.createWebViewClient();
-      Application app = (Application) InstrumentationRegistry.getTargetContext()
-          .getApplicationContext();
-      webViewClient.shouldOverrideUrlLoading(new WebView(app.getApplicationContext()),
+      webViewClient.shouldOverrideUrlLoading(new WebView(context),
           "fake_deeplink://fakeappdispatch");
     });
   }

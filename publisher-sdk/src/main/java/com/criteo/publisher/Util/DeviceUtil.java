@@ -2,16 +2,13 @@ package com.criteo.publisher.Util;
 
 import static android.content.ContentValues.TAG;
 
-import android.app.Application;
 import android.content.Context;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
 import com.criteo.publisher.model.AdSize;
-import java.util.Locale;
 
 public class DeviceUtil {
 
@@ -28,10 +25,10 @@ public class DeviceUtil {
     this.advertisingInfo = advertisingInfo;
   }
 
-  public void createSupportedScreenSizes(Application application) {
+  public void createSupportedScreenSizes() {
     try {
       DisplayMetrics metrics = new DisplayMetrics();
-      ((WindowManager) application.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()
+      ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()
           .getMetrics(metrics);
       setScreenSize(Math.round(metrics.widthPixels / metrics.density),
           Math.round(metrics.heightPixels / metrics.density));

@@ -9,11 +9,10 @@ import static org.mockito.Mockito.mock;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import com.criteo.publisher.DependencyProvider;
-import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.csm.MetricRequest;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
@@ -21,6 +20,7 @@ import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.privacy.gdpr.GdprData;
+import javax.inject.Inject;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
@@ -39,6 +39,7 @@ public class PubSdkApiIntegrationTest {
   private String gaid;
   private String eventType;
   private String appId;
+  @Inject
   private Context context;
   private CdbRequestFactory cdbRequestFactory;
   private PubSdkApi api;
@@ -47,7 +48,6 @@ public class PubSdkApiIntegrationTest {
 
   @Before
   public void setup() {
-    context = InstrumentationRegistry.getContext().getApplicationContext();
     appId = context.getApplicationContext().getPackageName();
     senderId = 2379;
     limitedAdTracking = 0;
@@ -55,9 +55,9 @@ public class PubSdkApiIntegrationTest {
     eventType = "Launch";
 
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-    cdbRequestFactory = dependencyProvider.provideCdbRequestFactory(context, "myCpId");
+    cdbRequestFactory = dependencyProvider.provideCdbRequestFactory();
     api = dependencyProvider.providePubSdkApi();
-    userPrivacyUtil = mockedDependenciesRule.getDependencyProvider().provideUserPrivacyUtil(context);
+    userPrivacyUtil = mockedDependenciesRule.getDependencyProvider().provideUserPrivacyUtil();
   }
 
   @After

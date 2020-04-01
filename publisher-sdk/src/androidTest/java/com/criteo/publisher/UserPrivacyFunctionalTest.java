@@ -11,15 +11,14 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
-import android.support.test.InstrumentationRegistry;
-import com.criteo.publisher.concurrent.ThreadingUtil;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.network.PubSdkApi;
+import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,6 +36,9 @@ public class UserPrivacyFunctionalTest {
   @Mock
   private PubSdkApi pubSdkApi;
 
+  @Inject
+  private Context context;
+
   private SharedPreferences defaultSharedPreferences;
 
   @Before
@@ -44,10 +46,7 @@ public class UserPrivacyFunctionalTest {
     MockitoAnnotations.initMocks(this);
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
-    Application app = (Application) InstrumentationRegistry.getTargetContext()
-        .getApplicationContext();
-    defaultSharedPreferences = PreferenceManager
-        .getDefaultSharedPreferences(app.getApplicationContext());
+    defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
     doReturn(pubSdkApi).when(dependencyProvider).providePubSdkApi();
   }

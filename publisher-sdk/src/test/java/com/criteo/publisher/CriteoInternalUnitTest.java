@@ -3,22 +3,16 @@ package com.criteo.publisher;
 import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import android.app.Application;
-import android.content.Context;
 import com.criteo.publisher.Util.AppLifecycleUtil;
 import com.criteo.publisher.Util.BuildConfigWrapper;
 import com.criteo.publisher.Util.DeviceUtil;
@@ -26,21 +20,17 @@ import com.criteo.publisher.Util.DirectMockRunOnUiThreadExecutor;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.csm.MetricSendingQueue;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
-import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.Executor;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -51,8 +41,6 @@ public class CriteoInternalUnitTest {
   private Application application;
 
   private List<AdUnit> adUnits;
-
-  private String criteoPublisherId = "B-000001";
 
   private Boolean usPrivacyOptout = false;
 
@@ -72,16 +60,6 @@ public class CriteoInternalUnitTest {
         .thenReturn(new DirectMockRunOnUiThreadExecutor());
 
     adUnits = new ArrayList<>();
-  }
-
-  @Test
-  public void whenCreatingNewCriteo_GivenNullCpId_ThrowExceptionAndDoNotUseNetwork()
-      throws Exception {
-    PubSdkApi api = givenMockedPubSdkApi();
-    criteoPublisherId = null;
-
-    assertThatThrownBy(this::createCriteo).isInstanceOf(IllegalArgumentException.class);
-    verifyZeroInteractions(api);
   }
 
   @Test
@@ -124,45 +102,11 @@ public class CriteoInternalUnitTest {
       throws Exception {
     DeviceUtil deviceUtil = mock(DeviceUtil.class);
 
-    Context context = application.getApplicationContext();
-    when(dependencyProvider.provideDeviceUtil(context)).thenReturn(deviceUtil);
+    when(dependencyProvider.provideDeviceUtil()).thenReturn(deviceUtil);
 
     createCriteo();
 
-    verify(deviceUtil).createSupportedScreenSizes(application);
-  }
-
-  @Test
-  public void whenCreatingNewCriteo_GivenDependencyProvider_OnlyUseApplicationContextToBuildDependencies()
-      throws Exception {
-    // Used to verify transitive dependencies
-    dependencyProvider = spy(DependencyProvider.getInstance());
-    doReturn(mock(DeviceUtil.class)).when(dependencyProvider).provideDeviceUtil(any());
-    doReturn(mock(UserPrivacyUtil.class)).when(dependencyProvider).provideUserPrivacyUtil(any());
-    doReturn(mock(Config.class)).when(dependencyProvider).provideConfig(any());
-    doReturn(mock(MetricSendingQueue.class)).when(dependencyProvider).provideMetricSendingQueue(any());
-    doReturn(new DirectMockRunOnUiThreadExecutor()).when(dependencyProvider)
-        .provideRunOnUiThreadExecutor();
-    doReturn((Executor) Runnable::run).when(dependencyProvider).provideThreadPoolExecutor();
-
-    Context applicationContext = mock(Context.class, Answers.RETURNS_DEEP_STUBS);
-    when(application.getApplicationContext()).thenReturn(applicationContext);
-    criteoPublisherId = "B-123456";
-
-    createCriteo();
-
-    ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
-    verify(dependencyProvider, atLeastOnce()).provideDeviceUtil(contextCaptor.capture());
-    verify(dependencyProvider, atLeastOnce()).provideDeviceInfo(contextCaptor.capture());
-    verify(dependencyProvider, atLeastOnce()).provideAdUnitMapper(contextCaptor.capture());
-    verify(dependencyProvider, atLeastOnce()).provideAndroidUtil(contextCaptor.capture());
-    verify(dependencyProvider, atLeastOnce())
-        .provideBidManager(contextCaptor.capture(), eq(criteoPublisherId));
-    verify(dependencyProvider, atLeastOnce()).provideConfig(contextCaptor.capture());
-    verify(dependencyProvider, atLeastOnce()).provideUserPrivacyUtil(contextCaptor.capture());
-    verify(dependencyProvider, atLeastOnce()).provideAppEvents(contextCaptor.capture());
-
-    assertThat(contextCaptor.getAllValues()).containsOnly(applicationContext);
+    verify(deviceUtil).createSupportedScreenSizes();
   }
 
   @Test
@@ -248,7 +192,7 @@ public class CriteoInternalUnitTest {
   @Test
   public void whenCreatingNewCriteo_GivenDeviceInfo_InitializeIt() throws Exception {
     DeviceInfo deviceInfo = mock(DeviceInfo.class);
-    doReturn(deviceInfo).when(dependencyProvider).provideDeviceInfo(any());
+    doReturn(deviceInfo).when(dependencyProvider).provideDeviceInfo();
 
     createCriteo();
 
@@ -296,8 +240,7 @@ public class CriteoInternalUnitTest {
   @Test
   public void whenCreatingNewCriteo_GivenNonNullMopubConsent_ShouldCallStoreMethod()
       throws Exception {
-    Context context = application.getApplicationContext();
-    when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
+    when(dependencyProvider.provideUserPrivacyUtil()).thenReturn(userPrivacyUtil);
     mopubConsentValue = "fake_mopub_consent_value";
 
     createCriteo();
@@ -308,8 +251,7 @@ public class CriteoInternalUnitTest {
   @Test
   public void whenCreatingNewCriteo_GivenNullMopubConsent_ShouldNotCallStoreMethod()
       throws Exception {
-    Context context = application.getApplicationContext();
-    when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
+    when(dependencyProvider.provideUserPrivacyUtil()).thenReturn(userPrivacyUtil);
     mopubConsentValue = null;
 
     createCriteo();
@@ -371,8 +313,7 @@ public class CriteoInternalUnitTest {
   }
 
   private void givenMockedUserPrivacyUtil() {
-    Context context = application.getApplicationContext();
-    when(dependencyProvider.provideUserPrivacyUtil(context)).thenReturn(userPrivacyUtil);
+    when(dependencyProvider.provideUserPrivacyUtil()).thenReturn(userPrivacyUtil);
   }
 
   private BidLifecycleListener givenMockedBidLifecycleListener() {
@@ -386,8 +327,7 @@ public class CriteoInternalUnitTest {
   private BidManager givenMockedBidManager() {
     BidManager bidManager = mock(BidManager.class);
 
-    Context context = application.getApplicationContext();
-    when(dependencyProvider.provideBidManager(context, criteoPublisherId)).thenReturn(bidManager);
+    when(dependencyProvider.provideBidManager()).thenReturn(bidManager);
 
     return bidManager;
   }
@@ -395,22 +335,13 @@ public class CriteoInternalUnitTest {
   private InHouse givenMockedInHouse() {
     InHouse inHouse = mock(InHouse.class);
 
-    Context context = application.getApplicationContext();
-    when(dependencyProvider.provideInHouse(context, criteoPublisherId)).thenReturn(inHouse);
+    when(dependencyProvider.provideInHouse()).thenReturn(inHouse);
 
     return inHouse;
   }
 
-  private PubSdkApi givenMockedPubSdkApi() {
-    PubSdkApi api = mock(PubSdkApi.class);
-
-    when(dependencyProvider.providePubSdkApi()).thenReturn(api);
-
-    return api;
-  }
-
   private CriteoInternal createCriteo() {
-    return new CriteoInternal(application, adUnits, criteoPublisherId, usPrivacyOptout,
+    return new CriteoInternal(application, adUnits, usPrivacyOptout,
         mopubConsentValue, dependencyProvider);
   }
 

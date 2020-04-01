@@ -10,13 +10,12 @@ import static org.mockito.Mockito.verify;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.test.InstrumentationRegistry;
-import com.criteo.publisher.concurrent.ThreadingUtil;
-import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.Util.UserAgentCallback;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
+import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,12 +25,13 @@ public class DeviceInfoIntegrationTest {
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
+  @Inject
   private Context context;
+
   private Executor runOnUiThreadExecutor;
 
   @Before
   public void setUp() throws Exception {
-    context = InstrumentationRegistry.getContext().getApplicationContext();
     runOnUiThreadExecutor = mockedDependenciesRule.getDependencyProvider()
         .provideRunOnUiThreadExecutor();
   }

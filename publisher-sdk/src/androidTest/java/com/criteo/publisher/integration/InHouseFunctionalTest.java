@@ -10,19 +10,17 @@ import static org.mockito.Mockito.verify;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.BidResponse;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.TestAdUnits;
-import com.criteo.publisher.concurrent.ThreadingUtil;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import org.junit.Before;
+import javax.inject.Inject;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -35,12 +33,8 @@ public class InHouseFunctionalTest {
   private final BannerAdUnit validBannerAdUnit = TestAdUnits.BANNER_320_50;
   private final BannerAdUnit invalidBannerAdUnit = TestAdUnits.BANNER_UNKNOWN;
 
+  @Inject
   private Context context;
-
-  @Before
-  public void setUp() throws Exception {
-    context = InstrumentationRegistry.getContext().getApplicationContext();
-  }
 
   @Test
   public void loadBannerAd_GivenValidAdUnit_ThenListenerIsNotifiedOfTheSuccess() throws Exception {

@@ -40,6 +40,9 @@ public class FileMetricRepositoryTest {
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
+  @Inject
+  private Context context;
+
   private MetricDirectory directory;
 
   @Inject
@@ -626,7 +629,6 @@ public class FileMetricRepositoryTest {
   }
 
   private void givenNewRepository() {
-    Context context = InstrumentationRegistry.getContext().getApplicationContext();
     directory = new MetricDirectory(context, buildConfigWrapper, parser);
     repository = new FileMetricRepository(directory);
   }

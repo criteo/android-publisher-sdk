@@ -6,7 +6,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
 import android.support.v4.util.AtomicFile;
 import com.criteo.publisher.Util.BuildConfigWrapper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
@@ -19,11 +18,19 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class MetricDirectoryTest {
 
   @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
+
+  @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
+  @Inject
+  private Context context;
 
   @Inject
   private BuildConfigWrapper buildConfigWrapper;
@@ -35,9 +42,6 @@ public class MetricDirectoryTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
-    Context context = InstrumentationRegistry.getContext().getApplicationContext();
     directory = new MetricDirectory(context, buildConfigWrapper, parser);
   }
 

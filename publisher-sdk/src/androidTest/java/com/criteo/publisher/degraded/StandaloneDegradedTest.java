@@ -11,13 +11,11 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdListener;
-import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdSize;
@@ -25,6 +23,7 @@ import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,6 +38,7 @@ public class StandaloneDegradedTest {
   private final BannerAdUnit bannerAdUnit = new BannerAdUnit("banner", new AdSize(1, 2));
   private final InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit("interstitial");
 
+  @Inject
   private Context context;
 
   @Mock
@@ -53,8 +53,6 @@ public class StandaloneDegradedTest {
     when(dependencyProvider.providePubSdkApi()).thenReturn(api);
 
     DegradedUtil.assumeIsDegraded();
-
-    context = InstrumentationRegistry.getContext();
 
     givenInitializedCriteo();
   }

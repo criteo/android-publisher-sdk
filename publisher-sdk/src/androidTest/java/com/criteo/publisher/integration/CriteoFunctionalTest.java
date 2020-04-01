@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
 import android.app.Application;
 import android.content.Intent;
 import android.os.Looper;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 import com.criteo.publisher.BidManager;
 import com.criteo.publisher.Criteo;
@@ -37,10 +36,10 @@ import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
 import java.util.Collections;
 import java.util.List;
+import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class CriteoFunctionalTest {
@@ -54,28 +53,21 @@ public class CriteoFunctionalTest {
   private final BannerAdUnit validBannerAdUnit = TestAdUnits.BANNER_320_50;
   private final InterstitialAdUnit validInterstitialAdUnit = TestAdUnits.INTERSTITIAL;
 
+  @Inject
   private Application application;
 
   private PubSdkApi api;
 
   private DependencyProvider dependencyProvider;
 
-  @Mock
-  private BuildConfigWrapper buildConfigWrapper;
-
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-
-    application = (Application) InstrumentationRegistry.getTargetContext()
-        .getApplicationContext();
 
     dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
     api = spy(dependencyProvider.providePubSdkApi());
     doReturn(api).when(dependencyProvider).providePubSdkApi();
-
-    doReturn(buildConfigWrapper).when(dependencyProvider).provideBuildConfigWrapper();
   }
 
   @Test
@@ -131,7 +123,7 @@ public class CriteoFunctionalTest {
   @Test
   public void init_WaitingForIdleState_BidManagerIsPrefetchOnMainThread() throws Exception {
     BidManager bidManager = mock(BidManager.class);
-    doReturn(bidManager).when(dependencyProvider).provideBidManager(any(), any());
+    doReturn(bidManager).when(dependencyProvider).provideBidManager();
 
     doAnswer(answerVoid((List<AdUnit> adUnits) -> {
       assertTrue(adUnits.isEmpty());
@@ -146,8 +138,11 @@ public class CriteoFunctionalTest {
 
   @Test
   public void init_GivenCpIdAppIdAndVersion_CallConfigWithThose() throws Exception {
-    givenInitializedCriteo();
+    BuildConfigWrapper buildConfigWrapper = spy(dependencyProvider.provideBuildConfigWrapper());
+    doReturn(buildConfigWrapper).when(dependencyProvider).provideBuildConfigWrapper();
     when(buildConfigWrapper.getSdkVersion()).thenReturn("1.2.3");
+
+    givenInitializedCriteo();
     waitForBids();
 
     verify(api).loadConfig(argThat(request -> {

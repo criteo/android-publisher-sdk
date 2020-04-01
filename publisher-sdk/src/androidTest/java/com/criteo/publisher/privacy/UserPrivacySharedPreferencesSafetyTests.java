@@ -7,10 +7,10 @@ import static org.mockito.Mockito.when;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.Util.BuildConfigWrapper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -22,6 +22,7 @@ public class UserPrivacySharedPreferencesSafetyTests {
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
+  @Inject
   private Context context;
 
   @Mock
@@ -32,11 +33,10 @@ public class UserPrivacySharedPreferencesSafetyTests {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    context = InstrumentationRegistry.getContext().getApplicationContext();
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
     when(buildConfigWrapper.isDebug()).thenReturn(false);
     doReturn(buildConfigWrapper).when(dependencyProvider).provideBuildConfigWrapper();
-    userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil(context);
+    userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil();
   }
 
   @After

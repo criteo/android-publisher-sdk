@@ -2,7 +2,6 @@ package com.criteo.publisher.degraded;
 
 import static junit.framework.Assert.assertFalse;
 
-import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import org.junit.Before;
@@ -21,8 +20,7 @@ public class DeviceUtilDegradedTest {
 
   @Test
   public void isVersionSupported_GivenDegradedFunctionality_ReturnsFalse() throws Exception {
-    DeviceUtil deviceUtil = mockedDependenciesRule.getDependencyProvider()
-        .provideDeviceUtil(InstrumentationRegistry.getContext());
+    DeviceUtil deviceUtil = mockedDependenciesRule.getDependencyProvider().provideDeviceUtil();
     boolean versionSupported = deviceUtil.isVersionSupported();
     assertFalse(versionSupported);
   }

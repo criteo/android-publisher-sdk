@@ -16,11 +16,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.os.Looper;
-import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Util.AdUnitType;
-import com.criteo.publisher.concurrent.ThreadingUtil;
-import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Slot;
@@ -61,7 +59,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   public void setup() throws CriteoInitException {
     MockitoAnnotations.initMocks(this);
 
-    Config config = new Config(InstrumentationRegistry.getContext());
+    Config config = mockedDependenciesRule.getDependencyProvider().provideConfig();
     webViewData = new WebViewData(config);
     webViewData.setContent("html content");
 

@@ -25,9 +25,7 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Util.AdUnitType;
 import com.criteo.publisher.Util.BuildConfigWrapper;
 import com.criteo.publisher.Util.DeviceUtil;
@@ -115,8 +113,7 @@ public class BidManagerFunctionalTest {
 
     dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
-    Context context = InstrumentationRegistry.getContext();
-    deviceUtil = dependencyProvider.provideDeviceUtil(context);
+    deviceUtil = dependencyProvider.provideDeviceUtil();
 
     // Should be set to at least 1 because user-level silent mode is set the 0 included
     givenMockedClockSetTo(1);
@@ -321,7 +318,7 @@ public class BidManagerFunctionalTest {
       Consumer<AdUnit> callingCdb) throws Exception {
     DeviceInfo deviceInfo = mock(DeviceInfo.class);
     when(deviceInfo.getUserAgent()).thenReturn(completedFuture("expectedUserAgent"));
-    doReturn(deviceInfo).when(dependencyProvider).provideDeviceInfo(any());
+    doReturn(deviceInfo).when(dependencyProvider).provideDeviceInfo();
 
     GdprData expectedGdpr = mock(GdprData.class);
     UserPrivacyUtil userPrivacyUtil = mock(UserPrivacyUtil.class);
@@ -329,7 +326,7 @@ public class BidManagerFunctionalTest {
     when(userPrivacyUtil.getUsPrivacyOptout()).thenReturn("");
     when(userPrivacyUtil.getIabUsPrivacyString()).thenReturn("");
     when(userPrivacyUtil.getMopubConsent()).thenReturn("");
-    doReturn(userPrivacyUtil).when(dependencyProvider).provideUserPrivacyUtil(any());
+    doReturn(userPrivacyUtil).when(dependencyProvider).provideUserPrivacyUtil();
 
     when(buildConfigWrapper.getSdkVersion()).thenReturn("1.2.3");
     when(buildConfigWrapper.getProfileId()).thenReturn(235);
@@ -893,7 +890,7 @@ public class BidManagerFunctionalTest {
   private Config givenKillSwitchIs(boolean isEnabled) {
     Config config = mock(Config.class);
     when(config.isKillSwitchEnabled()).thenReturn(isEnabled);
-    doReturn(config).when(dependencyProvider).provideConfig(any());
+    doReturn(config).when(dependencyProvider).provideConfig();
     return config;
   }
 
@@ -941,7 +938,7 @@ public class BidManagerFunctionalTest {
 
   private AdUnitMapper givenMockedAdUnitMapper() {
     AdUnitMapper mapper = mock(AdUnitMapper.class);
-    when(dependencyProvider.provideAdUnitMapper(any())).thenReturn(mapper);
+    when(dependencyProvider.provideAdUnitMapper()).thenReturn(mapper);
     return mapper;
   }
 
@@ -984,16 +981,14 @@ public class BidManagerFunctionalTest {
   }
 
   private BidManager createBidManager() {
-    Context context = InstrumentationRegistry.getContext();
-
     return new BidManager(
         cache,
-        dependencyProvider.provideConfig(context),
+        dependencyProvider.provideConfig(),
         dependencyProvider.provideClock(),
-        dependencyProvider.provideAdUnitMapper(context),
-        dependencyProvider.provideBidRequestSender(context, "myCpId"),
+        dependencyProvider.provideAdUnitMapper(),
+        dependencyProvider.provideBidRequestSender(),
         dependencyProvider.provideBidLifecycleListener(),
-        dependencyProvider.provideMetricSendingQueueConsumer(context)
+        dependencyProvider.provideMetricSendingQueueConsumer()
     );
   }
 

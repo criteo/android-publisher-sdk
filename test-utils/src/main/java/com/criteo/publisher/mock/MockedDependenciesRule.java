@@ -1,12 +1,17 @@
 package com.criteo.publisher.mock;
 
+import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
+import android.app.Application;
 import android.os.Build.VERSION_CODES;
 import android.support.annotation.RequiresApi;
+import android.support.test.InstrumentationRegistry;
+import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.MockableDependencyProvider;
 import com.criteo.publisher.concurrent.TrackingCommandsExecutor;
@@ -69,12 +74,27 @@ public class MockedDependenciesRule implements MethodRule {
 
   private void setUpDependencyProvider() {
     DependencyProvider originalDependencyProvider = DependencyProvider.getInstance();
+
+    Application application = getApplication();
+    originalDependencyProvider.setApplication(application);
+    originalDependencyProvider.setCriteoPublisherId(CriteoUtil.TEST_CP_ID);
+
     Executor oldExecutor = originalDependencyProvider.provideThreadPoolExecutor();
     trackingCommandsExecutor = new TrackingCommandsExecutor(oldExecutor);
     dependencyProvider = spy(originalDependencyProvider);
     MockableDependencyProvider.setInstance(dependencyProvider);
     doReturn(trackingCommandsExecutor).when(dependencyProvider).provideThreadPoolExecutor();
     doReturn(trackingCommandsExecutor).when(dependencyProvider).provideSerialExecutor();
+  }
+
+  private Application getApplication() {
+    try {
+      return (Application) InstrumentationRegistry.getTargetContext()
+          .getApplicationContext();
+    } catch (IllegalStateException e) {
+      // This means that we are not running inside an emulator. So we use a mock instead.
+      return mock(Application.class, RETURNS_DEEP_STUBS);
+    }
   }
 
   @RequiresApi(api = VERSION_CODES.O)

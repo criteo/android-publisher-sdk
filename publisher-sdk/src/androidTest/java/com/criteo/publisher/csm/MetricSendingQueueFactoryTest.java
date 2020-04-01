@@ -8,8 +8,6 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.Util.BuildConfigWrapper;
 import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
@@ -18,6 +16,7 @@ import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -28,30 +27,31 @@ public class MetricSendingQueueFactoryTest {
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
+  @Inject
   private Context context;
 
   private File queueFile;
 
+  @Inject
+  private MetricParser metricParser;
+
+  @MockBean
   private BuildConfigWrapper buildConfigWrapper;
 
   private MetricSendingQueueFactory factory;
 
   @Before
   public void setUp() throws Exception {
-    context = InstrumentationRegistry.getContext().getApplicationContext();
-
     buildConfigWrapper = spy(mockedDependenciesRule.getDependencyProvider().provideBuildConfigWrapper());
     doReturn(buildConfigWrapper).when(mockedDependenciesRule.getDependencyProvider()).provideBuildConfigWrapper();
     when(buildConfigWrapper.getCsmQueueFilename()).thenReturn("queueFile");
 
     queueFile = new File(context.getFilesDir(), "queueFile");
 
-    DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-
     factory = new MetricSendingQueueFactory(
         context,
-        dependencyProvider.provideMetricParser(),
-        dependencyProvider.provideBuildConfigWrapper()
+        metricParser,
+        buildConfigWrapper
     );
   }
 

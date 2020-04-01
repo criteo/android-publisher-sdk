@@ -10,16 +10,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.CriteoBannerView;
-import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.DependencyProvider;
-import com.criteo.publisher.concurrent.ThreadingUtil;
 import com.criteo.publisher.Util.AdvertisingInfo;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbRequest;
+import javax.inject.Inject;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
@@ -47,6 +45,7 @@ public class DeviceIdTest {
   @Mock
   private PubSdkApi pubSdkApi;
 
+  @Inject
   private Context context;
 
   @Before
@@ -55,7 +54,6 @@ public class DeviceIdTest {
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
     when(dependencyProvider.providePubSdkApi()).thenReturn(pubSdkApi);
     when(dependencyProvider.provideAdvertisingInfo()).thenReturn(advertisingInfo);
-    context = InstrumentationRegistry.getContext();
   }
 
   @Test

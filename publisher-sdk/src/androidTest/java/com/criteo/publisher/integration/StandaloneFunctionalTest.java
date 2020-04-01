@@ -9,7 +9,6 @@ import static com.criteo.publisher.view.WebViewLookup.getRootView;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -36,13 +35,13 @@ import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.Util.AndroidUtil;
 import com.criteo.publisher.mock.MockedDependenciesRule;
-import com.criteo.publisher.view.WebViewLookup;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
+import com.criteo.publisher.view.WebViewLookup;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -96,7 +95,7 @@ public class StandaloneFunctionalTest {
 
     api = spy(dependencyProvider.providePubSdkApi());
     when(dependencyProvider.providePubSdkApi()).thenReturn(api);
-    when(dependencyProvider.provideAndroidUtil(any())).thenReturn(androidUtil);
+    when(dependencyProvider.provideAndroidUtil()).thenReturn(androidUtil);
 
     webViewLookup = new WebViewLookup();
   }

@@ -85,14 +85,15 @@ public abstract class Criteo {
       if (criteo == null) {
         try {
           DependencyProvider dependencyProvider = DependencyProvider.getInstance();
-          DeviceUtil deviceUtil = dependencyProvider
-              .provideDeviceUtil(application.getApplicationContext());
+          dependencyProvider.setApplication(application);
+          dependencyProvider.setCriteoPublisherId(criteoPublisherId);
+
+          DeviceUtil deviceUtil = dependencyProvider.provideDeviceUtil();
 
           if (deviceUtil.isVersionSupported()) {
             criteo = new CriteoInternal(
                 application,
                 adUnits,
-                criteoPublisherId,
                 usPrivacyOptOut,
                 mopubConsent,
                 dependencyProvider

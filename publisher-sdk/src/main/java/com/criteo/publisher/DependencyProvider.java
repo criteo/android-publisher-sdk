@@ -1,5 +1,6 @@
 package com.criteo.publisher;
 
+import android.app.Application;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -13,6 +14,7 @@ import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.JsonSerializer;
 import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.RunOnUiThreadExecutor;
+import com.criteo.publisher.Util.TextUtils;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.bid.LoggingBidLifecycleListener;
 import com.criteo.publisher.bid.UniqueIdGenerator;
@@ -48,6 +50,9 @@ public class DependencyProvider {
 
   private final Map<Class, Object> services = new HashMap<>();
 
+  private Application application;
+  private String criteoPublisherId;
+
   private DependencyProvider() {
   }
 
@@ -65,6 +70,45 @@ public class DependencyProvider {
    */
   static synchronized void setInstance(@Nullable DependencyProvider dependencyProvider) {
     instance = dependencyProvider;
+  }
+
+  public void setApplication(@NonNull Application application) {
+    this.application = application;
+    checkApplicationIsSet();
+  }
+
+  public void setCriteoPublisherId(@NonNull String criteoPublisherId) {
+    this.criteoPublisherId = criteoPublisherId;
+    checkCriteoPublisherIdIsSet();
+  }
+
+  private void checkApplicationIsSet() {
+    if (application == null) {
+      throw new IllegalArgumentException("Application reference is required.");
+    }
+  }
+
+  private void checkCriteoPublisherIdIsSet() {
+    if (TextUtils.isEmpty(criteoPublisherId)) {
+      throw new IllegalArgumentException("Criteo Publisher Id is required.");
+    }
+  }
+
+  @NonNull
+  public Application provideApplication() {
+    checkApplicationIsSet();
+    return application;
+  }
+
+  @NonNull
+  public Context provideContext() {
+    return provideApplication().getApplicationContext();
+  }
+
+  @NonNull
+  public String provideCriteoPublisherId() {
+    checkCriteoPublisherIdIsSet();
+    return criteoPublisherId;
   }
 
   @NonNull
@@ -93,23 +137,26 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public AndroidUtil provideAndroidUtil(@NonNull Context context) {
+  public AndroidUtil provideAndroidUtil() {
     return getOrCreate(AndroidUtil.class, new Factory<AndroidUtil>() {
       @NonNull
       @Override
       public AndroidUtil create() {
-        return new AndroidUtil(context);
+        return new AndroidUtil(provideContext());
       }
     });
   }
 
   @NonNull
-  public DeviceUtil provideDeviceUtil(@NonNull Context context) {
+  public DeviceUtil provideDeviceUtil() {
     return getOrCreate(DeviceUtil.class, new Factory<DeviceUtil>() {
       @NonNull
       @Override
       public DeviceUtil create() {
-        return new DeviceUtil(context, DependencyProvider.this.provideAdvertisingInfo());
+        return new DeviceUtil(
+            provideContext(),
+            provideAdvertisingInfo()
+        );
       }
     });
   }
@@ -147,12 +194,12 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public Config provideConfig(Context context) {
+  public Config provideConfig() {
     return getOrCreate(Config.class, new Factory<Config>() {
       @NonNull
       @Override
       public Config create() {
-        return new Config(context);
+        return new Config(provideContext());
       }
     });
   }
@@ -169,88 +216,86 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public UserPrivacyUtil provideUserPrivacyUtil(@NonNull Context context) {
+  public UserPrivacyUtil provideUserPrivacyUtil() {
     return getOrCreate(UserPrivacyUtil.class, new Factory<UserPrivacyUtil>() {
       @NonNull
       @Override
       public UserPrivacyUtil create() {
-        return new UserPrivacyUtil(context);
+        return new UserPrivacyUtil(provideContext());
       }
     });
   }
 
   @NonNull
-  public BidManager provideBidManager(
-      @NonNull Context context,
-      @NonNull String criteoPublisherId) {
+  public BidManager provideBidManager() {
     return getOrCreate(BidManager.class, new Factory<BidManager>() {
       @NonNull
       @Override
       public BidManager create() {
         return new BidManager(
-            new SdkCache(DependencyProvider.this.provideDeviceUtil(context)),
-            DependencyProvider.this.provideConfig(context),
-            DependencyProvider.this.provideClock(),
-            DependencyProvider.this.provideAdUnitMapper(context),
-            DependencyProvider.this.provideBidRequestSender(context, criteoPublisherId),
-            DependencyProvider.this.provideBidLifecycleListener(),
-            DependencyProvider.this.provideMetricSendingQueueConsumer(context)
+            new SdkCache(provideDeviceUtil()),
+            provideConfig(),
+            provideClock(),
+            provideAdUnitMapper(),
+            provideBidRequestSender(),
+            provideBidLifecycleListener(),
+            provideMetricSendingQueueConsumer()
         );
       }
     });
   }
 
   @NonNull
-  public DeviceInfo provideDeviceInfo(Context context) {
+  public DeviceInfo provideDeviceInfo() {
     return getOrCreate(DeviceInfo.class, new Factory<DeviceInfo>() {
       @NonNull
       @Override
       public DeviceInfo create() {
         return new DeviceInfo(
-            context,
-            DependencyProvider.this.provideRunOnUiThreadExecutor());
+            provideContext(),
+            provideRunOnUiThreadExecutor());
       }
     });
   }
 
   @NonNull
-  public AdUnitMapper provideAdUnitMapper(Context context) {
+  public AdUnitMapper provideAdUnitMapper() {
     return getOrCreate(AdUnitMapper.class, new Factory<AdUnitMapper>() {
       @NonNull
       @Override
       public AdUnitMapper create() {
         return new AdUnitMapper(
-            DependencyProvider.this.provideAndroidUtil(context),
-            DependencyProvider.this.provideDeviceUtil(context));
+            DependencyProvider.this.provideAndroidUtil(),
+            DependencyProvider.this.provideDeviceUtil());
       }
     });
   }
 
   @NonNull
-  public AppEvents provideAppEvents(@NonNull Context context) {
+  public AppEvents provideAppEvents() {
     return getOrCreate(AppEvents.class, new Factory<AppEvents>() {
       @NonNull
       @Override
       public AppEvents create() {
         return new AppEvents(
-            context,
-            DependencyProvider.this.provideDeviceUtil(context),
-            DependencyProvider.this.provideClock(),
-            DependencyProvider.this.providePubSdkApi(),
-            DependencyProvider.this.provideUserPrivacyUtil(context),
-            DependencyProvider.this.provideDeviceInfo(context)
+            provideContext(),
+            provideDeviceUtil(),
+            provideClock(),
+            providePubSdkApi(),
+            provideUserPrivacyUtil(),
+            provideDeviceInfo()
         );
       }
     });
   }
 
   @NonNull
-  public Publisher providePublisher(@NonNull Context context, @NonNull String criteoPublisherId) {
+  public Publisher providePublisher() {
     return getOrCreate(Publisher.class, new Factory<Publisher>() {
       @NonNull
       @Override
       public Publisher create() {
-        return new Publisher(context, criteoPublisherId);
+        return new Publisher(provideContext(), provideCriteoPublisherId());
       }
     });
   }
@@ -267,16 +312,16 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public CdbRequestFactory provideCdbRequestFactory(@NonNull Context context, @NonNull String criteoPublisherId) {
+  public CdbRequestFactory provideCdbRequestFactory() {
     return getOrCreate(CdbRequestFactory.class, new Factory<CdbRequestFactory>() {
       @NonNull
       @Override
       public CdbRequestFactory create() {
         return new CdbRequestFactory(
-            providePublisher(context, criteoPublisherId),
-            provideDeviceInfo(context),
-            provideDeviceUtil(context),
-            provideUserPrivacyUtil(context),
+            providePublisher(),
+            provideDeviceInfo(),
+            provideDeviceUtil(),
+            provideUserPrivacyUtil(),
             new UniqueIdGenerator(provideClock()),
             provideBuildConfigWrapper()
         );
@@ -285,13 +330,13 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public RemoteConfigRequestFactory provideRemoteConfigRequestFactory(@NonNull Context context, @NonNull String criteoPublisherId) {
+  public RemoteConfigRequestFactory provideRemoteConfigRequestFactory() {
     return getOrCreate(RemoteConfigRequestFactory.class, new Factory<RemoteConfigRequestFactory>() {
       @NonNull
       @Override
       public RemoteConfigRequestFactory create() {
         return new RemoteConfigRequestFactory(
-            providePublisher(context, criteoPublisherId),
+            providePublisher(),
             provideBuildConfigWrapper()
         );
       }
@@ -299,14 +344,14 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public BidRequestSender provideBidRequestSender(@NonNull Context context, @NonNull String criteoPublisherId) {
+  public BidRequestSender provideBidRequestSender() {
     return getOrCreate(BidRequestSender.class, new Factory<BidRequestSender>() {
       @NonNull
       @Override
       public BidRequestSender create() {
         return new BidRequestSender(
-            provideCdbRequestFactory(context, criteoPublisherId),
-            provideRemoteConfigRequestFactory(context, criteoPublisherId),
+            provideCdbRequestFactory(),
+            provideRemoteConfigRequestFactory(),
             providePubSdkApi(),
             provideThreadPoolExecutor()
         );
@@ -341,39 +386,39 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public InHouse provideInHouse(@NonNull Context context, @NonNull String criteoPublisherId) {
+  public InHouse provideInHouse() {
     return getOrCreate(InHouse.class, new Factory<InHouse>() {
       @NonNull
       @Override
       public InHouse create() {
         return new InHouse(
-            DependencyProvider.this.provideBidManager(context, criteoPublisherId),
+            DependencyProvider.this.provideBidManager(),
             new TokenCache(),
             DependencyProvider.this.provideClock(),
-            DependencyProvider.this.provideInterstitialActivityHelper(context));
+            DependencyProvider.this.provideInterstitialActivityHelper());
       }
     });
   }
 
   @NonNull
-  public InterstitialActivityHelper provideInterstitialActivityHelper(@NonNull Context context) {
+  public InterstitialActivityHelper provideInterstitialActivityHelper() {
     return getOrCreate(InterstitialActivityHelper.class, new Factory<InterstitialActivityHelper>() {
       @NonNull
       @Override
       public InterstitialActivityHelper create() {
-        return new InterstitialActivityHelper(context);
+        return new InterstitialActivityHelper(provideContext());
       }
     });
   }
 
   @NonNull
-  public MetricSendingQueueConsumer provideMetricSendingQueueConsumer(@NonNull Context context) {
+  public MetricSendingQueueConsumer provideMetricSendingQueueConsumer() {
     return getOrCreate(MetricSendingQueueConsumer.class, new Factory<MetricSendingQueueConsumer>() {
       @NonNull
       @Override
       public MetricSendingQueueConsumer create() {
         return new MetricSendingQueueConsumer(
-            provideMetricSendingQueue(context),
+            provideMetricSendingQueue(),
             providePubSdkApi(),
             provideBuildConfigWrapper(),
             provideThreadPoolExecutor()
@@ -383,18 +428,18 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public MetricSendingQueue provideMetricSendingQueue(@NonNull Context context) {
+  public MetricSendingQueue provideMetricSendingQueue() {
     return getOrCreate(MetricSendingQueue.class, new MetricSendingQueueFactory(
-        context,
+        provideContext(),
         provideMetricParser(),
         provideBuildConfigWrapper()
     ));
   }
 
   @NonNull
-  public MetricRepository provideMetricRepository(@NonNull Context context) {
+  public MetricRepository provideMetricRepository() {
     return getOrCreate(MetricRepository.class, new MetricRepositoryFactory(
-        context,
+        provideContext(),
         provideMetricParser(),
         provideBuildConfigWrapper()
     ));
