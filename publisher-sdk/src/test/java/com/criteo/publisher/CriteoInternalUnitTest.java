@@ -20,9 +20,11 @@ import static org.mockito.Mockito.when;
 import android.app.Application;
 import android.content.Context;
 import com.criteo.publisher.Util.AppLifecycleUtil;
+import com.criteo.publisher.Util.BuildConfigWrapper;
 import com.criteo.publisher.Util.DeviceUtil;
 import com.criteo.publisher.Util.DirectMockRunOnUiThreadExecutor;
 import com.criteo.publisher.bid.BidLifecycleListener;
+import com.criteo.publisher.csm.MetricSendingQueue;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
@@ -138,6 +140,7 @@ public class CriteoInternalUnitTest {
     doReturn(mock(DeviceUtil.class)).when(dependencyProvider).provideDeviceUtil(any());
     doReturn(mock(UserPrivacyUtil.class)).when(dependencyProvider).provideUserPrivacyUtil(any());
     doReturn(mock(Config.class)).when(dependencyProvider).provideConfig(any());
+    doReturn(mock(MetricSendingQueue.class)).when(dependencyProvider).provideMetricSendingQueue(any());
     doReturn(new DirectMockRunOnUiThreadExecutor()).when(dependencyProvider)
         .provideRunOnUiThreadExecutor();
     doReturn((Executor) Runnable::run).when(dependencyProvider).provideThreadPoolExecutor();

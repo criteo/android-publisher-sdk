@@ -10,6 +10,7 @@ androidLibModule() {
     addBuildConfigField<String>("eventUrl")
     addBuildConfigField<String>("pubSdkSharedPreferences")
     addBuildConfigField<String>("csmDirectory")
+    addBuildConfigField<String>("csmQueueFilename")
     addBuildConfigField<Boolean>("debugLogging")
     addBuildConfigField<Int>("profileId")
     addBuildConfigField<Int>("csmBatchSize")

@@ -182,7 +182,7 @@ public class DependencyProvider {
             DependencyProvider.this.provideAdUnitMapper(context),
             DependencyProvider.this.provideBidRequestSender(context, criteoPublisherId),
             DependencyProvider.this.provideBidLifecycleListener(),
-            DependencyProvider.this.provideMetricSendingQueueConsumer()
+            DependencyProvider.this.provideMetricSendingQueueConsumer(context)
         );
       }
     });
@@ -344,12 +344,12 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public MetricSendingQueueConsumer provideMetricSendingQueueConsumer() {
+  public MetricSendingQueueConsumer provideMetricSendingQueueConsumer(@NonNull Context context) {
     return getOrCreate(MetricSendingQueueConsumer.class, new Factory<MetricSendingQueueConsumer>() {
       @Override
       public MetricSendingQueueConsumer create() {
         return new MetricSendingQueueConsumer(
-            provideMetricSendingQueue(),
+            provideMetricSendingQueue(context),
             providePubSdkApi(),
             provideBuildConfigWrapper(),
             provideThreadPoolExecutor()
@@ -359,8 +359,12 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public MetricSendingQueue provideMetricSendingQueue() {
-    return getOrCreate(MetricSendingQueue.class, new MetricSendingQueueFactory());
+  public MetricSendingQueue provideMetricSendingQueue(@NonNull Context context) {
+    return getOrCreate(MetricSendingQueue.class, new MetricSendingQueueFactory(
+        context,
+        provideMetricParser(),
+        provideBuildConfigWrapper()
+    ));
   }
 
   @NonNull

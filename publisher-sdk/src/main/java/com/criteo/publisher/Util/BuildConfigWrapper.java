@@ -57,4 +57,12 @@ public class BuildConfigWrapper {
   public int getMaxSizeOfCsmMetricSendingQueue() {
     return BuildConfig.maxSizeOfCsmMetricSendingQueue;
   }
+
+  /**
+   * The relative path in application folder of the sending queue file
+   */
+  @NonNull
+  public String getCsmQueueFilename() {
+    return BuildConfig.csmQueueFilename;
+  }
 }

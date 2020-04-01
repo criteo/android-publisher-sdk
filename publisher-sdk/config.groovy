@@ -9,6 +9,9 @@ profileId = 235
 // The relative path in application folder of the folder used to store metric files
 csmDirectory = 'criteo_metrics'
 
+// The relative path in application folder of the sending queue file
+csmQueueFilename = 'criteo_metrics_queue'
+
 // FIXME EE-991 Document how to determine this value + determine it
 // The batch size of metric files sent, at most, in each CSM requests.
 csmBatchSize = 5

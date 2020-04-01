@@ -2,7 +2,6 @@ package com.criteo.publisher.csm;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
 import com.criteo.publisher.Util.PreconditionsUtil;
 import com.squareup.tape.FileException;
 import com.squareup.tape.FileObjectQueue;
@@ -28,7 +27,6 @@ class TapeMetricSendingQueue extends MetricSendingQueue {
   @Nullable
   private QueueFile queueFile;
 
-  @VisibleForTesting
   TapeMetricSendingQueue(@NonNull ObjectQueue<Metric> queue) {
     this.queue = queue;
     this.usedBytesMethod = null;
@@ -36,7 +34,6 @@ class TapeMetricSendingQueue extends MetricSendingQueue {
   }
 
   @NonNull
-  @VisibleForTesting
   static ObjectQueue<Metric> createFileObjectQueue(
       @NonNull File file,
       @NonNull MetricParser parser

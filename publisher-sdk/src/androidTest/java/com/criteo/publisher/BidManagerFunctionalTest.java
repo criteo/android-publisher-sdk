@@ -993,7 +993,7 @@ public class BidManagerFunctionalTest {
         dependencyProvider.provideAdUnitMapper(context),
         dependencyProvider.provideBidRequestSender(context, "myCpId"),
         dependencyProvider.provideBidLifecycleListener(),
-        dependencyProvider.provideMetricSendingQueueConsumer()
+        dependencyProvider.provideMetricSendingQueueConsumer(context)
     );
   }
 
