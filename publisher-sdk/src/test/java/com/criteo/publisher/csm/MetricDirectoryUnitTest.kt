@@ -50,19 +50,4 @@ class MetricDirectoryUnitTest {
     assertThat(files).isEmpty()
   }
 
-  @Test
-  fun listFiles_GivenDirectoryThrowingSecurityException_ReturnEmpty() {
-    directory = spy(directory) {
-      on { directoryFile } doReturn mock()
-    }
-
-    directory.directoryFile.stub {
-      on { listFiles(any<FilenameFilter>()) } doThrow SecurityException::class
-    }
-
-    val files = directory.listFiles()
-
-    assertThat(files).isEmpty()
-  }
-
 }

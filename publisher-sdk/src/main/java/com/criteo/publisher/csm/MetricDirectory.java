@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.AtomicFile;
 import com.criteo.publisher.BuildConfig;
-import com.criteo.publisher.Util.PreconditionsUtil;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Arrays;
@@ -31,19 +30,12 @@ class MetricDirectory {
   }
 
   Collection<File> listFiles() {
-    File[] files;
-
-    try {
-      files = getDirectoryFile().listFiles(new FilenameFilter() {
-        @Override
-        public boolean accept(File dir, String name) {
-          return name.endsWith(METRIC_FILE_EXTENSION);
-        }
-      });
-    } catch (SecurityException e) {
-      PreconditionsUtil.throwOrLog(e);
-      return Collections.emptyList();
-    }
+    File[] files = getDirectoryFile().listFiles(new FilenameFilter() {
+      @Override
+      public boolean accept(File dir, String name) {
+        return name.endsWith(METRIC_FILE_EXTENSION);
+      }
+    });
 
     if (files == null) {
       return Collections.emptyList();
