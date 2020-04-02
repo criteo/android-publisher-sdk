@@ -3,11 +3,14 @@ package com.criteo.publisher.csm;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import com.criteo.publisher.Clock;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.TestAdUnits;
@@ -39,6 +42,9 @@ public class CsmFunctionalTest {
 
   @SpyBean
   private PubSdkApi api;
+
+  @SpyBean
+  private Clock clock;
 
   @After
   public void tearDown() throws Exception {
@@ -83,6 +89,27 @@ public class CsmFunctionalTest {
     }));
   }
 
+  @Test
+  public void givenConsumedExpiredBid_CallApiWithCsmOfConsumedExpiredBid() throws Exception {
+    when(clock.getCurrentTimeInMillis()).thenReturn(0L);
+    CriteoUtil.givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+    waitForIdleState();
+
+    when(clock.getCurrentTimeInMillis()).thenReturn(Long.MAX_VALUE);
+    Criteo.getInstance().getBidResponse(TestAdUnits.INTERSTITIAL);
+    waitForIdleState();
+
+    verify(api).postCsm(argThat(request -> {
+      assertRequestHeaderIsExpected(request);
+
+      assertEquals(1, request.getFeedbacks().size());
+      MetricRequestFeedback feedback = request.getFeedbacks().get(0);
+      assertItRepresentsExpiredConsumedBid(feedback);
+
+      return true;
+    }));
+  }
+
   private void assertRequestHeaderIsExpected(MetricRequest request) {
     assertEquals(buildConfigWrapper.getProfileId(), request.getProfileId());
     assertEquals(buildConfigWrapper.getSdkVersion(), request.getWrapperVersion());
@@ -92,6 +119,14 @@ public class CsmFunctionalTest {
     assertEquals(0, feedback.getCdbCallStartElapsed());
     assertNotNull(feedback.getCdbCallEndElapsed());
     assertNotNull(feedback.getElapsed());
+    assertEquals(1, feedback.getSlots().size());
+    assertTrue(feedback.getSlots().get(0).getCachedBidUsed());
+  }
+
+  private void assertItRepresentsExpiredConsumedBid(MetricRequestFeedback feedback) {
+    assertEquals(0, feedback.getCdbCallStartElapsed());
+    assertNotNull(feedback.getCdbCallEndElapsed());
+    assertNull(feedback.getElapsed());
     assertEquals(1, feedback.getSlots().size());
     assertTrue(feedback.getSlots().get(0).getCachedBidUsed());
   }
