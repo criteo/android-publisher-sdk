@@ -73,4 +73,11 @@ public class BuildConfigWrapper {
   public String getCsmDirectoryName() {
     return BuildConfig.csmDirectoryName;
   }
+
+  /**
+   * Duration in milliseconds for the network layer to drop a call and consider it timeouted.
+   */
+  public int getNetworkTimeoutInMillis() {
+    return BuildConfig.networkTimeoutInMillis;
+  }
 }

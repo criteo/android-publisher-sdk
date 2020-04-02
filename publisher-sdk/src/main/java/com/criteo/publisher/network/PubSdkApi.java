@@ -29,8 +29,8 @@ import org.json.JSONObject;
 
 public class PubSdkApi {
 
-  private static final int TIMEOUT_IN_MILLIS = 60 * 1000;
   private static final String TAG = PubSdkApi.class.getSimpleName();
+
   private static final String CRITEO_PUBLISHER_ID = "cpId";
   private static final String APP_ID = "appId";
   private static final String SDK_VERSION = "sdkVersion";
@@ -174,7 +174,7 @@ public class PubSdkApi {
   }
 
   @NonNull
-  private static JSONObject executePost(
+  private JSONObject executePost(
       @NonNull URL url,
       @NonNull JSONObject requestJson,
       @NonNull String userAgent)
@@ -194,12 +194,12 @@ public class PubSdkApi {
   }
 
   @NonNull
-  private static HttpURLConnection prepareConnection(@NonNull URL url,
+  private HttpURLConnection prepareConnection(@NonNull URL url,
       @Nullable String userAgent, String method) throws IOException {
     HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
     urlConnection.setRequestMethod(method);
-    urlConnection.setReadTimeout(TIMEOUT_IN_MILLIS);
-    urlConnection.setConnectTimeout(TIMEOUT_IN_MILLIS);
+    urlConnection.setReadTimeout(buildConfigWrapper.getNetworkTimeoutInMillis());
+    urlConnection.setConnectTimeout(buildConfigWrapper.getNetworkTimeoutInMillis());
     urlConnection.setRequestProperty("Content-Type", "text/plain");
     if (!TextUtils.isEmpty(userAgent)) {
       urlConnection.setRequestProperty("User-Agent", userAgent);

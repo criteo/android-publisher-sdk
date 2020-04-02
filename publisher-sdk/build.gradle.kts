@@ -5,17 +5,23 @@ plugins {
 }
 
 androidLibModule() {
+    // Network
     addBuildConfigField<String>("cdbUrl")
     addBuildConfigField<String>("remoteConfigUrl")
     addBuildConfigField<String>("eventUrl")
-    addBuildConfigField<String>("pubSdkSharedPreferences")
-    addBuildConfigField<String>("csmDirectoryName")
+    addBuildConfigField<Int>("networkTimeoutInMillis")
+
+    // Client side metrics
     addBuildConfigField<String>("csmQueueFilename")
-    addBuildConfigField<Boolean>("debugLogging")
-    addBuildConfigField<Int>("profileId")
+    addBuildConfigField<String>("csmDirectoryName")
     addBuildConfigField<Int>("csmBatchSize")
     addBuildConfigField<Int>("maxSizeOfCsmMetricsFolder")
     addBuildConfigField<Int>("maxSizeOfCsmMetricSendingQueue")
+
+    // Misc
+    addBuildConfigField<Int>("profileId")
+    addBuildConfigField<String>("pubSdkSharedPreferences")
+    addBuildConfigField<Boolean>("debugLogging")
 }
 
 addAzureRepository()

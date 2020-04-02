@@ -3,6 +3,14 @@ debugLogging = false
 profileId = 235
 
 /**
+ * Network configuration
+ */
+
+// FIXME EE-874 Review timeout duration
+// Duration in milliseconds for the network layer to drop a call and consider it timeouted.
+networkTimeoutInMillis = 60 * 1000
+
+/**
  * Client-Side Metrics configuration
  */
 

@@ -18,6 +18,8 @@ import android.support.annotation.NonNull;
 import com.criteo.publisher.Util.BuildConfigWrapper;
 import com.criteo.publisher.Util.JsonSerializer;
 import com.criteo.publisher.csm.MetricRequest;
+import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.RemoteConfigRequest;
@@ -25,8 +27,10 @@ import com.criteo.publisher.privacy.gdpr.GdprData;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
@@ -40,12 +44,15 @@ import org.mockserver.model.MediaType;
 public class PubSdkApiTest {
 
   @Rule
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
+  @Rule
   public MockServerRule mockServerRule = new MockServerRule(this);
 
   @SuppressWarnings("unused")
   private MockServerClient mockServerClient;
 
-  @Mock
+  @SpyBean
   private BuildConfigWrapper buildConfigWrapper;
 
   private URL serverUrl;
@@ -97,7 +104,7 @@ public class PubSdkApiTest {
   }
 
   @Test
-  public void postCsm_GivenConnectionError_ReturnFailedFuture() throws Exception {
+  public void postCsm_GivenConnectionError_ThrowIOException() throws Exception {
     MetricRequest request = mock(MetricRequest.class);
 
     mockServerClient.when(request()).error(error().withDropConnection(true));
@@ -106,12 +113,25 @@ public class PubSdkApiTest {
   }
 
   @Test
-  public void postCsm_GivenHttpError_ReturnFailedFuture() throws Exception {
+  public void postCsm_GivenHttpError_ThrowIOException() throws Exception {
     MetricRequest request = mock(MetricRequest.class);
 
     mockServerClient.when(request()).respond(response().withStatusCode(400));
 
     assertThatCode(() -> api.postCsm(request)).isInstanceOf(IOException.class);
+  }
+
+  @Test
+  public void postCsm_GivenLongRequestError_ThrowTimeoutError() throws Exception {
+    when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenReturn(10);
+
+    MetricRequest request = mock(MetricRequest.class);
+
+    mockServerClient.when(request()).respond(response()
+        .withDelay(TimeUnit.MILLISECONDS, 100)
+        .withStatusCode(200));
+
+    assertThatCode(() -> api.postCsm(request)).isInstanceOf(SocketTimeoutException.class);
   }
 
   @Test

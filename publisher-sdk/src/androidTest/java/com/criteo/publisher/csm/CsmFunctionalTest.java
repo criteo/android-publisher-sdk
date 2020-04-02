@@ -41,7 +41,7 @@ public class CsmFunctionalTest {
   @Inject
   private MetricRepository repository;
 
-  @Inject
+  @SpyBean
   private BuildConfigWrapper buildConfigWrapper;
 
   @SpyBean
@@ -161,6 +161,36 @@ public class CsmFunctionalTest {
     }));
   }
 
+  @Test
+  public void givenTimeoutErrorFromCdb_CallApiWithCsmOfTimeoutError() throws Exception {
+    when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenReturn(1);
+
+    CriteoUtil.givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+    waitForIdleState();
+
+    when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenCallRealMethod();
+
+    Criteo.getInstance().getBidResponse(TestAdUnits.INTERSTITIAL_UNKNOWN);
+    waitForIdleState();
+
+    verify(api).postCsm(argThat(request -> {
+      assertRequestHeaderIsExpected(request);
+
+      assertEquals(2, request.getFeedbacks().size());
+      MetricRequestFeedback feedback1 = request.getFeedbacks().get(0);
+      MetricRequestFeedback feedback2 = request.getFeedbacks().get(1);
+      assertItRepresentsTimeoutError(feedback1);
+      assertItRepresentsTimeoutError(feedback2);
+
+      assertNotEquals(
+          feedback1.getSlots().get(0).getImpressionId(),
+          feedback2.getSlots().get(0).getImpressionId()
+      );
+
+      return true;
+    }));
+  }
+
   private void assertRequestHeaderIsExpected(MetricRequest request) {
     assertEquals(buildConfigWrapper.getProfileId(), request.getProfileId());
     assertEquals(buildConfigWrapper.getSdkVersion(), request.getWrapperVersion());
@@ -198,6 +228,15 @@ public class CsmFunctionalTest {
     assertNull(feedback.getCdbCallEndElapsed());
     assertNull(feedback.getElapsed());
     assertFalse(feedback.isTimeout());
+    assertEquals(1, feedback.getSlots().size());
+    assertFalse(feedback.getSlots().get(0).getCachedBidUsed());
+  }
+
+  private void assertItRepresentsTimeoutError(MetricRequestFeedback feedback) {
+    assertEquals(0, feedback.getCdbCallStartElapsed());
+    assertNull(feedback.getCdbCallEndElapsed());
+    assertNull(feedback.getElapsed());
+    assertTrue(feedback.isTimeout());
     assertEquals(1, feedback.getSlots().size());
     assertFalse(feedback.getSlots().get(0).getCachedBidUsed());
   }
