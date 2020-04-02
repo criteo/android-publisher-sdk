@@ -10,6 +10,27 @@ The tests in this project are organised according to the following convention:
 - The subset of integration tests which represent one of the functional tests defined [here](https://confluence.criteois.com/display/EE/Functional+Tests)
  are post-fixed with `FunctionTests`. The rest are post-fixed with `IntegrationTests`.
 
+## Testing against a local CDB
+
+When working in debug environment, the SDK hits the preprod of CDB. To test integration with CDB,
+you can make the SDK hit a local instance of CDB instead. You need to:
+
+- Checkout the CDB project:
+
+```shell
+cd ~ && \
+mkdir -p publisher/direct-bidder && \
+cd publisher/direct-bidder && \
+gradle initWorkspace && \
+./gradlew checkout --project=publisher/direct-bidder
+```
+
+- Follow instructions in `README.md` to start the server (either in debug or not)
+- Update the `cdbUrl` in `environments.debug` closure in the `publisher-sdk/config.groovy` file
+(just use the commented line if you kept default values)
+
+Please note that from the Android device, your local computer is not `127.0.0.1` but `10.0.2.2`.
+
 # Release
 ## Release steps
 Releasing a new version of the PubSDK involves a few steps:
