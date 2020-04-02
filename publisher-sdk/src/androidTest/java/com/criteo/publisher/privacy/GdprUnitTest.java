@@ -1,4 +1,4 @@
-package com.criteo.publisher;
+package com.criteo.publisher.privacy;
 
 import android.content.Context;
 import android.content.SharedPreferences;
