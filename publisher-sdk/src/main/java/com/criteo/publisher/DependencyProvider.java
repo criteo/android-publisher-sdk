@@ -325,9 +325,20 @@ public class DependencyProvider {
             provideDeviceInfo(),
             provideDeviceUtil(),
             provideUserPrivacyUtil(),
-            new UniqueIdGenerator(provideClock()),
+            provideUniqueIdGenerator(),
             provideBuildConfigWrapper()
         );
+      }
+    });
+  }
+
+  @NonNull
+  public UniqueIdGenerator provideUniqueIdGenerator() {
+    return getOrCreate(UniqueIdGenerator.class, new Factory<UniqueIdGenerator>() {
+      @NonNull
+      @Override
+      public UniqueIdGenerator create() {
+        return new UniqueIdGenerator(provideClock());
       }
     });
   }
@@ -373,7 +384,8 @@ public class DependencyProvider {
         BidLifecycleListener csmListener = new CsmBidLifecycleListener(
             provideMetricRepository(),
             new MetricSendingQueueProducer(provideMetricSendingQueue()),
-            provideClock()
+            provideClock(),
+            provideUniqueIdGenerator()
         );
 
         return new CompositeBidLifecycleListener(loggingListener, csmListener);

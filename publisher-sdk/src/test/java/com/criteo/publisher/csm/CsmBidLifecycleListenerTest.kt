@@ -2,6 +2,7 @@ package com.criteo.publisher.csm
 
 import com.criteo.publisher.Clock
 import com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER
+import com.criteo.publisher.bid.UniqueIdGenerator
 import com.criteo.publisher.model.*
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
@@ -23,6 +24,9 @@ class CsmBidLifecycleListenerTest {
   @Mock
   private lateinit var clock: Clock
 
+  @Mock
+  private lateinit var uniqueIdGenerator: UniqueIdGenerator
+
   private lateinit var listener: CsmBidLifecycleListener
 
   @Before
@@ -32,7 +36,8 @@ class CsmBidLifecycleListenerTest {
     listener = CsmBidLifecycleListener(
         repository,
         sendingQueueProducer,
-        clock
+        clock,
+        uniqueIdGenerator
     )
   }
 
@@ -44,11 +49,15 @@ class CsmBidLifecycleListenerTest {
   }
 
   @Test
-  fun onCdbCallStarted_GivenMultipleSlots_UpdateAllStartTimeOfMetricsById() {
+  fun onCdbCallStarted_GivenMultipleSlots_UpdateAllStartTimeAndRequestIdOfMetricsById() {
     val request = givenCdbRequestWithSlots("id1", "id2")
 
     clock.stub {
       on { currentTimeInMillis } doReturn 42
+    }
+
+    uniqueIdGenerator.stub {
+      on { generateId() } doReturn "myRequestId"
     }
 
     listener.onCdbCallStarted(request)
@@ -56,6 +65,7 @@ class CsmBidLifecycleListenerTest {
 
     assertRepositoryIsUpdatedByIds("id1", "id2") {
       verify(it).setCdbCallStartTimestamp(42)
+      verify(it).setRequestGroupId("myRequestId")
     }
   }
 

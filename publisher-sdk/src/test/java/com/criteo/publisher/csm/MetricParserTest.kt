@@ -78,6 +78,7 @@ class MetricParserTest {
         .setCdbCallTimeout(true)
         .setCachedBidUsed(true)
         .setElapsedTimestamp(2L)
+        .setRequestGroupId("requestId")
         .setReadyToSend(true)
         .build()
 
@@ -90,6 +91,7 @@ class MetricParserTest {
       "cachedBidUsed": true,
       "elapsedTimestamp": 2,
       "impressionId": "impId",
+      "requestGroupId": "requestId",
       "readyToSend": true
     }""".trimIndent())
   }

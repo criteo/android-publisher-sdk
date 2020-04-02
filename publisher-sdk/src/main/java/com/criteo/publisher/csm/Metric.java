@@ -31,8 +31,25 @@ public abstract class Metric {
   @Nullable
   abstract Long getElapsedTimestamp();
 
+  /**
+   * Uniquely identifies a slot from a CDB request.
+   * <p>
+   * This ID is generated on client side so we can track the life of this slot during a CDB call.
+   * For CSM, this allows studies at slot level.
+   */
   @NonNull
   abstract String getImpressionId();
+
+  /**
+   * Uniquely identifies a CDB bid request.
+   * <p>
+   * This ID is generated on client side so we can track the life of a request even after a CDB
+   * call. All metrics coming from the same request should have the same request group ID. For CSM,
+   * this allows studies at request level (for instance to determine the timeout rate vs the number
+   * of slots in the same request).
+   */
+  @Nullable
+  abstract String getRequestGroupId();
 
   abstract boolean isReadyToSend();
 
@@ -47,6 +64,7 @@ public abstract class Metric {
     abstract Builder setCdbCallTimeout(boolean isTimeout);
     abstract Builder setCachedBidUsed(boolean isCachedBidUsed);
     abstract Builder setElapsedTimestamp(Long absoluteTimeInMillis);
+    abstract Builder setRequestGroupId(String requestGroupId);
     abstract Builder setReadyToSend(boolean isReadyToSend);
     abstract Metric build();
 

@@ -72,7 +72,8 @@ public abstract class MetricRequest {
           elapsed,
           metric.isCdbCallTimeout(),
           0L,
-          cdbCallEndElapsed
+          cdbCallEndElapsed,
+          metric.getRequestGroupId()
       );
     }
 
@@ -105,6 +106,8 @@ public abstract class MetricRequest {
     @Nullable
     abstract Long getCdbCallEndElapsed();
 
+    @Nullable
+    abstract String getRequestGroupId();
   }
 
   @AutoValue

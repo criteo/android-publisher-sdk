@@ -64,6 +64,7 @@ public class CsmFunctionalTest {
     waitForIdleState();
 
     AtomicReference<String> firstImpressionId = new AtomicReference<>();
+    AtomicReference<String> firstRequestGroupId = new AtomicReference<>();
 
     verify(api).postCsm(argThat(request -> {
       assertRequestHeaderIsExpected(request);
@@ -73,11 +74,12 @@ public class CsmFunctionalTest {
       MetricRequestFeedback feedback = request.getFeedbacks().get(0);
       assertItRepresentsConsumedBid(feedback);
       firstImpressionId.set(feedback.getSlots().get(0).getImpressionId());
+      firstRequestGroupId.set(feedback.getRequestGroupId());
 
       return true;
     }));
-    clearInvocations(api);
 
+    clearInvocations(api);
     Criteo.getInstance().getBidResponse(TestAdUnits.INTERSTITIAL);
     waitForIdleState();
 
@@ -88,6 +90,27 @@ public class CsmFunctionalTest {
       MetricRequestFeedback feedback = request.getFeedbacks().get(0);
       assertItRepresentsConsumedBid(feedback);
       assertNotEquals(firstImpressionId.get(), feedback.getSlots().get(0).getImpressionId());
+
+      // This two metrics come from the same CDB request (prefetch) and should have the same ID
+      assertEquals(firstRequestGroupId.get(), feedback.getRequestGroupId());
+
+      return true;
+    }));
+
+    clearInvocations(api);
+    Criteo.getInstance().getBidResponse(TestAdUnits.INTERSTITIAL);
+    waitForIdleState();
+
+    verify(api).postCsm(argThat(request -> {
+      assertRequestHeaderIsExpected(request);
+
+      assertEquals(1, request.getFeedbacks().size());
+      MetricRequestFeedback feedback = request.getFeedbacks().get(0);
+      assertItRepresentsConsumedBid(feedback);
+      assertNotEquals(firstImpressionId.get(), feedback.getSlots().get(0).getImpressionId());
+
+      // This metric come from another CDB request and should have another ID
+      assertNotEquals(firstRequestGroupId.get(), feedback.getRequestGroupId());
 
       return true;
     }));
@@ -157,6 +180,8 @@ public class CsmFunctionalTest {
           feedback2.getSlots().get(0).getImpressionId()
       );
 
+      assertEquals(feedback1.getRequestGroupId(), feedback2.getRequestGroupId());
+
       return true;
     }));
   }
@@ -187,6 +212,8 @@ public class CsmFunctionalTest {
           feedback2.getSlots().get(0).getImpressionId()
       );
 
+      assertEquals(feedback1.getRequestGroupId(), feedback2.getRequestGroupId());
+
       return true;
     }));
   }
@@ -201,6 +228,7 @@ public class CsmFunctionalTest {
     assertNotNull(feedback.getCdbCallEndElapsed());
     assertNotNull(feedback.getElapsed());
     assertFalse(feedback.isTimeout());
+    assertNotNull(feedback.getRequestGroupId());
     assertEquals(1, feedback.getSlots().size());
     assertTrue(feedback.getSlots().get(0).getCachedBidUsed());
   }
@@ -210,6 +238,7 @@ public class CsmFunctionalTest {
     assertNotNull(feedback.getCdbCallEndElapsed());
     assertNull(feedback.getElapsed());
     assertFalse(feedback.isTimeout());
+    assertNotNull(feedback.getRequestGroupId());
     assertEquals(1, feedback.getSlots().size());
     assertTrue(feedback.getSlots().get(0).getCachedBidUsed());
   }
@@ -219,6 +248,7 @@ public class CsmFunctionalTest {
     assertNotNull(feedback.getCdbCallEndElapsed());
     assertNull(feedback.getElapsed());
     assertFalse(feedback.isTimeout());
+    assertNotNull(feedback.getRequestGroupId());
     assertEquals(1, feedback.getSlots().size());
     assertFalse(feedback.getSlots().get(0).getCachedBidUsed());
   }
@@ -228,6 +258,7 @@ public class CsmFunctionalTest {
     assertNull(feedback.getCdbCallEndElapsed());
     assertNull(feedback.getElapsed());
     assertFalse(feedback.isTimeout());
+    assertNotNull(feedback.getRequestGroupId());
     assertEquals(1, feedback.getSlots().size());
     assertFalse(feedback.getSlots().get(0).getCachedBidUsed());
   }
@@ -237,6 +268,7 @@ public class CsmFunctionalTest {
     assertNull(feedback.getCdbCallEndElapsed());
     assertNull(feedback.getElapsed());
     assertTrue(feedback.isTimeout());
+    assertNotNull(feedback.getRequestGroupId());
     assertEquals(1, feedback.getSlots().size());
     assertFalse(feedback.getSlots().get(0).getCachedBidUsed());
   }

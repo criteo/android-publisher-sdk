@@ -35,6 +35,7 @@ class MetricRequestTest {
         .build()
 
     val metric2 = Metric.builder("id2")
+        .setRequestGroupId("requestId")
         .setCdbCallStartTimestamp(1L)
         .setCdbCallEndTimestamp(43L)
         .setCachedBidUsed(true)
@@ -51,7 +52,7 @@ class MetricRequestTest {
 
     assertThat(serializer.writeIntoString(request)).isEqualToIgnoringWhitespace(expectedMultipleJson(
         listOf(
-            feedbackJson(impressionId = "id1"),
+            feedbackJson(impressionId = "id1", requestGroupId = null),
             feedbackJson(
                 impressionId = "id2",
                 cdbCallEndElapsed = 43 - 1,
@@ -74,12 +75,13 @@ class MetricRequestTest {
     assertThat(request.wrapperVersion).isEqualTo("1.2.3")
     assertThat(request.profileId).isEqualTo(456)
 
-    assertThat(serializer.writeIntoString(request)).isEqualToIgnoringWhitespace(expectedSingleJson())
+    assertThat(serializer.writeIntoString(request)).isEqualToIgnoringWhitespace(expectedSingleJson(requestGroupId = null))
   }
 
   @Test
   fun create_GivenMetricRepresentingNetworkError_ReturnRequestFullOfNulls() {
     val metric = Metric.builder("id")
+        .setRequestGroupId("requestId")
         .setCdbCallStartTimestamp(42L)
         .build()
 
@@ -94,6 +96,7 @@ class MetricRequestTest {
       assertThat(it.isTimeout).isFalse()
       assertThat(it.cdbCallStartElapsed).isEqualTo(0L)
       assertThat(it.cdbCallEndElapsed).isNull()
+      assertThat(it.requestGroupId).isEqualTo("requestId")
     }
     assertThat(request.wrapperVersion).isEqualTo("1.2.3")
     assertThat(request.profileId).isEqualTo(456)
@@ -104,6 +107,7 @@ class MetricRequestTest {
   @Test
   fun create_GivenMetricRepresentingTimeout_ReturnRequestWithTimeoutFlag() {
     val metric = Metric.builder("id")
+        .setRequestGroupId("requestId")
         .setCdbCallStartTimestamp(42L)
         .setCdbCallTimeout(true)
         .build()
@@ -119,6 +123,7 @@ class MetricRequestTest {
       assertThat(it.isTimeout).isTrue()
       assertThat(it.cdbCallStartElapsed).isEqualTo(0L)
       assertThat(it.cdbCallEndElapsed).isNull()
+      assertThat(it.requestGroupId).isEqualTo("requestId")
     }
     assertThat(request.wrapperVersion).isEqualTo("1.2.3")
     assertThat(request.profileId).isEqualTo(456)
@@ -130,6 +135,7 @@ class MetricRequestTest {
   @Test
   fun create_GivenMetricRepresentingNoBid_ReturnRequestWithCdbCallEnd() {
     val metric = Metric.builder("id")
+        .setRequestGroupId("requestId")
         .setCdbCallStartTimestamp(42L)
         .setCdbCallEndTimestamp(1337L)
         .build()
@@ -145,6 +151,7 @@ class MetricRequestTest {
       assertThat(it.isTimeout).isFalse()
       assertThat(it.cdbCallStartElapsed).isEqualTo(0L)
       assertThat(it.cdbCallEndElapsed).isEqualTo(1337 - 42)
+      assertThat(it.requestGroupId).isEqualTo("requestId")
     }
     assertThat(request.wrapperVersion).isEqualTo("1.2.3")
     assertThat(request.profileId).isEqualTo(456)
@@ -156,6 +163,7 @@ class MetricRequestTest {
   @Test
   fun create_GivenMetricRepresentingExpiredBid_ReturnRequestWithCdbCallEndAndImpressionId() {
     val metric = Metric.builder("impId")
+        .setRequestGroupId("requestId")
         .setCdbCallStartTimestamp(1L)
         .setCdbCallEndTimestamp(43L)
         .setCachedBidUsed(true)
@@ -172,6 +180,7 @@ class MetricRequestTest {
       assertThat(it.isTimeout).isFalse()
       assertThat(it.cdbCallStartElapsed).isEqualTo(0L)
       assertThat(it.cdbCallEndElapsed).isEqualTo(43 - 1)
+      assertThat(it.requestGroupId).isEqualTo("requestId")
     }
     assertThat(request.wrapperVersion).isEqualTo("1.2.3")
     assertThat(request.profileId).isEqualTo(456)
@@ -185,6 +194,7 @@ class MetricRequestTest {
   @Test
   fun create_GivenMetricRepresentingConsumedBid_ReturnRequestNonNull() {
     val metric = Metric.builder("impId")
+        .setRequestGroupId("requestId")
         .setCdbCallStartTimestamp(1L)
         .setCdbCallEndTimestamp(43L)
         .setCachedBidUsed(true)
@@ -208,7 +218,9 @@ class MetricRequestTest {
         profileId = 654))
   }
 
-  private fun ObjectAssert<MetricRequest.MetricRequestFeedback>.matchEmptyMetric(impressionId: String) {
+  private fun ObjectAssert<MetricRequest.MetricRequestFeedback>.matchEmptyMetric(
+      impressionId: String
+  ) {
     satisfies {
       assertThat(it.slots).hasSize(1).allSatisfy {
         assertThat(it.impressionId).isEqualTo(impressionId)
@@ -218,11 +230,14 @@ class MetricRequestTest {
       assertThat(it.isTimeout).isFalse()
       assertThat(it.cdbCallStartElapsed).isEqualTo(0L)
       assertThat(it.cdbCallEndElapsed).isNull()
+      assertThat(it.cdbCallEndElapsed).isNull()
+      assertThat(it.requestGroupId).isNull()
     }
   }
 
   private fun ObjectAssert<MetricRequest.MetricRequestFeedback>.matchConsumedBidMetric(
       impressionId: String,
+      requestGroupId: String = "requestId",
       cdbCallStartTimestamp: Long = 1L,
       cdbCallEndTimestamp: Long = 43L,
       elapsedTimestamp: Long = 1338L
@@ -236,6 +251,7 @@ class MetricRequestTest {
       assertThat(it.isTimeout).isFalse()
       assertThat(it.cdbCallStartElapsed).isEqualTo(0L)
       assertThat(it.cdbCallEndElapsed).isEqualTo(cdbCallEndTimestamp - cdbCallStartTimestamp)
+      assertThat(it.requestGroupId).isEqualTo(requestGroupId)
     }
   }
 
@@ -244,6 +260,7 @@ class MetricRequestTest {
 
   private fun expectedSingleJson(
       impressionId: String = "id",
+      requestGroupId: String? = "requestId",
       cachedBidUsed: Boolean = false,
       isTimeout: Boolean = false,
       cdbCallEndElapsed: Long? = null,
@@ -253,6 +270,7 @@ class MetricRequestTest {
   ): String {
     val feedbackJson = feedbackJson(
         impressionId,
+        requestGroupId,
         cachedBidUsed,
         isTimeout,
         cdbCallEndElapsed,
@@ -279,6 +297,7 @@ class MetricRequestTest {
 
   private fun feedbackJson(
       impressionId: String = "id",
+      requestGroupId: String? = "requestId",
       cachedBidUsed: Boolean = false,
       isTimeout: Boolean = false,
       cdbCallEndElapsed: Long? = null,
@@ -293,6 +312,7 @@ class MetricRequestTest {
       "isTimeout": $isTimeout,
       "cdbCallStartElapsed": 0
       ${cdbCallEndElapsed?.let { ",\"cdbCallEndElapsed\": $it" } ?: ""}
+      ${requestGroupId?.let { ",\"requestGroupId\": \"$it\"" } ?: ""}
     }""".trimIndent()
   }
 
