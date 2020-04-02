@@ -9,8 +9,8 @@ import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import com.criteo.publisher.Util.BuildConfigWrapper;
-import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
@@ -35,15 +35,13 @@ public class MetricSendingQueueFactoryTest {
   @Inject
   private MetricParser metricParser;
 
-  @MockBean
+  @SpyBean
   private BuildConfigWrapper buildConfigWrapper;
 
   private MetricSendingQueueFactory factory;
 
   @Before
   public void setUp() throws Exception {
-    buildConfigWrapper = spy(mockedDependenciesRule.getDependencyProvider().provideBuildConfigWrapper());
-    doReturn(buildConfigWrapper).when(mockedDependenciesRule.getDependencyProvider()).provideBuildConfigWrapper();
     when(buildConfigWrapper.getCsmQueueFilename()).thenReturn("queueFile");
 
     queueFile = new File(context.getFilesDir(), "queueFile");

@@ -13,6 +13,25 @@ import javax.inject.Inject
 class DependenciesAnnotationInjectionTest {
 
   @Test
+  fun processSpy_GivenATestInstanceWithSpy_InjectSpyInDependencyProvider() {
+    val dependencyProvider = spy(DummyDependencyProvider())
+
+    val dummyTest = DummyTest()
+
+    val injection = DependenciesAnnotationInjection(dependencyProvider)
+    injection.process(dummyTest)
+
+    dummyTest.spyDependency.assertThatIsSpy()
+    dummyTest.spyDependency.transitiveSpy.assertThatIsSpy()
+
+    assertThat(dummyTest.spyDependency).isSameAs(dummyTest.injectedDependency().spy)
+    assertThat(dummyTest.spyDependency).isSameAs(dummyTest.superDependency.spy)
+    assertThat(dummyTest.spyDependency).isSameAs(dependencyProvider.provideSpyDummyDependency())
+    assertThat(dummyTest.spyDependency.transitiveSpy).isSameAs(dummyTest.transitiveSpy)
+    assertThat(dummyTest.spyDependency.transitiveSpy).isSameAs(dependencyProvider.provideTransitiveSpyDummyDependency())
+  }
+
+  @Test
   fun processMock_GivenATestInstanceWithMock_InjectMockInDependencyProvider() {
     val dependencyProvider = spy(DummyDependencyProvider())
 
@@ -32,7 +51,7 @@ class DependenciesAnnotationInjectionTest {
     val dummyDependency = mock<DummyDependency>()
     val superDummyDependency = mock<SuperDummyDependency>()
 
-    val dependencyProvider = mock<DummyDependencyProvider> {
+    val dependencyProvider = spy(DummyDependencyProvider()) {
       on { provideDummyDependency() } doReturn dummyDependency
       on { provideSuperDummyDependency() } doReturn superDummyDependency
     }
@@ -65,7 +84,7 @@ class DependenciesAnnotationInjectionTest {
 
   @Test
   fun processInject_GivenFieldWithTooManyProvidedDependency_ThrowException() {
-    val dependencyProvider = mock<DummyTooManyDependencyProvider>()
+    val dependencyProvider = DummyTooManyDependencyProvider()
 
     val dummyTest = DummyTest()
 
@@ -78,6 +97,10 @@ class DependenciesAnnotationInjectionTest {
 
   private fun Any.assertThatIsMock() {
     assertThat(mockingDetails(this).isMock).isTrue()
+  }
+
+  private fun Any.assertThatIsSpy() {
+    assertThat(mockingDetails(this).isSpy).isTrue()
   }
 
   open class SuperDummyTest {
@@ -96,6 +119,12 @@ class DependenciesAnnotationInjectionTest {
     @MockBean
     lateinit var mockDependency: MockDummyDependency
 
+    @SpyBean
+    lateinit var spyDependency: SpyDummyDependency
+
+    @SpyBean
+    lateinit var transitiveSpy: TransitiveSpyDummyDependency
+
     lateinit var ignoredDependency: DummyDependency
 
     fun injectedDependency() = injectedDependency
@@ -110,23 +139,42 @@ class DependenciesAnnotationInjectionTest {
   }
 
   class NotProvidedDummyDependency
-  open class DummyDependency(val mock: MockDummyDependency)
-  open class SuperDummyDependency(val mock: MockDummyDependency)
+  open class DummyDependency(val mock: MockDummyDependency, val spy: SpyDummyDependency)
+  open class SuperDummyDependency(val mock: MockDummyDependency, val spy: SpyDummyDependency)
   open class MockDummyDependency
+  open class SpyDummyDependency(val transitiveSpy: TransitiveSpyDummyDependency)
+  open class TransitiveSpyDummyDependency
 
   abstract class SuperDummyDependencyProvider {
-    open fun provideSuperDummyDependency() = SuperDummyDependency(provideMockDummyDependency(1))
+    open fun provideSuperDummyDependency() = SuperDummyDependency(
+        provideMockDummyDependency(1),
+        provideSpyDummyDependency())
+
     open fun provideMockDummyDependency(ignored: Any?) = MockDummyDependency()
+    open fun provideSpyDummyDependency(): SpyDummyDependency {
+      return SpyDummyDependency(provideTransitiveSpyDummyDependency())
+    }
+    open fun provideTransitiveSpyDummyDependency() = TransitiveSpyDummyDependency()
   }
 
   open class DummyDependencyProvider : SuperDummyDependencyProvider() {
-    private fun ignoredDummyDependency() = DummyDependency(provideMockDummyDependency(2))
-    open fun ignoredDummyDependency(ignored: Any) = DummyDependency(provideMockDummyDependency(3))
-    open fun provideDummyDependency() = DummyDependency(provideMockDummyDependency(4))
+    private fun ignoredDummyDependency() = DummyDependency(
+        provideMockDummyDependency(2),
+        provideSpyDummyDependency())
+
+    open fun ignoredDummyDependency(ignored: Any) = DummyDependency(
+        provideMockDummyDependency(3),
+        provideSpyDummyDependency())
+
+    open fun provideDummyDependency() = DummyDependency(
+        provideMockDummyDependency(4),
+        provideSpyDummyDependency())
   }
 
-  abstract class DummyTooManyDependencyProvider : DummyDependencyProvider() {
-    abstract fun provideDummyDependency2(): DummyDependency
+  open class DummyTooManyDependencyProvider : DummyDependencyProvider() {
+    open fun provideDummyDependency2() = DummyDependency(
+        provideMockDummyDependency(5),
+        provideSpyDummyDependency())
   }
 
 }

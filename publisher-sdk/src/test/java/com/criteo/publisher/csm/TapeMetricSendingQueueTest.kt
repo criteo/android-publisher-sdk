@@ -2,8 +2,8 @@ package com.criteo.publisher.csm
 
 import com.criteo.publisher.Util.BuildConfigWrapper
 import com.criteo.publisher.csm.TapeMetricSendingQueue.createFileObjectQueue
-import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
+import com.criteo.publisher.mock.SpyBean
 import com.nhaarman.mockitokotlin2.*
 import com.squareup.tape.FileException
 import com.squareup.tape.InMemoryObjectQueue
@@ -15,8 +15,6 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import org.mockito.AdditionalAnswers.delegatesTo
-import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import java.io.File
 import javax.inject.Inject
@@ -46,7 +44,7 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
     }
   }
 
-  @MockBean
+  @SpyBean
   private lateinit var buildConfigWrapper: BuildConfigWrapper
 
   @Inject
@@ -59,10 +57,6 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
   @Before
   fun setUp() {
     MockitoAnnotations.initMocks(this)
-
-    buildConfigWrapper.stub {
-      on { isDebug } doReturn true
-    }
 
     tapeQueue = spy(createObjectQueue())
     queue = TapeMetricSendingQueue(tapeQueue)
