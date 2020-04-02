@@ -1,6 +1,7 @@
 package com.criteo.publisher.csm;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -110,6 +111,25 @@ public class CsmFunctionalTest {
     }));
   }
 
+  @Test
+  public void givenNoBidFromCdb_CallApiWithCsmOfNoBid() throws Exception {
+    CriteoUtil.givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL_UNKNOWN);
+    waitForIdleState();
+
+    Criteo.getInstance().getBidResponse(TestAdUnits.INTERSTITIAL_UNKNOWN);
+    waitForIdleState();
+
+    verify(api).postCsm(argThat(request -> {
+      assertRequestHeaderIsExpected(request);
+
+      assertEquals(1, request.getFeedbacks().size());
+      MetricRequestFeedback feedback = request.getFeedbacks().get(0);
+      assertItRepresentsNoBid(feedback);
+
+      return true;
+    }));
+  }
+
   private void assertRequestHeaderIsExpected(MetricRequest request) {
     assertEquals(buildConfigWrapper.getProfileId(), request.getProfileId());
     assertEquals(buildConfigWrapper.getSdkVersion(), request.getWrapperVersion());
@@ -119,6 +139,7 @@ public class CsmFunctionalTest {
     assertEquals(0, feedback.getCdbCallStartElapsed());
     assertNotNull(feedback.getCdbCallEndElapsed());
     assertNotNull(feedback.getElapsed());
+    assertFalse(feedback.isTimeout());
     assertEquals(1, feedback.getSlots().size());
     assertTrue(feedback.getSlots().get(0).getCachedBidUsed());
   }
@@ -127,8 +148,18 @@ public class CsmFunctionalTest {
     assertEquals(0, feedback.getCdbCallStartElapsed());
     assertNotNull(feedback.getCdbCallEndElapsed());
     assertNull(feedback.getElapsed());
+    assertFalse(feedback.isTimeout());
     assertEquals(1, feedback.getSlots().size());
     assertTrue(feedback.getSlots().get(0).getCachedBidUsed());
+  }
+
+  private void assertItRepresentsNoBid(MetricRequestFeedback feedback) {
+    assertEquals(0, feedback.getCdbCallStartElapsed());
+    assertNotNull(feedback.getCdbCallEndElapsed());
+    assertNull(feedback.getElapsed());
+    assertFalse(feedback.isTimeout());
+    assertEquals(1, feedback.getSlots().size());
+    assertFalse(feedback.getSlots().get(0).getCachedBidUsed());
   }
 
   private void waitForIdleState() {
