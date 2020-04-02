@@ -69,6 +69,6 @@ public class Tcf1KeysSharedPreferencesSafetyTests {
     assertEquals("", tcf1GdprStrategy.getConsentString());
     assertEquals("", tcf1GdprStrategy.getSubjectToGdpr());
     assertEquals("", tcf2GdprStrategy.getConsentString());
-    assertEquals("-1", tcf2GdprStrategy.getSubjectToGdpr());
+    assertEquals("", tcf2GdprStrategy.getSubjectToGdpr());
   }
 }

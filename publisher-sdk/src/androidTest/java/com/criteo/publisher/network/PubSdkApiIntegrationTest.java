@@ -132,9 +132,9 @@ public class PubSdkApiIntegrationTest {
     // Then
 
     // Value generated using: https://www.base64decode.org/ on:
-    // {"consentGiven":true,"consentData":"ssds","gdprApplies":false,"version":2}
+    // {"consentData":"ssds","gdprApplies":false,"version":2}
     assertEquals(
-        "eyJjb25zZW50R2l2ZW4iOnRydWUsImNvbnNlbnREYXRhIjoic3NkcyIsImdkcHJBcHBsaWVzIjpmYWxzZSwidmVyc2lvbiI6Mn0=",
+        "eyJjb25zZW50RGF0YSI6InNzZHMiLCJnZHByQXBwbGllcyI6ZmFsc2UsInZlcnNpb24iOjJ9",
         gdprString
     );
   }
@@ -181,12 +181,12 @@ public class PubSdkApiIntegrationTest {
     // When
 
     // Value generated using: https://www.base64decode.org/ on:
-    // {"consentGiven":true,"consentData":"ssds","gdprApplies":true,"version":1}
+    // {"consentData":"ssds","gdprApplies":true,"version":1}
     String gdprString = api.getGdprDataStringBase64(gdprData);
 
     // Then
     assertEquals(
-        "eyJjb25zZW50R2l2ZW4iOnRydWUsImNvbnNlbnREYXRhIjoic3NkcyIsImdkcHJBcHBsaWVzIjp0cnVlLCJ2ZXJzaW9uIjoxfQ==",
+        "eyJjb25zZW50RGF0YSI6InNzZHMiLCJnZHByQXBwbGllcyI6dHJ1ZSwidmVyc2lvbiI6MX0=",
         gdprString
     );
 
