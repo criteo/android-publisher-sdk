@@ -2,12 +2,12 @@ package com.criteo.publisher.csm;
 
 import android.support.annotation.NonNull;
 
-class MetricSendingQueueProducer {
+public class MetricSendingQueueProducer {
 
   @NonNull
   private final MetricSendingQueue queue;
 
-  MetricSendingQueueProducer(@NonNull MetricSendingQueue queue) {
+  public MetricSendingQueueProducer(@NonNull MetricSendingQueue queue) {
     this.queue = queue;
   }
 

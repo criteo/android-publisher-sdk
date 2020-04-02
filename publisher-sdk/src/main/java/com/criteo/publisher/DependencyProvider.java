@@ -16,15 +16,18 @@ import com.criteo.publisher.Util.LoggingUtil;
 import com.criteo.publisher.Util.RunOnUiThreadExecutor;
 import com.criteo.publisher.Util.TextUtils;
 import com.criteo.publisher.bid.BidLifecycleListener;
+import com.criteo.publisher.bid.CompositeBidLifecycleListener;
 import com.criteo.publisher.bid.LoggingBidLifecycleListener;
 import com.criteo.publisher.bid.UniqueIdGenerator;
 import com.criteo.publisher.cache.SdkCache;
+import com.criteo.publisher.csm.CsmBidLifecycleListener;
 import com.criteo.publisher.csm.MetricParser;
 import com.criteo.publisher.csm.MetricRepository;
 import com.criteo.publisher.csm.MetricRepositoryFactory;
 import com.criteo.publisher.csm.MetricSendingQueue;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
 import com.criteo.publisher.csm.MetricSendingQueueFactory;
+import com.criteo.publisher.csm.MetricSendingQueueProducer;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CdbRequestFactory;
@@ -365,9 +368,15 @@ public class DependencyProvider {
       @NonNull
       @Override
       public BidLifecycleListener create() {
-        return new LoggingBidLifecycleListener(
-            provideLoggingUtil()
+        BidLifecycleListener loggingListener = new LoggingBidLifecycleListener(provideLoggingUtil());
+
+        BidLifecycleListener csmListener = new CsmBidLifecycleListener(
+            provideMetricRepository(),
+            new MetricSendingQueueProducer(provideMetricSendingQueue()),
+            provideClock()
         );
+
+        return new CompositeBidLifecycleListener(loggingListener, csmListener);
       }
     });
   }
