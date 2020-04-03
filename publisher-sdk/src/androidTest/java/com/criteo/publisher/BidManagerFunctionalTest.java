@@ -672,8 +672,8 @@ public class BidManagerFunctionalTest {
 
     BidManager bidManager = createBidManager();
     givenMockedClockSetTo(0);
-    bidManager.setTimeToNextCall(60); // Silent until 60_000 included
-    givenMockedClockSetTo(60_000);
+    bidManager.setTimeToNextCall(60); // Silent until 60_000 excluded
+    givenMockedClockSetTo(60_000 - 1);
     bidManager.getBidForAdUnitAndPrefetch(adUnit);
     waitForIdleState();
 

@@ -22,7 +22,7 @@ csmQueueFilename = 'criteo_metrics_queue'
 
 // FIXME EE-991 Document how to determine this value + determine it
 // The batch size of metric files sent, at most, in each CSM requests.
-csmBatchSize = 5
+csmBatchSize = 6
 
 // Maximum size (in bytes) of metric elements stored in the metrics folder.
 // 48KB represents ~300 metrics (with ~164 bytes/metric) which already represent an extreme case.

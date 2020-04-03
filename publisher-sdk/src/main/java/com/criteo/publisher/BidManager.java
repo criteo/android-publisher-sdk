@@ -93,7 +93,7 @@ public class BidManager implements ApplicationStoppedListener {
    * load data for next time
    */
   private void fetch(CacheAdUnit cacheAdUnit) {
-    if (cdbTimeToNextCall.get() < clock.getCurrentTimeInMillis()) {
+    if (cdbTimeToNextCall.get() <= clock.getCurrentTimeInMillis()) {
       sendBidRequest(Collections.singletonList(cacheAdUnit));
     }
   }

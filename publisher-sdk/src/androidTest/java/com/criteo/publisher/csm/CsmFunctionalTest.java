@@ -1,5 +1,6 @@
 package com.criteo.publisher.csm;
 
+import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -9,13 +10,14 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import android.support.v4.util.Consumer;
 import com.criteo.publisher.Clock;
 import com.criteo.publisher.Criteo;
-import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.Util.BuildConfigWrapper;
 import com.criteo.publisher.concurrent.ThreadingUtil;
@@ -24,9 +26,15 @@ import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.network.PubSdkApi;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -50,6 +58,11 @@ public class CsmFunctionalTest {
   @SpyBean
   private Clock clock;
 
+  @Before
+  public void setUp() throws Exception {
+    cleanState();
+  }
+
   @After
   public void tearDown() throws Exception {
     cleanState();
@@ -57,7 +70,7 @@ public class CsmFunctionalTest {
 
   @Test
   public void givenPrefetchAdUnitsWithBidsThenConsumption_CallApiWithCsmOfConsumedBid() throws Exception {
-    CriteoUtil.givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
     waitForIdleState();
 
     Criteo.getInstance().getBidResponse(TestAdUnits.BANNER_320_50);
@@ -119,7 +132,7 @@ public class CsmFunctionalTest {
   @Test
   public void givenConsumedExpiredBid_CallApiWithCsmOfConsumedExpiredBid() throws Exception {
     when(clock.getCurrentTimeInMillis()).thenReturn(0L);
-    CriteoUtil.givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
     waitForIdleState();
 
     when(clock.getCurrentTimeInMillis()).thenReturn(Long.MAX_VALUE);
@@ -139,7 +152,7 @@ public class CsmFunctionalTest {
 
   @Test
   public void givenNoBidFromCdb_CallApiWithCsmOfNoBid() throws Exception {
-    CriteoUtil.givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL_UNKNOWN);
+    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL_UNKNOWN);
     waitForIdleState();
 
     Criteo.getInstance().getBidResponse(TestAdUnits.INTERSTITIAL_UNKNOWN);
@@ -160,7 +173,7 @@ public class CsmFunctionalTest {
   public void givenNetworkErrorFromCdb_CallApiWithCsmOfNetworkError() throws Exception {
     doThrow(IOException.class).when(api).loadCdb(any(), any());
 
-    CriteoUtil.givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
     waitForIdleState();
 
     Criteo.getInstance().getBidResponse(TestAdUnits.INTERSTITIAL_UNKNOWN);
@@ -190,7 +203,7 @@ public class CsmFunctionalTest {
   public void givenTimeoutErrorFromCdb_CallApiWithCsmOfTimeoutError() throws Exception {
     when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenReturn(1);
 
-    CriteoUtil.givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
     waitForIdleState();
 
     when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenCallRealMethod();
@@ -216,6 +229,89 @@ public class CsmFunctionalTest {
 
       return true;
     }));
+  }
+
+  @Test
+  public void givenErrorWhenSendingCsm_QueueMetricsUntilCsmRequestWorksAgain() throws Exception {
+    when(buildConfigWrapper.isDebug()).thenReturn(false);
+    doThrow(IOException.class).when(api).postCsm(any());
+
+    when(clock.getCurrentTimeInMillis()).thenReturn(0L);
+    Criteo criteo = givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+    waitForIdleState();
+
+    // Consumed and not expired
+    criteo.getBidResponse(TestAdUnits.INTERSTITIAL);
+    waitForIdleState();
+
+    // Consumed but expired
+    // There is also a bid request here and consumed at timeout step
+    when(clock.getCurrentTimeInMillis()).thenCallRealMethod();
+    criteo.getBidResponse(TestAdUnits.INTERSTITIAL);
+    waitForIdleState();
+
+    // No bid
+    criteo.getBidResponse(TestAdUnits.INTERSTITIAL_UNKNOWN);
+    waitForIdleState();
+
+    // Timeout
+    when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenReturn(1);
+    criteo.getBidResponse(TestAdUnits.INTERSTITIAL);
+    waitForIdleState();
+    when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenCallRealMethod();
+
+    // Network error
+    doThrow(IOException.class).when(api).loadCdb(any(), any());
+    criteo.getBidResponse(TestAdUnits.INTERSTITIAL);
+    waitForIdleState();
+    doCallRealMethod().when(api).loadCdb(any(), any());
+
+    // CSM endpoint works again: on next bid request, there should metrics for all previous bids.
+    clearInvocations(api);
+    doCallRealMethod().when(api).postCsm(any());
+    criteo.getBidResponse(TestAdUnits.BANNER_UNKNOWN);
+    waitForIdleState();
+
+    verify(api).postCsm(argThat(request -> {
+      assertRequestHeaderIsExpected(request);
+
+      List<MetricRequestFeedback> feedbacks = request.getFeedbacks();
+      assertEquals(6, feedbacks.size());
+      assertOnlyNSatisfy(feedbacks, 2, this::assertItRepresentsConsumedBid);
+      assertOnlyNSatisfy(feedbacks, 1, this::assertItRepresentsExpiredConsumedBid);
+      assertOnlyNSatisfy(feedbacks, 1, this::assertItRepresentsNoBid);
+      assertOnlyNSatisfy(feedbacks, 1, this::assertItRepresentsTimeoutError);
+      assertOnlyNSatisfy(feedbacks, 1, this::assertItRepresentsNetworkError);
+
+      Set<String> impressionIds = new HashSet<>();
+      Set<String> requestGroupIds = new HashSet<>();
+      for (MetricRequestFeedback feedback : feedbacks) {
+        impressionIds.add(feedback.getSlots().get(0).getImpressionId());
+        requestGroupIds.add(feedback.getRequestGroupId());
+      }
+
+      assertEquals(6, impressionIds.size());
+      assertEquals(6, requestGroupIds.size());
+
+      return true;
+    }));
+  }
+
+  private <T> void assertOnlyNSatisfy(
+      Collection<T> elements,
+      int expectedNumberOfValidatedElements,
+      Consumer<T> validation) {
+    List<T> validatedElements = new ArrayList<>();
+    for (T element : elements) {
+      try {
+        validation.accept(element);
+        validatedElements.add(element);
+      } catch (AssertionError e) {
+        // ignored
+      }
+    }
+
+    assertEquals(expectedNumberOfValidatedElements, validatedElements.size());
   }
 
   private void assertRequestHeaderIsExpected(MetricRequest request) {
