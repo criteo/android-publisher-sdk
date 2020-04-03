@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
 import android.support.v4.util.AtomicFile;
-import com.criteo.publisher.Util.BuildConfigWrapper;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import java.io.File;
 import java.util.Collection;
@@ -17,7 +17,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 

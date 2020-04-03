@@ -1,6 +1,6 @@
 package com.criteo.publisher;
 
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
@@ -13,12 +13,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.app.Application;
-import com.criteo.publisher.Util.AppLifecycleUtil;
-import com.criteo.publisher.Util.BuildConfigWrapper;
-import com.criteo.publisher.Util.DeviceUtil;
-import com.criteo.publisher.Util.DirectMockRunOnUiThreadExecutor;
+import com.criteo.publisher.util.AppLifecycleUtil;
+import com.criteo.publisher.util.DeviceUtil;
+import com.criteo.publisher.util.DirectMockRunOnUiThreadExecutor;
 import com.criteo.publisher.bid.BidLifecycleListener;
-import com.criteo.publisher.csm.MetricSendingQueue;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Slot;

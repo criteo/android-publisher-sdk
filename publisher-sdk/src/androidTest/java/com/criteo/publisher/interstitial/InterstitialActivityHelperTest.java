@@ -18,7 +18,7 @@ import android.support.annotation.NonNull;
 import android.support.test.rule.ActivityTestRule;
 import com.criteo.publisher.CriteoInterstitialActivity;
 import com.criteo.publisher.CriteoInterstitialAdListener;
-import com.criteo.publisher.Util.CriteoResultReceiver;
+import com.criteo.publisher.util.CriteoResultReceiver;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.view.WebViewLookup;
 import com.criteo.publisher.test.activity.DummyActivity;

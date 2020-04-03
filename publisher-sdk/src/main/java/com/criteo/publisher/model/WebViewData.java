@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.DependencyProvider;
-import com.criteo.publisher.Util.WebViewLoadStatus;
+import com.criteo.publisher.util.WebViewLoadStatus;
 import com.criteo.publisher.tasks.WebViewDataTask;
 import java.util.concurrent.Executor;
 

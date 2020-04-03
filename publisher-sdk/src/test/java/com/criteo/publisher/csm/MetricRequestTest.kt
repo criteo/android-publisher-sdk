@@ -1,7 +1,7 @@
 package com.criteo.publisher.csm
 
-import com.criteo.publisher.Util.JsonSerializer
-import com.criteo.publisher.Util.writeIntoString
+import com.criteo.publisher.util.JsonSerializer
+import com.criteo.publisher.util.writeIntoString
 import com.criteo.publisher.mock.MockedDependenciesRule
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.ObjectAssert

@@ -1,6 +1,6 @@
 package com.criteo.publisher.model;
 
-import com.criteo.publisher.Util.AdUnitType;
+import com.criteo.publisher.util.AdUnitType;
 
 public final class CacheAdUnit {
 

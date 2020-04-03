@@ -10,7 +10,7 @@ import static org.mockito.Mockito.verify;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import com.criteo.publisher.Util.UserAgentCallback;
+import com.criteo.publisher.util.UserAgentCallback;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;

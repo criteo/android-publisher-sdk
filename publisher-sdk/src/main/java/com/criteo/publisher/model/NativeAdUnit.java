@@ -1,8 +1,8 @@
 package com.criteo.publisher.model;
 
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_CUSTOM_NATIVE;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 
-import com.criteo.publisher.Util.ObjectsUtil;
+import com.criteo.publisher.util.ObjectsUtil;
 
 public final class NativeAdUnit extends AdUnit {
 

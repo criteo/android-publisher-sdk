@@ -1,6 +1,6 @@
 package com.criteo.publisher.csm
 
-import com.criteo.publisher.Util.BuildConfigWrapper
+import com.criteo.publisher.util.BuildConfigWrapper
 import com.criteo.publisher.csm.TapeMetricSendingQueue.createFileObjectQueue
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean

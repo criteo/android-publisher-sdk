@@ -15,8 +15,8 @@ import static org.mockserver.model.NottableString.not;
 import static org.mockserver.verify.VerificationTimes.once;
 
 import android.support.annotation.NonNull;
-import com.criteo.publisher.Util.BuildConfigWrapper;
-import com.criteo.publisher.Util.JsonSerializer;
+import com.criteo.publisher.util.BuildConfigWrapper;
+import com.criteo.publisher.util.JsonSerializer;
 import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;

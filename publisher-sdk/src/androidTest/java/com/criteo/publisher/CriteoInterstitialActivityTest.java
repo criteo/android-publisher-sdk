@@ -17,7 +17,7 @@ import android.support.test.runner.AndroidJUnit4;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import com.criteo.publisher.Util.CriteoResultReceiver;
+import com.criteo.publisher.util.CriteoResultReceiver;
 import java.util.Collection;
 import org.junit.Rule;
 import org.junit.Test;

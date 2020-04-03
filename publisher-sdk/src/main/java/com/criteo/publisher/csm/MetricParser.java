@@ -1,7 +1,7 @@
 package com.criteo.publisher.csm;
 
 import android.support.annotation.NonNull;
-import com.criteo.publisher.Util.JsonSerializer;
+import com.criteo.publisher.util.JsonSerializer;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import java.io.EOFException;

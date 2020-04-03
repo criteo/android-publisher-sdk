@@ -1,8 +1,8 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.CriteoUtil.clearSharedPreferences;
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
-import static com.criteo.publisher.Util.CompletableFuture.completedFuture;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
+import static com.criteo.publisher.util.CompletableFuture.completedFuture;
 import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static com.criteo.publisher.concurrent.ThreadingUtil.waitForMessageQueueToBeIdle;
 import static java.util.Collections.emptyList;
@@ -26,9 +26,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.support.annotation.NonNull;
-import com.criteo.publisher.Util.AdUnitType;
-import com.criteo.publisher.Util.BuildConfigWrapper;
-import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.util.AdUnitType;
+import com.criteo.publisher.util.BuildConfigWrapper;
+import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;

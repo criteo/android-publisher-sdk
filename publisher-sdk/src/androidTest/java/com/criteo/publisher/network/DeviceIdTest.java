@@ -12,7 +12,7 @@ import static org.mockito.Mockito.when;
 import android.content.Context;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.DependencyProvider;
-import com.criteo.publisher.Util.AdvertisingInfo;
+import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;

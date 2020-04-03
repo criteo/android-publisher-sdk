@@ -1,8 +1,8 @@
 package com.criteo.publisher.csm;
 
 import android.support.annotation.NonNull;
-import com.criteo.publisher.Util.BuildConfigWrapper;
-import com.criteo.publisher.Util.PreconditionsUtil;
+import com.criteo.publisher.util.BuildConfigWrapper;
+import com.criteo.publisher.util.PreconditionsUtil;
 import com.criteo.publisher.network.PubSdkApi;
 import java.io.IOException;
 import java.util.Collection;

@@ -2,7 +2,7 @@ package com.criteo.publisher.bid;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
-import com.criteo.publisher.Util.LoggingUtil;
+import com.criteo.publisher.util.LoggingUtil;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;

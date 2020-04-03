@@ -1,6 +1,6 @@
 package com.criteo.publisher.bid
 
-import com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER
+import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
 import com.criteo.publisher.model.*
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify

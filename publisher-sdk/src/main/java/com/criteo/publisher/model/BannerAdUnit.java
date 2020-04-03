@@ -1,7 +1,7 @@
 package com.criteo.publisher.model;
 
-import com.criteo.publisher.Util.AdUnitType;
-import com.criteo.publisher.Util.ObjectsUtil;
+import com.criteo.publisher.util.AdUnitType;
+import com.criteo.publisher.util.ObjectsUtil;
 
 public final class BannerAdUnit extends AdUnit {
 

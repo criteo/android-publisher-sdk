@@ -26,7 +26,7 @@ import com.criteo.publisher.BidManager;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.TestAdUnits;
-import com.criteo.publisher.Util.BuildConfigWrapper;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;

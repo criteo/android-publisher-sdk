@@ -2,7 +2,7 @@ package com.criteo.publisher.csm;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import com.criteo.publisher.Util.PreconditionsUtil;
+import com.criteo.publisher.util.PreconditionsUtil;
 import com.squareup.tape.FileException;
 import com.squareup.tape.FileObjectQueue;
 import com.squareup.tape.ObjectQueue;

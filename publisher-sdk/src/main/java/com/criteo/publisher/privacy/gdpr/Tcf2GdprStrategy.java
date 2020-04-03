@@ -2,7 +2,7 @@ package com.criteo.publisher.privacy.gdpr;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
-import com.criteo.publisher.Util.SafeSharedPreferences;
+import com.criteo.publisher.util.SafeSharedPreferences;
 
 /**
  * https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/tree/master/TCFv2

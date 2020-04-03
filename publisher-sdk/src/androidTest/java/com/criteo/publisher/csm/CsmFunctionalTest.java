@@ -19,7 +19,7 @@ import android.support.v4.util.Consumer;
 import com.criteo.publisher.Clock;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
-import com.criteo.publisher.Util.BuildConfigWrapper;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.concurrent.ThreadingUtil;
 import com.criteo.publisher.csm.MetricRequest.MetricRequestFeedback;
 import com.criteo.publisher.mock.MockedDependenciesRule;

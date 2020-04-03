@@ -8,7 +8,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
-import com.criteo.publisher.Util.BuildConfigWrapper;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import java.io.File;

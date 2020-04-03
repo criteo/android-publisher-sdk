@@ -11,7 +11,7 @@ import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.TestAdUnits;
-import com.criteo.publisher.Util.CompletableFuture;
+import com.criteo.publisher.util.CompletableFuture;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.test.activity.DummyActivity;

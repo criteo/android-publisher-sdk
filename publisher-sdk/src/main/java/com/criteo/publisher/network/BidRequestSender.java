@@ -4,7 +4,7 @@ import android.support.annotation.GuardedBy;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
-import com.criteo.publisher.Util.CdbCallListener;
+import com.criteo.publisher.util.CdbCallListener;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestFactory;

@@ -1,6 +1,6 @@
 package com.criteo.publisher.csm
 
-import com.criteo.publisher.Util.BuildConfigWrapper
+import com.criteo.publisher.util.BuildConfigWrapper
 import com.criteo.publisher.csm.MetricRepository.MetricUpdater
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat

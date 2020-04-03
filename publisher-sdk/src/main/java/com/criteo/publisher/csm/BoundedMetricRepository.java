@@ -1,7 +1,7 @@
 package com.criteo.publisher.csm;
 
 import android.support.annotation.NonNull;
-import com.criteo.publisher.Util.BuildConfigWrapper;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import java.util.Collection;
 
 class BoundedMetricRepository extends MetricRepository {

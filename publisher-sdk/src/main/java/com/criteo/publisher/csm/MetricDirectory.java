@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.util.AtomicFile;
-import com.criteo.publisher.Util.BuildConfigWrapper;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Arrays;

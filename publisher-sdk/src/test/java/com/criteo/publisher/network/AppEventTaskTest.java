@@ -1,6 +1,6 @@
 package com.criteo.publisher.network;
 
-import static com.criteo.publisher.Util.CompletableFuture.completedFuture;
+import static com.criteo.publisher.util.CompletableFuture.completedFuture;
 import static com.criteo.publisher.network.AppEventTask.THROTTLE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -9,8 +9,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
-import com.criteo.publisher.Util.AppEventResponseListener;
-import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.util.AppEventResponseListener;
+import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.privacy.gdpr.GdprData;

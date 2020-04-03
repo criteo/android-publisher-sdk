@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
-import com.criteo.publisher.Util.ObjectsUtil;
+import com.criteo.publisher.util.ObjectsUtil;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.WebViewData;
 

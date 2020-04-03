@@ -3,7 +3,7 @@ package com.criteo.publisher;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-import com.criteo.publisher.Util.AdUnitType;
+import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.DeviceInfo;

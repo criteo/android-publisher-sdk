@@ -7,7 +7,7 @@ import android.support.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.WebView;
-import com.criteo.publisher.Util.CompletableFuture;
+import com.criteo.publisher.util.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;

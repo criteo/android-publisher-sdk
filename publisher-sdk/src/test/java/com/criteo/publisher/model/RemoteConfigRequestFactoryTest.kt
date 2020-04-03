@@ -1,6 +1,6 @@
 package com.criteo.publisher.model
 
-import com.criteo.publisher.Util.BuildConfigWrapper
+import com.criteo.publisher.util.BuildConfigWrapper
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.stub
 import com.nhaarman.mockitokotlin2.whenever

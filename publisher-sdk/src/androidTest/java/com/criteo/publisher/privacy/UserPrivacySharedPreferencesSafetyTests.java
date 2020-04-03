@@ -8,7 +8,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import com.criteo.publisher.DependencyProvider;
-import com.criteo.publisher.Util.BuildConfigWrapper;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import javax.inject.Inject;
 import org.junit.After;

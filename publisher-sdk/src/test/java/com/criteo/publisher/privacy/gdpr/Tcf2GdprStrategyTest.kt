@@ -1,6 +1,6 @@
 package com.criteo.publisher.privacy.gdpr
 
-import com.criteo.publisher.Util.SafeSharedPreferences
+import com.criteo.publisher.util.SafeSharedPreferences
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.Test

@@ -3,7 +3,7 @@ package com.criteo.publisher.csm;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import com.criteo.publisher.DependencyProvider.Factory;
-import com.criteo.publisher.Util.BuildConfigWrapper;
+import com.criteo.publisher.util.BuildConfigWrapper;
 
 public class MetricRepositoryFactory implements Factory<MetricRepository> {
 

@@ -33,7 +33,7 @@ import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.TestAdUnits;
-import com.criteo.publisher.Util.AndroidUtil;
+import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;

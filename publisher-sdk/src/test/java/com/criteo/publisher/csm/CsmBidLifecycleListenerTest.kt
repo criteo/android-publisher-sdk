@@ -1,7 +1,7 @@
 package com.criteo.publisher.csm
 
 import com.criteo.publisher.Clock
-import com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER
+import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
 import com.criteo.publisher.bid.UniqueIdGenerator
 import com.criteo.publisher.model.*
 import com.nhaarman.mockitokotlin2.*

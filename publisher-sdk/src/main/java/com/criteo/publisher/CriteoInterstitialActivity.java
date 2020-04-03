@@ -1,9 +1,9 @@
 package com.criteo.publisher;
 
-import static com.criteo.publisher.Util.CriteoResultReceiver.ACTION_CLOSED;
-import static com.criteo.publisher.Util.CriteoResultReceiver.ACTION_LEFT_CLICKED;
-import static com.criteo.publisher.Util.CriteoResultReceiver.INTERSTITIAL_ACTION;
-import static com.criteo.publisher.Util.CriteoResultReceiver.RESULT_CODE_SUCCESSFUL;
+import static com.criteo.publisher.util.CriteoResultReceiver.ACTION_CLOSED;
+import static com.criteo.publisher.util.CriteoResultReceiver.ACTION_LEFT_CLICKED;
+import static com.criteo.publisher.util.CriteoResultReceiver.INTERSTITIAL_ACTION;
+import static com.criteo.publisher.util.CriteoResultReceiver.RESULT_CODE_SUCCESSFUL;
 import static com.criteo.publisher.interstitial.InterstitialActivityHelper.RESULT_RECEIVER;
 import static com.criteo.publisher.interstitial.InterstitialActivityHelper.WEB_VIEW_DATA;
 

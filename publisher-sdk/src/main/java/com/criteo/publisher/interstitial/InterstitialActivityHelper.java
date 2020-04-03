@@ -11,7 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import com.criteo.publisher.CriteoInterstitialActivity;
 import com.criteo.publisher.CriteoInterstitialAdListener;
-import com.criteo.publisher.Util.CriteoResultReceiver;
+import com.criteo.publisher.util.CriteoResultReceiver;
 
 public class InterstitialActivityHelper {
 

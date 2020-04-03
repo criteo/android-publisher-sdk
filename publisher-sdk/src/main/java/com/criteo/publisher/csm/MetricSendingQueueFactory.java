@@ -5,8 +5,8 @@ import static com.criteo.publisher.csm.TapeMetricSendingQueue.createFileObjectQu
 import android.content.Context;
 import android.support.annotation.NonNull;
 import com.criteo.publisher.DependencyProvider.Factory;
-import com.criteo.publisher.Util.BuildConfigWrapper;
-import com.criteo.publisher.Util.PreconditionsUtil;
+import com.criteo.publisher.util.BuildConfigWrapper;
+import com.criteo.publisher.util.PreconditionsUtil;
 import com.squareup.tape.InMemoryObjectQueue;
 import com.squareup.tape.ObjectQueue;
 import java.io.File;

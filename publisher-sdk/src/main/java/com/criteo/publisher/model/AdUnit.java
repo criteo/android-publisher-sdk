@@ -1,8 +1,8 @@
 package com.criteo.publisher.model;
 
 import android.support.annotation.NonNull;
-import com.criteo.publisher.Util.AdUnitType;
-import com.criteo.publisher.Util.ObjectsUtil;
+import com.criteo.publisher.util.AdUnitType;
+import com.criteo.publisher.util.ObjectsUtil;
 
 public abstract class AdUnit {
 

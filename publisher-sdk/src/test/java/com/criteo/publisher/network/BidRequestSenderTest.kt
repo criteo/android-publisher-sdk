@@ -1,8 +1,8 @@
 package com.criteo.publisher.network
 
-import com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER
-import com.criteo.publisher.Util.CdbCallListener
-import com.criteo.publisher.Util.CompletableFuture.completedFuture
+import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
+import com.criteo.publisher.util.CdbCallListener
+import com.criteo.publisher.util.CompletableFuture.completedFuture
 import com.criteo.publisher.model.*
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
@@ -11,7 +11,6 @@ import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import java.io.IOException
 import java.util.concurrent.*

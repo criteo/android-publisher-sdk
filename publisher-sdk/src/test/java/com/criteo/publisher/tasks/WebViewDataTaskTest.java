@@ -1,6 +1,6 @@
 package com.criteo.publisher.tasks;
 
-import static com.criteo.publisher.Util.CompletableFuture.completedFuture;
+import static com.criteo.publisher.util.CompletableFuture.completedFuture;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;

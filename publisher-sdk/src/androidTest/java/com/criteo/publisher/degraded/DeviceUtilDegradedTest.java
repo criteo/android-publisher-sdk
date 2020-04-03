@@ -2,7 +2,7 @@ package com.criteo.publisher.degraded;
 
 import static junit.framework.Assert.assertFalse;
 
-import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import org.junit.Before;
 import org.junit.Rule;

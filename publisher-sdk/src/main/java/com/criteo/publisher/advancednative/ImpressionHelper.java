@@ -2,7 +2,7 @@ package com.criteo.publisher.advancednative;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
-import com.criteo.publisher.Util.RunOnUiThreadExecutor;
+import com.criteo.publisher.util.RunOnUiThreadExecutor;
 import com.criteo.publisher.network.PubSdkApi;
 import java.io.IOException;
 import java.io.InputStream;

@@ -2,7 +2,7 @@ package com.criteo.publisher;
 
 import static org.mockito.Mockito.when;
 
-import com.criteo.publisher.Util.AdUnitType;
+import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;

@@ -1,6 +1,6 @@
 package com.criteo.publisher.network;
 
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static java.util.Collections.singletonList;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

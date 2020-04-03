@@ -1,8 +1,8 @@
 package com.criteo.publisher.model;
 
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_CUSTOM_NATIVE;
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_INTERSTITIAL;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL;
 import static com.criteo.publisher.model.AdUnitMapper.splitIntoChunks;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -14,8 +14,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import android.content.res.Configuration;
-import com.criteo.publisher.Util.AndroidUtil;
-import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.util.AndroidUtil;
+import com.criteo.publisher.util.DeviceUtil;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;

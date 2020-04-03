@@ -20,7 +20,7 @@ import android.content.Context;
 import android.os.Looper;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import com.criteo.publisher.Util.AdUnitType;
+import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Slot;

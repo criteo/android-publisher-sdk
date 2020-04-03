@@ -4,7 +4,7 @@ import static java.util.Collections.singletonList;
 
 import android.support.annotation.NonNull;
 import com.criteo.publisher.DependencyProvider;
-import com.criteo.publisher.Util.AdUnitType;
+import com.criteo.publisher.util.AdUnitType;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;

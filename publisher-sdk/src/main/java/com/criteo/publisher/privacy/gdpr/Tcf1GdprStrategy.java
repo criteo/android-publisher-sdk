@@ -2,7 +2,7 @@ package com.criteo.publisher.privacy.gdpr;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
-import com.criteo.publisher.Util.SafeSharedPreferences;
+import com.criteo.publisher.util.SafeSharedPreferences;
 
 /**
  * https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/Mobile%20In-App%20Consent%20APIs%20v1.0%20Final.md

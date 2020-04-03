@@ -7,7 +7,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
-import com.criteo.publisher.Util.SafeSharedPreferences;
+import com.criteo.publisher.util.SafeSharedPreferences;
 import com.criteo.publisher.privacy.gdpr.GdprData;
 import com.criteo.publisher.privacy.gdpr.GdprDataFetcher;
 import java.util.Arrays;

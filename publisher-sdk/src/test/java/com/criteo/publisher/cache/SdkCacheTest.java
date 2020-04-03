@@ -1,8 +1,8 @@
 package com.criteo.publisher.cache;
 
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_CUSTOM_NATIVE;
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_INTERSTITIAL;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -10,8 +10,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
-import com.criteo.publisher.Util.AdvertisingInfo;
-import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.util.AdvertisingInfo;
+import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Slot;

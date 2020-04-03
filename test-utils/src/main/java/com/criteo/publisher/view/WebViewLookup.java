@@ -16,7 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import com.criteo.publisher.Util.CompletableFuture;
+import com.criteo.publisher.util.CompletableFuture;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;

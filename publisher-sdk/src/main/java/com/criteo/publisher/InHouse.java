@@ -2,7 +2,7 @@ package com.criteo.publisher;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import com.criteo.publisher.Util.AdUnitType;
+import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;

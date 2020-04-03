@@ -1,6 +1,6 @@
 package com.criteo.publisher;
 
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;

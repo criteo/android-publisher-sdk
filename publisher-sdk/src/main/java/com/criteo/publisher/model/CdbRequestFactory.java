@@ -1,10 +1,10 @@
 package com.criteo.publisher.model;
 
-import static com.criteo.publisher.Util.TextUtils.getNotEmptyOrNullValue;
+import static com.criteo.publisher.util.TextUtils.getNotEmptyOrNullValue;
 
 import android.support.annotation.NonNull;
-import com.criteo.publisher.Util.BuildConfigWrapper;
-import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.util.BuildConfigWrapper;
+import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.bid.UniqueIdGenerator;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import java.util.ArrayList;

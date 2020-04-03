@@ -16,7 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.os.Looper;
-import com.criteo.publisher.Util.AdUnitType;
+import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;

@@ -1,7 +1,7 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
-import static com.criteo.publisher.Util.CompletableFuture.completedFuture;
+import static com.criteo.publisher.util.CompletableFuture.completedFuture;
 import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 
 import android.content.Intent;
 import android.support.test.rule.ActivityTestRule;
-import com.criteo.publisher.Util.AdvertisingInfo;
+import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.network.PubSdkApi;

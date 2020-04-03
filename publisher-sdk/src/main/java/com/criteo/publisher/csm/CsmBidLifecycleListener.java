@@ -94,7 +94,6 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
    */
   @Override
   public void onCdbCallFinished(@NonNull CdbRequest request, @NonNull CdbResponse response) {
-    boolean shouldPushInQueue = false;
     long currentTimeInMillis = clock.getCurrentTimeInMillis();
 
     for (CdbRequestSlot requestSlot : request.getSlots()) {

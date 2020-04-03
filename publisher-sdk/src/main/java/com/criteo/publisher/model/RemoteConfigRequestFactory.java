@@ -1,7 +1,7 @@
 package com.criteo.publisher.model;
 
 import android.support.annotation.NonNull;
-import com.criteo.publisher.Util.BuildConfigWrapper;
+import com.criteo.publisher.util.BuildConfigWrapper;
 
 public class RemoteConfigRequestFactory {
 

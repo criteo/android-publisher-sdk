@@ -1,11 +1,11 @@
 package com.criteo.publisher;
 
-import static com.criteo.publisher.Util.CompletableFuture.completedFuture;
+import static com.criteo.publisher.util.CompletableFuture.completedFuture;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import com.criteo.publisher.Util.AdUnitType;
-import com.criteo.publisher.Util.RunOnUiThreadExecutor;
+import com.criteo.publisher.util.AdUnitType;
+import com.criteo.publisher.util.RunOnUiThreadExecutor;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;

@@ -1,7 +1,7 @@
 package com.criteo.publisher
 
-import com.criteo.publisher.Util.BuildConfigWrapper
-import com.criteo.publisher.Util.PreconditionsUtil
+import com.criteo.publisher.util.BuildConfigWrapper
+import com.criteo.publisher.util.PreconditionsUtil
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.After

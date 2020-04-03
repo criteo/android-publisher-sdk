@@ -1,6 +1,6 @@
 package com.criteo.publisher.model
 
-import com.criteo.publisher.Util.AdUnitType.*
+import com.criteo.publisher.util.AdUnitType.*
 import org.assertj.core.api.Assertions.assertThat
 import org.json.JSONArray
 import org.json.JSONObject

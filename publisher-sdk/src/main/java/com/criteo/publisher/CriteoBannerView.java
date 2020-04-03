@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import android.webkit.WebView;
-import com.criteo.publisher.Util.ObjectsUtil;
+import com.criteo.publisher.util.ObjectsUtil;
 import com.criteo.publisher.model.BannerAdUnit;
 
 public class CriteoBannerView extends WebView {

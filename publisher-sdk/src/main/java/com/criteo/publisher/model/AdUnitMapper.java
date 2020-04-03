@@ -1,16 +1,16 @@
 package com.criteo.publisher.model;
 
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_BANNER;
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_CUSTOM_NATIVE;
-import static com.criteo.publisher.Util.AdUnitType.CRITEO_INTERSTITIAL;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL;
 
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
-import com.criteo.publisher.Util.AndroidUtil;
-import com.criteo.publisher.Util.DeviceUtil;
+import com.criteo.publisher.util.AndroidUtil;
+import com.criteo.publisher.util.DeviceUtil;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

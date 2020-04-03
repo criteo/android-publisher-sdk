@@ -1,6 +1,6 @@
 package com.criteo.publisher.advancednative
 
-import com.criteo.publisher.Util.RunOnUiThreadExecutor
+import com.criteo.publisher.util.RunOnUiThreadExecutor
 import com.criteo.publisher.network.PubSdkApi
 import com.nhaarman.mockitokotlin2.doAnswer
 import com.nhaarman.mockitokotlin2.doThrow
