@@ -20,9 +20,12 @@ csmDirectoryName = 'criteo_metrics'
 // The relative path in application folder of the sending queue file
 csmQueueFilename = 'criteo_metrics_queue'
 
-// FIXME EE-991 Document how to determine this value + determine it
 // The batch size of metric files sent, at most, in each CSM requests.
-csmBatchSize = 6
+// Bid requests are only bulked during the prefetch phase and CDB requests are split into chunks of,
+// at most, 8 slots. This means that while CSM requests are emitted without issues, there should be,
+// at most, 8 stored metrics. A batch size of 24 handles potential network issues and keeps the
+// requests' size small (around 4KB given below estimation).
+csmBatchSize = 24
 
 // Maximum size (in bytes) of metric elements stored in the metrics folder.
 // 48KB represents ~300 metrics (with ~164 bytes/metric) which already represent an extreme case.
