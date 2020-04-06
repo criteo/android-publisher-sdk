@@ -9,6 +9,7 @@ import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestSlot;
 import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Slot;
 import java.net.SocketTimeoutException;
 
@@ -32,16 +33,21 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
   @NonNull
   private final UniqueIdGenerator uniqueIdGenerator;
 
+  @NonNull
+  private final Config config;
+
   public CsmBidLifecycleListener(
       @NonNull MetricRepository repository,
       @NonNull MetricSendingQueueProducer sendingQueueProducer,
       @NonNull Clock clock,
-      @NonNull UniqueIdGenerator uniqueIdGenerator
+      @NonNull UniqueIdGenerator uniqueIdGenerator,
+      @NonNull Config config
   ) {
     this.repository = repository;
     this.sendingQueueProducer = sendingQueueProducer;
     this.clock = clock;
     this.uniqueIdGenerator = uniqueIdGenerator;
+    this.config = config;
   }
 
   /**
@@ -52,6 +58,10 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
    */
   @Override
   public void onSdkInitialized() {
+    if (isCsmDisabled()) {
+      return;
+    }
+
     sendingQueueProducer.pushAllInQueue(repository);
   }
 
@@ -63,6 +73,10 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
    */
   @Override
   public void onCdbCallStarted(@NonNull CdbRequest request) {
+    if (isCsmDisabled()) {
+      return;
+    }
+
     long currentTimeInMillis = clock.getCurrentTimeInMillis();
     String requestGroupId = uniqueIdGenerator.generateId();
 
@@ -94,6 +108,10 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
    */
   @Override
   public void onCdbCallFinished(@NonNull CdbRequest request, @NonNull CdbResponse response) {
+    if (isCsmDisabled()) {
+      return;
+    }
+
     long currentTimeInMillis = clock.getCurrentTimeInMillis();
 
     for (CdbRequestSlot requestSlot : request.getSlots()) {
@@ -135,6 +153,10 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
    */
   @Override
   public void onCdbCallFailed(@NonNull CdbRequest request, @NonNull Exception exception) {
+    if (isCsmDisabled()) {
+      return;
+    }
+
     boolean isTimeout = exception instanceof SocketTimeoutException;
     if (isTimeout) {
       onCdbCallTimeout(request);
@@ -181,6 +203,10 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
    */
   @Override
   public void onBidConsumed(@NonNull CacheAdUnit adUnit, @NonNull Slot consumedBid) {
+    if (isCsmDisabled()) {
+      return;
+    }
+
     String impressionId = consumedBid.getImpressionId();
     if (impressionId == null) {
       return;
@@ -207,6 +233,10 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
     for (CdbRequestSlot requestSlot : request.getSlots()) {
       repository.addOrUpdateById(requestSlot.getImpressionId(), updater);
     }
+  }
+
+  private boolean isCsmDisabled() {
+    return !config.isCsmEnabled();
   }
 
 }

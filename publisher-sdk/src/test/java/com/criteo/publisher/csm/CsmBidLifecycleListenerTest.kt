@@ -27,18 +27,35 @@ class CsmBidLifecycleListenerTest {
   @Mock
   private lateinit var uniqueIdGenerator: UniqueIdGenerator
 
+  @Mock
+  private lateinit var config: Config
+
   private lateinit var listener: CsmBidLifecycleListener
 
   @Before
   fun setUp() {
     MockitoAnnotations.initMocks(this)
 
+    config.stub {
+      on { isCsmEnabled } doReturn true
+    }
+
     listener = CsmBidLifecycleListener(
         repository,
         sendingQueueProducer,
         clock,
-        uniqueIdGenerator
+        uniqueIdGenerator,
+        config
     )
+  }
+
+  @Test
+  fun onSdkInitialized_GivenDeactivatedFeature_DoNothing() {
+    givenDeactivatedFeature()
+
+    listener.onSdkInitialized()
+
+    verifyFeatureIsDeactivated()
   }
 
   @Test
@@ -46,6 +63,15 @@ class CsmBidLifecycleListenerTest {
     listener.onSdkInitialized()
 
     verify(sendingQueueProducer).pushAllInQueue(repository)
+  }
+
+  @Test
+  fun onCdbCallStarted_GivenDeactivatedFeature_DoNothing() {
+    givenDeactivatedFeature()
+
+    listener.onCdbCallStarted(mock())
+
+    verifyFeatureIsDeactivated()
   }
 
   @Test
@@ -67,6 +93,15 @@ class CsmBidLifecycleListenerTest {
       verify(it).setCdbCallStartTimestamp(42)
       verify(it).setRequestGroupId("myRequestId")
     }
+  }
+
+  @Test
+  fun onCdbCallFinished_GivenDeactivatedFeature_DoNothing() {
+    givenDeactivatedFeature()
+
+    listener.onCdbCallFinished(mock(), mock())
+
+    verifyFeatureIsDeactivated()
   }
 
   @Test
@@ -150,6 +185,15 @@ class CsmBidLifecycleListenerTest {
   }
 
   @Test
+  fun onCdbCallFailed_GivenDeactivatedFeature_DoNothing() {
+    givenDeactivatedFeature()
+
+    listener.onCdbCallFailed(mock(), mock())
+
+    verifyFeatureIsDeactivated()
+  }
+
+  @Test
   fun onCdbCallFailed_GivenNotATimeoutException_UpdateAllForNetworkError() {
     val request = givenCdbRequestWithSlots("id1", "id2")
 
@@ -174,6 +218,16 @@ class CsmBidLifecycleListenerTest {
 
     verify(sendingQueueProducer).pushInQueue(repository, "id1")
     verify(sendingQueueProducer).pushInQueue(repository, "id2")
+  }
+
+  @Test
+  fun onBidConsumed_GivenDeactivatedFeature_DoNothing() {
+    givenDeactivatedFeature()
+    val adUnit = CacheAdUnit(AdSize(1, 2), "myAdUnit", CRITEO_BANNER)
+
+    listener.onBidConsumed(adUnit, mock())
+
+    verifyFeatureIsDeactivated()
   }
 
   @Test
@@ -302,6 +356,19 @@ class CsmBidLifecycleListenerTest {
 
       this(metricBuilder)
     }
+  }
+
+  private fun givenDeactivatedFeature() {
+    config.stub {
+      on { isCsmEnabled } doReturn false
+    }
+  }
+
+  private fun verifyFeatureIsDeactivated() {
+    verifyZeroInteractions(repository)
+    verifyZeroInteractions(clock)
+    verifyZeroInteractions(uniqueIdGenerator)
+    verifyZeroInteractions(sendingQueueProducer)
   }
 
 }

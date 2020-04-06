@@ -386,7 +386,8 @@ public class DependencyProvider {
             provideMetricRepository(),
             new MetricSendingQueueProducer(provideMetricSendingQueue()),
             provideClock(),
-            provideUniqueIdGenerator()
+            provideUniqueIdGenerator(),
+            provideConfig()
         );
 
         return new CompositeBidLifecycleListener(loggingListener, csmListener);
