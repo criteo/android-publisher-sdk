@@ -177,6 +177,7 @@ public class DependencyProvider {
 
   @NonNull
   public Executor provideThreadPoolExecutor() {
+    // FIXME EE-1006 Use dedicated executor service, see AndroidThreadPoolExecutorFactory
     return AsyncTask.THREAD_POOL_EXECUTOR;
   }
 

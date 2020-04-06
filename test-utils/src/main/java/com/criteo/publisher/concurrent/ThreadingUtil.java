@@ -1,5 +1,7 @@
 package com.criteo.publisher.concurrent;
 
+import static com.criteo.publisher.util.InstrumentationUtil.isRunningInInstrumentationTest;
+
 import android.os.Build.VERSION_CODES;
 import android.os.Handler;
 import android.os.Looper;
@@ -37,7 +39,9 @@ public class ThreadingUtil {
     //  But it would be great to have a single async entry point and consider main thread just as an
     //  normal async task.
 
-    waitForMessageQueueToBeIdle();
+    if (isRunningInInstrumentationTest()) {
+      waitForMessageQueueToBeIdle();
+    }
 
     try {
       trackingCommandsExecutor.waitCommands();
@@ -45,7 +49,9 @@ public class ThreadingUtil {
       throw new RuntimeException(e);
     }
 
-    waitForMessageQueueToBeIdle();
+    if (isRunningInInstrumentationTest()) {
+      waitForMessageQueueToBeIdle();
+    }
   }
 
   /**

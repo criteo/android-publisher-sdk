@@ -1,5 +1,6 @@
 package com.criteo.publisher.mock;
 
+import static com.criteo.publisher.util.InstrumentationUtil.isRunningInInstrumentationTest;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockingDetails;
@@ -279,8 +280,7 @@ class DependenciesAnnotationInjection {
   @SuppressLint("ObsoleteSdkInt")
   private static boolean canGetParameterCount() {
     // If we're not on Android, there is no API restrictions, so we bypass checks
-    boolean isNotRunningOnAndroidEmulator = VERSION.SDK_INT == 0;
-    return isNotRunningOnAndroidEmulator || VERSION.SDK_INT >= VERSION_CODES.O;
+    return !isRunningInInstrumentationTest() || VERSION.SDK_INT >= VERSION_CODES.O;
   }
 
   private void setFieldValue(@NonNull Object testInstance,

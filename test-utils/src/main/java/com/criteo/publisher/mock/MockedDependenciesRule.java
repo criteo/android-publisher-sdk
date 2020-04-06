@@ -1,5 +1,6 @@
 package com.criteo.publisher.mock;
 
+import static com.criteo.publisher.util.InstrumentationUtil.isRunningInInstrumentationTest;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -14,6 +15,7 @@ import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.MockableDependencyProvider;
+import com.criteo.publisher.concurrent.AndroidThreadPoolExecutorFactory;
 import com.criteo.publisher.concurrent.TrackingCommandsExecutor;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.network.PubSdkApi;
@@ -79,7 +81,13 @@ public class MockedDependenciesRule implements MethodRule {
     originalDependencyProvider.setApplication(application);
     originalDependencyProvider.setCriteoPublisherId(CriteoUtil.TEST_CP_ID);
 
-    Executor oldExecutor = originalDependencyProvider.provideThreadPoolExecutor();
+    Executor oldExecutor;
+    if (isRunningInInstrumentationTest()) {
+      oldExecutor = originalDependencyProvider.provideThreadPoolExecutor();
+    } else {
+      oldExecutor = new AndroidThreadPoolExecutorFactory().create();
+    }
+
     trackingCommandsExecutor = new TrackingCommandsExecutor(oldExecutor);
     dependencyProvider = spy(originalDependencyProvider);
     MockableDependencyProvider.setInstance(dependencyProvider);
