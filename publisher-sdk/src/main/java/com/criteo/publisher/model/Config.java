@@ -122,6 +122,14 @@ public class Config {
     return killSwitchEnabled;
   }
 
+  /**
+   * Return <code>true</code> to indicate if the CSM feature is activated. Else <code>false</code>
+   * is returned.
+   */
+  public boolean isCsmEnabled() {
+    return true;
+  }
+
   @NonNull
   public String getDisplayUrlMacro() {
     return displayUrlMacro;

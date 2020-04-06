@@ -3,6 +3,7 @@ package com.criteo.publisher.csm;
 import android.support.annotation.NonNull;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.PreconditionsUtil;
+import com.criteo.publisher.model.Config;
 import com.criteo.publisher.network.PubSdkApi;
 import java.io.IOException;
 import java.util.Collection;
@@ -20,17 +21,22 @@ public class MetricSendingQueueConsumer {
   private final BuildConfigWrapper buildConfigWrapper;
 
   @NonNull
+  private final Config config;
+
+  @NonNull
   private final Executor executor;
 
   public MetricSendingQueueConsumer(
       @NonNull MetricSendingQueue queue,
       @NonNull PubSdkApi api,
       @NonNull BuildConfigWrapper buildConfigWrapper,
+      @NonNull Config config,
       @NonNull Executor executor
   ) {
     this.queue = queue;
     this.api = api;
     this.buildConfigWrapper = buildConfigWrapper;
+    this.config = config;
     this.executor = executor;
   }
 
@@ -45,7 +51,9 @@ public class MetricSendingQueueConsumer {
    * metric will never be sent to CSM backend twice.
    */
   public void sendMetricBatch() {
-    executor.execute(new MetricSendingTask(queue, api, buildConfigWrapper));
+    if (config.isCsmEnabled()) {
+      executor.execute(new MetricSendingTask(queue, api, buildConfigWrapper));
+    }
   }
 
   private static class MetricSendingTask implements Runnable {

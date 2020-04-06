@@ -1,8 +1,9 @@
 package com.criteo.publisher.csm
 
 import com.criteo.publisher.util.BuildConfigWrapper
-import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
+import com.criteo.publisher.mock.SpyBean
+import com.criteo.publisher.model.Config
 import com.criteo.publisher.network.PubSdkApi
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
@@ -26,8 +27,11 @@ class MetricSendingQueueConsumerTest {
   @Mock
   private lateinit var api: PubSdkApi
 
-  @MockBean
+  @SpyBean
   private lateinit var buildConfigWrapper: BuildConfigWrapper
+
+  @SpyBean
+  private lateinit var config: Config
 
   @Mock
   private lateinit var executor: Executor
@@ -39,7 +43,6 @@ class MetricSendingQueueConsumerTest {
     MockitoAnnotations.initMocks(this)
 
     buildConfigWrapper.stub {
-      on { sdkVersion } doReturn "1"
       on { isDebug } doReturn false
     }
 
@@ -49,8 +52,36 @@ class MetricSendingQueueConsumerTest {
         queue,
         api,
         buildConfigWrapper,
+        config,
         executor
     )
+  }
+
+  @Test
+  fun sendMetricBatch_GivenDeactivatedFeature_DoNothing() {
+    config.stub {
+      on { isCsmEnabled } doReturn false
+    }
+
+    consumer.sendMetricBatch()
+
+    verifyZeroInteractions(queue)
+    verifyZeroInteractions(api)
+  }
+
+  @Test
+  fun sendMetricBatch_GivenFeatureDeactivatedAfterAPreviousSending_DoNothing() {
+    sendMetricBatch_GivenSomeMetricsInBatch_SendThemAsyncWithApi()
+    clearInvocations(queue, api)
+
+    config.stub {
+      on { isCsmEnabled } doReturn false
+    }
+
+    consumer.sendMetricBatch()
+
+    verifyZeroInteractions(queue)
+    verifyZeroInteractions(api)
   }
 
   @Test

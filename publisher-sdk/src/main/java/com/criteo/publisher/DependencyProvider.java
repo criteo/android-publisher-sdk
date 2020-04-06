@@ -443,6 +443,7 @@ public class DependencyProvider {
             provideMetricSendingQueue(),
             providePubSdkApi(),
             provideBuildConfigWrapper(),
+            provideConfig(),
             provideThreadPoolExecutor()
         );
       }
