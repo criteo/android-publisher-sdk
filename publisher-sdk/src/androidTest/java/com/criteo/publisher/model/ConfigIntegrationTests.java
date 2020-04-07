@@ -18,6 +18,7 @@ import static org.mockito.Mockito.when;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.criteo.publisher.BuildConfig;
 import com.criteo.publisher.Criteo;
@@ -25,6 +26,9 @@ import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.util.JsonSerializer;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import javax.inject.Inject;
 import org.junit.After;
@@ -35,12 +39,16 @@ import org.junit.Test;
 public class ConfigIntegrationTests {
 
   private final String CACHED_KILL_SWITCH = "CriteoCachedKillSwitch";
+  private final String CACHED_CONFIG = "CriteoCachedConfig";
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   @Inject
   private Context context;
+
+  @Inject
+  private JsonSerializer jsonSerializer;
 
   @Inject
   private Application application;
@@ -83,7 +91,7 @@ public class ConfigIntegrationTests {
 
   private void isKillSwitchEnabled_GivenKillSwitchInLocalStorageAndNoRemoteConfig_ReturnsLocalStorageValue(
       boolean isEnabled) throws Exception {
-    givenKillSwitchInLocalStorage(isEnabled);
+    givenKillSwitchInOldLocalStorage(isEnabled);
     givenRemoteConfigInError();
 
     givenInitializedCriteo();
@@ -107,7 +115,7 @@ public class ConfigIntegrationTests {
   private void localStorage_GivenRemoteConfigWithKillSwitch_PersistKillSwitchInLocalStorage(
       boolean isEnabled) throws Exception {
     givenEmptyLocalStorage();
-    givenRemoteConfigWithKillSwitch(isEnabled);
+    givenRemoteConfigResponseWithKillSwitch(isEnabled);
 
     givenInitializedCriteo();
     waitForIdleState();
@@ -119,7 +127,7 @@ public class ConfigIntegrationTests {
   public void localStorage_GivenNullKillSwitch_DoesNotPersistKillSwitch()
       throws Exception {
     givenEmptyLocalStorage();
-    givenRemoteConfigWithKillSwitch(null);
+    givenRemoteConfigResponseWithKillSwitch(null);
 
     givenInitializedCriteo();
     waitForIdleState();
@@ -192,23 +200,26 @@ public class ConfigIntegrationTests {
   }
 
   @Test
-  public void testConfigConstructorCachedKillSwitch() {
-    givenKillSwitchInLocalStorage(true);
+  public void testConfigConstructorCachedRemoteConfig() throws Exception {
+    RemoteConfigResponse remoteConfig = createRemoteConfigWithKillSwitch(true);
+
+    givenRemoteConfigInLocalStorage(remoteConfig);
 
     // test
-    Config config = new Config(context);
+    Config config = createConfig();
+
     // Assert that constructor hasn't cleared the cache
-    assertTrue(getKillSwitchInLocalStorage());
+    assertEquals(remoteConfig, getRemoteConfigInLocalStorage());
     assertTrue(config.isKillSwitchEnabled());
   }
 
   @Test
   public void testRefreshConfig() throws Exception {
-    Config config = new Config(context);
+    Config config = createConfig();
     // The config ctor shouldn't set the default to the shared prefs
     assertNull(getKillSwitchInLocalStorage());
 
-    RemoteConfigResponse response = givenResponseWithKillSwitch(true);
+    RemoteConfigResponse response = createRemoteConfigWithKillSwitch(true);
 
     // test
     config.refreshConfig(response);
@@ -220,11 +231,11 @@ public class ConfigIntegrationTests {
   @Test
   public void testRefreshConfigCachedKillSwitch() throws Exception {
     //set the killSwitch to true in sharedPrefs
-    givenKillSwitchInLocalStorage(true);
+    givenKillSwitchInOldLocalStorage(true);
 
-    Config config = new Config(context);
+    Config config = createConfig();
 
-    RemoteConfigResponse response = givenResponseWithKillSwitch(false);
+    RemoteConfigResponse response = createRemoteConfigWithKillSwitch(false);
 
     // test
     config.refreshConfig(response);
@@ -237,25 +248,126 @@ public class ConfigIntegrationTests {
   }
 
   @Test
-  public void testRefreshWithNullKillSwitch() {
+  public void refreshConfig_GivenKillSwitchInOldStorageAndGivenNullKillSwitchInRemoteConfig_DoNotPersistNullKillSwitch() throws Exception {
     //set the killSwitch to true in sharedPrefs
-    givenKillSwitchInLocalStorage(true);
+    givenKillSwitchInOldLocalStorage(true);
 
-    Config config = new Config(context);
+    Config config = createConfig();
 
-    RemoteConfigResponse response = givenResponseWithKillSwitch(null);
+    RemoteConfigResponse response = createRemoteConfigWithKillSwitch(null);
 
     // test
     config.refreshConfig(response);
 
     assertTrue(config.isKillSwitchEnabled());
+
     // this should not flip from the explicitly set value
     // as the json doesn't have a kill switch value to overwrite
     assertTrue(getKillSwitchInLocalStorage());
   }
 
+  @Test
+  public void refreshConfig_GivenKillSwitchInStorageAndGivenNullKillSwitchInRemoteConfig_DoNotPersistNullKillSwitch() throws Exception {
+    //set the killSwitch to true in sharedPrefs
+    givenKillSwitchInLocalStorage(true);
+
+    Config config = createConfig();
+
+    RemoteConfigResponse response = createRemoteConfigWithKillSwitch(null);
+
+    // test
+    config.refreshConfig(response);
+
+    assertTrue(config.isKillSwitchEnabled());
+
+    // this should not flip from the explicitly set value
+    // as the json doesn't have a kill switch value to overwrite
+    assertTrue(getKillSwitchInLocalStorage());
+  }
+
+  @Test
+  public void refreshConfig_GivenEmptyLocalStorageAndEmptyRemoteConfig_KeepDefaultValues() throws Exception {
+    givenEmptyLocalStorage();
+
+    Config config = createConfig();
+    String defaultUrlMode = config.getAdTagUrlMode();
+
+    RemoteConfigResponse emptyRemoteConfig = RemoteConfigResponse.createEmpty();
+
+    config.refreshConfig(emptyRemoteConfig);
+
+    assertEquals(defaultUrlMode, config.getAdTagUrlMode());
+  }
+
+  @Test
+  public void refreshConfig_GivenNotEmptyLocalStorageAndEmptyRemoteConfig_KeepPreviousValuesAndDoNotPersistEmptyValues() throws Exception {
+    RemoteConfigResponse persistedConfig = RemoteConfigResponse.create(
+        true,
+        "macro1",
+        "mode1",
+        "macro2",
+        "mode2",
+        false
+    );
+
+    givenRemoteConfigInLocalStorage(persistedConfig);
+
+    Config config = createConfig();
+
+    RemoteConfigResponse emptyRemoteConfig = RemoteConfigResponse.createEmpty();
+
+    config.refreshConfig(emptyRemoteConfig);
+
+    assertEquals("mode1", config.getAdTagUrlMode());
+    assertEquals(persistedConfig, getRemoteConfigInLocalStorage());
+  }
+
+  @Test
+  public void refreshConfig_GivenNotEmptyLocalStorageAndPartialRemoteConfig_OverrideNewNonNullValuesPersistMergedConfig() throws Exception {
+    RemoteConfigResponse oldPersistedConfig = RemoteConfigResponse.create(
+        true,
+        null,
+        "mode1",
+        null,
+        "mode2",
+        null
+    );
+
+    RemoteConfigResponse remoteConfig = RemoteConfigResponse.create(
+        null,
+        null,
+        "overriddenMode1",
+        "overriddenMacro2",
+        null,
+        false
+    );
+
+    RemoteConfigResponse expectedRemoteConfig = RemoteConfigResponse.create(
+        true,
+        null,
+        "overriddenMode1",
+        "overriddenMacro2",
+        "mode2",
+        false
+    );
+
+    givenRemoteConfigInLocalStorage(oldPersistedConfig);
+
+    Config config = createConfig();
+
+    config.refreshConfig(remoteConfig);
+
+    assertEquals("overriddenMacro2", config.getAdTagDataMacro());
+    assertEquals("mode2", config.getAdTagDataMode());
+    assertEquals(expectedRemoteConfig, getRemoteConfigInLocalStorage());
+  }
+
   private Config getConfig() {
     return mockedDependenciesRule.getDependencyProvider().provideConfig();
+  }
+
+  private RemoteConfigResponse createRemoteConfigWithKillSwitch(Boolean isEnabled) {
+    return RemoteConfigResponse.createEmpty().withKillSwitch(isEnabled);
   }
 
   private void givenRemoteConfigInError() throws IOException {
@@ -263,15 +375,9 @@ public class ConfigIntegrationTests {
     when(api.loadConfig(any())).thenThrow(IOException.class);
   }
 
-  private void givenRemoteConfigWithKillSwitch(Boolean isEnabled) throws Exception {
-    RemoteConfigResponse response = givenResponseWithKillSwitch(isEnabled);
+  private void givenRemoteConfigResponseWithKillSwitch(Boolean isEnabled) throws Exception {
+    RemoteConfigResponse response = createRemoteConfigWithKillSwitch(isEnabled);
     givenRemoteConfigWithResponse(response);
-  }
-
-  private RemoteConfigResponse givenResponseWithKillSwitch(Boolean isEnabled) {
-    RemoteConfigResponse response = mock(RemoteConfigResponse.class);
-    when(response.getKillSwitch()).thenReturn(isEnabled);
-    return response;
   }
 
   private void givenRemoteConfigWithResponse(RemoteConfigResponse response) throws IOException {
@@ -286,29 +392,55 @@ public class ConfigIntegrationTests {
   }
 
   @Nullable
-  private Boolean getKillSwitchInLocalStorage() {
+  private Boolean getKillSwitchInLocalStorage() throws Exception {
+    RemoteConfigResponse remoteConfig = getRemoteConfigInLocalStorage();
+    if (remoteConfig != null) {
+      return remoteConfig.getKillSwitch();
+    }
+    return null;
+  }
+
+  @Nullable
+  private RemoteConfigResponse getRemoteConfigInLocalStorage() throws Exception {
     SharedPreferences sharedPreferences = getSharedPreferences();
 
-    if (!sharedPreferences.contains(CACHED_KILL_SWITCH)) {
+    if (!sharedPreferences.contains(CACHED_CONFIG)) {
       return null;
     } else {
-      return sharedPreferences.getBoolean(CACHED_KILL_SWITCH, false);
+      String json = sharedPreferences.getString(CACHED_CONFIG, "");
+      ByteArrayInputStream jsonBais = new ByteArrayInputStream(json.getBytes("UTF-8"));
+      return jsonSerializer.read(RemoteConfigResponse.class, jsonBais);
     }
   }
 
   private void givenEmptyLocalStorage() {
-    SharedPreferences sharedPreferences = getSharedPreferences();
-
-    sharedPreferences.edit()
-        .remove(CACHED_KILL_SWITCH)
-        .apply();
+    CriteoUtil.clearSharedPreferences();
   }
 
-  private void givenKillSwitchInLocalStorage(boolean isEnabled) {
+  private void givenKillSwitchInOldLocalStorage(boolean isEnabled) {
     SharedPreferences sharedPreferences = getSharedPreferences();
 
     sharedPreferences.edit()
         .putBoolean(CACHED_KILL_SWITCH, isEnabled)
+        .apply();
+  }
+
+  private void givenKillSwitchInLocalStorage(boolean isEnabled) throws Exception {
+    RemoteConfigResponse remoteConfig = createRemoteConfigWithKillSwitch(isEnabled);
+    givenRemoteConfigInLocalStorage(remoteConfig);
+  }
+
+  private void givenRemoteConfigInLocalStorage(RemoteConfigResponse remoteConfigResponse) throws Exception{
+    SharedPreferences sharedPreferences = getSharedPreferences();
+
+    String json;
+    try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+      jsonSerializer.write(remoteConfigResponse, baos);
+      json = baos.toString("UTF-8");
+    }
+
+    sharedPreferences.edit()
+        .putString(CACHED_CONFIG, json)
         .apply();
   }
 
@@ -320,5 +452,10 @@ public class ConfigIntegrationTests {
 
   private void waitForIdleState() {
     waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+  }
+
+  @NonNull
+  private Config createConfig() {
+    return new Config(context, jsonSerializer);
   }
 }

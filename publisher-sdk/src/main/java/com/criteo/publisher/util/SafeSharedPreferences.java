@@ -18,7 +18,6 @@ public class SafeSharedPreferences {
   }
 
   @Nullable
-
   public String getString(@NonNull String key, @Nullable String defaultValue) {
     String value = defaultValue;
 
@@ -33,18 +32,32 @@ public class SafeSharedPreferences {
     return value;
   }
 
-  @Nullable
-  public Integer getInt(@NonNull String key, @Nullable Integer defaultValue) {
-    Integer value = defaultValue;
+  public int getInt(@NonNull String key, int defaultValue) {
+    int value = defaultValue;
 
     try {
       value = sharedPreferences.getInt(key, defaultValue);
     } catch (ClassCastException e) {
       PreconditionsUtil.throwOrLog(
-          new IllegalStateException("Expect an Integer type when reading " + key, e)
+          new IllegalStateException("Expect an int type when reading " + key, e)
       );
     }
 
     return value;
   }
+
+  public boolean getBoolean(@NonNull String key, boolean defaultValue) {
+    boolean value = defaultValue;
+
+    try {
+      value = sharedPreferences.getBoolean(key, defaultValue);
+    } catch (ClassCastException e) {
+      PreconditionsUtil.throwOrLog(
+          new IllegalStateException("Expect an boolean type when reading " + key, e)
+      );
+    }
+
+    return value;
+  }
+
 }

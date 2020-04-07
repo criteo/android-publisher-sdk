@@ -12,8 +12,6 @@ public class CriteoUtil {
 
   public static final String TEST_CP_ID = "B-000001";
 
-  private static final String CACHED_KILL_SWITCH = "CriteoCachedKillSwitch";
-
   public static Criteo givenInitializedCriteo(AdUnit... preloadedAdUnits)
       throws CriteoInitException {
     Application app = (Application) InstrumentationRegistry.getTargetContext()
@@ -48,9 +46,7 @@ public class CriteoUtil {
   public static void clearSharedPreferences() {
     SharedPreferences sharedPreferences = getSharedPreferences();
 
-    sharedPreferences.edit()
-        .remove(CACHED_KILL_SWITCH)
-        .apply();
+    sharedPreferences.edit().clear().apply();
   }
 
   private static SharedPreferences getSharedPreferences() {

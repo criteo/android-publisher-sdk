@@ -203,7 +203,10 @@ public class DependencyProvider {
       @NonNull
       @Override
       public Config create() {
-        return new Config(provideContext());
+        return new Config(
+            provideContext(),
+            provideJsonSerializer()
+        );
       }
     });
   }

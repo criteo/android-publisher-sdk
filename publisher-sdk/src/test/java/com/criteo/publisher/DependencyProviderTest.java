@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import android.app.Application;
 import android.content.Context;
+import com.criteo.publisher.mock.ApplicationMock;
 import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.csm.MetricSendingQueue;
@@ -166,7 +167,7 @@ public class DependencyProviderTest {
   private <T> void provideBean_WhenProvidedTwice_ReturnsTheSame(
       Function<DependencyProvider, T> providing) {
     DependencyProvider instance = spy(DependencyProvider.getInstance());
-    instance.setApplication(mock(Application.class, RETURNS_DEEP_STUBS));
+    instance.setApplication(ApplicationMock.newMock());
     instance.setCriteoPublisherId(CriteoUtil.TEST_CP_ID);
 
     T bean1 = providing.apply(instance);

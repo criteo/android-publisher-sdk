@@ -1,11 +1,9 @@
 package com.criteo.publisher.mock;
 
 import static com.criteo.publisher.util.InstrumentationUtil.isRunningInInstrumentationTest;
-import static org.mockito.Answers.RETURNS_DEEP_STUBS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 import android.app.Application;
@@ -96,12 +94,10 @@ public class MockedDependenciesRule implements MethodRule {
   }
 
   private Application getApplication() {
-    try {
-      return (Application) InstrumentationRegistry.getTargetContext()
-          .getApplicationContext();
-    } catch (IllegalStateException e) {
-      // This means that we are not running inside an emulator. So we use a mock instead.
-      return mock(Application.class, RETURNS_DEEP_STUBS);
+    if (isRunningInInstrumentationTest()) {
+      return (Application) InstrumentationRegistry.getTargetContext().getApplicationContext();
+    } else {
+      return ApplicationMock.newMock();
     }
   }
 

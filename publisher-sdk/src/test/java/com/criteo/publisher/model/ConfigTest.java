@@ -3,10 +3,12 @@ package com.criteo.publisher.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.AdditionalAnswers.answerVoid;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -15,8 +17,16 @@ import static org.mockito.Mockito.when;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
+import com.criteo.publisher.util.BuildConfigWrapper;
+import com.criteo.publisher.util.JsonSerializer;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.InOrder;
@@ -24,6 +34,15 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class ConfigTest {
+
+  @Rule
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
+  @SpyBean
+  private BuildConfigWrapper buildConfigWrapper;
+
+  @SpyBean
+  private JsonSerializer jsonSerializer;
 
   private Config config;
 
@@ -39,14 +58,19 @@ public class ConfigTest {
 
     when(context.getSharedPreferences(any(), eq(Context.MODE_PRIVATE)))
         .thenReturn(sharedPreferences);
+
+    when(sharedPreferences.getString(any(), any()))
+        .thenAnswer(invocation -> invocation.getArguments()[1]);
   }
 
   @Test
   public void new_GivenEmptyLocalStorage_ContainsDefaultValues() {
     when(sharedPreferences.getBoolean(any(), anyBoolean()))
         .thenAnswer(invocation -> invocation.getArguments()[1]);
+    when(sharedPreferences.getString(any(), any()))
+        .thenAnswer(invocation -> invocation.getArguments()[1]);
 
-    config = new Config(context);
+    givenNewConfig();
 
     assertConfigContainsDefaultValues();
   }
@@ -54,34 +78,50 @@ public class ConfigTest {
   @Test
   public void new_GivenInvalidValueInLocalStorage_DoesNotThrowAndUseDefaultValues()
       throws Exception {
-    when(sharedPreferences.getBoolean(any(), anyBoolean())).thenThrow(ClassCastException.class);
+    when(buildConfigWrapper.isDebug()).thenReturn(false);
 
-    config = new Config(context);
+    when(sharedPreferences.getBoolean(any(), anyBoolean())).thenThrow(ClassCastException.class);
+    when(sharedPreferences.getString(any(), any())).thenThrow(ClassCastException.class);
+
+    givenNewConfig();
 
     assertConfigContainsDefaultValues();
   }
 
   @Test
-  public void isKillSwitchEnabled_GivenKillSwitchEnabledInLocalStorage_ReturnsEnabled() {
-    givenKillSwitchInLocalStorage(true);
+  public void new_GivenInvalidJsonInLocalStorage_DoesNotThrowAndUseDefaultValues()
+      throws Exception {
+    when(buildConfigWrapper.isDebug()).thenReturn(false);
 
-    config = new Config(context);
+    when(sharedPreferences.getBoolean(any(), anyBoolean())).thenThrow(ClassCastException.class);
+    when(sharedPreferences.getString(any(), any())).thenReturn("{");
+
+    givenNewConfig();
+
+    assertConfigContainsDefaultValues();
+  }
+
+  @Test
+  public void isKillSwitchEnabled_GivenKillSwitchEnabledInOldLocalStorage_ReturnsEnabled() {
+    givenKillSwitchInOldLocalStorage(true);
+
+    givenNewConfig();
 
     assertTrue(config.isKillSwitchEnabled());
   }
 
   @Test
-  public void isKillSwitchEnabled_GivenKillSwitchDisabledInLocalStorage_ReturnsDisabled() {
-    givenKillSwitchInLocalStorage(false);
+  public void isKillSwitchEnabled_GivenKillSwitchDisabledInOldLocalStorage_ReturnsDisabled() {
+    givenKillSwitchInOldLocalStorage(false);
 
-    config = new Config(context);
+    givenNewConfig();
 
     assertFalse(config.isKillSwitchEnabled());
   }
 
   @Test
   public void refreshConfig_GivenMissingKillSwitch_ItIsUnchanged() throws Exception {
-    config = new Config(context);
+    givenNewConfig();
 
     RemoteConfigResponse newConfig = givenFullNewPayload(config);
     when(newConfig.getKillSwitch()).thenReturn(null);
@@ -91,7 +131,7 @@ public class ConfigTest {
 
   @Test
   public void refreshConfig_GivenMissingUrlMacro_ItIsUnchanged() throws Exception {
-    config = new Config(context);
+    givenNewConfig();
 
     RemoteConfigResponse newConfig = givenFullNewPayload(config);
     when(newConfig.getAndroidDisplayUrlMacro()).thenReturn(null);
@@ -101,7 +141,7 @@ public class ConfigTest {
 
   @Test
   public void refreshConfig_GivenMissingUrlMode_ItIsUnchanged() throws Exception {
-    config = new Config(context);
+    givenNewConfig();
 
     RemoteConfigResponse newConfig = givenFullNewPayload(config);
     when(newConfig.getAndroidAdTagUrlMode()).thenReturn(null);
@@ -111,7 +151,7 @@ public class ConfigTest {
 
   @Test
   public void refreshConfig_GivenMissingDataMacro_ItIsUnchanged() throws Exception {
-    config = new Config(context);
+    givenNewConfig();
 
     RemoteConfigResponse newConfig = givenFullNewPayload(config);
     when(newConfig.getAndroidAdTagDataMacro()).thenReturn(null);
@@ -121,7 +161,7 @@ public class ConfigTest {
 
   @Test
   public void refreshConfig_GivenMissingDataMode_ItIsUnchanged() throws Exception {
-    config = new Config(context);
+    givenNewConfig();
 
     RemoteConfigResponse newConfig = givenFullNewPayload(config);
     when(newConfig.getAndroidAdTagDataMode()).thenReturn(null);
@@ -131,7 +171,7 @@ public class ConfigTest {
 
   @Test
   public void refreshConfig_GivenMissingCsmEnabled_ItIsUnchanged() throws Exception {
-    config = new Config(context);
+    givenNewConfig();
 
     RemoteConfigResponse newConfig = givenFullNewPayload(config);
     when(newConfig.getCsmEnabled()).thenReturn(null);
@@ -149,39 +189,52 @@ public class ConfigTest {
   }
 
   @Test
-  public void refreshConfig_GivenEnabledKillSwitch_ItIsPersisted() throws Exception {
+  public void refreshConfig_GivenRemoteConfigAndSerializer_PersistSerializedRemoteConfig() throws Exception {
     Editor editor = mock(Editor.class);
     when(sharedPreferences.edit()).thenReturn(editor);
 
-    config = new Config(context);
+    givenNewConfig();
 
-    RemoteConfigResponse newConfig = givenFullNewPayload(config);
-    when(newConfig.getKillSwitch()).thenReturn(true);
+    RemoteConfigResponse newConfig = RemoteConfigResponse.create(
+        true,
+        "urlMacro",
+        null,
+        "dataMacro",
+        "dataMode",
+        false
+    );
+
+    doAnswer(answerVoid((RemoteConfigResponse ignored, OutputStream outputStream) -> {
+      outputStream.write("serialized".getBytes(StandardCharsets.UTF_8));
+    })).when(jsonSerializer).write(eq(newConfig), any());
 
     config.refreshConfig(newConfig);
 
     InOrder inOrder = inOrder(editor);
-    inOrder.verify(editor).putBoolean("CriteoCachedKillSwitch", true);
+    inOrder.verify(editor).putString("CriteoCachedConfig", "serialized");
     inOrder.verify(editor).apply();
     inOrder.verifyNoMoreInteractions();
   }
 
   @Test
-  public void refreshConfig_GivenNullKillSwitch_ItIsNotPersisted() throws Exception {
-    config = new Config(context);
+  public void refreshConfig_GivenFailingSerializer_DoNotPersistAndDoNotCrash() throws Exception {
+    Editor editor = mock(Editor.class);
+    when(sharedPreferences.edit()).thenReturn(editor);
+
+    givenNewConfig();
 
     RemoteConfigResponse newConfig = givenFullNewPayload(config);
-    when(newConfig.getKillSwitch()).thenReturn(null);
 
-    clearInvocations(sharedPreferences);
+    doThrow(IOException.class).when(jsonSerializer).write(any(), any());
+
     config.refreshConfig(newConfig);
 
-    verifyZeroInteractions(sharedPreferences);
+    verifyZeroInteractions(editor);
   }
 
   @Test
   public void refreshConfig_GivenNewConfig_UpdateEverything() throws Exception {
-    config = new Config(context);
+    givenNewConfig();
     boolean killSwitchEnabled = config.isKillSwitchEnabled();
     String displayUrlMacro = config.getDisplayUrlMacro();
     String adTagUrlMode = config.getAdTagUrlMode();
@@ -201,6 +254,10 @@ public class ConfigTest {
     assertEquals(!config.isCsmEnabled(), csmEnabled);
   }
 
+  private void givenNewConfig() {
+    config = new Config(context, jsonSerializer);
+  }
+
   private RemoteConfigResponse givenFullNewPayload(Config config) {
     RemoteConfigResponse response = mock(RemoteConfigResponse.class);
     when(response.getKillSwitch()).thenReturn(!config.isKillSwitchEnabled());
@@ -212,7 +269,8 @@ public class ConfigTest {
     return response;
   }
 
-  private void givenKillSwitchInLocalStorage(boolean isEnabled) {
+  private void givenKillSwitchInOldLocalStorage(boolean isEnabled) {
+    when(sharedPreferences.contains("CriteoCachedKillSwitch")).thenReturn(true);
     when(sharedPreferences.getBoolean(eq("CriteoCachedKillSwitch"), anyBoolean()))
         .thenReturn(isEnabled);
   }

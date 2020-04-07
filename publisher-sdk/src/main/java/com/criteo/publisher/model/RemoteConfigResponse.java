@@ -1,5 +1,6 @@
 package com.criteo.publisher.model;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
@@ -8,6 +9,49 @@ import com.google.gson.annotations.SerializedName;
 
 @AutoValue
 public abstract class RemoteConfigResponse {
+
+  @NonNull
+  public static RemoteConfigResponse create(
+      @Nullable Boolean killSwitch,
+      @Nullable String androidDisplayUrlMacro,
+      @Nullable String androidAdTagUrlMode,
+      @Nullable String androidAdTagDataMacro,
+      @Nullable String androidAdTagDataMode,
+      @Nullable Boolean csmEnabled
+  ) {
+    return new AutoValue_RemoteConfigResponse(
+        killSwitch,
+        androidDisplayUrlMacro,
+        androidAdTagUrlMode,
+        androidAdTagDataMacro,
+        androidAdTagDataMode,
+        csmEnabled
+    );
+  }
+
+  @NonNull
+  public static RemoteConfigResponse createEmpty() {
+    return create(
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    );
+  }
+
+  @NonNull
+  RemoteConfigResponse withKillSwitch(@Nullable Boolean killSwitch) {
+    return create(
+        killSwitch,
+        getAndroidDisplayUrlMacro(),
+        getAndroidAdTagUrlMode(),
+        getAndroidAdTagDataMacro(),
+        getAndroidAdTagDataMode(),
+        getCsmEnabled()
+    );
+  }
 
   public static TypeAdapter<RemoteConfigResponse> typeAdapter(Gson gson) {
     return new AutoValue_RemoteConfigResponse.GsonTypeAdapter(gson);

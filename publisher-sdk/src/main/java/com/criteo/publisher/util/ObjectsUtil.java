@@ -1,5 +1,6 @@
 package com.criteo.publisher.util;
 
+import android.support.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -52,5 +53,13 @@ public class ObjectsUtil {
    */
   public static int hash(Object... values) {
     return Arrays.hashCode(values);
+  }
+
+  @Nullable
+  public static <T> T getOrElse(@Nullable T value, @Nullable T defaultValue) {
+    if (value == null) {
+      return defaultValue;
+    }
+    return value;
   }
 }
