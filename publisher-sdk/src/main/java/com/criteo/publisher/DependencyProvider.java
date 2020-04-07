@@ -2,7 +2,6 @@ package com.criteo.publisher;
 
 import android.app.Application;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.criteo.publisher.AppEvents.AppEvents;
@@ -11,6 +10,7 @@ import com.criteo.publisher.bid.CompositeBidLifecycleListener;
 import com.criteo.publisher.bid.LoggingBidLifecycleListener;
 import com.criteo.publisher.bid.UniqueIdGenerator;
 import com.criteo.publisher.cache.SdkCache;
+import com.criteo.publisher.concurrent.ThreadPoolExecutorFactory;
 import com.criteo.publisher.csm.CsmBidLifecycleListener;
 import com.criteo.publisher.csm.MetricParser;
 import com.criteo.publisher.csm.MetricRepository;
@@ -43,6 +43,7 @@ import com.google.gson.GsonBuilder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Provides global dependencies to the rest of the codebase
@@ -177,13 +178,7 @@ public class DependencyProvider {
 
   @NonNull
   public Executor provideThreadPoolExecutor() {
-    // FIXME EE-1006 Use dedicated executor service, see AndroidThreadPoolExecutorFactory
-    return AsyncTask.THREAD_POOL_EXECUTOR;
-  }
-
-  @NonNull
-  public Executor provideSerialExecutor() {
-    return AsyncTask.SERIAL_EXECUTOR;
+    return getOrCreate(ThreadPoolExecutor.class, new ThreadPoolExecutorFactory());
   }
 
   @NonNull

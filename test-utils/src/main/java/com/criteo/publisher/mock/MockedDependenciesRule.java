@@ -13,7 +13,6 @@ import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.MockableDependencyProvider;
-import com.criteo.publisher.concurrent.AndroidThreadPoolExecutorFactory;
 import com.criteo.publisher.concurrent.TrackingCommandsExecutor;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.network.PubSdkApi;
@@ -79,18 +78,12 @@ public class MockedDependenciesRule implements MethodRule {
     originalDependencyProvider.setApplication(application);
     originalDependencyProvider.setCriteoPublisherId(CriteoUtil.TEST_CP_ID);
 
-    Executor oldExecutor;
-    if (isRunningInInstrumentationTest()) {
-      oldExecutor = originalDependencyProvider.provideThreadPoolExecutor();
-    } else {
-      oldExecutor = new AndroidThreadPoolExecutorFactory().create();
-    }
+    Executor oldExecutor = originalDependencyProvider.provideThreadPoolExecutor();
 
     trackingCommandsExecutor = new TrackingCommandsExecutor(oldExecutor);
     dependencyProvider = spy(originalDependencyProvider);
     MockableDependencyProvider.setInstance(dependencyProvider);
     doReturn(trackingCommandsExecutor).when(dependencyProvider).provideThreadPoolExecutor();
-    doReturn(trackingCommandsExecutor).when(dependencyProvider).provideSerialExecutor();
   }
 
   private Application getApplication() {

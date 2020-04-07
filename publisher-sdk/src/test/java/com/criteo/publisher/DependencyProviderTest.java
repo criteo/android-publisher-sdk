@@ -17,6 +17,8 @@ import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.csm.MetricSendingQueue;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.util.AdvertisingInfo;
+import com.criteo.publisher.util.DeviceUtil;
 import java.util.function.Function;
 import org.junit.After;
 import org.junit.Before;
@@ -147,11 +149,6 @@ public class DependencyProviderTest {
   @Test
   public void provideLoggingUtil_WhenProvidedTwice_ReturnsTheSame() throws Exception {
     provideBean_WhenProvidedTwice_ReturnsTheSame(DependencyProvider::provideLoggingUtil);
-  }
-
-  @Test
-  public void provideSerialExecutor_WhenProvidedTwice_ReturnsTheSame() throws Exception {
-    provideBean_WhenProvidedTwice_ReturnsTheSame(DependencyProvider::provideSerialExecutor);
   }
 
   @Test
