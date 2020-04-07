@@ -1,9 +1,9 @@
 package com.criteo.publisher.csm
 
-import com.criteo.publisher.util.BuildConfigWrapper
 import com.criteo.publisher.csm.TapeMetricSendingQueue.createFileObjectQueue
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
+import com.criteo.publisher.util.BuildConfigWrapper
 import com.nhaarman.mockitokotlin2.*
 import com.squareup.tape.FileException
 import com.squareup.tape.InMemoryObjectQueue
@@ -17,6 +17,11 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.mockito.MockitoAnnotations
 import java.io.File
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.Executors
 import javax.inject.Inject
 
 @RunWith(Parameterized::class)
@@ -217,6 +222,34 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
     val metrics = queue.poll(1)
 
     assertThat(metrics).isEmpty()
+  }
+
+  @Test
+  fun poll_GivenManyWorkersInParallel_ShouldNotProduceDuplicate() {
+    for (id in 0 until 2000) {
+      val metric = mockMetric(id)
+      queue.offer(metric)
+    }
+
+    val polledMetric = Collections.newSetFromMap(ConcurrentHashMap<Metric, Boolean>())
+
+    val nbWorkers = 10
+    val executor = Executors.newFixedThreadPool(nbWorkers)
+    val allAreReadyToWork = CyclicBarrier(nbWorkers)
+    val allAreDone = CountDownLatch(nbWorkers)
+
+    for (i in 0 until nbWorkers) {
+      executor.execute {
+        allAreReadyToWork.await()
+        val metrics = queue.poll(100)
+        polledMetric.addAll(metrics)
+        allAreDone.countDown()
+      }
+    }
+
+    allAreDone.await()
+
+    assertThat(polledMetric).hasSize(100 * nbWorkers)
   }
 
   private fun givenDeactivatedPreconditionUtils() {

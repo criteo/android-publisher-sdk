@@ -1,5 +1,6 @@
 package com.criteo.publisher.csm;
 
+import android.support.annotation.GuardedBy;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.criteo.publisher.util.PreconditionsUtil;
@@ -19,7 +20,18 @@ import java.util.List;
 class TapeMetricSendingQueue extends MetricSendingQueue {
 
   @NonNull
+  @GuardedBy("pollLock")
   private final ObjectQueue<Metric> queue;
+
+  /**
+   * Lock on the polling side of the queue.
+   *
+   * There is no need to lock the other side of the FIFO because operations on the underlying queue
+   * are atomic. If two workers concurrently offer and poll the queue, the poller will either see
+   * the offered elements, either he will see nothing. So there is no risk of inconsistency. Note
+   * that the outcome is not deterministic but it is not needed.
+   */
+  private final Object pollLock = new Object();
 
   @Nullable
   private Method usedBytesMethod;
@@ -56,20 +68,22 @@ class TapeMetricSendingQueue extends MetricSendingQueue {
   @Override
   List<Metric> poll(int max) {
     List<Metric> metrics = new ArrayList<>();
-    try {
-      for (int i = 0; i < max; i++) {
-        Metric metric = queue.peek();
-        if (metric == null) {
-          break;
-        }
+    synchronized (pollLock) {
+      try {
+        for (int i = 0; i < max; i++) {
+          Metric metric = queue.peek();
+          if (metric == null) {
+            break;
+          }
 
-        metrics.add(metric);
-        queue.remove();
+          metrics.add(metric);
+          queue.remove();
+        }
+        return metrics;
+      } catch (FileException e) {
+        PreconditionsUtil.throwOrLog(e);
+        return metrics;
       }
-      return metrics;
-    } catch (FileException e) {
-      PreconditionsUtil.throwOrLog(e);
-      return metrics;
     }
   }
 
