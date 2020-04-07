@@ -27,6 +27,7 @@ public class Config {
   private String adTagUrlMode;
   private String adTagDataMacro;
   private String adTagDataMode;
+  private volatile boolean csmEnabled;
 
   @Nullable
   private Context context;
@@ -44,6 +45,7 @@ public class Config {
     this.adTagDataMode = DEFAULT_AD_TAG_DATA_MODE;
     this.context = context;
     this.killSwitchEnabled = readKillSwitchOrFalse(context);
+    this.csmEnabled = true;
   }
 
   public void refreshConfig(@NonNull RemoteConfigResponse response) {
@@ -57,9 +59,11 @@ public class Config {
     adTagUrlMode = getOrElse(response.getAndroidAdTagUrlMode(), adTagUrlMode);
     adTagDataMacro = getOrElse(response.getAndroidAdTagDataMacro(), adTagDataMacro);
     adTagDataMode = getOrElse(response.getAndroidAdTagDataMode(), adTagDataMode);
+    csmEnabled = getOrElse(response.getCsmEnabled(), csmEnabled);
   }
 
-  private static String getOrElse(@Nullable String value, @NonNull String defaultValue) {
+  @NonNull
+  private static <T> T getOrElse(@Nullable T value, @NonNull T defaultValue) {
     if (value == null) {
       return defaultValue;
     }
@@ -105,7 +109,7 @@ public class Config {
    * is returned.
    */
   public boolean isCsmEnabled() {
-    return true;
+    return csmEnabled;
   }
 
   @NonNull

@@ -34,13 +34,29 @@ class RemoteConfigResponseTest {
   }
 
   @Test
+  fun read_GivenJsonWithUnknownProperty_IgnoreThemAndReturnEmptyObject() {
+    val json = """{
+      "unknownPropertyThatShouldBeIgnored": ""
+    }""".trimIndent()
+
+    val response = readFromString(json)
+
+    assertThat(response.killSwitch).isNull()
+    assertThat(response.androidDisplayUrlMacro).isNull()
+    assertThat(response.androidAdTagUrlMode).isNull()
+    assertThat(response.androidAdTagDataMacro).isNull()
+    assertThat(response.androidAdTagDataMode).isNull()
+  }
+
+  @Test
   fun read_GivenFullJson_ReturnFullObject() {
     val json = """{
       "killSwitch": true,
       "AndroidDisplayUrlMacro": "%%macroUrl%%",
       "AndroidAdTagUrlMode": "<html />",
       "AndroidAdTagDataMacro": "%%macroData%%",
-      "AndroidAdTagDataMode": "<body />"
+      "AndroidAdTagDataMode": "<body />",
+      "csmEnabled": true
     }""".trimIndent()
 
     val response = readFromString(json)
@@ -50,6 +66,7 @@ class RemoteConfigResponseTest {
     assertThat(response.androidAdTagUrlMode).isEqualTo("<html />")
     assertThat(response.androidAdTagDataMacro).isEqualTo("%%macroData%%")
     assertThat(response.androidAdTagDataMode).isEqualTo("<body />")
+    assertThat(response.csmEnabled).isTrue()
   }
 
   @Test

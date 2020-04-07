@@ -129,6 +129,16 @@ public class ConfigTest {
     refreshConfig_assertItIsUnchanged(newConfig, Config::getAdTagDataMode);
   }
 
+  @Test
+  public void refreshConfig_GivenMissingCsmEnabled_ItIsUnchanged() throws Exception {
+    config = new Config(context);
+
+    RemoteConfigResponse newConfig = givenFullNewPayload(config);
+    when(newConfig.getCsmEnabled()).thenReturn(null);
+
+    refreshConfig_assertItIsUnchanged(newConfig, Config::isCsmEnabled);
+  }
+
   private <T> void refreshConfig_assertItIsUnchanged(RemoteConfigResponse newConfig,
       Function<Config, T> projection) {
     T previousValue = projection.apply(config);
@@ -177,6 +187,7 @@ public class ConfigTest {
     String adTagUrlMode = config.getAdTagUrlMode();
     String adTagDataMacro = config.getAdTagDataMacro();
     String adTagDataMode = config.getAdTagDataMode();
+    boolean csmEnabled = config.isCsmEnabled();
 
     RemoteConfigResponse newConfig = givenFullNewPayload(config);
 
@@ -187,6 +198,7 @@ public class ConfigTest {
     assertEquals("new_" + adTagUrlMode, config.getAdTagUrlMode());
     assertEquals("new_" + adTagDataMacro, config.getAdTagDataMacro());
     assertEquals("new_" + adTagDataMode, config.getAdTagDataMode());
+    assertEquals(!config.isCsmEnabled(), csmEnabled);
   }
 
   private RemoteConfigResponse givenFullNewPayload(Config config) {
@@ -196,6 +208,7 @@ public class ConfigTest {
     when(response.getAndroidAdTagUrlMode()).thenReturn("new_" + config.getAdTagUrlMode());
     when(response.getAndroidAdTagDataMacro()).thenReturn("new_" + config.getAdTagDataMacro());
     when(response.getAndroidAdTagDataMode()).thenReturn("new_" + config.getAdTagDataMode());
+    when(response.getCsmEnabled()).thenReturn(!config.isCsmEnabled());
     return response;
   }
 
@@ -214,6 +227,7 @@ public class ConfigTest {
     assertEquals(
         "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>",
         config.getAdTagDataMode());
+    assertTrue(config.isCsmEnabled());
   }
 
 }

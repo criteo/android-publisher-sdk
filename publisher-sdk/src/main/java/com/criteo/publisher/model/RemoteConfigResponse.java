@@ -74,4 +74,14 @@ public abstract class RemoteConfigResponse {
   @SerializedName("AndroidAdTagDataMode")
   abstract String getAndroidAdTagDataMode();
 
+  /**
+   * Feature flag for activating/deactivating the CSM feature. If set to <code>true</code>, then the
+   * feature is activated. If <code>false</code>, then it is deactivated. If the flag is not present
+   * (i.e. equals to <code>null</code>), then the previous persisted value of this flag is taken. If
+   * there is no previous value, this means that this is a fresh start of a new application, then a
+   * default value is taken.
+   */
+  @Nullable
+  public abstract Boolean getCsmEnabled();
+
 }
