@@ -15,8 +15,6 @@ import static org.mockserver.model.NottableString.not;
 import static org.mockserver.verify.VerificationTimes.once;
 
 import android.support.annotation.NonNull;
-import com.criteo.publisher.util.BuildConfigWrapper;
-import com.criteo.publisher.util.JsonSerializer;
 import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
@@ -24,6 +22,8 @@ import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.RemoteConfigRequest;
 import com.criteo.publisher.privacy.gdpr.GdprData;
+import com.criteo.publisher.util.BuildConfigWrapper;
+import com.criteo.publisher.util.JsonSerializer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -326,6 +326,8 @@ public class PubSdkApiTest {
         "myCpId",
         "myAppId",
         "myVersion");
+
+    mockServerClient.when(request()).respond(response().withStatusCode(204));
 
     api.loadConfig(request);
 

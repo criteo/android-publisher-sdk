@@ -1,9 +1,7 @@
 package com.criteo.publisher.model;
 
-import static org.json.JSONObject.quote;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -18,7 +16,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import java.util.function.Function;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
@@ -86,8 +83,8 @@ public class ConfigTest {
   public void refreshConfig_GivenMissingKillSwitch_ItIsUnchanged() throws Exception {
     config = new Config(context);
 
-    JSONObject newConfig = givenFullNewPayload(config);
-    newConfig.remove("killSwitch");
+    RemoteConfigResponse newConfig = givenFullNewPayload(config);
+    when(newConfig.getKillSwitch()).thenReturn(null);
 
     refreshConfig_assertItIsUnchanged(newConfig, Config::isKillSwitchEnabled);
   }
@@ -96,8 +93,8 @@ public class ConfigTest {
   public void refreshConfig_GivenMissingUrlMacro_ItIsUnchanged() throws Exception {
     config = new Config(context);
 
-    JSONObject newConfig = givenFullNewPayload(config);
-    newConfig.remove("AndroidDisplayUrlMacro");
+    RemoteConfigResponse newConfig = givenFullNewPayload(config);
+    when(newConfig.getAndroidDisplayUrlMacro()).thenReturn(null);
 
     refreshConfig_assertItIsUnchanged(newConfig, Config::getDisplayUrlMacro);
   }
@@ -106,8 +103,8 @@ public class ConfigTest {
   public void refreshConfig_GivenMissingUrlMode_ItIsUnchanged() throws Exception {
     config = new Config(context);
 
-    JSONObject newConfig = givenFullNewPayload(config);
-    newConfig.remove("AndroidAdTagUrlMode");
+    RemoteConfigResponse newConfig = givenFullNewPayload(config);
+    when(newConfig.getAndroidAdTagUrlMode()).thenReturn(null);
 
     refreshConfig_assertItIsUnchanged(newConfig, Config::getAdTagUrlMode);
   }
@@ -116,8 +113,8 @@ public class ConfigTest {
   public void refreshConfig_GivenMissingDataMacro_ItIsUnchanged() throws Exception {
     config = new Config(context);
 
-    JSONObject newConfig = givenFullNewPayload(config);
-    newConfig.remove("AndroidAdTagDataMacro");
+    RemoteConfigResponse newConfig = givenFullNewPayload(config);
+    when(newConfig.getAndroidAdTagDataMacro()).thenReturn(null);
 
     refreshConfig_assertItIsUnchanged(newConfig, Config::getAdTagDataMacro);
   }
@@ -126,23 +123,13 @@ public class ConfigTest {
   public void refreshConfig_GivenMissingDataMode_ItIsUnchanged() throws Exception {
     config = new Config(context);
 
-    JSONObject newConfig = givenFullNewPayload(config);
-    newConfig.remove("AndroidAdTagDataMode");
+    RemoteConfigResponse newConfig = givenFullNewPayload(config);
+    when(newConfig.getAndroidAdTagDataMode()).thenReturn(null);
 
     refreshConfig_assertItIsUnchanged(newConfig, Config::getAdTagDataMode);
   }
 
-  @Test
-  public void refreshConfig_GivenInvalidKillSwitch_ItIsUnchanged() throws Exception {
-    config = new Config(context);
-
-    JSONObject newConfig = givenFullNewPayload(config);
-    newConfig.put("killSwitch", "not a boolean");
-
-    refreshConfig_assertItIsUnchanged(newConfig, Config::isKillSwitchEnabled);
-  }
-
-  private <T> void refreshConfig_assertItIsUnchanged(JSONObject newConfig,
+  private <T> void refreshConfig_assertItIsUnchanged(RemoteConfigResponse newConfig,
       Function<Config, T> projection) {
     T previousValue = projection.apply(config);
     config.refreshConfig(newConfig);
@@ -158,8 +145,8 @@ public class ConfigTest {
 
     config = new Config(context);
 
-    JSONObject newConfig = givenFullNewPayload(config);
-    newConfig.put("killSwitch", true);
+    RemoteConfigResponse newConfig = givenFullNewPayload(config);
+    when(newConfig.getKillSwitch()).thenReturn(true);
 
     config.refreshConfig(newConfig);
 
@@ -170,11 +157,11 @@ public class ConfigTest {
   }
 
   @Test
-  public void refreshConfig_GivenInvalidKillSwitch_ItIsNotPersisted() throws Exception {
+  public void refreshConfig_GivenNullKillSwitch_ItIsNotPersisted() throws Exception {
     config = new Config(context);
 
-    JSONObject newConfig = givenFullNewPayload(config);
-    newConfig.put("killSwitch", "not a boolean");
+    RemoteConfigResponse newConfig = givenFullNewPayload(config);
+    when(newConfig.getKillSwitch()).thenReturn(null);
 
     clearInvocations(sharedPreferences);
     config.refreshConfig(newConfig);
@@ -191,7 +178,7 @@ public class ConfigTest {
     String adTagDataMacro = config.getAdTagDataMacro();
     String adTagDataMode = config.getAdTagDataMode();
 
-    JSONObject newConfig = givenFullNewPayload(config);
+    RemoteConfigResponse newConfig = givenFullNewPayload(config);
 
     config.refreshConfig(newConfig);
 
@@ -202,35 +189,14 @@ public class ConfigTest {
     assertEquals("new_" + adTagDataMode, config.getAdTagDataMode());
   }
 
-  @Test
-  public void testRefreshConfig() throws Exception {
-    givenKillSwitchInLocalStorage(false);
-
-    config = new Config(context);
-
-    String newDisplayUrlMacro = "%%newDisplayUrl%%";
-    JSONObject json = new JSONObject();
-    json.put("killSwitch", true);
-    json.put("AndroidDisplayUrlMacro", newDisplayUrlMacro);
-
-    config.refreshConfig(json);
-
-    assertTrue(config.isKillSwitchEnabled());
-    assertNotNull(config.getAdTagUrlMode());
-    assertEquals(newDisplayUrlMacro, config.getDisplayUrlMacro());
-  }
-
-  private JSONObject givenFullNewPayload(Config config) throws Exception {
-    return new JSONObject("{\n"
-        + "  \"killSwitch\": " + !config.isKillSwitchEnabled() + ",\n"
-        + "  \"AndroidDisplayUrlMacro\": " + quote("new_" + config.getDisplayUrlMacro()) + ",\n"
-        + "  \"AndroidAdTagUrlMode\": " + quote("new_" + config.getAdTagUrlMode()) + ",\n"
-        + "  \"AndroidAdTagDataMacro\": " + quote("new_" + config.getAdTagDataMacro()) + ",\n"
-        + "  \"AndroidAdTagDataMode\": " + quote("new_" + config.getAdTagDataMode()) + ",\n"
-        + "  \"iOSDisplayUrlMacro\": \"not used\",\n"
-        + "  \"iOSWidthMacro\": \"not used\",\n"
-        + "  \"iOSAdTagUrlMode\": \"not used\"\n"
-        + "}");
+  private RemoteConfigResponse givenFullNewPayload(Config config) {
+    RemoteConfigResponse response = mock(RemoteConfigResponse.class);
+    when(response.getKillSwitch()).thenReturn(!config.isKillSwitchEnabled());
+    when(response.getAndroidDisplayUrlMacro()).thenReturn("new_" + config.getDisplayUrlMacro());
+    when(response.getAndroidAdTagUrlMode()).thenReturn("new_" + config.getAdTagUrlMode());
+    when(response.getAndroidAdTagDataMacro()).thenReturn("new_" + config.getAdTagDataMacro());
+    when(response.getAndroidAdTagDataMode()).thenReturn("new_" + config.getAdTagDataMode());
+    return response;
   }
 
   private void givenKillSwitchInLocalStorage(boolean isEnabled) {

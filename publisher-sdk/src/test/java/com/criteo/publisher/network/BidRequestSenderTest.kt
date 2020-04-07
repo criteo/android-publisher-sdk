@@ -1,13 +1,12 @@
 package com.criteo.publisher.network
 
+import com.criteo.publisher.model.*
 import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
 import com.criteo.publisher.util.CdbCallListener
 import com.criteo.publisher.util.CompletableFuture.completedFuture
-import com.criteo.publisher.model.*
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
-import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -56,30 +55,20 @@ class BidRequestSenderTest {
     fun sendRemoteConfigRequest_GivenSuccessfulResponse_RefreshConfig() {
         val configToUpdate: Config = mock()
         val request: RemoteConfigRequest = mock()
-        val jsonConfig: JSONObject = mock()
+        val response: RemoteConfigResponse = mock()
 
         whenever(remoteConfigRequestFactory.createRequest()).doReturn(request)
-        whenever(api.loadConfig(request)).doReturn(jsonConfig)
+        whenever(api.loadConfig(request)).doReturn(response)
 
         sender.sendRemoteConfigRequest(configToUpdate)
 
-        verify(configToUpdate).refreshConfig(jsonConfig)
-    }
-
-    @Test
-    fun sendRemoteConfigRequest_GivenNoResponse_DoNoRefreshConfig() {
-        val configToUpdate: Config = mock()
-        whenever(api.loadConfig(any())).doReturn(null)
-
-        sender.sendRemoteConfigRequest(configToUpdate)
-
-        verify(configToUpdate, never()).refreshConfig(any())
+        verify(configToUpdate).refreshConfig(response)
     }
 
     @Test
     fun sendRemoteConfigRequest_GivenException_DoNotThrow() {
         val configToUpdate: Config = mock()
-        whenever(api.loadConfig(any())).doThrow(RuntimeException::class)
+        whenever(api.loadConfig(any())).doThrow(IOException::class)
 
         assertThatCode {
             sender.sendRemoteConfigRequest(configToUpdate)

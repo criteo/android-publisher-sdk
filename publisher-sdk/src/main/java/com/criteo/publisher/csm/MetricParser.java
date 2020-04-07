@@ -2,24 +2,16 @@ package com.criteo.publisher.csm;
 
 import android.support.annotation.NonNull;
 import com.criteo.publisher.util.JsonSerializer;
-import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 public class MetricParser {
 
   @NonNull
-  private final Gson gson;
-
-  @NonNull
   private final JsonSerializer serializer;
 
-  public MetricParser(@NonNull Gson gson, @NonNull JsonSerializer serializer) {
-    this.gson = gson;
+  public MetricParser(@NonNull JsonSerializer serializer) {
     this.serializer = serializer;
   }
 
@@ -38,17 +30,7 @@ public class MetricParser {
    */
   @NonNull
   Metric read(@NonNull InputStream inputStream) throws IOException {
-    Metric metric;
-    try {
-      metric = gson.fromJson(new InputStreamReader(inputStream), Metric.class);
-    } catch (JsonParseException e) {
-      throw new IOException(e);
-    }
-
-    if (metric == null) {
-      throw new EOFException();
-    }
-    return metric;
+    return serializer.read(Metric.class, inputStream);
   }
 
   /**

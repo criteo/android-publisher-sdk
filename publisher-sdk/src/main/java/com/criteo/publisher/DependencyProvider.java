@@ -6,15 +6,6 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.criteo.publisher.AppEvents.AppEvents;
-import com.criteo.publisher.util.AdvertisingInfo;
-import com.criteo.publisher.util.AndroidUtil;
-import com.criteo.publisher.util.BuildConfigWrapper;
-import com.criteo.publisher.util.CustomAdapterFactory;
-import com.criteo.publisher.util.DeviceUtil;
-import com.criteo.publisher.util.JsonSerializer;
-import com.criteo.publisher.util.LoggingUtil;
-import com.criteo.publisher.util.RunOnUiThreadExecutor;
-import com.criteo.publisher.util.TextUtils;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.bid.CompositeBidLifecycleListener;
 import com.criteo.publisher.bid.LoggingBidLifecycleListener;
@@ -38,6 +29,15 @@ import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.network.BidRequestSender;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
+import com.criteo.publisher.util.AdvertisingInfo;
+import com.criteo.publisher.util.AndroidUtil;
+import com.criteo.publisher.util.BuildConfigWrapper;
+import com.criteo.publisher.util.CustomAdapterFactory;
+import com.criteo.publisher.util.DeviceUtil;
+import com.criteo.publisher.util.JsonSerializer;
+import com.criteo.publisher.util.LoggingUtil;
+import com.criteo.publisher.util.RunOnUiThreadExecutor;
+import com.criteo.publisher.util.TextUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.util.HashMap;
@@ -476,7 +476,6 @@ public class DependencyProvider {
       @Override
       public MetricParser create() {
         return new MetricParser(
-            provideGson(),
             provideJsonSerializer()
         );
       }

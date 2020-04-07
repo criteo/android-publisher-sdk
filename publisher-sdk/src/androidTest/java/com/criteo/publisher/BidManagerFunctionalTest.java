@@ -1,10 +1,10 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.CriteoUtil.clearSharedPreferences;
-import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
-import static com.criteo.publisher.util.CompletableFuture.completedFuture;
 import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static com.criteo.publisher.concurrent.ThreadingUtil.waitForMessageQueueToBeIdle;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
+import static com.criteo.publisher.util.CompletableFuture.completedFuture;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.junit.Assert.assertEquals;
@@ -26,9 +26,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.support.annotation.NonNull;
-import com.criteo.publisher.util.AdUnitType;
-import com.criteo.publisher.util.BuildConfigWrapper;
-import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
@@ -44,11 +41,15 @@ import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
+import com.criteo.publisher.model.RemoteConfigResponse;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.privacy.gdpr.GdprData;
+import com.criteo.publisher.util.AdUnitType;
+import com.criteo.publisher.util.BuildConfigWrapper;
+import com.criteo.publisher.util.DeviceUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,8 +57,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -143,14 +142,14 @@ public class BidManagerFunctionalTest {
 
   @Test
   public void prefetch_GivenNoAdUnit_ShouldUpdateConfig() throws Exception {
-    JSONObject jsonConfig = mock(JSONObject.class);
-    when(api.loadConfig(any())).thenReturn(jsonConfig);
+    RemoteConfigResponse response = mock(RemoteConfigResponse.class);
+    when(api.loadConfig(any())).thenReturn(response);
 
     BidManager bidManager = spy(createBidManager());
     bidManager.prefetch(emptyList());
     waitForIdleState();
 
-    verify(config).refreshConfig(jsonConfig);
+    verify(config).refreshConfig(response);
     verify(api, never()).loadCdb(any(), any());
   }
 
@@ -207,13 +206,13 @@ public class BidManagerFunctionalTest {
 
     CdbResponse response1 = givenMockedCdbResponseWithValidSlot(1);
     CdbResponse response3 = givenMockedCdbResponseWithValidSlot(3);
-    JSONObject jsonConfig = mock(JSONObject.class);
+    RemoteConfigResponse remoteConfigResponse = mock(RemoteConfigResponse.class);
 
     when(api.loadCdb(any(), any()))
         .thenReturn(response1)
         .thenThrow(IOException.class)
         .thenReturn(response3);
-    when(api.loadConfig(any())).thenReturn(jsonConfig);
+    when(api.loadConfig(any())).thenReturn(remoteConfigResponse);
 
     BidManager bidManager = spy(createBidManager());
     bidManager.prefetch(prefetchAdUnits);
@@ -222,7 +221,7 @@ public class BidManagerFunctionalTest {
     InOrder inOrder = inOrder(bidManager, cache, api, config);
 
     // First call with only config call
-    inOrder.verify(config).refreshConfig(jsonConfig);
+    inOrder.verify(config).refreshConfig(remoteConfigResponse);
 
     // First call to CDB
     inOrder.verify(config, never()).refreshConfig(any());
@@ -273,8 +272,8 @@ public class BidManagerFunctionalTest {
   public void prefetch_GivenRemoteConfigWithKillSwitchEnabled_WhenGettingBidShouldNotCallCdbAndNotPopulateCacheAndReturnNull()
       throws Exception {
     Config config = givenKillSwitchIs(false);
-    doAnswer(answerVoid((JSONObject json) -> {
-      Boolean killSwitch = Config.parseKillSwitch(json);
+    doAnswer(answerVoid((RemoteConfigResponse response) -> {
+      Boolean killSwitch = response.getKillSwitch();
       when(config.isKillSwitchEnabled()).thenReturn(killSwitch);
     })).when(config).refreshConfig(any());
 
@@ -894,10 +893,10 @@ public class BidManagerFunctionalTest {
     return config;
   }
 
-  private void givenRemoteConfigWithKillSwitchEnabled() throws JSONException {
-    JSONObject json = new JSONObject();
-    json.put("killSwitch", true);
-    when(api.loadConfig(any())).thenReturn(json);
+  private void givenRemoteConfigWithKillSwitchEnabled() throws IOException {
+    RemoteConfigResponse response = mock(RemoteConfigResponse.class);
+    when(response.getKillSwitch()).thenReturn(true);
+    when(api.loadConfig(any())).thenReturn(response);
   }
 
   @NonNull

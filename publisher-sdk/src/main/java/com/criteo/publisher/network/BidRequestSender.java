@@ -4,7 +4,6 @@ import android.support.annotation.GuardedBy;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
-import com.criteo.publisher.util.CdbCallListener;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestFactory;
@@ -12,6 +11,9 @@ import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.RemoteConfigRequest;
 import com.criteo.publisher.model.RemoteConfigRequestFactory;
+import com.criteo.publisher.model.RemoteConfigResponse;
+import com.criteo.publisher.util.CdbCallListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
-import org.json.JSONObject;
 
 public class BidRequestSender {
 
@@ -214,13 +215,10 @@ public class BidRequestSender {
       }
     }
 
-    private void doRun() {
+    private void doRun() throws IOException {
       RemoteConfigRequest request = remoteConfigRequestFactory.createRequest();
-      JSONObject configResult = api.loadConfig(request);
-
-      if (configResult != null) {
-        configToUpdate.refreshConfig(configResult);
-      }
+      RemoteConfigResponse response = api.loadConfig(request);
+      configToUpdate.refreshConfig(response);
     }
   }
 }

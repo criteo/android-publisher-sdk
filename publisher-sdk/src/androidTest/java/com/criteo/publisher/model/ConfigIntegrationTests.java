@@ -25,8 +25,8 @@ import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.network.PubSdkApi;
+import java.io.IOException;
 import javax.inject.Inject;
-import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -116,10 +116,10 @@ public class ConfigIntegrationTests {
   }
 
   @Test
-  public void localStorage_GivenRemoteConfigWithInvalidResponse_DoesNotPersistKillSwitch()
+  public void localStorage_GivenNullKillSwitch_DoesNotPersistKillSwitch()
       throws Exception {
     givenEmptyLocalStorage();
-    givenRemoteConfigWithResponse("{}");
+    givenRemoteConfigWithKillSwitch(null);
 
     givenInitializedCriteo();
     waitForIdleState();
@@ -157,7 +157,7 @@ public class ConfigIntegrationTests {
     when(config.isKillSwitchEnabled()).thenReturn(false);
     doReturn(config).when(mockedDependenciesRule.getDependencyProvider()).provideConfig();
 
-    JSONObject response = mock(JSONObject.class);
+    RemoteConfigResponse response = mock(RemoteConfigResponse.class);
     givenRemoteConfigWithResponse(response);
 
     givenInitializedCriteo();
@@ -173,7 +173,7 @@ public class ConfigIntegrationTests {
     when(config.isKillSwitchEnabled()).thenReturn(true);
     doReturn(config).when(mockedDependenciesRule.getDependencyProvider()).provideConfig();
 
-    JSONObject response = mock(JSONObject.class);
+    RemoteConfigResponse response = mock(RemoteConfigResponse.class);
     givenRemoteConfigWithResponse(response);
 
     givenInitializedCriteo();
@@ -208,11 +208,10 @@ public class ConfigIntegrationTests {
     // The config ctor shouldn't set the default to the shared prefs
     assertNull(getKillSwitchInLocalStorage());
 
-    JSONObject json = new JSONObject();
-    json.put("killSwitch", true);
+    RemoteConfigResponse response = givenResponseWithKillSwitch(true);
 
     // test
-    config.refreshConfig(json);
+    config.refreshConfig(response);
 
     assertTrue(config.isKillSwitchEnabled());
     assertTrue(getKillSwitchInLocalStorage());
@@ -225,11 +224,10 @@ public class ConfigIntegrationTests {
 
     Config config = new Config(context);
 
-    JSONObject json = new JSONObject();
-    json.put("killSwitch", false);
+    RemoteConfigResponse response = givenResponseWithKillSwitch(false);
 
     // test
-    config.refreshConfig(json);
+    config.refreshConfig(response);
 
     assertFalse(config.isKillSwitchEnabled());
     // This should flip from the explicitly set true to false from the JSON.
@@ -239,17 +237,16 @@ public class ConfigIntegrationTests {
   }
 
   @Test
-  public void testRefreshBadJson() {
+  public void testRefreshWithNullKillSwitch() {
     //set the killSwitch to true in sharedPrefs
     givenKillSwitchInLocalStorage(true);
 
     Config config = new Config(context);
 
-    // json intentionally left blank
-    JSONObject json = new JSONObject();
+    RemoteConfigResponse response = givenResponseWithKillSwitch(null);
 
     // test
-    config.refreshConfig(json);
+    config.refreshConfig(response);
 
     assertTrue(config.isKillSwitchEnabled());
     // this should not flip from the explicitly set value
@@ -261,27 +258,30 @@ public class ConfigIntegrationTests {
     return mockedDependenciesRule.getDependencyProvider().provideConfig();
   }
 
-  private void givenRemoteConfigInError() {
-    givenRemoteConfigWithResponse((JSONObject) null);
-  }
-
-  private void givenRemoteConfigWithKillSwitch(boolean isEnabled) throws Exception {
-    givenRemoteConfigWithResponse("{ \"killSwitch\": " + isEnabled + " }");
-  }
-
-  private void givenRemoteConfigWithResponse(String jsonResponse) throws Exception {
-    givenRemoteConfigWithResponse(new JSONObject(jsonResponse));
-  }
-
-  private void givenRemoteConfigWithResponse(JSONObject configJson) {
+  private void givenRemoteConfigInError() throws IOException {
     PubSdkApi api = givenMockedRemoteConfig();
-    when(api.loadConfig(any())).thenReturn(configJson);
+    when(api.loadConfig(any())).thenThrow(IOException.class);
+  }
+
+  private void givenRemoteConfigWithKillSwitch(Boolean isEnabled) throws Exception {
+    RemoteConfigResponse response = givenResponseWithKillSwitch(isEnabled);
+    givenRemoteConfigWithResponse(response);
+  }
+
+  private RemoteConfigResponse givenResponseWithKillSwitch(Boolean isEnabled) {
+    RemoteConfigResponse response = mock(RemoteConfigResponse.class);
+    when(response.getKillSwitch()).thenReturn(isEnabled);
+    return response;
+  }
+
+  private void givenRemoteConfigWithResponse(RemoteConfigResponse response) throws IOException {
+    PubSdkApi api = givenMockedRemoteConfig();
+    when(api.loadConfig(any())).thenReturn(response);
   }
 
   private PubSdkApi givenMockedRemoteConfig() {
     PubSdkApi api = mock(PubSdkApi.class);
-    when(mockedDependenciesRule.getDependencyProvider().providePubSdkApi())
-        .thenReturn(api);
+    when(mockedDependenciesRule.getDependencyProvider().providePubSdkApi()).thenReturn(api);
     return api;
   }
 

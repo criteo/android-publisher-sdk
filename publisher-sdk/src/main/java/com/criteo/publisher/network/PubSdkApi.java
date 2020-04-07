@@ -4,16 +4,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
+import com.criteo.publisher.csm.MetricRequest;
+import com.criteo.publisher.model.CdbRequest;
+import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.model.RemoteConfigRequest;
+import com.criteo.publisher.model.RemoteConfigResponse;
+import com.criteo.publisher.privacy.gdpr.GdprData;
 import com.criteo.publisher.util.Base64;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.JsonSerializer;
 import com.criteo.publisher.util.StreamUtil;
 import com.criteo.publisher.util.TextUtils;
-import com.criteo.publisher.csm.MetricRequest;
-import com.criteo.publisher.model.CdbRequest;
-import com.criteo.publisher.model.CdbResponse;
-import com.criteo.publisher.model.RemoteConfigRequest;
-import com.criteo.publisher.privacy.gdpr.GdprData;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -53,23 +54,19 @@ public class PubSdkApi {
     this.jsonSerializer = jsonSerializer;
   }
 
-  @Nullable
-  public JSONObject loadConfig(@NonNull RemoteConfigRequest request) {
+  @NonNull
+  public RemoteConfigResponse loadConfig(@NonNull RemoteConfigRequest request) throws IOException {
     Map<String, String> parameters = new HashMap<>();
     parameters.put(CRITEO_PUBLISHER_ID, request.getCriteoPublisherId());
     parameters.put(APP_ID, request.getBundleId());
     parameters.put(SDK_VERSION, request.getSdkVersion());
+    String paramsString = getParamsString(parameters);
 
-    JSONObject configResult = null;
-    try {
-      URL url = new URL(buildConfigWrapper.getRemoteConfigUrl() + "/v2.0/api/config" + "?" + getParamsString(
-              parameters));
-      configResult = executeGet(url, null);
-    } catch (IOException | JSONException e) {
-      Log.d(TAG, "Unable to process request to remote config TLA:" + e.getMessage());
-      e.printStackTrace();
+    URL url = new URL(buildConfigWrapper.getRemoteConfigUrl() + "/v2.0/api/config" + "?" + paramsString);
+
+    try (InputStream inputStream = executeRawGet(url, null)) {
+      return jsonSerializer.read(RemoteConfigResponse.class, inputStream);
     }
-    return configResult;
   }
 
   @NonNull

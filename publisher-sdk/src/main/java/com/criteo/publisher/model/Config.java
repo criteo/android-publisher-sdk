@@ -7,24 +7,17 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import com.criteo.publisher.BuildConfig;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class Config {
 
-  private static String TAG = Config.class.getSimpleName();
+  private static final String TAG = Config.class.getSimpleName();
+
   private static final String DEFAULT_AD_TAG_DATA_MACRO = "%%adTagData%%";
   private static final String DEFAULT_DISPLAY_URL_MACRO = "%%displayUrl%%";
   private static final String DEFAULT_AD_TAG_URL_MODE = "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script src=\"%%displayUrl%%\"></script></body></html>";
   private static final String DEFAULT_AD_TAG_DATA_MODE = "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>";
 
-  private static final String KILL_SWITCH = "killSwitch";
-
   private static final String KILL_SWITCH_STORAGE_KEY = "CriteoCachedKillSwitch";
-  private static final String DISPLAY_URL_MACRO_KEY = "AndroidDisplayUrlMacro";
-  private static final String AD_TAG_URL_MODE_KEY = "AndroidAdTagUrlMode";
-  private static final String AD_TAG_DATA_MACRO_KEY = "AndroidAdTagDataMacro";
-  private static final String AD_TAG_DATA_MODE_KEY = "AndroidAdTagDataMode";
 
   // NOTE: This entire object is not at all thread-safe, but except the kill switch, other config
   //  are only accessed at display time. As they are only updated during SDK init, before any bids
@@ -53,39 +46,24 @@ public class Config {
     this.killSwitchEnabled = readKillSwitchOrFalse(context);
   }
 
-  /**
-   * Parse kill switch from given JSON payload.
-   * <p>
-   * It is expected to read a boolean value at the {@link #KILL_SWITCH} element. If none is found or
-   * non boolean value is found, <code>null</code> is returned.
-   *
-   * @param json payload to read from
-   * @return existing kill switch status or <code>null</code> if not readable
-   */
-  @Nullable
-  public static Boolean parseKillSwitch(@Nullable JSONObject json) {
-    if (json == null) {
-      return null;
-    }
-
-    try {
-      return json.getBoolean(KILL_SWITCH);
-    } catch (JSONException e) {
-      return null;
-    }
-  }
-
-  public void refreshConfig(@NonNull JSONObject json) {
-    Boolean newKillSwitch = parseKillSwitch(json);
+  public void refreshConfig(@NonNull RemoteConfigResponse response) {
+    Boolean newKillSwitch = response.getKillSwitch();
     if (newKillSwitch != null) {
       killSwitchEnabled = newKillSwitch;
       persistKillSwitch();
     }
 
-    displayUrlMacro = json.optString(DISPLAY_URL_MACRO_KEY, displayUrlMacro);
-    adTagUrlMode = json.optString(AD_TAG_URL_MODE_KEY, adTagUrlMode);
-    adTagDataMacro = json.optString(AD_TAG_DATA_MACRO_KEY, adTagDataMacro);
-    adTagDataMode = json.optString(AD_TAG_DATA_MODE_KEY, adTagDataMode);
+    displayUrlMacro = getOrElse(response.getAndroidDisplayUrlMacro(), displayUrlMacro);
+    adTagUrlMode = getOrElse(response.getAndroidAdTagUrlMode(), adTagUrlMode);
+    adTagDataMacro = getOrElse(response.getAndroidAdTagDataMacro(), adTagDataMacro);
+    adTagDataMode = getOrElse(response.getAndroidAdTagDataMode(), adTagDataMode);
+  }
+
+  private static String getOrElse(@Nullable String value, @NonNull String defaultValue) {
+    if (value == null) {
+      return defaultValue;
+    }
+    return value;
   }
 
   private static boolean readKillSwitchOrFalse(@NonNull Context context) {
