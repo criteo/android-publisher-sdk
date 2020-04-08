@@ -80,7 +80,7 @@ public class PrivacyConsentSelectorActivity extends AppCompatActivity {
 
     Editor edit = defaultSharedPreferences.edit();
     edit.putString("IABUSPrivacy_String", ccpaIabEditText.getText().toString());
-    edit.commit();
+    edit.apply();
   }
 
   private void saveMopubConsentString() {
@@ -91,6 +91,6 @@ public class PrivacyConsentSelectorActivity extends AppCompatActivity {
 
     Editor edit = defaultSharedPreferences.edit();
     edit.putString("MoPubConsent_String", ccpaMopubEditText.getText().toString());
-    edit.commit();
+    edit.apply();
   }
 }
