@@ -9,5 +9,5 @@ git fetch origin
 git checkout remotes/origin/v$RELEASE_VERSION_WITH_UNDERSCORE
 
 ./scripts/do-pre-submit.sh
-./gradlew publishReleasePublicationToAzureRepository -PpubSdkVersion=$RELEASE_VERSION
+./gradlew clean publishReleasePublicationToAzureRepository -PpubSdkVersion=$RELEASE_VERSION
 
