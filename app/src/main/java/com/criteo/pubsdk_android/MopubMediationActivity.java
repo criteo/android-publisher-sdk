@@ -20,6 +20,8 @@ public class MopubMediationActivity extends AppCompatActivity {
   private MoPubView publisherAdView;
   private LinearLayout linearLayout;
 
+  MoPubInterstitial mInterstitial;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -31,6 +33,8 @@ public class MopubMediationActivity extends AppCompatActivity {
     findViewById(R.id.buttonMopubMediationBanner).setOnClickListener((View v) -> onBannerClick());
     findViewById(R.id.buttonMopubMediationInterstitial)
         .setOnClickListener((View v) -> onInterstitialClick());
+
+    mInterstitial = new MoPubInterstitial(this, MOPUB_INTERSTITIAL_ADUNIT_ID);
   }
 
   private void onBannerClick() {
@@ -44,15 +48,18 @@ public class MopubMediationActivity extends AppCompatActivity {
   }
 
   private void onInterstitialClick() {
-    MoPubInterstitial mInterstitial = new MoPubInterstitial(this, MOPUB_INTERSTITIAL_ADUNIT_ID);
     mInterstitial.setInterstitialAdListener(
-        new TestAppMoPubInterstitialAdListener(TAG, mInterstitial));
+        new TestAppMoPubInterstitialAdListener(TAG, mInterstitial)
+    );
+
     mInterstitial.load();
   }
 
   @Override
   protected void onDestroy() {
     super.onDestroy();
+
+    mInterstitial.destroy();
     if (publisherAdView != null) {
       publisherAdView.destroy();
     }
