@@ -5,9 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import com.criteo.publisher.AppEvents.AppEvents;
-import com.criteo.publisher.util.AdUnitType;
-import com.criteo.publisher.util.AppLifecycleUtil;
-import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
@@ -16,6 +13,9 @@ import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
+import com.criteo.publisher.util.AdUnitType;
+import com.criteo.publisher.util.AppLifecycleUtil;
+import com.criteo.publisher.util.DeviceUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -23,6 +23,9 @@ import java.util.concurrent.Executor;
 final class CriteoInternal extends Criteo {
 
   private static final String TAG = CriteoInternal.class.getSimpleName();
+
+  @NonNull
+  private final DependencyProvider dependencyProvider;
 
   @NonNull
   private final BidManager bidManager;
@@ -53,6 +56,8 @@ final class CriteoInternal extends Criteo {
       adUnits = new ArrayList<>();
     }
 
+    this.dependencyProvider = dependencyProvider;
+
     DeviceUtil deviceUtil = dependencyProvider.provideDeviceUtil();
     deviceUtil.createSupportedScreenSizes();
 
@@ -80,6 +85,8 @@ final class CriteoInternal extends Criteo {
     AppEvents appEvents = dependencyProvider.provideAppEvents();
     AppLifecycleUtil lifecycleCallback = new AppLifecycleUtil(appEvents, bidManager);
     application.registerActivityLifecycleCallbacks(lifecycleCallback);
+
+    dependencyProvider.provideLastActivityTracker().registerActivityLifecycleFor(application);
 
     BidLifecycleListener bidLifecycleListener = dependencyProvider.provideBidLifecycleListener();
     bidLifecycleListener.onSdkInitialized();
@@ -158,6 +165,17 @@ final class CriteoInternal extends Criteo {
   @Override
   InterstitialActivityHelper getInterstitialActivityHelper() {
     return interstitialActivityHelper;
+  }
+
+  @NonNull
+  @Override
+  public CriteoBannerEventController createBannerController(CriteoBannerView bannerView) {
+    return new RealCriteoBannerEventController(
+        bannerView,
+        this,
+        dependencyProvider.provideLastActivityTracker(),
+        dependencyProvider.provideRunOnUiThreadExecutor()
+    );
   }
 
   @Override

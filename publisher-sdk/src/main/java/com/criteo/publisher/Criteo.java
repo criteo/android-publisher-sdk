@@ -145,6 +145,9 @@ public abstract class Criteo {
   @NonNull
   abstract InterstitialActivityHelper getInterstitialActivityHelper();
 
+  @NonNull
+  public abstract CriteoBannerEventController createBannerController(CriteoBannerView bannerView);
+
   public abstract void setUsPrivacyOptOut(boolean usPrivacyOptOut);
 
   public abstract void setMopubConsent(@Nullable String mopubConsent);

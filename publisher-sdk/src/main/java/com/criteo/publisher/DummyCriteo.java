@@ -4,14 +4,14 @@ import static com.criteo.publisher.util.CompletableFuture.completedFuture;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import com.criteo.publisher.util.AdUnitType;
-import com.criteo.publisher.util.RunOnUiThreadExecutor;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
+import com.criteo.publisher.util.AdUnitType;
+import com.criteo.publisher.util.RunOnUiThreadExecutor;
 import java.util.concurrent.Future;
 
 public class DummyCriteo extends Criteo {
@@ -56,6 +56,20 @@ public class DummyCriteo extends Criteo {
     return new DummyInterstitialActivityHelper();
   }
 
+  @NonNull
+  @Override
+  public CriteoBannerEventController createBannerController(CriteoBannerView bannerView) {
+    return new CriteoBannerEventController() {
+      @Override
+      public void fetchAdAsync(@Nullable AdUnit adUnit) {
+      }
+
+      @Override
+      public void fetchAdAsync(@Nullable BidToken bidToken) {
+      }
+    };
+  }
+
   @Override
   public void setUsPrivacyOptOut(boolean usPrivacyOptOut) {
     // do nothing
@@ -87,7 +101,7 @@ public class DummyCriteo extends Criteo {
   private static class DummyInterstitialActivityHelper extends InterstitialActivityHelper {
 
     DummyInterstitialActivityHelper() {
-      super(null);
+      super(null, null);
     }
 
     @Override

@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import android.content.Context;
 import android.content.pm.ResolveInfo;
 import com.criteo.publisher.CriteoInterstitialAdListener;
+import com.criteo.publisher.activity.TopActivityFinder;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
@@ -25,6 +26,9 @@ public class InterstitialActivityHelperUnitTest {
   private Context context;
 
   @Mock
+  private TopActivityFinder topActivityFinder;
+
+  @Mock
   private CriteoInterstitialAdListener listener;
 
   private InterstitialActivityHelper helper;
@@ -33,7 +37,7 @@ public class InterstitialActivityHelperUnitTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    helper = spy(new InterstitialActivityHelper(context));
+    helper = spy(new InterstitialActivityHelper(context, topActivityFinder));
   }
 
   @Test

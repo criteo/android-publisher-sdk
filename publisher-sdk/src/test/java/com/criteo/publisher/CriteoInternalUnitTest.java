@@ -13,15 +13,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.app.Application;
-import com.criteo.publisher.util.AppLifecycleUtil;
-import com.criteo.publisher.util.DeviceUtil;
-import com.criteo.publisher.util.DirectMockRunOnUiThreadExecutor;
+import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
+import com.criteo.publisher.util.AppLifecycleUtil;
+import com.criteo.publisher.util.DeviceUtil;
+import com.criteo.publisher.util.DirectMockRunOnUiThreadExecutor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -198,11 +199,20 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void whenCreatingNewCriteo_GivenApplication_RegisterOneActivityLifecycleCallback()
+  public void whenCreatingNewCriteo_GivenApplication_RegisterAppLifecycleUtil()
       throws Exception {
     createCriteo();
 
     verify(application).registerActivityLifecycleCallbacks(any(AppLifecycleUtil.class));
+  }
+
+  @Test
+  public void whenCreatingNewCriteo_GivenApplication_RegisterLastActivityTracker()
+      throws Exception {
+    createCriteo();
+
+    TopActivityFinder topActivityFinder = dependencyProvider.provideLastActivityTracker();
+    verify(topActivityFinder).registerActivityLifecycleFor(application);
   }
 
   @Test

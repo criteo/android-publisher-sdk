@@ -1,5 +1,6 @@
 package com.criteo.publisher;
 
+import static com.criteo.publisher.interstitial.InterstitialActivityHelper.CALLING_ACTIVITY;
 import static com.criteo.publisher.interstitial.InterstitialActivityHelper.RESULT_RECEIVER;
 import static com.criteo.publisher.interstitial.InterstitialActivityHelper.WEB_VIEW_DATA;
 import static com.criteo.publisher.util.CriteoResultReceiver.ACTION_CLOSED;
@@ -8,6 +9,7 @@ import static com.criteo.publisher.util.CriteoResultReceiver.INTERSTITIAL_ACTION
 import static com.criteo.publisher.util.CriteoResultReceiver.RESULT_CODE_SUCCESSFUL;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.support.annotation.VisibleForTesting;
@@ -25,6 +27,7 @@ public class CriteoInterstitialActivity extends Activity {
   private ResultReceiver resultReceiver;
   private ImageButton closeButton;
   private RelativeLayout adLayout;
+  private ComponentName callingActivityName;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -34,12 +37,13 @@ public class CriteoInterstitialActivity extends Activity {
     webView = findViewById(R.id.webview);
     closeButton = findViewById(R.id.closeButton);
 
-    prepareWebView();
-
     Bundle bundle = getIntent().getExtras();
     if (bundle != null && bundle.getString(WEB_VIEW_DATA) != null) {
       String webViewData = bundle.getString(WEB_VIEW_DATA);
       resultReceiver = bundle.getParcelable(RESULT_RECEIVER);
+      callingActivityName = bundle.getParcelable(CALLING_ACTIVITY);
+
+      prepareWebView();
       displayWebView(webViewData);
     }
 
@@ -55,6 +59,13 @@ public class CriteoInterstitialActivity extends Activity {
   private void close() {
     Bundle bundle = new Bundle();
     bundle.putInt(INTERSTITIAL_ACTION, ACTION_CLOSED);
+    resultReceiver.send(RESULT_CODE_SUCCESSFUL, bundle);
+    finish();
+  }
+
+  private void click() {
+    Bundle bundle = new Bundle();
+    bundle.putInt(INTERSTITIAL_ACTION, ACTION_LEFT_CLICKED);
     resultReceiver.send(RESULT_CODE_SUCCESSFUL, bundle);
     finish();
   }
@@ -78,13 +89,14 @@ public class CriteoInterstitialActivity extends Activity {
     webView.setWebViewClient(new AdWebViewClient(new AdWebViewListener() {
       @Override
       public void onUserRedirectedToAd() {
-        Bundle bundle = new Bundle();
-        bundle.putInt(INTERSTITIAL_ACTION, ACTION_LEFT_CLICKED);
-        resultReceiver.send(RESULT_CODE_SUCCESSFUL, bundle);
-
-        finish();
+        click();
       }
-    }));
+
+      @Override
+      public void onUserBackFromAd() {
+        close();
+      }
+    }, callingActivityName));
   }
 
   @Override

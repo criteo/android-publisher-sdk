@@ -7,8 +7,6 @@ import static org.mockito.Mockito.when;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
-import com.criteo.publisher.util.AndroidUtil;
-import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
@@ -21,6 +19,8 @@ import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.network.BidRequestSender;
+import com.criteo.publisher.util.AndroidUtil;
+import com.criteo.publisher.util.DeviceUtil;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -77,6 +77,9 @@ public class BidManagerTests {
 
   @Mock
   private MetricSendingQueueConsumer metricSendingQueueConsumer;
+
+  @Mock
+  private InterstitialActivityHelper interstitialActivityHelper;
 
   @Before
   public void setup() {
@@ -270,7 +273,7 @@ public class BidManagerTests {
 
   @NonNull
   private InHouse createInHouse(BidManager bidManager) {
-    return new InHouse(bidManager, mock(TokenCache.class), clock, new InterstitialActivityHelper(context));
+    return new InHouse(bidManager, mock(TokenCache.class), clock, interstitialActivityHelper);
   }
 
   private interface SpecialMap extends Map {

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.criteo.publisher.AppEvents.AppEvents;
+import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.bid.CompositeBidLifecycleListener;
 import com.criteo.publisher.bid.LoggingBidLifecycleListener;
@@ -427,7 +428,21 @@ public class DependencyProvider {
       @NonNull
       @Override
       public InterstitialActivityHelper create() {
-        return new InterstitialActivityHelper(provideContext());
+        return new InterstitialActivityHelper(
+            provideContext(),
+            provideLastActivityTracker()
+        );
+      }
+    });
+  }
+
+  @NonNull
+  public TopActivityFinder provideLastActivityTracker() {
+    return getOrCreate(TopActivityFinder.class, new Factory<TopActivityFinder>() {
+      @NonNull
+      @Override
+      public TopActivityFinder create() {
+        return new TopActivityFinder(provideContext());
       }
     });
   }

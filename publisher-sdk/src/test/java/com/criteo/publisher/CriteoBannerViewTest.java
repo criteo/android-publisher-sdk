@@ -47,12 +47,11 @@ public class CriteoBannerViewTest {
     bidToken = new BidToken(UUID.randomUUID(), bannerAdUnit);
 
     bannerView = spy(new CriteoBannerView(context, bannerAdUnit, criteo));
+    doReturn(controller).when(criteo).createBannerController(bannerView);
   }
 
   @Test
   public void loadAdStandalone_GivenController_DelegateToIt() throws Exception {
-    doReturn(controller).when(bannerView).getOrCreateController();
-
     bannerView.loadAd();
 
     verify(controller).fetchAdAsync(bannerAdUnit);
@@ -61,8 +60,6 @@ public class CriteoBannerViewTest {
 
   @Test
   public void loadAdStandalone_GivenControllerAndLoadTwice_DelegateToItTwice() throws Exception {
-    doReturn(controller).when(bannerView).getOrCreateController();
-
     bannerView.loadAd();
     bannerView.loadAd();
 
@@ -72,8 +69,8 @@ public class CriteoBannerViewTest {
 
   @Test
   public void loadAdStandalone_GivenNullAdUnitController_DelegateToIt() throws Exception {
-    bannerView = spy(new CriteoBannerView(context, null));
-    doReturn(controller).when(bannerView).getOrCreateController();
+    bannerView = spy(new CriteoBannerView(context, null, criteo));
+    doReturn(controller).when(criteo).createBannerController(bannerView);
 
     bannerView.loadAd();
 
@@ -83,7 +80,6 @@ public class CriteoBannerViewTest {
 
   @Test
   public void loadAdStandalone_GivenControllerThrowing_DoNotThrow() throws Exception {
-    doReturn(controller).when(bannerView).getOrCreateController();
     doThrow(RuntimeException.class).when(controller).fetchAdAsync(any(AdUnit.class));
 
     assertThatCode(bannerView::loadAd).doesNotThrowAnyException();
@@ -98,8 +94,6 @@ public class CriteoBannerViewTest {
 
   @Test
   public void loadAdInHouse_GivenController_DelegateToIt() throws Exception {
-    doReturn(controller).when(bannerView).getOrCreateController();
-
     bannerView.loadAd(bidToken);
 
     verify(controller).fetchAdAsync(bidToken);
@@ -108,8 +102,6 @@ public class CriteoBannerViewTest {
 
   @Test
   public void loadAdInHouse_GivenControllerAndLoadTwice_DelegateToItTwice() throws Exception {
-    doReturn(controller).when(bannerView).getOrCreateController();
-
     bannerView.loadAd(bidToken);
     bannerView.loadAd(bidToken);
 
@@ -119,8 +111,6 @@ public class CriteoBannerViewTest {
 
   @Test
   public void loadAdInHouse_GivenNullTokenAndController_DelegateToIt() throws Exception {
-    doReturn(controller).when(bannerView).getOrCreateController();
-
     bannerView.loadAd(null);
 
     verify(controller).fetchAdAsync((BidToken) null);
@@ -129,7 +119,6 @@ public class CriteoBannerViewTest {
 
   @Test
   public void loadAdInHouse_GivenControllerThrowing_DoNotThrow() throws Exception {
-    doReturn(controller).when(bannerView).getOrCreateController();
     doThrow(RuntimeException.class).when(controller).fetchAdAsync(any(BidToken.class));
 
     assertThatCode(() -> bannerView.loadAd(bidToken)).doesNotThrowAnyException();
@@ -145,7 +134,6 @@ public class CriteoBannerViewTest {
   @Test
   public void loadAdInHouse_GivenTokenWithDifferentButEqualAdUnit_DelegateToController()
       throws Exception {
-    doReturn(controller).when(bannerView).getOrCreateController();
     BannerAdUnit equalAdUnit = new BannerAdUnit(bannerAdUnit.getAdUnitId(), bannerAdUnit.getSize());
     bidToken = new BidToken(UUID.randomUUID(), equalAdUnit);
 
@@ -164,7 +152,6 @@ public class CriteoBannerViewTest {
    */
   @Test
   public void loadAdInHouse_GivenTokenWithDifferentAdUnit_SkipIt() throws Exception {
-    doReturn(controller).when(bannerView).getOrCreateController();
     BannerAdUnit differentAdUnit = new BannerAdUnit(bannerAdUnit.getAdUnitId() + "_",
         bannerAdUnit.getSize());
     bidToken = new BidToken(UUID.randomUUID(), differentAdUnit);
@@ -179,7 +166,6 @@ public class CriteoBannerViewTest {
    */
   @Test
   public void loadAdInHouse_GivenNotABannerToken_SkipIt() throws Exception {
-    doReturn(controller).when(bannerView).getOrCreateController();
     AdUnit differentAdUnit = new InterstitialAdUnit(bannerAdUnit.getAdUnitId());
     bidToken = new BidToken(UUID.randomUUID(), differentAdUnit);
 

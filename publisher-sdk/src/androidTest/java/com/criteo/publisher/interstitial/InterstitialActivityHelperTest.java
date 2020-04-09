@@ -1,5 +1,6 @@
 package com.criteo.publisher.interstitial;
 
+import static com.criteo.publisher.interstitial.InterstitialActivityHelper.CALLING_ACTIVITY;
 import static com.criteo.publisher.interstitial.InterstitialActivityHelper.RESULT_RECEIVER;
 import static com.criteo.publisher.interstitial.InterstitialActivityHelper.WEB_VIEW_DATA;
 import static org.junit.Assert.assertEquals;
@@ -18,10 +19,12 @@ import android.support.annotation.NonNull;
 import android.support.test.rule.ActivityTestRule;
 import com.criteo.publisher.CriteoInterstitialActivity;
 import com.criteo.publisher.CriteoInterstitialAdListener;
-import com.criteo.publisher.util.CriteoResultReceiver;
+import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.mock.MockedDependenciesRule;
-import com.criteo.publisher.view.WebViewLookup;
 import com.criteo.publisher.test.activity.DummyActivity;
+import com.criteo.publisher.util.CriteoResultReceiver;
+import com.criteo.publisher.view.WebViewLookup;
+import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,6 +41,9 @@ public class InterstitialActivityHelperTest {
 
   private Context context;
 
+  @Inject
+  private TopActivityFinder topActivityFinder;
+
   @Mock
   private CriteoInterstitialAdListener listener;
 
@@ -50,6 +56,7 @@ public class InterstitialActivityHelperTest {
     MockitoAnnotations.initMocks(this);
 
     context = activityRule.getActivity().getApplicationContext();
+    topActivityFinder.registerActivityLifecycleFor(activityRule.getActivity().getApplication());
     helper = createHelper();
     webViewLookup = new WebViewLookup();
   }
@@ -73,8 +80,11 @@ public class InterstitialActivityHelperTest {
     when(context.getPackageName()).thenReturn("myPackage");
     ComponentName expectedComponent = new ComponentName(context, CriteoInterstitialActivity.class);
 
+    ComponentName expectedCallingActivity = activityRule.getActivity().getComponentName();
+
     CriteoResultReceiver expectedReceiver = mock(CriteoResultReceiver.class);
-    doReturn(expectedReceiver).when(helper).createReceiver(listener);doReturn(true).when(helper).isAvailable();
+    doReturn(expectedReceiver).when(helper).createReceiver(listener);
+    doReturn(true).when(helper).isAvailable();
 
     helper.openActivity("myContent", listener);
 
@@ -82,6 +92,7 @@ public class InterstitialActivityHelperTest {
       assertEquals(expectedComponent, intent.getComponent());
       assertEquals("myContent", intent.getStringExtra(WEB_VIEW_DATA));
       assertEquals(expectedReceiver, intent.getParcelableExtra(RESULT_RECEIVER));
+      assertEquals(expectedCallingActivity, intent.getParcelableExtra(CALLING_ACTIVITY));
       return true;
     }));
   }
@@ -111,7 +122,7 @@ public class InterstitialActivityHelperTest {
 
   @NonNull
   private InterstitialActivityHelper createHelper() {
-    return new InterstitialActivityHelper(context);
+    return new InterstitialActivityHelper(context, topActivityFinder);
   }
 
 }

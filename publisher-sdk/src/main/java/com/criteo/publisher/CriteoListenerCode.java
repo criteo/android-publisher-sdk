@@ -4,4 +4,5 @@ public enum CriteoListenerCode {
   VALID,
   INVALID,
   CLICK,
+  CLOSE
 }

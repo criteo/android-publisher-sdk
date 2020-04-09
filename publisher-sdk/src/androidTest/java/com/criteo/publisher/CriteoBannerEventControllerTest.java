@@ -20,11 +20,13 @@ import android.content.Context;
 import android.os.Looper;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
+import com.criteo.publisher.util.RunOnUiThreadExecutor;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -42,7 +44,7 @@ public class CriteoBannerEventControllerTest {
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
-  private CriteoBannerEventController criteoBannerEventController;
+  private RealCriteoBannerEventController criteoBannerEventController;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private CriteoBannerView criteoBannerView;
@@ -56,6 +58,12 @@ public class CriteoBannerEventControllerTest {
   @Inject
   private Context context;
 
+  @Inject
+  private TopActivityFinder topActivityFinder;
+
+  @Inject
+  private RunOnUiThreadExecutor runOnUiThreadExecutor;
+
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
@@ -64,7 +72,12 @@ public class CriteoBannerEventControllerTest {
     when(criteo.getConfig().getAdTagUrlMode()).thenReturn("");
 
     when(criteoBannerView.getCriteoBannerAdListener()).thenReturn(criteoBannerAdListener);
-    criteoBannerEventController = spy(new CriteoBannerEventController(criteoBannerView, criteo));
+    criteoBannerEventController = spy(new RealCriteoBannerEventController(
+        criteoBannerView,
+        criteo,
+        topActivityFinder,
+        runOnUiThreadExecutor
+    ));
   }
 
   @Test

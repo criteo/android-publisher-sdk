@@ -51,6 +51,9 @@ public class CriteoBannerListenerCallTask implements Runnable {
         listener.onAdLeftApplication();
         listener.onAdOpened();
         break;
+      case CLOSE:
+        listener.onAdClosed();
+        break;
     }
   }
 

@@ -84,7 +84,7 @@ public class CriteoBannerView extends WebView {
   @VisibleForTesting
   CriteoBannerEventController getOrCreateController() {
     if (criteoBannerEventController == null) {
-      criteoBannerEventController = new CriteoBannerEventController(this, getCriteo());
+      criteoBannerEventController = getCriteo().createBannerController(this);
     }
     return criteoBannerEventController;
   }

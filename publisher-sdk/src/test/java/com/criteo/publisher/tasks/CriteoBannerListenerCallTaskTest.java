@@ -2,6 +2,9 @@ package com.criteo.publisher.tasks;
 
 import static com.criteo.publisher.CriteoListenerCode.INVALID;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
@@ -11,7 +14,6 @@ import java.lang.ref.WeakReference;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class CriteoBannerListenerCallTaskTest {
@@ -41,12 +43,12 @@ public class CriteoBannerListenerCallTaskTest {
     CriteoBannerListenerCallTask task = createTask(INVALID);
     task.run();
 
-    Mockito.verify(criteoBannerAdListener, Mockito.times(1))
+    verify(criteoBannerAdListener, times(1))
         .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
-    Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdReceived(criteoBannerView);
-    Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdClicked();
-    Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdLeftApplication();
-    Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdOpened();
+    verify(criteoBannerAdListener, times(0)).onAdReceived(criteoBannerView);
+    verify(criteoBannerAdListener, times(0)).onAdClicked();
+    verify(criteoBannerAdListener, times(0)).onAdLeftApplication();
+    verify(criteoBannerAdListener, times(0)).onAdOpened();
 
   }
 
@@ -55,12 +57,12 @@ public class CriteoBannerListenerCallTaskTest {
     CriteoBannerListenerCallTask task = createTask(CriteoListenerCode.VALID);
     task.run();
 
-    Mockito.verify(criteoBannerAdListener, Mockito.times(0))
+    verify(criteoBannerAdListener, times(0))
         .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
-    Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdReceived(criteoBannerView);
-    Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdClicked();
-    Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdLeftApplication();
-    Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdOpened();
+    verify(criteoBannerAdListener, times(1)).onAdReceived(criteoBannerView);
+    verify(criteoBannerAdListener, times(0)).onAdClicked();
+    verify(criteoBannerAdListener, times(0)).onAdLeftApplication();
+    verify(criteoBannerAdListener, times(0)).onAdOpened();
   }
 
   @Test
@@ -68,12 +70,21 @@ public class CriteoBannerListenerCallTaskTest {
     CriteoBannerListenerCallTask task = createTask(CriteoListenerCode.CLICK);
     task.run();
 
-    Mockito.verify(criteoBannerAdListener, Mockito.times(0))
+    verify(criteoBannerAdListener, times(0))
         .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
-    Mockito.verify(criteoBannerAdListener, Mockito.times(0)).onAdReceived(criteoBannerView);
-    Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdClicked();
-    Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdLeftApplication();
-    Mockito.verify(criteoBannerAdListener, Mockito.times(1)).onAdOpened();
+    verify(criteoBannerAdListener, times(0)).onAdReceived(criteoBannerView);
+    verify(criteoBannerAdListener, times(1)).onAdClicked();
+    verify(criteoBannerAdListener, times(1)).onAdLeftApplication();
+    verify(criteoBannerAdListener, times(1)).onAdOpened();
+  }
+
+  @Test
+  public void testWithCloseCode() {
+    CriteoBannerListenerCallTask task = createTask(CriteoListenerCode.CLOSE);
+    task.run();
+
+    verify(criteoBannerAdListener).onAdClosed();
+    verifyNoMoreInteractions(criteoBannerAdListener);
   }
 
   private CriteoBannerListenerCallTask createTask(CriteoListenerCode code) {

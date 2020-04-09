@@ -1,5 +1,6 @@
 package com.criteo.publisher.interstitial;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,18 +12,27 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import com.criteo.publisher.CriteoInterstitialActivity;
 import com.criteo.publisher.CriteoInterstitialAdListener;
+import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.util.CriteoResultReceiver;
 
 public class InterstitialActivityHelper {
 
   public static final String WEB_VIEW_DATA = "webviewdata";
   public static final String RESULT_RECEIVER = "resultreceiver";
+  public static final String CALLING_ACTIVITY = "callingactivity";
 
   @NonNull
   private final Context context;
 
-  public InterstitialActivityHelper(@NonNull Context context) {
+  @NonNull
+  private final TopActivityFinder topActivityFinder;
+
+  public InterstitialActivityHelper(
+      @NonNull Context context,
+      @NonNull TopActivityFinder topActivityFinder
+  ) {
     this.context = context;
+    this.topActivityFinder = topActivityFinder;
   }
 
   public boolean isAvailable() {
@@ -49,11 +59,13 @@ public class InterstitialActivityHelper {
     }
 
     CriteoResultReceiver criteoResultReceiver = createReceiver(listener);
+    ComponentName hostActivityName = topActivityFinder.getTopActivityName();
 
     Intent intent = createIntent();
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     intent.putExtra(WEB_VIEW_DATA, webViewContent);
     intent.putExtra(RESULT_RECEIVER, criteoResultReceiver);
+    intent.putExtra(CALLING_ACTIVITY, hostActivityName);
 
     context.startActivity(intent);
   }
