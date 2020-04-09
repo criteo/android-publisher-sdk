@@ -8,22 +8,35 @@ import android.os.Looper;
 import android.os.MessageQueue;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import com.criteo.publisher.util.CompletableFuture;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 
 @RequiresApi(api = VERSION_CODES.M)
 public class ThreadingUtil {
 
   public static void runOnMainThreadAndWait(@NonNull Runnable runnable) {
-    CountDownLatch latch = new CountDownLatch(1);
+    callOnMainThreadAndWait(() -> {
+      runnable.run();
+      return null;
+    });
+  }
+
+  public static <T> T callOnMainThreadAndWait(@NonNull Callable<T> callable) {
+    CompletableFuture<T> future = new CompletableFuture<>();
 
     new Handler(Looper.getMainLooper()).post(() -> {
-      runnable.run();
-      latch.countDown();
+      try {
+        future.complete(callable.call());
+      } catch (Exception e) {
+        future.completeExceptionally(e);
+      }
     });
 
     try {
-      latch.await();
-    } catch (InterruptedException e) {
+      return future.get();
+    } catch (InterruptedException | ExecutionException e) {
       throw new RuntimeException(e);
     }
   }
