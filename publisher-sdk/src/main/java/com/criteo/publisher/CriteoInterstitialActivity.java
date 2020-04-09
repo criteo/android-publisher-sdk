@@ -1,27 +1,23 @@
 package com.criteo.publisher;
 
+import static com.criteo.publisher.interstitial.InterstitialActivityHelper.RESULT_RECEIVER;
+import static com.criteo.publisher.interstitial.InterstitialActivityHelper.WEB_VIEW_DATA;
 import static com.criteo.publisher.util.CriteoResultReceiver.ACTION_CLOSED;
 import static com.criteo.publisher.util.CriteoResultReceiver.ACTION_LEFT_CLICKED;
 import static com.criteo.publisher.util.CriteoResultReceiver.INTERSTITIAL_ACTION;
 import static com.criteo.publisher.util.CriteoResultReceiver.RESULT_CODE_SUCCESSFUL;
-import static com.criteo.publisher.interstitial.InterstitialActivityHelper.RESULT_RECEIVER;
-import static com.criteo.publisher.interstitial.InterstitialActivityHelper.WEB_VIEW_DATA;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.support.annotation.VisibleForTesting;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
-import java.util.List;
+import com.criteo.publisher.adview.AdWebViewClient;
+import com.criteo.publisher.adview.AdWebViewListener;
 
 public class CriteoInterstitialActivity extends Activity {
 
@@ -78,7 +74,17 @@ public class CriteoInterstitialActivity extends Activity {
 
   private void prepareWebView() {
     webView.getSettings().setJavaScriptEnabled(true);
-    webView.setWebViewClient(new InterstitialWebViewClient());
+
+    webView.setWebViewClient(new AdWebViewClient(new AdWebViewListener() {
+      @Override
+      public void onUserRedirectedToAd() {
+        Bundle bundle = new Bundle();
+        bundle.putInt(INTERSTITIAL_ACTION, ACTION_LEFT_CLICKED);
+        resultReceiver.send(RESULT_CODE_SUCCESSFUL, bundle);
+
+        finish();
+      }
+    }));
   }
 
   @Override
@@ -89,33 +95,6 @@ public class CriteoInterstitialActivity extends Activity {
   @VisibleForTesting
   WebView getWebView() {
     return webView;
-  }
-
-  private class InterstitialWebViewClient extends WebViewClient {
-
-    @Override
-    public boolean shouldOverrideUrlLoading(WebView view, String url) {
-      Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url)).
-          addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-      // this callback gets called after the user has clicked on the creative. In case of deeplink,
-      // if the target application is not installed on the device, an ActivityNotFoundException
-      // will be thrown. Therefore, an explicit check is made to ensure that there exists at least
-      // one package that can handle the intent
-      PackageManager packageManager = getPackageManager();
-      List<ResolveInfo> list = packageManager
-          .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-
-      if (list.size() > 0) {
-        view.getContext().startActivity(intent);
-        Bundle bundle = new Bundle();
-        bundle.putInt(INTERSTITIAL_ACTION, ACTION_LEFT_CLICKED);
-        resultReceiver.send(RESULT_CODE_SUCCESSFUL, bundle);
-        finish();
-      }
-
-      return true;
-    }
   }
 
 }
