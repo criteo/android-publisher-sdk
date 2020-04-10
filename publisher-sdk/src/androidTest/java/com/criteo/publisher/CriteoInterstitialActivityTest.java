@@ -1,95 +1,169 @@
 package com.criteo.publisher;
 
-import static android.support.test.runner.lifecycle.Stage.DESTROYED;
 import static android.support.test.runner.lifecycle.Stage.RESUMED;
+import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
+import static com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
-import static com.criteo.publisher.interstitial.InterstitialActivityHelper.RESULT_RECEIVER;
-import static com.criteo.publisher.interstitial.InterstitialActivityHelper.WEB_VIEW_DATA;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.support.test.InstrumentationRegistry;
+import android.app.Activity;
+import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.AndroidJUnit4;
+import android.support.test.runner.lifecycle.ActivityLifecycleMonitor;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
+import android.support.test.runner.lifecycle.Stage;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import com.criteo.publisher.util.CriteoResultReceiver;
+import com.criteo.publisher.concurrent.ThreadingUtil;
+import com.criteo.publisher.interstitial.InterstitialActivityHelper;
+import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
+import com.criteo.publisher.test.activity.DummyActivity;
+import com.criteo.publisher.view.WebViewClicker;
+import com.criteo.publisher.view.WebViewLookup;
 import java.util.Collection;
+import javax.inject.Inject;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 
-@RunWith(AndroidJUnit4.class)
 public class CriteoInterstitialActivityTest {
 
   @Rule
-  public ActivityTestRule<CriteoInterstitialActivity> activityRule = new ActivityTestRule<>(
-      CriteoInterstitialActivity.class, true, false);
+  public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(DummyActivity.class);
 
-  @Test
-  public void whenDeeplinkIsLoaded_GivenTargetAppIsNotInstalled_DontThrowActivityNotFound() {
-    CriteoResultReceiver criteoResultReceiver = mock(CriteoResultReceiver.class);
-    Intent intent = new Intent();
-    Bundle bundle = new Bundle();
-    bundle.putString(WEB_VIEW_DATA, "");
-    bundle.putParcelable(RESULT_RECEIVER, criteoResultReceiver);
-    intent.putExtras(bundle);
-    activityRule.launchActivity(intent);
+  @Rule
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
-    CriteoInterstitialActivity activity = activityRule.getActivity();
-    runOnMainThreadAndWait(() -> {
-      WebView webView = activity.getWebView();
-      WebViewClient webViewClient = webView.getWebViewClient();
-      webViewClient.shouldOverrideUrlLoading(webView, "fake_deeplink://fakeappdispatch");
-    });
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
+
+  private final WebViewLookup lookup = new WebViewLookup();
+
+  private final WebViewClicker clicker = new WebViewClicker();
+
+  @SpyBean
+  private Context context;
+
+  @Inject
+  private InterstitialActivityHelper interstitialActivityHelper;
+
+  @Mock
+  private CriteoInterstitialAdListener listener;
+
+  @Before
+  public void setUp() throws Exception {
+    givenInitializedCriteo();
   }
 
   @Test
-  public void testAppearAndDoNotDismiss() {
-    CriteoResultReceiver criteoResultReceiver = mock(CriteoResultReceiver.class);
-    Intent intent = new Intent();
-    Bundle bundle = new Bundle();
-    bundle.putString(WEB_VIEW_DATA, "html content");
-    bundle.putParcelable(RESULT_RECEIVER, criteoResultReceiver);
-    intent.putExtras(bundle);
-    activityRule.launchActivity(intent);
+  public void whenUserClickOnAd_GivenHtmlWithHttpUrl_RedirectUserAndNotifyListener() throws Exception {
+    Activity activity = whenUserClickOnAd("https://criteo.com");
 
-    try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-    InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-      public void run() {
-        Collection resumedActivities = ActivityLifecycleMonitorRegistry.getInstance()
-            .getActivitiesInStage(RESUMED);
-        Collection closedActivities = ActivityLifecycleMonitorRegistry.getInstance()
-            .getActivitiesInStage(DESTROYED);
-        assertTrue(resumedActivities.contains(activityRule.getActivity()));
-        assertFalse(closedActivities.contains(activityRule.getActivity()));
-      }
-    });
+    assertFalse(getActivitiesInStage(RESUMED).contains(activity));
+    verify(listener).onAdClicked();
+    verify(listener).onAdLeftApplication();
+    verifyNoMoreInteractions(listener);
+  }
 
-    try {
-      Thread.sleep(8000);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
+  @Test
+  public void whenUserClickOnAd_GivenHtmlWithNotHandledDeepLink_DoNothing() throws Exception {
+    // We assume that no application can handle such URL.
 
-    InstrumentationRegistry.getInstrumentation().runOnMainSync(new Runnable() {
-      public void run() {
-        Collection closedActivities = ActivityLifecycleMonitorRegistry.getInstance()
-            .getActivitiesInStage(DESTROYED);
-        assertFalse(closedActivities.contains(activityRule.getActivity()));
-      }
-    });
+    whenUserClickOnAd("fake-deeplink://fakeappdispatch");
 
+    verify(context, never()).startActivity(any());
+    verifyNoMoreInteractions(listener);
+  }
 
+  @Test
+  public void whenUserClickOnAd_GivenHtmlWithHandledDeepLink_RedirectUserAndNotifyListener() throws Exception {
+    Activity activity = whenUserClickOnAd("criteo-test://dummy-ad-activity");
+
+    assertFalse(getActivitiesInStage(RESUMED).contains(activity));
+    verify(listener).onAdClicked();
+    verify(listener).onAdLeftApplication();
+    verifyNoMoreInteractions(listener);
+  }
+
+  @Test
+  public void whenUserClickOnAdAndGoBack_GivenHtmlWithHandledDeepLink_NotifyListener() throws Exception {
+    String html = clicker.getAdHtmlWithClickUrl("criteo-test://dummy-ad-activity");
+    CriteoInterstitialActivity activity = givenOpenedInterstitialActivity(html);
+    WebView webView = activity.getWebView();
+
+    Activity dummyAdActivity = lookup.lookForResumedActivity(() -> {
+      clicker.simulateClickOnAd(webView);
+    }).get();
+
+    Activity afterGoingBackActivity = lookup.lookForResumedActivity(() -> {
+      runOnMainThreadAndWait(dummyAdActivity::onBackPressed);
+    }).get();
+
+    waitForIdleState();
+
+    assertEquals(activityRule.getActivity().getComponentName(), afterGoingBackActivity.getComponentName());
+
+    InOrder inOrder = inOrder(listener);
+    inOrder.verify(listener).onAdClicked();
+    inOrder.verify(listener).onAdLeftApplication();
+    inOrder.verify(listener).onAdClosed();
+    verifyNoMoreInteractions(listener);
+  }
+
+  @Test
+  public void testAppearAndDoNotDismiss() throws Exception {
+    Activity activity = givenOpenedInterstitialActivity("");
+
+    assertTrue(getActivitiesInStage(RESUMED).contains(activity));
+
+    Thread.sleep(2000);
+
+    assertTrue(getActivitiesInStage(RESUMED).contains(activity));
+  }
+
+  private CriteoInterstitialActivity whenUserClickOnAd(String url) throws Exception {
+    String html = clicker.getAdHtmlWithClickUrl(url);
+    CriteoInterstitialActivity activity = givenOpenedInterstitialActivity(html);
+    WebView webView = activity.getWebView();
+
+    clicker.simulateClickOnAd(webView);
+    waitForIdleState();
+
+    return activity;
+  }
+
+  @NonNull
+  private CriteoInterstitialActivity givenOpenedInterstitialActivity(@NonNull String html) throws Exception {
+    Activity activity = lookup.lookForResumedActivity(() -> {
+      interstitialActivityHelper.openActivity(html, listener);
+    }).get();
+
+    clearInvocations(context);
+
+    return (CriteoInterstitialActivity) activity;
+  }
+
+  private Collection<Activity> getActivitiesInStage(Stage stage) {
+    ActivityLifecycleMonitor activityMonitor = ActivityLifecycleMonitorRegistry.getInstance();
+    return callOnMainThreadAndWait(() -> activityMonitor.getActivitiesInStage(stage));
+  }
+
+  private void waitForIdleState() {
+    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
   }
 
 }

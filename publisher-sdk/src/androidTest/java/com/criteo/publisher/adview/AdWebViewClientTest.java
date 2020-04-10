@@ -2,10 +2,7 @@ package com.criteo.publisher.adview;
 
 import static com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.AdditionalAnswers.answerVoid;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -19,8 +16,8 @@ import android.support.test.rule.ActivityTestRule;
 import android.webkit.WebView;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.test.activity.DummyActivity;
+import com.criteo.publisher.view.WebViewClicker;
 import com.criteo.publisher.view.WebViewLookup;
-import java.util.concurrent.CountDownLatch;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,6 +39,8 @@ public class AdWebViewClientTest {
 
   private WebViewLookup lookup = new WebViewLookup();
 
+  private WebViewClicker clicker = new WebViewClicker();
+
   private Context context;
 
   @Mock
@@ -54,12 +53,18 @@ public class AdWebViewClientTest {
   @Before
   public void setUp() throws Exception {
     context = spy(activityRule.getActivity());
-    webView = callOnMainThreadAndWait(() -> new WebView(context));
 
     webViewClient = spy(new AdWebViewClient(
         listener,
         activityRule.getActivity().getComponentName()
     ));
+
+    webView = callOnMainThreadAndWait(() -> {
+      WebView view = new WebView(context);
+      view.getSettings().setJavaScriptEnabled(true);
+      view.setWebViewClient(webViewClient);
+      return view;
+    });
   }
 
   @Test
@@ -109,38 +114,7 @@ public class AdWebViewClientTest {
   }
 
   private void whenUserClickOnAd(@NonNull String url) throws Exception {
-    String html = "<html><body><a href='" + url + "' id='click'>My Awesome Ad</a></body></html>";
-    CountDownLatch isHtmlLoaded = new CountDownLatch(1);
-    CountDownLatch isClickDone = new CountDownLatch(1);
-
-    doAnswer(answerVoid((WebView ignored1, String ignored2) -> {
-      isHtmlLoaded.countDown();
-    })).when(webViewClient).onPageFinished(any(), any());
-
-    runOnMainThreadAndWait(() -> {
-      webView.getSettings().setJavaScriptEnabled(true);
-      webView.setWebViewClient(webViewClient);
-      webView.loadData(html, "text/html", "UTF-8");
-    });
-
-    isHtmlLoaded.await();
-
-    // Simulate click via JavaScript
-    runOnMainThreadAndWait(() -> {
-      webView.evaluateJavascript("(function() {\n"
-          + "  var element = document.getElementById('click');\n"
-          + "  if (element === null) {\n"
-          + "    return false;\n"
-          + "  }\n"
-          + "  element.click();\n"
-          + "  return true;\n"
-          + "})();", value -> {
-        assertEquals("Clickable element was not found in the WebView", "true", value);
-        isClickDone.countDown();
-      });
-    });
-
-    isClickDone.await();
+    clicker.loadHtmlAndSimulateClickOnAd(webView, url);
   }
 
 }
