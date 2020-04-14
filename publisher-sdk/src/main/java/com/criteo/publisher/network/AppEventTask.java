@@ -4,18 +4,20 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
-import com.criteo.publisher.util.AppEventResponseListener;
-import com.criteo.publisher.util.DeviceUtil;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
+import com.criteo.publisher.util.AppEventResponseListener;
+import com.criteo.publisher.util.DeviceUtil;
 import org.json.JSONObject;
 
 public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
 
-  private static final String TAG = "Criteo.AET";
   private static final int SENDER_ID = 2379;
   protected static final String THROTTLE = "throttleSec";
+
+  private final Logger logger = LoggerFactory.getLogger(AppEventTask.class);
 
   @NonNull
   private final Context mContext;
@@ -58,7 +60,7 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
     try {
       jsonObject = doAppEventTask(objects);
     } catch (Throwable tr) {
-      Log.e(TAG, "Internal AET exec error.", tr);
+      logger.error("Internal AET exec error.", tr);
     }
 
     return jsonObject;
@@ -81,9 +83,8 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
         userPrivacyUtil.getGdprData()
     );
 
-    if (response != null) {
-      Log.d(TAG, response.toString());
-    }
+    logger.debug("App event response: %s", response);
+
     return response;
   }
 
@@ -92,7 +93,7 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
     try {
       doOnPostExecute(result);
     } catch (Throwable tr) {
-      Log.e(TAG, "Internal AET PostExec error.", tr);
+      logger.error("Internal AET PostExec error.", tr);
     }
   }
 

@@ -24,6 +24,10 @@ public class Logger {
     log(Log.DEBUG, message, args, null);
   }
 
+  public void error(String message, Throwable thrown) {
+    log(Log.ERROR, message, EMPTY, thrown);
+  }
+
   private void log(int level, String message, Object[] args, @Nullable Throwable thrown) {
     if (!isLoggable()) {
       return;
