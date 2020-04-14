@@ -3,7 +3,6 @@ package com.criteo.publisher;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -11,10 +10,8 @@ import static org.mockito.Mockito.when;
 
 import android.app.Application;
 import android.content.Context;
-import com.criteo.publisher.mock.ApplicationMock;
-import com.criteo.publisher.util.AdvertisingInfo;
-import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.csm.MetricSendingQueue;
+import com.criteo.publisher.mock.ApplicationMock;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.util.AdvertisingInfo;
@@ -147,8 +144,8 @@ public class DependencyProviderTest {
   }
 
   @Test
-  public void provideLoggingUtil_WhenProvidedTwice_ReturnsTheSame() throws Exception {
-    provideBean_WhenProvidedTwice_ReturnsTheSame(DependencyProvider::provideLoggingUtil);
+  public void provideLoggerFactory_WhenProvidedTwice_ReturnsTheSame() throws Exception {
+    provideBean_WhenProvidedTwice_ReturnsTheSame(DependencyProvider::provideLoggerFactory);
   }
 
   @Test

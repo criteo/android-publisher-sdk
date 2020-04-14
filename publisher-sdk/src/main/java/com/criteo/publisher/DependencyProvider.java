@@ -21,6 +21,7 @@ import com.criteo.publisher.csm.MetricSendingQueueConsumer;
 import com.criteo.publisher.csm.MetricSendingQueueFactory;
 import com.criteo.publisher.csm.MetricSendingQueueProducer;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.Config;
@@ -36,7 +37,6 @@ import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.CustomAdapterFactory;
 import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.util.JsonSerializer;
-import com.criteo.publisher.util.LoggingUtil;
 import com.criteo.publisher.util.RunOnUiThreadExecutor;
 import com.criteo.publisher.util.TextUtils;
 import com.google.gson.Gson;
@@ -69,7 +69,7 @@ public class DependencyProvider {
     return instance;
   }
 
-  /** KEEP VISIBILITY AS PACKAGE-PRIVATE **/
+  /**KEEP VISIBILITY AS PACKAGE-PRIVATE **/
   /**
    * This method will be used by tests to provide a fake {@link DependencyProvider} instance
    */
@@ -162,17 +162,6 @@ public class DependencyProvider {
             provideContext(),
             provideAdvertisingInfo()
         );
-      }
-    });
-  }
-
-  @NonNull
-  public LoggingUtil provideLoggingUtil() {
-    return getOrCreate(LoggingUtil.class, new Factory<LoggingUtil>() {
-      @NonNull
-      @Override
-      public LoggingUtil create() {
-        return new LoggingUtil();
       }
     });
   }
@@ -379,7 +368,7 @@ public class DependencyProvider {
       @NonNull
       @Override
       public BidLifecycleListener create() {
-        BidLifecycleListener loggingListener = new LoggingBidLifecycleListener(provideLoggingUtil());
+        BidLifecycleListener loggingListener = new LoggingBidLifecycleListener();
 
         BidLifecycleListener csmListener = new CsmBidLifecycleListener(
             provideMetricRepository(),
@@ -515,6 +504,17 @@ public class DependencyProvider {
         return new GsonBuilder()
             .registerTypeAdapterFactory(CustomAdapterFactory.create())
             .create();
+      }
+    });
+  }
+
+  @NonNull
+  public LoggerFactory provideLoggerFactory() {
+    return getOrCreate(LoggerFactory.class, new Factory<LoggerFactory>() {
+      @NonNull
+      @Override
+      public LoggerFactory create() {
+        return new LoggerFactory();
       }
     });
   }

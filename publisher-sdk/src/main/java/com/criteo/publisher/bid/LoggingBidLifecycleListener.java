@@ -1,8 +1,8 @@
 package com.criteo.publisher.bid;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
-import com.criteo.publisher.util.LoggingUtil;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
@@ -13,49 +13,31 @@ import com.criteo.publisher.model.Slot;
  */
 public class LoggingBidLifecycleListener implements BidLifecycleListener {
 
-  private static final String TAG = LoggingBidLifecycleListener.class.getSimpleName();
-
-  @NonNull
-  private final LoggingUtil loggingUtil;
-
-  public LoggingBidLifecycleListener(@NonNull LoggingUtil loggingUtil) {
-    this.loggingUtil = loggingUtil;
-  }
+  private final Logger logger = LoggerFactory.getLogger(LoggingBidLifecycleListener.class);
 
   @Override
   public void onSdkInitialized() {
-    log("onSdkInitialized");
+    logger.debug("onSdkInitialized");
   }
 
   @Override
   public void onCdbCallStarted(@NonNull CdbRequest request) {
-    log("onCdbCallStarted: %s", request);
+    logger.debug("onCdbCallStarted: %s", request);
   }
 
   @Override
   public void onCdbCallFinished(@NonNull CdbRequest request, @NonNull CdbResponse response) {
-    log("onCdbCallFinished: %s", response);
+    logger.debug("onCdbCallFinished: %s", response);
   }
 
   @Override
   public void onCdbCallFailed(@NonNull CdbRequest request, @NonNull Exception exception) {
-    if (isEnabled()) {
-      Log.d(TAG, "onCdbCallFailed", exception);
-    }
+    logger.debug("onCdbCallFailed", exception);
   }
 
   @Override
   public void onBidConsumed(@NonNull CacheAdUnit adUnit, @NonNull Slot consumedBid) {
-    log("onBidConsumed: %s", consumedBid);
+    logger.debug("onBidConsumed: %s", consumedBid);
   }
 
-  private void log(String format, Object... args) {
-    if (isEnabled()) {
-      Log.d(TAG, String.format(format, args));
-    }
-  }
-
-  private boolean isEnabled() {
-    return loggingUtil.isLoggingEnabled();
-  }
 }
