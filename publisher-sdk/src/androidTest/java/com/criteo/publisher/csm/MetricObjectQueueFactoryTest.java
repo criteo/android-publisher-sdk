@@ -2,6 +2,7 @@ package com.criteo.publisher.csm;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
@@ -11,6 +12,7 @@ import android.content.Context;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
+import com.squareup.tape.ObjectQueue;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
@@ -22,15 +24,15 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class MetricSendingQueueFactoryTest {
+public class MetricObjectQueueFactoryTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
+  private File queueFile;
+
   @Inject
   private Context context;
-
-  private File queueFile;
 
   @Inject
   private MetricParser metricParser;
@@ -38,7 +40,7 @@ public class MetricSendingQueueFactoryTest {
   @SpyBean
   private BuildConfigWrapper buildConfigWrapper;
 
-  private MetricSendingQueueFactory factory;
+  private MetricObjectQueueFactory factory;
 
   @Before
   public void setUp() throws Exception {
@@ -46,11 +48,13 @@ public class MetricSendingQueueFactoryTest {
 
     queueFile = new File(context.getFilesDir(), "queueFile");
 
-    factory = new MetricSendingQueueFactory(
+    factory = spy(new MetricObjectQueueFactory(
         context,
         metricParser,
         buildConfigWrapper
-    );
+    ));
+
+    doReturn(queueFile).when(factory).getQueueFile();
   }
 
   @After
@@ -72,29 +76,12 @@ public class MetricSendingQueueFactoryTest {
   public void create_GivenNotExistingQueueFile_CreateFileAndQueueIsWorking() throws Exception {
     queueFile.delete();
 
-    MetricSendingQueue queue = factory.create();
+    ObjectQueue<Metric> queue = factory.create();
 
     assertTrue(queueFile.exists());
-    assertQueueIsWorking(queue);
+    assertNotNull(queue);
   }
 
-  @Test
-  public void create_GivenAlreadyExistingQueueFile_ReuseFileAndQueueIsWorking() throws Exception {
-    Metric metric1 = Metric.builder("id1").build();
-    Metric metric2 = Metric.builder("id2").build();
-
-    queueFile.delete();
-
-    MetricSendingQueue previousQueue = factory.create();
-    previousQueue.offer(metric1);
-
-    MetricSendingQueue queue = factory.create();
-    queue.offer(metric2);
-    List<Metric> metrics = queue.poll(2);
-
-    assertTrue(queueFile.exists());
-    assertEquals(Arrays.asList(metric1, metric2), metrics);
-  }
 
   @Test
   public void create_GivenStaleQueueFile_RecreateFileAndQueueIsWorking() throws Exception {
@@ -105,12 +92,12 @@ public class MetricSendingQueueFactoryTest {
       fos.write(garbage);
     }
 
-    MetricSendingQueue queue = factory.create();
-    byte[] fileContent = Files.readAllBytes(queueFile.toPath());
+    ObjectQueue<Metric> metricObjectQueue = factory.create();
 
+    byte[] fileContent = Files.readAllBytes(queueFile.toPath());
     assertTrue(queueFile.exists());
     assertFalse(Arrays.equals(fileContent, garbage));
-    assertQueueIsWorking(queue);
+    assertNotNull(metricObjectQueue);
   }
 
   @Test
@@ -119,11 +106,11 @@ public class MetricSendingQueueFactoryTest {
 
     queueFile.mkdirs();
 
-    MetricSendingQueue queue = factory.create();
+    ObjectQueue<Metric> metricObjectQueue = factory.create();
 
     assertTrue(queueFile.exists());
     assertFalse(queueFile.isDirectory());
-    assertQueueIsWorking(queue);
+    assertNotNull(metricObjectQueue);
   }
 
   @Test
@@ -133,11 +120,11 @@ public class MetricSendingQueueFactoryTest {
     queueFile.mkdirs();
     new File(queueFile, "dummyContent").createNewFile();
 
-    MetricSendingQueue queue = factory.create();
+    ObjectQueue<Metric> metricObjectQueue = factory.create();
 
     assertTrue(queueFile.exists());
     assertFalse(queueFile.isDirectory());
-    assertQueueIsWorking(queue);
+    assertNotNull(metricObjectQueue);
   }
 
   @Test
@@ -147,7 +134,9 @@ public class MetricSendingQueueFactoryTest {
     int requiredMetricsForOverflow = maxSize / smallSizeEstimationPerMetrics;
     int requiredMetricsForOverflowWithMargin = (int) (requiredMetricsForOverflow * 1.20);
 
-    MetricSendingQueue queue = factory.create();
+    MetricSendingQueue tapeQueue = new TapeMetricSendingQueue(factory);
+    BoundedMetricSendingQueue boundedMetricSendingQueue = new BoundedMetricSendingQueue(tapeQueue,
+        buildConfigWrapper);
 
     for (int i = 0; i < requiredMetricsForOverflowWithMargin; i++) {
       Metric metric = Metric.builder("id" + i)
@@ -156,11 +145,11 @@ public class MetricSendingQueueFactoryTest {
           .setElapsedTimestamp(2L)
           .build();
 
-      assertTrue(queue.offer(metric));
+      boundedMetricSendingQueue.offer(metric);
     }
 
     // The last element can overflow the limit, so we are lenient (up to 1%) on the below condition.
-    assertTrue(queue.getTotalSize() * 0.99 <= maxSize);
+    assertTrue(boundedMetricSendingQueue.getTotalSize() * 0.99 <= maxSize);
 
     // The queue file grows in power of 2. So it can be, at most, twice larger than expected.
     // To not waste this memory, the max size should be near a power of 2. We are lenient (up to
@@ -168,17 +157,7 @@ public class MetricSendingQueueFactoryTest {
     assertTrue(queueFile.length() <= maxSize * 1.10);
   }
 
-  private void assertQueueIsWorking(MetricSendingQueue queue) {
-    Metric savedMetric = Metric.builder("id").build();
-    queue.offer(savedMetric);
-    List<Metric> metrics = queue.poll(2);
-
-    assertEquals(1, metrics.size());
-    assertTrue(metrics.contains(savedMetric));
-  }
-
   private void givenDeactivatedPreconditionUtils() {
     when(buildConfigWrapper.isDebug()).thenReturn(false);
   }
-
 }

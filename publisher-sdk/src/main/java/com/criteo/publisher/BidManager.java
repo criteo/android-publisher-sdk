@@ -107,7 +107,6 @@ public class BidManager implements ApplicationStoppedListener {
     metricSendingQueueConsumer.sendMetricBatch();
   }
 
-
   public void enrichBid(Object object, AdUnit adUnit) {
     if (killSwitchEngaged()) {
       return;

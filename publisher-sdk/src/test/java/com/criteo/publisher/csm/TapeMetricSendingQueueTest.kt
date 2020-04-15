@@ -1,28 +1,31 @@
 package com.criteo.publisher.csm
 
-import com.criteo.publisher.csm.TapeMetricSendingQueue.createFileObjectQueue
+import com.criteo.publisher.csm.MetricObjectQueueFactory.MetricConverter
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.util.BuildConfigWrapper
 import com.nhaarman.mockitokotlin2.*
 import com.squareup.tape.FileException
+import com.squareup.tape.FileObjectQueue
 import com.squareup.tape.InMemoryObjectQueue
 import com.squareup.tape.ObjectQueue
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import java.io.File
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.Executors
 import javax.inject.Inject
+
 
 @RunWith(Parameterized::class)
 class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementation) {
@@ -59,38 +62,16 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
 
   private lateinit var queue: TapeMetricSendingQueue
 
+  @Mock
+  private lateinit var metricObjectQueueFactory: MetricObjectQueueFactory
+
   @Before
   fun setUp() {
     MockitoAnnotations.initMocks(this)
 
     tapeQueue = spy(createObjectQueue())
-    queue = TapeMetricSendingQueue(tapeQueue)
-  }
-
-  private fun createObjectQueue(): ObjectQueue<Metric> {
-    return when (tapeImplementation) {
-      TapeImplementation.NEW_FILE -> {
-        createFileObjectQueueFromNewFile()
-      }
-      TapeImplementation.EMPTY_QUEUE_FILE -> {
-        val newFile = tempFolder.newFile()
-        createFileObjectQueueFromNewFile(newFile)
-        createFileObjectQueue(newFile, metricParser)
-      }
-      TapeImplementation.IN_MEMORY -> {
-        InMemoryObjectQueue()
-      }
-    }
-  }
-
-  private fun givenMockedTapeQueue() {
-    tapeQueue = mock()
-    queue = TapeMetricSendingQueue(tapeQueue)
-  }
-
-  private fun createFileObjectQueueFromNewFile(newFile: File = tempFolder.newFile()): ObjectQueue<Metric> {
-    newFile.delete()
-    return createFileObjectQueue(newFile, metricParser)
+    doReturn(tapeQueue).whenever(metricObjectQueueFactory).create()
+    queue = TapeMetricSendingQueue(metricObjectQueueFactory)
   }
 
   @Test
@@ -114,6 +95,10 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
     (0 until 200).forEach {
       queue.offer(mockMetric(it))
     }
+
+    // Create new instance of TapeMetricSendingQueue to force recreating the queue reference when polling
+    // Since the queue is persistent, we should still find the metrics that were previously saved
+    queue = TapeMetricSendingQueue(metricObjectQueueFactory)
 
     val size = queue.totalSize
 
@@ -183,8 +168,26 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
     val metric1 = mockMetric(1)
     val metric2 = mockMetric(2)
 
-    tapeQueue.add(metric1)
-    tapeQueue.add(metric2)
+    queue.offer(metric1)
+    queue.offer(metric2)
+
+    val metrics = queue.poll(2)
+
+    assertThat(metrics).containsExactly(metric1, metric2)
+    assertThat(tapeQueue.size()).isEqualTo(0)
+  }
+
+  @Test
+  fun poll_GivenQueueInstanceOnWhichOfferWasCalledWasRecreated_ReturnListWithFullSize() {
+    val metric1 = mockMetric(1)
+    val metric2 = mockMetric(2)
+
+    queue.offer(metric1)
+    queue.offer(metric2)
+
+    // Create new instance of TapeMetricSendingQueue to force recreating the queue reference when polling
+    // Since the queue is persistent, we should still find the metrics that were previously saved
+    queue = TapeMetricSendingQueue(metricObjectQueueFactory)
 
     val metrics = queue.poll(2)
 
@@ -196,7 +199,7 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
   fun poll_GivenQueueWithNotEnoughCapacity_ReturnListWithOnlyContainedMetrics() {
     val metric1 = mockMetric()
 
-    tapeQueue.add(metric1)
+    queue.offer(metric1)
 
     val metrics = queue.poll(2)
 
@@ -252,6 +255,30 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
     assertThat(polledMetric).hasSize(100 * nbWorkers)
   }
 
+  private fun createObjectQueue(): ObjectQueue<Metric> {
+    return when (tapeImplementation) {
+      TapeImplementation.NEW_FILE -> {
+        val newFile = tempFolder.newFile()
+        newFile.delete()
+        FileObjectQueue(newFile, MetricConverter(metricParser))
+      }
+      TapeImplementation.EMPTY_QUEUE_FILE -> {
+        val newFile = tempFolder.newFile()
+        newFile.delete()
+        FileObjectQueue(newFile, MetricConverter(metricParser))
+      }
+      TapeImplementation.IN_MEMORY -> {
+        InMemoryObjectQueue()
+      }
+    }
+  }
+
+  private fun givenMockedTapeQueue() {
+    tapeQueue = mock()
+    doReturn(tapeQueue).whenever(metricObjectQueueFactory).create()
+    queue = TapeMetricSendingQueue(metricObjectQueueFactory)
+  }
+
   private fun givenDeactivatedPreconditionUtils() {
     buildConfigWrapper.stub {
       on { isDebug } doReturn false
@@ -265,5 +292,5 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
         .setElapsedTimestamp(1024L)
         .build()
   }
-
 }
+

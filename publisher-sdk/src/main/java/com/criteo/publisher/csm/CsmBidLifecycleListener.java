@@ -11,7 +11,9 @@ import com.criteo.publisher.model.CdbRequestSlot;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Slot;
+import com.criteo.publisher.util.PreconditionsUtil;
 import java.net.SocketTimeoutException;
+import java.util.concurrent.Executor;
 
 /**
  * Update metrics files accordingly to received events.
@@ -36,18 +38,23 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
   @NonNull
   private final Config config;
 
+  @NonNull
+  private final Executor executor;
+
   public CsmBidLifecycleListener(
       @NonNull MetricRepository repository,
       @NonNull MetricSendingQueueProducer sendingQueueProducer,
       @NonNull Clock clock,
       @NonNull UniqueIdGenerator uniqueIdGenerator,
-      @NonNull Config config
+      @NonNull Config config,
+      @NonNull Executor executor
   ) {
     this.repository = repository;
     this.sendingQueueProducer = sendingQueueProducer;
     this.clock = clock;
     this.uniqueIdGenerator = uniqueIdGenerator;
     this.config = config;
+    this.executor = executor;
   }
 
   /**
@@ -62,7 +69,16 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
       return;
     }
 
-    sendingQueueProducer.pushAllInQueue(repository);
+    executor.execute(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          sendingQueueProducer.pushAllInQueue(repository);
+        } catch (Exception e) {
+          PreconditionsUtil.throwOrLog(e);
+        }
+      }
+    });
   }
 
   /**
@@ -77,14 +93,23 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
       return;
     }
 
-    long currentTimeInMillis = clock.getCurrentTimeInMillis();
-    String requestGroupId = uniqueIdGenerator.generateId();
-
-    updateByCdbRequestIds(request, new MetricUpdater() {
+    executor.execute(new Runnable() {
       @Override
-      public void update(@NonNull Metric.Builder builder) {
-        builder.setRequestGroupId(requestGroupId);
-        builder.setCdbCallStartTimestamp(currentTimeInMillis);
+      public void run() {
+        try {
+          long currentTimeInMillis = clock.getCurrentTimeInMillis();
+          String requestGroupId = uniqueIdGenerator.generateId();
+
+          updateByCdbRequestIds(request, new MetricUpdater() {
+            @Override
+            public void update(@NonNull Metric.Builder builder) {
+              builder.setRequestGroupId(requestGroupId);
+              builder.setCdbCallStartTimestamp(currentTimeInMillis);
+            }
+          });
+        } catch (Exception e) {
+          PreconditionsUtil.throwOrLog(e);
+        }
       }
     });
   }
@@ -112,33 +137,42 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
       return;
     }
 
-    long currentTimeInMillis = clock.getCurrentTimeInMillis();
+    executor.execute(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          long currentTimeInMillis = clock.getCurrentTimeInMillis();
 
-    for (CdbRequestSlot requestSlot : request.getSlots()) {
-      String impressionId = requestSlot.getImpressionId();
-      Slot responseSlot = response.getSlotByImpressionId(impressionId);
-      boolean isNoBid = responseSlot == null;
-      boolean isInvalidBid = responseSlot != null && !responseSlot.isValid();
+          for (CdbRequestSlot requestSlot : request.getSlots()) {
+            String impressionId = requestSlot.getImpressionId();
+            Slot responseSlot = response.getSlotByImpressionId(impressionId);
+            boolean isNoBid = responseSlot == null;
+            boolean isInvalidBid = responseSlot != null && !responseSlot.isValid();
 
-      repository.addOrUpdateById(impressionId, new MetricUpdater() {
-        @Override
-        public void update(@NonNull Metric.Builder builder) {
-          if (isNoBid) {
-            builder.setCdbCallEndTimestamp(currentTimeInMillis);
-            builder.setReadyToSend(true);
-          } else if (isInvalidBid) {
-            builder.setReadyToSend(true);
-          } else /* if isValidBid */ {
-            builder.setCdbCallEndTimestamp(currentTimeInMillis);
-            builder.setCachedBidUsed(true);
+            repository.addOrUpdateById(impressionId, new MetricUpdater() {
+              @Override
+              public void update(@NonNull Metric.Builder builder) {
+                if (isNoBid) {
+                  builder.setCdbCallEndTimestamp(currentTimeInMillis);
+                  builder.setReadyToSend(true);
+                } else if (isInvalidBid) {
+                  builder.setReadyToSend(true);
+                } else /* if isValidBid */ {
+                  builder.setCdbCallEndTimestamp(currentTimeInMillis);
+                  builder.setCachedBidUsed(true);
+                }
+              }
+            });
+
+            if (isNoBid || isInvalidBid) {
+              sendingQueueProducer.pushInQueue(repository, impressionId);
+            }
           }
+        } catch (Exception e) {
+          PreconditionsUtil.throwOrLog(e);
         }
-      });
-
-      if (isNoBid || isInvalidBid) {
-        sendingQueueProducer.pushInQueue(repository, impressionId);
       }
-    }
+    });
   }
 
   /**
@@ -157,17 +191,26 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
       return;
     }
 
-    boolean isTimeout = exception instanceof SocketTimeoutException;
-    if (isTimeout) {
-      onCdbCallTimeout(request);
-    } else {
-      onCdbCallNetworkError(request);
-    }
+    executor.execute(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          boolean isTimeout = exception instanceof SocketTimeoutException;
+          if (isTimeout) {
+            onCdbCallTimeout(request);
+          } else {
+            onCdbCallNetworkError(request);
+          }
 
-    for (CdbRequestSlot slot : request.getSlots()) {
-      String impressionId = slot.getImpressionId();
-      sendingQueueProducer.pushInQueue(repository, impressionId);
-    }
+          for (CdbRequestSlot slot : request.getSlots()) {
+            String impressionId = slot.getImpressionId();
+            sendingQueueProducer.pushInQueue(repository, impressionId);
+          }
+        } catch (Exception e) {
+          PreconditionsUtil.throwOrLog(e);
+        }
+      }
+    });
   }
 
   private void onCdbCallNetworkError(CdbRequest request) {
@@ -207,26 +250,35 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
       return;
     }
 
-    String impressionId = consumedBid.getImpressionId();
-    if (impressionId == null) {
-      return;
-    }
-
-    boolean isNotExpired = !consumedBid.isExpired(clock);
-    long currentTimeInMillis = clock.getCurrentTimeInMillis();
-
-    repository.addOrUpdateById(impressionId, new MetricUpdater() {
+    executor.execute(new Runnable() {
       @Override
-      public void update(@NonNull Metric.Builder builder) {
-        if (isNotExpired) {
-          builder.setElapsedTimestamp(currentTimeInMillis);
-        }
+      public void run() {
+        try {
+          String impressionId = consumedBid.getImpressionId();
+          if (impressionId == null) {
+            return;
+          }
 
-        builder.setReadyToSend(true);
+          boolean isNotExpired = !consumedBid.isExpired(clock);
+          long currentTimeInMillis = clock.getCurrentTimeInMillis();
+
+          repository.addOrUpdateById(impressionId, new MetricUpdater() {
+            @Override
+            public void update(@NonNull Metric.Builder builder) {
+              if (isNotExpired) {
+                builder.setElapsedTimestamp(currentTimeInMillis);
+              }
+
+              builder.setReadyToSend(true);
+            }
+          });
+
+          sendingQueueProducer.pushInQueue(repository, impressionId);
+        } catch (Exception e) {
+          PreconditionsUtil.throwOrLog(e);
+        }
       }
     });
-
-    sendingQueueProducer.pushInQueue(repository, impressionId);
   }
 
   private void updateByCdbRequestIds(@NonNull CdbRequest request, @NonNull MetricUpdater updater) {

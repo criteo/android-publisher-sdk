@@ -8,10 +8,6 @@ import com.squareup.tape.FileException;
 import com.squareup.tape.FileObjectQueue;
 import com.squareup.tape.ObjectQueue;
 import com.squareup.tape.QueueFile;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -19,19 +15,11 @@ import java.util.List;
 
 class TapeMetricSendingQueue extends MetricSendingQueue {
 
-  @NonNull
-  @GuardedBy("pollLock")
-  private final ObjectQueue<Metric> queue;
+  private final Object queueLock = new Object();
 
-  /**
-   * Lock on the polling side of the queue.
-   *
-   * There is no need to lock the other side of the FIFO because operations on the underlying queue
-   * are atomic. If two workers concurrently offer and poll the queue, the poller will either see
-   * the offered elements, either he will see nothing. So there is no risk of inconsistency. Note
-   * that the outcome is not deterministic but it is not needed.
-   */
-  private final Object pollLock = new Object();
+  @Nullable
+  @GuardedBy("queueLock")
+  private ObjectQueue<Metric> queue;
 
   @Nullable
   private Method usedBytesMethod;
@@ -39,36 +27,37 @@ class TapeMetricSendingQueue extends MetricSendingQueue {
   @Nullable
   private QueueFile queueFile;
 
-  TapeMetricSendingQueue(@NonNull ObjectQueue<Metric> queue) {
-    this.queue = queue;
+  @NonNull
+  private final MetricObjectQueueFactory queueFactory;
+
+  TapeMetricSendingQueue(@NonNull MetricObjectQueueFactory queueFactory) {
+    this.queueFactory = queueFactory;
     this.usedBytesMethod = null;
     this.queueFile = null;
   }
 
-  @NonNull
-  static ObjectQueue<Metric> createFileObjectQueue(
-      @NonNull File file,
-      @NonNull MetricParser parser
-  ) throws IOException {
-    return new FileObjectQueue<>(file, new MetricConverter(parser));
-  }
-
   @Override
   boolean offer(@NonNull Metric metric) {
-    try {
-      queue.add(metric);
-      return true;
-    } catch (FileException e) {
-      PreconditionsUtil.throwOrLog(e);
-      return false;
+    synchronized (queueLock) {
+      createQueueIfNecessary();
+
+      try {
+        queue.add(metric);
+        return true;
+      } catch (FileException e) {
+        PreconditionsUtil.throwOrLog(e);
+        return false;
+      }
     }
   }
 
   @NonNull
   @Override
   List<Metric> poll(int max) {
-    List<Metric> metrics = new ArrayList<>();
-    synchronized (pollLock) {
+    synchronized (queueLock) {
+      createQueueIfNecessary();
+
+      List<Metric> metrics = new ArrayList<>();
       try {
         for (int i = 0; i < max; i++) {
           Metric metric = queue.peek();
@@ -89,27 +78,31 @@ class TapeMetricSendingQueue extends MetricSendingQueue {
 
   @Override
   int getTotalSize() {
-    // This size is mainly used to bound this queue. For this, it is not enough to get the size of
-    // the queue file. The file grows in power of 2. Even if it is the real size, then this means
-    // that if the limit is just after a power of 2, then we will have a lot of available space, but
-    // we would not use it. If the limit is just before a power of 2, then we will lose half the
-    // capacity of the queue.
-    // Moreover the file is shrinked after some removal. This is a detail of the implementation. And
-    // even if we make some room in the queue, we will not see it.
-    // There is a usedBytes method in the internal queueFile of the file object queue. This method
-    // is used to get the real size of the queue.
+    synchronized (queueLock) {
+      // This size is mainly used to bound this queue. For this, it is not enough to get the size of
+      // the queue file. The file grows in power of 2. Even if it is the real size, then this means
+      // that if the limit is just after a power of 2, then we will have a lot of available space,
+      // but we would not use it. If the limit is just before a power of 2, then we will lose half
+      // the capacity of the queue.
+      // Moreover the file is shrinked after some removal. This is a detail of the implementation.
+      // And even if we make some room in the queue, we will not see it.
+      // There is a usedBytes method in the internal queueFile of the file object queue. This method
+      // is used to get the real size of the queue.
 
-    if (!(queue instanceof FileObjectQueue)) {
-      return 0;
-    }
+      createQueueIfNecessary();
 
-    try {
-      Method usedBytesMethod = getUsedBytesMethod();
-      QueueFile queueFile = getQueueFile();
-      return (Integer) usedBytesMethod.invoke(queueFile);
-    } catch (Exception e) {
-      PreconditionsUtil.throwOrLog(e);
-      return 0;
+      if (!(queue instanceof FileObjectQueue)) {
+        return 0;
+      }
+
+      try {
+        Method usedBytesMethod = getUsedBytesMethod();
+        QueueFile queueFile = getQueueFile((FileObjectQueue) queue);
+        return (Integer) usedBytesMethod.invoke(queueFile);
+      } catch (Exception e) {
+        PreconditionsUtil.throwOrLog(e);
+        return 0;
+      }
     }
   }
 
@@ -124,42 +117,19 @@ class TapeMetricSendingQueue extends MetricSendingQueue {
   }
 
   @NonNull
-  private QueueFile getQueueFile() throws ReflectiveOperationException, ClassCastException {
-    if (queueFile == null) {
-      Field queueFileField = FileObjectQueue.class.getDeclaredField("queueFile");
-      queueFileField.setAccessible(true);
-      queueFile = (QueueFile) queueFileField.get(queue);
-    }
+  private QueueFile getQueueFile(@NonNull FileObjectQueue fileObjectQueue) throws ReflectiveOperationException, ClassCastException {
+      if (queueFile == null) {
+        Field queueFileField = FileObjectQueue.class.getDeclaredField("queueFile");
+        queueFileField.setAccessible(true);
+        queueFile = (QueueFile) queueFileField.get(fileObjectQueue);
+      }
 
-    return queueFile;
+      return queueFile;
   }
 
-  private static class MetricConverter implements FileObjectQueue.Converter<Metric> {
-
-    @NonNull
-    private final MetricParser parser;
-
-    MetricConverter(@NonNull MetricParser parser) {
-      this.parser = parser;
-    }
-
-    @Nullable
-    @Override
-    public Metric from(@Nullable byte[] bytes) throws IOException {
-      if (bytes == null) {
-        return null;
-      }
-
-      try (ByteArrayInputStream input = new ByteArrayInputStream(bytes)) {
-        return parser.read(input);
-      }
-    }
-
-    @Override
-    public void toStream(@Nullable Metric metric, @Nullable OutputStream outputStream) throws IOException {
-      if (metric != null && outputStream != null) {
-        parser.write(metric, outputStream);
-      }
+  private void createQueueIfNecessary() {
+    if (queue == null) {
+      queue = queueFactory.create();
     }
   }
 }

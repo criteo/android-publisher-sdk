@@ -20,6 +20,7 @@ import com.criteo.publisher.csm.MetricSendingQueue;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
 import com.criteo.publisher.csm.MetricSendingQueueFactory;
 import com.criteo.publisher.csm.MetricSendingQueueProducer;
+import com.criteo.publisher.csm.MetricObjectQueueFactory;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.AdUnitMapper;
@@ -375,7 +376,8 @@ public class DependencyProvider {
             new MetricSendingQueueProducer(provideMetricSendingQueue()),
             provideClock(),
             provideUniqueIdGenerator(),
-            provideConfig()
+            provideConfig(),
+            provideThreadPoolExecutor()
         );
 
         return new CompositeBidLifecycleListener(loggingListener, csmListener);
@@ -454,10 +456,24 @@ public class DependencyProvider {
   }
 
   @NonNull
+  public MetricObjectQueueFactory provideObjectQueueFactory() {
+    return getOrCreate(MetricObjectQueueFactory.class, new Factory<MetricObjectQueueFactory>() {
+      @NonNull
+      @Override
+      public MetricObjectQueueFactory create() {
+        return new MetricObjectQueueFactory(
+            provideContext(),
+            provideMetricParser(),
+            provideBuildConfigWrapper()
+        );
+      }
+    });
+  }
+
+  @NonNull
   public MetricSendingQueue provideMetricSendingQueue() {
     return getOrCreate(MetricSendingQueue.class, new MetricSendingQueueFactory(
-        provideContext(),
-        provideMetricParser(),
+        provideObjectQueueFactory(),
         provideBuildConfigWrapper()
     ));
   }
@@ -523,5 +539,4 @@ public class DependencyProvider {
     @NonNull
     T create();
   }
-
 }

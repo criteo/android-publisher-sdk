@@ -12,6 +12,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import java.io.IOException
 import java.net.SocketTimeoutException
+import java.util.concurrent.Executor
 
 class CsmBidLifecycleListenerTest {
 
@@ -30,11 +31,16 @@ class CsmBidLifecycleListenerTest {
   @Mock
   private lateinit var config: Config
 
+  @Mock
+  private lateinit var executor: Executor
+
   private lateinit var listener: CsmBidLifecycleListener
 
   @Before
   fun setUp() {
     MockitoAnnotations.initMocks(this)
+
+    executor = Executor { it.run() }
 
     config.stub {
       on { isCsmEnabled } doReturn true
@@ -45,7 +51,8 @@ class CsmBidLifecycleListenerTest {
         sendingQueueProducer,
         clock,
         uniqueIdGenerator,
-        config
+        config,
+        executor
     )
   }
 
@@ -371,4 +378,10 @@ class CsmBidLifecycleListenerTest {
     verifyZeroInteractions(sendingQueueProducer)
   }
 
+  private fun givenExecutor(executor: Executor) {
+    doAnswer {
+      val command = it.arguments[0] as Runnable
+      executor.execute(command)
+    }.whenever(this.executor).execute(any())
+  }
 }

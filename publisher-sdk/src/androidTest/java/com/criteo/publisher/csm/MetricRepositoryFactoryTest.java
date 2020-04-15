@@ -81,5 +81,4 @@ public class MetricRepositoryFactoryTest {
     // The last element can overflow the limit, so we are lenient (up to 1%) on the below condition.
     assertTrue(repository.getTotalSize() * 0.99 <= maxSize);
   }
-
 }

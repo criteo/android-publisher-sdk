@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 import org.junit.After;
@@ -79,6 +80,14 @@ public class CsmFunctionalTest {
     AtomicReference<String> firstImpressionId = new AtomicReference<>();
     AtomicReference<String> firstRequestGroupId = new AtomicReference<>();
 
+    // A third call is needed to trigger the sending of metrics to CSM. This is because,
+    // the execution of onBidConsumed() callback happens after the second call to CDB.
+    // An INTERSTITIAL AdUnit is set here on purpose to verify that the metric that is sent
+    // to CSM relates to BANNER_320_50, which is the one that was consumed and whose metric
+    // was pushed to the sending queue.
+    Criteo.getInstance().getBidResponse(TestAdUnits.INTERSTITIAL);
+    waitForIdleState();
+
     verify(api).postCsm(argThat(request -> {
       assertRequestHeaderIsExpected(request);
 
@@ -93,7 +102,7 @@ public class CsmFunctionalTest {
     }));
 
     clearInvocations(api);
-    Criteo.getInstance().getBidResponse(TestAdUnits.INTERSTITIAL);
+    Criteo.getInstance().getBidResponse(TestAdUnits.BANNER_320_50);
     waitForIdleState();
 
     verify(api).postCsm(argThat(request -> {
@@ -109,24 +118,6 @@ public class CsmFunctionalTest {
 
       return true;
     }));
-
-    clearInvocations(api);
-    Criteo.getInstance().getBidResponse(TestAdUnits.INTERSTITIAL);
-    waitForIdleState();
-
-    verify(api).postCsm(argThat(request -> {
-      assertRequestHeaderIsExpected(request);
-
-      assertEquals(1, request.getFeedbacks().size());
-      MetricRequestFeedback feedback = request.getFeedbacks().get(0);
-      assertItRepresentsConsumedBid(feedback);
-      assertNotEquals(firstImpressionId.get(), feedback.getSlots().get(0).getImpressionId());
-
-      // This metric come from another CDB request and should have another ID
-      assertNotEquals(firstRequestGroupId.get(), feedback.getRequestGroupId());
-
-      return true;
-    }));
   }
 
   @Test
@@ -137,6 +128,14 @@ public class CsmFunctionalTest {
 
     when(clock.getCurrentTimeInMillis()).thenReturn(Long.MAX_VALUE);
     Criteo.getInstance().getBidResponse(TestAdUnits.INTERSTITIAL);
+    waitForIdleState();
+
+    // A third call is needed to trigger the sending of metrics to CSM. This is because,
+    // the execution of onBidConsumed() callback happens after the second call to CDB.
+    // An BANNER_320_50 AdUnit is set here on purpose to verify that the metric that is sent
+    // to CSM relates to INTERSTITIAL, which is the one that was consumed and whose metric
+    // was pushed to the sending queue.
+    Criteo.getInstance().getBidResponse(TestAdUnits.BANNER_320_50);
     waitForIdleState();
 
     verify(api).postCsm(argThat(request -> {
