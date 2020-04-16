@@ -31,7 +31,6 @@ class CsmBidLifecycleListenerTest {
   @Mock
   private lateinit var config: Config
 
-  @Mock
   private lateinit var executor: Executor
 
   private lateinit var listener: CsmBidLifecycleListener

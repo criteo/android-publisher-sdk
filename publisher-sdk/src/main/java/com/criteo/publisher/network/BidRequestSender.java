@@ -3,7 +3,7 @@ package com.criteo.publisher.network;
 import android.support.annotation.GuardedBy;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
-import android.util.Log;
+import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestFactory;
@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
@@ -81,7 +82,7 @@ public class BidRequestSender {
    * ones, some are pending, they will be ignored from the request. If all given ad units are
    * pending, then no call is done and listener is not notified.
    *
-   * @param adUnits  ad units to request
+   * @param adUnits ad units to request
    * @param listener listener to notify
    */
   public void sendBidRequest(
@@ -153,9 +154,7 @@ public class BidRequestSender {
     }
   }
 
-  private class CdbCall implements Runnable {
-
-    private final String TAG = CdbCall.class.getSimpleName();
+  private class CdbCall extends SafeRunnable {
 
     @NonNull
     private final List<CacheAdUnit> requestedAdUnits;
@@ -171,15 +170,7 @@ public class BidRequestSender {
     }
 
     @Override
-    public void run() {
-      try {
-        doRun();
-      } catch (Throwable tr) {
-        Log.e(TAG, "Internal error", tr);
-      }
-    }
-
-    private void doRun() throws Exception {
+    public void runSafely() throws ExecutionException, InterruptedException {
       CdbRequest cdbRequest = cdbRequestFactory.createRequest(requestedAdUnits);
       String userAgent = cdbRequestFactory.getUserAgent().get();
 
@@ -190,15 +181,11 @@ public class BidRequestSender {
         listener.onCdbResponse(cdbRequest, cdbResponse);
       } catch (Exception e) {
         listener.onCdbError(cdbRequest, e);
-        throw e;
       }
     }
   }
 
-  private class RemoteConfigCall implements Runnable {
-
-    private final String TAG = RemoteConfigCall.class.getSimpleName();
-
+  private class RemoteConfigCall extends SafeRunnable {
     @NonNull
     private final Config configToUpdate;
 
@@ -207,15 +194,7 @@ public class BidRequestSender {
     }
 
     @Override
-    public void run() {
-      try {
-        doRun();
-      } catch (Throwable tr) {
-        Log.e(TAG, "Internal error", tr);
-      }
-    }
-
-    private void doRun() throws IOException {
+    public void runSafely() throws IOException {
       RemoteConfigRequest request = remoteConfigRequestFactory.createRequest();
       RemoteConfigResponse response = api.loadConfig(request);
       configToUpdate.refreshConfig(response);

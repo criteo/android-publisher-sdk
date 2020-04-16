@@ -255,7 +255,7 @@ class BidRequestSenderTest {
 
         assertThatCode {
             sender.sendBidRequest(listOf(createAdUnit()), mock())
-        }.isInstanceOf(RejectedExecutionException::class.java)
+        }.isInstanceOf(RuntimeException::class.java)
 
         assertThat(sender.pendingTaskAdUnits).isEmpty()
     }

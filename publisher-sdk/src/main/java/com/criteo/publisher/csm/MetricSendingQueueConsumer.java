@@ -1,8 +1,8 @@
 package com.criteo.publisher.csm;
 
 import android.support.annotation.NonNull;
+import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.util.BuildConfigWrapper;
-import com.criteo.publisher.util.PreconditionsUtil;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.network.PubSdkApi;
 import java.io.IOException;
@@ -56,7 +56,7 @@ public class MetricSendingQueueConsumer {
     }
   }
 
-  private static class MetricSendingTask implements Runnable {
+  private static class MetricSendingTask extends SafeRunnable {
 
     @NonNull
     private final MetricSendingQueue queue;
@@ -78,15 +78,7 @@ public class MetricSendingQueueConsumer {
     }
 
     @Override
-    public void run() {
-      try {
-        doRun();
-      } catch (Exception e) {
-        PreconditionsUtil.throwOrLog(e);
-      }
-    }
-
-    private void doRun() throws IOException {
+    public void runSafely() throws IOException {
       Collection<Metric> metrics = queue.poll(buildConfigWrapper.getCsmBatchSize());
       if (metrics.isEmpty()) {
         return;
@@ -116,5 +108,4 @@ public class MetricSendingQueueConsumer {
       }
     }
   }
-
 }
