@@ -41,10 +41,6 @@ public class DfpActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_dfp);
-    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
-    editor.putString("IABConsent_SubjectToGDPR", "1");
-    editor.putString("IABConsent_ConsentString", "1");
-    editor.apply();
 
     linearLayout = findViewById(R.id.adViewHolder);
     findViewById(R.id.buttonBanner).setOnClickListener((View v) -> {
