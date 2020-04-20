@@ -4,18 +4,23 @@ import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.ResultCaptor;
+import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Before;
@@ -36,6 +41,12 @@ public class GdprTcfEndToEndWithCdbTests {
 
   @Inject
   private Context context;
+
+  @SpyBean
+  private PubSdkApi api;
+
+  @SpyBean
+  private BuildConfigWrapper buildConfigWrapper;
 
   private SharedPreferences sharedPreferences;
 
@@ -83,6 +94,20 @@ public class GdprTcfEndToEndWithCdbTests {
     // then
     CdbResponse lastCaptureValue = cdbResultCaptor.getLastCaptureValue();
     assertTrue(lastCaptureValue.getSlots().size() > 0);
+  }
+
+  @Test
+  public void whenCdbCall_givenTcf2WithIllFormedConsent_ShouldBid() throws Exception {
+    // given
+    givenInitializedSdk();
+    givenTcf2IllFormedConsent();
+    when(buildConfigWrapper.isDebug()).thenReturn(false);
+
+    // when
+    whenBidding();
+
+    // then
+    verify(api).loadCdb(any(), any());
   }
 
   @Test
@@ -223,6 +248,13 @@ public class GdprTcfEndToEndWithCdbTests {
     SharedPreferences.Editor editor = sharedPreferences.edit();
     editor.putString("IABTCF_TCString", TCF2_CONSENT_NOT_GIVEN);
     editor.putInt("IABTCF_gdprApplies", 1);
+    editor.apply();
+  }
+
+  private void givenTcf2IllFormedConsent() {
+    SharedPreferences.Editor editor = sharedPreferences.edit();
+    editor.putString("IABTCF_TCString", "wrong");
+    editor.putString("IABTCF_gdprApplies", "bad");
     editor.apply();
   }
 
