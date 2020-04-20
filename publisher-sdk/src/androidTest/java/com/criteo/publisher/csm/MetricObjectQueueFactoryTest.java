@@ -1,6 +1,5 @@
 package com.criteo.publisher.csm;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -9,15 +8,14 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
-import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import com.squareup.tape.ObjectQueue;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.List;
 import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Before;
@@ -158,6 +156,6 @@ public class MetricObjectQueueFactoryTest {
   }
 
   private void givenDeactivatedPreconditionUtils() {
-    when(buildConfigWrapper.isDebug()).thenReturn(false);
+    when(buildConfigWrapper.preconditionThrowsOnException()).thenReturn(false);
   }
 }

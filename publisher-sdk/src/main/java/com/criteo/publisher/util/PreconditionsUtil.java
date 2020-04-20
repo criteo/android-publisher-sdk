@@ -13,7 +13,7 @@ public class PreconditionsUtil {
   public static void throwOrLog(@NonNull Exception exception) {
     Log.w(TAG, exception);
 
-    if (DependencyProvider.getInstance().provideBuildConfigWrapper().isDebug()) {
+    if (DependencyProvider.getInstance().provideBuildConfigWrapper().preconditionThrowsOnException()) {
       throw new RuntimeException(exception);
     }
   }

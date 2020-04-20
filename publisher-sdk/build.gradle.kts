@@ -22,6 +22,7 @@ androidLibModule() {
     addBuildConfigField<Int>("profileId")
     addBuildConfigField<String>("pubSdkSharedPreferences")
     addBuildConfigField<Boolean>("debugLogging")
+    addBuildConfigField<Boolean>("preconditionThrowsOnException")
 }
 
 addAzureRepository()

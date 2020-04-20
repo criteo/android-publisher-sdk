@@ -19,19 +19,18 @@ import android.support.v4.util.Consumer;
 import com.criteo.publisher.Clock;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
-import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.concurrent.ThreadingUtil;
 import com.criteo.publisher.csm.MetricRequest.MetricRequestFeedback;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 import org.junit.After;
@@ -232,7 +231,7 @@ public class CsmFunctionalTest {
 
   @Test
   public void givenErrorWhenSendingCsm_QueueMetricsUntilCsmRequestWorksAgain() throws Exception {
-    when(buildConfigWrapper.isDebug()).thenReturn(false);
+    when(buildConfigWrapper.preconditionThrowsOnException()).thenReturn(false);
     doThrow(IOException.class).when(api).postCsm(any());
 
     when(clock.getCurrentTimeInMillis()).thenReturn(0L);

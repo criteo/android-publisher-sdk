@@ -6,11 +6,8 @@ import com.criteo.publisher.util.BuildConfigWrapper
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThatCode
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.MockitoAnnotations
-import java.lang.RuntimeException
 
 class SafeRunnableTest {
     @Rule
@@ -22,7 +19,7 @@ class SafeRunnableTest {
 
     @Test
     fun dontThrowInProduction() {
-        doReturn(false).whenever(buildConfigWrapper).isDebug
+        doReturn(false).whenever(buildConfigWrapper).preconditionThrowsOnException()
 
         val safeRunnable = object: SafeRunnable() {
             override fun runSafely() {

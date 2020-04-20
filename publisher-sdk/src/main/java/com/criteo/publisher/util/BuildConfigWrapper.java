@@ -28,8 +28,13 @@ public class BuildConfigWrapper {
     return BuildConfig.eventUrl;
   }
 
-  public boolean isDebug() {
-    return BuildConfig.DEBUG;
+  /**
+   * Indicate if exceptions that could be ignored should be thrown.
+   *
+   * @see PreconditionsUtil
+   */
+  public boolean preconditionThrowsOnException() {
+    return BuildConfig.preconditionThrowsOnException;
   }
 
   /**

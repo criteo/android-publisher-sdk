@@ -6,7 +6,6 @@ import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import org.junit.After
 import org.junit.Test
-import java.lang.RuntimeException
 
 class PreconditionsUtilTests {
 
@@ -29,7 +28,7 @@ class PreconditionsUtilTests {
 
     private fun givenMockedDependencyProvider(isDebugMode: Boolean) {
         val buildConfigWrapper = mock<BuildConfigWrapper> {
-            on { isDebug } doReturn isDebugMode
+            on { preconditionThrowsOnException() } doReturn isDebugMode
         }
 
         val dependencyProvider = mock<DependencyProvider> {

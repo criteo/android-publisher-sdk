@@ -101,7 +101,7 @@ public class GdprTcfEndToEndWithCdbTests {
     // given
     givenInitializedSdk();
     givenTcf2IllFormedConsent();
-    when(buildConfigWrapper.isDebug()).thenReturn(false);
+    when(buildConfigWrapper.preconditionThrowsOnException()).thenReturn(false);
 
     // when
     whenBidding();

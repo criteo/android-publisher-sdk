@@ -3,6 +3,12 @@ debugLogging = false
 profileId = 235
 
 /**
+ * Indicate if exceptions that could be ignored should be thrown.
+ * See PreconditionsUtil
+ */
+preconditionThrowsOnException = false
+
+/**
  * Network configuration
  */
 
@@ -43,6 +49,7 @@ environments {
         eventUrl = 'https://gum.par.preprod.crto.in'
 
         debugLogging = true
+        preconditionThrowsOnException = true
     }
 
     staging {

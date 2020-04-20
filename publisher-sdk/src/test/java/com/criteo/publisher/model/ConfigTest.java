@@ -78,7 +78,7 @@ public class ConfigTest {
   @Test
   public void new_GivenInvalidValueInLocalStorage_DoesNotThrowAndUseDefaultValues()
       throws Exception {
-    when(buildConfigWrapper.isDebug()).thenReturn(false);
+    when(buildConfigWrapper.preconditionThrowsOnException()).thenReturn(false);
 
     when(sharedPreferences.getBoolean(any(), anyBoolean())).thenThrow(ClassCastException.class);
     when(sharedPreferences.getString(any(), any())).thenThrow(ClassCastException.class);
@@ -91,7 +91,7 @@ public class ConfigTest {
   @Test
   public void new_GivenInvalidJsonInLocalStorage_DoesNotThrowAndUseDefaultValues()
       throws Exception {
-    when(buildConfigWrapper.isDebug()).thenReturn(false);
+    when(buildConfigWrapper.preconditionThrowsOnException()).thenReturn(false);
 
     when(sharedPreferences.getBoolean(any(), anyBoolean())).thenThrow(ClassCastException.class);
     when(sharedPreferences.getString(any(), any())).thenReturn("{");

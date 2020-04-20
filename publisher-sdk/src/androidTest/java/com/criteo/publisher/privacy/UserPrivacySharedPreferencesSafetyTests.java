@@ -8,8 +8,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import com.criteo.publisher.DependencyProvider;
-import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Before;
@@ -34,7 +34,7 @@ public class UserPrivacySharedPreferencesSafetyTests {
   public void setUp() {
     MockitoAnnotations.initMocks(this);
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-    when(buildConfigWrapper.isDebug()).thenReturn(false);
+    when(buildConfigWrapper.preconditionThrowsOnException()).thenReturn(false);
     doReturn(buildConfigWrapper).when(dependencyProvider).provideBuildConfigWrapper();
     userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil();
   }

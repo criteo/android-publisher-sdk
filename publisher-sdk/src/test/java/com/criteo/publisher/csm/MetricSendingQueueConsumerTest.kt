@@ -1,10 +1,10 @@
 package com.criteo.publisher.csm
 
-import com.criteo.publisher.util.BuildConfigWrapper
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.model.Config
 import com.criteo.publisher.network.PubSdkApi
+import com.criteo.publisher.util.BuildConfigWrapper
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -43,7 +43,7 @@ class MetricSendingQueueConsumerTest {
     MockitoAnnotations.initMocks(this)
 
     buildConfigWrapper.stub {
-      on { isDebug } doReturn false
+      on { preconditionThrowsOnException() } doReturn false
     }
 
     givenExecutor(Executor { it.run() })

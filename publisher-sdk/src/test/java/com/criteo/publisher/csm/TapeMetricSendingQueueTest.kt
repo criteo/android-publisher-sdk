@@ -10,7 +10,6 @@ import com.squareup.tape.FileObjectQueue
 import com.squareup.tape.InMemoryObjectQueue
 import com.squareup.tape.ObjectQueue
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -281,7 +280,7 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
 
   private fun givenDeactivatedPreconditionUtils() {
     buildConfigWrapper.stub {
-      on { isDebug } doReturn false
+      on { preconditionThrowsOnException() } doReturn false
     }
   }
 
