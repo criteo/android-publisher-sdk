@@ -1,6 +1,8 @@
 package com.criteo.publisher.csm;
 
+import android.os.Build.VERSION_CODES;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import java.io.File;
 import java.io.IOException;
@@ -11,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
+@RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)
 class FileMetricRepository extends MetricRepository {
 
   private static final String TAG = FileMetricRepository.class.getSimpleName();

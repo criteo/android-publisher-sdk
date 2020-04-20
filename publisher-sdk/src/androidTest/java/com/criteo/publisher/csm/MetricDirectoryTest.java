@@ -6,9 +6,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
-import android.support.v4.util.AtomicFile;
-import com.criteo.publisher.util.BuildConfigWrapper;
+import android.util.AtomicFile;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import java.io.File;
 import java.util.Collection;
 import javax.inject.Inject;

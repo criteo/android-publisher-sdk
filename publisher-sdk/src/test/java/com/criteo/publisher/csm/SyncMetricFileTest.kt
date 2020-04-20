@@ -1,6 +1,6 @@
 package com.criteo.publisher.csm
 
-import android.support.v4.util.AtomicFile
+import android.util.AtomicFile
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before

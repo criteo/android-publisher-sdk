@@ -1,7 +1,7 @@
 package com.criteo.publisher.bid
 
-import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
 import com.criteo.publisher.model.*
+import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.Before
@@ -27,7 +27,10 @@ class CompositeBidLifecycleListenerTest {
 
   @Before
   fun setUp() {
-    listener = CompositeBidLifecycleListener(listener1, listener2)
+    listener = CompositeBidLifecycleListener().apply {
+      add(listener1)
+      add(listener2)
+    }
   }
 
   @Test

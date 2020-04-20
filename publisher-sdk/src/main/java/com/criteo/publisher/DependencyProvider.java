@@ -2,8 +2,10 @@ package com.criteo.publisher;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Build.VERSION_CODES;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.bid.BidLifecycleListener;
@@ -369,18 +371,21 @@ public class DependencyProvider {
       @NonNull
       @Override
       public BidLifecycleListener create() {
-        BidLifecycleListener loggingListener = new LoggingBidLifecycleListener();
+        CompositeBidLifecycleListener listener = new CompositeBidLifecycleListener();
+        listener.add(new LoggingBidLifecycleListener());
 
-        BidLifecycleListener csmListener = new CsmBidLifecycleListener(
-            provideMetricRepository(),
-            new MetricSendingQueueProducer(provideMetricSendingQueue()),
-            provideClock(),
-            provideUniqueIdGenerator(),
-            provideConfig(),
-            provideThreadPoolExecutor()
-        );
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+          listener.add(new CsmBidLifecycleListener(
+              provideMetricRepository(),
+              new MetricSendingQueueProducer(provideMetricSendingQueue()),
+              provideClock(),
+              provideUniqueIdGenerator(),
+              provideConfig(),
+              provideThreadPoolExecutor()
+          ));
+        }
 
-        return new CompositeBidLifecycleListener(loggingListener, csmListener);
+        return listener;
       }
     });
   }
@@ -479,6 +484,7 @@ public class DependencyProvider {
   }
 
   @NonNull
+  @RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)
   public MetricRepository provideMetricRepository() {
     return getOrCreate(MetricRepository.class, new MetricRepositoryFactory(
         provideContext(),

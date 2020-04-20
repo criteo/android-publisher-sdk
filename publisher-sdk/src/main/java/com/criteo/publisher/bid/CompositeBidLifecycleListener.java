@@ -5,16 +5,16 @@ import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.Slot;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CompositeBidLifecycleListener implements BidLifecycleListener {
 
   @NonNull
-  private final List<BidLifecycleListener> delegates;
+  private final List<BidLifecycleListener> delegates = new ArrayList<>();
 
-  public CompositeBidLifecycleListener(@NonNull BidLifecycleListener... delegates) {
-    this.delegates = Arrays.asList(delegates);
+  public void add(@NonNull BidLifecycleListener delegate) {
+    delegates.add(delegate);
   }
 
   @Override

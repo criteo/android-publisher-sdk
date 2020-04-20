@@ -1,9 +1,11 @@
 package com.criteo.publisher.csm;
 
 import android.content.Context;
+import android.os.Build.VERSION_CODES;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.annotation.VisibleForTesting;
-import android.support.v4.util.AtomicFile;
+import android.util.AtomicFile;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -56,6 +58,7 @@ class MetricDirectory {
   }
 
   @NonNull
+  @RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)
   SyncMetricFile createSyncMetricFile(@NonNull File metricFile) {
     String impressionId = getImpressionIdFromMetricFilename(metricFile);
     AtomicFile atomicFile = new AtomicFile(metricFile);
