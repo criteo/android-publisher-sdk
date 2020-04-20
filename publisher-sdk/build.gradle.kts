@@ -34,7 +34,7 @@ addPublication("release") {
 }
 
 dependencies {
-    implementation(Deps.Android.Support.SupportCoreUtils)
+    compileOnly(Deps.Android.Support.Annotations)
     implementation(Deps.Square.Tape.Tape)
 
     compileOnly(Deps.Google.AdMob) {
@@ -60,8 +60,10 @@ dependencies {
     testImplementation(Deps.Kotlin.Stdlib)
     testImplementation(Deps.Kotlin.JUnit)
     testImplementation(Deps.Mockito.Kotlin)
+    testCompileOnly(Deps.Android.Support.Annotations)
 
     androidTestImplementation(project(":test-utils"))
+    androidTestImplementation(Deps.Android.Support.SupportCoreUtils)
     androidTestImplementation(Deps.Android.Test.Runner)
     androidTestImplementation(Deps.Android.Test.Rules)
     androidTestImplementation(Deps.Mockito.Android)
