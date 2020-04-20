@@ -211,7 +211,7 @@ public class CriteoInternalUnitTest {
       throws Exception {
     createCriteo();
 
-    TopActivityFinder topActivityFinder = dependencyProvider.provideLastActivityTracker();
+    TopActivityFinder topActivityFinder = dependencyProvider.provideTopActivityFinder();
     verify(topActivityFinder).registerActivityLifecycleFor(application);
   }
 

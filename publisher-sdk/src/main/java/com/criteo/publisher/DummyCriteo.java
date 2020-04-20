@@ -59,15 +59,11 @@ public class DummyCriteo extends Criteo {
   @NonNull
   @Override
   public CriteoBannerEventController createBannerController(CriteoBannerView bannerView) {
-    return new CriteoBannerEventController() {
-      @Override
-      public void fetchAdAsync(@Nullable AdUnit adUnit) {
-      }
-
-      @Override
-      public void fetchAdAsync(@Nullable BidToken bidToken) {
-      }
-    };
+    return new CriteoBannerEventController(bannerView,
+        this,
+        DependencyProvider.getInstance().provideTopActivityFinder(),
+        DependencyProvider.getInstance().provideRunOnUiThreadExecutor()
+    );
   }
 
   @Override

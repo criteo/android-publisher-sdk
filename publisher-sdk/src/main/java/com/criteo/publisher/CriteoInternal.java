@@ -86,7 +86,7 @@ final class CriteoInternal extends Criteo {
     AppLifecycleUtil lifecycleCallback = new AppLifecycleUtil(appEvents, bidManager);
     application.registerActivityLifecycleCallbacks(lifecycleCallback);
 
-    dependencyProvider.provideLastActivityTracker().registerActivityLifecycleFor(application);
+    dependencyProvider.provideTopActivityFinder().registerActivityLifecycleFor(application);
 
     BidLifecycleListener bidLifecycleListener = dependencyProvider.provideBidLifecycleListener();
     bidLifecycleListener.onSdkInitialized();
@@ -170,10 +170,10 @@ final class CriteoInternal extends Criteo {
   @NonNull
   @Override
   public CriteoBannerEventController createBannerController(CriteoBannerView bannerView) {
-    return new RealCriteoBannerEventController(
+    return new CriteoBannerEventController(
         bannerView,
         this,
-        dependencyProvider.provideLastActivityTracker(),
+        dependencyProvider.provideTopActivityFinder(),
         dependencyProvider.provideRunOnUiThreadExecutor()
     );
   }

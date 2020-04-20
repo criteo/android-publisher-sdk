@@ -13,6 +13,7 @@ import com.criteo.publisher.bid.UniqueIdGenerator;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.concurrent.ThreadPoolExecutorFactory;
 import com.criteo.publisher.csm.CsmBidLifecycleListener;
+import com.criteo.publisher.csm.MetricObjectQueueFactory;
 import com.criteo.publisher.csm.MetricParser;
 import com.criteo.publisher.csm.MetricRepository;
 import com.criteo.publisher.csm.MetricRepositoryFactory;
@@ -20,7 +21,6 @@ import com.criteo.publisher.csm.MetricSendingQueue;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
 import com.criteo.publisher.csm.MetricSendingQueueFactory;
 import com.criteo.publisher.csm.MetricSendingQueueProducer;
-import com.criteo.publisher.csm.MetricObjectQueueFactory;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.AdUnitMapper;
@@ -421,14 +421,14 @@ public class DependencyProvider {
       public InterstitialActivityHelper create() {
         return new InterstitialActivityHelper(
             provideContext(),
-            provideLastActivityTracker()
+            provideTopActivityFinder()
         );
       }
     });
   }
 
   @NonNull
-  public TopActivityFinder provideLastActivityTracker() {
+  public TopActivityFinder provideTopActivityFinder() {
     return getOrCreate(TopActivityFinder.class, new Factory<TopActivityFinder>() {
       @NonNull
       @Override
