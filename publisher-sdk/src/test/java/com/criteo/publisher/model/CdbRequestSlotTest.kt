@@ -79,19 +79,32 @@ class CdbRequestSlotTest {
       expectedIsInterstitial: Boolean = false,
       expectedIsNative: Boolean = false
   ) {
-    assertThat(keys()).containsExactlyInAnyOrder(
+    val expectedKeys = mutableListOf(
         IMPRESSION_ID,
         PLACEMENT_ID,
-        SIZES,
-        IS_INTERSTITIAL,
-        IS_NATIVE
+        SIZES
     )
+
+    if (expectedIsInterstitial) {
+      expectedKeys.add(IS_INTERSTITIAL)
+    }
+    if (expectedIsNative) {
+      expectedKeys.add(IS_NATIVE)
+    }
+
+    assertThat(keys()).containsExactlyInAnyOrderElementsOf(expectedKeys)
 
     assertThat(this[IMPRESSION_ID]).isEqualTo(expectedImpressionId)
     assertThat(this[PLACEMENT_ID]).isEqualTo(expectedPlacementId)
     assertThat(this.readSizes()).isEqualTo(expectedSizes)
-    assertThat(this[IS_NATIVE]).isEqualTo(expectedIsNative)
-    assertThat(this[IS_INTERSTITIAL]).isEqualTo(expectedIsInterstitial)
+
+    if (expectedIsNative) {
+      assertThat(this[IS_NATIVE]).isEqualTo(true)
+    }
+
+    if (expectedIsInterstitial) {
+      assertThat(this[IS_INTERSTITIAL]).isEqualTo(true)
+    }
   }
 
   private fun JSONObject.readSizes(): List<String> {

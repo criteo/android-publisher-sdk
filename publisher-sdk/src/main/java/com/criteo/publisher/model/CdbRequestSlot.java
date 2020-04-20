@@ -3,6 +3,7 @@ package com.criteo.publisher.model;
 import static java.util.Collections.singletonList;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.util.AdUnitType;
 import com.google.auto.value.AutoValue;
@@ -28,8 +29,8 @@ public abstract class CdbRequestSlot {
     return new AutoValue_CdbRequestSlot(
         impressionId,
         placementId,
-        adUnitType == AdUnitType.CRITEO_CUSTOM_NATIVE,
-        adUnitType == AdUnitType.CRITEO_INTERSTITIAL,
+        adUnitType == AdUnitType.CRITEO_CUSTOM_NATIVE ? true : null,
+        adUnitType == AdUnitType.CRITEO_INTERSTITIAL ? true : null,
         formattedSizes
     );
   }
@@ -43,17 +44,21 @@ public abstract class CdbRequestSlot {
   public abstract String getImpressionId();
 
   @NonNull
+  @SerializedName("placementId")
   public abstract String getPlacementId();
 
   // isNative is not accepted by AutoValue because this generates a field called native which is a
   // reserved keyword.
+  @Nullable
   @SerializedName("isNative")
-  public abstract boolean isNativeAd();
+  public abstract Boolean isNativeAd();
 
+  @Nullable
   @SerializedName("interstitial")
-  public abstract boolean isInterstitial();
+  public abstract Boolean isInterstitial();
 
   @NonNull
+  @SerializedName("sizes")
   public abstract Collection<String> getSizes();
 
   @NonNull

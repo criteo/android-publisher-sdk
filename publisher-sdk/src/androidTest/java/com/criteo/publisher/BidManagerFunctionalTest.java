@@ -970,9 +970,9 @@ public class BidManagerFunctionalTest {
     AdSize size = new AdSize(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
 
     AdUnitType adUnitType = AdUnitType.CRITEO_BANNER;
-    if (slot.isInterstitial()) {
+    if (slot.isInterstitial() == Boolean.TRUE) {
       adUnitType = AdUnitType.CRITEO_INTERSTITIAL;
-    } else if (slot.isNativeAd()) {
+    } else if (slot.isNativeAd() == Boolean.TRUE) {
       adUnitType = AdUnitType.CRITEO_CUSTOM_NATIVE;
     }
 
