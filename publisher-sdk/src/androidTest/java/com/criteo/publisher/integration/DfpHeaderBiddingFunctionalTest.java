@@ -5,7 +5,6 @@ import static com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE;
 import static com.criteo.publisher.StubConstants.STUB_DISPLAY_URL;
 import static com.criteo.publisher.StubConstants.STUB_NATIVE_ASSETS;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
-import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static com.criteo.publisher.view.WebViewLookup.getRootView;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -20,7 +19,6 @@ import android.view.View;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.mock.MockedDependenciesRule;
-import com.criteo.publisher.view.WebViewLookup;
 import com.criteo.publisher.mock.ResultCaptor;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
@@ -30,6 +28,7 @@ import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.NativeAssets;
 import com.criteo.publisher.model.NativeProduct;
 import com.criteo.publisher.test.activity.DummyActivity;
+import com.criteo.publisher.view.WebViewLookup;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
@@ -540,7 +539,7 @@ public class DfpHeaderBiddingFunctionalTest {
   }
 
   private void waitForBids() {
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    mockedDependenciesRule.waitForIdleState();
   }
 
   private static final class DfpSync {

@@ -2,7 +2,6 @@ package com.criteo.publisher;
 
 import static com.criteo.publisher.CriteoErrorCode.ERROR_CODE_NO_FILL;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
-import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.AdditionalAnswers.answerVoid;
@@ -16,7 +15,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.os.Looper;
-import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
@@ -24,6 +22,7 @@ import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.model.WebViewData;
+import com.criteo.publisher.util.AdUnitType;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -225,7 +224,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   }
 
   private void waitForIdleState() {
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    mockedDependenciesRule.waitForIdleState();
   }
 
 }

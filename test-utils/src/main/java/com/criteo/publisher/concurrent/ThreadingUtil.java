@@ -13,7 +13,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 
-@RequiresApi(api = VERSION_CODES.M)
 public class ThreadingUtil {
 
   public static void runOnMainThreadAndWait(@NonNull Runnable runnable) {
@@ -41,6 +40,7 @@ public class ThreadingUtil {
     }
   }
 
+  @RequiresApi(api = VERSION_CODES.M)
   public static void waitForAllThreads(@NonNull TrackingCommandsExecutor trackingCommandsExecutor) {
     // FIXME EE-764 This is a wait with two different steps (main and async). Because of those steps, it
     //  may me possible that we're not awaiting all threads. For instance, given an async task
@@ -71,6 +71,7 @@ public class ThreadingUtil {
    * Blocks the current threads until the {@link MessageQueue} associated to the provided {@link
    * Looper} is idle.
    */
+  @RequiresApi(api = VERSION_CODES.M)
   public static void waitForMessageQueueToBeIdle() {
     CountDownLatch latch = new CountDownLatch(1);
 

@@ -1,7 +1,6 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.CriteoUtil.clearSharedPreferences;
-import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static com.criteo.publisher.concurrent.ThreadingUtil.waitForMessageQueueToBeIdle;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static com.criteo.publisher.util.CompletableFuture.completedFuture;
@@ -818,7 +817,7 @@ public class BidManagerFunctionalTest {
   }
 
   private void waitForIdleState() {
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    mockedDependenciesRule.waitForIdleState();
   }
 
   @NonNull

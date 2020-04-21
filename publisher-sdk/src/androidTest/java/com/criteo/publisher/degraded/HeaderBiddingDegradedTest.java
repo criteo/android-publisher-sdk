@@ -1,7 +1,6 @@
 package com.criteo.publisher.degraded;
 
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
-import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -64,6 +63,6 @@ public class HeaderBiddingDegradedTest {
   }
 
   private void waitForIdleState() {
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    mockedDependenciesRule.waitForIdleState();
   }
 }

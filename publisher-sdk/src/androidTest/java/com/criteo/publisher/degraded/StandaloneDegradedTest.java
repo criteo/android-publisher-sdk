@@ -3,7 +3,6 @@ package com.criteo.publisher.degraded;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
-import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -123,7 +122,7 @@ public class StandaloneDegradedTest {
   }
 
   private void waitForIdleState() {
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    mockedDependenciesRule.waitForIdleState();
   }
 
 }

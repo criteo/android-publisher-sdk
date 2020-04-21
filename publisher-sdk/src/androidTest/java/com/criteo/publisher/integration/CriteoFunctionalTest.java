@@ -2,7 +2,6 @@ package com.criteo.publisher.integration;
 
 import static com.criteo.publisher.CriteoUtil.TEST_CP_ID;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
-import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -26,7 +25,6 @@ import com.criteo.publisher.BidManager;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.TestAdUnits;
-import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
@@ -34,6 +32,7 @@ import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import java.util.Collections;
 import java.util.List;
 import javax.inject.Inject;
@@ -155,7 +154,7 @@ public class CriteoFunctionalTest {
   }
 
   private void waitForBids() {
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    mockedDependenciesRule.waitForIdleState();
   }
 
 }

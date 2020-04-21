@@ -4,7 +4,6 @@ import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE;
 import static com.criteo.publisher.StubConstants.STUB_DISPLAY_URL;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
-import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static com.criteo.publisher.view.WebViewLookup.getRootView;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -33,7 +32,6 @@ import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.TestAdUnits;
-import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
@@ -41,6 +39,7 @@ import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
+import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.view.WebViewLookup;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -387,7 +386,7 @@ public class StandaloneFunctionalTest {
   }
 
   private void waitForBids() {
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    mockedDependenciesRule.waitForIdleState();
   }
 
   private static final class CriteoSync {

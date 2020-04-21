@@ -3,7 +3,6 @@ package com.criteo.publisher;
 import static com.criteo.publisher.CriteoUtil.clearCriteo;
 import static com.criteo.publisher.CriteoUtil.getCriteoBuilder;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
-import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -61,7 +60,7 @@ public class UserPrivacyFunctionalTest {
     writeIntoDefaultSharedPrefs("IABUSPrivacy_String", "fake_iab_usp");
 
     givenInitializedCriteo(TestAdUnits.BANNER_320_50);
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForIdleState();
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
@@ -75,7 +74,7 @@ public class UserPrivacyFunctionalTest {
     writeIntoDefaultSharedPrefs("IABUSPrivacy_String", null);
 
     givenInitializedCriteo(TestAdUnits.BANNER_320_50);
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForIdleState();
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
@@ -89,7 +88,7 @@ public class UserPrivacyFunctionalTest {
     Criteo.Builder builder = getCriteoBuilder(TestAdUnits.BANNER_320_50);
     builder.usPrivacyOptOut(true).init();
 
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForIdleState();
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
@@ -103,7 +102,7 @@ public class UserPrivacyFunctionalTest {
     Criteo.Builder builder = getCriteoBuilder(TestAdUnits.BANNER_320_50);
     builder.init();
 
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForIdleState();
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
@@ -119,7 +118,7 @@ public class UserPrivacyFunctionalTest {
     Criteo criteo = builder.usPrivacyOptOut(true).init();
     criteo.setUsPrivacyOptOut(false);
 
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForIdleState();
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
@@ -134,12 +133,12 @@ public class UserPrivacyFunctionalTest {
     Criteo.Builder builder = getCriteoBuilder(TestAdUnits.BANNER_320_50);
     Criteo criteo = builder.usPrivacyOptOut(true).init();
 
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForIdleState();
 
     criteo.setUsPrivacyOptOut(false);
     criteo.getBidForAdUnit(TestAdUnits.BANNER_320_480);
 
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForIdleState();
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi, times(2)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
@@ -153,7 +152,7 @@ public class UserPrivacyFunctionalTest {
     Criteo.Builder builder = getCriteoBuilder(TestAdUnits.BANNER_320_50);
     builder.mopubConsent("fake_mopub_consent").init();
 
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForIdleState();
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
@@ -168,12 +167,12 @@ public class UserPrivacyFunctionalTest {
     Criteo.Builder builder = getCriteoBuilder(TestAdUnits.BANNER_320_50);
     Criteo criteo = builder.init();
 
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForIdleState();
 
     criteo.setMopubConsent("fake_mopub_consent");
     criteo.getBidForAdUnit(TestAdUnits.BANNER_320_480);
 
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForIdleState();
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi, times(2)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
@@ -189,7 +188,7 @@ public class UserPrivacyFunctionalTest {
     Criteo.Builder builder = getCriteoBuilder(TestAdUnits.BANNER_320_50);
     Criteo criteo = builder.init();
 
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForIdleState();
 
     criteo.setMopubConsent("fake_mopub_consent");
 
@@ -200,7 +199,7 @@ public class UserPrivacyFunctionalTest {
     Criteo.Builder builder2 = getCriteoBuilder(TestAdUnits.BANNER_320_50);
     Criteo criteo2 = builder2.init();
     criteo2.getBidForAdUnit(TestAdUnits.BANNER_320_480);
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    waitForIdleState();
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi, times(3)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
@@ -212,5 +211,9 @@ public class UserPrivacyFunctionalTest {
     Editor edit = defaultSharedPreferences.edit();
     edit.putString(key, value);
     edit.commit();
+  }
+
+  private void waitForIdleState() {
+    mockedDependenciesRule.waitForIdleState();
   }
 }

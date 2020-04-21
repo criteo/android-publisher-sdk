@@ -1,7 +1,6 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
-import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
@@ -209,7 +208,7 @@ public class BearcatPrivacyFunctionalTest {
 
     activityRule.launchActivity(new Intent());
 
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    mockedDependenciesRule.waitForIdleState();
 
     if (callBearcat) {
       verify(pubSdkApi)

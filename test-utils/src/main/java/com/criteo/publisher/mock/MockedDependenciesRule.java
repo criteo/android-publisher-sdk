@@ -13,6 +13,7 @@ import android.support.test.InstrumentationRegistry;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.MockableDependencyProvider;
+import com.criteo.publisher.concurrent.ThreadingUtil;
 import com.criteo.publisher.concurrent.TrackingCommandsExecutor;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.network.PubSdkApi;
@@ -104,8 +105,9 @@ public class MockedDependenciesRule implements MethodRule {
     return dependencyProvider;
   }
 
-  public TrackingCommandsExecutor getTrackingCommandsExecutor() {
-    return trackingCommandsExecutor;
+  @RequiresApi(api = VERSION_CODES.M)
+  public void waitForIdleState() {
+    ThreadingUtil.waitForAllThreads(trackingCommandsExecutor);
   }
 
   public ResultCaptor<CdbResponse> captorCdbResult() {

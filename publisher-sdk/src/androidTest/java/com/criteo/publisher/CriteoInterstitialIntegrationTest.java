@@ -3,7 +3,6 @@ package com.criteo.publisher;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 import static com.criteo.publisher.util.CompletableFuture.completedFuture;
-import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -93,7 +92,7 @@ public class CriteoInterstitialIntegrationTest {
   }
 
   private void waitForIdleState() {
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    mockedDependenciesRule.waitForIdleState();
   }
 
   private CriteoInterstitial createInterstitial() {

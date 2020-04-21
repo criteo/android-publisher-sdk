@@ -3,7 +3,6 @@ package com.criteo.publisher.integration;
 import static com.criteo.publisher.CriteoErrorCode.ERROR_CODE_NO_FILL;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
-import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -100,7 +99,7 @@ public class InHouseFunctionalTest {
   }
 
   private void waitForIdleState() {
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    mockedDependenciesRule.waitForIdleState();
   }
 
   private Criteo givenInitializedSdk(AdUnit... adUnits) throws CriteoInitException {

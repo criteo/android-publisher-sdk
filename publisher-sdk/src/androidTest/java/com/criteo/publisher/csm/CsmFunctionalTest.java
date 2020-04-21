@@ -19,7 +19,6 @@ import android.support.v4.util.Consumer;
 import com.criteo.publisher.Clock;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
-import com.criteo.publisher.concurrent.ThreadingUtil;
 import com.criteo.publisher.csm.MetricRequest.MetricRequestFeedback;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
@@ -368,7 +367,7 @@ public class CsmFunctionalTest {
   }
 
   private void waitForIdleState() {
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    mockedDependenciesRule.waitForIdleState();
   }
 
   private void cleanState() {

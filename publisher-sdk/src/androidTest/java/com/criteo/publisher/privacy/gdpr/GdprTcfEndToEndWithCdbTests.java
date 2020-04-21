@@ -1,7 +1,6 @@
 package com.criteo.publisher.privacy.gdpr;
 
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
-import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -220,7 +219,7 @@ public class GdprTcfEndToEndWithCdbTests {
   }
 
   private void waitForBids() {
-    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    mockedDependenciesRule.waitForIdleState();
   }
 
   private void givenTcf1PositiveConsent() {

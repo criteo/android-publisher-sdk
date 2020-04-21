@@ -22,7 +22,6 @@ import android.support.test.runner.lifecycle.ActivityLifecycleMonitor;
 import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import android.support.test.runner.lifecycle.Stage;
 import android.webkit.WebView;
-import com.criteo.publisher.concurrent.ThreadingUtil;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
@@ -163,7 +162,7 @@ public class CriteoInterstitialActivityTest {
   }
 
   private void waitForIdleState() {
-    ThreadingUtil.waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
+    mockedDependenciesRule.waitForIdleState();
   }
 
 }
