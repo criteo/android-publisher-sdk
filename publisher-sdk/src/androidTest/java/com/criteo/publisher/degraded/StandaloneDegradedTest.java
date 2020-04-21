@@ -1,13 +1,15 @@
 package com.criteo.publisher.degraded;
 
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
+import static com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
+import static com.criteo.publisher.concurrent.ThreadingUtil.waitForAllThreads;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
@@ -16,13 +18,13 @@ import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdListener;
-import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
-import java.util.concurrent.atomic.AtomicReference;
+import com.criteo.publisher.util.DeviceUtil;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,15 +46,14 @@ public class StandaloneDegradedTest {
   @Mock
   private PubSdkApi api;
 
+  @SpyBean
+  private DeviceUtil deviceUtil;
 
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-    when(dependencyProvider.providePubSdkApi()).thenReturn(api);
-
-    DegradedUtil.assumeIsDegraded();
+    when(deviceUtil.isVersionSupported()).thenReturn(false);
 
     givenInitializedCriteo();
   }
@@ -64,27 +65,25 @@ public class StandaloneDegradedTest {
       bannerView.loadAd();
     });
 
-    mockedDependenciesRule.getTrackingCommandsExecutor().waitCommands();
-    verifyZeroInteractions(api);
+    waitForIdleState();
+    verifyNoInteractions(api);
   }
 
   @Test
   public void whenLoadingTwiceABanner_ShouldCallBackListenerWithErrorNoFill() throws Exception {
     CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
-    AtomicReference<CriteoBannerView> bannerView = new AtomicReference<>();
 
-    runOnMainThreadAndWait(() -> {
-      bannerView.set(new CriteoBannerView(context, bannerAdUnit));
-    });
+    CriteoBannerView bannerView = callOnMainThreadAndWait(() ->
+      new CriteoBannerView(context, bannerAdUnit));
 
-    bannerView.get().setCriteoBannerAdListener(listener);
+    bannerView.setCriteoBannerAdListener(listener);
 
-    runOnMainThreadAndWait(bannerView.get()::loadAd);
-    mockedDependenciesRule.getTrackingCommandsExecutor().waitCommands();
+    runOnMainThreadAndWait(bannerView::loadAd);
+    waitForIdleState();
 
     // Load twice, because first one is a cache miss
-    runOnMainThreadAndWait(bannerView.get()::loadAd);
-    mockedDependenciesRule.getTrackingCommandsExecutor().waitCommands();
+    runOnMainThreadAndWait(bannerView::loadAd);
+    waitForIdleState();
 
     verify(listener, never()).onAdReceived(any());
     verify(listener, times(2)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
@@ -98,31 +97,33 @@ public class StandaloneDegradedTest {
       interstitial.loadAd();
     });
 
-    mockedDependenciesRule.getTrackingCommandsExecutor().waitCommands();
-    verifyZeroInteractions(api);
+    waitForIdleState();
+    verifyNoInteractions(api);
   }
 
   @Test
   public void whenLoadingTwiceAnInterstitial_ShouldCallBackListenerWithErrorNoFill()
       throws Exception {
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
-    AtomicReference<CriteoInterstitial> interstitial = new AtomicReference<>();
 
-    runOnMainThreadAndWait(() -> {
-      interstitial.set(new CriteoInterstitial(context, interstitialAdUnit));
-    });
+    CriteoInterstitial interstitial = callOnMainThreadAndWait(() ->
+        new CriteoInterstitial(context, interstitialAdUnit));
 
-    interstitial.get().setCriteoInterstitialAdListener(listener);
+    interstitial.setCriteoInterstitialAdListener(listener);
 
-    runOnMainThreadAndWait(interstitial.get()::loadAd);
-    mockedDependenciesRule.getTrackingCommandsExecutor().waitCommands();
+    runOnMainThreadAndWait(interstitial::loadAd);
+    waitForIdleState();
 
     // Load twice, because first one is a cache miss
-    runOnMainThreadAndWait(interstitial.get()::loadAd);
-    mockedDependenciesRule.getTrackingCommandsExecutor().waitCommands();
+    runOnMainThreadAndWait(interstitial::loadAd);
+    waitForIdleState();
 
     verify(listener, never()).onAdReceived();
     verify(listener, times(2)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+  }
+
+  private void waitForIdleState() {
+    waitForAllThreads(mockedDependenciesRule.getTrackingCommandsExecutor());
   }
 
 }
