@@ -4,6 +4,9 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.publish.PublishingExtension
 
+internal val Project.androidBase: BaseExtension get() =
+  (this as ExtensionAware).extensions.getByName("android") as BaseExtension
+
 internal fun Project.androidBase(configure: BaseExtension.() -> Unit): Unit =
     (this as ExtensionAware).extensions.configure("android", configure)
 

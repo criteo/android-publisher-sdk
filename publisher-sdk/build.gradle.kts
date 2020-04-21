@@ -36,18 +36,12 @@ addPublication("release") {
 
 // Declare both debug and staging publication with sources
 for (variant in listOf("debug", "staging")) {
-    val sourcesJar = tasks.create<Jar>("${variant}SourcesJar") {
-        archiveClassifier.set("sources")
-        from(android.sourceSets["main"].java.srcDirs)
-        from(android.sourceSets[variant].java.srcDirs)
-    }
-
     addPublication(variant) {
         from(components[variant])
         groupId = "com.criteo.publisher"
         artifactId = "criteo-publisher-sdk-$variant"
 
-        artifact(sourcesJar)
+        artifact(createSourcesJarTask(variant))
     }
 }
 
@@ -78,7 +72,7 @@ dependencies {
     testImplementation(Deps.Kotlin.Stdlib)
     testImplementation(Deps.Kotlin.JUnit)
     testImplementation(Deps.Mockito.Kotlin)
-    testCompileOnly(Deps.Android.Support.Annotations)
+    testImplementation(Deps.Android.Support.Annotations)
 
     androidTestImplementation(project(":test-utils"))
     androidTestImplementation(Deps.Android.Support.SupportCoreUtils)
