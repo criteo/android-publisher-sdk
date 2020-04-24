@@ -47,6 +47,17 @@ object Deps {
     const val GsonFactory = "com.ryanharter.auto.value:auto-value-gson-factory:$gsonVersion"
   }
 
+  object Criteo {
+    object PublisherSdk {
+      const val group = "com.criteo.publisher"
+    }
+
+    object Mediation {
+      fun MoPub(version: String) = "com.criteo.mediation.mopub:criteo-adapter:$version"
+      fun AdMob(version: String) = "com.criteo.mediation.google:criteo-adapter:$version"
+    }
+  }
+
   object EqualsVerifier {
     private const val version = "3.1.10"
 

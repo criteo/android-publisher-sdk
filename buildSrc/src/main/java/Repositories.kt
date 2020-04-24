@@ -25,6 +25,9 @@ internal fun RepositoryHandler.addDefaultInputRepository() {
   maven {
     setUrl("https://s3.amazonaws.com/moat-sdk-builds")
   }
+  maven {
+    setUrl("http://nexus.criteo.prod/content/groups/android/")
+  }
 }
 
 /**

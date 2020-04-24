@@ -35,6 +35,14 @@ addPublication("Apk") {
 dependencies {
     implementation(project(":publisher-sdk"))
 
+    implementation(Deps.Criteo.Mediation.MoPub("${sdkVersion()}+")) {
+        exclude(group = Deps.Criteo.PublisherSdk.group)
+    }
+
+    implementation(Deps.Criteo.Mediation.AdMob("${sdkVersion()}+")) {
+        exclude(group = Deps.Criteo.PublisherSdk.group)
+    }
+
     implementation(Deps.Kotlin.Stdlib)
     implementation(Deps.Android.Support.AppCompatV7)
     implementation(Deps.Android.Support.Constraint.ConstraintLayout)
