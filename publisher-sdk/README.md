@@ -98,3 +98,14 @@ dependencies {
     implementation "com.criteo.publisher:criteo-publisher-sdk:3.4.0"
 }
 ```
+
+
+# Misc
+## Dependency Graph
+The project embeds a plugin that generates the dependency graph as a PNG file. This can be handy for documentation purposes and for visualization.
+
+```
+brew install graphviz
+./gradlew generateDependencyGraph
+```
+

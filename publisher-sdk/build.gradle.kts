@@ -2,6 +2,7 @@ plugins {
     id("com.android.library")
     `maven-publish`
     kotlin("android")
+    id("com.vanniktech.dependency.graph.generator")
 }
 
 androidLibModule() {
