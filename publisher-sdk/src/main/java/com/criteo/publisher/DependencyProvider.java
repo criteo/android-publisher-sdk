@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.activity.TopActivityFinder;
+import com.criteo.publisher.advancednative.NativeAdMapper;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.bid.CompositeBidLifecycleListener;
 import com.criteo.publisher.bid.LoggingBidLifecycleListener;
@@ -386,6 +387,17 @@ public class DependencyProvider {
         }
 
         return listener;
+      }
+    });
+  }
+
+  @NonNull
+  public NativeAdMapper provideNativeAdMapper() {
+    return getOrCreate(NativeAdMapper.class, new Factory<NativeAdMapper>() {
+      @NonNull
+      @Override
+      public NativeAdMapper create() {
+        return new NativeAdMapper();
       }
     });
   }

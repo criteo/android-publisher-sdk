@@ -10,7 +10,7 @@ public class PreconditionsUtil {
   /**
    * Throw a runtime exception and log if the SDK runs in debug mode, or just log otherwise
    */
-  public static void throwOrLog(@NonNull Exception exception) {
+  public static void throwOrLog(@NonNull Throwable exception) {
     Log.w(TAG, exception);
 
     if (DependencyProvider.getInstance().provideBuildConfigWrapper().preconditionThrowsOnException()) {

@@ -10,7 +10,7 @@ public abstract class SafeRunnable implements Runnable {
     try {
       runSafely();
     } catch (Throwable throwable) {
-      PreconditionsUtil.throwOrLog(new Exception(throwable));
+      PreconditionsUtil.throwOrLog(throwable);
     }
   }
 }
