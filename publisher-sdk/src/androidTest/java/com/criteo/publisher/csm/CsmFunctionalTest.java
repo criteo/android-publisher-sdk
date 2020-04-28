@@ -36,6 +36,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.MockitoAnnotations;
 
 public class CsmFunctionalTest {
 
@@ -59,6 +60,8 @@ public class CsmFunctionalTest {
 
   @Before
   public void setUp() throws Exception {
+    MockitoAnnotations.initMocks(this);
+    mockedDependenciesRule.givenMockedRemoteConfigResponse(api);
     cleanState();
   }
 
@@ -377,5 +380,4 @@ public class CsmFunctionalTest {
       repository.moveById(metric.getImpressionId(), ignored -> true);
     }
   }
-
 }

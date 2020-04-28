@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import android.content.Intent;
 import android.support.test.rule.ActivityTestRule;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
@@ -23,7 +24,6 @@ import com.criteo.publisher.util.AdvertisingInfo;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class BearcatFunctionalTest {
@@ -34,8 +34,9 @@ public class BearcatFunctionalTest {
   @Rule
   public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(DummyActivity.class);
 
-  @Mock
+  @SpyBean
   private PubSdkApi api;
+
   private DependencyProvider dependencyProvider;
 
   private GdprData gdprData;
@@ -43,13 +44,10 @@ public class BearcatFunctionalTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-
     dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-
-    doReturn(api).when(dependencyProvider).providePubSdkApi();
-
     UserPrivacyUtil userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil();
     gdprData = userPrivacyUtil.getGdprData();
+    mockedDependenciesRule.givenMockedRemoteConfigResponse(api);
   }
 
   @Test
@@ -114,5 +112,4 @@ public class BearcatFunctionalTest {
   private void waitForIdleState() {
     mockedDependenciesRule.waitForIdleState();
   }
-
 }

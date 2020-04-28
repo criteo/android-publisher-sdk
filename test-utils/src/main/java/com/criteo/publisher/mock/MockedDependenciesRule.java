@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import android.app.Application;
 import android.os.Build.VERSION_CODES;
@@ -16,13 +17,16 @@ import com.criteo.publisher.MockableDependencyProvider;
 import com.criteo.publisher.concurrent.ThreadingUtil;
 import com.criteo.publisher.concurrent.TrackingCommandsExecutor;
 import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.model.RemoteConfigResponse;
 import com.criteo.publisher.network.PubSdkApi;
+import java.io.IOException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import org.junit.internal.runners.statements.FailOnTimeout;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
+import org.mockito.Mockito;
 
 /**
  * Use this Rule when writing tests that require mocking global dependencies.
@@ -42,7 +46,7 @@ public class MockedDependenciesRule implements MethodRule {
    * it, you may set the {@link #iAmDebuggingDoNotTimeoutMe} variable to <code>true</code>.
    */
   private final FailOnTimeout.Builder timeout = FailOnTimeout.builder()
-      .withTimeout(20, TimeUnit.SECONDS);
+      .withTimeout(30, TimeUnit.SECONDS);
 
   private final boolean iAmDebuggingDoNotTimeoutMe = false;
 
@@ -122,5 +126,21 @@ public class MockedDependenciesRule implements MethodRule {
     }
 
     return captor;
+  }
+
+  // FIXME (ma.chentir) https://jira.criteois.com/browse/EE-1040
+  // To be removed when we are able to mock backend responses. Ideally, this behavior should be
+  // defined in MockedDependenciesRule#setupNetworkDependencies(). However, this would require
+  // mocking PubSdkApi and overriding its behavior (like what is done below). But... PubSdkApi, would
+  // also be mocked within this test file specifically and hence all the behavior that was defined
+  // earlier would be lost.
+  // Once we will be able to mock backend responses with MockWebServer, we will be able to define
+  // a mock response for the RemoteConfig backend without having to play PubSdkApi at all.
+  public void givenMockedRemoteConfigResponse(PubSdkApi pubSdkApi)
+      throws IOException {
+    RemoteConfigResponse remoteConfigResponse = Mockito.mock(RemoteConfigResponse.class);
+    doReturn(false).when(remoteConfigResponse).getKillSwitch();
+    doReturn(true).when(remoteConfigResponse).getCsmEnabled();
+    doReturn(remoteConfigResponse).when(pubSdkApi).loadConfig(any());
   }
 }

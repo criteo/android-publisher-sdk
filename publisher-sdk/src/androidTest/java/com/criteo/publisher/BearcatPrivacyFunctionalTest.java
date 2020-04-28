@@ -170,13 +170,13 @@ public class BearcatPrivacyFunctionalTest {
   private SharedPreferences defaultSharedPreferences;
 
   @Before
-  public void setUp() {
+  public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
     defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-
     doReturn(pubSdkApi).when(dependencyProvider).providePubSdkApi();
+    mockedDependenciesRule.givenMockedRemoteConfigResponse(pubSdkApi);
   }
 
   @After

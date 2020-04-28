@@ -24,7 +24,9 @@ import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.JsonSerializer;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -52,8 +54,11 @@ public class ConfigIntegrationTests {
   @Inject
   private Application application;
 
+  @SpyBean
+  private BuildConfigWrapper buildConfigWrapper;
+
   @Before
-  public void setup() {
+  public void setup() throws Exception {
     givenEmptyLocalStorage();
   }
 
@@ -69,6 +74,7 @@ public class ConfigIntegrationTests {
     givenRemoteConfigInError();
 
     givenInitializedCriteo();
+    waitForIdleState();
     Config config = getConfig();
 
     assertFalse(config.isKillSwitchEnabled());
@@ -94,6 +100,7 @@ public class ConfigIntegrationTests {
     givenRemoteConfigInError();
 
     givenInitializedCriteo();
+    waitForIdleState();
     Config config = getConfig();
 
     assertEquals(isEnabled, config.isKillSwitchEnabled());
@@ -370,6 +377,7 @@ public class ConfigIntegrationTests {
   }
 
   private void givenRemoteConfigInError() throws IOException {
+    doReturn(false).when(buildConfigWrapper).preconditionThrowsOnException();
     PubSdkApi api = givenMockedRemoteConfig();
     when(api.loadConfig(any())).thenThrow(IOException.class);
   }

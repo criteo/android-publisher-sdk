@@ -48,11 +48,12 @@ public class DeviceIdTest {
   private Context context;
 
   @Before
-  public void setUp() {
+  public void setUp() throws  Exception {
     MockitoAnnotations.initMocks(this);
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
     when(dependencyProvider.providePubSdkApi()).thenReturn(pubSdkApi);
     when(dependencyProvider.provideAdvertisingInfo()).thenReturn(advertisingInfo);
+    mockedDependenciesRule.givenMockedRemoteConfigResponse(pubSdkApi);
   }
 
   @Test

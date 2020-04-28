@@ -28,7 +28,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class UserPrivacyFunctionalTest {
-
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
@@ -41,13 +40,14 @@ public class UserPrivacyFunctionalTest {
   private SharedPreferences defaultSharedPreferences;
 
   @Before
-  public void setUp() {
+  public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
     defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
     doReturn(pubSdkApi).when(dependencyProvider).providePubSdkApi();
+    mockedDependenciesRule.givenMockedRemoteConfigResponse(pubSdkApi);
   }
 
   @After
