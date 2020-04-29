@@ -1,140 +1,137 @@
 package com.criteo.publisher.model.nativeads;
 
+import android.support.annotation.NonNull;
+import com.criteo.publisher.DependencyProvider;
+import com.criteo.publisher.util.JsonSerializer;
+import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
+import com.google.gson.TypeAdapter;
+import com.google.gson.annotations.SerializedName;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-public class NativeAssets {
+@AutoValue
+public abstract class NativeAssets {
 
-  private static final String PRODUCTS = "products";
-  private static final String DESCRIPTION = "description";
-  private static final String NATIVE_URL = "url";
-  private static final String ADVERTISER = "advertiser";
-  private static final String DOMAIN = "domain";
-  private static final String LOGO = "logo";
-  private static final String LOGO_CLICK_URL = "logoClickUrl";
-  private static final String PRIVACY = "privacy";
-  private static final String OPT_OUT_CLICK_URL = "optoutClickUrl";
-  private static final String OPT_OUT_IMAGE_URL = "optoutImageUrl";
-  private static final String LONG_LEGAL_TEXT = "longLegalText";
-  private static final String IMPRESSION_PIXELS = "impressionPixels";
-  private static final String HEIGHT = "height";
-  private static final String WIDTH = "width";
+  public static NativeAssets fromJson(JSONObject json) throws IOException {
+    // TODO remove this after CDB response parsing is totally migrated to Gson
+    JsonSerializer jsonSerializer = DependencyProvider.getInstance().provideJsonSerializer();
+    String jsonStr = json.toString();
 
-  private List<NativeProduct> nativeProducts;
-  private String advertiserDescription;
-  private String advertiserDomain;
-  private String advertiserLogoUrl;
-  private int advertiserLogoHeight;
-  private int advertiserLogoWidth;
-  private String advertiserLogoClickUrl;
-  private String privacyOptOutClickUrl;
-  private String privacyOptOutImageUrl;
-  private String privacyLongLegalText;
-  private List<String> impressionPixels;
-
-  public NativeAssets(JSONObject jsonNative) throws JSONException {
-    // products
-    if (jsonNative.has(PRODUCTS)) {
-      JSONArray products = jsonNative.getJSONArray(PRODUCTS);
-      this.nativeProducts = new ArrayList<>();
-      for (int i = 0; i < products.length(); i++) {
-        this.nativeProducts.add(new NativeProduct(products.getJSONObject(i)));
-      }
-    }
-
-    // advertiser
-    if (jsonNative.has(ADVERTISER)) {
-      JSONObject advertiser = jsonNative.getJSONObject(ADVERTISER);
-      this.advertiserDescription = advertiser.optString(DESCRIPTION);
-      this.advertiserDomain = advertiser.optString(DOMAIN);
-      if (advertiser.has(LOGO)) {
-        this.advertiserLogoUrl = advertiser.getJSONObject(LOGO).optString(NATIVE_URL);
-        this.advertiserLogoHeight = advertiser.getJSONObject(LOGO).optInt(HEIGHT);
-        this.advertiserLogoWidth = advertiser.getJSONObject(LOGO).optInt(WIDTH);
-      }
-      this.advertiserLogoClickUrl = advertiser.optString(LOGO_CLICK_URL);
-    }
-
-    // privacy
-    if (jsonNative.has(PRIVACY)) {
-      JSONObject privacy = jsonNative.getJSONObject(PRIVACY);
-      this.privacyOptOutClickUrl = privacy.optString(OPT_OUT_CLICK_URL);
-      this.privacyOptOutImageUrl = privacy.optString(OPT_OUT_IMAGE_URL);
-      this.privacyLongLegalText = privacy.optString(LONG_LEGAL_TEXT);
-    }
-
-    // impression pixels
-    if (jsonNative.has(IMPRESSION_PIXELS)) {
-      JSONArray impressionPixels = jsonNative.getJSONArray(IMPRESSION_PIXELS);
-      this.impressionPixels = new ArrayList<>();
-      for (int i = 0; i < impressionPixels.length(); i++) {
-        this.impressionPixels.add(impressionPixels.getJSONObject(i).optString(NATIVE_URL));
-      }
+    try (InputStream input = new ByteArrayInputStream(jsonStr.getBytes())) {
+      return jsonSerializer.read(NativeAssets.class, input);
     }
   }
 
-  public List<NativeProduct> getNativeProducts() {
-    return nativeProducts;
+  public static TypeAdapter<NativeAssets> typeAdapter(Gson gson) {
+    return new AutoValue_NativeAssets.GsonTypeAdapter(gson);
   }
 
+  /**
+   * Always returns at least one product
+   */
+  @NonNull
+  @SerializedName("products")
+  abstract List<NativeProduct> getNativeProducts();
+
+  /**
+   * Return the first product in the payload.
+   * <p>
+   * For the moment only one native product is handled by the SDK, so the {@link
+   * #getNativeProducts()} is package private.
+   *
+   * @return first product in this native asset
+   */
+  @NonNull
+  public NativeProduct getProduct() {
+    return getNativeProducts().iterator().next();
+  }
+
+  @NonNull
+  abstract NativeAdvertiser getAdvertiser();
+
+  @NonNull
   public String getAdvertiserDescription() {
-    return advertiserDescription;
+    return getAdvertiser().getDescription();
   }
 
+  @NonNull
   public String getAdvertiserDomain() {
-    return advertiserDomain;
+    return getAdvertiser().getDomain();
   }
 
-  public String getAdvertiserLogoUrl() {
-    return advertiserLogoUrl;
+  @NonNull
+  public URL getAdvertiserLogoUrl() {
+    return getAdvertiser().getLogo().getUrl();
   }
 
-  public String getAdvertiserLogoClickUrl() {
-    return advertiserLogoClickUrl;
+  @NonNull
+  public URL getAdvertiserLogoClickUrl() {
+    return getAdvertiser().getLogoClickUrl();
   }
 
-  public String getPrivacyOptOutClickUrl() {
-    return privacyOptOutClickUrl;
+  @NonNull
+  abstract NativePrivacy getPrivacy();
+
+  @NonNull
+  public URL getPrivacyOptOutClickUrl() {
+    return getPrivacy().getClickUrl();
   }
 
-  public String getPrivacyOptOutImageUrl() {
-    return privacyOptOutImageUrl;
+  @NonNull
+  public URL getPrivacyOptOutImageUrl() {
+    return getPrivacy().getImageUrl();
   }
 
+  @NonNull
   public String getPrivacyLongLegalText() {
-    return privacyLongLegalText;
+    return getPrivacy().getLegalText();
   }
 
-  public List<String> getImpressionPixels() {
-    return impressionPixels;
-  }
+  @NonNull
+  @SerializedName("impressionPixels")
+  abstract List<NativeImpressionPixel> getPixels();
 
-  @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof NativeAssets) {
-      NativeAssets other = (NativeAssets) obj;
-      return (this.nativeProducts.equals(other.nativeProducts) &&
-          (this.advertiserDescription == other.advertiserDescription || this.advertiserDescription
-              .equals(other.advertiserDescription)) &&
-          (this.advertiserDomain == other.advertiserDomain || this.advertiserDomain
-              .equals(other.advertiserDomain)) &&
-          (this.advertiserLogoUrl == other.advertiserLogoUrl || this.advertiserLogoUrl
-              .equals(other.advertiserLogoUrl)) &&
-          this.advertiserLogoHeight == other.advertiserLogoHeight &&
-          this.advertiserLogoWidth == other.advertiserLogoWidth &&
-          (this.advertiserLogoClickUrl == other.advertiserLogoClickUrl
-              || this.advertiserLogoClickUrl.equals(other.advertiserLogoClickUrl)) &&
-          (this.privacyOptOutClickUrl == other.privacyOptOutClickUrl || this.privacyOptOutClickUrl
-              .equals(other.privacyOptOutClickUrl)) &&
-          (this.privacyOptOutImageUrl == other.privacyOptOutImageUrl || this.privacyOptOutImageUrl
-              .equals(other.privacyOptOutImageUrl)) &&
-          (this.privacyLongLegalText == other.privacyLongLegalText || this.privacyLongLegalText
-              .equals(other.privacyLongLegalText)) &&
-          this.impressionPixels.equals(other.impressionPixels));
+  @NonNull
+  public List<URL> getImpressionPixels() {
+    List<URL> pixels = new ArrayList<>();
+    for (NativeImpressionPixel pixel : getPixels()) {
+      pixels.add(pixel.getUrl());
     }
-    return false;
+    return pixels;
+  }
+
+  public static Builder builder() {
+    return new AutoValue_NativeAssets.Builder();
+  }
+
+  @AutoValue.Builder
+  abstract static class Builder {
+
+    abstract Builder setNativeProducts(List<NativeProduct> newNativeProducts);
+    abstract Builder setAdvertiser(NativeAdvertiser newAdvertiser);
+    abstract Builder setPrivacy(NativePrivacy newPrivacy);
+    abstract Builder setPixels(List<NativeImpressionPixel> newPixels);
+
+    NativeAssets build() {
+      if (getNativeProducts().isEmpty()) {
+        throw new JsonParseException("Expect that native payload has, at least, one product.");
+      }
+      if (getPixels().isEmpty()) {
+        throw new JsonParseException("Expect that native payload has, at least, one impression pixel.");
+      }
+      return autoBuild();
+    }
+
+    abstract List<NativeProduct> getNativeProducts();
+    abstract List<NativeImpressionPixel> getPixels();
+    abstract NativeAssets autoBuild();
+
   }
 }

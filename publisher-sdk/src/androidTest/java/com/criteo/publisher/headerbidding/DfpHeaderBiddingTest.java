@@ -18,6 +18,7 @@ import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeProduct;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
+import java.net.URI;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -121,29 +122,26 @@ public class DfpHeaderBiddingTest {
   public void enrichBid_GivenDfpBuilderAndNativeBidAvailable_EnrichBuilder() throws Exception {
     BannerAdUnit adUnit = new BannerAdUnit("adUnit", new AdSize(1, 2));
 
-    NativeProduct product1 = mock(NativeProduct.class);
-    when(product1.getTitle()).thenReturn("title");
-    when(product1.getDescription()).thenReturn("description");
-    when(product1.getPrice()).thenReturn("$1337");
-    when(product1.getClickUrl()).thenReturn("http://click.url");
-    when(product1.getImageUrl()).thenReturn("http://image.url");
-    when(product1.getCallToAction()).thenReturn("call to action");
-
-    NativeProduct product2 = mock(NativeProduct.class);
-    when(product2.getTitle()).thenReturn("unexpected title");
+    NativeProduct product = mock(NativeProduct.class);
+    when(product.getTitle()).thenReturn("title");
+    when(product.getDescription()).thenReturn("description");
+    when(product.getPrice()).thenReturn("$1337");
+    when(product.getClickUrl()).thenReturn(URI.create("http://click.url").toURL());
+    when(product.getImageUrl()).thenReturn(URI.create("http://image.url").toURL());
+    when(product.getCallToAction()).thenReturn("call to action");
 
     NativeAssets nativeAssets = mock(NativeAssets.class);
-    when(nativeAssets.getNativeProducts()).thenReturn(asList(product1, product2));
+    when(nativeAssets.getProduct()).thenReturn(product);
     when(nativeAssets.getAdvertiserDescription()).thenReturn("advertiser name");
     when(nativeAssets.getAdvertiserDomain()).thenReturn("advertiser domain");
-    when(nativeAssets.getAdvertiserLogoClickUrl()).thenReturn("http://advertiser.url");
-    when(nativeAssets.getAdvertiserLogoUrl()).thenReturn("http://advertiser.logo.url");
-    when(nativeAssets.getPrivacyOptOutImageUrl()).thenReturn("http://privacy.image.url");
-    when(nativeAssets.getPrivacyOptOutClickUrl()).thenReturn("http://privacy.url");
+    when(nativeAssets.getAdvertiserLogoClickUrl()).thenReturn(URI.create("http://advertiser.url").toURL());
+    when(nativeAssets.getAdvertiserLogoUrl()).thenReturn(URI.create("http://advertiser.logo.url").toURL());
+    when(nativeAssets.getPrivacyOptOutImageUrl()).thenReturn(URI.create("http://privacy.image.url").toURL());
+    when(nativeAssets.getPrivacyOptOutClickUrl()).thenReturn(URI.create("http://privacy.url").toURL());
     when(nativeAssets.getPrivacyLongLegalText()).thenReturn("privacy legal text");
     when(nativeAssets.getImpressionPixels()).thenReturn(asList(
-        "http://pixel.url/0",
-        "http://pixel.url/1"));
+        URI.create("http://pixel.url/0").toURL(),
+        URI.create("http://pixel.url/1").toURL()));
 
     Slot slot = mock(Slot.class);
     when(slot.isNative()).thenReturn(true);

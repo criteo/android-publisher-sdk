@@ -14,6 +14,7 @@ import com.criteo.publisher.util.TextUtils;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest.Builder;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -79,40 +80,32 @@ public class DfpHeaderBidding {
       return;
     }
 
-    // Inject first product fields (there is no room for more product, so we rely on CDB logic to
-    // only bid on one product).
-    List<NativeProduct> products = nativeAssets.getNativeProducts();
-    if (products != null && !products.isEmpty()) {
-      NativeProduct product = products.get(0);
-
-      checkAndReflect(builder, product.getTitle(), CRT_NATIVE_TITLE);
-      checkAndReflect(builder, product.getDescription(), CRT_NATIVE_DESC);
-      checkAndReflect(builder, product.getPrice(), CRT_NATIVE_PRICE);
-      checkAndReflect(builder, product.getClickUrl(), CRT_NATIVE_CLICK_URL);
-      checkAndReflect(builder, product.getCallToAction(), CRT_NATIVE_CTA);
-      checkAndReflect(builder, product.getImageUrl(), CRT_NATIVE_IMAGE_URL);
-    }
+    NativeProduct product = nativeAssets.getProduct();
+    checkAndReflect(builder, product.getTitle(), CRT_NATIVE_TITLE);
+    checkAndReflect(builder, product.getDescription(), CRT_NATIVE_DESC);
+    checkAndReflect(builder, product.getPrice(), CRT_NATIVE_PRICE);
+    checkAndReflect(builder, product.getClickUrl().toString(), CRT_NATIVE_CLICK_URL);
+    checkAndReflect(builder, product.getCallToAction(), CRT_NATIVE_CTA);
+    checkAndReflect(builder, product.getImageUrl().toString(), CRT_NATIVE_IMAGE_URL);
 
     // Inject advertiser fields
     checkAndReflect(builder, nativeAssets.getAdvertiserDescription(), CRT_NATIVE_ADV_NAME);
     checkAndReflect(builder, nativeAssets.getAdvertiserDomain(), CRT_NATIVE_ADV_DOMAIN);
-    checkAndReflect(builder, nativeAssets.getAdvertiserLogoUrl(), CRT_NATIVE_ADV_LOGO_URL);
-    checkAndReflect(builder, nativeAssets.getAdvertiserLogoClickUrl(), CRT_NATIVE_ADV_URL);
+    checkAndReflect(builder, nativeAssets.getAdvertiserLogoUrl().toString(), CRT_NATIVE_ADV_LOGO_URL);
+    checkAndReflect(builder, nativeAssets.getAdvertiserLogoClickUrl().toString(), CRT_NATIVE_ADV_URL);
 
     // Inject privacy fields
-    checkAndReflect(builder, nativeAssets.getPrivacyOptOutClickUrl(), CRT_NATIVE_PR_URL);
-    checkAndReflect(builder, nativeAssets.getPrivacyOptOutImageUrl(), CRT_NATIVE_PR_IMAGE_URL);
+    checkAndReflect(builder, nativeAssets.getPrivacyOptOutClickUrl().toString(), CRT_NATIVE_PR_URL);
+    checkAndReflect(builder, nativeAssets.getPrivacyOptOutImageUrl().toString(), CRT_NATIVE_PR_IMAGE_URL);
     checkAndReflect(builder, nativeAssets.getPrivacyLongLegalText(), CRT_NATIVE_PR_TEXT);
 
     // Inject impression pixels
-    List<String> impressionPixels = nativeAssets.getImpressionPixels();
-    if (impressionPixels != null) {
-      for (int i = 0; i < impressionPixels.size(); i++) {
-        checkAndReflect(builder, impressionPixels.get(i), CRT_NATIVE_PIXEL_URL + i);
-      }
-
-      builder.addCustomTargeting(CRT_NATIVE_PIXEL_COUNT, impressionPixels.size() + "");
+    List<URL> impressionPixels = nativeAssets.getImpressionPixels();
+    for (int i = 0; i < impressionPixels.size(); i++) {
+      checkAndReflect(builder, impressionPixels.get(i).toString(), CRT_NATIVE_PIXEL_URL + i);
     }
+
+    builder.addCustomTargeting(CRT_NATIVE_PIXEL_COUNT, impressionPixels.size() + "");
   }
 
   private void checkAndReflect(

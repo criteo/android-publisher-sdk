@@ -1,80 +1,39 @@
 package com.criteo.publisher.model.nativeads;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import android.support.annotation.NonNull;
+import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
+import java.net.URL;
 
-public class NativeProduct {
+@AutoValue
+public abstract class NativeProduct {
 
-  private static final String TITLE = "title";
-  private static final String PRICE = "price";
-  private static final String CLICK_URL = "clickUrl";
-  private static final String CALL_TO_ACTION = "callToAction";
-  private static final String IMAGE = "image";
-  private static final String DESCRIPTION = "description";
-  private static final String NATIVE_URL = "url";
-  private static final String HEIGHT = "height";
-  private static final String WIDTH = "width";
-
-  private String title;
-  private String description;
-  private String price;
-  private String clickUrl;
-  private String callToAction;
-  private String imageUrl;
-  private int imageHeight;
-  private int imageWidth;
-
-  public NativeProduct(JSONObject jsonProduct) throws JSONException {
-    this.title = jsonProduct.optString(TITLE);
-    this.description = jsonProduct.optString(DESCRIPTION);
-    this.price = jsonProduct.optString(PRICE);
-    this.clickUrl = jsonProduct.optString(CLICK_URL);
-    this.callToAction = jsonProduct.optString(CALL_TO_ACTION);
-    if (jsonProduct.has(IMAGE)) {
-      this.imageUrl = jsonProduct.getJSONObject(IMAGE).optString(NATIVE_URL);
-      this.imageHeight = jsonProduct.getJSONObject(IMAGE).optInt(HEIGHT);
-      this.imageWidth = jsonProduct.getJSONObject(IMAGE).optInt(WIDTH);
-    }
+  public static TypeAdapter<NativeProduct> typeAdapter(Gson gson) {
+    return new AutoValue_NativeProduct.GsonTypeAdapter(gson);
   }
 
-  public String getTitle() {
-    return title;
-  }
+  @NonNull
+  public abstract String getTitle();
 
-  public String getDescription() {
-    return description;
-  }
+  @NonNull
+  public abstract String getDescription();
 
-  public String getPrice() {
-    return price;
-  }
+  @NonNull
+  public abstract String getPrice();
 
-  public String getClickUrl() {
-    return clickUrl;
-  }
+  @NonNull
+  public abstract URL getClickUrl();
 
-  public String getCallToAction() {
-    return callToAction;
-  }
+  @NonNull
+  public abstract String getCallToAction();
 
-  public String getImageUrl() {
-    return imageUrl;
-  }
+  @NonNull
+  abstract NativeImage getImage();
 
-  @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof NativeProduct) {
-      NativeProduct other = (NativeProduct) obj;
-      return ((this.title == other.title || this.title.equals(other.title)) &&
-          (this.description == other.description || this.description.equals(other.description)) &&
-          (this.price == other.price || this.price.equals(other.price)) &&
-          (this.clickUrl == other.clickUrl || this.clickUrl.equals(other.clickUrl)) &&
-          (this.callToAction == other.callToAction || this.callToAction.equals(other.callToAction)) &&
-          (this.imageUrl == other.imageUrl || this.imageUrl.equals(other.imageUrl)) &&
-          this.imageHeight == other.imageHeight &&
-          this.imageWidth == other.imageWidth);
-    }
-    return false;
+  @NonNull
+  public URL getImageUrl() {
+    return getImage().getUrl();
   }
 
 }

@@ -38,7 +38,6 @@ public class Slot {
   private long timeOfDownload;
   private double cpmValue;
   private NativeAssets nativeAssets;
-  private boolean isNative;
 
   public Slot(JSONObject json) {
     impressionId = json.optString(IMPRESSION_ID, null);
@@ -62,14 +61,14 @@ public class Slot {
     if (getCpmAsNumber() == null) {
       cpmValue = 0.0;
     }
+
+    this.nativeAssets = null;
     if (json.has(NATIVE)) {
-      isNative = true;
       try {
         JSONObject jsonNative = json.getJSONObject(NATIVE);
-        this.nativeAssets = new NativeAssets(jsonNative);
+        this.nativeAssets = NativeAssets.fromJson(jsonNative);
       } catch (Exception ex) {
         Log.d(TAG, "exception when parsing json" + ex.getLocalizedMessage());
-        this.nativeAssets = null;
       }
     }
   }
@@ -80,7 +79,7 @@ public class Slot {
   }
 
   public boolean isNative() {
-    return this.isNative;
+    return nativeAssets != null;
   }
 
   public String getPlacementId() {
@@ -137,6 +136,7 @@ public class Slot {
     return displayUrl;
   }
 
+  @Nullable
   public NativeAssets getNativeAssets() {
     return this.nativeAssets;
   }
@@ -171,25 +171,7 @@ public class Slot {
     }
 
     // Check display Url
-    if (!isNative && !URLUtil.isValidUrl(displayUrl)) {
-      return false;
-    }
-
-    // if a slot is for Native but the required native assets are missing then mark the
-    // bid invalid
-    if (this.isNative) {
-      if (this.nativeAssets == null) {
-        return false;
-      } else {
-        return this.nativeAssets.getNativeProducts() != null
-            && this.nativeAssets.getNativeProducts().size() != 0
-            && !this.nativeAssets.getPrivacyOptOutImageUrl().equals("")
-            && !this.nativeAssets.getPrivacyOptOutClickUrl().equals("")
-            && this.nativeAssets.getImpressionPixels() != null
-            && this.nativeAssets.getImpressionPixels().size() != 0;
-      }
-    }
-    return true;
+    return isNative() || URLUtil.isValidUrl(displayUrl);
   }
 
   // Get the cpm as a double

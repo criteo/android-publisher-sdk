@@ -35,6 +35,7 @@ import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest.Builder;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import com.google.android.gms.ads.doubleclick.PublisherInterstitialAd;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
@@ -290,7 +291,7 @@ public class DfpHeaderBiddingFunctionalTest {
   public void whenEnrichingNativePayload_GivenValidCpIdAndPrefetchNative_PayloadIsEncodedInASpecificManner()
       throws Exception {
     NativeAssets expectedAssets = STUB_NATIVE_ASSETS;
-    NativeProduct expectedProduct = expectedAssets.getNativeProducts().get(0);
+    NativeProduct expectedProduct = expectedAssets.getProduct();
 
     givenInitializedCriteo(validNativeAdUnit);
     waitForBids();
@@ -305,11 +306,11 @@ public class DfpHeaderBiddingFunctionalTest {
         decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_TITLE)));
     assertEquals(expectedProduct.getDescription(),
         decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_DESCRIPTION)));
-    assertEquals(expectedProduct.getImageUrl(),
+    assertEquals(expectedProduct.getImageUrl().toString(),
         decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_IMAGE)));
     assertEquals(expectedProduct.getPrice(),
         decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PRICE)));
-    assertEquals(expectedProduct.getClickUrl(),
+    assertEquals(expectedProduct.getClickUrl().toString(),
         decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_CLICK)));
     assertEquals(expectedProduct.getCallToAction(),
         decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_CTA)));
@@ -317,17 +318,17 @@ public class DfpHeaderBiddingFunctionalTest {
         decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_ADVERTISER_NAME)));
     assertEquals(expectedAssets.getAdvertiserDomain(),
         decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_ADVERTISER_DOMAIN)));
-    assertEquals(expectedAssets.getAdvertiserLogoUrl(),
+    assertEquals(expectedAssets.getAdvertiserLogoUrl().toString(),
         decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_ADVERTISER_LOGO)));
-    assertEquals(expectedAssets.getAdvertiserLogoClickUrl(),
+    assertEquals(expectedAssets.getAdvertiserLogoClickUrl().toString(),
         decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_ADVERTISER_CLICK)));
-    assertEquals(expectedAssets.getPrivacyOptOutClickUrl(),
+    assertEquals(expectedAssets.getPrivacyOptOutClickUrl().toString(),
         decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PRIVACY_LINK)));
-    assertEquals(expectedAssets.getPrivacyOptOutImageUrl(),
+    assertEquals(expectedAssets.getPrivacyOptOutImageUrl().toString(),
         decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PRIVACY_IMAGE)));
-    assertEquals(expectedAssets.getImpressionPixels().get(0),
+    assertEquals(expectedAssets.getImpressionPixels().get(0).toString(),
         decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PIXEL_1)));
-    assertEquals(expectedAssets.getImpressionPixels().get(1),
+    assertEquals(expectedAssets.getImpressionPixels().get(1).toString(),
         decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PIXEL_2)));
     assertEquals(String.valueOf(expectedAssets.getImpressionPixels().size()),
         bundle.getString(MACRO_NATIVE_PIXEL_COUNT));
@@ -362,14 +363,14 @@ public class DfpHeaderBiddingFunctionalTest {
   @Test
   public void loadingDfpBanner_GivenValidNative_DfpViewContainsNativePayload() throws Exception {
     NativeAssets expectedAssets = STUB_NATIVE_ASSETS;
-    NativeProduct expectedProduct = expectedAssets.getNativeProducts().get(0);
+    NativeProduct expectedProduct = expectedAssets.getProduct();
 
     // URL are encoded because they are given, as query param, to a Google URL that will redirect
     // user.
     // TODO add a test that verify that users are properly redirected to the expected URL.
-    String expectedClickUrl = URLEncoder.encode(expectedProduct.getClickUrl(), CHARSET.name());
+    String expectedClickUrl = URLEncoder.encode(expectedProduct.getClickUrl().toString(), CHARSET.name());
     String expectedPrivacyUrl = URLEncoder
-        .encode(expectedAssets.getPrivacyOptOutClickUrl(), CHARSET.name());
+        .encode(expectedAssets.getPrivacyOptOutClickUrl().toString(), CHARSET.name());
 
     String html = loadDfpHtmlNative(validNativeAdUnit);
 
@@ -380,11 +381,11 @@ public class DfpHeaderBiddingFunctionalTest {
 
     assertTrue(html.contains(expectedProduct.getTitle()));
     assertTrue(html.contains(expectedProduct.getDescription()));
-    assertTrue(html.contains(expectedProduct.getImageUrl()));
+    assertTrue(html.contains(expectedProduct.getImageUrl().toString()));
     assertTrue(html.contains(expectedProduct.getPrice()));
     assertTrue(html.contains(expectedClickUrl));
     assertTrue(html.contains(expectedProduct.getCallToAction()));
-    assertTrue(html.contains(expectedAssets.getPrivacyOptOutImageUrl()));
+    assertTrue(html.contains(expectedAssets.getPrivacyOptOutImageUrl().toString()));
     assertTrue(html.contains(expectedPrivacyUrl));
     assertTrue(html.contains(expectedAssets.getPrivacyLongLegalText()));
   }
@@ -392,7 +393,10 @@ public class DfpHeaderBiddingFunctionalTest {
   @Test
   public void loadingDfpBanner_GivenValidNative_HtmlInDfpViewShouldTriggerImpressionPixels()
       throws Exception {
-    List<String> expectedPixels = new ArrayList<>(STUB_NATIVE_ASSETS.getImpressionPixels());
+    List<String> expectedPixels = new ArrayList<>();
+    for (URL pixel : STUB_NATIVE_ASSETS.getImpressionPixels()) {
+      expectedPixels.add(pixel.toString());
+    }
 
     String html = loadDfpHtmlNative(validNativeAdUnit);
 

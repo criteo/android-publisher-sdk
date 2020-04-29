@@ -1,6 +1,7 @@
 package com.criteo.publisher;
 
 import com.criteo.publisher.model.nativeads.NativeAssets;
+import java.io.IOException;
 import java.util.regex.Pattern;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -69,8 +70,8 @@ public class StubConstants {
 
   static {
     try {
-      STUB_NATIVE_ASSETS = new NativeAssets(new JSONObject(STUB_NATIVE_JSON));
-    } catch (JSONException e) {
+      STUB_NATIVE_ASSETS = NativeAssets.fromJson(new JSONObject(STUB_NATIVE_JSON));
+    } catch (JSONException | IOException e) {
       throw new IllegalStateException(e);
     }
   }
