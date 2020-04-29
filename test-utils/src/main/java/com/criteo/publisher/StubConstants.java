@@ -1,6 +1,6 @@
 package com.criteo.publisher;
 
-import com.criteo.publisher.model.NativeAssets;
+import com.criteo.publisher.model.nativeads.NativeAssets;
 import java.util.regex.Pattern;
 import org.json.JSONException;
 import org.json.JSONObject;
