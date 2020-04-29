@@ -11,7 +11,9 @@ git fetch origin "$RELEASE_COMMIT_SHA1"
 git checkout FETCH_HEAD
 
 ./scripts/do-pre-submit.sh
-./gradlew clean publishReleasePublicationToAzureRepository
+./gradlew clean \
+    publishReleasePublicationToAzureRepository \
+    sendReleaseDeployedToAzureMessageToSlack
 
 git tag -a "$VERSION" -m "Release $VERSION"
 git push origin "refs/tags/$VERSION"

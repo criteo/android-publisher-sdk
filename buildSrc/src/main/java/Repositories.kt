@@ -135,3 +135,6 @@ fun Project.addAzureRepository() {
     }
   }
 }
+
+fun MavenArtifactRepository.isNexusProd(): Boolean = name == "NexusProd"
+fun MavenArtifactRepository.isAzure(): Boolean = name == "azure"

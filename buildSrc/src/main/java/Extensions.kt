@@ -1,5 +1,6 @@
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
+import fr.pturpin.slackpublish.SlackPublishExtension
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.publish.PublishingExtension
@@ -18,3 +19,6 @@ internal fun Project.publishing(configure: PublishingExtension.() -> Unit): Unit
 
 internal fun Project.hasPublishing(): Boolean =
     hasProperty("publishing")
+
+internal fun Project.slack(configure: SlackPublishExtension.() -> Unit): Unit =
+  (this as ExtensionAware).extensions.configure("slack", configure)

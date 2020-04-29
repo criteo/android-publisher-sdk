@@ -3,6 +3,7 @@ plugins {
     `maven-publish`
     kotlin("android")
     id("com.vanniktech.dependency.graph.generator")
+    id("fr.pturpin.slack-publish")
 }
 
 androidLibModule() {
@@ -45,6 +46,8 @@ for (variant in listOf("debug", "staging")) {
         artifact(createSourcesJarTask(variant))
     }
 }
+
+addSlackDeploymentMessages()
 
 dependencies {
     compileOnly(Deps.Android.Support.Annotations)

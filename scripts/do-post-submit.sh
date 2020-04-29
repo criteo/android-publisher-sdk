@@ -13,4 +13,6 @@ echo "Building and publishing artifacts to nexus"
 
 # FIXME EE-944 Is pushing on prod instead of preprod nexus expected ?
 # Only publish to Nexus Prod acting as a PreProd environment
-./gradlew publishAllPublicationsToNexusProdRepository -PappendTimestamp=true
+./gradlew publishAllPublicationsToNexusProdRepository \
+    sendReleaseDeployedToNexusProdMessageToSlack \
+    -PappendTimestamp=true
