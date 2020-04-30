@@ -7,6 +7,7 @@ import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.annotation.Incubating;
 import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.Slot;
+import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.util.PreconditionsUtil;
 import com.criteo.publisher.util.RunOnUiThreadExecutor;
 
@@ -46,12 +47,13 @@ public class CriteoNativeLoader {
   private void doLoad() {
     BidManager bidManager = getBidManager();
     Slot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    NativeAssets assets = bid == null ? null : bid.getNativeAssets();
 
-    if (bid == null) {
+    if (assets == null) {
       notifyForFailureAsync();
     } else {
       NativeAdMapper nativeAdMapper = getNativeAdMapper();
-      CriteoNativeAd nativeAd = nativeAdMapper.map(bid);
+      CriteoNativeAd nativeAd = nativeAdMapper.map(assets);
       notifyForAdAsync(nativeAd);
     }
   }

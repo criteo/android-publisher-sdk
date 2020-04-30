@@ -7,6 +7,7 @@ import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.model.NativeAdUnit
 import com.criteo.publisher.model.Slot
+import com.criteo.publisher.model.nativeads.NativeAssets
 import com.criteo.publisher.util.BuildConfigWrapper
 import com.criteo.publisher.util.DirectMockRunOnUiThreadExecutor
 import com.nhaarman.mockitokotlin2.*
@@ -67,13 +68,24 @@ class CriteoNativeLoaderTest {
   }
 
   @Test
-  fun loadAd_GivenBid_NotifyListenerOnUiThreadForSuccess() {
+  fun loadAd_GivenNativeBid_NotifyListenerOnUiThreadForSuccess() {
     expectListenerToBeCalledOnUiThread()
     val nativeAd = givenNativeBidAvailable()
 
     nativeLoader.loadAd()
 
     verify(listener).onAdReceived(nativeAd)
+    verifyNoMoreInteractions(listener)
+  }
+
+  @Test
+  fun loadAd_GivenNotANativeBid_NotifyListenerOnUiThreadForFailure() {
+    expectListenerToBeCalledOnUiThread()
+    givenNotANativeBidAvailable()
+
+    nativeLoader.loadAd()
+
+    verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
     verifyNoMoreInteractions(listener)
   }
 
@@ -104,17 +116,30 @@ class CriteoNativeLoaderTest {
   }
 
   private fun givenNativeBidAvailable(): CriteoNativeAd {
-    val slot = mock<Slot>()
+    val nativeAssets = mock<NativeAssets>()
     val nativeAd = mock<CriteoNativeAd>()
+    val slot = mock<Slot>() {
+      on { this.nativeAssets } doReturn nativeAssets
+    }
 
     bidManager.stub {
       on { getBidForAdUnitAndPrefetch(adUnit) } doReturn slot
     }
 
     nativeAdMapper.stub {
-      on { map(slot) } doReturn nativeAd
+      on { map(nativeAssets) } doReturn nativeAd
     }
     return nativeAd
+  }
+
+  private fun givenNotANativeBidAvailable() {
+    val slot = mock<Slot>() {
+      on { nativeAssets } doReturn null
+    }
+
+    bidManager.stub {
+      on { getBidForAdUnitAndPrefetch(adUnit) } doReturn slot
+    }
   }
 
   private fun expectListenerToBeCalledOnUiThread() {
