@@ -7,7 +7,7 @@ public class NativeAdMapper {
 
   @NonNull
   CriteoNativeAd map(@NonNull NativeAssets nativeAssets) {
-    return new CriteoNativeAd(); // Dummy implementation for now
+    return new CriteoNativeAd(nativeAssets);
   }
 
 }
