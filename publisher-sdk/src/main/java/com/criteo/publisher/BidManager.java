@@ -7,13 +7,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
-import com.criteo.publisher.util.ApplicationStoppedListener;
-import com.criteo.publisher.util.CdbCallListener;
-import com.criteo.publisher.util.ReflectionUtil;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
 import com.criteo.publisher.headerbidding.DfpHeaderBidding;
+import com.criteo.publisher.headerbidding.MoPubHeaderBidding;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CacheAdUnit;
@@ -22,6 +20,8 @@ import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.network.BidRequestSender;
+import com.criteo.publisher.util.ApplicationStoppedListener;
+import com.criteo.publisher.util.CdbCallListener;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -29,11 +29,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class BidManager implements ApplicationStoppedListener {
 
-  private static final String MOPUB_ADVIEW_CLASS = "com.mopub.mobileads.MoPubView";
-  private static final String MOPUB_INTERSTITIAL_CLASS = "com.mopub.mobileads.MoPubInterstitial";
-
   private static final String CRT_CPM = "crt_cpm";
-  private static final String MOPUB_CRT_DISPLAY_URL = "crt_displayUrl";
   private static final String MAP_CRT_DISPLAY_URL = "crt_displayUrl";
 
   /**
@@ -69,6 +65,9 @@ public class BidManager implements ApplicationStoppedListener {
   @NonNull
   private final DfpHeaderBidding dfpHeaderBidding;
 
+  @NonNull
+  private final MoPubHeaderBidding moPubHeaderBidding;
+
   BidManager(
       @NonNull SdkCache sdkCache,
       @NonNull Config config,
@@ -87,6 +86,7 @@ public class BidManager implements ApplicationStoppedListener {
     this.metricSendingQueueConsumer = metricSendingQueueConsumer;
 
     this.dfpHeaderBidding = new DfpHeaderBidding(this);
+    this.moPubHeaderBidding = new MoPubHeaderBidding(this);
   }
 
   /**
@@ -112,9 +112,8 @@ public class BidManager implements ApplicationStoppedListener {
       return;
     }
     if (object != null) {
-      if (object.getClass() == ReflectionUtil.getClassFromString(MOPUB_ADVIEW_CLASS)
-          || object.getClass() == ReflectionUtil.getClassFromString(MOPUB_INTERSTITIAL_CLASS)) {
-        enrichMoPubBid(object, adUnit);
+      if (moPubHeaderBidding.canHandle(object)) {
+        moPubHeaderBidding.enrichBid(object, adUnit);
       } else if (dfpHeaderBidding.canHandle(object)) {
         dfpHeaderBidding.enrichBid(object, adUnit);
       } else if (object instanceof Map) {
@@ -132,28 +131,6 @@ public class BidManager implements ApplicationStoppedListener {
 
     map.put(MAP_CRT_DISPLAY_URL, slot.getDisplayUrl());
     map.put(CRT_CPM, slot.getCpm());
-  }
-
-  private void enrichMoPubBid(Object object, AdUnit adUnit) {
-    Slot slot = getBidForAdUnitAndPrefetch(adUnit);
-    if (slot == null) {
-      return;
-    }
-
-    StringBuilder keywords = new StringBuilder();
-    Object existingKeywords = ReflectionUtil.callMethodOnObject(object, "getKeywords");
-    if (existingKeywords != null) {
-      keywords.append(existingKeywords);
-      keywords.append(",");
-    }
-    keywords.append(CRT_CPM);
-    keywords.append(":");
-    keywords.append(slot.getCpm());
-    keywords.append(",");
-    keywords.append(MOPUB_CRT_DISPLAY_URL);
-    keywords.append(":");
-    keywords.append(slot.getDisplayUrl());
-    ReflectionUtil.callMethodOnObject(object, "setKeywords", keywords.toString());
   }
 
   /**
