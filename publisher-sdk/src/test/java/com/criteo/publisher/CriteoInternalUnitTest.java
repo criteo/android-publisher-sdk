@@ -17,8 +17,8 @@ import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.DeviceInfo;
+import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.Slot;
-import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AppLifecycleUtil;
 import com.criteo.publisher.util.DeviceUtil;
@@ -309,13 +309,13 @@ public class CriteoInternalUnitTest {
   @Test
   public void getTokenValue_GivenInHouse_DelegateToIt() throws Exception {
     BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
-    TokenValue expected = mock(TokenValue.class);
+    DisplayUrlTokenValue expected = mock(DisplayUrlTokenValue.class);
 
     InHouse inHouse = givenMockedInHouse();
     when(inHouse.getTokenValue(token, CRITEO_BANNER)).thenReturn(expected);
 
     CriteoInternal criteo = createCriteo();
-    TokenValue tokenValue = criteo.getTokenValue(token, CRITEO_BANNER);
+    DisplayUrlTokenValue tokenValue = criteo.getTokenValue(token, CRITEO_BANNER);
 
     assertThat(tokenValue).isSameAs(expected);
   }

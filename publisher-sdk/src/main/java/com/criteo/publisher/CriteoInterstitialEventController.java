@@ -6,15 +6,15 @@ import static com.criteo.publisher.CriteoListenerCode.VALID;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
-import com.criteo.publisher.util.AdUnitType;
-import com.criteo.publisher.util.RunOnUiThreadExecutor;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.DeviceInfo;
+import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.Slot;
-import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.model.WebViewData;
 import com.criteo.publisher.tasks.CriteoInterstitialListenerCallTask;
+import com.criteo.publisher.util.AdUnitType;
+import com.criteo.publisher.util.RunOnUiThreadExecutor;
 
 
 public class CriteoInterstitialEventController {
@@ -83,7 +83,7 @@ public class CriteoInterstitialEventController {
   }
 
   public void fetchAdAsync(@Nullable BidToken bidToken) {
-    TokenValue tokenValue = criteo.getTokenValue(bidToken, AdUnitType.CRITEO_INTERSTITIAL);
+    DisplayUrlTokenValue tokenValue = criteo.getTokenValue(bidToken, AdUnitType.CRITEO_INTERSTITIAL);
 
     if (tokenValue == null) {
       notifyFor(INVALID);

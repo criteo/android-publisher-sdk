@@ -1,13 +1,17 @@
 package com.criteo.publisher.advancednative;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import com.criteo.publisher.BidManager;
+import com.criteo.publisher.BidToken;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.DependencyProvider;
+import com.criteo.publisher.InHouse;
 import com.criteo.publisher.annotation.Incubating;
 import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.nativeads.NativeAssets;
+import com.criteo.publisher.model.nativeads.NativeTokenValue;
 import com.criteo.publisher.util.PreconditionsUtil;
 import com.criteo.publisher.util.RunOnUiThreadExecutor;
 
@@ -48,7 +52,25 @@ public class CriteoNativeLoader {
     BidManager bidManager = getBidManager();
     Slot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
     NativeAssets assets = bid == null ? null : bid.getNativeAssets();
+    handleNativeAssets(assets);
+  }
 
+  public void loadAd(@Nullable BidToken bidToken) {
+    try {
+      doLoad(bidToken);
+    } catch (Throwable t) {
+      PreconditionsUtil.throwOrLog(t);
+    }
+  }
+
+  private void doLoad(@Nullable BidToken bidToken) {
+    InHouse inHouse = getInHouse();
+    NativeTokenValue tokenValue = inHouse.getNativeTokenValue(bidToken);
+    NativeAssets assets = tokenValue == null ? null : tokenValue.getNativeAssets();
+    handleNativeAssets(assets);
+  }
+
+  private void handleNativeAssets(@Nullable NativeAssets assets) {
     if (assets == null) {
       notifyForFailureAsync();
     } else {
@@ -89,6 +111,11 @@ public class CriteoNativeLoader {
   @NonNull
   private BidManager getBidManager() {
     return DependencyProvider.getInstance().provideBidManager();
+  }
+
+  @NonNull
+  private InHouse getInHouse() {
+    return DependencyProvider.getInstance().provideInHouse();
   }
 
 }

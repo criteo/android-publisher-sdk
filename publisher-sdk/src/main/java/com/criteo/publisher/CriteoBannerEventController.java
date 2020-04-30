@@ -14,8 +14,8 @@ import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.adview.AdWebViewClient;
 import com.criteo.publisher.adview.AdWebViewListener;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.Slot;
-import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.tasks.CriteoBannerListenerCallTask;
 import com.criteo.publisher.tasks.CriteoBannerLoadTask;
 import com.criteo.publisher.util.AdUnitType;
@@ -65,7 +65,7 @@ public class CriteoBannerEventController {
   }
 
   public void fetchAdAsync(@Nullable BidToken bidToken) {
-    TokenValue tokenValue = criteo.getTokenValue(bidToken, AdUnitType.CRITEO_BANNER);
+    DisplayUrlTokenValue tokenValue = criteo.getTokenValue(bidToken, AdUnitType.CRITEO_BANNER);
 
     if (tokenValue == null) {
       notifyFor(INVALID);

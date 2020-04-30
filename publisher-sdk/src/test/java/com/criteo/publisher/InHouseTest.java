@@ -1,6 +1,7 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -8,9 +9,10 @@ import static org.mockito.Mockito.when;
 
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.Slot;
-import com.criteo.publisher.model.TokenValue;
+import com.criteo.publisher.model.nativeads.NativeTokenValue;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,12 +44,24 @@ public class InHouseTest {
 
   @Test
   public void getTokenValue_GivenToken_DelegateToCache() throws Exception {
-    TokenValue expectedTokenValue = mock(TokenValue.class);
+    DisplayUrlTokenValue expectedTokenValue = mock(DisplayUrlTokenValue.class);
     BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
 
     when(tokenCache.getTokenValue(token, CRITEO_BANNER)).thenReturn(expectedTokenValue);
 
-    TokenValue tokenValue = inHouse.getTokenValue(token, CRITEO_BANNER);
+    DisplayUrlTokenValue tokenValue = inHouse.getTokenValue(token, CRITEO_BANNER);
+
+    assertThat(tokenValue).isEqualTo(expectedTokenValue);
+  }
+
+  @Test
+  public void getNativeTokenValue_GivenToken_DelegateToCache() throws Exception {
+    NativeTokenValue expectedTokenValue = mock(NativeTokenValue.class);
+    BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
+
+    when(tokenCache.getTokenValue(token, CRITEO_CUSTOM_NATIVE)).thenReturn(expectedTokenValue);
+
+    NativeTokenValue tokenValue = inHouse.getNativeTokenValue(token);
 
     assertThat(tokenValue).isEqualTo(expectedTokenValue);
   }

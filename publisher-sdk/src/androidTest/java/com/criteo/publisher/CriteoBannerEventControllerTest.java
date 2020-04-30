@@ -22,8 +22,8 @@ import android.webkit.WebViewClient;
 import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.Slot;
-import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.RunOnUiThreadExecutor;
 import java.util.UUID;
@@ -189,7 +189,7 @@ public class CriteoBannerEventControllerTest {
   @Test
   public void fetchAdAsyncToken_GivenBid_NotifyListenerForSuccessAndDisplayAd() throws Exception {
     BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
-    TokenValue tokenValue = mock(TokenValue.class);
+    DisplayUrlTokenValue tokenValue = mock(DisplayUrlTokenValue.class);
 
     when(criteo.getTokenValue(token, AdUnitType.CRITEO_BANNER)).thenReturn(tokenValue);
     when(tokenValue.getDisplayUrl()).thenReturn("http://my.display.url");
@@ -204,7 +204,7 @@ public class CriteoBannerEventControllerTest {
   @Test
   public void fetchAdAsyncToken_GivenBidTwice_NotifyListenerForSuccessAndDisplayAdTwice() throws Exception {
     BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
-    TokenValue tokenValue = mock(TokenValue.class);
+    DisplayUrlTokenValue tokenValue = mock(DisplayUrlTokenValue.class);
 
     when(criteo.getTokenValue(any(), any())).thenReturn(tokenValue);
     when(tokenValue.getDisplayUrl())

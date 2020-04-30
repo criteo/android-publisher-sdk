@@ -5,14 +5,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
-import com.criteo.publisher.util.AdUnitType;
-import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
+import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.Slot;
-import com.criteo.publisher.model.TokenValue;
+import com.criteo.publisher.util.AdUnitType;
+import com.criteo.publisher.util.DeviceUtil;
 import java.util.List;
 
 public abstract class Criteo {
@@ -134,7 +134,7 @@ public abstract class Criteo {
   public abstract BidResponse getBidResponse(AdUnit adUnit);
 
   @Nullable
-  abstract TokenValue getTokenValue(@Nullable BidToken bidToken, @NonNull AdUnitType adUnitType);
+  abstract DisplayUrlTokenValue getTokenValue(@Nullable BidToken bidToken, @NonNull AdUnitType adUnitType);
 
   @NonNull
   abstract DeviceInfo getDeviceInfo();

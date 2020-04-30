@@ -2,6 +2,7 @@ package com.criteo.publisher.advancednative
 
 import com.criteo.publisher.BidManager
 import com.criteo.publisher.CriteoErrorCode
+import com.criteo.publisher.InHouse
 import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
@@ -24,6 +25,9 @@ class CriteoNativeLoaderTest {
   @Rule
   @JvmField
   val mockedDependenciesRule = MockedDependenciesRule()
+
+  @SpyBean
+  private lateinit var inHouse: InHouse
 
   @MockBean
   private lateinit var bidManager: BidManager
@@ -54,6 +58,40 @@ class CriteoNativeLoaderTest {
 
     adUnit = NativeAdUnit("myAdUnit")
     nativeLoader = CriteoNativeLoader(adUnit, listener)
+  }
+
+  @Test
+  fun loadAdInHouse_GivenNoBid_NotifyListenerOnUiThreadForFailure() {
+    expectListenerToBeCalledOnUiThread()
+
+    nativeLoader.loadAd(null)
+
+    verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
+    verifyNoMoreInteractions(listener)
+  }
+
+  @Test
+  fun loadAdInHouse_GivenNotANativeBid_NotifyListenerOnUiThreadForFailure() {
+    expectListenerToBeCalledOnUiThread()
+    givenNotANativeBidAvailable()
+
+    val bidResponse = inHouse.getBidResponse(adUnit)
+    nativeLoader.loadAd(bidResponse.bidToken)
+
+    verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
+    verifyNoMoreInteractions(listener)
+  }
+
+  @Test
+  fun loadAdInHouse_GivenNativeBid_NotifyListenerOnMainThreadForSuccess() {
+    expectListenerToBeCalledOnUiThread()
+    val nativeAd = givenNativeBidAvailable()
+
+    val bidResponse = inHouse.getBidResponse(adUnit)
+    nativeLoader.loadAd(bidResponse.bidToken)
+
+    verify(listener).onAdReceived(nativeAd)
+    verifyNoMoreInteractions(listener)
   }
 
   @Test

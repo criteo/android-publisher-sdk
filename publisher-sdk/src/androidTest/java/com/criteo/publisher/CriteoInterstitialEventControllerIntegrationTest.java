@@ -19,8 +19,8 @@ import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
+import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.Slot;
-import com.criteo.publisher.model.TokenValue;
 import com.criteo.publisher.model.WebViewData;
 import com.criteo.publisher.util.AdUnitType;
 import java.util.UUID;
@@ -185,7 +185,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   public void fetchAdAsyncInHouse_GivenBid_NotifyAdListenerForSuccessAndFetchCreative()
       throws Exception {
     BidToken bidToken = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
-    TokenValue tokenValue = mock(TokenValue.class);
+    DisplayUrlTokenValue tokenValue = mock(DisplayUrlTokenValue.class);
 
     when(tokenValue.getDisplayUrl()).thenReturn("http://my.creative");
     when(criteo.getTokenValue(bidToken, AdUnitType.CRITEO_INTERSTITIAL)).thenReturn(tokenValue);
@@ -202,7 +202,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   public void fetchAdAsyncInHouse_GivenBidTwice_NotifyAdListenerForSuccessAndFetchCreativeTwice()
       throws Exception {
     BidToken bidToken = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
-    TokenValue tokenValue = mock(TokenValue.class);
+    DisplayUrlTokenValue tokenValue = mock(DisplayUrlTokenValue.class);
 
     when(criteo.getTokenValue(bidToken, AdUnitType.CRITEO_INTERSTITIAL)).thenReturn(tokenValue);
     when(tokenValue.getDisplayUrl())

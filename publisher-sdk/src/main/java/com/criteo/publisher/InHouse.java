@@ -1,13 +1,17 @@
 package com.criteo.publisher;
 
+import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
+
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
+import com.criteo.publisher.model.AbstractTokenValue;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.Slot;
-import com.criteo.publisher.model.TokenValue;
+import com.criteo.publisher.model.nativeads.NativeTokenValue;
+import com.criteo.publisher.util.AdUnitType;
 
 public class InHouse {
 
@@ -45,20 +49,46 @@ public class InHouse {
       return new BidResponse();
     }
 
-    TokenValue tokenValue = new TokenValue(
-        slot.getTimeOfDownload(),
-        slot.getTtl(),
-        slot.getDisplayUrl(),
-        clock
-    );
+    AbstractTokenValue tokenValue;
+
+    if (slot.getNativeAssets() != null) {
+      tokenValue = new NativeTokenValue(
+          slot.getNativeAssets(),
+          slot,
+          clock
+      );
+    } else {
+      tokenValue = new DisplayUrlTokenValue(
+          slot.getDisplayUrl(),
+          slot,
+          clock
+      );
+    }
 
     double price = slot.getCpmAsNumber();
     return new BidResponse(price, tokenCache.add(tokenValue, adUnit), true);
   }
 
   @Nullable
-  public TokenValue getTokenValue(@Nullable BidToken bidToken, @NonNull AdUnitType adUnitType) {
-    return tokenCache.getTokenValue(bidToken, adUnitType);
+  public DisplayUrlTokenValue getTokenValue(@Nullable BidToken bidToken, @NonNull AdUnitType adUnitType) {
+    AbstractTokenValue tokenValue = tokenCache.getTokenValue(bidToken, adUnitType);
+    if (!(tokenValue instanceof DisplayUrlTokenValue)) {
+      // This should not happen. Tokens are forged with the expected type
+      return null;
+    }
+
+    return (DisplayUrlTokenValue) tokenValue;
+  }
+
+  @Nullable
+  public NativeTokenValue getNativeTokenValue(@Nullable BidToken bidToken) {
+    AbstractTokenValue tokenValue = tokenCache.getTokenValue(bidToken, CRITEO_CUSTOM_NATIVE);
+    if (!(tokenValue instanceof NativeTokenValue)) {
+      // This should not happen. Tokens are forged with the expected type
+      return null;
+    }
+
+    return (NativeTokenValue) tokenValue;
   }
 
 }

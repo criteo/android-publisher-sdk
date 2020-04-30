@@ -1,12 +1,14 @@
 package com.criteo.publisher;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.InterstitialAdUnit;
-import com.criteo.publisher.model.TokenValue;
+import com.criteo.publisher.model.Slot;
+import com.criteo.publisher.util.AdUnitType;
 import java.util.UUID;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,19 +39,16 @@ public class TokenCacheTest {
 
   @Test
   public void testGetTokenForBidAndGetValueForToken() {
-
     bannerAdUnit2 = new BannerAdUnit("banneradUnitId2", new AdSize(320, 50));
     interstitialAdUnit2 = new InterstitialAdUnit("interstitialadUnitId2");
 
-    TokenValue tokenForBanner1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE,
+    DisplayUrlTokenValue tokenForBanner1 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
         clock);
-    TokenValue tokenForBanner2 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE,
+    DisplayUrlTokenValue tokenForBanner2 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
         clock);
-    TokenValue tokenForInterstitial1 = new TokenValue(System.currentTimeMillis(), 100,
-        TEST_CREATIVE,
+    DisplayUrlTokenValue tokenForInterstitial1 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
         clock);
-    TokenValue tokenForInterstitial2 = new TokenValue(System.currentTimeMillis(), 100,
-        TEST_CREATIVE,
+    DisplayUrlTokenValue tokenForInterstitial2 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
         clock);
 
     BidToken bidTokenForBanner1 = tokenCache.add(tokenForBanner1, bannerAdUnit1);
@@ -69,15 +68,11 @@ public class TokenCacheTest {
 
   @Test
   public void testReturnNullWhenTokenExpired() {
-    long bidTime = System.currentTimeMillis();
-    int bidTtlInSeconds = 100;
-    when(clock.getCurrentTimeInMillis()).thenReturn(bidTime + bidTtlInSeconds * 1000 + 1);
+    Slot slot = mock(Slot.class);
+    when(slot.isExpired(clock)).thenReturn(true);
 
-    TokenValue tokenForBanner1 = new TokenValue(bidTime, bidTtlInSeconds, TEST_CREATIVE,
-        clock);
-
-    TokenValue tokenForInterstitial1 = new TokenValue(bidTime, bidTtlInSeconds, TEST_CREATIVE,
-        clock);
+    DisplayUrlTokenValue tokenForBanner1 = new DisplayUrlTokenValue(TEST_CREATIVE, slot, clock);
+    DisplayUrlTokenValue tokenForInterstitial1 = new DisplayUrlTokenValue(TEST_CREATIVE, slot, clock);
 
     BidToken bidTokenForBanner1 = tokenCache.add(tokenForBanner1, bannerAdUnit1);
     BidToken bidTokenForInterstitial1 = tokenCache.add(tokenForInterstitial1, interstitialAdUnit1);
@@ -89,11 +84,8 @@ public class TokenCacheTest {
 
   @Test
   public void testReturnNullWhenWrongAdUnitType() {
-    TokenValue tokenForBanner1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE,
-        clock);
-    TokenValue tokenForInterstitial1 = new TokenValue(System.currentTimeMillis(), 100,
-        TEST_CREATIVE,
-        clock);
+    DisplayUrlTokenValue tokenForBanner1 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class), clock);
+    DisplayUrlTokenValue tokenForInterstitial1 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class), clock);
 
     BidToken bidTokenForBanner1 = tokenCache.add(tokenForBanner1, bannerAdUnit1);
     BidToken bidTokenForInterstitial1 = tokenCache.add(tokenForInterstitial1, interstitialAdUnit1);
@@ -107,15 +99,13 @@ public class TokenCacheTest {
     bannerAdUnit2 = new BannerAdUnit("banneradUnitId2", new AdSize(320, 50));
     interstitialAdUnit2 = new InterstitialAdUnit("interstitialadUnitId2");
 
-    TokenValue tokenForBanner1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE,
+    DisplayUrlTokenValue tokenForBanner1 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
         clock);
-    TokenValue tokenForBanner2 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE,
+    DisplayUrlTokenValue tokenForBanner2 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
         clock);
-    TokenValue tokenForInterstitial1 = new TokenValue(System.currentTimeMillis(), 100,
-        TEST_CREATIVE,
+    DisplayUrlTokenValue tokenForInterstitial1 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
         clock);
-    TokenValue tokenForInterstitial2 = new TokenValue(System.currentTimeMillis(), 100,
-        TEST_CREATIVE,
+    DisplayUrlTokenValue tokenForInterstitial2 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
         clock);
 
     BidToken bidTokenForBanner2 = tokenCache.add(tokenForBanner2, bannerAdUnit2);
@@ -129,10 +119,9 @@ public class TokenCacheTest {
   //Checks TokenCache removes token after call getTokenValue
   @Test
   public void testGetTokenForBidAndGetValueForTokenCheckNull() {
-    TokenValue tokenForBanner1 = new TokenValue(System.currentTimeMillis(), 100, TEST_CREATIVE,
+    DisplayUrlTokenValue tokenForBanner1 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
         clock);
-    TokenValue tokenForInterstitial1 = new TokenValue(System.currentTimeMillis(), 100,
-        TEST_CREATIVE,
+    DisplayUrlTokenValue tokenForInterstitial1 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
         clock);
 
     BidToken bidTokenForBanner1 = tokenCache.add(tokenForBanner1, bannerAdUnit1);
