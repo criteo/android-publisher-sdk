@@ -14,6 +14,7 @@ import com.criteo.publisher.BidManager;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeProduct;
@@ -31,6 +32,7 @@ public class DfpHeaderBiddingTest {
 
   private static final String CRT_CPM = "crt_cpm";
   private static final String CRT_DISPLAY_URL = "crt_displayurl";
+  private static final String CRT_SIZE = "crt_size";
   private static final String CRT_NATIVE_TITLE = "crtn_title";
   private static final String CRT_NATIVE_DESC = "crtn_desc";
   private static final String CRT_NATIVE_PRICE = "crtn_price";
@@ -94,12 +96,38 @@ public class DfpHeaderBiddingTest {
     headerBidding.enrichBid(builder, adUnit);
     PublisherAdRequest request = builder.build();
 
+    assertNull(request.getCustomTargeting().getString(CRT_CPM));
     assertNull(request.getCustomTargeting().getString(CRT_DISPLAY_URL));
+    assertNull(request.getCustomTargeting().getString(CRT_SIZE));
   }
 
   @Test
-  public void enrichBid_GivenDfpBuilderAndNotNativeBidAvailable_EnrichBuilder() throws Exception {
-    BannerAdUnit adUnit = new BannerAdUnit("adUnit", new AdSize(1, 2));
+  public void enrichBid_GivenDfpBuilderAndBannerBidAvailable_EnrichBuilder() throws Exception {
+    BannerAdUnit adUnit = new BannerAdUnit("adUnit", new AdSize(42, 1337));
+
+    Slot slot = mock(Slot.class);
+    when(slot.isNative()).thenReturn(false);
+    when(slot.getCpm()).thenReturn("0.10");
+    when(slot.getDisplayUrl()).thenReturn("http://display.url");
+    when(slot.getWidth()).thenReturn(42);
+    when(slot.getHeight()).thenReturn(1337);
+
+    when(bidManager.getBidForAdUnitAndPrefetch(adUnit)).thenReturn(slot);
+
+    PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
+    headerBidding.enrichBid(builder, adUnit);
+    PublisherAdRequest request = builder.build();
+    Bundle customTargeting = request.getCustomTargeting();
+
+    assertEquals(3, customTargeting.size());
+    assertEquals("0.10", customTargeting.get(CRT_CPM));
+    assertEquals(encodeForDfp("http://display.url"), customTargeting.get(CRT_DISPLAY_URL));
+    assertEquals("42x1337", customTargeting.get(CRT_SIZE));
+  }
+
+  @Test
+  public void enrichBid_GivenDfpBuilderAndInterstitialBidAvailable_EnrichBuilder() throws Exception {
+    InterstitialAdUnit adUnit = new InterstitialAdUnit("adUnit");
 
     Slot slot = mock(Slot.class);
     when(slot.isNative()).thenReturn(false);

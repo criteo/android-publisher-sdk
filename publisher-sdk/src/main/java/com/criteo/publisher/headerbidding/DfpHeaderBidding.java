@@ -6,6 +6,8 @@ import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 import com.criteo.publisher.BidManager;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeProduct;
@@ -23,6 +25,7 @@ public class DfpHeaderBidding {
 
   private static final String CRT_CPM = "crt_cpm";
   private static final String CRT_DISPLAY_URL = "crt_displayurl";
+  private static final String CRT_SIZE = "crt_size";
   private static final String CRT_NATIVE_TITLE = "crtn_title";
   private static final String CRT_NATIVE_DESC = "crtn_desc";
   private static final String CRT_NATIVE_PRICE = "crtn_price";
@@ -65,13 +68,12 @@ public class DfpHeaderBidding {
 
     if (slot.isNative()) {
       enrichNativeRequest(builder, slot);
-    } else {
-      enrichDfpRequest(builder, slot);
+    } else if (adUnit instanceof BannerAdUnit) {
+      checkAndReflect(builder, slot.getDisplayUrl(), CRT_DISPLAY_URL);
+      builder.addCustomTargeting(CRT_SIZE, slot.getWidth() + "x" + slot.getHeight());
+    } else if (adUnit instanceof InterstitialAdUnit) {
+      checkAndReflect(builder, slot.getDisplayUrl(), CRT_DISPLAY_URL);
     }
-  }
-
-  private void enrichDfpRequest(@NonNull SafeDfpBuilder builder, @NonNull Slot slot) {
-    checkAndReflect(builder, slot.getDisplayUrl(), CRT_DISPLAY_URL);
   }
 
   private void enrichNativeRequest(@NonNull SafeDfpBuilder builder, @NonNull Slot slot) {
