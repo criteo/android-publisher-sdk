@@ -13,39 +13,53 @@
     android:layout_marginStart="10dp"
     android:layout_marginEnd="10dp"
     android:orientation="vertical">
-    <LinearLayout
+    <HorizontalScrollView
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:orientation="horizontal">
-      <Button
-        android:id="@+id/buttonInhouseInterstitial"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="0dp"
+      android:layout_height="wrap_content">
+      <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight=".5"
-        android:background="@android:color/holo_orange_dark"
-        android:text="@string/btn_interstitial"/>
-      <Button
-        android:id="@+id/buttonInhouseBanner"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight=".5"
-        android:layout_marginStart="5dp"
-        android:layout_marginLeft="5dp"
-        android:background="@android:color/holo_orange_dark"
-        android:text="@string/btn_banner"/>
-      <Button
-        android:id="@+id/buttonInhouseInterstitialIbv"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight=".5"
-        android:layout_marginStart="5dp"
-        android:layout_marginLeft="5dp"
-        android:background="@android:color/holo_orange_dark"
-        android:text="@string/btn_interstitial_ibv"/>
-    </LinearLayout>
+        android:orientation="horizontal">
+        <Button
+          android:id="@+id/buttonInhouseInterstitial"
+          style="@style/Widget.AppCompat.Button.Colored"
+          android:layout_width="0dp"
+          android:layout_height="match_parent"
+          android:layout_weight="1"
+          android:background="@android:color/holo_orange_dark"
+          android:text="@string/btn_interstitial"/>
+        <Button
+          android:id="@+id/buttonInhouseBanner"
+          style="@style/Widget.AppCompat.Button.Colored"
+          android:layout_width="0dp"
+          android:layout_height="match_parent"
+          android:layout_weight="1"
+          android:layout_marginStart="5dp"
+          android:layout_marginLeft="5dp"
+          android:background="@android:color/holo_orange_dark"
+          android:text="@string/btn_banner"/>
+        <Button
+          android:id="@+id/buttonInhouseInterstitialIbv"
+          style="@style/Widget.AppCompat.Button.Colored"
+          android:layout_width="0dp"
+          android:layout_height="match_parent"
+          android:layout_weight="1"
+          android:layout_marginStart="5dp"
+          android:layout_marginLeft="5dp"
+          android:background="@android:color/holo_orange_dark"
+          android:text="@string/btn_interstitial_ibv"/>
+        <Button
+          android:id="@+id/buttonInhouseNative"
+          style="@style/Widget.AppCompat.Button.Colored"
+          android:layout_width="0dp"
+          android:layout_height="match_parent"
+          android:layout_weight="1"
+          android:layout_marginStart="5dp"
+          android:layout_marginLeft="5dp"
+          android:background="@android:color/holo_orange_dark"
+          android:text="@string/btn_advanced_native"/>
+      </LinearLayout>
+    </HorizontalScrollView>
     <LinearLayout
       android:id="@+id/AdLayout"
       android:layout_width="match_parent"

@@ -1,6 +1,7 @@
 package com.criteo.pubsdk_android;
 
 import static com.criteo.pubsdk_android.PubSdkDemoApplication.INTERSTITIAL_IBV_DEMO;
+import static com.criteo.pubsdk_android.PubSdkDemoApplication.NATIVE;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -12,12 +13,14 @@ import com.criteo.publisher.BidResponse;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoInterstitial;
+import com.criteo.publisher.advancednative.CriteoNativeLoader;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.pubsdk_android.listener.TestAppBannerAdListener;
 import com.criteo.pubsdk_android.listener.TestAppInterstitialAdDisplayListener;
 import com.criteo.pubsdk_android.listener.TestAppInterstitialAdListener;
+import com.criteo.pubsdk_android.listener.TestAppNativeAdListener;
 
 public class InHouseActivity extends AppCompatActivity {
 
@@ -33,6 +36,7 @@ public class InHouseActivity extends AppCompatActivity {
   private Context context;
   private LinearLayout adLayout;
   private CriteoBannerView criteoBannerView;
+  private CriteoNativeLoader nativeLoader;
   private Button btnShowInterstitial;
   private Button btnShowInterstitialIbv;
 
@@ -46,7 +50,13 @@ public class InHouseActivity extends AppCompatActivity {
     btnShowInterstitialIbv = findViewById(R.id.buttonInhouseInterstitialIbv);
     context = getApplicationContext();
 
+    nativeLoader = new CriteoNativeLoader(
+        NATIVE,
+        new TestAppNativeAdListener(TAG, NATIVE.getAdUnitId(), adLayout)
+    );
+
     findViewById(R.id.buttonInhouseBanner).setOnClickListener(v -> loadBannerAd());
+    findViewById(R.id.buttonInhouseNative).setOnClickListener(v -> loadNative());
   }
 
   @Override
@@ -84,6 +94,11 @@ public class InHouseActivity extends AppCompatActivity {
     Log.d(TAG, "Banner Requested");
     BidResponse bidResponse = Criteo.getInstance().getBidResponse(BANNER);
     criteoBannerView.loadAd(bidResponse.getBidToken());
+  }
+
+  private void loadNative() {
+    BidResponse bidResponse = Criteo.getInstance().getBidResponse(NATIVE);
+    nativeLoader.loadAd(bidResponse.getBidToken());
   }
 
   private void loadInterstitialAd(InterstitialAdUnit adUnit, Button btnShow) {
