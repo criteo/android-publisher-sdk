@@ -36,7 +36,7 @@ class NativeProductTest {
     assertThat(product.title).isEqualTo("")
     assertThat(product.description).isEqualTo("")
     assertThat(product.price).isEqualTo("")
-    assertThat(product.clickUrl).isEqualTo(URI.create("http://criteo.com").toURL())
+    assertThat(product.clickUrl).isEqualTo(URI.create("http://criteo.com"))
     assertThat(product.callToAction).isEqualTo("")
     assertThat(product.imageUrl).isEqualTo(URI.create("http://criteo.com").toURL())
   }
@@ -59,7 +59,7 @@ class NativeProductTest {
     assertThat(product.title).isEqualTo("myTitle")
     assertThat(product.description).isEqualTo("myDescription")
     assertThat(product.price).isEqualTo("10€")
-    assertThat(product.clickUrl).isEqualTo(URI.create("http://click.url").toURL())
+    assertThat(product.clickUrl).isEqualTo(URI.create("http://click.url"))
     assertThat(product.callToAction).isEqualTo("myCTA")
     assertThat(product.imageUrl).isEqualTo(URI.create("http://image.url").toURL())
   }

@@ -41,6 +41,7 @@ public class NativeAdMapper {
         impressionHelper);
 
     NativeViewClickHandler clickOnProductHandler = new AdViewClickHandler(
+        nativeAssets.getProduct().getClickUrl(),
         listenerRef,
         clickHelper
     );

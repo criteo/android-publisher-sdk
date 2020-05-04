@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
-import java.net.URL;
+import java.net.URI;
 
 @AutoValue
 public abstract class NativeAdvertiser {
@@ -19,8 +19,11 @@ public abstract class NativeAdvertiser {
   @NonNull
   abstract String getDescription();
 
+  /**
+   * This is an {@link URI} and not an {@link java.net.URL}, because deeplink are acceptable.
+   */
   @NonNull
-  abstract URL getLogoClickUrl();
+  abstract URI getLogoClickUrl();
 
   @NonNull
   abstract NativeImage getLogo();

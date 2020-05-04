@@ -5,6 +5,7 @@ import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.annotations.SerializedName;
+import java.net.URI;
 import java.net.URL;
 
 @AutoValue
@@ -14,9 +15,12 @@ public abstract class NativePrivacy {
     return new AutoValue_NativePrivacy.GsonTypeAdapter(gson);
   }
 
+  /**
+   * This is an {@link URI} and not an {@link URL}, because deeplink are acceptable.
+   */
   @NonNull
   @SerializedName("optoutClickUrl")
-  abstract URL getClickUrl();
+  abstract URI getClickUrl();
 
   @NonNull
   @SerializedName("optoutImageUrl")

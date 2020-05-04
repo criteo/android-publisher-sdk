@@ -28,7 +28,7 @@ class NativePrivacyTest {
 
     val privacy = read(json)
 
-    assertThat(privacy.clickUrl).isEqualTo(URI.create("http://click.url").toURL())
+    assertThat(privacy.clickUrl).isEqualTo(URI.create("http://click.url"))
     assertThat(privacy.imageUrl).isEqualTo(URI.create("http://image.url").toURL())
     assertThat(privacy.legalText).isEqualTo("")
   }
@@ -43,7 +43,7 @@ class NativePrivacyTest {
 
     val privacy = read(json)
 
-    assertThat(privacy.clickUrl).isEqualTo(URI.create("http://click.url").toURL())
+    assertThat(privacy.clickUrl).isEqualTo(URI.create("http://click.url"))
     assertThat(privacy.imageUrl).isEqualTo(URI.create("http://image.url").toURL())
     assertThat(privacy.legalText).isEqualTo("my long legal text")
   }

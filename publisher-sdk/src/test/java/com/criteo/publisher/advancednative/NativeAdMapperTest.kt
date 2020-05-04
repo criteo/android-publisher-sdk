@@ -1,6 +1,9 @@
 package com.criteo.publisher.advancednative
 
+import android.content.ComponentName
 import android.view.View
+import com.criteo.publisher.activity.TopActivityFinder
+import com.criteo.publisher.adview.Redirection
 import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
@@ -12,6 +15,7 @@ import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Answers
 import java.lang.ref.WeakReference
 import java.net.URI
 import javax.inject.Inject
@@ -30,6 +34,12 @@ class NativeAdMapperTest {
 
   @MockBean
   private lateinit var clickDetection: ClickDetection
+
+  @MockBean
+  private lateinit var topActivityFinder: TopActivityFinder
+
+  @MockBean
+  private lateinit var redirection: Redirection
 
   @MockBean
   private lateinit var api: PubSdkApi
@@ -72,7 +82,7 @@ class NativeAdMapperTest {
 
     val pixel1 = URI.create("http://pixel1.url").toURL()
     val pixel2 = URI.create("http://pixel2.url").toURL()
-    val assets = mock<NativeAssets>() {
+    val assets = mock<NativeAssets>(defaultAnswer=Answers.RETURNS_DEEP_STUBS) {
       on { impressionPixels } doReturn listOf(pixel1, pixel2)
     }
 
@@ -107,13 +117,24 @@ class NativeAdMapperTest {
   }
 
   @Test
-  fun setProductClickableView_GivenDifferentViewsClickedManyTimes_NotifyListenerForClicks() {
+  fun setProductClickableView_GivenDifferentViewsClickedManyTimes_NotifyListenerForClicksAndRedirectUser() {
     val listener = mock<CriteoNativeAdListener>()
 
-    val assets = mock<NativeAssets>()
+    val product = mock<NativeProduct> {
+      on { clickUrl } doReturn URI.create("click://uri.com")
+    }
+
+    val assets = mock<NativeAssets> {
+      on { this.product } doReturn product
+    }
 
     val view1 = mock<View>()
     val view2 = mock<View>()
+
+    val topActivity = mock<ComponentName>()
+    topActivityFinder.stub {
+      on { topActivityName } doReturn topActivity
+    }
 
     givenDirectUiExecutor()
 
@@ -133,6 +154,7 @@ class NativeAdMapperTest {
 
     // then
     verify(listener, times(4)).onAdClicked()
+    verify(redirection, times(4)).redirect(eq("click://uri.com"), eq(topActivity), any())
   }
 
   private fun givenDirectUiExecutor() {

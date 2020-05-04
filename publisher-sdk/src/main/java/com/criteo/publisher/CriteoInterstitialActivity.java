@@ -19,7 +19,7 @@ import android.webkit.WebView;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import com.criteo.publisher.adview.AdWebViewClient;
-import com.criteo.publisher.adview.AdWebViewListener;
+import com.criteo.publisher.adview.RedirectionListener;
 
 public class CriteoInterstitialActivity extends Activity {
 
@@ -86,7 +86,7 @@ public class CriteoInterstitialActivity extends Activity {
   private void prepareWebView() {
     webView.getSettings().setJavaScriptEnabled(true);
 
-    webView.setWebViewClient(new AdWebViewClient(new AdWebViewListener() {
+    webView.setWebViewClient(new AdWebViewClient(new RedirectionListener() {
       @Override
       public void onUserRedirectedToAd() {
         click();

@@ -1,6 +1,6 @@
 package com.criteo.publisher.adview;
 
-public interface AdWebViewListener {
+public interface RedirectionListener {
 
   /**
    * Callback notified when the user click on the ad view, and is then redirected to the ad.

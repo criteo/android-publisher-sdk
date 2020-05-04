@@ -331,7 +331,6 @@ public class SlotTest {
         "                \"logoClickUrl\": \"https://cat.sv.us.criteo.com/delivery/ckn.php\"\n" +
         "            },\n" +
         "            \"privacy\": {\n" +
-        "                \"optoutClickUrl\": \"\",\n" +
         "                \"optoutImageUrl\": \"https://static.criteo.net/flash/icon/nai_small.png\",\n"
         +
         "                \"longLegalText\": \"\"\n" +

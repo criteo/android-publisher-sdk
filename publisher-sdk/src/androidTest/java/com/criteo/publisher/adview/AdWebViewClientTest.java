@@ -15,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.test.rule.ActivityTestRule;
 import android.webkit.WebView;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.view.WebViewClicker;
 import com.criteo.publisher.view.WebViewLookup;
@@ -41,10 +42,11 @@ public class AdWebViewClientTest {
 
   private WebViewClicker clicker = new WebViewClicker();
 
+  @SpyBean
   private Context context;
 
   @Mock
-  private AdWebViewListener listener;
+  private RedirectionListener listener;
 
   private WebView webView;
 
@@ -52,8 +54,6 @@ public class AdWebViewClientTest {
 
   @Before
   public void setUp() throws Exception {
-    context = spy(activityRule.getActivity());
-
     webViewClient = spy(new AdWebViewClient(
         listener,
         activityRule.getActivity().getComponentName()

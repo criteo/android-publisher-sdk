@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
 import android.app.Application;
 import android.os.Build.VERSION_CODES;
@@ -48,7 +47,7 @@ public class MockedDependenciesRule implements MethodRule {
   private final FailOnTimeout.Builder timeout = FailOnTimeout.builder()
       .withTimeout(30, TimeUnit.SECONDS);
 
-  private final boolean iAmDebuggingDoNotTimeoutMe = false;
+  private final boolean iAmDebuggingDoNotTimeoutMe = true;
 
   protected DependencyProvider dependencyProvider;
   private TrackingCommandsExecutor trackingCommandsExecutor = null;

@@ -16,6 +16,7 @@ import com.criteo.publisher.advancednative.ImpressionHelper;
 import com.criteo.publisher.advancednative.NativeAdMapper;
 import com.criteo.publisher.advancednative.VisibilityChecker;
 import com.criteo.publisher.advancednative.VisibilityTracker;
+import com.criteo.publisher.adview.Redirection;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.bid.CompositeBidLifecycleListener;
 import com.criteo.publisher.bid.LoggingBidLifecycleListener;
@@ -416,7 +417,11 @@ public class DependencyProvider {
                 provideRunOnUiThreadExecutor()
             ),
             provideClickDetection(),
-            new ClickHelper(provideRunOnUiThreadExecutor()));
+            new ClickHelper(
+                provideRedirection(),
+                provideTopActivityFinder(),
+                provideRunOnUiThreadExecutor()
+            ));
       }
     });
   }
@@ -439,6 +444,17 @@ public class DependencyProvider {
       @Override
       public ClickDetection create() {
         return new ClickDetection();
+      }
+    });
+  }
+
+  @NonNull
+  public Redirection provideRedirection() {
+    return getOrCreate(Redirection.class, new Factory<Redirection>() {
+      @NonNull
+      @Override
+      public Redirection create() {
+        return new Redirection(provideContext());
       }
     });
   }

@@ -11,6 +11,7 @@ import com.google.gson.annotations.SerializedName;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +73,7 @@ public abstract class NativeAssets {
   }
 
   @NonNull
-  public URL getAdvertiserLogoClickUrl() {
+  public URI getAdvertiserLogoClickUrl() {
     return getAdvertiser().getLogoClickUrl();
   }
 
@@ -80,7 +81,7 @@ public abstract class NativeAssets {
   abstract NativePrivacy getPrivacy();
 
   @NonNull
-  public URL getPrivacyOptOutClickUrl() {
+  public URI getPrivacyOptOutClickUrl() {
     return getPrivacy().getClickUrl();
   }
 

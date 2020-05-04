@@ -12,7 +12,7 @@ import android.support.annotation.VisibleForTesting;
 import android.webkit.WebViewClient;
 import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.adview.AdWebViewClient;
-import com.criteo.publisher.adview.AdWebViewListener;
+import com.criteo.publisher.adview.RedirectionListener;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.Slot;
@@ -94,7 +94,7 @@ public class CriteoBannerEventController {
     // context to the view. So we're getting the activity by this way.
     ComponentName bannerActivityName = topActivityFinder.getTopActivityName();
 
-    return new AdWebViewClient(new AdWebViewListener() {
+    return new AdWebViewClient(new RedirectionListener() {
       @Override
       public void onUserRedirectedToAd() {
         notifyFor(CLICK);

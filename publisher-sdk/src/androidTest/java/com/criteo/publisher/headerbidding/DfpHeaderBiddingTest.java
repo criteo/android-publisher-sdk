@@ -121,7 +121,7 @@ public class DfpHeaderBiddingTest {
     when(product.getTitle()).thenReturn("title");
     when(product.getDescription()).thenReturn("description");
     when(product.getPrice()).thenReturn("$1337");
-    when(product.getClickUrl()).thenReturn(URI.create("http://click.url").toURL());
+    when(product.getClickUrl()).thenReturn(URI.create("http://click.url"));
     when(product.getImageUrl()).thenReturn(URI.create("http://image.url").toURL());
     when(product.getCallToAction()).thenReturn("call to action");
 
@@ -129,10 +129,10 @@ public class DfpHeaderBiddingTest {
     when(nativeAssets.getProduct()).thenReturn(product);
     when(nativeAssets.getAdvertiserDescription()).thenReturn("advertiser name");
     when(nativeAssets.getAdvertiserDomain()).thenReturn("advertiser domain");
-    when(nativeAssets.getAdvertiserLogoClickUrl()).thenReturn(URI.create("http://advertiser.url").toURL());
+    when(nativeAssets.getAdvertiserLogoClickUrl()).thenReturn(URI.create("http://advertiser.url"));
     when(nativeAssets.getAdvertiserLogoUrl()).thenReturn(URI.create("http://advertiser.logo.url").toURL());
     when(nativeAssets.getPrivacyOptOutImageUrl()).thenReturn(URI.create("http://privacy.image.url").toURL());
-    when(nativeAssets.getPrivacyOptOutClickUrl()).thenReturn(URI.create("http://privacy.url").toURL());
+    when(nativeAssets.getPrivacyOptOutClickUrl()).thenReturn(URI.create("http://privacy.url"));
     when(nativeAssets.getPrivacyLongLegalText()).thenReturn("privacy legal text");
     when(nativeAssets.getImpressionPixels()).thenReturn(asList(
         URI.create("http://pixel.url/0").toURL(),

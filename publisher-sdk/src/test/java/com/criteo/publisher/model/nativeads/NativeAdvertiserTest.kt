@@ -33,7 +33,7 @@ class NativeAdvertiserTest {
 
     assertThat(advertiser.domain).isEqualTo("")
     assertThat(advertiser.description).isEqualTo("")
-    assertThat(advertiser.logoClickUrl).isEqualTo(URI.create("http://click.url").toURL())
+    assertThat(advertiser.logoClickUrl).isEqualTo(URI.create("http://click.url"))
     assertThat(advertiser.logo.url).isEqualTo(URI.create("http://logo.url").toURL())
   }
 
@@ -52,7 +52,7 @@ class NativeAdvertiserTest {
 
     assertThat(advertiser.domain).isEqualTo("myDomain")
     assertThat(advertiser.description).isEqualTo("myDescription")
-    assertThat(advertiser.logoClickUrl).isEqualTo(URI.create("http://click.url").toURL())
+    assertThat(advertiser.logoClickUrl).isEqualTo(URI.create("http://click.url"))
     assertThat(advertiser.logo.url).isEqualTo(URI.create("http://logo.url").toURL())
   }
 
