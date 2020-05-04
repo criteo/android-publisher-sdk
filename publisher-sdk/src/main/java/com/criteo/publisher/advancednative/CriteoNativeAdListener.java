@@ -3,7 +3,9 @@ package com.criteo.publisher.advancednative;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import com.criteo.publisher.CriteoErrorCode;
+import com.criteo.publisher.annotation.Incubating;
 
+@Incubating(Incubating.NATIVE)
 public abstract class CriteoNativeAdListener {
 
   /**
@@ -15,7 +17,7 @@ public abstract class CriteoNativeAdListener {
    * @param nativeAd native ad with the native data that may be used to render it
    */
   @UiThread
-  void onAdReceived(@NonNull CriteoNativeAd nativeAd) {
+  public void onAdReceived(@NonNull CriteoNativeAd nativeAd) {
   }
 
   /**
@@ -27,7 +29,7 @@ public abstract class CriteoNativeAdListener {
    * @param errorCode error code indicating the reason of the failure
    */
   @UiThread
-  void onAdFailedToReceive(@NonNull CriteoErrorCode errorCode) {
+  public void onAdFailedToReceive(@NonNull CriteoErrorCode errorCode) {
   }
 
   /**
@@ -40,6 +42,6 @@ public abstract class CriteoNativeAdListener {
    * implementation.
    */
   @UiThread
-  void onAdImpression() {
+  public void onAdImpression() {
   }
 }

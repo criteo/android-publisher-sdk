@@ -8,6 +8,7 @@ import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import com.criteo.publisher.model.NativeAdUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,8 @@ public class PubSdkDemoApplication extends Application {
 
   public static final InterstitialAdUnit INTERSTITIAL_IBV_DEMO = new InterstitialAdUnit(
       "mf2v6pikq5vqdjdtfo3j");
+
+  public static final NativeAdUnit NATIVE = new NativeAdUnit(NATIVE_AD_UNIT_ID);
 
   @Override
   public void onCreate() {
@@ -50,6 +53,7 @@ public class PubSdkDemoApplication extends Application {
     adUnits.add(moPubInterstitialAdUnit);
 
     adUnits.add(INTERSTITIAL_IBV_DEMO);
+    adUnits.add(NATIVE);
 
     try {
       Criteo.init(this, "B-056946", adUnits);

@@ -31,4 +31,5 @@
   <string name="hint_tcf_vendor_consents">Vendor Consents String</string>
   <string name="hint_tcf_gdpr_applies">GDPR applies</string>
   <string name="btn_save">Save</string>
+  <string name="btn_advanced_native">Advanced Native</string>
 </resources>

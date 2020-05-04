@@ -1,6 +1,7 @@
 package com.criteo.pubsdk_android;
 
 import static com.criteo.pubsdk_android.PubSdkDemoApplication.INTERSTITIAL_IBV_DEMO;
+import static com.criteo.pubsdk_android.PubSdkDemoApplication.NATIVE;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -10,12 +11,14 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoInterstitial;
+import com.criteo.publisher.advancednative.CriteoNativeLoader;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.pubsdk_android.listener.TestAppBannerAdListener;
 import com.criteo.pubsdk_android.listener.TestAppInterstitialAdDisplayListener;
 import com.criteo.pubsdk_android.listener.TestAppInterstitialAdListener;
+import com.criteo.pubsdk_android.listener.TestAppNativeAdListener;
 
 
 public class StandaloneActivity extends AppCompatActivity {
@@ -32,6 +35,7 @@ public class StandaloneActivity extends AppCompatActivity {
   private Context context;
   private LinearLayout adLayout;
   private CriteoBannerView criteoBannerView;
+  private CriteoNativeLoader nativeLoader;
   private Button btnShowInterstitial;
   private Button btnShowInterstitialIbv;
 
@@ -46,7 +50,13 @@ public class StandaloneActivity extends AppCompatActivity {
 
     context = getApplicationContext();
 
+    nativeLoader = new CriteoNativeLoader(
+        NATIVE,
+        new TestAppNativeAdListener(TAG, NATIVE.getAdUnitId(), adLayout)
+    );
+
     findViewById(R.id.buttonStandAloneBanner).setOnClickListener(v -> loadBanner());
+    findViewById(R.id.buttonStandAloneNative).setOnClickListener(v -> loadNative());
   }
 
   @Override
@@ -79,10 +89,14 @@ public class StandaloneActivity extends AppCompatActivity {
 
     criteoBannerView = new CriteoBannerView(context, BANNER);
     criteoBannerView.setCriteoBannerAdListener(new TestAppBannerAdListener(
-        TAG, "Standalone", adLayout, criteoBannerView));
+        TAG, "Standalone", adLayout));
 
     Log.d(TAG, "Banner Requested");
     criteoBannerView.loadAd();
+  }
+
+  private void loadNative() {
+    nativeLoader.loadAd();
   }
 
   private void loadInterstitial(InterstitialAdUnit adUnit, Button btnShow) {

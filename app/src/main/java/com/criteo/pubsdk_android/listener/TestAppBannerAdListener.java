@@ -4,28 +4,23 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import com.criteo.publisher.CriteoBannerAdListener;
-import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
 
 public class TestAppBannerAdListener implements CriteoBannerAdListener {
 
   private final String tag;
   private final String prefix;
-
   private final ViewGroup adLayout;
-  private final CriteoBannerView bannerView;
 
-  public TestAppBannerAdListener(String tag, String prefix, ViewGroup adLayout,
-      CriteoBannerView bannerView) {
+  public TestAppBannerAdListener(String tag, String prefix, ViewGroup adLayout) {
     this.tag = tag;
     this.prefix = prefix;
     this.adLayout = adLayout;
-    this.bannerView = bannerView;
   }
 
   @Override
   public void onAdLeftApplication() {
-    Log.d(tag, "Standalone - Banner onAdLeftApplication");
+    Log.d(tag, prefix + " - Banner onAdLeftApplication");
   }
 
   @Override
@@ -53,7 +48,7 @@ public class TestAppBannerAdListener implements CriteoBannerAdListener {
     Log.d(tag, prefix + " - Banner onAdReceived");
 
     adLayout.removeAllViews();
-    adLayout.addView(bannerView);
+    adLayout.addView(view);
   }
 
 }

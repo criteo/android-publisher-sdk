@@ -79,7 +79,7 @@ public class InHouseActivity extends AppCompatActivity {
 
     criteoBannerView = new CriteoBannerView(context, BANNER);
     criteoBannerView.setCriteoBannerAdListener(new TestAppBannerAdListener(
-        TAG, "In-House", adLayout, criteoBannerView));
+        TAG, "In-House", adLayout));
 
     Log.d(TAG, "Banner Requested");
     BidResponse bidResponse = Criteo.getInstance().getBidResponse(BANNER);
