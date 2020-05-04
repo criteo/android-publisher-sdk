@@ -11,6 +11,7 @@ import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
 import com.criteo.publisher.headerbidding.DfpHeaderBidding;
+import com.criteo.publisher.headerbidding.OtherAdServersHeaderBidding;
 import com.criteo.publisher.headerbidding.MoPubHeaderBidding;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
@@ -24,13 +25,9 @@ import com.criteo.publisher.util.ApplicationStoppedListener;
 import com.criteo.publisher.util.CdbCallListener;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class BidManager implements ApplicationStoppedListener {
-
-  private static final String CRT_CPM = "crt_cpm";
-  private static final String MAP_CRT_DISPLAY_URL = "crt_displayUrl";
 
   /**
    * Default TTL (15 minutes in seconds) overridden on immediate bids (CPM > 0, TTL = 0).
@@ -68,6 +65,9 @@ public class BidManager implements ApplicationStoppedListener {
   @NonNull
   private final MoPubHeaderBidding moPubHeaderBidding;
 
+  @NonNull
+  private final OtherAdServersHeaderBidding otherAdServersHeaderBidding;
+
   BidManager(
       @NonNull SdkCache sdkCache,
       @NonNull Config config,
@@ -87,6 +87,7 @@ public class BidManager implements ApplicationStoppedListener {
 
     this.dfpHeaderBidding = new DfpHeaderBidding(this);
     this.moPubHeaderBidding = new MoPubHeaderBidding(this);
+    this.otherAdServersHeaderBidding = new OtherAdServersHeaderBidding(this);
   }
 
   /**
@@ -116,21 +117,10 @@ public class BidManager implements ApplicationStoppedListener {
         moPubHeaderBidding.enrichBid(object, adUnit);
       } else if (dfpHeaderBidding.canHandle(object)) {
         dfpHeaderBidding.enrichBid(object, adUnit);
-      } else if (object instanceof Map) {
-        enrichMapBid((Map) object, adUnit);
+      } else if (otherAdServersHeaderBidding.canHandle(object)) {
+        otherAdServersHeaderBidding.enrichBid(object, adUnit);
       }
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  private void enrichMapBid(Map map, AdUnit adUnit) {
-    Slot slot = getBidForAdUnitAndPrefetch(adUnit);
-    if (slot == null) {
-      return;
-    }
-
-    map.put(MAP_CRT_DISPLAY_URL, slot.getDisplayUrl());
-    map.put(CRT_CPM, slot.getCpm());
   }
 
   /**

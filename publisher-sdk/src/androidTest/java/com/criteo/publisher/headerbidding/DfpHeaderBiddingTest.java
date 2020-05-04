@@ -62,14 +62,14 @@ public class DfpHeaderBiddingTest {
   }
 
   @Test
-  public void isHandling_GivenSimpleObject_ReturnFalse() throws Exception {
+  public void canHandle_GivenSimpleObject_ReturnFalse() throws Exception {
     boolean handling = headerBidding.canHandle(mock(Object.class));
 
     assertFalse(handling);
   }
 
   @Test
-  public void isHandling_GivenDfpBuilder_ReturnTrue() throws Exception {
+  public void canHandle_GivenDfpBuilder_ReturnTrue() throws Exception {
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
 
     boolean handling = headerBidding.canHandle(builder);

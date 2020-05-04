@@ -21,12 +21,6 @@ import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.network.BidRequestSender;
 import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.DeviceUtil;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import org.json.JSONObject;
 import org.junit.After;
@@ -37,9 +31,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class BidManagerTests {
-
-  private static final String MAP_CRT_CPM = "crt_cpm";
-  private static final String MAP_CRT_DISPLAY_URL = "crt_displayUrl";
 
   private String adUnitId = "someAdUnit";
   private AdSize adSize = new AdSize(320, 50);
@@ -192,72 +183,6 @@ public class BidManagerTests {
     //can't compare the BidResponse.Token as it's a randomly generated UUID when inserting to token cache
   }
 
-  @Test
-  public void testBidsAreNotSetOnNonBiddableObjects() {
-    // setup
-    when(config.isKillSwitchEnabled()).thenReturn(false);
-
-    CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
-    when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
-    BidManager bidManager = createBidManager();
-
-    BannerAdUnit bannerAdUnit = new BannerAdUnit(adUnitId, new AdSize(320, 50));
-
-    // Test null does not crash
-    bidManager.enrichBid(null, bannerAdUnit);
-
-    // Test set
-    Set<String> set = new HashSet<>();
-    bidManager.enrichBid(set, bannerAdUnit);
-
-    Assert.assertEquals(0, set.size());
-
-    // Test string
-    String someString = "abcd123";
-    bidManager.enrichBid(someString, bannerAdUnit);
-
-    // Test Object
-    Object someObject = new Object();
-    bidManager.enrichBid(someObject, bannerAdUnit);
-  }
-
-  @Test
-  public void testSetBidsOnMap() {
-    // setup
-    when(config.isKillSwitchEnabled()).thenReturn(false);
-
-    CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
-    when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
-
-    BidManager bidManager = createBidManager();
-
-    BannerAdUnit bannerAdUnit = new BannerAdUnit(adUnitId, new AdSize(320, 50));
-
-    // Test Map
-    Map<String, String> map = new HashMap<>();
-    bidManager.enrichBid(map, bannerAdUnit);
-
-    Assert.assertEquals(2, map.size());
-    Assert.assertEquals(cpm, map.get(MAP_CRT_CPM));
-    Assert.assertEquals(displayUrl, map.get(MAP_CRT_DISPLAY_URL));
-
-    // Test Dictionary
-    Dictionary<String, String> dict = new Hashtable<>();
-    bidManager.enrichBid(dict, bannerAdUnit);
-
-    Assert.assertEquals(2, dict.size());
-    Assert.assertEquals(cpm, dict.get(MAP_CRT_CPM));
-    Assert.assertEquals(displayUrl, dict.get(MAP_CRT_DISPLAY_URL));
-
-    // Test nested custom class that implements map via a custom interface
-    SpecialMap specialHashMap = new SpecialHashMap();
-    bidManager.enrichBid(specialHashMap, bannerAdUnit);
-
-    Assert.assertEquals(2, specialHashMap.size());
-    Assert.assertEquals(cpm, specialHashMap.get(MAP_CRT_CPM));
-    Assert.assertEquals(displayUrl, specialHashMap.get(MAP_CRT_DISPLAY_URL));
-  }
-
   @NonNull
   private BidManager createBidManager() {
     return new BidManager(
@@ -276,11 +201,4 @@ public class BidManagerTests {
     return new InHouse(bidManager, mock(TokenCache.class), clock, interstitialActivityHelper);
   }
 
-  private interface SpecialMap extends Map {
-
-  }
-
-  private class SpecialHashMap extends HashMap implements SpecialMap {
-
-  }
 }
