@@ -1,6 +1,7 @@
 package com.criteo.publisher.advancednative
 
-import com.nhaarman.mockitokotlin2.any
+import com.criteo.publisher.adview.RedirectionListener
+import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
@@ -23,8 +24,16 @@ class AdViewClickHandlerTest {
 
     task.onClick()
 
-    verify(helper).notifyUserClickAsync(listener)
-    verify(helper).redirectUserTo(eq(uri), any())
+    argumentCaptor<RedirectionListener> {
+      verify(helper).notifyUserClickAsync(listener)
+      verify(helper).redirectUserTo(eq(uri), capture())
+
+      lastValue.onUserRedirectedToAd()
+      lastValue.onUserBackFromAd()
+
+      verify(helper).notifyUserIsLeavingApplicationAsync(listener)
+      verify(helper).notifyUserIsBackToApplicationAsync(listener)
+    }
   }
 
 }

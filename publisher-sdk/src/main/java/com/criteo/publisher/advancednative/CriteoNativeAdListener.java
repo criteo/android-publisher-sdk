@@ -48,4 +48,20 @@ public abstract class CriteoNativeAdListener {
   @UiThread
   public void onAdClicked() {
   }
+
+  /**
+   * Callback invoked when an ad is opened and the user is redirected outside the application, to
+   * the product web page or to the AdChoice page for instance.
+   */
+  @UiThread
+  public void onAdLeftApplication() {
+  }
+
+  /**
+   * Callback invoked when the user is back from the Ad. This happens generally when the user
+   * presses the back button after being redirected to an ad.
+   */
+  @UiThread
+  public void onAdClosed() {
+  }
 }

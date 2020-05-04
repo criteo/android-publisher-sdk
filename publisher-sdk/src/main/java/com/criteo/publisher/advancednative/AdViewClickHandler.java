@@ -33,12 +33,12 @@ class AdViewClickHandler implements NativeViewClickHandler {
     helper.redirectUserTo(uri, new RedirectionListener() {
       @Override
       public void onUserRedirectedToAd() {
-        // TODO EE-920 notify listener that user is leaving the application
+        helper.notifyUserIsLeavingApplicationAsync(listenerRef.get());
       }
 
       @Override
       public void onUserBackFromAd() {
-        // TODO EE-920 notify listener that user is back to the application
+        helper.notifyUserIsBackToApplicationAsync(listenerRef.get());
       }
     });
   }

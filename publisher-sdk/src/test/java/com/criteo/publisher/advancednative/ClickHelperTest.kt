@@ -42,16 +42,43 @@ class ClickHelperTest {
 
   @Test
   fun notifyUserClick_GivenListener_TriggerListenerInUiThread() {
-    val listener = mock<CriteoNativeAdListener>() {
-      on { onAdClicked() } doAnswer {
-        assertThat(runOnUiThreadExecutor.isRunningOnUiThread).isTrue()
-        null
-      }
-    }
+    val listener = expectListenerToBeCalledOnUiThread()
 
     clickHelper.notifyUserClickAsync(listener)
 
     verify(listener).onAdClicked()
+  }
+
+  @Test
+  fun notifyUserIsLeavingApplication_GivenNull_DoNothing() {
+    clickHelper.notifyUserIsLeavingApplicationAsync(null)
+
+    verifyZeroInteractions(runOnUiThreadExecutor)
+  }
+
+  @Test
+  fun notifyUserIsLeavingApplication_GivenListener_TriggerListenerInUiThread() {
+    val listener = expectListenerToBeCalledOnUiThread()
+
+    clickHelper.notifyUserIsLeavingApplicationAsync(listener)
+
+    verify(listener).onAdLeftApplication()
+  }
+
+  @Test
+  fun notifyUserIsBackToApplication_GivenNull_DoNothing() {
+    clickHelper.notifyUserIsBackToApplicationAsync(null)
+
+    verifyZeroInteractions(runOnUiThreadExecutor)
+  }
+
+  @Test
+  fun notifyUserIsBackToApplication_GivenListener_TriggerListenerInUiThread() {
+    val listener = expectListenerToBeCalledOnUiThread()
+
+    clickHelper.notifyUserIsBackToApplicationAsync(listener)
+
+    verify(listener).onAdClosed()
   }
 
   @Test
@@ -67,6 +94,25 @@ class ClickHelperTest {
     clickHelper.redirectUserTo(uri, listener)
 
     verify(redirection).redirect("uri://path.com", activityName, listener)
+  }
+
+  private fun expectListenerToBeCalledOnUiThread(): CriteoNativeAdListener {
+    return mock {
+      on { onAdClicked() } doAnswer {
+        assertThat(runOnUiThreadExecutor.isRunningOnUiThread).isTrue()
+        null
+      }
+
+      on { onAdLeftApplication() } doAnswer {
+        assertThat(runOnUiThreadExecutor.isRunningOnUiThread).isTrue()
+        null
+      }
+
+      on { onAdClosed() } doAnswer {
+        assertThat(runOnUiThreadExecutor.isRunningOnUiThread).isTrue()
+        null
+      }
+    }
   }
 
 }

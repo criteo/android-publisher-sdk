@@ -43,6 +43,32 @@ public class ClickHelper {
     });
   }
 
+  void notifyUserIsLeavingApplicationAsync(@Nullable CriteoNativeAdListener listener) {
+    if (listener == null) {
+      return;
+    }
+
+    runOnUiThreadExecutor.executeAsync(new Runnable() {
+      @Override
+      public void run() {
+        listener.onAdLeftApplication();
+      }
+    });
+  }
+
+  void notifyUserIsBackToApplicationAsync(@Nullable CriteoNativeAdListener listener) {
+    if (listener == null) {
+      return;
+    }
+
+    runOnUiThreadExecutor.executeAsync(new Runnable() {
+      @Override
+      public void run() {
+        listener.onAdClosed();
+      }
+    });
+  }
+
   void redirectUserTo(@NonNull URI uri, @NonNull RedirectionListener listener) {
     // We are here because a user clicked on ad. So we assume that there is currently an activity
     // running which we use as the leaving activity for the redirection.
