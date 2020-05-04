@@ -10,9 +10,6 @@ import android.util.Log;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
-import com.criteo.publisher.headerbidding.DfpHeaderBidding;
-import com.criteo.publisher.headerbidding.OtherAdServersHeaderBidding;
-import com.criteo.publisher.headerbidding.MoPubHeaderBidding;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CacheAdUnit;
@@ -59,15 +56,6 @@ public class BidManager implements ApplicationStoppedListener {
   @NonNull
   private final MetricSendingQueueConsumer metricSendingQueueConsumer;
 
-  @NonNull
-  private final DfpHeaderBidding dfpHeaderBidding;
-
-  @NonNull
-  private final MoPubHeaderBidding moPubHeaderBidding;
-
-  @NonNull
-  private final OtherAdServersHeaderBidding otherAdServersHeaderBidding;
-
   BidManager(
       @NonNull SdkCache sdkCache,
       @NonNull Config config,
@@ -84,10 +72,6 @@ public class BidManager implements ApplicationStoppedListener {
     this.bidRequestSender = bidRequestSender;
     this.bidLifecycleListener = bidLifecycleListener;
     this.metricSendingQueueConsumer = metricSendingQueueConsumer;
-
-    this.dfpHeaderBidding = new DfpHeaderBidding(this);
-    this.moPubHeaderBidding = new MoPubHeaderBidding(this);
-    this.otherAdServersHeaderBidding = new OtherAdServersHeaderBidding(this);
   }
 
   /**
@@ -106,21 +90,6 @@ public class BidManager implements ApplicationStoppedListener {
 
     bidRequestSender.sendBidRequest(prefetchCacheAdUnits, new CdbListener());
     metricSendingQueueConsumer.sendMetricBatch();
-  }
-
-  public void enrichBid(Object object, AdUnit adUnit) {
-    if (killSwitchEngaged()) {
-      return;
-    }
-    if (object != null) {
-      if (moPubHeaderBidding.canHandle(object)) {
-        moPubHeaderBidding.enrichBid(object, adUnit);
-      } else if (dfpHeaderBidding.canHandle(object)) {
-        dfpHeaderBidding.enrichBid(object, adUnit);
-      } else if (otherAdServersHeaderBidding.canHandle(object)) {
-        otherAdServersHeaderBidding.enrichBid(object, adUnit);
-      }
-    }
   }
 
   /**

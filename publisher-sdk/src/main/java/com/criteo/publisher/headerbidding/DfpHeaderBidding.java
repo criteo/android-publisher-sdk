@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
-import com.criteo.publisher.BidManager;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
@@ -21,7 +20,7 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.List;
 
-public class DfpHeaderBidding {
+public class DfpHeaderBidding implements HeaderBiddingHandler {
 
   private static final String CRT_CPM = "crt_cpm";
   private static final String CRT_DISPLAY_URL = "crt_displayurl";
@@ -42,24 +41,14 @@ public class DfpHeaderBidding {
   private static final String CRT_NATIVE_PIXEL_URL = "crtn_pixurl_";
   private static final String CRT_NATIVE_PIXEL_COUNT = "crtn_pixcount";
 
-  @NonNull
-  private final BidManager bidManager;
-
-  public DfpHeaderBidding(@NonNull BidManager bidManager) {
-    this.bidManager = bidManager;
-  }
-
+  @Override
   public boolean canHandle(@NonNull Object object) {
     return SafeDfpBuilder.isDfpBuilder(object);
   }
 
-  public void enrichBid(@NonNull Object object, @Nullable AdUnit adUnit) {
+  @Override
+  public void enrichBid(@NonNull Object object, @Nullable AdUnit adUnit, @NonNull Slot slot) {
     if (!canHandle(object)) {
-      return;
-    }
-
-    Slot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
-    if (slot == null) {
       return;
     }
 

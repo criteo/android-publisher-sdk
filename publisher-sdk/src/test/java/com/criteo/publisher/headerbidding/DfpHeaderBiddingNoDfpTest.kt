@@ -1,26 +1,18 @@
 package com.criteo.publisher.headerbidding
 
-import com.criteo.publisher.BidManager
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 
 class DfpHeaderBiddingNoDfpTest {
-
-  @Mock
-  private lateinit var bidManager: BidManager
 
   private lateinit var headerBidding: DfpHeaderBidding
 
   @Before
   fun setUp() {
-    MockitoAnnotations.initMocks(this)
-
     assertThatCode {
       Class.forName("com.google.android.gms.ads.doubleclick.PublisherAdRequest")
     }.withFailMessage("""
@@ -33,9 +25,7 @@ To run those test locally and properly, you should use Gradle. Either via gradle
 via IntelliJ delegating test run to Gradle.
 """).isInstanceOf(ClassNotFoundException::class.java)
 
-    headerBidding = DfpHeaderBidding(
-        bidManager
-    )
+    headerBidding = DfpHeaderBidding()
   }
 
   @Test
@@ -51,9 +41,9 @@ via IntelliJ delegating test run to Gradle.
   fun enrichBid_GivenNoDfpDependency_DoNothing() {
     val builder = mock<Any>()
 
-    headerBidding.enrichBid(builder, mock())
+    headerBidding.enrichBid(builder, mock(), mock())
 
-    verifyZeroInteractions(bidManager)
+    verifyZeroInteractions(builder)
   }
 
 }

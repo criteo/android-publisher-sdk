@@ -10,7 +10,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import android.os.Bundle;
-import com.criteo.publisher.BidManager;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
@@ -20,10 +19,7 @@ import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeProduct;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import java.net.URI;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 /**
  * This is an instrumented test because DFP use Android objects
@@ -49,17 +45,7 @@ public class DfpHeaderBiddingTest {
   private static final String CRT_NATIVE_PIXEL_URL = "crtn_pixurl_";
   private static final String CRT_NATIVE_PIXEL_COUNT = "crtn_pixcount";
 
-  @Mock
-  private BidManager bidManager;
-
-  private DfpHeaderBidding headerBidding;
-
-  @Before
-  public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
-    headerBidding = new DfpHeaderBidding(bidManager);
-  }
+  private final DfpHeaderBidding headerBidding = new DfpHeaderBidding();
 
   @Test
   public void canHandle_GivenSimpleObject_ReturnFalse() throws Exception {
@@ -81,24 +67,9 @@ public class DfpHeaderBiddingTest {
   public void enrichBid_GivenNotHandledObject_DoNothing() throws Exception {
     Object builder = mock(Object.class);
 
-    headerBidding.enrichBid(builder, mock(AdUnit.class));
+    headerBidding.enrichBid(builder, mock(AdUnit.class), mock(Slot.class));
 
-    verifyNoMoreInteractions(bidManager);
-  }
-
-  @Test
-  public void enrichBid_GivenDfpBuilderAndNoBidAvailable_DoNotEnrich() throws Exception {
-    BannerAdUnit adUnit = new BannerAdUnit("adUnit", new AdSize(1, 2));
-
-    when(bidManager.getBidForAdUnitAndPrefetch(adUnit)).thenReturn(null);
-
-    PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-    headerBidding.enrichBid(builder, adUnit);
-    PublisherAdRequest request = builder.build();
-
-    assertNull(request.getCustomTargeting().getString(CRT_CPM));
-    assertNull(request.getCustomTargeting().getString(CRT_DISPLAY_URL));
-    assertNull(request.getCustomTargeting().getString(CRT_SIZE));
+    verifyNoMoreInteractions(builder);
   }
 
   @Test
@@ -112,10 +83,8 @@ public class DfpHeaderBiddingTest {
     when(slot.getWidth()).thenReturn(42);
     when(slot.getHeight()).thenReturn(1337);
 
-    when(bidManager.getBidForAdUnitAndPrefetch(adUnit)).thenReturn(slot);
-
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-    headerBidding.enrichBid(builder, adUnit);
+    headerBidding.enrichBid(builder, adUnit, slot);
     PublisherAdRequest request = builder.build();
     Bundle customTargeting = request.getCustomTargeting();
 
@@ -134,10 +103,8 @@ public class DfpHeaderBiddingTest {
     when(slot.getCpm()).thenReturn("0.10");
     when(slot.getDisplayUrl()).thenReturn("http://display.url");
 
-    when(bidManager.getBidForAdUnitAndPrefetch(adUnit)).thenReturn(slot);
-
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-    headerBidding.enrichBid(builder, adUnit);
+    headerBidding.enrichBid(builder, adUnit, slot);
     PublisherAdRequest request = builder.build();
     Bundle customTargeting = request.getCustomTargeting();
 
@@ -176,10 +143,8 @@ public class DfpHeaderBiddingTest {
     when(slot.getCpm()).thenReturn("0.42");
     when(slot.getNativeAssets()).thenReturn(nativeAssets);
 
-    when(bidManager.getBidForAdUnitAndPrefetch(adUnit)).thenReturn(slot);
-
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-    headerBidding.enrichBid(builder, adUnit);
+    headerBidding.enrichBid(builder, adUnit, slot);
     PublisherAdRequest request = builder.build();
     Bundle customTargeting = request.getCustomTargeting();
 

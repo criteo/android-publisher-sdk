@@ -1,19 +1,14 @@
 package com.criteo.publisher.headerbidding
 
-import com.criteo.publisher.BidManager
 import com.criteo.publisher.model.AdSize
 import com.criteo.publisher.model.BannerAdUnit
 import com.criteo.publisher.model.InterstitialAdUnit
 import com.criteo.publisher.model.Slot
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.stub
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Before
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 
 class OtherAdServersHeaderBiddingTest {
 
@@ -23,19 +18,7 @@ class OtherAdServersHeaderBiddingTest {
     const val CRT_SIZE = "crt_size"
   }
 
-  @Mock
-  private lateinit var bidManager: BidManager
-
-  private lateinit var headerBidding: OtherAdServersHeaderBidding
-
-  @Before
-  fun setUp() {
-    MockitoAnnotations.initMocks(this)
-
-    headerBidding = OtherAdServersHeaderBidding(
-        bidManager
-    )
-  }
+  private val headerBidding = OtherAdServersHeaderBidding()
 
   @Test
   fun canHandle_GivenSimpleObject_ReturnFalse() {
@@ -55,24 +38,11 @@ class OtherAdServersHeaderBiddingTest {
 
   @Test
   fun enrichBid_GivenNotHandledObject_DoNothing() {
-    headerBidding.enrichBid(mock(), mock())
+    val builder = mock<Any>()
 
-    verifyZeroInteractions(bidManager)
-  }
+    headerBidding.enrichBid(builder, mock(), mock())
 
-  @Test
-  fun enrichBid_GivenMapAndNoBidAvailable_DoNotEnrich() {
-    val adUnit = BannerAdUnit("adUnit", AdSize(1, 2))
-
-    bidManager.stub {
-      on { getBidForAdUnitAndPrefetch(adUnit) } doReturn null
-    }
-
-    val map = mutableMapOf<Any, Any>()
-
-    headerBidding.enrichBid(map, adUnit)
-
-    assertThat(map).isEmpty()
+    verifyZeroInteractions(builder)
   }
 
   @Test
@@ -87,14 +57,10 @@ class OtherAdServersHeaderBiddingTest {
       on { height } doReturn 1337
     }
 
-    bidManager.stub {
-      on { getBidForAdUnitAndPrefetch(adUnit) } doReturn slot
-    }
-
     val map = mutableMapOf<Any, Any>()
     map["garbage"] = "should stay"
 
-    headerBidding.enrichBid(map, adUnit)
+    headerBidding.enrichBid(map, adUnit, slot)
 
     assertThat(map).isEqualTo(mapOf<Any, Any>(
         "garbage" to "should stay",
@@ -114,14 +80,10 @@ class OtherAdServersHeaderBiddingTest {
       on { displayUrl } doReturn "http://display.url"
     }
 
-    bidManager.stub {
-      on { getBidForAdUnitAndPrefetch(adUnit) } doReturn slot
-    }
-
     val map = mutableMapOf<Any, Any>()
     map["garbage"] = "should stay"
 
-    headerBidding.enrichBid(map, adUnit)
+    headerBidding.enrichBid(map, adUnit, slot)
 
     assertThat(map).isEqualTo(mapOf<Any, Any>(
         "garbage" to "should stay",

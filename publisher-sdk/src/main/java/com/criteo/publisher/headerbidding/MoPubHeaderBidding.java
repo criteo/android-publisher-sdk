@@ -2,13 +2,12 @@ package com.criteo.publisher.headerbidding;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import com.criteo.publisher.BidManager;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.util.ReflectionUtil;
 
-public class MoPubHeaderBidding {
+public class MoPubHeaderBidding implements HeaderBiddingHandler{
 
   private static final String MOPUB_ADVIEW_CLASS = "com.mopub.mobileads.MoPubView";
   private static final String MOPUB_INTERSTITIAL_CLASS = "com.mopub.mobileads.MoPubInterstitial";
@@ -17,25 +16,14 @@ public class MoPubHeaderBidding {
   private static final String CRT_DISPLAY_URL = "crt_displayUrl";
   private static final String CRT_SIZE = "crt_size";
 
-  @NonNull
-  private final BidManager bidManager;
-
-  public MoPubHeaderBidding(@NonNull BidManager bidManager) {
-    this.bidManager = bidManager;
-  }
-
   public boolean canHandle(@NonNull Object object) {
     return object.getClass().getName().equals(MOPUB_ADVIEW_CLASS)
         || object.getClass().getName().equals(MOPUB_INTERSTITIAL_CLASS);
   }
 
-  public void enrichBid(@NonNull Object object, @Nullable AdUnit adUnit) {
+  @Override
+  public void enrichBid(@NonNull Object object, @Nullable AdUnit adUnit, @NonNull Slot slot) {
     if (!canHandle(object)) {
-      return;
-    }
-
-    Slot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
-    if (slot == null) {
       return;
     }
 

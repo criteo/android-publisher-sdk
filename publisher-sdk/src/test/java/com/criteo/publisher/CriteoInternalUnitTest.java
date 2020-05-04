@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 import android.app.Application;
 import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.bid.BidLifecycleListener;
+import com.criteo.publisher.headerbidding.HeaderBidding;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
@@ -268,9 +269,9 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void setBidsForAdUnit_GivenBidManagerThrowing_DoNotThrow() throws Exception {
-    BidManager bidManager = givenMockedBidManager();
-    doThrow(RuntimeException.class).when(bidManager).enrichBid(any(), any());
+  public void setBidsForAdUnit_GivenHeaderBiddingThrowing_DoNotThrow() throws Exception {
+    HeaderBidding headerBidding = givenMockedHeaderBidding();
+    doThrow(RuntimeException.class).when(headerBidding).enrichBid(any(), any());
 
     CriteoInternal criteo = createCriteo();
 
@@ -280,8 +281,8 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void setBidsForAdUnit_GivenBidManager_DelegateToIt() throws Exception {
-    BidManager bidManager = givenMockedBidManager();
+  public void setBidsForAdUnit_GivenHeaderBidding_DelegateToIt() throws Exception {
+    HeaderBidding headerBidding = givenMockedHeaderBidding();
 
     Object object = mock(Object.class);
     AdUnit adUnit = mock(AdUnit.class);
@@ -289,7 +290,7 @@ public class CriteoInternalUnitTest {
     CriteoInternal criteo = createCriteo();
     criteo.setBidsForAdUnit(object, adUnit);
 
-    verify(bidManager).enrichBid(object, adUnit);
+    verify(headerBidding).enrichBid(object, adUnit);
   }
 
   @Test
@@ -338,6 +339,14 @@ public class CriteoInternalUnitTest {
     when(dependencyProvider.provideBidManager()).thenReturn(bidManager);
 
     return bidManager;
+  }
+
+  private HeaderBidding givenMockedHeaderBidding() {
+    HeaderBidding headerBidding = mock(HeaderBidding.class);
+
+    when(dependencyProvider.provideHeaderBidding()).thenReturn(headerBidding);
+
+    return headerBidding;
   }
 
   private InHouse givenMockedInHouse() {

@@ -1,5 +1,7 @@
 package com.criteo.publisher;
 
+import static java.util.Arrays.asList;
+
 import android.app.Application;
 import android.content.Context;
 import android.os.Build.VERSION_CODES;
@@ -24,6 +26,10 @@ import com.criteo.publisher.csm.MetricSendingQueue;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
 import com.criteo.publisher.csm.MetricSendingQueueFactory;
 import com.criteo.publisher.csm.MetricSendingQueueProducer;
+import com.criteo.publisher.headerbidding.DfpHeaderBidding;
+import com.criteo.publisher.headerbidding.HeaderBidding;
+import com.criteo.publisher.headerbidding.MoPubHeaderBidding;
+import com.criteo.publisher.headerbidding.OtherAdServersHeaderBidding;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.AdUnitMapper;
@@ -426,6 +432,24 @@ public class DependencyProvider {
             new TokenCache(),
             DependencyProvider.this.provideClock(),
             DependencyProvider.this.provideInterstitialActivityHelper());
+      }
+    });
+  }
+
+  @NonNull
+  public HeaderBidding provideHeaderBidding() {
+    return getOrCreate(HeaderBidding.class, new Factory<HeaderBidding>() {
+      @NonNull
+      @Override
+      public HeaderBidding create() {
+        return new HeaderBidding(
+            provideBidManager(),
+            asList(
+                new MoPubHeaderBidding(),
+                new DfpHeaderBidding(),
+                new OtherAdServersHeaderBidding()
+            )
+        );
       }
     });
   }

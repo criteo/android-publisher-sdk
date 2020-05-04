@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.bid.BidLifecycleListener;
+import com.criteo.publisher.headerbidding.HeaderBidding;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
@@ -43,6 +44,9 @@ final class CriteoInternal extends Criteo {
   private final InHouse inHouse;
 
   @NonNull
+  private final HeaderBidding headerBidding;
+
+  @NonNull
   private final InterstitialActivityHelper interstitialActivityHelper;
 
   CriteoInternal(
@@ -68,6 +72,7 @@ final class CriteoInternal extends Criteo {
 
     bidManager = dependencyProvider.provideBidManager();
     inHouse = dependencyProvider.provideInHouse();
+    headerBidding = dependencyProvider.provideHeaderBidding();
 
     interstitialActivityHelper = dependencyProvider.provideInterstitialActivityHelper();
 
@@ -113,7 +118,7 @@ final class CriteoInternal extends Criteo {
   }
 
   private void doSetBidsForAdUnit(Object object, AdUnit adUnit) {
-    bidManager.enrichBid(object, adUnit);
+    headerBidding.enrichBid(object, adUnit);
   }
 
   /**
