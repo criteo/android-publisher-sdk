@@ -1,16 +1,15 @@
 package com.criteo.publisher.advancednative;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
-import com.criteo.publisher.util.RunOnUiThreadExecutor;
+import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.util.RunOnUiThreadExecutor;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.util.concurrent.Executor;
 
-class ImpressionHelper {
+public class ImpressionHelper {
 
   @NonNull
   private final PubSdkApi api;
@@ -21,7 +20,7 @@ class ImpressionHelper {
   @NonNull
   private final RunOnUiThreadExecutor runOnUiThreadExecutor;
 
-  ImpressionHelper(
+  public ImpressionHelper(
       @NonNull PubSdkApi api,
       @NonNull Executor executor,
       @NonNull RunOnUiThreadExecutor runOnUiThreadExecutor) {
@@ -38,14 +37,14 @@ class ImpressionHelper {
    *
    * @param pixels list of pixels to fire
    */
-  void firePixels(@NonNull Iterable<URI> pixels) {
-    for (URI impressionPixel : pixels) {
+  void firePixels(@NonNull Iterable<URL> pixels) {
+    for (URL impressionPixel : pixels) {
       executor.execute(new PixelTask(impressionPixel, api));
     }
   }
 
   /**
-   * Notify the given listener for {@linkplain CriteoNativeAdListener#onAdImpressed() impression}.
+   * Notify the given listener for {@linkplain CriteoNativeAdListener#onAdImpression() impression}.
    * <p>
    * To allow implementation do UI job, then the listener is invoked on UI thread.
    *
@@ -60,35 +59,24 @@ class ImpressionHelper {
     });
   }
 
-  private static class PixelTask implements Runnable {
-
-    private static final String TAG = PixelTask.class.getSimpleName();
+  private static class PixelTask extends SafeRunnable {
 
     @NonNull
-    private final URI impressionPixel;
+    private final URL impressionPixel;
 
     @NonNull
     private final PubSdkApi api;
 
     private PixelTask(
-        @NonNull URI impressionPixel,
-        @NonNull PubSdkApi api) {
+        @NonNull URL impressionPixel,
+        @NonNull PubSdkApi api
+    ) {
       this.impressionPixel = impressionPixel;
       this.api = api;
     }
 
-    @Override
-    public void run() {
-      try {
-        doRun();
-      } catch (IOException e) {
-        Log.e(TAG, "Error while firing impression pixel", e);
-      }
-    }
-
-    private void doRun() throws IOException {
-      URL url = impressionPixel.toURL();
-      try (InputStream ignored = api.executeRawGet(url)) {
+    public void runSafely() throws IOException {
+      try (InputStream ignored = api.executeRawGet(impressionPixel)) {
         // ignore response
       }
     }

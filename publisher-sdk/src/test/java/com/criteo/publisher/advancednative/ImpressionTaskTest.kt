@@ -8,12 +8,12 @@ import org.mockito.Mock
 import org.mockito.Mockito.never
 import org.mockito.MockitoAnnotations
 import java.lang.ref.Reference
-import java.net.URI
+import java.net.URL
 
 class ImpressionTaskTest {
 
     @Mock
-    private lateinit var impressionPixels: Iterable<URI>
+    private lateinit var impressionPixels: Iterable<URL>
 
     @Mock
     private lateinit var listenerRef: Reference<CriteoNativeAdListener>

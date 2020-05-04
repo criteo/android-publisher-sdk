@@ -10,7 +10,10 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.activity.TopActivityFinder;
+import com.criteo.publisher.advancednative.ImpressionHelper;
 import com.criteo.publisher.advancednative.NativeAdMapper;
+import com.criteo.publisher.advancednative.VisibilityChecker;
+import com.criteo.publisher.advancednative.VisibilityTracker;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.bid.CompositeBidLifecycleListener;
 import com.criteo.publisher.bid.LoggingBidLifecycleListener;
@@ -403,7 +406,25 @@ public class DependencyProvider {
       @NonNull
       @Override
       public NativeAdMapper create() {
-        return new NativeAdMapper();
+        return new NativeAdMapper(
+            provideVisibilityTracker(),
+            new ImpressionHelper(
+                providePubSdkApi(),
+                provideThreadPoolExecutor(),
+                provideRunOnUiThreadExecutor()
+            )
+        );
+      }
+    });
+  }
+
+  @NonNull
+  public VisibilityTracker provideVisibilityTracker() {
+    return getOrCreate(VisibilityTracker.class, new Factory<VisibilityTracker>() {
+      @NonNull
+      @Override
+      public VisibilityTracker create() {
+        return new VisibilityTracker(new VisibilityChecker());
       }
     });
   }

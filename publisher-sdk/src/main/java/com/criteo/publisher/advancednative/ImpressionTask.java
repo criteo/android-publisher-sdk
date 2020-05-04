@@ -2,13 +2,13 @@ package com.criteo.publisher.advancednative;
 
 import android.support.annotation.NonNull;
 import java.lang.ref.Reference;
-import java.net.URI;
+import java.net.URL;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 class ImpressionTask implements VisibilityListener {
 
   @NonNull
-  private final Iterable<URI> impressionPixels;
+  private final Iterable<URL> impressionPixels;
 
   @NonNull
   private final Reference<CriteoNativeAdListener> listenerRef;
@@ -20,7 +20,7 @@ class ImpressionTask implements VisibilityListener {
   private final AtomicBoolean isAlreadyTriggered;
 
   ImpressionTask(
-      @NonNull Iterable<URI> impressionPixels,
+      @NonNull Iterable<URL> impressionPixels,
       @NonNull Reference<CriteoNativeAdListener> listenerRef,
       @NonNull ImpressionHelper helper) {
     this.impressionPixels = impressionPixels;

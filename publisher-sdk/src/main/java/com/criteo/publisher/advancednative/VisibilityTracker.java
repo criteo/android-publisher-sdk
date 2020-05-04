@@ -12,18 +12,18 @@ import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-class VisibilityTracker {
+public class VisibilityTracker {
 
   @NonNull
   private final VisibilityChecker visibilityChecker;
 
   @NonNull
   @GuardedBy("lock")
-  private Map<View, VisibilityTrackingTask> trackedViews = new WeakHashMap<>();
+  private final Map<View, VisibilityTrackingTask> trackedViews = new WeakHashMap<>();
 
   private final Object lock = new Object();
 
-  VisibilityTracker(@NonNull VisibilityChecker visibilityChecker) {
+  public VisibilityTracker(@NonNull VisibilityChecker visibilityChecker) {
     this.visibilityChecker = visibilityChecker;
   }
 

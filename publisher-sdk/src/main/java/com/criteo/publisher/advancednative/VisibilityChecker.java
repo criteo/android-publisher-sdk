@@ -4,7 +4,7 @@ import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.view.View;
 
-class VisibilityChecker {
+public class VisibilityChecker {
 
   /**
    * Detect the visibility on screen of the given view.

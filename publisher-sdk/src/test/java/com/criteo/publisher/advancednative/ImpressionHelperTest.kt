@@ -1,13 +1,15 @@
 package com.criteo.publisher.advancednative
 
-import com.criteo.publisher.util.RunOnUiThreadExecutor
+import com.criteo.publisher.mock.MockBean
+import com.criteo.publisher.mock.MockedDependenciesRule
+import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.network.PubSdkApi
-import com.nhaarman.mockitokotlin2.doAnswer
-import com.nhaarman.mockitokotlin2.doThrow
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import com.criteo.publisher.util.BuildConfigWrapper
+import com.criteo.publisher.util.RunOnUiThreadExecutor
+import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mock
@@ -16,16 +18,21 @@ import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import java.io.IOException
 import java.io.InputStream
-import java.net.URI
 import java.net.URL
-import java.util.Arrays.asList
 import java.util.concurrent.Executor
 import java.util.concurrent.atomic.AtomicBoolean
 
 class ImpressionHelperTest {
 
-    @Mock
+    @Rule
+    @JvmField
+    val mockedDependenciesRule = MockedDependenciesRule()
+
+    @MockBean
     private lateinit var api: PubSdkApi
+
+    @SpyBean
+    private lateinit var buildConfigWrapper: BuildConfigWrapper
 
     private val executor = Executor { it.run() }
 
@@ -43,7 +50,7 @@ class ImpressionHelperTest {
 
     @Test
     fun firePixels_GivenAPixel_AskToApiToSendItAndCloseStream() {
-        val pixels = setOf(URI("http://my.pixel"))
+        val pixels = setOf(URL("http://my.pixel"))
         val stream = mock<InputStream>()
         whenever(api.executeRawGet(any())).thenReturn(stream)
 
@@ -55,9 +62,9 @@ class ImpressionHelperTest {
 
     @Test
     fun firePixels_GivenMultiplePixels_AskToApiToSendThem() {
-        val pixels = asList(
-                URI("http://my.pixel.1"),
-                URI("http://my.pixel.2")
+        val pixels = listOf(
+                URL("http://my.pixel.1"),
+                URL("http://my.pixel.2")
         )
 
         helper.firePixels(pixels)
@@ -67,23 +74,13 @@ class ImpressionHelperTest {
     }
 
     @Test
-    fun firePixels_GivenNotAUrlPixel_IgnoreItAndContinueOnOthers() {
-        val pixels = asList(
-                URI("not://a.url"),
-                URI("http://my.pixel")
-        )
-
-        helper.firePixels(pixels)
-
-        verify(api).executeRawGet(URL("http://my.pixel"))
-    }
-
-    @Test
     fun firePixels_GivenErrorOnOnePixel_IgnoreItAndContinueOnOthers() {
-        val pixels = asList(
-                URI("http://my.pixel.1"),
-                URI("http://my.pixel.2"),
-                URI("http://my.pixel.3")
+        whenever(buildConfigWrapper.preconditionThrowsOnException()).doReturn(false)
+
+        val pixels = listOf(
+                URL("http://my.pixel.1"),
+                URL("http://my.pixel.2"),
+                URL("http://my.pixel.3")
         )
 
         doThrow(IOException::class)

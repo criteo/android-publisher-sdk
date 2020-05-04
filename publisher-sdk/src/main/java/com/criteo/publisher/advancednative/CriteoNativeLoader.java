@@ -14,6 +14,7 @@ import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeTokenValue;
 import com.criteo.publisher.util.PreconditionsUtil;
 import com.criteo.publisher.util.RunOnUiThreadExecutor;
+import java.lang.ref.WeakReference;
 
 @Incubating(Incubating.NATIVE)
 public class CriteoNativeLoader {
@@ -75,7 +76,7 @@ public class CriteoNativeLoader {
       notifyForFailureAsync();
     } else {
       NativeAdMapper nativeAdMapper = getNativeAdMapper();
-      CriteoNativeAd nativeAd = nativeAdMapper.map(assets);
+      CriteoNativeAd nativeAd = nativeAdMapper.map(assets, new WeakReference<>(listener));
       notifyForAdAsync(nativeAd);
     }
   }
