@@ -16,4 +16,14 @@ public class CriteoNativeAdHelper {
     nativeAd.watchForImpression(nativeView);
   }
 
+  @SuppressLint("VisibleForTests")
+  public static void setProductClickableView(@NonNull CriteoNativeAd nativeAd, @NonNull View nativeView) {
+    nativeAd.setProductClickableView(nativeView);
+  }
+
+  @SuppressLint("VisibleForTests")
+  public static void setAdChoiceClickableView(@NonNull CriteoNativeAd nativeAd, @NonNull View adChoiceView) {
+    nativeAd.setAdChoiceClickableView(adChoiceView);
+  }
+
 }

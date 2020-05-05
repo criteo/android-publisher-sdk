@@ -1,5 +1,6 @@
 package com.criteo.pubsdk_android.listener;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +25,7 @@ public class TestAppNativeAdListener extends CriteoNativeAdListener {
   }
 
   @Override
-  public void onAdReceived(CriteoNativeAd nativeAd) {
+  public void onAdReceived(@NonNull CriteoNativeAd nativeAd) {
     Log.d(tag, prefix + " - Native onAdReceived");
 
     LayoutInflater inflater = LayoutInflater.from(adLayout.getContext());
@@ -37,14 +38,19 @@ public class TestAppNativeAdListener extends CriteoNativeAdListener {
     view.<TextView>findViewById(R.id.ad_advertiser).setText(nativeAd.getAdvertiserDomain());
     view.<TextView>findViewById(R.id.ad_store).setText(nativeAd.getAdvertiserDescription());
 
+    // This view is used as a kind of dummy AdChoice icon while the feature is not supported.
+    View dummyAdChoiceView = view.findViewById(R.id.ad_app_icon);
+
     CriteoNativeAdHelper.watchForImpression(nativeAd, view);
+    CriteoNativeAdHelper.setProductClickableView(nativeAd, view);
+    CriteoNativeAdHelper.setAdChoiceClickableView(nativeAd, dummyAdChoiceView);
 
     adLayout.removeAllViews();
     adLayout.addView(view);
   }
 
   @Override
-  public void onAdFailedToReceive(CriteoErrorCode code) {
+  public void onAdFailedToReceive(@NonNull CriteoErrorCode code) {
     Log.d(tag, prefix + " - Native onAdFailedToReceive, reason : " + code.toString());
   }
 
@@ -52,4 +58,20 @@ public class TestAppNativeAdListener extends CriteoNativeAdListener {
   public void onAdImpression() {
     Log.d(tag, prefix + " - Native onAdImpression");
   }
+
+  @Override
+  public void onAdClicked() {
+    Log.d(tag, prefix + " - Native onAdClicked");
+  }
+
+  @Override
+  public void onAdLeftApplication() {
+    Log.d(tag, prefix + " - Native onAdLeftApplication");
+  }
+
+  @Override
+  public void onAdClosed() {
+    Log.d(tag, prefix + " - Native onAdClosed");
+  }
+
 }
