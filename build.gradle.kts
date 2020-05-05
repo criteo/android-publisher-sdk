@@ -11,3 +11,12 @@ buildscript {
 allprojects {
   addDefaultInputRepository()
 }
+
+tasks.register("printPublicationVersion") {
+  group = "reporting"
+  description = "Print the version that is used on publications"
+
+  doLast {
+    print(sdkPublicationVersion())
+  }
+}

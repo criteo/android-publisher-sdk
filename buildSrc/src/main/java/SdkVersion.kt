@@ -6,9 +6,8 @@ private const val sdkBaseVersion = "3.5.0"
 
 private val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd.HHmm"))
 
-fun Project.sdkVersion(): String {
-  val overriddenVersion = properties["pubSdkVersion"] as? String
-  return overriddenVersion ?: sdkBaseVersion
+fun sdkVersion(): String {
+  return sdkBaseVersion
 }
 
 fun Project.sdkPublicationVersion(): String {

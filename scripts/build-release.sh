@@ -11,6 +11,6 @@ set -Eeuo pipefail
 # Go at the root of the mochi directory
 cd "$(dirname "$0")/.."
 
-RELEASE_VERSION=$1 # Version such as 3.5.0
+RELEASE_COMMIT_SHA1=$1
 
-./scripts/do-docker-build.sh release "${RELEASE_VERSION}"
+./scripts/do-docker-build.sh release "${RELEASE_COMMIT_SHA1}"

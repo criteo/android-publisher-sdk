@@ -13,7 +13,7 @@ set -Eeuo pipefail
 cd "$(dirname "$0")/.."
 
 print_usage_and_exit() {
-  echo "Usage: $0 (pre-submit|post-submit|release VERSION)"
+  echo "Usage: $0 (pre-submit|post-submit|release COMMIT_SHA1)"
   exit 1
 }
 
