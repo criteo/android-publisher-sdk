@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.advancednative.CriteoNativeAd;
+import com.criteo.publisher.advancednative.CriteoNativeAdHelper;
 import com.criteo.publisher.advancednative.CriteoNativeAdListener;
 import com.criteo.pubsdk_android.R;
 
@@ -36,6 +37,8 @@ public class TestAppNativeAdListener extends CriteoNativeAdListener {
     view.<TextView>findViewById(R.id.ad_advertiser).setText(nativeAd.getAdvertiserDomain());
     view.<TextView>findViewById(R.id.ad_store).setText(nativeAd.getAdvertiserDescription());
 
+    CriteoNativeAdHelper.watchForImpression(nativeAd, view);
+
     adLayout.removeAllViews();
     adLayout.addView(view);
   }
@@ -45,4 +48,8 @@ public class TestAppNativeAdListener extends CriteoNativeAdListener {
     Log.d(tag, prefix + " - Native onAdFailedToReceive, reason : " + code.toString());
   }
 
+  @Override
+  public void onAdImpression() {
+    Log.d(tag, prefix + " - Native onAdImpression");
+  }
 }

@@ -150,7 +150,8 @@ public class Slot {
   @Override
   public String toString() {
     return "Slot{" +
-        " cpm=" + cpm +
+        "impressionId='" + impressionId + '\'' +
+        ", cpm='" + cpm + '\'' +
         ", currency='" + currency + '\'' +
         ", width=" + width +
         ", height=" + height +
@@ -158,6 +159,8 @@ public class Slot {
         ", displayUrl='" + displayUrl + '\'' +
         ", ttl=" + ttl +
         ", timeOfDownload=" + timeOfDownload +
+        ", cpmValue=" + cpmValue +
+        ", nativeAssets=" + nativeAssets +
         '}';
   }
 
