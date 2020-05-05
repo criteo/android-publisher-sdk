@@ -157,6 +157,43 @@ class NativeAdMapperTest {
     verify(redirection, times(4)).redirect(eq("click://uri.com"), eq(topActivity), any())
   }
 
+  @Test
+  fun setPrivacyOptOutClickableView_GivenDifferentViewsClickedManyTimes_NotifyListenerForClicksAndRedirectUser() {
+    val listener = mock<CriteoNativeAdListener>()
+
+    val assets = mock<NativeAssets>(defaultAnswer=Answers.RETURNS_DEEP_STUBS) {
+      on { privacyOptOutClickUrl } doReturn URI.create("privacy://criteo")
+    }
+
+    val view1 = mock<View>()
+    val view2 = mock<View>()
+
+    val topActivity = mock<ComponentName>()
+    topActivityFinder.stub {
+      on { topActivityName } doReturn topActivity
+    }
+
+    givenDirectUiExecutor()
+
+    //when
+    val nativeAd = mapper.map(assets, WeakReference(listener))
+    nativeAd.setAdChoiceClickableView(view1)
+    nativeAd.setAdChoiceClickableView(view2)
+
+    argumentCaptor<NativeViewClickHandler>().apply {
+      verify(clickDetection, times(2)).watch(any(), capture())
+
+      allValues.forEach {
+        it.onClick()
+        it.onClick()
+      }
+    }
+
+    // then
+    verify(listener, never()).onAdClicked()
+    verify(redirection, times(4)).redirect(eq("privacy://criteo"), eq(topActivity), any())
+  }
+
   private fun givenDirectUiExecutor() {
     runOnUiThreadExecutor.stub {
       on { executeAsync(any()) } doAnswer {

@@ -46,12 +46,19 @@ public class NativeAdMapper {
         clickHelper
     );
 
+    NativeViewClickHandler clickOnAdChoiceHandler = new AdChoiceClickHandler(
+        nativeAssets.getPrivacyOptOutClickUrl(),
+        listenerRef,
+        clickHelper
+    );
+
     return new CriteoNativeAd(
         nativeAssets,
         visibilityTracker,
         impressionTask,
         clickDetection,
-        clickOnProductHandler
+        clickOnProductHandler,
+        clickOnAdChoiceHandler
     );
   }
 

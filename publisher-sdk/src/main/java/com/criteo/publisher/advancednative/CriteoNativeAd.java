@@ -25,18 +25,23 @@ public class CriteoNativeAd {
   @NonNull
   private final NativeViewClickHandler clickOnProductHandler;
 
+  @NonNull
+  private final NativeViewClickHandler clickOnAdChoiceHandler;
+
   public CriteoNativeAd(
       @NonNull NativeAssets assets,
       @NonNull VisibilityTracker visibilityTracker,
       @NonNull ImpressionTask impressionTask,
       @NonNull ClickDetection clickDetection,
-      @NonNull NativeViewClickHandler clickOnProductHandler
+      @NonNull NativeViewClickHandler clickOnProductHandler,
+      @NonNull NativeViewClickHandler clickOnAdChoiceHandler
   ) {
     this.assets = assets;
     this.visibilityTracker = visibilityTracker;
     this.impressionTask = impressionTask;
     this.clickDetection = clickDetection;
     this.clickOnProductHandler = clickOnProductHandler;
+    this.clickOnAdChoiceHandler = clickOnAdChoiceHandler;
   }
 
   @NonNull
@@ -110,6 +115,17 @@ public class CriteoNativeAd {
   @VisibleForTesting
   void setProductClickableView(@NonNull View nativeView) {
     clickDetection.watch(nativeView, clickOnProductHandler);
+  }
+
+  /**
+   * Set the given views as a clickable region representing this Ad opt out.
+   *
+   * @param adChoiceView view to start watching for clicks
+   * @see #setProductClickableView(View)
+   */
+  @VisibleForTesting
+  void setAdChoiceClickableView(@NonNull View adChoiceView) {
+    clickDetection.watch(adChoiceView, clickOnAdChoiceHandler);
   }
 
 }
