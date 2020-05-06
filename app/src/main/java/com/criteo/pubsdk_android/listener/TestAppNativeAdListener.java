@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.advancednative.CriteoNativeAd;
@@ -30,6 +31,7 @@ public class TestAppNativeAdListener extends CriteoNativeAdListener {
 
     LayoutInflater inflater = LayoutInflater.from(adLayout.getContext());
     View view = inflater.inflate(R.layout.native_ad, null);
+    view = CriteoNativeAdHelper.addAdChoiceOverlay(nativeAd, view);
 
     view.<TextView>findViewById(R.id.ad_headline).setText(nativeAd.getTitle());
     view.<TextView>findViewById(R.id.ad_body).setText(nativeAd.getDescription());
@@ -38,12 +40,15 @@ public class TestAppNativeAdListener extends CriteoNativeAdListener {
     view.<TextView>findViewById(R.id.ad_advertiser).setText(nativeAd.getAdvertiserDomain());
     view.<TextView>findViewById(R.id.ad_store).setText(nativeAd.getAdvertiserDescription());
 
-    // This view is used as a kind of dummy AdChoice icon while the feature is not supported.
-    View dummyAdChoiceView = view.findViewById(R.id.ad_app_icon);
-
     CriteoNativeAdHelper.watchForImpression(nativeAd, view);
     CriteoNativeAdHelper.setProductClickableView(nativeAd, view);
-    CriteoNativeAdHelper.setAdChoiceClickableView(nativeAd, dummyAdChoiceView);
+
+    ImageView adChoiceView = CriteoNativeAdHelper.getAdChoiceView(nativeAd, view);
+    if (adChoiceView != null) {
+      // Use dummy image while image loading feature is not available
+      adChoiceView.setImageResource(android.R.drawable.ic_delete);
+      CriteoNativeAdHelper.setAdChoiceClickableView(nativeAd, adChoiceView);
+    }
 
     adLayout.removeAllViews();
     adLayout.addView(view);

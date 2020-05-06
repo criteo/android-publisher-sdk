@@ -1,8 +1,11 @@
 package com.criteo.publisher.advancednative;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 import com.criteo.publisher.annotation.Incubating;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 import java.net.URL;
@@ -28,13 +31,17 @@ public class CriteoNativeAd {
   @NonNull
   private final NativeViewClickHandler clickOnAdChoiceHandler;
 
+  @NonNull
+  private final AdChoiceOverlay adChoiceOverlay;
+
   public CriteoNativeAd(
       @NonNull NativeAssets assets,
       @NonNull VisibilityTracker visibilityTracker,
       @NonNull ImpressionTask impressionTask,
       @NonNull ClickDetection clickDetection,
       @NonNull NativeViewClickHandler clickOnProductHandler,
-      @NonNull NativeViewClickHandler clickOnAdChoiceHandler
+      @NonNull NativeViewClickHandler clickOnAdChoiceHandler,
+      @NonNull AdChoiceOverlay adChoiceOverlay
   ) {
     this.assets = assets;
     this.visibilityTracker = visibilityTracker;
@@ -42,6 +49,7 @@ public class CriteoNativeAd {
     this.clickDetection = clickDetection;
     this.clickOnProductHandler = clickOnProductHandler;
     this.clickOnAdChoiceHandler = clickOnAdChoiceHandler;
+    this.adChoiceOverlay = adChoiceOverlay;
   }
 
   @NonNull
@@ -126,6 +134,32 @@ public class CriteoNativeAd {
   @VisibleForTesting
   void setAdChoiceClickableView(@NonNull View adChoiceView) {
     clickDetection.watch(adChoiceView, clickOnAdChoiceHandler);
+  }
+
+  /**
+   * Add an overlay on the given view, with a placeholder for AdChoice icon.
+   *
+   * @param view view to wrap with AdChoice
+   * @return view with the overlay
+   * @see AdChoiceOverlay#addOverlay(View)
+   */
+  @NonNull
+  @VisibleForTesting
+  ViewGroup addAdChoiceOverlay(@NonNull View view) {
+    return adChoiceOverlay.addOverlay(view);
+  }
+
+  /**
+   * Return the AdChoice placeholder injected by {@link #addAdChoiceOverlay(View)}.
+   *
+   * @param overlappedView view to get the AdChoice from
+   * @return AdChoice view
+   * @see AdChoiceOverlay#getAdChoiceView(View)
+   */
+  @Nullable
+  @VisibleForTesting
+  ImageView getAdChoiceView(@NonNull View overlappedView) {
+    return adChoiceOverlay.getAdChoiceView(overlappedView);
   }
 
 }

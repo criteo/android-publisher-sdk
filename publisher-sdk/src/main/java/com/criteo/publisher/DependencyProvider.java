@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.activity.TopActivityFinder;
+import com.criteo.publisher.advancednative.AdChoiceOverlay;
 import com.criteo.publisher.advancednative.ClickDetection;
 import com.criteo.publisher.advancednative.ClickHelper;
 import com.criteo.publisher.advancednative.ImpressionHelper;
@@ -421,7 +422,9 @@ public class DependencyProvider {
                 provideRedirection(),
                 provideTopActivityFinder(),
                 provideRunOnUiThreadExecutor()
-            ));
+            ),
+            provideAdChoiceOverlay()
+        );
       }
     });
   }
@@ -455,6 +458,20 @@ public class DependencyProvider {
       @Override
       public Redirection create() {
         return new Redirection(provideContext());
+      }
+    });
+  }
+
+  @NonNull
+  public AdChoiceOverlay provideAdChoiceOverlay() {
+    return getOrCreate(AdChoiceOverlay.class, new Factory<AdChoiceOverlay>() {
+      @NonNull
+      @Override
+      public AdChoiceOverlay create() {
+        return new AdChoiceOverlay(
+            provideBuildConfigWrapper(),
+            provideAndroidUtil()
+        );
       }
     });
   }

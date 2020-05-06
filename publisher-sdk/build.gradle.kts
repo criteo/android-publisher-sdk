@@ -20,6 +20,10 @@ androidLibModule() {
     addBuildConfigField<Int>("maxSizeOfCsmMetricsFolder")
     addBuildConfigField<Int>("maxSizeOfCsmMetricSendingQueue")
 
+    // Advanced Native
+    addBuildConfigField<Int>("adChoiceIconWidthInDp")
+    addBuildConfigField<Int>("adChoiceIconHeightInDp")
+
     // Misc
     addBuildConfigField<Int>("profileId")
     addBuildConfigField<String>("pubSdkSharedPreferences")

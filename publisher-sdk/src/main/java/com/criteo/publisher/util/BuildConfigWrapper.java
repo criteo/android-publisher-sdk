@@ -101,4 +101,18 @@ public class BuildConfigWrapper {
   public int getMinLogLevel() {
     return BuildConfig.minLogLevel;
   }
+
+  /**
+   * Width in dp of the AdChoice icon for advanced native.
+   */
+  public int getAdChoiceIconWidthInDp() {
+    return BuildConfig.adChoiceIconWidthInDp;
+  }
+
+  /**
+   * Height in dp of the AdChoice icon for advanced native.
+   */
+  public int getAdChoiceIconHeightInDp() {
+    return BuildConfig.adChoiceIconHeightInDp;
+  }
 }

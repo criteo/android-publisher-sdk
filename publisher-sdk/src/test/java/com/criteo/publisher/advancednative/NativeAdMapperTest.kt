@@ -2,6 +2,8 @@ package com.criteo.publisher.advancednative
 
 import android.content.ComponentName
 import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
 import com.criteo.publisher.activity.TopActivityFinder
 import com.criteo.publisher.adview.Redirection
 import com.criteo.publisher.mock.MockBean
@@ -40,6 +42,9 @@ class NativeAdMapperTest {
 
   @MockBean
   private lateinit var redirection: Redirection
+
+  @MockBean
+  private lateinit var adChoiceOverlay: AdChoiceOverlay
 
   @MockBean
   private lateinit var api: PubSdkApi
@@ -192,6 +197,36 @@ class NativeAdMapperTest {
     // then
     verify(listener, never()).onAdClicked()
     verify(redirection, times(4)).redirect(eq("privacy://criteo"), eq(topActivity), any())
+  }
+
+  @Test
+  fun addAdChoiceOverlay_GivenAnyView_DelegateToAdChoiceOverlay() {
+    val listener = mock<CriteoNativeAdListener>()
+    val nativeAssets = mock<NativeAssets>(defaultAnswer = Answers.RETURNS_DEEP_STUBS)
+    val inputView = mock<View>()
+    val overlappedView = mock<ViewGroup>()
+
+    whenever(adChoiceOverlay.addOverlay(inputView)).doReturn(overlappedView)
+
+    val nativeAd = mapper.map(nativeAssets, WeakReference(listener))
+    val outputView = nativeAd.addAdChoiceOverlay(inputView)
+
+    assertThat(outputView).isEqualTo(overlappedView)
+  }
+
+  @Test
+  fun getAdChoiceView_GivenAnyView_DelegateToAdChoiceOverlay() {
+    val listener = mock<CriteoNativeAdListener>()
+    val nativeAssets = mock<NativeAssets>(defaultAnswer = Answers.RETURNS_DEEP_STUBS)
+    val inputView = mock<View>()
+    val adChoiceView = mock<ImageView>()
+
+    whenever(adChoiceOverlay.getAdChoiceView(inputView)).doReturn(adChoiceView)
+
+    val nativeAd = mapper.map(nativeAssets, WeakReference(listener))
+    val outputView = nativeAd.getAdChoiceView(inputView)
+
+    assertThat(outputView).isEqualTo(adChoiceView)
   }
 
   private fun givenDirectUiExecutor() {

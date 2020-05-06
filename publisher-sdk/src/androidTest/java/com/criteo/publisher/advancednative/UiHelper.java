@@ -3,14 +3,18 @@ package com.criteo.publisher.advancednative;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 
 import android.app.Activity;
-import android.content.Context;
+import android.graphics.Rect;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.test.rule.ActivityTestRule;
 import android.util.DisplayMetrics;
 import android.view.View;
-import android.view.WindowManager;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import java.util.Comparator;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class UiHelper {
@@ -22,7 +26,7 @@ public class UiHelper {
 
   private final ActivityTestRule<? extends Activity> activityRule;
 
-  private AtomicInteger viewIndex = new AtomicInteger(0);
+  private final AtomicInteger viewIndex = new AtomicInteger(0);
 
   public UiHelper(ActivityTestRule<? extends Activity> activityRule) {
     this.activityRule = activityRule;
@@ -50,25 +54,111 @@ public class UiHelper {
 
   @NonNull
   private DisplayMetrics getDisplayMetrics() {
-    WindowManager windowManager = (WindowManager) activityRule.getActivity()
-        .getSystemService(Context.WINDOW_SERVICE);
-
-    DisplayMetrics metrics = new DisplayMetrics();
-    windowManager.getDefaultDisplay().getMetrics(metrics);
-    return metrics;
+    return activityRule.getActivity().getResources().getDisplayMetrics();
   }
 
   public void drawViews(View... views) {
-    FrameLayout layout = new FrameLayout(activityRule.getActivity());
-    for (View view : views) {
-      layout.addView(view);
+    View contentView;
+
+    if (views.length > 1 || true) {
+      FrameLayout layout = new FrameLayout(activityRule.getActivity());
+      for (View view : views) {
+        layout.addView(view);
+      }
+      contentView = layout;
+    } else {
+      contentView = views[0];
     }
 
     runOnMainThreadAndWait(() -> {
-      activityRule.getActivity().setContentView(layout);
+      activityRule.getActivity().setContentView(contentView);
     });
 
     waitForUiReady();
+  }
+
+  /**
+   * Return the view located a the given position (in DP) in given view hierarchy.
+   *
+   * The coordinates are relative to the given view, So the (0, 0) coordinate is at the top left of
+   * the view. And X goes from left to right, Y goes from top to bottom.
+   *
+   * You can indicate negative coordinates to start from the ends on the negated axis. For instance,
+   * (X=-1, Y=0) indicates the top-right corner of the view.
+   *
+   * @param view hierarchy of views to look into
+   * @param xInDp X coordinate in DP relative to view
+   * @param yInDp Y coordinate in DP relative to view
+   * @return view at given location or <code>null</code> if none are found.
+   */
+  @Nullable
+  public View findViewAt(@NonNull View view, int xInDp, int yInDp) {
+    int xInPixel;
+    if (xInDp < 0) {
+      xInPixel = dpToPixel(xInDp + 1) + view.getWidth();
+    } else {
+      xInPixel = dpToPixel(xInDp);
+    }
+
+    int yInPixel;
+    if (yInDp < 0) {
+      yInPixel = dpToPixel(yInDp + 1) + view.getHeight();
+    } else {
+      yInPixel = dpToPixel(yInDp);
+    }
+
+    int[] location = new int[2];
+    view.getLocationOnScreen(location);
+    int xInScreen = xInPixel + location[0];
+    int yInScreen = yInPixel + location[1];
+
+    return findViewAtPixels(view, xInScreen, yInScreen);
+  }
+
+  @Nullable
+  public View findViewAtPixels(@NonNull View view, int x, int y) {
+    if (view instanceof ViewGroup) {
+      ViewGroup viewGroup = (ViewGroup) view;
+
+      // Simulate order of display: first greatest Z-index, then lowest index in view group
+      Comparator<View> displayComparator = Comparator.comparing(View::getZ)
+          .reversed()
+          .thenComparingInt(viewGroup::indexOfChild);
+
+      SortedSet<View> children = new TreeSet<>(displayComparator);
+
+      for (int i = 0; i < viewGroup.getChildCount(); i++) {
+        children.add(viewGroup.getChildAt(i));
+      }
+
+      for (View child : children) {
+        View foundView = findViewAtPixels(child, x, y);
+        if (foundView != null && foundView.isShown()) {
+          return foundView;
+        }
+      }
+    }
+
+    int[] location = new int[2];
+    view.getLocationOnScreen(location);
+
+    Rect rect = new Rect(
+        location[0],
+        location[1],
+        // Right is excluded in contains, we want it included
+        location[0] + view.getWidth() + 1,
+        // Bottom is excluded in contains, we want it included
+        location[1] + view.getHeight() + 1
+    );
+
+    if (rect.contains(x, y)) {
+      return view;
+    }
+    return null;
+  }
+
+  private int dpToPixel(int dp) {
+    return (int) Math.ceil(dp * getDisplayMetrics().density);
   }
 
   private void waitForUiReady() {

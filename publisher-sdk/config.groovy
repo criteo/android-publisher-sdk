@@ -54,6 +54,12 @@ maxSizeOfCsmMetricsFolder = 48 * 1024
 // 60KB represents ~360 metrics (with ~170 bytes/metric) which already represent an extreme case.
 maxSizeOfCsmMetricSendingQueue = 60 * 1024
 
+/**
+ * Width and height in dp of the injected AdChoice icon for advanced native.
+ */
+adChoiceIconWidthInDp = 19
+adChoiceIconHeightInDp = 15
+
 environments {
     debug {
         cdbUrl = 'http://directbidder-test-app.par.preprod.crto.in'
