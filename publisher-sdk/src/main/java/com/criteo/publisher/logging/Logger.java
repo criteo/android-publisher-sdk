@@ -2,8 +2,9 @@ package com.criteo.publisher.logging;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
-import com.criteo.publisher.BuildConfig;
+import com.criteo.publisher.util.BuildConfigWrapper;
 
 public class Logger {
 
@@ -12,8 +13,15 @@ public class Logger {
   @NonNull
   private final String tag;
 
-  public Logger(@NonNull Class<?> klass) {
+  @NonNull
+  private final BuildConfigWrapper buildConfigWrapper;
+
+  public Logger(
+      @NonNull Class<?> klass,
+      @NonNull BuildConfigWrapper buildConfigWrapper
+  ) {
     this.tag = klass.getSimpleName();
+    this.buildConfigWrapper = buildConfigWrapper;
   }
 
   public void debug(String message, Throwable thrown) {
@@ -24,25 +32,36 @@ public class Logger {
     log(Log.DEBUG, message, args, null);
   }
 
+  public void error(Throwable thrown) {
+    log(Log.ERROR, null, EMPTY, thrown);
+  }
+
   public void error(String message, Throwable thrown) {
     log(Log.ERROR, message, EMPTY, thrown);
   }
 
-  private void log(int level, String message, Object[] args, @Nullable Throwable thrown) {
-    if (!isLoggable()) {
+  private void log(int level, @Nullable String message, Object[] args, @Nullable Throwable thrown) {
+    if (!isLoggable(level)) {
       return;
     }
 
-    String formattedMessage = String.format(message, args);
-    Log.println(level, tag, formattedMessage);
+    if (message != null) {
+      String formattedMessage = String.format(message, args);
+      println(level, formattedMessage);
+    }
 
     if (thrown != null) {
-      Log.println(level, tag, Log.getStackTraceString(thrown));
+      println(level, Log.getStackTraceString(thrown));
     }
   }
 
-  public boolean isLoggable() {
-    return BuildConfig.debugLogging;
+  @VisibleForTesting
+  void println(int level, @NonNull String message) {
+    Log.println(level, tag, message);
+  }
+
+  private boolean isLoggable(int level) {
+    return level >= buildConfigWrapper.getMinLogLevel();
   }
 
 }

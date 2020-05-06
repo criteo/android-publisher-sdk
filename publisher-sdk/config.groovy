@@ -1,6 +1,19 @@
 pubSdkSharedPreferences = 'com.criteo.publisher.sdkSharedPreferences'
-debugLogging = false
 profileId = 235
+
+/**
+ * Included minimum level of logs to print
+ * Values are from {@link android.util.Log}:
+ * <ul>
+ *     <li>2 = VERBOSE</li>
+ *     <li>3 = DEBUG</li>
+ *     <li>4 = INFO</li>
+ *     <li>5 = WARNING</li>
+ *     <li>6 = ERROR</li>
+ *     <li>7 = ASSERT</li>
+ * </ul>
+ */
+minLogLevel = 5 // Warning
 
 /**
  * Indicate if exceptions that could be ignored should be thrown.
@@ -48,7 +61,7 @@ environments {
         remoteConfigUrl = 'https://pub-sdk-cfg.par.preprod.crto.in'
         eventUrl = 'https://gum.par.preprod.crto.in'
 
-        debugLogging = true
+        minLogLevel = 2 // All
         preconditionThrowsOnException = true
     }
 
@@ -57,7 +70,7 @@ environments {
         remoteConfigUrl = 'https://pub-sdk-cfg.criteo.com'
         eventUrl = 'https://gum.criteo.com'
 
-        debugLogging = true
+        minLogLevel = 2 // All
     }
 
     release {

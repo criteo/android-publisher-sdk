@@ -22,7 +22,7 @@ androidLibModule() {
     // Misc
     addBuildConfigField<Int>("profileId")
     addBuildConfigField<String>("pubSdkSharedPreferences")
-    addBuildConfigField<Boolean>("debugLogging")
+    addBuildConfigField<Int>("minLogLevel")
     addBuildConfigField<Boolean>("preconditionThrowsOnException")
 }
 

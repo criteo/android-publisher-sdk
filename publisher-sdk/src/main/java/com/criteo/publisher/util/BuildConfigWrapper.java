@@ -85,4 +85,20 @@ public class BuildConfigWrapper {
   public int getNetworkTimeoutInMillis() {
     return BuildConfig.networkTimeoutInMillis;
   }
+
+  /**
+   * Included minimum level of logs to print
+   * Values are from {@link android.util.Log}:
+   * <ul>
+   *     <li>2 = VERBOSE</li>
+   *     <li>3 = DEBUG</li>
+   *     <li>4 = INFO</li>
+   *     <li>5 = WARNING</li>
+   *     <li>6 = ERROR</li>
+   *     <li>7 = ASSERT</li>
+   * </ul>
+   */
+  public int getMinLogLevel() {
+    return BuildConfig.minLogLevel;
+  }
 }

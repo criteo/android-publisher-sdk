@@ -31,7 +31,7 @@ public abstract class SafeRunnable implements Runnable {
       if (throwable instanceof RuntimeException) {
         PreconditionsUtil.throwOrLog(e);
       } else {
-        logger.error("Error while running task", e);
+        logger.error(e);
       }
     }
   }

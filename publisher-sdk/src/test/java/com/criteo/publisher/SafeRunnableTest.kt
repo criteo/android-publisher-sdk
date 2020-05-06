@@ -43,7 +43,7 @@ class SafeRunnableTest {
 
         assertThatCode { safeRunnable.run() }.doesNotThrowAnyException()
 
-        verify(logger).error(any(), check {
+        verify(logger).error(check {
             assertThat(it).hasCause(throwable)
         })
     }

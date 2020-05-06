@@ -623,7 +623,7 @@ public class DependencyProvider {
       @NonNull
       @Override
       public LoggerFactory create() {
-        return new LoggerFactory();
+        return new LoggerFactory(provideBuildConfigWrapper());
       }
     });
   }
