@@ -6,6 +6,8 @@
 # Explicitly bound environment variables
 MAVEN_USER="${MAVEN_USER}"
 MAVEN_PASSWORD="${MAVEN_PASSWORD}"
+AZURE_USER="${AZURE_USER}"
+AZURE_PASSWORD="${AZURE_PASSWORD}"
 
 set -Eeuo pipefail
 
@@ -56,5 +58,7 @@ docker run \
     -w "${DST}" \
     -e "MAVEN_USER=${MAVEN_USER}" \
     -e "MAVEN_PASSWORD=${MAVEN_PASSWORD}" \
+    -e "AZURE_USER=${AZURE_USER}" \
+    -e "AZURE_PASSWORD=${AZURE_PASSWORD}" \
     ${DOCKER_IMAGE} \
     bash "$SCRIPT" "$@"

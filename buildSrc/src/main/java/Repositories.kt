@@ -80,9 +80,8 @@ private fun MavenArtifactRepository.withMavenCredentialsIfPresent() {
 fun Project.addAzureRepository() {
   val blobStorage = AzureBlobStorage(containerName = "publishersdk") {
     credentials {
-      // TODO EE-926 Retrieve azure credentials from a vault
-      username = "pubsdkuseprod"
-      password = "IBXkbamPEDzFFvLFgjL8bG5v7GOLy/2HY2xMVtgXICxSXG/AYYP57Xme9lxNgcoaznc2XGdye/zDT7fPUYrXbA=="
+      username = System.getenv("AZURE_USER")
+      password = System.getenv("AZURE_PASSWORD")
     }
   }
 
