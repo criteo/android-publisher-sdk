@@ -35,10 +35,16 @@ Please note that from the Android device, your local computer is not `127.0.0.1`
 ## Release steps
 Releasing a new version of the PubSDK involves a few steps:
 
-1. Publishing the new version of the AAR on Azure
-2. Publishing new versions of _android-google-mediation_ and _android-mopub-mediation_ that depend
-on the newly released version of PubSDK. Please refer to the README of each of those projects for
-additional release information.
+1. Bump the version in `buildSrc/src/main/java/SdkVersion.kt`
+2. Bump the version of _android-google-mediation_ (see its README)
+3. Bump the version of _android-mopub-mediation_ (see its README)
+4. Select a version pushed on NexusProd as a release candidate.
+5. Communicate on Slack (#pub-sdk-private) and Confluence about the RC (with commit SHA1, maven coordinates and changelog)
+6. Execute a bugfest on the RC (with mediation adapters), if there is blocker, fix it and restart from 4.
+7. Release the new SDK version on Azure (see section below)
+8. Release the new _android-google-mediation_ version on Azure (see its README)
+9. Release the new _android-mopub-mediation_ version on Azure (see its README)
+10. Communicate about the release on #pub-sdk-private
 
 ## Internal releases on Nexus
 Each new version is published on the internal Nexus repository on post-submit. No manual action is needed
@@ -67,15 +73,12 @@ dependencies {
 ```
 
 ## Customer facing releases on Azure
-Publishers consume PubSDK artifacts from the Azure maven repository. To publish a new version of the SDK, run the following command:
-```shell script
-./scripts/do-release.sh $version
-```
 
-To release version 3.5.0 the following command would be run:
-```shell script
-./scripts/do-release.sh 3.5.0
-```
+Publishers consume PubSDK artifacts from the Azure maven repository.
+To select a new version of the SDK:
+- Select a commit representing the new version (the one validated by bugfest)
+- Go on [Jenkins deploy job](https://build.crto.in/job/pub-sdk-mochi-prod-deployment/build)
+- Insert the commit SHA1 and validate
 
 ### Use public releases on Azure
 
