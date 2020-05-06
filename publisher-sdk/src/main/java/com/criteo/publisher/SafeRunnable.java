@@ -1,9 +1,13 @@
 package com.criteo.publisher;
 
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.util.PreconditionsUtil;
 import java.util.concurrent.ExecutionException;
 
 public abstract class SafeRunnable implements Runnable {
+
+  private final Logger logger = LoggerFactory.getLogger(SafeRunnable.class);
 
   /**
    * This stackTrace provides contextual information for tasks executed on a separate
@@ -23,7 +27,12 @@ public abstract class SafeRunnable implements Runnable {
     } catch (Throwable throwable) {
       ExecutionException e = new ExecutionException(throwable);
       e.setStackTrace(stackTrace);
-      PreconditionsUtil.throwOrLog(e);
+
+      if (throwable instanceof RuntimeException) {
+        PreconditionsUtil.throwOrLog(e);
+      } else {
+        logger.error("Error while running task", e);
+      }
     }
   }
 
