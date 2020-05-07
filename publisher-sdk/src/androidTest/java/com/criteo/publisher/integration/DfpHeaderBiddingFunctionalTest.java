@@ -53,6 +53,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
   private static final String MACRO_CPM = "crt_cpm";
   private static final String MACRO_DISPLAY_URL = "crt_displayurl";
+  private static final String MACRO_SIZE = "crt_size";
   private static final String MACRO_NATIVE_TITLE = "crtn_title";
   private static final String MACRO_NATIVE_DESCRIPTION = "crtn_desc";
   private static final String MACRO_NATIVE_IMAGE = "crtn_imageurl";
@@ -135,7 +136,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
 
-    assertCriteoMacroAreInjectedInDfpBuilder(builder);
+    assertCriteoMacroAreInjectedInDfpBuilder(builder, adUnit);
   }
 
   @Test
@@ -250,7 +251,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
 
-    assertCriteoMacroAreInjectedInDfpBuilder(builder);
+    assertCriteoMacroAreInjectedInDfpBuilder(builder, adUnit);
 
     // The amount is not that important, but the format is
     String cpm = builder.build().getCustomTargeting().getString(MACRO_CPM);
@@ -534,12 +535,17 @@ public class DfpHeaderBiddingFunctionalTest {
     return publisherAdView;
   }
 
-  private void assertCriteoMacroAreInjectedInDfpBuilder(Builder builder) {
+  private void assertCriteoMacroAreInjectedInDfpBuilder(Builder builder, AdUnit adUnit) {
     Bundle customTargeting = builder.build().getCustomTargeting();
 
     assertNotNull(customTargeting.getString(MACRO_CPM));
     assertNotNull(customTargeting.getString(MACRO_DISPLAY_URL));
-    assertEquals(2, customTargeting.size());
+    if (adUnit instanceof BannerAdUnit) {
+      assertNotNull(customTargeting.getString(MACRO_SIZE));
+      assertEquals(3, customTargeting.size());
+    } else {
+      assertEquals(2, customTargeting.size());
+    }
   }
 
   private void waitForBids() {

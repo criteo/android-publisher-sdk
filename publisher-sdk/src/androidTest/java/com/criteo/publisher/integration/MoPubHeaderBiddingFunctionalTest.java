@@ -9,7 +9,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.test.InstrumentationRegistry;
@@ -20,6 +19,7 @@ import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.ResultCaptor;
+import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.InterstitialAdUnit;
@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -45,6 +44,9 @@ public class MoPubHeaderBiddingFunctionalTest {
 
   private static final Pattern EXPECTED_KEYWORDS = Pattern
       .compile("(.+,)?crt_cpm:[0-9]+\\.[0-9]{2},crt_displayUrl:.+");
+
+  private static final Pattern EXPECTED_KEYWORDS_FOR_BANNER = Pattern
+      .compile("(.+,)?crt_cpm:[0-9]+\\.[0-9]{2},crt_displayUrl:.+,crt_size:[0-9]+x[0-9]+");
 
   /**
    * Those are adunit IDs that are declared on MoPub server. We need it to get an accepted bid from
@@ -69,25 +71,29 @@ public class MoPubHeaderBiddingFunctionalTest {
 
   private final WebViewLookup webViewLookup = new WebViewLookup();
 
-  private Context context;
-
-  @Before
-  public void setUp() throws Exception {
-    context = activityRule.getActivity().getApplicationContext();
-  }
-
   @Test
   public void exampleOfExpectedKeywords() throws Exception {
     assertFalse("Keywords should not be empty",
         EXPECTED_KEYWORDS.matcher("").matches());
 
+    assertFalse("Keywords should not be empty",
+        EXPECTED_KEYWORDS_FOR_BANNER.matcher("").matches());
+
     assertTrue("Keywords should use crt_cpm and crt_displayUrl",
         EXPECTED_KEYWORDS.matcher("crt_cpm:1234.56,crt_displayUrl:http://my.super/creative")
+            .matches());
+
+    assertTrue("Keywords for banner should use crt_cpm and crt_displayUrl and crt_size",
+        EXPECTED_KEYWORDS_FOR_BANNER.matcher("crt_cpm:1234.56,crt_displayUrl:http://my.super/creative,crt_size:42x1337")
             .matches());
 
     assertTrue("Keywords should accept older keywords from outside",
         EXPECTED_KEYWORDS.matcher(
             "previous keywords setup by someone,crt_cpm:1234.56,crt_displayUrl:http://my.super/creative")
+            .matches());
+
+    assertTrue("Keywords for banner should accept older keywords from outside",
+        EXPECTED_KEYWORDS_FOR_BANNER.matcher("previous keywords setup by someone,crt_cpm:1234.56,crt_displayUrl:http://my.super/creative,crt_size:42x1337")
             .matches());
   }
 
@@ -142,7 +148,7 @@ public class MoPubHeaderBiddingFunctionalTest {
 
     Criteo.getInstance().setBidsForAdUnit(moPubView, adUnit);
 
-    assertCriteoKeywordsAreInjectedInMoPubView(moPubView.getKeywords());
+    assertCriteoKeywordsAreInjectedInMoPubView(moPubView.getKeywords(), adUnit);
   }
 
   @Test
@@ -169,7 +175,7 @@ public class MoPubHeaderBiddingFunctionalTest {
 
     Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, interstitialAdUnit);
 
-    assertCriteoKeywordsAreInjectedInMoPubView(moPubInterstitial.getKeywords());
+    assertCriteoKeywordsAreInjectedInMoPubView(moPubInterstitial.getKeywords(), interstitialAdUnit);
   }
 
   @Test
@@ -276,10 +282,11 @@ public class MoPubHeaderBiddingFunctionalTest {
     return moPubInterstitial;
   }
 
-  private void assertCriteoKeywordsAreInjectedInMoPubView(String keywords) {
+  private void assertCriteoKeywordsAreInjectedInMoPubView(String keywords, AdUnit adUnit) {
     assertNotNull(keywords);
 
-    boolean isMatched = EXPECTED_KEYWORDS.matcher(keywords).matches();
+    Pattern expectedKeywords = adUnit instanceof BannerAdUnit ? EXPECTED_KEYWORDS_FOR_BANNER : EXPECTED_KEYWORDS;
+    boolean isMatched = expectedKeywords.matcher(keywords).matches();
     assertTrue(isMatched);
   }
 
