@@ -4,19 +4,27 @@ import static com.criteo.publisher.util.CriteoResultReceiver.ACTION_CLOSED;
 import static com.criteo.publisher.util.CriteoResultReceiver.ACTION_LEFT_CLICKED;
 import static com.criteo.publisher.util.CriteoResultReceiver.INTERSTITIAL_ACTION;
 import static com.criteo.publisher.util.CriteoResultReceiver.RESULT_CODE_SUCCESSFUL;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import android.os.Bundle;
 import android.os.Handler;
 import com.criteo.publisher.CriteoInterstitialAdListener;
+import java.lang.ref.WeakReference;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class CriteoResultReceiverTest {
 
   private CriteoResultReceiver criteoResultReceiver;
+
+  @Mock
+  private WeakReference<CriteoInterstitialAdListener> criteoInterstitialAdListenerRef;
 
   @Mock
   private CriteoInterstitialAdListener criteoInterstitialAdListener;
@@ -29,37 +37,59 @@ public class CriteoResultReceiverTest {
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
-    criteoResultReceiver = new CriteoResultReceiver(handler,
-        criteoInterstitialAdListener);
+    criteoResultReceiver = new CriteoResultReceiver(
+        handler,
+        criteoInterstitialAdListenerRef
+    );
   }
 
   @Test
-  public void sendOnClick() {
-    bundle = new Bundle();
-    bundle.putInt(INTERSTITIAL_ACTION, ACTION_LEFT_CLICKED);
-    criteoResultReceiver.onReceiveResult(RESULT_CODE_SUCCESSFUL, bundle);
+  public void givenListenerReachable_whenSendOnClick_ThenCallbackShouldBeCalled() {
+    givenReachableListenerReference();
 
-    Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdLeftApplication();
+    criteoResultReceiver.onReceiveResult(RESULT_CODE_SUCCESSFUL, getActionBundle(ACTION_LEFT_CLICKED));
+
+    verify(criteoInterstitialAdListener, times(1)).onAdLeftApplication();
+    verify(criteoInterstitialAdListener, times(1)).onAdClicked();
   }
 
   @Test
-  public void sendOnClose() {
-    bundle = new Bundle();
-    bundle.putInt(INTERSTITIAL_ACTION, ACTION_CLOSED);
-    criteoResultReceiver.onReceiveResult(RESULT_CODE_SUCCESSFUL, bundle);
+  public void givenListenerReachable_whenSendOnClosed_ThenCallbackShouldBeCalled() {
+    givenReachableListenerReference();
 
-    Mockito.verify(criteoInterstitialAdListener, Mockito.times(1)).onAdClosed();
+    criteoResultReceiver.onReceiveResult(RESULT_CODE_SUCCESSFUL, getActionBundle(ACTION_CLOSED));
+
+    verify(criteoInterstitialAdListener, times(1)).onAdClosed();
   }
 
   @Test
-  public void sendWithNullListener() {
-    criteoInterstitialAdListener = null;
-    bundle = new Bundle();
-    bundle.putInt(INTERSTITIAL_ACTION, ACTION_CLOSED);
-    criteoResultReceiver = new CriteoResultReceiver(handler,
-        criteoInterstitialAdListener);
-    criteoResultReceiver.onReceiveResult(RESULT_CODE_SUCCESSFUL, bundle);
+  public void givenListenerUnreachable_whenSendOnClick_ThenCallbackShouldNotBeCalled() {
+    givenUnreachableListenerReference();
+
+    criteoResultReceiver.onReceiveResult(RESULT_CODE_SUCCESSFUL, getActionBundle(ACTION_LEFT_CLICKED));
+    verifyNoInteractions(criteoInterstitialAdListener);
   }
 
+  @Test
+  public void givenListenerUnreachable_whenSendOnClose_ThenCallbackShouldNotBeCalled() {
+    givenUnreachableListenerReference();
 
+    criteoResultReceiver.onReceiveResult(RESULT_CODE_SUCCESSFUL, getActionBundle(ACTION_CLOSED));
+
+    verify(criteoInterstitialAdListener, never()).onAdClosed();
+  }
+
+  private Bundle getActionBundle(int actionClosed) {
+    bundle = new Bundle();
+    bundle.putInt(INTERSTITIAL_ACTION, actionClosed);
+    return bundle;
+  }
+
+  private void givenReachableListenerReference() {
+    when(criteoInterstitialAdListenerRef.get()).thenReturn(criteoInterstitialAdListener);
+  }
+
+  private void givenUnreachableListenerReference() {
+    when(criteoInterstitialAdListenerRef.get()).thenReturn(null);
+  }
 }

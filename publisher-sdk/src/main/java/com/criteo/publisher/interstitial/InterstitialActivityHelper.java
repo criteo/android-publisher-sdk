@@ -14,6 +14,7 @@ import com.criteo.publisher.CriteoInterstitialActivity;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.util.CriteoResultReceiver;
+import java.lang.ref.WeakReference;
 
 public class InterstitialActivityHelper {
 
@@ -77,7 +78,6 @@ public class InterstitialActivityHelper {
 
   @VisibleForTesting
   CriteoResultReceiver createReceiver(@Nullable CriteoInterstitialAdListener listener) {
-    return new CriteoResultReceiver(new Handler(Looper.getMainLooper()), listener);
+    return new CriteoResultReceiver(new Handler(Looper.getMainLooper()), new WeakReference<>(listener));
   }
-
 }
