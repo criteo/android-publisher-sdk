@@ -1,6 +1,7 @@
 package com.criteo.publisher.advancednative
 
 import android.content.ComponentName
+import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -69,7 +70,7 @@ class NativeAdMapperTest {
       on { advertiserLogoUrl } doReturn URI.create("http://logo.url").toURL()
     }
 
-    val nativeAd = mapper.map(assets, WeakReference(null))
+    val nativeAd = mapper.map(assets, WeakReference(null), mock())
 
     assertThat(nativeAd.title).isEqualTo("myTitle")
     assertThat(nativeAd.description).isEqualTo("myDescription")
@@ -97,7 +98,7 @@ class NativeAdMapperTest {
     givenDirectUiExecutor()
 
     //when
-    val nativeAd = mapper.map(assets, WeakReference(listener))
+    val nativeAd = mapper.map(assets, WeakReference(listener), mock())
 
     nativeAd.watchForImpression(view1)
     verify(visibilityTracker).watch(eq(view1), check {
@@ -144,7 +145,7 @@ class NativeAdMapperTest {
     givenDirectUiExecutor()
 
     //when
-    val nativeAd = mapper.map(assets, WeakReference(listener))
+    val nativeAd = mapper.map(assets, WeakReference(listener), mock())
     nativeAd.setProductClickableView(view1)
     nativeAd.setProductClickableView(view2)
 
@@ -181,7 +182,7 @@ class NativeAdMapperTest {
     givenDirectUiExecutor()
 
     //when
-    val nativeAd = mapper.map(assets, WeakReference(listener))
+    val nativeAd = mapper.map(assets, WeakReference(listener), mock())
     nativeAd.setAdChoiceClickableView(view1)
     nativeAd.setAdChoiceClickableView(view2)
 
@@ -208,7 +209,7 @@ class NativeAdMapperTest {
 
     whenever(adChoiceOverlay.addOverlay(inputView)).doReturn(overlappedView)
 
-    val nativeAd = mapper.map(nativeAssets, WeakReference(listener))
+    val nativeAd = mapper.map(nativeAssets, WeakReference(listener), mock())
     val outputView = nativeAd.addAdChoiceOverlay(inputView)
 
     assertThat(outputView).isEqualTo(overlappedView)
@@ -223,10 +224,38 @@ class NativeAdMapperTest {
 
     whenever(adChoiceOverlay.getAdChoiceView(inputView)).doReturn(adChoiceView)
 
-    val nativeAd = mapper.map(nativeAssets, WeakReference(listener))
+    val nativeAd = mapper.map(nativeAssets, WeakReference(listener), mock())
     val outputView = nativeAd.getAdChoiceView(inputView)
 
     assertThat(outputView).isEqualTo(adChoiceView)
+  }
+
+  @Test
+  fun createRenderedNativeView_GivenRenderer_InflateThenRenderAndSetupInternals() {
+    val listener = mock<CriteoNativeAdListener>()
+    val renderer = mock<CriteoNativeRenderer>()
+    val assets = mock<NativeAssets>(defaultAnswer=Answers.RETURNS_DEEP_STUBS)
+    val context = mock<Context>()
+    val parent = mock<ViewGroup>()
+    val inflatedView = mock<View>()
+    val nativeView = mock<ViewGroup>()
+    val adChoiceView = mock<ImageView>()
+
+    whenever(renderer.createNativeView(context, parent)).doReturn(inflatedView)
+    whenever(adChoiceOverlay.addOverlay(inflatedView)).doReturn(nativeView)
+    whenever(adChoiceOverlay.getAdChoiceView(nativeView)).doReturn(adChoiceView)
+
+    val nativeAd = spy(mapper.map(assets, WeakReference(listener), renderer))
+    val renderedView = nativeAd.createNativeRenderedView(context, parent)
+
+    assertThat(renderedView).isEqualTo(nativeView)
+
+    inOrder(renderer, nativeAd) {
+      verify(renderer).renderNativeView(nativeView, nativeAd)
+      verify(nativeAd).watchForImpression(nativeView)
+      verify(nativeAd).setProductClickableView(nativeView)
+      verify(nativeAd).setAdChoiceClickableView(adChoiceView)
+    }
   }
 
   private fun givenDirectUiExecutor() {

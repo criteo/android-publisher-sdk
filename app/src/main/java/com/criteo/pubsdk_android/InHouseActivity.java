@@ -52,7 +52,8 @@ public class InHouseActivity extends AppCompatActivity {
 
     nativeLoader = new CriteoNativeLoader(
         NATIVE,
-        new TestAppNativeAdListener(TAG, NATIVE.getAdUnitId(), adLayout)
+        new TestAppNativeAdListener(TAG, NATIVE.getAdUnitId(), adLayout),
+        new TestAppNativeRenderer()
     );
 
     findViewById(R.id.buttonInhouseBanner).setOnClickListener(v -> loadBannerAd());

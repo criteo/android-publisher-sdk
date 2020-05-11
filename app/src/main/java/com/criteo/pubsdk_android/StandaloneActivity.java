@@ -52,7 +52,8 @@ public class StandaloneActivity extends AppCompatActivity {
 
     nativeLoader = new CriteoNativeLoader(
         NATIVE,
-        new TestAppNativeAdListener(TAG, NATIVE.getAdUnitId(), adLayout)
+        new TestAppNativeAdListener(TAG, NATIVE.getAdUnitId(), adLayout),
+        new TestAppNativeRenderer()
     );
 
     findViewById(R.id.buttonStandAloneBanner).setOnClickListener(v -> loadBanner());

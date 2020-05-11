@@ -1,5 +1,6 @@
 package com.criteo.publisher.advancednative;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
@@ -34,6 +35,9 @@ public class CriteoNativeAd {
   @NonNull
   private final AdChoiceOverlay adChoiceOverlay;
 
+  @NonNull
+  private final CriteoNativeRenderer renderer;
+
   public CriteoNativeAd(
       @NonNull NativeAssets assets,
       @NonNull VisibilityTracker visibilityTracker,
@@ -41,7 +45,8 @@ public class CriteoNativeAd {
       @NonNull ClickDetection clickDetection,
       @NonNull NativeViewClickHandler clickOnProductHandler,
       @NonNull NativeViewClickHandler clickOnAdChoiceHandler,
-      @NonNull AdChoiceOverlay adChoiceOverlay
+      @NonNull AdChoiceOverlay adChoiceOverlay,
+      @NonNull CriteoNativeRenderer renderer
   ) {
     this.assets = assets;
     this.visibilityTracker = visibilityTracker;
@@ -50,6 +55,7 @@ public class CriteoNativeAd {
     this.clickOnProductHandler = clickOnProductHandler;
     this.clickOnAdChoiceHandler = clickOnAdChoiceHandler;
     this.adChoiceOverlay = adChoiceOverlay;
+    this.renderer = renderer;
   }
 
   @NonNull
@@ -90,6 +96,35 @@ public class CriteoNativeAd {
   @NonNull
   public URL getAdvertiserLogoImageUrl() {
     return assets.getAdvertiserLogoUrl();
+  }
+
+  /**
+   * Create a new rendered native view.
+   * <p>
+   * The native view is directly usable. You can add it to your view hierarchy.
+   * <p>
+   * Note that parent is given so that inflated views are setup with the {@link
+   * android.view.ViewGroup.LayoutParams} corresponding to their parent. See {@link
+   * CriteoNativeRenderer} for more information.
+   *
+   * @param context android context
+   * @param parent optional parent to get layout params from
+   * @return new renderer native view
+   */
+  @NonNull
+  public View createNativeRenderedView(@NonNull Context context, @Nullable ViewGroup parent) {
+    View nativeView = addAdChoiceOverlay(renderer.createNativeView(context, parent));
+    renderer.renderNativeView(nativeView, this);
+
+    watchForImpression(nativeView);
+    setProductClickableView(nativeView);
+
+    ImageView adChoiceView = adChoiceOverlay.getAdChoiceView(nativeView);
+    if (adChoiceView != null) {
+      setAdChoiceClickableView(adChoiceView);
+    }
+
+    return nativeView;
   }
 
   /**

@@ -25,12 +25,17 @@ public class CriteoNativeLoader {
   @NonNull
   private final CriteoNativeAdListener listener;
 
+  @NonNull
+  private final CriteoNativeRenderer renderer;
+
   public CriteoNativeLoader(
       @NonNull NativeAdUnit adUnit,
-      @NonNull CriteoNativeAdListener listener
+      @NonNull CriteoNativeAdListener listener,
+      @NonNull CriteoNativeRenderer renderer
   ) {
     this.adUnit = adUnit;
     this.listener = listener;
+    this.renderer = renderer;
   }
 
   /**
@@ -76,7 +81,7 @@ public class CriteoNativeLoader {
       notifyForFailureAsync();
     } else {
       NativeAdMapper nativeAdMapper = getNativeAdMapper();
-      CriteoNativeAd nativeAd = nativeAdMapper.map(assets, new WeakReference<>(listener));
+      CriteoNativeAd nativeAd = nativeAdMapper.map(assets, new WeakReference<>(listener), renderer);
       notifyForAdAsync(nativeAd);
     }
   }

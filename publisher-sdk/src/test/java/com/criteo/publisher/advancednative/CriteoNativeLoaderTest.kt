@@ -43,6 +43,9 @@ class CriteoNativeLoaderTest {
   @Mock
   private lateinit var listener: CriteoNativeAdListener
 
+  @Mock
+  private lateinit var renderer: CriteoNativeRenderer
+
   private lateinit var runOnUiThreadExecutor: DirectMockRunOnUiThreadExecutor
 
   private lateinit var nativeLoader: CriteoNativeLoader
@@ -57,7 +60,7 @@ class CriteoNativeLoaderTest {
     }
 
     adUnit = NativeAdUnit("myAdUnit")
-    nativeLoader = CriteoNativeLoader(adUnit, listener)
+    nativeLoader = CriteoNativeLoader(adUnit, listener, renderer)
   }
 
   @Test
@@ -165,7 +168,7 @@ class CriteoNativeLoaderTest {
     }
 
     nativeAdMapper.stub {
-      on { map(eq(nativeAssets), argThat { listener == get() }) } doReturn nativeAd
+      on { map(eq(nativeAssets), argThat { listener == get() }, eq(renderer)) } doReturn nativeAd
     }
     return nativeAd
   }

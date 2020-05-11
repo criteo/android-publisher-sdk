@@ -38,7 +38,8 @@ public class NativeAdMapper {
   @NonNull
   CriteoNativeAd map(
       @NonNull NativeAssets nativeAssets,
-      @NonNull WeakReference<CriteoNativeAdListener> listenerRef
+      @NonNull WeakReference<CriteoNativeAdListener> listenerRef,
+      @NonNull CriteoNativeRenderer renderer
   ) {
     ImpressionTask impressionTask = new ImpressionTask(
         nativeAssets.getImpressionPixels(),
@@ -64,7 +65,8 @@ public class NativeAdMapper {
         clickDetection,
         clickOnProductHandler,
         clickOnAdChoiceHandler,
-        adChoiceOverlay
+        adChoiceOverlay,
+        renderer
     );
   }
 

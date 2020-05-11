@@ -2,16 +2,11 @@ package com.criteo.pubsdk_android.listener;
 
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.advancednative.CriteoNativeAd;
-import com.criteo.publisher.advancednative.CriteoNativeAdHelper;
 import com.criteo.publisher.advancednative.CriteoNativeAdListener;
-import com.criteo.pubsdk_android.R;
 
 public class TestAppNativeAdListener extends CriteoNativeAdListener {
 
@@ -29,27 +24,7 @@ public class TestAppNativeAdListener extends CriteoNativeAdListener {
   public void onAdReceived(@NonNull CriteoNativeAd nativeAd) {
     Log.d(tag, prefix + " - Native onAdReceived");
 
-    LayoutInflater inflater = LayoutInflater.from(adLayout.getContext());
-    View view = inflater.inflate(R.layout.native_ad, null);
-    view = CriteoNativeAdHelper.addAdChoiceOverlay(nativeAd, view);
-
-    view.<TextView>findViewById(R.id.ad_headline).setText(nativeAd.getTitle());
-    view.<TextView>findViewById(R.id.ad_body).setText(nativeAd.getDescription());
-    view.<TextView>findViewById(R.id.ad_price).setText(nativeAd.getPrice());
-    view.<TextView>findViewById(R.id.ad_call_to_action).setText(nativeAd.getCallToAction());
-    view.<TextView>findViewById(R.id.ad_advertiser).setText(nativeAd.getAdvertiserDomain());
-    view.<TextView>findViewById(R.id.ad_store).setText(nativeAd.getAdvertiserDescription());
-
-    CriteoNativeAdHelper.watchForImpression(nativeAd, view);
-    CriteoNativeAdHelper.setProductClickableView(nativeAd, view);
-
-    ImageView adChoiceView = CriteoNativeAdHelper.getAdChoiceView(nativeAd, view);
-    if (adChoiceView != null) {
-      // Use dummy image while image loading feature is not available
-      adChoiceView.setImageResource(android.R.drawable.ic_delete);
-      CriteoNativeAdHelper.setAdChoiceClickableView(nativeAd, adChoiceView);
-    }
-
+    View view = nativeAd.createNativeRenderedView(adLayout.getContext(), adLayout);
     adLayout.removeAllViews();
     adLayout.addView(view);
   }
