@@ -114,7 +114,7 @@ object Deps {
 
   object Square {
     object LeakCanary {
-      private const val version = "2.1"
+      private const val version = "2.3"
 
       const val LeakCanary = "com.squareup.leakcanary:leakcanary-android:$version"
     }
