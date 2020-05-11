@@ -4,6 +4,9 @@ import org.gradle.kotlin.dsl.withType
 
 fun Project.addSlackDeploymentMessages() {
   val webHookUrl = System.getenv("SLACK_WEBHOOK") ?: return
+  val teamChannel = "#pub-sdk-private"
+  val rcChannel = "#pub-sdk-release-candidates"
+  val confluenceSpaceUrl = "https://confluence.criteois.com/display/PUBSDK/"
 
   afterEvaluate {
     tasks.withType<PublishToMavenRepository>()
@@ -15,10 +18,10 @@ fun Project.addSlackDeploymentMessages() {
             webHook.set(webHookUrl)
 
             payload {
-              if (repository.isAzure()) {
-                channel = "#pub-sdk-private"
+              channel = if (repository.isAzure()) {
+                teamChannel
               } else {
-                channel = "#pub-sdk-release-candidates"
+                rcChannel
               }
               username = "Android Release"
               iconEmoji = ":android:"
@@ -36,10 +39,15 @@ fun Project.addSlackDeploymentMessages() {
               git {
                 format {
                   context {
-                    markdown("How-to release: Go on " +
-                        "<https://build.crto.in/job/pub-sdk-mochi-prod-deployment/build|Jenkins deploy job> " +
-                        "and insert this commit SHA-1"
-                    )
+                    markdown("""
+*Promote as a RC*
+- Go on <$confluenceSpaceUrl/Bugfest+process|Bugfest creation page> and insert `${publication.version}` as RC name
+- Share this message on $teamChannel
+*Validate the RC*
+- Go on <$confluenceSpaceUrl/Bugfest+Android+${publication.version}|Bugfest page> and execute tests
+*Release the RC*
+- Go on <https://build.crto.in/job/pub-sdk-mochi-prod-deployment/build|Jenkins deploy job> and insert this commit SHA-1
+""".trimIndent())
                   }
                 }
               }

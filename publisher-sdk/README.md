@@ -38,10 +38,10 @@ Releasing a new version of the PubSDK involves a few steps:
 1. Bump the version in `buildSrc/src/main/java/SdkVersion.kt`
 2. Bump the version of _android-google-mediation_ (see its README)
 3. Bump the version of _android-mopub-mediation_ (see its README)
-4. Select a version pushed on NexusProd as a release candidate.
-5. Transfer the generated message from #pub-sdk-release-candidates to #pub-sdk-private
-6. Execute a bugfest on the RC (with mediation adapters), if there is blocker, fix it and restart from 4.
-7. Release the new SDK version on Azure (see section below)
+4. Select a version declared in #pub-sdk-release-candidates as a RC.
+5. Promote it (follows instructions)
+6. Execute a bugfest on the RC (with mediation adapters), if there is a blocker, fix it and restart from 4.
+7. Release the new SDK version on Azure (see Slack message or section below)
 8. Release the new _android-google-mediation_ version on Azure (see its README)
 9. Release the new _android-mopub-mediation_ version on Azure (see its README)
 
