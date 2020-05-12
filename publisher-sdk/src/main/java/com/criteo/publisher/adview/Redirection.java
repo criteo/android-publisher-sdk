@@ -11,6 +11,8 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import com.criteo.publisher.activity.NoOpActivityLifecycleCallbacks;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.List;
 
 public class Redirection {
@@ -48,7 +50,7 @@ public class Redirection {
         BackOnTargetActivityTracker tracker = new BackOnTargetActivityTracker(
             application,
             hostActivityName,
-            listener
+            new WeakReference<>(listener)
         );
         application.registerActivityLifecycleCallbacks(tracker);
       }
@@ -63,17 +65,17 @@ public class Redirection {
     @NonNull
     private final ComponentName trackedActivity;
 
-    @Nullable
-    private RedirectionListener listener;
+    @NonNull
+    private Reference<RedirectionListener> listenerRef;
 
     public BackOnTargetActivityTracker(
         @NonNull Application application,
         @NonNull ComponentName trackedActivity,
-        @Nullable RedirectionListener listener
+        @NonNull Reference<RedirectionListener> listenerRef
     ) {
       this.application = application;
       this.trackedActivity = trackedActivity;
-      this.listener = listener;
+      this.listenerRef = listenerRef;
     }
 
     @Override
@@ -82,16 +84,13 @@ public class Redirection {
         return;
       }
 
-      RedirectionListener listener = this.listener;
-      if (listener == null) {
+      RedirectionListener redirectionListener = listenerRef.get();
+      if (redirectionListener == null) {
         return;
       }
 
-      listener.onUserBackFromAd();
+      redirectionListener.onUserBackFromAd();
       application.unregisterActivityLifecycleCallbacks(this);
-      this.listener = null;
     }
-
   }
-
 }
