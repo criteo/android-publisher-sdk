@@ -6,6 +6,7 @@ import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.BuildConfigWrapper;
+import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -22,7 +24,7 @@ public class AdChoiceOverlay {
   // This is used instead of View.setTag, which causes a memory leak in 2.3
   // and earlier: https://code.google.com/p/android/issues/detail?id=18273
   @NonNull
-  private final Map<View, ImageView> adChoicePerView = new WeakHashMap<>();
+  private final Map<View, WeakReference<ImageView>> adChoicePerView = new WeakHashMap<>();
 
   @NonNull
   private final BuildConfigWrapper buildConfigWrapper;
@@ -88,7 +90,7 @@ public class AdChoiceOverlay {
       adChoiceImageView.setOutlineProvider(null);
     }
 
-    adChoicePerView.put(overlayFrameLayout, adChoiceImageView);
+    adChoicePerView.put(overlayFrameLayout, new WeakReference<>(adChoiceImageView));
 
     return overlayFrameLayout;
   }
@@ -103,7 +105,16 @@ public class AdChoiceOverlay {
    */
   @Nullable
   ImageView getAdChoiceView(@NonNull View overlappedView) {
-    return adChoicePerView.get(overlappedView);
+    WeakReference<ImageView> adChoiceViewRef = adChoicePerView.get(overlappedView);
+    if (adChoiceViewRef == null) {
+      return null;
+    }
+    return adChoiceViewRef.get();
+  }
+
+  @VisibleForTesting
+  int getAdChoiceCount() {
+    return adChoicePerView.size();
   }
 
 }
