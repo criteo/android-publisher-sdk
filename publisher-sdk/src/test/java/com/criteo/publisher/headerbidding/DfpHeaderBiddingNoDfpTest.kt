@@ -25,7 +25,7 @@ To run those test locally and properly, you should use Gradle. Either via gradle
 via IntelliJ delegating test run to Gradle.
 """).isInstanceOf(ClassNotFoundException::class.java)
 
-    headerBidding = DfpHeaderBidding()
+    headerBidding = DfpHeaderBidding(mock(), mock())
   }
 
   @Test

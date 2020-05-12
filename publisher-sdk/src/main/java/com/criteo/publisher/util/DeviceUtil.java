@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.WindowManager;
 import com.criteo.publisher.model.AdSize;
 
 public class DeviceUtil {
@@ -25,17 +24,36 @@ public class DeviceUtil {
     this.advertisingInfo = advertisingInfo;
   }
 
+  /**
+   * Indicate if the device is a tablet or not.
+   * <p>
+   * The definition of a tablet is based on its <a href="https://developer.android.com/training/multiscreen/screensizes.html#TaskUseSWQuali">smallest
+   * width</a>: if width is above or equal to 600dp, then it is a tablet.
+   * <p>
+   * The corollary is that, if this is not a tablet, then we consider this as a mobile.
+   *
+   * @return <code>true</code> if this device is a tablet
+   */
+  public boolean isTablet() {
+    DisplayMetrics metrics = getDisplayMetrics();
+    int smallestWidthInPixel = Math.min(metrics.widthPixels, metrics.heightPixels);
+    float thresholdInPixel = 600.f * metrics.density;
+    return smallestWidthInPixel >= thresholdInPixel;
+  }
+
   public void createSupportedScreenSizes() {
     try {
-      DisplayMetrics metrics = new DisplayMetrics();
-      ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay()
-          .getMetrics(metrics);
+      DisplayMetrics metrics = getDisplayMetrics();
       setScreenSize(Math.round(metrics.widthPixels / metrics.density),
           Math.round(metrics.heightPixels / metrics.density));
     } catch (Exception e) {
       // FIXME(ma.chentir) message might be misleading as this could not be the only exception cause
       throw new Error("Screen parameters can not be empty or null", e);
     }
+  }
+
+  private DisplayMetrics getDisplayMetrics() {
+    return context.getResources().getDisplayMetrics();
   }
 
   public void setScreenSize(int screenWidth, int screenHeight) {
@@ -50,7 +68,7 @@ public class DeviceUtil {
   public AdSize getSizeLandscape() {
     return sizeLandscape;
   }
-  
+
   @Nullable
   public String getAdvertisingId() {
     try {

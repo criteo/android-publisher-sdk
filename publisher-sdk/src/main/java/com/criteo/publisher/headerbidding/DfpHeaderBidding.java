@@ -1,5 +1,6 @@
 package com.criteo.publisher.headerbidding;
 
+import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
@@ -10,7 +11,9 @@ import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeProduct;
+import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.Base64;
+import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.util.TextUtils;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest.Builder;
@@ -41,6 +44,20 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
   private static final String CRT_NATIVE_PIXEL_URL = "crtn_pixurl_";
   private static final String CRT_NATIVE_PIXEL_COUNT = "crtn_pixcount";
 
+  @NonNull
+  private final AndroidUtil androidUtil;
+
+  @NonNull
+  private final DeviceUtil deviceUtil;
+
+  public DfpHeaderBidding(
+      @NonNull AndroidUtil androidUtil,
+      @NonNull DeviceUtil deviceUtil
+  ) {
+    this.androidUtil = androidUtil;
+    this.deviceUtil = deviceUtil;
+  }
+
   @Override
   public boolean canHandle(@NonNull Object object) {
     return SafeDfpBuilder.isDfpBuilder(object);
@@ -62,6 +79,40 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
       builder.addCustomTargeting(CRT_SIZE, slot.getWidth() + "x" + slot.getHeight());
     } else if (adUnit instanceof InterstitialAdUnit) {
       checkAndReflect(builder, slot.getDisplayUrl(), CRT_DISPLAY_URL);
+      builder.addCustomTargeting(CRT_SIZE, getDfpSizeForInterstitial(slot));
+    }
+  }
+
+  /**
+   * Return constant sizes for interstitial:
+   * <ul>
+   *   <li>320x480 (portrait) or 480x320 (landscape) for mobile devices</li>
+   *   <li>768x1024 (portrait) and 1024x768 (landscape) for tablets</li>
+   *   <li>If a device isn't big enough to fit a 1024x768 or 768x1024, it will fall back to the 320x480 or 480x320 size</li>
+   * </ul>
+   * <p>
+   * Those sizes are constant because they have a meaning in DFP.
+   */
+  @NonNull
+  private String getDfpSizeForInterstitial(@NonNull Slot slot) {
+    boolean isPortrait = androidUtil.getOrientation() == Configuration.ORIENTATION_PORTRAIT;
+
+    if (deviceUtil.isTablet()) {
+      // This dimension are when device is in landscape and should be transposed for portrait.
+      int minTabletWidth = 1024;
+      int minTabletHeight = 768;
+
+      if (isPortrait && slot.getWidth() >= minTabletHeight && slot.getHeight() >= minTabletWidth) {
+        return "768x1024";
+      } else if (!isPortrait && slot.getWidth() >= minTabletWidth && slot.getHeight() >= minTabletHeight) {
+        return "1024x768";
+      }
+    }
+
+    if (isPortrait) {
+      return "320x480";
+    } else {
+      return "480x320";
     }
   }
 

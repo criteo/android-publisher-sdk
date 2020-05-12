@@ -1,12 +1,15 @@
 package com.criteo.publisher.util;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
+import android.util.DisplayMetrics;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -14,7 +17,7 @@ public class DeviceUtilTest {
 
   private static final String DEVICE_ID_LIMITED = "00000000-0000-0000-0000-000000000000";
 
-  @Mock
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private Context context;
 
   @Mock
@@ -83,4 +86,61 @@ public class DeviceUtilTest {
 
     assertNull(advertisingId);
   }
+
+  @Test
+  public void isTablet_GivenDeviceInPortraitAndWidthBelow600dp_ReturnFalse() throws Exception {
+    DisplayMetrics metrics = new DisplayMetrics();
+    when(context.getResources().getDisplayMetrics()).thenReturn(metrics);
+
+    metrics.density = 1.25f;
+    metrics.widthPixels = 749; // 600dp is 750pixel
+    metrics.heightPixels = 1000;
+
+    boolean isTablet = deviceUtil.isTablet();
+
+    assertThat(isTablet).isFalse();
+  }
+
+  @Test
+  public void isTablet_GivenDeviceInPortraitAndWidthAboveOrEqualTo600dp_ReturnTrue() throws Exception {
+    DisplayMetrics metrics = new DisplayMetrics();
+    when(context.getResources().getDisplayMetrics()).thenReturn(metrics);
+
+    metrics.density = 1.25f;
+    metrics.widthPixels = 750; // 600dp is 750pixel
+    metrics.heightPixels = 1000;
+
+    boolean isTablet = deviceUtil.isTablet();
+
+    assertThat(isTablet).isTrue();
+  }
+
+  @Test
+  public void isTablet_GivenDeviceInLandscapeAndHeightBelow600dp_ReturnFalse() throws Exception {
+    DisplayMetrics metrics = new DisplayMetrics();
+    when(context.getResources().getDisplayMetrics()).thenReturn(metrics);
+
+    metrics.density = 1.25f;
+    metrics.widthPixels = 1000;
+    metrics.heightPixels = 749; // 600dp is 750pixel
+
+    boolean isTablet = deviceUtil.isTablet();
+
+    assertThat(isTablet).isFalse();
+  }
+
+  @Test
+  public void isTablet_GivenDeviceInLandscapeAndHeightAboveOrEqualTo600dp_ReturnTrue() throws Exception {
+    DisplayMetrics metrics = new DisplayMetrics();
+    when(context.getResources().getDisplayMetrics()).thenReturn(metrics);
+
+    metrics.density = 1.25f;
+    metrics.widthPixels = 1000;
+    metrics.heightPixels = 750; // 600dp is 750pixel
+
+    boolean isTablet = deviceUtil.isTablet();
+
+    assertThat(isTablet).isTrue();
+  }
+
 }

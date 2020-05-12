@@ -514,7 +514,7 @@ public class DependencyProvider {
             provideBidManager(),
             asList(
                 new MoPubHeaderBidding(),
-                new DfpHeaderBidding(),
+                new DfpHeaderBidding(provideAndroidUtil(), provideDeviceUtil()),
                 new OtherAdServersHeaderBidding()
             )
         );
