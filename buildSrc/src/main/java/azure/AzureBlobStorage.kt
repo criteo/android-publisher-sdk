@@ -94,11 +94,10 @@ class AzureBlobStorage(
   private fun uploadBlob(path: Path, blobName: String) {
     val blob = blobContainer.getBlockBlobReference(blobName)
 
-    // FIXME reactivate the Azure deployment
     println("Upload $path to $blobName")
-//    Files.newInputStream(path).use {
-//      blob.upload(it, Files.size(path))
-//    }
+    Files.newInputStream(path).use {
+      blob.upload(it, Files.size(path))
+    }
   }
 
   private fun createBlobContainer(): CloudBlobContainer {
