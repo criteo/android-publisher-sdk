@@ -1,7 +1,6 @@
 package com.criteo.publisher.concurrent;
 
 import android.support.annotation.NonNull;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This is a mock implementation of the {@link RunOnUiThreadExecutor} class.
@@ -14,24 +13,24 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class DirectMockRunOnUiThreadExecutor extends RunOnUiThreadExecutor {
 
-  private final AtomicInteger runningOnUiThreadCount = new AtomicInteger(0);
-
-  public boolean isRunningOnUiThread() {
-    return runningOnUiThreadCount.get() > 0;
-  }
+  private final DirectMockExecutor delegate = new DirectMockExecutor();
 
   @Override
   public void execute(@NonNull Runnable command) {
-    runningOnUiThreadCount.incrementAndGet();
-    try {
-      command.run();
-    } finally {
-      runningOnUiThreadCount.decrementAndGet();
-    }
+    delegate.execute(command);
   }
 
   @Override
   public void executeAsync(@NonNull Runnable command) {
     execute(command);
   }
+
+  public void expectIsRunningInExecutor() {
+    delegate.expectIsRunningInExecutor();
+  }
+
+  public void verifyExpectations() {
+    delegate.verifyExpectations();
+  }
+
 }

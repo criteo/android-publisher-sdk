@@ -1,5 +1,6 @@
 package com.criteo.publisher.network
 
+import com.criteo.publisher.concurrent.DirectMockExecutor
 import com.criteo.publisher.model.*
 import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
 import com.criteo.publisher.util.CdbCallListener
@@ -13,7 +14,6 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import java.io.IOException
 import java.util.concurrent.*
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
 class BidRequestSenderTest {
@@ -42,7 +42,7 @@ class BidRequestSenderTest {
         givenNewSender()
     }
 
-    private fun givenNewSender() {
+    private fun givenNewSender(executor: Executor = this.executor) {
         sender = BidRequestSender(
                 cdbRequestFactory,
                 remoteConfigRequestFactory,
@@ -77,25 +77,17 @@ class BidRequestSenderTest {
 
     @Test
     fun sendRemoteConfigRequest_GivenExecutor_IsWorkingInExecutor() {
-        val isInExecutor = AtomicBoolean(false)
-        val wasWorkingInExecutor = AtomicBoolean(false)
-
-        executor = Executor {
-            isInExecutor.set(true)
-            it.run()
-            isInExecutor.set(false)
-        }
-
-        givenNewSender()
+        val executor = DirectMockExecutor()
+        givenNewSender(executor=executor)
 
         doAnswer {
-            wasWorkingInExecutor.set(isInExecutor.get())
+            executor.expectIsRunningInExecutor()
             null
         }.whenever(api).loadConfig(anyOrNull())
 
         sender.sendRemoteConfigRequest(mock())
 
-        assertThat(wasWorkingInExecutor).isTrue
+        executor.verifyExpectations()
     }
 
     @Test
@@ -148,25 +140,17 @@ class BidRequestSenderTest {
 
     @Test
     fun sendBidRequest_GivenExecutor_IsWorkingInExecutor() {
-        val isInExecutor = AtomicBoolean(false)
-        val wasWorkingInExecutor = AtomicBoolean(false)
-
-        executor = Executor {
-            isInExecutor.set(true)
-            it.run()
-            isInExecutor.set(false)
-        }
-
-        givenNewSender()
+        val executor = DirectMockExecutor()
+        givenNewSender(executor=executor)
 
         doAnswer {
-            wasWorkingInExecutor.set(isInExecutor.get())
+            executor.expectIsRunningInExecutor()
             null
         }.whenever(api).loadCdb(anyOrNull(), anyOrNull())
 
         sender.sendBidRequest(listOf(createAdUnit()), mock())
 
-        assertThat(wasWorkingInExecutor).isTrue
+        executor.verifyExpectations()
     }
 
     @Test

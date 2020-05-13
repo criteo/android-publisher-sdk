@@ -6,7 +6,6 @@ import com.criteo.publisher.adview.Redirection
 import com.criteo.publisher.adview.RedirectionListener
 import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor
 import com.nhaarman.mockitokotlin2.*
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -47,6 +46,7 @@ class ClickHelperTest {
     clickHelper.notifyUserClickAsync(listener)
 
     verify(listener).onAdClicked()
+    runOnUiThreadExecutor.verifyExpectations()
   }
 
   @Test
@@ -63,6 +63,7 @@ class ClickHelperTest {
     clickHelper.notifyUserIsLeavingApplicationAsync(listener)
 
     verify(listener).onAdLeftApplication()
+    runOnUiThreadExecutor.verifyExpectations()
   }
 
   @Test
@@ -79,6 +80,7 @@ class ClickHelperTest {
     clickHelper.notifyUserIsBackToApplicationAsync(listener)
 
     verify(listener).onAdClosed()
+    runOnUiThreadExecutor.verifyExpectations()
   }
 
   @Test
@@ -99,17 +101,17 @@ class ClickHelperTest {
   private fun expectListenerToBeCalledOnUiThread(): CriteoNativeAdListener {
     return mock {
       on { onAdClicked() } doAnswer {
-        assertThat(runOnUiThreadExecutor.isRunningOnUiThread).isTrue()
+        runOnUiThreadExecutor.expectIsRunningInExecutor()
         null
       }
 
       on { onAdLeftApplication() } doAnswer {
-        assertThat(runOnUiThreadExecutor.isRunningOnUiThread).isTrue()
+        runOnUiThreadExecutor.expectIsRunningInExecutor()
         null
       }
 
       on { onAdClosed() } doAnswer {
-        assertThat(runOnUiThreadExecutor.isRunningOnUiThread).isTrue()
+        runOnUiThreadExecutor.expectIsRunningInExecutor()
         null
       }
     }

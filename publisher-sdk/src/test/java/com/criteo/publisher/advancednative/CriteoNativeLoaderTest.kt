@@ -12,7 +12,6 @@ import com.criteo.publisher.model.Slot
 import com.criteo.publisher.model.nativeads.NativeAssets
 import com.criteo.publisher.util.BuildConfigWrapper
 import com.nhaarman.mockitokotlin2.*
-import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
 import org.junit.Rule
@@ -71,6 +70,7 @@ class CriteoNativeLoaderTest {
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
     verifyNoMoreInteractions(listener)
+    runOnUiThreadExecutor.verifyExpectations()
   }
 
   @Test
@@ -83,6 +83,7 @@ class CriteoNativeLoaderTest {
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
     verifyNoMoreInteractions(listener)
+    runOnUiThreadExecutor.verifyExpectations()
   }
 
   @Test
@@ -95,6 +96,7 @@ class CriteoNativeLoaderTest {
 
     verify(listener).onAdReceived(nativeAd)
     verifyNoMoreInteractions(listener)
+    runOnUiThreadExecutor.verifyExpectations()
   }
 
   @Test
@@ -106,6 +108,7 @@ class CriteoNativeLoaderTest {
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
     verifyNoMoreInteractions(listener)
+    runOnUiThreadExecutor.verifyExpectations()
   }
 
   @Test
@@ -117,6 +120,7 @@ class CriteoNativeLoaderTest {
 
     verify(listener).onAdReceived(nativeAd)
     verifyNoMoreInteractions(listener)
+    runOnUiThreadExecutor.verifyExpectations()
   }
 
   @Test
@@ -128,6 +132,7 @@ class CriteoNativeLoaderTest {
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
     verifyNoMoreInteractions(listener)
+    runOnUiThreadExecutor.verifyExpectations()
   }
 
   @Test
@@ -186,12 +191,12 @@ class CriteoNativeLoaderTest {
   private fun expectListenerToBeCalledOnUiThread() {
     listener.stub {
       on { onAdFailedToReceive(any()) } doAnswer {
-        assertThat(runOnUiThreadExecutor.isRunningOnUiThread).isTrue()
+        runOnUiThreadExecutor.expectIsRunningInExecutor()
         null
       }
 
       on { onAdReceived(any()) } doAnswer {
-        assertThat(runOnUiThreadExecutor.isRunningOnUiThread).isTrue()
+        runOnUiThreadExecutor.expectIsRunningInExecutor()
         null
       }
     }

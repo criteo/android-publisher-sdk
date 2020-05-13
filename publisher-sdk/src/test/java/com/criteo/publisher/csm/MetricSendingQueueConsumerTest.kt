@@ -1,19 +1,18 @@
 package com.criteo.publisher.csm
 
+import com.criteo.publisher.concurrent.DirectMockExecutor
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.model.Config
 import com.criteo.publisher.network.PubSdkApi
 import com.criteo.publisher.util.BuildConfigWrapper
 import com.nhaarman.mockitokotlin2.*
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import java.io.IOException
-import java.util.concurrent.Executor
 
 class MetricSendingQueueConsumerTest {
 
@@ -33,8 +32,7 @@ class MetricSendingQueueConsumerTest {
   @SpyBean
   private lateinit var config: Config
 
-  @Mock
-  private lateinit var executor: Executor
+  private val executor = DirectMockExecutor()
 
   private lateinit var consumer: MetricSendingQueueConsumer
 
@@ -45,8 +43,6 @@ class MetricSendingQueueConsumerTest {
     buildConfigWrapper.stub {
       on { preconditionThrowsOnException() } doReturn false
     }
-
-    givenExecutor(Executor { it.run() })
 
     consumer = MetricSendingQueueConsumer(
         queue,
@@ -150,27 +146,14 @@ class MetricSendingQueueConsumerTest {
       on { poll(any()) } doReturn listOf(Metric.builder("id1").build())
     }
 
-    var isInExecutor = false
-    givenExecutor(Executor {
-      isInExecutor = true
-      it.run()
-      isInExecutor = false
-    })
-
     doAnswer {
-      assertThat(isInExecutor).isTrue()
+      executor.expectIsRunningInExecutor()
     }.whenever(api).postCsm(any())
 
     consumer.sendMetricBatch()
 
     verify(api).postCsm(any())
-  }
-
-  private fun givenExecutor(executor: Executor) {
-    doAnswer {
-      val command = it.arguments[0] as Runnable
-      executor.execute(command)
-    }.whenever(this.executor).execute(any())
+    executor.verifyExpectations()
   }
 
 }
