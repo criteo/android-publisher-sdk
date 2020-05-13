@@ -24,11 +24,15 @@ public class RendererHelper {
     this.uiExecutor = uiExecutor;
   }
 
-  public void setMediaInView(@NonNull URL imageUrl, @NonNull ImageView imageView) {
+  public void setMediaInView(CriteoMedia mediaContent, ImageView imageView) {
+    setMediaInView(mediaContent.getImageUrl(), imageView);
+  }
+
+  void setMediaInView(@NonNull URL url, @NonNull ImageView imageView) {
     uiExecutor.execute(new SafeRunnable() {
       @Override
       public void runSafely() throws Throwable {
-        imageLoader.loadImageInto(imageUrl, imageView);
+        imageLoader.loadImageInto(url, imageView);
       }
     });
   }

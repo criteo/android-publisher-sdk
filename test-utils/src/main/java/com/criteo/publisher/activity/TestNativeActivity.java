@@ -99,11 +99,11 @@ public class TestNativeActivity extends Activity {
             ((TextView) layout.getChildAt(2)).setText(nativeAd.getPrice());
             ((TextView) layout.getChildAt(3)).setText(nativeAd.getCallToAction());
             ((ImageView) layout.getChildAt(4)).setImageDrawable(getDefaultDrawable());
-            helper.setMediaInView(nativeAd.getProductImageUrl(), (ImageView) layout.getChildAt(4));
+            helper.setMediaInView(nativeAd.getProductMedia(), (ImageView) layout.getChildAt(4));
             ((TextView) layout.getChildAt(5)).setText(nativeAd.getAdvertiserDomain());
             ((TextView) layout.getChildAt(6)).setText(nativeAd.getAdvertiserDescription());
             ((ImageView) layout.getChildAt(7)).setImageDrawable(getDefaultDrawable());
-            helper.setMediaInView(nativeAd.getAdvertiserLogoImageUrl(), (ImageView) layout.getChildAt(7));
+            helper.setMediaInView(nativeAd.getAdvertiserLogoMedia(), (ImageView) layout.getChildAt(7));
           }
 
           private TextView createTextView(@NonNull Context context, @NonNull Object tag) {

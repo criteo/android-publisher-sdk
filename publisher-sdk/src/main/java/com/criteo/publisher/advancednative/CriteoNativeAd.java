@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import com.criteo.publisher.annotation.Incubating;
 import com.criteo.publisher.model.nativeads.NativeAssets;
-import java.net.URL;
 
 @Incubating(Incubating.NATIVE)
 public class CriteoNativeAd {
@@ -84,8 +83,8 @@ public class CriteoNativeAd {
   }
 
   @NonNull
-  public URL getProductImageUrl() {
-    return assets.getProduct().getImageUrl();
+  public CriteoMedia getProductMedia() {
+    return CriteoMedia.create(assets.getProduct().getImageUrl());
   }
 
   @NonNull
@@ -99,8 +98,8 @@ public class CriteoNativeAd {
   }
 
   @NonNull
-  public URL getAdvertiserLogoImageUrl() {
-    return assets.getAdvertiserLogoUrl();
+  public CriteoMedia getAdvertiserLogoMedia() {
+    return CriteoMedia.create(assets.getAdvertiserLogoUrl());
   }
 
   /**

@@ -79,10 +79,10 @@ class NativeAdMapperTest {
     assertThat(nativeAd.description).isEqualTo("myDescription")
     assertThat(nativeAd.price).isEqualTo("42€")
     assertThat(nativeAd.callToAction).isEqualTo("myCTA")
-    assertThat(nativeAd.productImageUrl).isEqualTo(URI.create("http://click.url").toURL())
+    assertThat(nativeAd.productMedia).isEqualTo(CriteoMedia.create(URI.create("http://click.url").toURL()))
     assertThat(nativeAd.advertiserDomain).isEqualTo("advDomain")
     assertThat(nativeAd.advertiserDescription).isEqualTo("advDescription")
-    assertThat(nativeAd.advertiserLogoImageUrl).isEqualTo(URI.create("http://logo.url").toURL())
+    assertThat(nativeAd.advertiserLogoMedia).isEqualTo(CriteoMedia.create(URI.create("http://logo.url").toURL()))
   }
 
   @Test

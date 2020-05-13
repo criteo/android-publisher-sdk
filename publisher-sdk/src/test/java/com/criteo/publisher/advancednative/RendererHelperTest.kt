@@ -14,6 +14,7 @@ class RendererHelperTest {
   @Test
   fun setMediaInView_GivenImageLoader_DelegateToIt() {
     val url = URI.create("http://image.url").toURL()
+    val media = CriteoMedia.create(url)
     val imageView = mock<ImageView>()
     val imageLoader = mock<ImageLoader>()
     val helper = RendererHelper(imageLoader, uiExecutor)
@@ -23,7 +24,7 @@ class RendererHelperTest {
       null
     }.whenever(imageLoader).loadImageInto(any(), any())
 
-    helper.setMediaInView(url, imageView)
+    helper.setMediaInView(media, imageView)
 
     verify(imageLoader).loadImageInto(url, imageView)
     uiExecutor.expectIsRunningInExecutor()
