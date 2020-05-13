@@ -14,6 +14,7 @@ import com.criteo.publisher.advancednative.CriteoNativeAd;
 import com.criteo.publisher.advancednative.CriteoNativeAdListener;
 import com.criteo.publisher.advancednative.CriteoNativeLoader;
 import com.criteo.publisher.advancednative.CriteoNativeRenderer;
+import com.criteo.publisher.advancednative.RendererHelper;
 
 /**
  * This tries to generate memory leaks by having inner class with strong references to the parent
@@ -53,7 +54,11 @@ public class MemoryTestNativeActivity extends Activity {
           }
 
           @Override
-          public void renderNativeView(@NonNull View nativeView, @NonNull CriteoNativeAd nativeAd) {
+          public void renderNativeView(
+              @NonNull RendererHelper helper,
+              @NonNull View nativeView,
+              @NonNull CriteoNativeAd nativeAd
+          ) {
           }
         }
     );

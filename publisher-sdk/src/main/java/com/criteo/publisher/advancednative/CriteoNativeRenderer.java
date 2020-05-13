@@ -40,9 +40,14 @@ public interface CriteoNativeRenderer {
    * having residual data, you should clear the view. If you're not setting values conditionally,
    * you should not be worried about this warning.
    *
+   * @param helper helper class providing extension features, such as image loading
    * @param nativeView the view to fill with data
    * @param nativeAd Ad payload that you can use
    */
-  void renderNativeView(@NonNull View nativeView, @NonNull CriteoNativeAd nativeAd);
+  void renderNativeView(
+      @NonNull RendererHelper helper,
+      @NonNull View nativeView,
+      @NonNull CriteoNativeAd nativeAd
+  );
 
 }

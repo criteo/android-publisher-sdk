@@ -13,8 +13,10 @@ import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.advancednative.AdChoiceOverlay;
 import com.criteo.publisher.advancednative.ClickDetection;
 import com.criteo.publisher.advancednative.ClickHelper;
+import com.criteo.publisher.advancednative.CriteoImageLoader;
 import com.criteo.publisher.advancednative.ImpressionHelper;
 import com.criteo.publisher.advancednative.NativeAdMapper;
+import com.criteo.publisher.advancednative.RendererHelper;
 import com.criteo.publisher.advancednative.VisibilityChecker;
 import com.criteo.publisher.advancednative.VisibilityTracker;
 import com.criteo.publisher.adview.Redirection;
@@ -423,7 +425,8 @@ public class DependencyProvider {
                 provideTopActivityFinder(),
                 provideRunOnUiThreadExecutor()
             ),
-            provideAdChoiceOverlay()
+            provideAdChoiceOverlay(),
+            provideRendererHelper()
         );
       }
     });
@@ -471,6 +474,20 @@ public class DependencyProvider {
         return new AdChoiceOverlay(
             provideBuildConfigWrapper(),
             provideAndroidUtil()
+        );
+      }
+    });
+  }
+
+  @NonNull
+  public RendererHelper provideRendererHelper() {
+    return getOrCreate(RendererHelper.class, new Factory<RendererHelper>() {
+      @NonNull
+      @Override
+      public RendererHelper create() {
+        return new RendererHelper(
+            new CriteoImageLoader(),
+            provideRunOnUiThreadExecutor()
         );
       }
     });

@@ -48,6 +48,9 @@ class NativeAdMapperTest {
   private lateinit var adChoiceOverlay: AdChoiceOverlay
 
   @MockBean
+  private lateinit var rendererHelper: RendererHelper
+
+  @MockBean
   private lateinit var api: PubSdkApi
 
   @Inject
@@ -251,7 +254,7 @@ class NativeAdMapperTest {
     assertThat(renderedView).isEqualTo(nativeView)
 
     inOrder(renderer, nativeAd) {
-      verify(renderer).renderNativeView(nativeView, nativeAd)
+      verify(renderer).renderNativeView(rendererHelper, nativeView, nativeAd)
       verify(nativeAd).watchForImpression(nativeView)
       verify(nativeAd).setProductClickableView(nativeView)
       verify(nativeAd).setAdChoiceClickableView(adChoiceView)

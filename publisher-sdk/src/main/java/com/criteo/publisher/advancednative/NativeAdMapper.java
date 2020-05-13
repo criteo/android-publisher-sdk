@@ -21,18 +21,23 @@ public class NativeAdMapper {
   @NonNull
   private final AdChoiceOverlay adChoiceOverlay;
 
+  @NonNull
+  private final RendererHelper rendererHelper;
+
   public NativeAdMapper(
       @NonNull VisibilityTracker visibilityTracker,
       @NonNull ImpressionHelper impressionHelper,
       @NonNull ClickDetection clickDetection,
       @NonNull ClickHelper clickHelper,
-      @NonNull AdChoiceOverlay adChoiceOverlay
+      @NonNull AdChoiceOverlay adChoiceOverlay,
+      @NonNull RendererHelper rendererHelper
   ) {
     this.visibilityTracker = visibilityTracker;
     this.impressionHelper = impressionHelper;
     this.clickDetection = clickDetection;
     this.clickHelper = clickHelper;
     this.adChoiceOverlay = adChoiceOverlay;
+    this.rendererHelper = rendererHelper;
   }
 
   @NonNull
@@ -66,7 +71,8 @@ public class NativeAdMapper {
         clickOnProductHandler,
         clickOnAdChoiceHandler,
         adChoiceOverlay,
-        renderer
+        renderer,
+        rendererHelper
     );
   }
 

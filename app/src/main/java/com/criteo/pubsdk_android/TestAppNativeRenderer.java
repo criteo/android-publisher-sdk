@@ -6,11 +6,10 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import com.criteo.publisher.advancednative.CriteoNativeAd;
-import com.criteo.publisher.advancednative.CriteoNativeAdHelper;
 import com.criteo.publisher.advancednative.CriteoNativeRenderer;
+import com.criteo.publisher.advancednative.RendererHelper;
 
 public class TestAppNativeRenderer implements CriteoNativeRenderer {
 
@@ -22,7 +21,11 @@ public class TestAppNativeRenderer implements CriteoNativeRenderer {
   }
 
   @Override
-  public void renderNativeView(@NonNull View nativeView, @NonNull CriteoNativeAd nativeAd) {
+  public void renderNativeView(
+      @NonNull RendererHelper helper,
+      @NonNull View nativeView,
+      @NonNull CriteoNativeAd nativeAd
+  ) {
     nativeView.<TextView>findViewById(R.id.ad_headline).setText(nativeAd.getTitle());
     nativeView.<TextView>findViewById(R.id.ad_body).setText(nativeAd.getDescription());
     nativeView.<TextView>findViewById(R.id.ad_price).setText(nativeAd.getPrice());
@@ -30,10 +33,7 @@ public class TestAppNativeRenderer implements CriteoNativeRenderer {
     nativeView.<TextView>findViewById(R.id.ad_advertiser).setText(nativeAd.getAdvertiserDomain());
     nativeView.<TextView>findViewById(R.id.ad_store).setText(nativeAd.getAdvertiserDescription());
 
-    ImageView adChoiceView = CriteoNativeAdHelper.getAdChoiceView(nativeAd, nativeView);
-    if (adChoiceView != null) {
-      // Use dummy image while image loading feature is not available
-      adChoiceView.setImageResource(android.R.drawable.ic_delete);
-    }
+    helper.setMediaInView(nativeAd.getProductImageUrl(), nativeView.findViewById(R.id.ad_media));
+    helper.setMediaInView(nativeAd.getAdvertiserLogoImageUrl(), nativeView.findViewById(R.id.ad_app_icon));
   }
 }

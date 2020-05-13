@@ -38,6 +38,9 @@ public class CriteoNativeAd {
   @NonNull
   private final CriteoNativeRenderer renderer;
 
+  @NonNull
+  private final RendererHelper rendererHelper;
+
   public CriteoNativeAd(
       @NonNull NativeAssets assets,
       @NonNull VisibilityTracker visibilityTracker,
@@ -46,7 +49,8 @@ public class CriteoNativeAd {
       @NonNull NativeViewClickHandler clickOnProductHandler,
       @NonNull NativeViewClickHandler clickOnAdChoiceHandler,
       @NonNull AdChoiceOverlay adChoiceOverlay,
-      @NonNull CriteoNativeRenderer renderer
+      @NonNull CriteoNativeRenderer renderer,
+      @NonNull RendererHelper rendererHelper
   ) {
     this.assets = assets;
     this.visibilityTracker = visibilityTracker;
@@ -56,6 +60,7 @@ public class CriteoNativeAd {
     this.clickOnAdChoiceHandler = clickOnAdChoiceHandler;
     this.adChoiceOverlay = adChoiceOverlay;
     this.renderer = renderer;
+    this.rendererHelper = rendererHelper;
   }
 
   @NonNull
@@ -114,7 +119,7 @@ public class CriteoNativeAd {
   @NonNull
   public View createNativeRenderedView(@NonNull Context context, @Nullable ViewGroup parent) {
     View nativeView = addAdChoiceOverlay(renderer.createNativeView(context, parent));
-    renderer.renderNativeView(nativeView, this);
+    renderer.renderNativeView(rendererHelper, nativeView, this);
 
     watchForImpression(nativeView);
     setProductClickableView(nativeView);
@@ -122,6 +127,7 @@ public class CriteoNativeAd {
     ImageView adChoiceView = adChoiceOverlay.getAdChoiceView(nativeView);
     if (adChoiceView != null) {
       setAdChoiceClickableView(adChoiceView);
+      rendererHelper.setMediaInView(assets.getPrivacyOptOutImageUrl(), adChoiceView);
     }
 
     return nativeView;
