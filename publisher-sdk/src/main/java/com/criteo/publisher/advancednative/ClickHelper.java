@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.adview.Redirection;
 import com.criteo.publisher.adview.RedirectionListener;
-import com.criteo.publisher.util.RunOnUiThreadExecutor;
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import java.net.URI;
 
 public class ClickHelper {

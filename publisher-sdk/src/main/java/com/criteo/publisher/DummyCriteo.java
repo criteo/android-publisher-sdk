@@ -4,6 +4,7 @@ import static com.criteo.publisher.util.CompletableFuture.completedFuture;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
@@ -11,7 +12,6 @@ import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.util.AdUnitType;
-import com.criteo.publisher.util.RunOnUiThreadExecutor;
 import java.util.concurrent.Future;
 
 public class DummyCriteo extends Criteo {

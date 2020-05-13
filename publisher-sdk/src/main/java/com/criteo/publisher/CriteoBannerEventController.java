@@ -13,13 +13,13 @@ import android.webkit.WebViewClient;
 import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.adview.AdWebViewClient;
 import com.criteo.publisher.adview.RedirectionListener;
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.tasks.CriteoBannerListenerCallTask;
 import com.criteo.publisher.tasks.CriteoBannerLoadTask;
 import com.criteo.publisher.util.AdUnitType;
-import com.criteo.publisher.util.RunOnUiThreadExecutor;
 import java.lang.ref.WeakReference;
 
 

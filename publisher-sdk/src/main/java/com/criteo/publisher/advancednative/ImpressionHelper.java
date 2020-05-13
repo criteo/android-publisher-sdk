@@ -2,8 +2,8 @@ package com.criteo.publisher.advancednative;
 
 import android.support.annotation.NonNull;
 import com.criteo.publisher.SafeRunnable;
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.network.PubSdkApi;
-import com.criteo.publisher.util.RunOnUiThreadExecutor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;

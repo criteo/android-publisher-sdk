@@ -3,6 +3,7 @@ package com.criteo.publisher.advancednative
 import com.criteo.publisher.BidManager
 import com.criteo.publisher.CriteoErrorCode
 import com.criteo.publisher.InHouse
+import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor
 import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
@@ -10,7 +11,6 @@ import com.criteo.publisher.model.NativeAdUnit
 import com.criteo.publisher.model.Slot
 import com.criteo.publisher.model.nativeads.NativeAssets
 import com.criteo.publisher.util.BuildConfigWrapper
-import com.criteo.publisher.util.DirectMockRunOnUiThreadExecutor
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode

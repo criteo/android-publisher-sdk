@@ -7,13 +7,13 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import com.criteo.publisher.activity.TopActivityFinder
 import com.criteo.publisher.adview.Redirection
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
 import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.model.nativeads.NativeAssets
 import com.criteo.publisher.model.nativeads.NativeProduct
 import com.criteo.publisher.network.PubSdkApi
-import com.criteo.publisher.util.RunOnUiThreadExecutor
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule

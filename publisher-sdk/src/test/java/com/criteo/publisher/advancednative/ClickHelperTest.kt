@@ -4,7 +4,7 @@ import android.content.ComponentName
 import com.criteo.publisher.activity.TopActivityFinder
 import com.criteo.publisher.adview.Redirection
 import com.criteo.publisher.adview.RedirectionListener
-import com.criteo.publisher.util.DirectMockRunOnUiThreadExecutor
+import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before

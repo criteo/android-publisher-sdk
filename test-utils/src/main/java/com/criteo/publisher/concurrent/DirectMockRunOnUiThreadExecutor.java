@@ -1,4 +1,4 @@
-package com.criteo.publisher.util;
+package com.criteo.publisher.concurrent;
 
 import android.support.annotation.NonNull;
 import java.util.concurrent.atomic.AtomicInteger;

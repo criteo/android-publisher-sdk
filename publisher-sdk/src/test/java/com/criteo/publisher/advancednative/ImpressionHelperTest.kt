@@ -1,11 +1,11 @@
 package com.criteo.publisher.advancednative
 
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
 import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.network.PubSdkApi
 import com.criteo.publisher.util.BuildConfigWrapper
-import com.criteo.publisher.util.RunOnUiThreadExecutor
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before

@@ -8,12 +8,12 @@ import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.InHouse;
 import com.criteo.publisher.annotation.Incubating;
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeTokenValue;
 import com.criteo.publisher.util.PreconditionsUtil;
-import com.criteo.publisher.util.RunOnUiThreadExecutor;
 import java.lang.ref.WeakReference;
 
 @Incubating(Incubating.NATIVE)

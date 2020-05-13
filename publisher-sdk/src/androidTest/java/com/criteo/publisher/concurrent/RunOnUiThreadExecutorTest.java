@@ -1,10 +1,9 @@
-package com.criteo.publisher.util;
+package com.criteo.publisher.concurrent;
 
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import android.os.Looper;
-import com.criteo.publisher.concurrent.ThreadingUtil;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
