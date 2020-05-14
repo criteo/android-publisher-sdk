@@ -240,12 +240,12 @@ class NativeAdMapperTest {
     val assets = mock<NativeAssets>(defaultAnswer=Answers.RETURNS_DEEP_STUBS)
     val context = mock<Context>()
     val parent = mock<ViewGroup>()
-    val inflatedView = mock<View>()
+    val publisherView = mock<View>()
     val nativeView = mock<ViewGroup>()
     val adChoiceView = mock<ImageView>()
 
-    whenever(renderer.createNativeView(context, parent)).doReturn(inflatedView)
-    whenever(adChoiceOverlay.addOverlay(inflatedView)).doReturn(nativeView)
+    whenever(renderer.createNativeView(context, parent)).doReturn(publisherView)
+    whenever(adChoiceOverlay.addOverlay(publisherView)).doReturn(nativeView)
     whenever(adChoiceOverlay.getAdChoiceView(nativeView)).doReturn(adChoiceView)
 
     val nativeAd = spy(mapper.map(assets, WeakReference(listener), renderer))
@@ -254,7 +254,7 @@ class NativeAdMapperTest {
     assertThat(renderedView).isEqualTo(nativeView)
 
     inOrder(renderer, nativeAd) {
-      verify(renderer).renderNativeView(rendererHelper, nativeView, nativeAd)
+      verify(renderer).renderNativeView(rendererHelper, publisherView, nativeAd)
       verify(nativeAd).watchForImpression(nativeView)
       verify(nativeAd).setProductClickableView(nativeView)
       verify(nativeAd).setAdChoiceClickableView(adChoiceView)

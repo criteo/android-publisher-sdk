@@ -59,6 +59,7 @@ public class MemoryTestNativeActivity extends Activity {
               @NonNull View nativeView,
               @NonNull CriteoNativeAd nativeAd
           ) {
+            ((Button) nativeView).setText(nativeAd.getTitle());
           }
         }
     );

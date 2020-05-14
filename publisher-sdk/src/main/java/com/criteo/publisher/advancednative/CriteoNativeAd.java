@@ -118,8 +118,11 @@ public class CriteoNativeAd {
    */
   @NonNull
   public View createNativeRenderedView(@NonNull Context context, @Nullable ViewGroup parent) {
-    View nativeView = addAdChoiceOverlay(renderer.createNativeView(context, parent));
-    renderer.renderNativeView(rendererHelper, nativeView, this);
+    View publisherView = renderer.createNativeView(context, parent);
+    View nativeView = addAdChoiceOverlay(publisherView);
+
+    // Publisher only see it's own view.
+    renderer.renderNativeView(rendererHelper, publisherView, this);
 
     watchForImpression(nativeView);
     setProductClickableView(nativeView);
