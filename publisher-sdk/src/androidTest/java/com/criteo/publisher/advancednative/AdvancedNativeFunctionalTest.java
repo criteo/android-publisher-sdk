@@ -26,6 +26,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.criteo.publisher.BidResponse;
+import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.activity.TestNativeActivity;
 import com.criteo.publisher.adview.Redirection;
@@ -53,8 +55,6 @@ public class AdvancedNativeFunctionalTest {
 
   @Test
   public void loadStandaloneAd_GivenValidBid_DisplayAllInformationInViews() throws Exception {
-    NativeAssets expectedAssets = STUB_NATIVE_ASSETS;
-
     givenInitializedCriteo(TestAdUnits.NATIVE);
     mockedDependenciesRule.waitForIdleState();
 
@@ -62,6 +62,24 @@ public class AdvancedNativeFunctionalTest {
     activity.loadStandaloneAd();
     mockedDependenciesRule.waitForIdleState();
 
+    checkAllInformationAreDisplayed(STUB_NATIVE_ASSETS);
+  }
+
+  @Test
+  public void loadInHouseAd_GivenValidBid_DisplayAllInformationInViews() throws Exception {
+    givenInitializedCriteo(TestAdUnits.NATIVE);
+    mockedDependenciesRule.waitForIdleState();
+
+    TestNativeActivity activity = activityRule.getActivity();
+    BidResponse bidResponse = Criteo.getInstance().getBidResponse(TestAdUnits.NATIVE);
+    activity.loadInHouseAd(bidResponse.getBidToken());
+    mockedDependenciesRule.waitForIdleState();
+
+    checkAllInformationAreDisplayed(STUB_NATIVE_ASSETS);
+  }
+
+  private void checkAllInformationAreDisplayed(NativeAssets expectedAssets) {
+    TestNativeActivity activity = activityRule.getActivity();
     ViewGroup adLayout = activity.getWindow().getDecorView().findViewWithTag(AD_LAYOUT_TAG);
 
     // Check there is one ad

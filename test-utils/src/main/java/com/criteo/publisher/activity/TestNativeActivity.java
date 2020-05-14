@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.criteo.publisher.BidToken;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.advancednative.CriteoNativeAd;
 import com.criteo.publisher.advancednative.CriteoNativeAdListener;
@@ -122,6 +123,10 @@ public class TestNativeActivity extends Activity {
 
   public void loadStandaloneAd() {
     nativeLoader.loadAd();
+  }
+
+  public void loadInHouseAd(@Nullable BidToken bidToken) {
+    nativeLoader.loadAd(bidToken);
   }
 
   public Drawable getDefaultDrawable() {
