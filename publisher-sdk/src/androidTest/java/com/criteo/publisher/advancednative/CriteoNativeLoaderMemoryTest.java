@@ -45,7 +45,7 @@ public class CriteoNativeLoaderMemoryTest {
   }
 
   private void forceGc() throws InterruptedException {
-    GarbageCollector.forceGc(1);
+    GarbageCollector.forceGc(5);
   }
 
 }
