@@ -5,10 +5,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.support.test.rule.ActivityTestRule;
 import com.criteo.publisher.TestAdUnits;
-import com.criteo.publisher.activity.MemoryTestNativeActivity;
+import com.criteo.publisher.activity.TestNativeActivity;
 import com.criteo.publisher.memory.GarbageCollector;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import java.lang.ref.WeakReference;
@@ -18,7 +17,8 @@ import org.junit.Test;
 public class CriteoNativeLoaderMemoryTest {
 
   @Rule
-  public ActivityTestRule<MemoryTestNativeActivity> activityRule = new ActivityTestRule<>(MemoryTestNativeActivity.class, false, false);
+  public ActivityTestRule<TestNativeActivity> activityRule = new ActivityTestRule<>(
+      TestNativeActivity.class);
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
@@ -28,7 +28,7 @@ public class CriteoNativeLoaderMemoryTest {
     givenInitializedCriteo(TestAdUnits.NATIVE);
     mockedDependenciesRule.waitForIdleState();
 
-    activityRule.launchActivity(new Intent());
+    activityRule.getActivity().loadStandaloneAd();
     mockedDependenciesRule.waitForIdleState();
 
     WeakReference<Activity> activityRef = new WeakReference<>(activityRule.getActivity());
