@@ -119,6 +119,12 @@ object Deps {
       const val LeakCanary = "com.squareup.leakcanary:leakcanary-android:$version"
     }
 
+    object Picasso {
+      private const val version = "2.71828"
+
+      const val Picasso = "com.squareup.picasso:picasso:$version"
+    }
+
     object Tape {
       private const val version = "1.2.3"
 

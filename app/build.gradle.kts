@@ -35,6 +35,10 @@ addPublication("Apk") {
 dependencies {
     implementation(project(":publisher-sdk"))
 
+    implementation(Deps.Square.Picasso.Picasso) {
+        exclude(group = Deps.Android.Support.group)
+    }
+
     implementation(Deps.Criteo.Mediation.MoPub("${sdkVersion()}+")) {
         exclude(group = Deps.Criteo.PublisherSdk.group)
     }
