@@ -1,6 +1,8 @@
 package com.criteo.publisher.advancednative;
 
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.widget.ImageView;
 import java.net.URL;
@@ -19,8 +21,13 @@ public interface ImageLoader {
    *
    * @param imageUrl URL of the image to load
    * @param imageView the image view to fill
+   * @param placeholder that you defined the {@link CriteoMediaView}
    */
   @UiThread
-  void loadImageInto(@NonNull URL imageUrl, @NonNull ImageView imageView) throws Exception;
+  void loadImageInto(
+      @NonNull URL imageUrl,
+      @NonNull ImageView imageView,
+      @Nullable Drawable placeholder
+  ) throws Exception;
 
 }

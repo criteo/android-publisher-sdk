@@ -13,11 +13,11 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.criteo.publisher.BidToken;
 import com.criteo.publisher.TestAdUnits;
+import com.criteo.publisher.advancednative.CriteoMediaView;
 import com.criteo.publisher.advancednative.CriteoNativeAd;
 import com.criteo.publisher.advancednative.CriteoNativeAdListener;
 import com.criteo.publisher.advancednative.CriteoNativeLoader;
@@ -78,10 +78,10 @@ public class TestNativeActivity extends Activity {
             layout.addView(createTextView(context, DESCRIPTION_TAG));
             layout.addView(createTextView(context, PRICE_TAG));
             layout.addView(createTextView(context, CALL_TO_ACTION_TAG));
-            layout.addView(createImageView(context, PRODUCT_IMAGE_TAG));
+            layout.addView(createMediaView(context, PRODUCT_IMAGE_TAG));
             layout.addView(createTextView(context, ADVERTISER_DOMAIN_TAG));
             layout.addView(createTextView(context, ADVERTISER_DESCRIPTION_TAG));
-            layout.addView(createImageView(context, ADVERTISER_LOGO_TAG));
+            layout.addView(createMediaView(context, ADVERTISER_LOGO_TAG));
             return layout;
           }
 
@@ -98,12 +98,12 @@ public class TestNativeActivity extends Activity {
             ((TextView) layout.getChildAt(1)).setText(nativeAd.getDescription());
             ((TextView) layout.getChildAt(2)).setText(nativeAd.getPrice());
             ((TextView) layout.getChildAt(3)).setText(nativeAd.getCallToAction());
-            ((ImageView) layout.getChildAt(4)).setImageDrawable(getDefaultDrawable());
-            helper.setMediaInView(nativeAd.getProductMedia(), (ImageView) layout.getChildAt(4));
+            ((CriteoMediaView) layout.getChildAt(4)).setPlaceholder(getDefaultDrawable());
+            helper.setMediaInView(nativeAd.getProductMedia(), (CriteoMediaView) layout.getChildAt(4));
             ((TextView) layout.getChildAt(5)).setText(nativeAd.getAdvertiserDomain());
             ((TextView) layout.getChildAt(6)).setText(nativeAd.getAdvertiserDescription());
-            ((ImageView) layout.getChildAt(7)).setImageDrawable(getDefaultDrawable());
-            helper.setMediaInView(nativeAd.getAdvertiserLogoMedia(), (ImageView) layout.getChildAt(7));
+            ((CriteoMediaView) layout.getChildAt(7)).setPlaceholder(getDefaultDrawable());
+            helper.setMediaInView(nativeAd.getAdvertiserLogoMedia(), (CriteoMediaView) layout.getChildAt(7));
           }
 
           private TextView createTextView(@NonNull Context context, @NonNull Object tag) {
@@ -112,8 +112,8 @@ public class TestNativeActivity extends Activity {
             return view;
           }
 
-          private ImageView createImageView(@NonNull Context context, @NonNull Object tag) {
-            ImageView view = new ImageView(context);
+          private CriteoMediaView createMediaView(@NonNull Context context, @NonNull Object tag) {
+            CriteoMediaView view = new CriteoMediaView(context);
             view.setTag(tag);
             return view;
           }

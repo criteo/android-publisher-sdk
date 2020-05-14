@@ -130,8 +130,8 @@ public class AdvancedNativeFunctionalTest {
   }
 
   private Drawable drawableInView(@NonNull ViewGroup view, @NonNull Object tag) {
-    ImageView imageView = view.findViewWithTag(tag);
-    return imageView.getDrawable();
+    CriteoMediaView mediaView = view.findViewWithTag(tag);
+    return mediaView.getImageView().getDrawable();
   }
 
   private void checkClickOnViewRedirectTo(@NonNull ViewGroup view, @NonNull Object tag, @NonNull String expectedRedirectionUri) {

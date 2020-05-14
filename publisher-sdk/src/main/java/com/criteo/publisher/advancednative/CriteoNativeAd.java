@@ -129,7 +129,11 @@ public class CriteoNativeAd {
     ImageView adChoiceView = adChoiceOverlay.getAdChoiceView(nativeView);
     if (adChoiceView != null) {
       setAdChoiceClickableView(adChoiceView);
-      rendererHelper.setMediaInView(assets.getPrivacyOptOutImageUrl(), adChoiceView);
+      rendererHelper.setMediaInView(
+          assets.getPrivacyOptOutImageUrl(),
+          adChoiceView,
+          /* placeholder */ null // No placeholder is expected for AdChoice
+      );
     }
 
     return nativeView;

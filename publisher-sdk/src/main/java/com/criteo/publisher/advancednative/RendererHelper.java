@@ -1,6 +1,8 @@
 package com.criteo.publisher.advancednative;
 
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.widget.ImageView;
 import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.annotation.Incubating;
@@ -24,15 +26,15 @@ public class RendererHelper {
     this.uiExecutor = uiExecutor;
   }
 
-  public void setMediaInView(CriteoMedia mediaContent, ImageView imageView) {
-    setMediaInView(mediaContent.getImageUrl(), imageView);
+  public void setMediaInView(CriteoMedia mediaContent, CriteoMediaView mediaView) {
+    setMediaInView(mediaContent.getImageUrl(), mediaView.getImageView(), mediaView.getPlaceholder());
   }
 
-  void setMediaInView(@NonNull URL url, @NonNull ImageView imageView) {
+  void setMediaInView(@NonNull URL url, @NonNull ImageView imageView, @Nullable Drawable placeholder) {
     uiExecutor.execute(new SafeRunnable() {
       @Override
       public void runSafely() throws Throwable {
-        imageLoader.loadImageInto(url, imageView);
+        imageLoader.loadImageInto(url, imageView, placeholder);
       }
     });
   }
