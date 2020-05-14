@@ -37,6 +37,14 @@
       android:background="#81C784"
       android:text="@string/btn_standalone"/>
     <Button
+      android:id="@+id/buttonStandaloneRecyclerView"
+      style="@style/Widget.AppCompat.Button.Colored"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="20dp"
+      android:background="#81C784"
+      android:text="@string/btn_standalone_recycler_view"/>
+    <Button
       android:id="@+id/buttoninHouse"
       style="@style/Widget.AppCompat.Button.Colored"
       android:layout_width="match_parent"

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:padding="10dp"
+  android:orientation="vertical">
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+    <Button
+      android:id="@+id/buttonStandaloneContent"
+      style="@style/Widget.AppCompat.Button.Colored"
+      android:layout_width="0dp"
+      android:layout_height="match_parent"
+      android:layout_weight="1"
+      android:background="@android:color/holo_blue_dark"
+      android:text="@string/btn_content"/>
+    <Button
+      android:id="@+id/buttonStandaloneBanner"
+      style="@style/Widget.AppCompat.Button.Colored"
+      android:layout_width="0dp"
+      android:layout_height="match_parent"
+      android:layout_weight="1"
+      android:layout_marginStart="5dp"
+      android:layout_marginLeft="5dp"
+      android:background="@android:color/holo_blue_dark"
+      android:text="@string/btn_banner"/>
+    <Button
+      android:id="@+id/buttonStandaloneNative"
+      style="@style/Widget.AppCompat.Button.Colored"
+      android:layout_width="0dp"
+      android:layout_height="match_parent"
+      android:layout_weight="1"
+      android:layout_marginStart="5dp"
+      android:layout_marginLeft="5dp"
+      android:background="@android:color/holo_blue_dark"
+      android:text="@string/btn_advanced_native"/>
+  </LinearLayout>
+
+  <android.support.v7.widget.RecyclerView
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:layout_marginTop="5dp"
+    />
+
+</LinearLayout>

@@ -33,6 +33,10 @@ public class MainActivity extends AppCompatActivity {
       Intent intent = new Intent(getApplicationContext(), StandaloneActivity.class);
       startActivity(intent);
     });
+    findViewById(R.id.buttonStandaloneRecyclerView).setOnClickListener((View v) -> {
+      Intent intent = new Intent(getApplicationContext(), StandaloneRecyclerViewActivity.class);
+      startActivity(intent);
+    });
     findViewById(R.id.buttoninHouse).setOnClickListener((View v) -> {
       Intent intent = new Intent(getApplicationContext(), InHouseActivity.class);
       startActivity(intent);
