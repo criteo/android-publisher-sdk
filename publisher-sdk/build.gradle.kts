@@ -70,6 +70,10 @@ dependencies {
     // Optional @GsonTypeAdapterFactory support
     annotationProcessor(Deps.AutoValue.GsonFactory)
 
+    implementation(Deps.Square.Picasso.Picasso) {
+        exclude(group = Deps.Android.Support.group)
+    }
+
     testImplementation(project(":test-utils"))
     testImplementation(Deps.JUnit.JUnit)
     testImplementation(Deps.Mockito.Core)

@@ -60,9 +60,12 @@ import com.criteo.publisher.util.JsonSerializer;
 import com.criteo.publisher.util.TextUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.squareup.picasso.Picasso;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -480,13 +483,24 @@ public class DependencyProvider {
   }
 
   @NonNull
+  public Picasso providePicasso() {
+    return getOrCreate(Picasso.class, new Factory<Picasso>() {
+      @NonNull
+      @Override
+      public Picasso create() {
+        return new Picasso.Builder(provideContext()).build();
+      }
+    });
+  }
+
+  @NonNull
   public RendererHelper provideRendererHelper() {
     return getOrCreate(RendererHelper.class, new Factory<RendererHelper>() {
       @NonNull
       @Override
       public RendererHelper create() {
         return new RendererHelper(
-            new CriteoImageLoader(),
+            new CriteoImageLoader(providePicasso()),
             provideRunOnUiThreadExecutor()
         );
       }
