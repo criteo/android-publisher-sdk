@@ -11,18 +11,35 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import com.criteo.publisher.CriteoBannerView
+import com.criteo.publisher.advancednative.CriteoNativeAd
+import com.criteo.publisher.advancednative.CriteoNativeLoader
+import com.criteo.pubsdk_android.PubSdkDemoApplication.NATIVE
 import com.criteo.pubsdk_android.PubSdkDemoApplication.STANDALONE_BANNER
 import com.criteo.pubsdk_android.listener.TestAppBannerAdListener
+import com.criteo.pubsdk_android.listener.TestAppNativeAdListener
 import com.squareup.picasso.Picasso
 import kotlin.random.Random
 
 class StandaloneRecyclerViewActivity : AppCompatActivity() {
 
+  private lateinit var nativeLoader: CriteoNativeLoader
+  private lateinit var viewAdapter: Adapter
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_standalone_recycler_view)
 
-    val viewAdapter = Adapter()
+    nativeLoader = CriteoNativeLoader(
+        NATIVE,
+        object : TestAppNativeAdListener(javaClass.simpleName, "Native", null) {
+          override fun onAdReceived(nativeAd: CriteoNativeAd) {
+            viewAdapter.addNativeAd(nativeAd)
+          }
+        },
+        TestAppNativeRenderer()
+    )
+
+    viewAdapter = Adapter(nativeLoader)
     val viewManager = LinearLayoutManager(this)
     findViewById<RecyclerView>(R.id.recyclerView).apply {
       layoutManager = viewManager
@@ -35,6 +52,10 @@ class StandaloneRecyclerViewActivity : AppCompatActivity() {
 
     findViewById<View>(R.id.buttonStandaloneBanner).setOnClickListener {
       loadBanner(viewAdapter)
+    }
+
+    findViewById<View>(R.id.buttonStandaloneNative).setOnClickListener {
+      nativeLoader.loadAd()
     }
   }
 
@@ -49,19 +70,21 @@ class StandaloneRecyclerViewActivity : AppCompatActivity() {
     bannerView.loadAd()
   }
 
-  class Adapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+  class Adapter(private val nativeLoader: CriteoNativeLoader) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val dataset: MutableList<Any> = mutableListOf()
 
     private companion object {
       const val CONTENT = 1
       const val BANNER = 2
+      const val NATIVE = 3
     }
 
     override fun getItemViewType(position: Int): Int {
       return when (dataset[position]) {
         is Content -> CONTENT
         is CriteoBannerView -> BANNER
+        is CriteoNativeAd -> NATIVE
         else -> throw NotImplementedError()
       }
     }
@@ -74,6 +97,7 @@ class StandaloneRecyclerViewActivity : AppCompatActivity() {
           inflater.inflate(R.layout.content_dummy, parent, false)
         }
         BANNER -> FrameLayout(context)
+        NATIVE -> nativeLoader.createEmptyNativeView(context, parent)
         else -> throw NotImplementedError()
       }
 
@@ -99,6 +123,10 @@ class StandaloneRecyclerViewActivity : AppCompatActivity() {
           (banner.parent as? ViewGroup)?.removeView(banner)
           layout.addView(banner)
         }
+        NATIVE -> {
+          val nativeAd = rawData as CriteoNativeAd
+          nativeAd.renderNativeView(view)
+        }
       }
     }
 
@@ -111,6 +139,11 @@ class StandaloneRecyclerViewActivity : AppCompatActivity() {
 
     fun addBannerAd(bannerView: CriteoBannerView) {
       dataset.add(bannerView)
+      notifyItemInserted(dataset.size - 1)
+    }
+
+    fun addNativeAd(nativeAd: CriteoNativeAd) {
+      dataset.add(nativeAd)
       notifyItemInserted(dataset.size - 1)
     }
 
