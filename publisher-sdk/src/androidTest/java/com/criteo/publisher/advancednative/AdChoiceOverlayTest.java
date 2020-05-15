@@ -61,6 +61,15 @@ public class AdChoiceOverlayTest {
   }
 
   @Test
+  public void getInitialView_GivenViewWithoutOverlay_ReturnNull() throws Exception {
+    View view = viewFactory.create(this);
+
+    View initialView = adChoiceOverlay.getInitialView(view);
+
+    assertNull(initialView);
+  }
+
+  @Test
   public void getAdChoiceView_GivenViewWithoutOverlay_ReturnNull() throws Exception {
     View view = viewFactory.create(this);
 
@@ -75,10 +84,12 @@ public class AdChoiceOverlayTest {
 
     ViewGroup viewWithOverlay = adChoiceOverlay.addOverlay(viewWrappedInOverlay);
     View adChoiceView = adChoiceOverlay.getAdChoiceView(viewWithOverlay);
+    View initialView = adChoiceOverlay.getInitialView(viewWithOverlay);
 
     assertEquals(viewWithOverlay.getChildCount(), 2);
     assertEquals(viewWithOverlay.getChildAt(0), viewWrappedInOverlay);
     assertEquals(viewWithOverlay.getChildAt(1), adChoiceView);
+    assertEquals(viewWrappedInOverlay, initialView);
   }
 
   @Test

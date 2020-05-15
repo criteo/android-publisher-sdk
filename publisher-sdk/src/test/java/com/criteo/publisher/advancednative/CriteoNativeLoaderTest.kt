@@ -173,7 +173,7 @@ class CriteoNativeLoaderTest {
     }
 
     nativeAdMapper.stub {
-      on { map(eq(nativeAssets), argThat { listener == get() }, eq(renderer)) } doReturn nativeAd
+      on { map(eq(nativeAssets), argThat { listener == get() }, any()) } doReturn nativeAd
     }
     return nativeAd
   }

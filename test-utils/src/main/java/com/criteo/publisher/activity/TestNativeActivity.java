@@ -10,6 +10,9 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -24,6 +27,8 @@ import com.criteo.publisher.advancednative.CriteoNativeLoader;
 import com.criteo.publisher.advancednative.CriteoNativeRenderer;
 import com.criteo.publisher.advancednative.RendererHelper;
 import com.criteo.publisher.testutils.R;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This tries to generate memory leaks by having inner class with strong references to the parent
@@ -32,6 +37,7 @@ import com.criteo.publisher.testutils.R;
 public class TestNativeActivity extends Activity {
 
   public static final Object AD_LAYOUT_TAG = new Object();
+  public static final Object RECYCLER_VIEW_TAG = new Object();
   public static final Object TITLE_TAG = new Object();
   public static final Object DESCRIPTION_TAG = new Object();
   public static final Object PRICE_TAG = new Object();
@@ -41,8 +47,12 @@ public class TestNativeActivity extends Activity {
   public static final Object ADVERTISER_DESCRIPTION_TAG = new Object();
   public static final Object ADVERTISER_LOGO_TAG = new Object();
 
-  private CriteoNativeLoader nativeLoader;
+  private CriteoNativeLoader nativeLoaderInAdLayout;
   private ViewGroup adLayout;
+
+  private CriteoNativeLoader nativeLoaderInRecyclerView;
+  private Adapter adapter;
+
   private Drawable defaultDrawable;
 
   @Override
@@ -51,82 +61,47 @@ public class TestNativeActivity extends Activity {
 
     adLayout = new FrameLayout(this);
     adLayout.setTag(AD_LAYOUT_TAG);
-    setContentView(adLayout);
+
+    adapter = new Adapter();
+    RecyclerView recyclerView = new RecyclerView(this);
+    recyclerView.setTag(RECYCLER_VIEW_TAG);
+    recyclerView.setLayoutManager(new LinearLayoutManager(this));
+    recyclerView.setAdapter(adapter);
+
+    ViewGroup layout = new FrameLayout(this);
+    layout.addView(adLayout);
+    layout.addView(recyclerView);
+    setContentView(layout);
+
     initDefaultDrawable();
 
-    nativeLoader = new CriteoNativeLoader(
+    nativeLoaderInAdLayout = new CriteoNativeLoader(
         TestAdUnits.NATIVE,
-        new CriteoNativeAdListener() {
-          @Override
-          public void onAdReceived(@NonNull CriteoNativeAd nativeAd) {
-            View nativeView = nativeAd.createNativeRenderedView(TestNativeActivity.this, adLayout);
-            adLayout.addView(nativeView);
-          }
+        new AdLayoutNativeAdListener(),
+        new NativeRenderer()
+    );
 
-          @Override
-          public void onAdClicked() {
-            loadStandaloneAd();
-          }
-        },
-        new CriteoNativeRenderer() {
-          @NonNull
-          @Override
-          public View createNativeView(@NonNull Context context, @Nullable ViewGroup parent) {
-            LinearLayout layout = new LinearLayout(context);
-            layout.setOrientation(VERTICAL);
-            layout.addView(createTextView(context, TITLE_TAG));
-            layout.addView(createTextView(context, DESCRIPTION_TAG));
-            layout.addView(createTextView(context, PRICE_TAG));
-            layout.addView(createTextView(context, CALL_TO_ACTION_TAG));
-            layout.addView(createMediaView(context, PRODUCT_IMAGE_TAG));
-            layout.addView(createTextView(context, ADVERTISER_DOMAIN_TAG));
-            layout.addView(createTextView(context, ADVERTISER_DESCRIPTION_TAG));
-            layout.addView(createMediaView(context, ADVERTISER_LOGO_TAG));
-            return layout;
-          }
-
-          @Override
-          public void renderNativeView(
-              @NonNull RendererHelper helper,
-              @NonNull View nativeView,
-              @NonNull CriteoNativeAd nativeAd
-          ) {
-            // Casts and index are used to check that this views is the same than the one that was
-            // created above.
-            LinearLayout layout = (LinearLayout) nativeView;
-            ((TextView) layout.getChildAt(0)).setText(nativeAd.getTitle());
-            ((TextView) layout.getChildAt(1)).setText(nativeAd.getDescription());
-            ((TextView) layout.getChildAt(2)).setText(nativeAd.getPrice());
-            ((TextView) layout.getChildAt(3)).setText(nativeAd.getCallToAction());
-            ((CriteoMediaView) layout.getChildAt(4)).setPlaceholder(getDefaultDrawable());
-            helper.setMediaInView(nativeAd.getProductMedia(), (CriteoMediaView) layout.getChildAt(4));
-            ((TextView) layout.getChildAt(5)).setText(nativeAd.getAdvertiserDomain());
-            ((TextView) layout.getChildAt(6)).setText(nativeAd.getAdvertiserDescription());
-            ((CriteoMediaView) layout.getChildAt(7)).setPlaceholder(getDefaultDrawable());
-            helper.setMediaInView(nativeAd.getAdvertiserLogoMedia(), (CriteoMediaView) layout.getChildAt(7));
-          }
-
-          private TextView createTextView(@NonNull Context context, @NonNull Object tag) {
-            TextView view = new TextView(context);
-            view.setTag(tag);
-            return view;
-          }
-
-          private CriteoMediaView createMediaView(@NonNull Context context, @NonNull Object tag) {
-            CriteoMediaView view = new CriteoMediaView(context);
-            view.setTag(tag);
-            return view;
-          }
-        }
+    nativeLoaderInRecyclerView = new CriteoNativeLoader(
+        TestAdUnits.NATIVE,
+        new RecyclerViewNativeAdListener(),
+        new NativeRenderer()
     );
   }
 
-  public void loadStandaloneAd() {
-    nativeLoader.loadAd();
+  public void loadStandaloneAdInAdLayout() {
+    nativeLoaderInAdLayout.loadAd();
   }
 
-  public void loadInHouseAd(@Nullable BidToken bidToken) {
-    nativeLoader.loadAd(bidToken);
+  public void loadInHouseAdInAdLayout(@Nullable BidToken bidToken) {
+    nativeLoaderInAdLayout.loadAd(bidToken);
+  }
+
+  public void loadStandaloneAdInRecyclerView() {
+    nativeLoaderInRecyclerView.loadAd();
+  }
+
+  public void loadInHouseAdInRecyclerView(@Nullable BidToken bidToken) {
+    nativeLoaderInRecyclerView.loadAd(bidToken);
   }
 
   public Drawable getDefaultDrawable() {
@@ -141,4 +116,104 @@ public class TestNativeActivity extends Activity {
       defaultDrawable = getResources().getDrawable(R.drawable.closebtn);
     }
   }
+
+  private class Adapter extends RecyclerView.Adapter<ViewHolder> {
+
+    private final List<CriteoNativeAd> dataset = new ArrayList<>();
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+      View nativeView = nativeLoaderInRecyclerView.createEmptyNativeView(
+          parent.getContext(),
+          parent
+      );
+
+      return new ViewHolder(nativeView) {};
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+      dataset.get(position).renderNativeView(holder.itemView);
+    }
+
+    @Override
+    public int getItemCount() {
+      return dataset.size();
+    }
+
+    void addNativeAd(CriteoNativeAd nativeAd) {
+      dataset.add(nativeAd);
+      notifyItemInserted(dataset.size() - 1);
+    }
+
+  }
+
+  private class AdLayoutNativeAdListener extends CriteoNativeAdListener {
+    @Override
+    public void onAdReceived(@NonNull CriteoNativeAd nativeAd) {
+      View nativeView = nativeAd.createNativeRenderedView(TestNativeActivity.this, adLayout);
+      adLayout.addView(nativeView);
+    }
+  }
+
+  private class RecyclerViewNativeAdListener extends CriteoNativeAdListener {
+    @Override
+    public void onAdReceived(@NonNull CriteoNativeAd nativeAd) {
+      adapter.addNativeAd(nativeAd);
+    }
+  }
+
+  private class NativeRenderer implements CriteoNativeRenderer {
+
+    @NonNull
+    @Override
+    public View createNativeView(@NonNull Context context, @Nullable ViewGroup parent) {
+      LinearLayout layout = new LinearLayout(context);
+      layout.setOrientation(VERTICAL);
+      layout.addView(createTextView(context, TITLE_TAG));
+      layout.addView(createTextView(context, DESCRIPTION_TAG));
+      layout.addView(createTextView(context, PRICE_TAG));
+      layout.addView(createTextView(context, CALL_TO_ACTION_TAG));
+      layout.addView(createMediaView(context, PRODUCT_IMAGE_TAG));
+      layout.addView(createTextView(context, ADVERTISER_DOMAIN_TAG));
+      layout.addView(createTextView(context, ADVERTISER_DESCRIPTION_TAG));
+      layout.addView(createMediaView(context, ADVERTISER_LOGO_TAG));
+      return layout;
+    }
+
+    @Override
+    public void renderNativeView(
+        @NonNull RendererHelper helper,
+        @NonNull View nativeView,
+        @NonNull CriteoNativeAd nativeAd
+    ) {
+      // Casts and index are used to check that this views is the same than the one that was
+      // created above.
+      LinearLayout layout = (LinearLayout) nativeView;
+      ((TextView) layout.getChildAt(0)).setText(nativeAd.getTitle());
+      ((TextView) layout.getChildAt(1)).setText(nativeAd.getDescription());
+      ((TextView) layout.getChildAt(2)).setText(nativeAd.getPrice());
+      ((TextView) layout.getChildAt(3)).setText(nativeAd.getCallToAction());
+      ((CriteoMediaView) layout.getChildAt(4)).setPlaceholder(getDefaultDrawable());
+      helper.setMediaInView(nativeAd.getProductMedia(), (CriteoMediaView) layout.getChildAt(4));
+      ((TextView) layout.getChildAt(5)).setText(nativeAd.getAdvertiserDomain());
+      ((TextView) layout.getChildAt(6)).setText(nativeAd.getAdvertiserDescription());
+      ((CriteoMediaView) layout.getChildAt(7)).setPlaceholder(getDefaultDrawable());
+      helper.setMediaInView(nativeAd.getAdvertiserLogoMedia(), (CriteoMediaView) layout.getChildAt(7));
+    }
+
+    private TextView createTextView(@NonNull Context context, @NonNull Object tag) {
+      TextView view = new TextView(context);
+      view.setTag(tag);
+      return view;
+    }
+
+    private CriteoMediaView createMediaView(@NonNull Context context, @NonNull Object tag) {
+      CriteoMediaView view = new CriteoMediaView(context);
+      view.setTag(tag);
+      return view;
+    }
+  }
+
 }

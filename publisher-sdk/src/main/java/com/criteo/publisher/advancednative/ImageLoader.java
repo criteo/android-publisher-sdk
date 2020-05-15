@@ -18,6 +18,12 @@ public interface ImageLoader {
    * Implementation is expected to move in a worker thread when doing long task such as network to
    * download the image. Also, having a caching mechanism is recommended to minimize network calls
    * and avoid flickering effects in your RecyclerViews.
+   * <p>
+   * If you're using RecyclerViews, then the implementation should be aware that an image view can
+   * be recycled and reused for another URL. This also means that a given image view may contain an
+   * old image. If you need to do any operations outside the UI-thread, you're expected to clean the
+   * state of the view by setting the given placeholder. If you're using an image loading library,
+   * it generally already takes care of that.
    *
    * @param imageUrl URL of the image to load
    * @param imageView the image view to fill

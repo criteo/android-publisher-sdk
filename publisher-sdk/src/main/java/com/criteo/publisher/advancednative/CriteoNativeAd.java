@@ -117,11 +117,26 @@ public class CriteoNativeAd {
    */
   @NonNull
   public View createNativeRenderedView(@NonNull Context context, @Nullable ViewGroup parent) {
-    View publisherView = renderer.createNativeView(context, parent);
-    View nativeView = addAdChoiceOverlay(publisherView);
+    View nativeView = renderer.createNativeView(context, parent);
+    renderNativeView(nativeView);
+    return nativeView;
+  }
 
-    // Publisher only see it's own view.
-    renderer.renderNativeView(rendererHelper, publisherView, this);
+  /**
+   * Render the given native view.
+   * <p>
+   * This view should come from {@link #createNativeRenderedView(Context, ViewGroup)} or from {@link
+   * CriteoNativeLoader#createEmptyNativeView(Context, ViewGroup)}.
+   * <p>
+   * It is safe to call this method many times on the same view or on different views. This will
+   * render many times the ad.
+   * <p>
+   * See {@link CriteoNativeRenderer} for more information.
+   *
+   * @param nativeView native you to render
+   */
+  public void renderNativeView(@NonNull View nativeView) {
+    renderer.renderNativeView(rendererHelper, nativeView, this);
 
     watchForImpression(nativeView);
     setProductClickableView(nativeView);
@@ -135,8 +150,6 @@ public class CriteoNativeAd {
           /* placeholder */ null // No placeholder is expected for AdChoice
       );
     }
-
-    return nativeView;
   }
 
   /**
@@ -184,20 +197,7 @@ public class CriteoNativeAd {
   }
 
   /**
-   * Add an overlay on the given view, with a placeholder for AdChoice icon.
-   *
-   * @param view view to wrap with AdChoice
-   * @return view with the overlay
-   * @see AdChoiceOverlay#addOverlay(View)
-   */
-  @NonNull
-  @VisibleForTesting
-  ViewGroup addAdChoiceOverlay(@NonNull View view) {
-    return adChoiceOverlay.addOverlay(view);
-  }
-
-  /**
-   * Return the AdChoice placeholder injected by {@link #addAdChoiceOverlay(View)}.
+   * Return the AdChoice placeholder injected by {@link AdChoiceOverlay#addOverlay(View)}.
    *
    * @param overlappedView view to get the AdChoice from
    * @return AdChoice view

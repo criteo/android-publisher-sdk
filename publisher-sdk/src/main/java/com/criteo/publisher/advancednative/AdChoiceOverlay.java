@@ -112,6 +112,24 @@ public class AdChoiceOverlay {
     return adChoiceViewRef.get();
   }
 
+  /**
+   * Return the initial view that was wrapped by {@link #addOverlay(View)}.
+   * <p>
+   * You can call this method multiple times on the same view.
+   *
+   * @param overlappedView view to get the initial view from
+   * @return initial view, or null if this view was not wrapped
+   */
+  @Nullable
+  View getInitialView(@NonNull View overlappedView) {
+    if (getAdChoiceView(overlappedView) == null) {
+      return null;
+    }
+
+    ViewGroup viewGroup = (ViewGroup) overlappedView;
+    return viewGroup.getChildAt(0);
+  }
+
   @VisibleForTesting
   int getAdChoiceCount() {
     return adChoicePerView.size();

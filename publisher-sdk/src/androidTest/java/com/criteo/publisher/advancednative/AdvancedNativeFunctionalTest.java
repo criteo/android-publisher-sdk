@@ -10,6 +10,7 @@ import static com.criteo.publisher.activity.TestNativeActivity.CALL_TO_ACTION_TA
 import static com.criteo.publisher.activity.TestNativeActivity.DESCRIPTION_TAG;
 import static com.criteo.publisher.activity.TestNativeActivity.PRICE_TAG;
 import static com.criteo.publisher.activity.TestNativeActivity.PRODUCT_IMAGE_TAG;
+import static com.criteo.publisher.activity.TestNativeActivity.RECYCLER_VIEW_TAG;
 import static com.criteo.publisher.activity.TestNativeActivity.TITLE_TAG;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 import static org.junit.Assert.assertEquals;
@@ -54,57 +55,102 @@ public class AdvancedNativeFunctionalTest {
   private Redirection redirection;
 
   @Test
-  public void loadStandaloneAd_GivenValidBid_DisplayAllInformationInViews() throws Exception {
+  public void loadStandaloneAdInAdLayout_GivenValidBid_DisplayAllInformationInViews() throws Exception {
     givenInitializedCriteo(TestAdUnits.NATIVE);
     mockedDependenciesRule.waitForIdleState();
 
     TestNativeActivity activity = activityRule.getActivity();
-    activity.loadStandaloneAd();
+    activity.loadStandaloneAdInAdLayout();
     mockedDependenciesRule.waitForIdleState();
 
-    checkAllInformationAreDisplayed(STUB_NATIVE_ASSETS);
+    // Check there is one ad
+    ViewGroup adLayout = getAdLayout();
+    assertEquals(1, adLayout.getChildCount());
+
+    checkAllInformationAreDisplayed((ViewGroup) adLayout.getChildAt(0));
   }
 
   @Test
-  public void loadInHouseAd_GivenValidBid_DisplayAllInformationInViews() throws Exception {
+  public void loadInHouseAdInAdLayout_GivenValidBid_DisplayAllInformationInViews() throws Exception {
     givenInitializedCriteo(TestAdUnits.NATIVE);
     mockedDependenciesRule.waitForIdleState();
 
     TestNativeActivity activity = activityRule.getActivity();
     BidResponse bidResponse = Criteo.getInstance().getBidResponse(TestAdUnits.NATIVE);
-    activity.loadInHouseAd(bidResponse.getBidToken());
+    activity.loadInHouseAdInAdLayout(bidResponse.getBidToken());
     mockedDependenciesRule.waitForIdleState();
 
-    checkAllInformationAreDisplayed(STUB_NATIVE_ASSETS);
+    // Check there is one ad
+    ViewGroup adLayout = getAdLayout();
+    assertEquals(1, adLayout.getChildCount());
+
+    checkAllInformationAreDisplayed((ViewGroup) adLayout.getChildAt(0));
   }
 
-  private void checkAllInformationAreDisplayed(NativeAssets expectedAssets) {
-    TestNativeActivity activity = activityRule.getActivity();
-    ViewGroup adLayout = activity.getWindow().getDecorView().findViewWithTag(AD_LAYOUT_TAG);
+  @Test
+  public void loadStandaloneAdInRecyclerView_GivenValidBid_DisplayAllInformationInViews() throws Exception {
+    givenInitializedCriteo(TestAdUnits.NATIVE);
+    mockedDependenciesRule.waitForIdleState();
 
-    // Check there is one ad
-    assertEquals(1, adLayout.getChildCount());
+    TestNativeActivity activity = activityRule.getActivity();
+    activity.loadStandaloneAdInRecyclerView();
+    mockedDependenciesRule.waitForIdleState();
+
+    activity.loadStandaloneAdInRecyclerView();
+    mockedDependenciesRule.waitForIdleState();
+
+    // Check there is two ads
+    ViewGroup recyclerView = getRecyclerView();
+    assertEquals(2, recyclerView.getChildCount());
+
+    checkAllInformationAreDisplayed((ViewGroup) recyclerView.getChildAt(0));
+    checkAllInformationAreDisplayed((ViewGroup) recyclerView.getChildAt(1));
+  }
+
+  @Test
+  public void loadInHouseAdInRecyclerView_GivenValidBid_DisplayAllInformationInViews() throws Exception {
+    givenInitializedCriteo(TestAdUnits.NATIVE);
+    mockedDependenciesRule.waitForIdleState();
+
+    TestNativeActivity activity = activityRule.getActivity();
+    BidResponse bidResponse1 = Criteo.getInstance().getBidResponse(TestAdUnits.NATIVE);
+    activity.loadInHouseAdInRecyclerView(bidResponse1.getBidToken());
+    mockedDependenciesRule.waitForIdleState();
+
+    BidResponse bidResponse2 = Criteo.getInstance().getBidResponse(TestAdUnits.NATIVE);
+    activity.loadInHouseAdInRecyclerView(bidResponse2.getBidToken());
+    mockedDependenciesRule.waitForIdleState();
+
+    // Check there is two ads
+    ViewGroup recyclerView = getRecyclerView();
+    assertEquals(2, recyclerView.getChildCount());
+
+    checkAllInformationAreDisplayed((ViewGroup) recyclerView.getChildAt(0));
+    checkAllInformationAreDisplayed((ViewGroup) recyclerView.getChildAt(1));
+  }
+
+  private void checkAllInformationAreDisplayed(ViewGroup nativeAdView) {
+    NativeAssets expectedAssets = STUB_NATIVE_ASSETS;
 
     // Check assets
     NativeProduct product = expectedAssets.getProduct();
-    assertEquals(product.getTitle(), textInView(adLayout, TITLE_TAG));
-    assertEquals(product.getDescription(), textInView(adLayout, DESCRIPTION_TAG));
-    assertEquals(product.getPrice(), textInView(adLayout, PRICE_TAG));
-    assertEquals(product.getCallToAction(), textInView(adLayout, CALL_TO_ACTION_TAG));
-    assertEquals(expectedAssets.getAdvertiserDomain(), textInView(adLayout, ADVERTISER_DOMAIN_TAG));
-    assertEquals(expectedAssets.getAdvertiserDescription(), textInView(adLayout, ADVERTISER_DESCRIPTION_TAG));
+    assertEquals(product.getTitle(), textInView(nativeAdView, TITLE_TAG));
+    assertEquals(product.getDescription(), textInView(nativeAdView, DESCRIPTION_TAG));
+    assertEquals(product.getPrice(), textInView(nativeAdView, PRICE_TAG));
+    assertEquals(product.getCallToAction(), textInView(nativeAdView, CALL_TO_ACTION_TAG));
+    assertEquals(expectedAssets.getAdvertiserDomain(), textInView(nativeAdView, ADVERTISER_DOMAIN_TAG));
+    assertEquals(expectedAssets.getAdvertiserDescription(), textInView(nativeAdView, ADVERTISER_DESCRIPTION_TAG));
 
     // FIXME EE-1052
     // Check product image that should be replaced
-    // assertNotNull(drawableInView(adLayout, PRODUCT_IMAGE_TAG));
+    // assertNotNull(drawableInView(nativeAdView, PRODUCT_IMAGE_TAG));
     // assertNotEquals(activity.getDefaultDrawable(), drawableInView(adLayout, PRODUCT_IMAGE_TAG));
     // FIXME EE-1052
     // Check logo image that should keep placeholder (there is no advertiser logo in stub assets)
-    // assertNotNull(drawableInView(adLayout, ADVERTISER_LOGO_TAG));
-    // assertEquals(activity.getDefaultDrawable(), drawableInView(adLayout, ADVERTISER_LOGO_TAG));
+    // assertNotNull(drawableInView(nativeAdView, ADVERTISER_LOGO_TAG));
+    // assertEquals(activityRule.getActivity().getDefaultDrawable(), drawableInView(nativeAdView, ADVERTISER_LOGO_TAG));
 
     // Check AdChoice
-    View nativeAdView = adLayout.getChildAt(0);
     ImageView adChoiceView = adChoiceOverlay.getAdChoiceView(nativeAdView);
     assertNotNull(adChoiceView);
     // FIXME EE-1052
@@ -112,16 +158,26 @@ public class AdvancedNativeFunctionalTest {
 
     // Check click
     String clickUrl = product.getClickUrl().toString();
-    checkClickOnViewRedirectTo(adLayout, TITLE_TAG, clickUrl);
-    checkClickOnViewRedirectTo(adLayout, DESCRIPTION_TAG, clickUrl);
-    checkClickOnViewRedirectTo(adLayout, PRICE_TAG, clickUrl);
-    checkClickOnViewRedirectTo(adLayout, CALL_TO_ACTION_TAG, clickUrl);
-    checkClickOnViewRedirectTo(adLayout, PRODUCT_IMAGE_TAG, clickUrl);
-    checkClickOnViewRedirectTo(adLayout, ADVERTISER_DOMAIN_TAG, clickUrl);
-    checkClickOnViewRedirectTo(adLayout, ADVERTISER_DESCRIPTION_TAG, clickUrl);
-    checkClickOnViewRedirectTo(adLayout, ADVERTISER_LOGO_TAG, clickUrl);
+    checkClickOnViewRedirectTo(nativeAdView, TITLE_TAG, clickUrl);
+    checkClickOnViewRedirectTo(nativeAdView, DESCRIPTION_TAG, clickUrl);
+    checkClickOnViewRedirectTo(nativeAdView, PRICE_TAG, clickUrl);
+    checkClickOnViewRedirectTo(nativeAdView, CALL_TO_ACTION_TAG, clickUrl);
+    checkClickOnViewRedirectTo(nativeAdView, PRODUCT_IMAGE_TAG, clickUrl);
+    checkClickOnViewRedirectTo(nativeAdView, ADVERTISER_DOMAIN_TAG, clickUrl);
+    checkClickOnViewRedirectTo(nativeAdView, ADVERTISER_DESCRIPTION_TAG, clickUrl);
+    checkClickOnViewRedirectTo(nativeAdView, ADVERTISER_LOGO_TAG, clickUrl);
     checkClickOnViewRedirectTo(nativeAdView, clickUrl);
     checkClickOnViewRedirectTo(adChoiceView, expectedAssets.getPrivacyOptOutClickUrl().toString());
+  }
+
+  private ViewGroup getAdLayout() {
+    TestNativeActivity activity = activityRule.getActivity();
+    return activity.getWindow().getDecorView().findViewWithTag(AD_LAYOUT_TAG);
+  }
+
+  private ViewGroup getRecyclerView() {
+    TestNativeActivity activity = activityRule.getActivity();
+    return activity.getWindow().getDecorView().findViewWithTag(RECYCLER_VIEW_TAG);
   }
 
   private CharSequence textInView(@NonNull ViewGroup view, @NonNull Object tag) {

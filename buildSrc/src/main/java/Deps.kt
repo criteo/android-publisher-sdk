@@ -12,6 +12,7 @@ object Deps {
       const val AppCompatV7 = "com.android.support:appcompat-v7:$version"
       const val Annotations = "com.android.support:support-annotations:$version"
       const val Design = "com.android.support:design:$version"
+      const val RecyclerViewV7 = "com.android.support:recyclerview-v7:$version"
       const val SupportCoreUtils = "com.android.support:support-core-utils:$version"
 
       object Constraint {

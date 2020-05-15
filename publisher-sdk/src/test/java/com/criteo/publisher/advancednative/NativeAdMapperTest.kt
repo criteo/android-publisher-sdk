@@ -204,21 +204,6 @@ class NativeAdMapperTest {
   }
 
   @Test
-  fun addAdChoiceOverlay_GivenAnyView_DelegateToAdChoiceOverlay() {
-    val listener = mock<CriteoNativeAdListener>()
-    val nativeAssets = mock<NativeAssets>(defaultAnswer = Answers.RETURNS_DEEP_STUBS)
-    val inputView = mock<View>()
-    val overlappedView = mock<ViewGroup>()
-
-    whenever(adChoiceOverlay.addOverlay(inputView)).doReturn(overlappedView)
-
-    val nativeAd = mapper.map(nativeAssets, WeakReference(listener), mock())
-    val outputView = nativeAd.addAdChoiceOverlay(inputView)
-
-    assertThat(outputView).isEqualTo(overlappedView)
-  }
-
-  @Test
   fun getAdChoiceView_GivenAnyView_DelegateToAdChoiceOverlay() {
     val listener = mock<CriteoNativeAdListener>()
     val nativeAssets = mock<NativeAssets>(defaultAnswer = Answers.RETURNS_DEEP_STUBS)
@@ -240,12 +225,10 @@ class NativeAdMapperTest {
     val assets = mock<NativeAssets>(defaultAnswer=Answers.RETURNS_DEEP_STUBS)
     val context = mock<Context>()
     val parent = mock<ViewGroup>()
-    val publisherView = mock<View>()
     val nativeView = mock<ViewGroup>()
     val adChoiceView = mock<ImageView>()
 
-    whenever(renderer.createNativeView(context, parent)).doReturn(publisherView)
-    whenever(adChoiceOverlay.addOverlay(publisherView)).doReturn(nativeView)
+    whenever(renderer.createNativeView(context, parent)).doReturn(nativeView)
     whenever(adChoiceOverlay.getAdChoiceView(nativeView)).doReturn(adChoiceView)
 
     val nativeAd = spy(mapper.map(assets, WeakReference(listener), renderer))
@@ -254,7 +237,7 @@ class NativeAdMapperTest {
     assertThat(renderedView).isEqualTo(nativeView)
 
     inOrder(renderer, nativeAd) {
-      verify(renderer).renderNativeView(rendererHelper, publisherView, nativeAd)
+      verify(renderer).renderNativeView(rendererHelper, nativeView, nativeAd)
       verify(nativeAd).watchForImpression(nativeView)
       verify(nativeAd).setProductClickableView(nativeView)
       verify(nativeAd).setAdChoiceClickableView(adChoiceView)

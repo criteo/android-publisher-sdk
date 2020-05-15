@@ -13,6 +13,7 @@ dependencies {
   implementation(Deps.Mockito.Core)
 
   compileOnly(Deps.Android.Support.Annotations)
+  implementation(Deps.Android.Support.RecyclerViewV7)
   implementation(Deps.Android.Test.Monitor) {
     exclude(group = Deps.Android.Support.group)
   }
