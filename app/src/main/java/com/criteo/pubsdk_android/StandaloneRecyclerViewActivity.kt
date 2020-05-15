@@ -7,8 +7,12 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import com.criteo.publisher.CriteoBannerView
+import com.criteo.pubsdk_android.PubSdkDemoApplication.STANDALONE_BANNER
+import com.criteo.pubsdk_android.listener.TestAppBannerAdListener
 import com.squareup.picasso.Picasso
 import kotlin.random.Random
 
@@ -28,32 +32,85 @@ class StandaloneRecyclerViewActivity : AppCompatActivity() {
     findViewById<View>(R.id.buttonStandaloneContent).setOnClickListener {
       viewAdapter.addContent()
     }
+
+    findViewById<View>(R.id.buttonStandaloneBanner).setOnClickListener {
+      loadBanner(viewAdapter)
+    }
+  }
+
+  private fun loadBanner(adapter: Adapter) {
+    val bannerView = CriteoBannerView(baseContext, STANDALONE_BANNER)
+    bannerView.setCriteoBannerAdListener(object : TestAppBannerAdListener(javaClass.simpleName, "Banner", null) {
+      override fun onAdReceived(view: View?) {
+        adapter.addBannerAd(bannerView)
+      }
+    })
+
+    bannerView.loadAd()
   }
 
   class Adapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val dataset: MutableList<Content> = mutableListOf()
+    private val dataset: MutableList<Any> = mutableListOf()
+
+    private companion object {
+      const val CONTENT = 1
+      const val BANNER = 2
+    }
+
+    override fun getItemViewType(position: Int): Int {
+      return when (dataset[position]) {
+        is Content -> CONTENT
+        is CriteoBannerView -> BANNER
+        else -> throw NotImplementedError()
+      }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-      val inflater = LayoutInflater.from(parent.context)
-      val view = inflater.inflate(R.layout.content_dummy, parent, false)
+      val context = parent.context
+      val view = when (viewType) {
+        CONTENT -> {
+          val inflater = LayoutInflater.from(context)
+          inflater.inflate(R.layout.content_dummy, parent, false)
+        }
+        BANNER -> FrameLayout(context)
+        else -> throw NotImplementedError()
+      }
 
       return object: RecyclerView.ViewHolder(view) {}
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-      val data = dataset[position]
+      val viewType = getItemViewType(position)
+      val rawData = dataset[position]
+      val view = holder.itemView
 
-      val textView = holder.itemView.findViewById<TextView>(R.id.text)
-      val imageView = holder.itemView.findViewById<ImageView>(R.id.image)
-      textView.text = data.text
-      Picasso.get().load(data.imageUrl).fit().into(imageView)
+      when (viewType) {
+        CONTENT -> {
+          val content = rawData as Content
+          val textView = view.findViewById<TextView>(R.id.text)
+          val imageView = view.findViewById<ImageView>(R.id.image)
+          textView.text = content.text
+          Picasso.get().load(content.imageUrl).fit().into(imageView)
+        }
+        BANNER -> {
+          val banner = rawData as CriteoBannerView
+          val layout = view as ViewGroup
+          (banner.parent as? ViewGroup)?.removeView(banner)
+          layout.addView(banner)
+        }
+      }
     }
 
     override fun getItemCount() = dataset.size
 
     fun addContent() {
       dataset.add(Content.newRandom())
+      notifyItemInserted(dataset.size - 1)
+    }
+
+    fun addBannerAd(bannerView: CriteoBannerView) {
+      dataset.add(bannerView)
       notifyItemInserted(dataset.size - 1)
     }
 

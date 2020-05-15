@@ -26,6 +26,11 @@ public class PubSdkDemoApplication extends Application {
 
   public static final NativeAdUnit NATIVE = new NativeAdUnit(NATIVE_AD_UNIT_ID);
 
+  public static final BannerAdUnit STANDALONE_BANNER = new BannerAdUnit(
+      DFP_BANNER_ADUNIT_ID,
+      new AdSize(320, 50)
+  );
+
   @Override
   public void onCreate() {
     super.onCreate();

@@ -2,6 +2,7 @@ package com.criteo.pubsdk_android;
 
 import static com.criteo.pubsdk_android.PubSdkDemoApplication.INTERSTITIAL_IBV_DEMO;
 import static com.criteo.pubsdk_android.PubSdkDemoApplication.NATIVE;
+import static com.criteo.pubsdk_android.PubSdkDemoApplication.STANDALONE_BANNER;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -12,8 +13,6 @@ import android.widget.LinearLayout;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.advancednative.CriteoNativeLoader;
-import com.criteo.publisher.model.AdSize;
-import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.pubsdk_android.listener.TestAppBannerAdListener;
 import com.criteo.pubsdk_android.listener.TestAppInterstitialAdDisplayListener;
@@ -27,10 +26,6 @@ public class StandaloneActivity extends AppCompatActivity {
 
   private static final InterstitialAdUnit INTERSTITIAL = new InterstitialAdUnit(
       "/140800857/Endeavour_Interstitial_320x480");
-
-  private static final BannerAdUnit BANNER = new BannerAdUnit(
-      "/140800857/Endeavour_320x50",
-      new AdSize(320, 50));
 
   private Context context;
   private LinearLayout adLayout;
@@ -88,7 +83,7 @@ public class StandaloneActivity extends AppCompatActivity {
       criteoBannerView.destroy();
     }
 
-    criteoBannerView = new CriteoBannerView(context, BANNER);
+    criteoBannerView = new CriteoBannerView(context, STANDALONE_BANNER);
     criteoBannerView.setCriteoBannerAdListener(new TestAppBannerAdListener(
         TAG, "Standalone", adLayout));
 
