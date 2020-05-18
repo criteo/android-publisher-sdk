@@ -120,13 +120,7 @@ public class UiHelper {
     if (view instanceof ViewGroup) {
       ViewGroup viewGroup = (ViewGroup) view;
 
-      // Simulate order of display: first greatest Z-index, then lowest index in view group
-      Comparator<View> displayComparator = Comparator.comparing(View::getZ)
-          .reversed()
-          .thenComparingInt(viewGroup::indexOfChild);
-
-      SortedSet<View> children = new TreeSet<>(displayComparator);
-
+      SortedSet<View> children = new TreeSet<>(new DisplayOrderComparator(viewGroup));
       for (int i = 0; i < viewGroup.getChildCount(); i++) {
         children.add(viewGroup.getChildAt(i));
       }
@@ -166,6 +160,29 @@ public class UiHelper {
       Thread.sleep(UI_TIMEOUT_MS);
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Simulate order of display: first greatest Z-index, then lowest index in view group
+   */
+  private static class DisplayOrderComparator implements Comparator<View> {
+
+    @NonNull
+    private final ViewGroup parent;
+
+    private DisplayOrderComparator(@NonNull ViewGroup parent) {
+      this.parent = parent;
+    }
+
+    @Override
+    public int compare(View o1, View o2) {
+      int cmp = Float.compare(o1.getZ(), o2.getZ());
+      if (cmp != 0) {
+        return -cmp;
+      }
+
+      return Integer.compare(parent.indexOfChild(o1), parent.indexOfChild(o2));
     }
   }
 }
