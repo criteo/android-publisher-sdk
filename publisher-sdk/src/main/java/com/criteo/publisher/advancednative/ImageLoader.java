@@ -10,6 +10,21 @@ import java.net.URL;
 public interface ImageLoader {
 
   /**
+   * Preload the image at the given URL.
+   * <p>
+   * This method is called before the rendering of the native Ad and lets you start downloading
+   * images and caching them in order to have them ready to be rendered when {@link
+   * #loadImageInto(URL, ImageView, Drawable)} is called.
+   * <p>
+   * Implementation is expected to move in a worker thread when doing long task such as network to
+   * download the image.
+   *
+   * @param imageUrl URL of the image to preload
+   * @see #loadImageInto(URL, ImageView, Drawable)
+   */
+  void preload(@NonNull URL imageUrl) throws Exception;
+
+  /**
    * Load the image at the given URL and set it in the given image view when finished.
    * <p>
    * The given image URL is in HTTPS and represents images in PNG, WebP or JPEG format.

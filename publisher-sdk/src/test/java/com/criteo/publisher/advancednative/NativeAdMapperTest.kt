@@ -57,20 +57,25 @@ class NativeAdMapperTest {
   private lateinit var mapper: NativeAdMapper
 
   @Test
-  fun map_GivenAssets_ReturnsNativeAdWithSameData() {
+  fun map_GivenAssets_ReturnsNativeAdWithSameDataAndPreloadImages() {
+    val productImageUrl = URI.create("http://click.url").toURL()
+    val advertiserLogoUrl = URI.create("http://logo.url").toURL()
+    val adChoiceUrl = URI.create("http://ad-choice.url").toURL()
+
     val product = mock<NativeProduct>() {
       on { title } doReturn "myTitle"
       on { description } doReturn "myDescription"
       on { price } doReturn "42€"
       on { callToAction } doReturn "myCTA"
-      on { imageUrl } doReturn URI.create("http://click.url").toURL()
+      on { imageUrl } doReturn productImageUrl
     }
 
     val assets = mock<NativeAssets>() {
       on { this.product } doReturn product
       on { advertiserDomain } doReturn "advDomain"
       on { advertiserDescription } doReturn "advDescription"
-      on { advertiserLogoUrl } doReturn URI.create("http://logo.url").toURL()
+      on { this.advertiserLogoUrl } doReturn advertiserLogoUrl
+      on { privacyOptOutImageUrl } doReturn adChoiceUrl
     }
 
     val nativeAd = mapper.map(assets, WeakReference(null), mock())
@@ -79,10 +84,14 @@ class NativeAdMapperTest {
     assertThat(nativeAd.description).isEqualTo("myDescription")
     assertThat(nativeAd.price).isEqualTo("42€")
     assertThat(nativeAd.callToAction).isEqualTo("myCTA")
-    assertThat(nativeAd.productMedia).isEqualTo(CriteoMedia.create(URI.create("http://click.url").toURL()))
+    assertThat(nativeAd.productMedia).isEqualTo(CriteoMedia.create(productImageUrl))
     assertThat(nativeAd.advertiserDomain).isEqualTo("advDomain")
     assertThat(nativeAd.advertiserDescription).isEqualTo("advDescription")
-    assertThat(nativeAd.advertiserLogoMedia).isEqualTo(CriteoMedia.create(URI.create("http://logo.url").toURL()))
+    assertThat(nativeAd.advertiserLogoMedia).isEqualTo(CriteoMedia.create(advertiserLogoUrl))
+
+    verify(rendererHelper).preloadMedia(productImageUrl)
+    verify(rendererHelper).preloadMedia(advertiserLogoUrl)
+    verify(rendererHelper).preloadMedia(adChoiceUrl)
   }
 
   @Test

@@ -63,6 +63,10 @@ public class NativeAdMapper {
         clickHelper
     );
 
+    rendererHelper.preloadMedia(nativeAssets.getProduct().getImageUrl());
+    rendererHelper.preloadMedia(nativeAssets.getAdvertiserLogoUrl());
+    rendererHelper.preloadMedia(nativeAssets.getPrivacyOptOutImageUrl());
+
     return new CriteoNativeAd(
         nativeAssets,
         visibilityTracker,

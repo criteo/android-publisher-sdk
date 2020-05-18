@@ -26,6 +26,15 @@ public class RendererHelper {
     this.uiExecutor = uiExecutor;
   }
 
+  void preloadMedia(@NonNull URL url) {
+    new SafeRunnable() {
+      @Override
+      public void runSafely() throws Throwable {
+        imageLoader.preload(url);
+      }
+    }.run();
+  }
+
   public void setMediaInView(CriteoMedia mediaContent, CriteoMediaView mediaView) {
     setMediaInView(mediaContent.getImageUrl(), mediaView.getImageView(), mediaView.getPlaceholder());
   }
