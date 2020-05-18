@@ -1,15 +1,15 @@
 package com.criteo.publisher.advancednative;
 
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.UiThread;
 import com.criteo.publisher.CriteoErrorCode;
-import com.criteo.publisher.annotation.Incubating;
 
 /**
  * All callbacks are invoked on the UI thread, so it is safe to execute any UI operations in the
  * implementation.
  */
-@Incubating(Incubating.NATIVE)
+@Keep
 public abstract class CriteoNativeAdListener {
 
   /**

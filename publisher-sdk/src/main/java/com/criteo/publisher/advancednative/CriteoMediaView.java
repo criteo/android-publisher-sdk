@@ -4,13 +4,13 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Build.VERSION_CODES;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import com.criteo.publisher.annotation.Incubating;
 
 /**
  * Displays {@linkplain CriteoMedia Ad media} such as product image or advertiser logo.
@@ -34,7 +34,7 @@ import com.criteo.publisher.annotation.Incubating;
  *
  * @attr ref android.R.styleable#ImageView_src
  */
-@Incubating(Incubating.NATIVE)
+@Keep
 public class CriteoMediaView extends FrameLayout {
 
   @NonNull

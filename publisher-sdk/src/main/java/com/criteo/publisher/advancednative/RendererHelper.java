@@ -2,14 +2,14 @@ package com.criteo.publisher.advancednative;
 
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.SafeRunnable;
-import com.criteo.publisher.annotation.Incubating;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import java.net.URL;
 
-@Incubating(Incubating.NATIVE)
+@Keep
 public class RendererHelper {
 
   @NonNull

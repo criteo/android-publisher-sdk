@@ -3,11 +3,11 @@ package com.criteo.publisher.advancednative;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.criteo.publisher.annotation.Incubating;
 
-@Incubating(Incubating.NATIVE)
+@Keep
 public interface CriteoNativeRenderer {
 
   /**

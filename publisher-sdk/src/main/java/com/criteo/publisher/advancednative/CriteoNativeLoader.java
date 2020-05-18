@@ -3,6 +3,7 @@ package com.criteo.publisher.advancednative;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.BidManager;
@@ -10,7 +11,6 @@ import com.criteo.publisher.BidToken;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.InHouse;
-import com.criteo.publisher.annotation.Incubating;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.Slot;
@@ -19,7 +19,7 @@ import com.criteo.publisher.model.nativeads.NativeTokenValue;
 import com.criteo.publisher.util.PreconditionsUtil;
 import java.lang.ref.WeakReference;
 
-@Incubating(Incubating.NATIVE)
+@Keep
 public class CriteoNativeLoader {
 
   @NonNull

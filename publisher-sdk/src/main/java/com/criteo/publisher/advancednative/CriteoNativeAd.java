@@ -4,13 +4,13 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
-import com.criteo.publisher.annotation.Incubating;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 
-@Incubating(Incubating.NATIVE)
+@Keep
 public class CriteoNativeAd {
 
   @NonNull

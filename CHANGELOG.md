@@ -1,3 +1,9 @@
+# Version 3.7.0
+
+- Features
+  - *Advanced native ads* public release; integration instructions and documentation available on
+  our [support website](https://publisherdocs.criteotilt.com/app/android/)
+
 # Version 3.6.0
 
 - Features

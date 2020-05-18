@@ -1,12 +1,12 @@
 package com.criteo.publisher.advancednative;
 
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
-import com.criteo.publisher.annotation.Incubating;
 import com.google.auto.value.AutoValue;
 import java.net.URL;
 
 @AutoValue
-@Incubating(Incubating.NATIVE)
+@Keep
 public abstract class CriteoMedia {
 
   static CriteoMedia create(@NonNull URL imageUrl) {
