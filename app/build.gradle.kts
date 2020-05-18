@@ -39,13 +39,15 @@ dependencies {
         exclude(group = Deps.Android.Support.group)
     }
 
-    implementation(Deps.Criteo.Mediation.MoPub("${sdkVersion()}+")) {
-        exclude(group = Deps.Criteo.PublisherSdk.group)
-    }
-
-    implementation(Deps.Criteo.Mediation.AdMob("${sdkVersion()}+")) {
-        exclude(group = Deps.Criteo.PublisherSdk.group)
-    }
+    // FIXME EE-1097 Adapters need SDK vX, but test app needs adapters vX, so when bumping version,
+    //  one dependency should be cut off.
+//    implementation(Deps.Criteo.Mediation.MoPub("${sdkVersion()}+")) {
+//        exclude(group = Deps.Criteo.PublisherSdk.group)
+//    }
+//
+//    implementation(Deps.Criteo.Mediation.AdMob("${sdkVersion()}+")) {
+//        exclude(group = Deps.Criteo.PublisherSdk.group)
+//    }
 
     implementation(Deps.Kotlin.Stdlib)
     implementation(Deps.Android.Support.AppCompatV7)
