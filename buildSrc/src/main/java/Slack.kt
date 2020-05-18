@@ -35,6 +35,11 @@ fun Project.addSlackDeploymentMessages() {
 
             git()
 
+            changelog {
+              version.set(sdkVersion())
+              versionLinesStartWith("# Version")
+            }
+
             if (repository.isNexusProd()) {
               git {
                 format {
