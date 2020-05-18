@@ -16,25 +16,36 @@ import android.support.annotation.VisibleForTesting;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.WebView;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 import com.criteo.publisher.adview.AdWebViewClient;
 import com.criteo.publisher.adview.RedirectionListener;
+import java.lang.ref.WeakReference;
 
 public class CriteoInterstitialActivity extends Activity {
 
   private WebView webView;
   private ResultReceiver resultReceiver;
   private ImageButton closeButton;
-  private RelativeLayout adLayout;
+  private FrameLayout adLayout;
   private ComponentName callingActivityName;
+  private AdWebViewClient adWebViewClient;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_criteo_interstitial);
     adLayout = findViewById(R.id.AdLayout);
-    webView = findViewById(R.id.webview);
+
+    /**
+     * {@link WebView}s leak the Activity context:
+     * {@link https://issuetracker.google.com/issues/36918787}. This happens when the {@link WebView}
+     * is created via the XML file. In order to avoid leaking the Activity context, a workaround
+     * consists in creating the WebView by hand by passing the Application context instead.
+     */
+    webView = new WebView(getApplicationContext());
+    adLayout.addView(webView, 0);
+
     closeButton = findViewById(R.id.closeButton);
 
     Bundle bundle = getIntent().getExtras();
@@ -74,6 +85,7 @@ public class CriteoInterstitialActivity extends Activity {
   protected void onDestroy() {
     super.onDestroy();
     adLayout.removeAllViews();
+    webView.setWebViewClient(null);
     webView.destroy();
     webView = null;
   }
@@ -86,17 +98,16 @@ public class CriteoInterstitialActivity extends Activity {
   private void prepareWebView() {
     webView.getSettings().setJavaScriptEnabled(true);
 
-    webView.setWebViewClient(new AdWebViewClient(new RedirectionListener() {
-      @Override
-      public void onUserRedirectedToAd() {
-        click();
-      }
+    WeakRedirectionListener weakRedirectionListener = new WeakRedirectionListener(
+        new WeakReference<>(this)
+    );
 
-      @Override
-      public void onUserBackFromAd() {
-        close();
-      }
-    }, callingActivityName));
+    AdWebViewClient adWebViewClient = new AdWebViewClient(
+        weakRedirectionListener,
+        callingActivityName
+    );
+
+    webView.setWebViewClient(adWebViewClient);
   }
 
   @Override
@@ -109,7 +120,30 @@ public class CriteoInterstitialActivity extends Activity {
     return webView;
   }
 
-}
+  private static class WeakRedirectionListener implements RedirectionListener {
 
+    private final WeakReference<CriteoInterstitialActivity> activityRef;
+
+    private WeakRedirectionListener(WeakReference<CriteoInterstitialActivity> activityRef) {
+      this.activityRef = activityRef;
+    }
+
+    @Override
+    public void onUserRedirectedToAd() {
+      CriteoInterstitialActivity criteoInterstitialActivity = activityRef.get();
+      if (criteoInterstitialActivity != null) {
+        criteoInterstitialActivity.click();
+      }
+    }
+
+    @Override
+    public void onUserBackFromAd() {
+      CriteoInterstitialActivity criteoInterstitialActivity = activityRef.get();
+      if (criteoInterstitialActivity != null) {
+        criteoInterstitialActivity.close();
+      }
+    }
+  }
+}
 
 

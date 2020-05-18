@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools"
   android:id="@+id/AdLayout"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  android:orientation="vertical"
   tools:context=".CriteoInterstitialActivity">
-  <WebView
-    android:id="@+id/webview"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
-  </WebView>
   <ImageButton
     android:id="@+id/closeButton"
     android:layout_width="45dp"
@@ -22,4 +15,4 @@
     android:src="@drawable/closebtn"
     tools:layout_editor_absoluteX="239dp"
     tools:layout_editor_absoluteY="1dp"/>
-</RelativeLayout>
+</FrameLayout>
