@@ -1,18 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.criteo.publisher.testutils">
-
-  <application>
-    <activity android:name="com.criteo.publisher.activity.DummyAdActivity">
-      <intent-filter>
-        <action android:name="android.intent.action.VIEW" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.BROWSABLE" />
-
-        <!-- Accepts URIs that begin with "criteo_test://dummy-ad-activity” -->
-        <data android:scheme="criteo-test" android:host="dummy-ad-activity" />
-      </intent-filter>
-    </activity>
-  </application>
-
+<manifest package="com.criteo.publisher.testutils">
 </manifest>

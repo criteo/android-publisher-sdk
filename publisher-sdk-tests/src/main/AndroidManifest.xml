@@ -6,6 +6,17 @@
     <activity android:name="com.criteo.publisher.test.activity.DummyActivity"/>
     <activity android:name="com.criteo.publisher.activity.TestNativeActivity"/>
 
+    <activity android:name="com.criteo.publisher.activity.DummyAdActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <!-- Accepts URIs that begin with "criteo-test://dummy-ad-activity” -->
+        <data android:scheme="criteo-test" android:host="dummy-ad-activity" />
+      </intent-filter>
+    </activity>
+
     <activity
       android:configChanges="keyboardHidden|orientation|screenSize"
       android:name="com.mopub.mobileads.MoPubActivity"/>
