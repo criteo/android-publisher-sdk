@@ -10,10 +10,11 @@ dependencies {
   compileOnly(project(":publisher-sdk"))
 
   implementation(Deps.JUnit.JUnit)
-  implementation(Deps.Mockito.Core)
+  compileOnly(Deps.Mockito.Core) {
+    because("Brings injected mock mechanism. Caller should provide its own Mockito deps.")
+  }
 
   compileOnly(Deps.Android.Support.Annotations)
-  implementation(Deps.Android.Support.RecyclerViewV7)
   implementation(Deps.Android.Test.Monitor) {
     exclude(group = Deps.Android.Support.group)
   }

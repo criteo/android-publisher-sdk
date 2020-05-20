@@ -13,9 +13,11 @@ android {
 
 dependencies {
   implementation(project(":publisher-sdk"))
+  implementation(project(":test-utils"))
   implementation(Deps.Android.Support.MultiDex)
+  implementation(Deps.Android.Support.Annotations)
+  implementation(Deps.Android.Support.RecyclerViewV7)
 
-  androidTestImplementation(project(":test-utils"))
   androidTestImplementation(Deps.Android.Support.SupportCoreUtils)
   androidTestImplementation(Deps.Android.Test.Runner)
   androidTestImplementation(Deps.Android.Test.Rules)

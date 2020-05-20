@@ -26,7 +26,7 @@ import com.criteo.publisher.advancednative.CriteoNativeAdListener;
 import com.criteo.publisher.advancednative.CriteoNativeLoader;
 import com.criteo.publisher.advancednative.CriteoNativeRenderer;
 import com.criteo.publisher.advancednative.RendererHelper;
-import com.criteo.publisher.testutils.R;
+import com.criteo.publisher.tests.R;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -5,8 +5,8 @@ import static org.junit.Assert.assertNull;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import com.criteo.publisher.R;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.tests.R;
 import javax.inject.Inject;
 import org.junit.Rule;
 import org.junit.Test;

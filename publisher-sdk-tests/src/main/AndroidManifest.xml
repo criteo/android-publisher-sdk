@@ -1,3 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="com.criteo.publisher.tests">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  package="com.criteo.publisher.tests">
+
+  <application>
+    <activity android:name="com.criteo.publisher.test.activity.DummyActivity"/>
+    <activity android:name="com.criteo.publisher.activity.TestNativeActivity"/>
+
+    <activity
+      android:configChanges="keyboardHidden|orientation|screenSize"
+      android:name="com.mopub.mobileads.MoPubActivity"/>
+  </application>
+
 </manifest>

@@ -95,8 +95,10 @@ object Deps {
   }
 
   object Mockito {
-    const val Android = "org.mockito:mockito-android:3.3.0"
-    const val Core = "org.mockito:mockito-core:2.7.0"
+    private const val version = "3.3.0"
+
+    const val Android = "org.mockito:mockito-android:$version"
+    const val Core = "org.mockito:mockito-core:$version"
     const val Kotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
   }
 
