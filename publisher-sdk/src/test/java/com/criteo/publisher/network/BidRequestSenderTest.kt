@@ -258,14 +258,14 @@ class BidRequestSenderTest {
 
         val bothCallsAreWaiting = CountDownLatch(2)
         val waitingLatch = CountDownLatch(1)
-        val interruptedParties = AtomicInteger()
+        val bothCallsAreInterrupted = CountDownLatch(2)
 
         doAnswer {
             bothCallsAreWaiting.countDown()
             try {
                 waitingLatch.await()
             } catch (e: InterruptedException) {
-                interruptedParties.incrementAndGet()
+                bothCallsAreInterrupted.countDown()
                 throw e
             }
             null
@@ -277,7 +277,7 @@ class BidRequestSenderTest {
 
         sender.cancelAllPendingTasks()
 
-        assertThat(interruptedParties).hasValue(2)
+        assertThat(bothCallsAreInterrupted.await(1, TimeUnit.SECONDS)).isTrue()
     }
 
     private fun createAdUnit(): CacheAdUnit {
