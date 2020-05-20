@@ -146,7 +146,7 @@ public class CriteoFunctionalTest {
 
     verify(api).loadConfig(argThat(request -> {
       assertEquals(TEST_CP_ID, request.getCriteoPublisherId());
-      assertEquals("com.criteo.publisher.test", request.getBundleId());
+      assertEquals("com.criteo.publisher.tests.test", request.getBundleId());
       assertEquals("1.2.3", request.getSdkVersion());
 
       return true;

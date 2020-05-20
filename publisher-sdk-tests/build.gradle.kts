@@ -20,11 +20,18 @@ dependencies {
   androidTestImplementation(Deps.Android.Test.Runner)
   androidTestImplementation(Deps.Android.Test.Rules)
   androidTestImplementation(Deps.Mockito.Android)
+  androidTestImplementation(Deps.Square.Tape.Tape)
   androidTestImplementation(Deps.Google.AdMob) {
     exclude(group = Deps.Android.Support.group)
   }
 
   androidTestImplementation(Deps.MoPub.Banner) {
+    isTransitive = true
+    exclude(group = Deps.Android.Support.group)
+  }
+
+  // Debug is needed because MoPub need some activities to be declare in the AndroidManifest.xml
+  debugImplementation(Deps.MoPub.Interstitial) {
     isTransitive = true
     exclude(group = Deps.Android.Support.group)
   }

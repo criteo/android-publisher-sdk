@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.test.runner.AndroidJUnit4;
 import com.criteo.publisher.mock.MockedDependenciesRule;
-import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.privacy.gdpr.GdprData;
 import javax.inject.Inject;
 import org.junit.After;

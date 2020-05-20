@@ -15,9 +15,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
-import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.csm.MetricRepository.MetricUpdater;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;

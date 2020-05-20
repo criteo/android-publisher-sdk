@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -122,7 +123,7 @@ public class MoPubHeaderBiddingFunctionalTest {
 
     Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, invalidInterstitialAdUnit);
 
-    assertEquals("old keywords", moPubInterstitial.getKeywords());
+    Assert.assertEquals("old keywords", moPubInterstitial.getKeywords());
   }
 
   @Test

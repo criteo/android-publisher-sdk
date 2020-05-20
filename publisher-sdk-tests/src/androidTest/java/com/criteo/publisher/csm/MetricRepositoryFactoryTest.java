@@ -8,8 +8,8 @@ import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
-import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Before;
