@@ -51,6 +51,7 @@ fun Project.addSlackDeploymentMessages() {
 - Go on <$gerritProjectBranchesUrl|Gerrit> and create the `v${sdkVersion()}` branch on this commit SHA-1 (only for new version)
 - Share this message on $teamChannel
 *Validate the RC*
+- Install the <${testAppUrl(publication.version)}|TestApp APK>
 - Go on <$confluenceSpaceUrl/Bugfest+Android+${publication.version}|Bugfest page> and execute tests
 *Release the RC*
 - Go on <https://build.crto.in/job/pub-sdk-mochi-prod-deployment/build|Jenkins deploy job> and insert this commit SHA-1
@@ -64,4 +65,12 @@ fun Project.addSlackDeploymentMessages() {
       }
     }
   }
+}
+
+private fun testAppUrl(version: String): String {
+  // FIXME this is not a stable solution, if the test app coordinates are changed, this will be
+  //  broken. A proper solution could be to get the publication from the test-app module, but it may
+  //  be extracted outside this project.
+  //  But coordinates are pretty constant, so this is not a big deal for now.
+  return "http://nexus.criteo.prod/content/groups/android/com/criteo/pubsdk_android/publisher-app/$version/publisher-app-$version-staging.apk"
 }
