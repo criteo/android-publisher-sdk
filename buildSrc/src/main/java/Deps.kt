@@ -87,7 +87,7 @@ object Deps {
   }
 
   object Kotlin {
-    private const val version = "1.3.61"
+    private const val version = "1.3.70"
 
     const val GradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
     const val JUnit = "org.jetbrains.kotlin:kotlin-test-junit:$version"

@@ -54,6 +54,8 @@ for (variant in listOf("debug", "staging")) {
 addSlackDeploymentMessages()
 
 dependencies {
+    implementation(Deps.Kotlin.Stdlib)
+
     compileOnly(Deps.Android.Support.Annotations)
     implementation(Deps.Square.Tape.Tape)
 
@@ -81,7 +83,6 @@ dependencies {
     testImplementation(Deps.AssertJ.AssertJ)
     testImplementation(Deps.MockServer.Netty)
     testImplementation(Deps.MockServer.Client)
-    testImplementation(Deps.Kotlin.Stdlib)
     testImplementation(Deps.Kotlin.JUnit)
     testImplementation(Deps.Mockito.Kotlin)
     testImplementation(Deps.Android.Support.Annotations)
