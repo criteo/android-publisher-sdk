@@ -7,6 +7,7 @@ fun Project.addSlackDeploymentMessages() {
   val teamChannel = "#pub-sdk-private"
   val rcChannel = "#pub-sdk-release-candidates"
   val confluenceSpaceUrl = "https://confluence.criteois.com/display/PUBSDK/"
+  val gerritProjectBranchesUrl = "http://review.crto.in/#/admin/projects/pub-sdk/mochi,branches"
 
   afterEvaluate {
     tasks.withType<PublishToMavenRepository>()
@@ -47,6 +48,7 @@ fun Project.addSlackDeploymentMessages() {
                     markdown("""
 *Promote as a RC*
 - Go on <$confluenceSpaceUrl/Bugfest+process|Bugfest creation page> and insert `${publication.version}` as RC name
+- Go on <$gerritProjectBranchesUrl|Gerrit> and create the `v${sdkVersion()}` branch on this commit SHA-1 (only for new version)
 - Share this message on $teamChannel
 *Validate the RC*
 - Go on <$confluenceSpaceUrl/Bugfest+Android+${publication.version}|Bugfest page> and execute tests
