@@ -14,6 +14,7 @@ import static com.criteo.publisher.activity.TestNativeActivity.RECYCLER_VIEW_TAG
 import static com.criteo.publisher.activity.TestNativeActivity.TITLE_TAG;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -141,20 +142,18 @@ public class AdvancedNativeFunctionalTest {
     assertEquals(expectedAssets.getAdvertiserDomain(), textInView(nativeAdView, ADVERTISER_DOMAIN_TAG));
     assertEquals(expectedAssets.getAdvertiserDescription(), textInView(nativeAdView, ADVERTISER_DESCRIPTION_TAG));
 
-    // FIXME EE-1052
     // Check product image that should be replaced
-    // assertNotNull(drawableInView(nativeAdView, PRODUCT_IMAGE_TAG));
-    // assertNotEquals(activity.getDefaultDrawable(), drawableInView(adLayout, PRODUCT_IMAGE_TAG));
-    // FIXME EE-1052
+    Drawable defaultDrawable = activityRule.getActivity().getDefaultDrawable();
+    assertNotNull(drawableInView(nativeAdView, PRODUCT_IMAGE_TAG));
+    assertNotEquals(defaultDrawable, drawableInView(nativeAdView, PRODUCT_IMAGE_TAG));
     // Check logo image that should keep placeholder (there is no advertiser logo in stub assets)
-    // assertNotNull(drawableInView(nativeAdView, ADVERTISER_LOGO_TAG));
-    // assertEquals(activityRule.getActivity().getDefaultDrawable(), drawableInView(nativeAdView, ADVERTISER_LOGO_TAG));
+    assertNotNull(drawableInView(nativeAdView, ADVERTISER_LOGO_TAG));
+    assertEquals(defaultDrawable, drawableInView(nativeAdView, ADVERTISER_LOGO_TAG));
 
     // Check AdChoice
     ImageView adChoiceView = adChoiceOverlay.getAdChoiceView(nativeAdView);
     assertNotNull(adChoiceView);
-    // FIXME EE-1052
-    // assertNotNull(adChoiceView.getDrawable());
+    assertNotNull(adChoiceView.getDrawable());
 
     // Check click
     String clickUrl = product.getClickUrl().toString();
