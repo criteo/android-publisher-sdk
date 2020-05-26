@@ -15,5 +15,3 @@ git checkout FETCH_HEAD
     publishReleasePublicationToAzureRepository \
     sendReleaseDeployedToAzureMessageToSlack
 
-git tag -a "$VERSION" -m "Release $VERSION"
-git push origin "refs/tags/$VERSION"
