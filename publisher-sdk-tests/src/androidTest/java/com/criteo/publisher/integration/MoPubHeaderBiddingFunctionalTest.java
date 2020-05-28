@@ -11,8 +11,8 @@ import static org.junit.Assert.assertTrue;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.rule.ActivityTestRule;
+import androidx.test.InstrumentationRegistry;
+import androidx.test.rule.ActivityTestRule;
 import android.view.View;
 import android.webkit.WebView;
 import com.criteo.publisher.Criteo;

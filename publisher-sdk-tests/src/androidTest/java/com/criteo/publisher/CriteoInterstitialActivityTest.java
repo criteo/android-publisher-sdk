@@ -1,6 +1,6 @@
 package com.criteo.publisher;
 
-import static android.support.test.runner.lifecycle.Stage.RESUMED;
+import static androidx.test.runner.lifecycle.Stage.RESUMED;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
@@ -16,12 +16,12 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.test.rule.ActivityTestRule;
-import android.support.test.runner.lifecycle.ActivityLifecycleMonitor;
-import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
-import android.support.test.runner.lifecycle.Stage;
+import androidx.annotation.NonNull;
+import androidx.test.rule.ActivityTestRule;
 import android.webkit.WebView;
+import androidx.test.runner.lifecycle.ActivityLifecycleMonitor;
+import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
+import androidx.test.runner.lifecycle.Stage;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;

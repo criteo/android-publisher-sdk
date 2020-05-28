@@ -3,7 +3,7 @@ package com.criteo.publisher.util;
 import static org.junit.Assert.assertTrue;
 
 import android.os.Build.VERSION;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.runner.AndroidJUnit4;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;

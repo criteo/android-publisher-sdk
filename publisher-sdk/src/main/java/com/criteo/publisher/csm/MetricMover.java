@@ -1,6 +1,6 @@
 package com.criteo.publisher.csm;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Organize a move of metric from an original container to a destination one.

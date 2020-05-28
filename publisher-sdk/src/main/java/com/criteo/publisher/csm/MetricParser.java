@@ -1,6 +1,6 @@
 package com.criteo.publisher.csm;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.criteo.publisher.util.JsonSerializer;
 import java.io.IOException;
 import java.io.InputStream;

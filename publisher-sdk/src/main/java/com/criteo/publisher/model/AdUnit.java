@@ -1,6 +1,6 @@
 package com.criteo.publisher.model;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.ObjectsUtil;
 

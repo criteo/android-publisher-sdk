@@ -6,9 +6,9 @@ import static com.criteo.pubsdk_android.PubSdkDemoApplication.MOPUB_INTERSTITIAL
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.LinearLayout;
+import androidx.appcompat.app.AppCompatActivity;
 import com.criteo.pubsdk_android.listener.TestAppMoPubInterstitialAdListener;
 import com.mopub.mobileads.MoPubInterstitial;
 import com.mopub.mobileads.MoPubView;

@@ -3,9 +3,9 @@ package com.criteo.publisher;
 import static com.criteo.publisher.CriteoListenerCode.INVALID;
 import static com.criteo.publisher.CriteoListenerCode.VALID;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;

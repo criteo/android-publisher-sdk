@@ -1,9 +1,9 @@
 package com.criteo.publisher.advancednative;
 
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.widget.ImageView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.annotation.Incubating;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;

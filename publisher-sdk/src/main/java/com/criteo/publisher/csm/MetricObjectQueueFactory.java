@@ -1,9 +1,9 @@
 package com.criteo.publisher.csm;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.PreconditionsUtil;
 import com.squareup.tape.FileObjectQueue;

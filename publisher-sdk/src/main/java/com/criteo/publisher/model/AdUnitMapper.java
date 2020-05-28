@@ -5,9 +5,9 @@ import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL;
 
 import android.content.res.Configuration;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import android.util.Log;
 import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.DeviceUtil;

@@ -6,9 +6,9 @@ import static com.criteo.publisher.CriteoListenerCode.INVALID;
 import static com.criteo.publisher.CriteoListenerCode.VALID;
 
 import android.content.ComponentName;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import android.webkit.WebViewClient;
 import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.adview.AdWebViewClient;

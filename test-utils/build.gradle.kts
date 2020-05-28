@@ -14,10 +14,8 @@ dependencies {
     because("Brings injected mock mechanism. Caller should provide its own Mockito deps.")
   }
 
-  compileOnly(Deps.Android.Support.Annotations)
-  implementation(Deps.Android.Test.Monitor) {
-    exclude(group = Deps.Android.Support.group)
-  }
+  compileOnly(Deps.AndroidX.Annotations)
+  implementation(Deps.AndroidX.Test.Monitor)
 
   api(Deps.Javax.Inject.Inject)
 

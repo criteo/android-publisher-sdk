@@ -22,8 +22,8 @@ import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.verify;
 
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
-import android.support.test.rule.ActivityTestRule;
+import androidx.annotation.NonNull;
+import androidx.test.rule.ActivityTestRule;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;

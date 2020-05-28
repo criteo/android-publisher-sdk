@@ -1,6 +1,6 @@
 package com.criteo.publisher;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 public final class BidResponse {
 

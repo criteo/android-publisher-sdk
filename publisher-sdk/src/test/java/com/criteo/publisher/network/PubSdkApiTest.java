@@ -14,7 +14,7 @@ import static org.mockserver.model.HttpResponse.response;
 import static org.mockserver.model.NottableString.not;
 import static org.mockserver.verify.VerificationTimes.once;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;

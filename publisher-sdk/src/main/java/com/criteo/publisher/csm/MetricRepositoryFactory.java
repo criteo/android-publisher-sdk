@@ -2,8 +2,8 @@ package com.criteo.publisher.csm;
 
 import android.content.Context;
 import android.os.Build.VERSION_CODES;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import com.criteo.publisher.DependencyProvider.Factory;
 import com.criteo.publisher.util.BuildConfigWrapper;
 

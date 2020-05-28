@@ -1,7 +1,7 @@
 package com.criteo.publisher.util;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Represent the state of the android application.

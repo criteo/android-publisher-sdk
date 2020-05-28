@@ -2,7 +2,7 @@ package com.criteo.publisher.concurrent;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import java.util.concurrent.Executor;
 
 public class RunOnUiThreadExecutor implements Executor {

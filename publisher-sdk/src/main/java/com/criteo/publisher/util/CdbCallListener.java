@@ -1,6 +1,6 @@
 package com.criteo.publisher.util;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
 

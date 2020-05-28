@@ -1,6 +1,6 @@
 package com.criteo.publisher.concurrent;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * This is a mock implementation of the {@link RunOnUiThreadExecutor} class.

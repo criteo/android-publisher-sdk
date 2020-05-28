@@ -1,6 +1,6 @@
 package com.criteo.publisher.csm;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import java.util.List;
 
 public abstract class MetricSendingQueue {

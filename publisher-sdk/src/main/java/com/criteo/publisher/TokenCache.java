@@ -1,7 +1,7 @@
 package com.criteo.publisher;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.criteo.publisher.model.AbstractTokenValue;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.util.AdUnitType;

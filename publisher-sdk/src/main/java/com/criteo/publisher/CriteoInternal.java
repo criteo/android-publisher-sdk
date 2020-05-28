@@ -1,9 +1,9 @@
 package com.criteo.publisher;
 
 import android.app.Application;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.headerbidding.HeaderBidding;

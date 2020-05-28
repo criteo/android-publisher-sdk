@@ -4,31 +4,25 @@ object Deps {
 
     private const val agpVersion = "3.6.1"
     const val GradlePlugin = "com.android.tools.build:gradle:$agpVersion"
+  }
 
-    object Support {
-      private const val version = "28.0.0"
+  object AndroidX {
+    const val AppCompat = "androidx.appcompat:appcompat:1.1.0"
+    const val Annotations = "androidx.annotation:annotation:1.0.0"
+    const val MaterialComponents = "com.google.android.material:material:1.0.0"
+    const val MultiDex = "androidx.multidex:multidex:2.0.0"
+    const val RecyclerView = "androidx.recyclerview:recyclerview:1.1.0"
+    const val SupportCoreUtils = "androidx.legacy:legacy-support-core-utils:1.0.0"
 
-      const val group = "com.android.support"
-      const val AppCompatV7 = "com.android.support:appcompat-v7:$version"
-      const val Annotations = "com.android.support:support-annotations:$version"
-      const val Design = "com.android.support:design:$version"
-      const val MultiDex = "com.android.support:multidex:1.0.3"
-      const val RecyclerViewV7 = "com.android.support:recyclerview-v7:$version"
-      const val SupportCoreUtils = "com.android.support:support-core-utils:$version"
-
-      object Constraint {
-        private const val version = "1.1.3"
-
-        const val ConstraintLayout = "com.android.support.constraint:constraint-layout:$version"
-      }
+    object Constraint {
+      const val ConstraintLayout = "androidx.constraintlayout:constraintlayout:2.0.0-beta6"
     }
 
     object Test {
-      private const val version = "1.0.2"
-
-      const val Monitor = "com.android.support.test:monitor:$version"
-      const val Runner = "com.android.support.test:runner:$version"
-      const val Rules = "com.android.support.test:rules:$version"
+      private const val version = "1.2.0"
+      const val Monitor = "androidx.test:monitor:$version"
+      const val Runner = "androidx.test:runner:$version"
+      const val Rules = "androidx.test:rules:$version"
     }
   }
 
@@ -110,7 +104,7 @@ object Deps {
   }
 
   object MoPub {
-    private const val version = "5.6.0"
+    private const val version = "5.10.0"
 
     const val Banner = "com.mopub:mopub-sdk-banner:$version@aar"
     const val Interstitial = "com.mopub:mopub-sdk-interstitial:$version@aar"

@@ -11,7 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
-import android.support.test.rule.ActivityTestRule;
+import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;

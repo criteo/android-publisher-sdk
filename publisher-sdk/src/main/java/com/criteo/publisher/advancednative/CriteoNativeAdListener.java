@@ -1,7 +1,7 @@
 package com.criteo.publisher.advancednative;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.UiThread;
+import androidx.annotation.NonNull;
+import androidx.annotation.UiThread;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.annotation.Incubating;
 

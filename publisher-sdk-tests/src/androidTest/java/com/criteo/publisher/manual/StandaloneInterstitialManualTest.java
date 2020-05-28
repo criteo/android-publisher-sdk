@@ -4,7 +4,7 @@ import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 
 import android.content.Context;
-import android.support.test.rule.ActivityTestRule;
+import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdDisplayListener;

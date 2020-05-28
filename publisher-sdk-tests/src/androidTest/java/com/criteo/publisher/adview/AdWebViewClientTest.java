@@ -11,9 +11,9 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import android.app.Activity;
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.test.rule.ActivityTestRule;
 import android.webkit.WebView;
+import androidx.annotation.NonNull;
+import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.test.activity.DummyActivity;

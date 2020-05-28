@@ -1,8 +1,8 @@
 package com.criteo.publisher.util;
 
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * Wrapper around {@link SharedPreferences} that provide type safety when accessing data saved under

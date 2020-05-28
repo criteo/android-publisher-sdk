@@ -1,10 +1,10 @@
 package com.criteo.publisher.csm;
 
 import android.os.Build.VERSION_CODES;
-import android.support.annotation.GuardedBy;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.GuardedBy;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.annotation.VisibleForTesting;
 import android.util.AtomicFile;
 import com.criteo.publisher.csm.MetricRepository.MetricUpdater;
 import java.io.BufferedInputStream;

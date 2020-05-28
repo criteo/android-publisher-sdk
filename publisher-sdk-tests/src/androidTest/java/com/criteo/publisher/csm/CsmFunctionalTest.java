@@ -15,7 +15,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import android.support.v4.util.Consumer;
+import androidx.core.util.Consumer;
 import com.criteo.publisher.Clock;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;

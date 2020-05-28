@@ -5,7 +5,7 @@ import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWa
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import android.support.test.InstrumentationRegistry;
+import androidx.test.InstrumentationRegistry;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.BannerAdUnit;
 import java.util.UUID;

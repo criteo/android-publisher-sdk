@@ -1,7 +1,7 @@
 package com.criteo.publisher.model;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.criteo.publisher.privacy.gdpr.GdprData;
 import java.util.List;
 import org.json.JSONArray;

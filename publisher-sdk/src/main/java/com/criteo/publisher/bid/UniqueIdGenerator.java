@@ -1,7 +1,7 @@
 package com.criteo.publisher.bid;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.Clock;
 import java.util.UUID;
 

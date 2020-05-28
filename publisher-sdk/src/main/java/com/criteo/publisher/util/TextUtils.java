@@ -1,11 +1,12 @@
 package com.criteo.publisher.util;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
- * This class contains some code from {@link android.text.TextUtils}.
- * This is to enable unit testing code that relies on it, on the JVM.
+ * This class contains some code from {@link android.text.TextUtils}. This is to enable unit testing
+ * code that relies on it, on the JVM.
  */
 
 /**

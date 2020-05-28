@@ -2,9 +2,9 @@ package com.criteo.publisher.privacy.gdpr;
 
 import android.content.Context;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.util.SafeSharedPreferences;
 
 public class GdprDataFetcher {

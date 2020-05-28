@@ -4,8 +4,8 @@ import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWa
 import static org.junit.Assert.assertEquals;
 
 import android.os.Build.VERSION_CODES;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import android.webkit.WebView;
 import android.webkit.WebView.VisualStateCallback;
 import com.criteo.publisher.util.CompletableFuture;

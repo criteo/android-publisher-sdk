@@ -1,10 +1,10 @@
 package com.criteo.publisher.adview;
 
 import android.content.ComponentName;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.criteo.publisher.DependencyProvider;
 
 public class AdWebViewClient extends WebViewClient {

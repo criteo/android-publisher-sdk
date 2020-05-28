@@ -14,6 +14,10 @@ android {
             versionNameSuffix = "-memoryLeaksHunt"
         }
     }
+
+    defaultConfig {
+        multiDexEnabled = true
+    }
 }
 
 // Export APK for all build types (release, staging, debug)
@@ -35,9 +39,7 @@ addPublication("Apk") {
 dependencies {
     implementation(project(":publisher-sdk"))
 
-    implementation(Deps.Square.Picasso.Picasso) {
-        exclude(group = Deps.Android.Support.group)
-    }
+    implementation(Deps.Square.Picasso.Picasso)
 
     // FIXME EE-1097 Adapters need SDK vX, but test app needs adapters vX, so when bumping version,
     //  one dependency should be cut off.
@@ -50,22 +52,19 @@ dependencies {
     }
 
     implementation(Deps.Kotlin.Stdlib)
-    implementation(Deps.Android.Support.AppCompatV7)
-    implementation(Deps.Android.Support.Constraint.ConstraintLayout)
-    implementation(Deps.Android.Support.Design)
+    implementation(Deps.AndroidX.MultiDex)
+    implementation(Deps.AndroidX.AppCompat)
+    implementation(Deps.AndroidX.Constraint.ConstraintLayout)
+    implementation(Deps.AndroidX.MaterialComponents)
 
-    implementation(Deps.Google.AdMob) {
-        exclude(group = Deps.Android.Support.group)
-    }
+    implementation(Deps.Google.AdMob)
 
     implementation(Deps.MoPub.Banner) {
         isTransitive = true
-        exclude(group = Deps.Android.Support.group)
     }
 
     implementation(Deps.MoPub.Interstitial) {
         isTransitive = true
-        exclude(group = Deps.Android.Support.group)
     }
 
     "memoryLeaksHuntImplementation"(Deps.Square.LeakCanary.LeakCanary)

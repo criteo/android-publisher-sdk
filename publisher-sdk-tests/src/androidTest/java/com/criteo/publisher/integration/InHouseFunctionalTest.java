@@ -8,7 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.criteo.publisher.BidResponse;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoBannerAdListener;

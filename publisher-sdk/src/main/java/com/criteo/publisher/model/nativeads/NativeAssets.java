@@ -1,6 +1,6 @@
 package com.criteo.publisher.model.nativeads;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.util.JsonSerializer;
 import com.google.auto.value.AutoValue;

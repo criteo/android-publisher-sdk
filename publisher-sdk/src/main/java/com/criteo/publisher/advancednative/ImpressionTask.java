@@ -1,6 +1,6 @@
 package com.criteo.publisher.advancednative;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import java.lang.ref.Reference;
 import java.net.URL;
 import java.util.concurrent.atomic.AtomicBoolean;

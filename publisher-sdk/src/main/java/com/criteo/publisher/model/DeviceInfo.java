@@ -1,9 +1,9 @@
 package com.criteo.publisher.model;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.UiThread;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.UiThread;
+import androidx.annotation.VisibleForTesting;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.WebView;

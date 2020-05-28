@@ -4,9 +4,9 @@ import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.model.AdSize;

@@ -1,6 +1,6 @@
 package com.criteo.publisher.privacy.gdpr;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 interface TcfGdprStrategy {
   @NonNull

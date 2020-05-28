@@ -5,10 +5,10 @@ import static com.criteo.pubsdk_android.PubSdkDemoApplication.NATIVE;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import androidx.appcompat.app.AppCompatActivity;
 import com.criteo.publisher.BidResponse;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoBannerView;

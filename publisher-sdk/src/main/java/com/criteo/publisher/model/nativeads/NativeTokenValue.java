@@ -1,6 +1,6 @@
 package com.criteo.publisher.model.nativeads;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.criteo.publisher.Clock;
 import com.criteo.publisher.model.AbstractTokenValue;
 import com.criteo.publisher.model.Slot;

@@ -2,11 +2,11 @@ package com.criteo.publisher;
 
 import static android.content.ContentValues.TAG;
 
-import android.support.annotation.GuardedBy;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
 import android.util.Log;
+import androidx.annotation.GuardedBy;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;

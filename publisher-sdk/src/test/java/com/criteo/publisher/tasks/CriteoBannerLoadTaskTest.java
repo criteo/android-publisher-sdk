@@ -4,7 +4,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.criteo.publisher.model.Config;

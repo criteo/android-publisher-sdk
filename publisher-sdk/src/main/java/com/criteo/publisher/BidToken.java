@@ -1,6 +1,6 @@
 package com.criteo.publisher;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.criteo.publisher.model.AdUnit;
 import java.util.UUID;
 

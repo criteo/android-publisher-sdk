@@ -6,7 +6,7 @@ import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.content.res.Configuration;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;

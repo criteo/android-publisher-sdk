@@ -1,6 +1,6 @@
 package com.criteo.publisher.csm;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.model.Config;

@@ -9,7 +9,7 @@ import static org.mockito.Mockito.mock;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.runner.AndroidJUnit4;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.mock.MockedDependenciesRule;

@@ -1,9 +1,9 @@
 package com.criteo.publisher.network;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
 import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;

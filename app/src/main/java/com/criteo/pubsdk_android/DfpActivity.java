@@ -2,13 +2,11 @@ package com.criteo.pubsdk_android;
 
 import static com.criteo.pubsdk_android.PubSdkDemoApplication.NATIVE_AD_UNIT_ID;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import androidx.appcompat.app.AppCompatActivity;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;

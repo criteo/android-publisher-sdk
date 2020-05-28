@@ -77,7 +77,7 @@ private fun Project.defaultAndroidModule() {
       targetSdkVersion(27)
       versionCode = 1
       versionName = sdkVersion()
-      testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+      testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     fun BuildType.addProguardIfExists() {
@@ -120,8 +120,7 @@ private fun Project.defaultAndroidModule() {
     lintOptions {
       isAbortOnError = true
 
-      file("lint.xml")
-          .takeIf { it.exists() }
+      file("lint.xml").takeIf { it.exists() }
           ?.let { lintConfig = it }
     }
 

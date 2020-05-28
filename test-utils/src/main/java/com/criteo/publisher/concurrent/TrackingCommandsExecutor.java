@@ -1,6 +1,6 @@
 package com.criteo.publisher.concurrent;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;

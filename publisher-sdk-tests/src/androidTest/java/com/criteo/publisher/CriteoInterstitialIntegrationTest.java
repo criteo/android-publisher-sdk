@@ -10,7 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import android.support.test.InstrumentationRegistry;
+import androidx.test.InstrumentationRegistry;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import java.util.UUID;

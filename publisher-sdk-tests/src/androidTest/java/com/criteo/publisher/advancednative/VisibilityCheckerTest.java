@@ -4,7 +4,7 @@ import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWa
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import android.support.test.rule.ActivityTestRule;
+import androidx.test.rule.ActivityTestRule;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;

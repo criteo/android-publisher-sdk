@@ -1,7 +1,7 @@
 package com.criteo.publisher.advancednative;
 
 import android.graphics.Rect;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.View;
 
 public class VisibilityChecker {

@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.support.test.rule.ActivityTestRule;
+import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.test.activity.DummyActivity;
 import org.junit.Before;
 import org.junit.Rule;

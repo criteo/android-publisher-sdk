@@ -56,12 +56,10 @@ addSlackDeploymentMessages()
 dependencies {
     implementation(Deps.Kotlin.Stdlib)
 
-    compileOnly(Deps.Android.Support.Annotations)
+    compileOnly(Deps.AndroidX.Annotations)
     implementation(Deps.Square.Tape.Tape)
 
-    compileOnly(Deps.Google.AdMob) {
-        exclude(group = Deps.Android.Support.group)
-    }
+    compileOnly(Deps.Google.AdMob)
 
     implementation(Deps.AutoValue.Annotation)
     annotationProcessor(Deps.AutoValue.AutoValue)
@@ -72,9 +70,7 @@ dependencies {
     // Optional @GsonTypeAdapterFactory support
     annotationProcessor(Deps.AutoValue.GsonFactory)
 
-    implementation(Deps.Square.Picasso.Picasso) {
-        exclude(group = Deps.Android.Support.group)
-    }
+    implementation(Deps.Square.Picasso.Picasso)
 
     testImplementation(project(":test-utils"))
     testImplementation(Deps.JUnit.JUnit)
@@ -85,5 +81,5 @@ dependencies {
     testImplementation(Deps.MockServer.Client)
     testImplementation(Deps.Kotlin.JUnit)
     testImplementation(Deps.Mockito.Kotlin)
-    testImplementation(Deps.Android.Support.Annotations)
+    testImplementation(Deps.AndroidX.Annotations)
 }

@@ -3,9 +3,9 @@ package com.criteo.pubsdk_android
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.support.v7.app.AppCompatActivity
 import android.widget.Button
 import android.widget.EditText
+import androidx.appcompat.app.AppCompatActivity
 
 class GdprActivity : AppCompatActivity() {
 

@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 import android.app.Application;
 import android.content.Intent;
 import android.os.Looper;
-import android.support.test.rule.ActivityTestRule;
+import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.BidManager;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.DependencyProvider;

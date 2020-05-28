@@ -8,8 +8,8 @@ import static org.mockito.Mockito.spy;
 
 import android.app.Application;
 import android.os.Build.VERSION_CODES;
-import android.support.annotation.RequiresApi;
-import android.support.test.InstrumentationRegistry;
+import androidx.annotation.RequiresApi;
+import androidx.test.InstrumentationRegistry;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.MockableDependencyProvider;

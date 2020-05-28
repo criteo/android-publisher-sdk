@@ -16,10 +16,9 @@
 
 package com.criteo.publisher.concurrent;
 
-import android.support.annotation.GuardedBy;
-import android.support.annotation.NonNull;
+import androidx.annotation.GuardedBy;
+import androidx.annotation.NonNull;
 import com.criteo.publisher.DependencyProvider.Factory;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;

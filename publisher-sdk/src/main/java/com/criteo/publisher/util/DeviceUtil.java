@@ -3,10 +3,10 @@ package com.criteo.publisher.util;
 import static android.content.ContentValues.TAG;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.criteo.publisher.model.AdSize;
 
 public class DeviceUtil {

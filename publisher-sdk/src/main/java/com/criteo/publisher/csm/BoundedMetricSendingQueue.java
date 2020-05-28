@@ -1,7 +1,7 @@
 package com.criteo.publisher.csm;
 
-import android.support.annotation.GuardedBy;
-import android.support.annotation.NonNull;
+import androidx.annotation.GuardedBy;
+import androidx.annotation.NonNull;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import java.util.List;
 

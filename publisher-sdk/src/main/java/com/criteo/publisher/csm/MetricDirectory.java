@@ -2,10 +2,10 @@ package com.criteo.publisher.csm;
 
 import android.content.Context;
 import android.os.Build.VERSION_CODES;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.annotation.VisibleForTesting;
 import android.util.AtomicFile;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import java.io.File;
 import java.io.FilenameFilter;

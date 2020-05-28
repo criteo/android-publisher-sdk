@@ -1,8 +1,8 @@
 package com.criteo.pubsdk_android;
 
-import android.app.Application;
 import android.os.StrictMode;
 import android.util.Log;
+import androidx.multidex.MultiDexApplication;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
@@ -12,7 +12,7 @@ import com.criteo.publisher.model.NativeAdUnit;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PubSdkDemoApplication extends Application {
+public class PubSdkDemoApplication extends MultiDexApplication {
 
   private static final String TAG = PubSdkDemoApplication.class.getSimpleName();
   public static final String DFP_BANNER_ADUNIT_ID = "/140800857/Endeavour_320x50";

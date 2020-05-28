@@ -2,8 +2,8 @@ package com.criteo.publisher.model;
 
 import static java.util.Collections.singletonList;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.util.AdUnitType;
 import com.google.auto.value.AutoValue;

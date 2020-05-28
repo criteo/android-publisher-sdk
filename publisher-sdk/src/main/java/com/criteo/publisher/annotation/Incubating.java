@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * is not ready yet to be published publicly.
  *
  * This help the rollout of new APIs. Once a feature is finished, one may replace this annotation by
- * {@link android.support.annotation.Keep} or add a matching proguard rule.
+ * {@link androidx.annotation.Keep} or add a matching proguard rule.
  */
 @Documented
 @Retention(RetentionPolicy.CLASS)

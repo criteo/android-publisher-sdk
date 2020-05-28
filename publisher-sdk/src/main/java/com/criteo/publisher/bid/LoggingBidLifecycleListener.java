@@ -1,6 +1,6 @@
 package com.criteo.publisher.bid;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.CacheAdUnit;

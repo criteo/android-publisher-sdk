@@ -8,7 +8,7 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.support.test.rule.ActivityTestRule;
+import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.concurrent.ThreadingUtil;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.test.activity.DummyActivity;

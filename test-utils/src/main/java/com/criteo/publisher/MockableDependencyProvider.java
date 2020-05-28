@@ -1,6 +1,7 @@
 package com.criteo.publisher;
 
-import android.support.annotation.Nullable;
+
+import androidx.annotation.Nullable;
 
 /**
  * This class is purposefully located within the <code>com.criteo.publisher</code> package, as it

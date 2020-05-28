@@ -1,6 +1,6 @@
 package com.criteo.publisher.advancednative;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import com.criteo.publisher.annotation.Incubating;
 import com.google.auto.value.AutoValue;
 import java.net.URL;

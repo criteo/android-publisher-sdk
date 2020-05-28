@@ -2,8 +2,8 @@ package com.criteo.publisher;
 
 import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AbstractTokenValue;
 import com.criteo.publisher.model.AdUnit;
