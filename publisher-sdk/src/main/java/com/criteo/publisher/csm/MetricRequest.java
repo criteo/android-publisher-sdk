@@ -111,18 +111,21 @@ public abstract class MetricRequest {
   }
 
   @AutoValue
-  abstract static class MetricRequestSlot {
+  public abstract static class MetricRequestSlot {
 
     @NonNull
     static MetricRequestSlot create(@NonNull String impressionId, boolean cachedBidUsed) {
       return new AutoValue_MetricRequest_MetricRequestSlot(impressionId, cachedBidUsed);
     }
 
+    public static TypeAdapter<MetricRequestSlot> typeAdapter(Gson gson) {
+      return new AutoValue_MetricRequest_MetricRequestSlot.GsonTypeAdapter(gson);
+    }
+
+
     @Nullable
     abstract String getImpressionId();
 
     abstract boolean getCachedBidUsed();
-
   }
-
 }
