@@ -1,15 +1,15 @@
 package com.criteo.publisher.advancednative;
 
+import static android.widget.RelativeLayout.ALIGN_PARENT_BOTTOM;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import androidx.test.rule.ActivityTestRule;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.FrameLayout.LayoutParams;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.test.activity.DummyActivity;
 import org.junit.Before;
 import org.junit.Rule;
@@ -89,7 +89,7 @@ public class VisibilityCheckerTest {
 
     View viewAtTop = uiHelper.createView();
     View viewAtBottom = uiHelper.createView();
-    FrameLayout layout = uiHelper.createFrameLayout();
+    RelativeLayout layout = new RelativeLayout(activityRule.getActivity());
     ScrollView scrollView = new ScrollView(activityRule.getActivity());
 
     layout.addView(viewAtTop);
@@ -98,9 +98,9 @@ public class VisibilityCheckerTest {
 
     viewAtTop.getLayoutParams().height = viewHeightPixels;
 
-    LayoutParams bottomLayoutParams = (LayoutParams) viewAtBottom.getLayoutParams();
+    RelativeLayout.LayoutParams bottomLayoutParams = (RelativeLayout.LayoutParams) viewAtBottom.getLayoutParams();
     bottomLayoutParams.height = viewHeightPixels;
-    bottomLayoutParams.topMargin = screenHeightPixels - viewHeightPixels;
+    bottomLayoutParams.addRule(ALIGN_PARENT_BOTTOM);
 
     layout.getLayoutParams().height = screenHeightPixels + viewHeightPixels;
 
