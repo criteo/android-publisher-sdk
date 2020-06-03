@@ -243,7 +243,9 @@ public class MoPubHeaderBiddingFunctionalTest {
   private String loadMoPubHtmlInterstitial(InterstitialAdUnit adUnit)
       throws Exception {
     View moPubView = getRootView(webViewLookup.lookForResumedActivity(() -> {
-      loadMoPubInterstitial(adUnit).show();
+      MoPubInterstitial moPubInterstitial = loadMoPubInterstitial(adUnit);
+      assertTrue(moPubInterstitial.isReady());
+      moPubInterstitial.show();
     }).get());
 
     return webViewLookup.lookForHtmlContent(moPubView).get();

@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -98,8 +99,8 @@ public class WebViewLookup {
     executor.submit(() -> {
       try {
         action.run();
-      } catch (Exception e) {
-        activityFuture.completeExceptionally(e);
+      } catch (Throwable e) {
+        activityFuture.completeExceptionally(new ExecutionException(e));
       }
 
       return null;
