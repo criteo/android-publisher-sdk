@@ -2,19 +2,17 @@ package com.criteo.publisher;
 
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
-import androidx.test.rule.ActivityTestRule;
+import com.criteo.publisher.AppEvents.AppEvents;
+import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.network.PubSdkApi;
-import com.criteo.publisher.test.activity.DummyActivity;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
@@ -26,7 +24,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 @RunWith(Parameterized.class)
@@ -34,9 +31,6 @@ public class BearcatPrivacyFunctionalTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
-
-  @Rule
-  public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(DummyActivity.class);
 
   @Parameterized.Parameters
   public static Collection consents() {
@@ -164,7 +158,10 @@ public class BearcatPrivacyFunctionalTest {
   @Inject
   private Context context;
 
-  @Mock
+  @Inject
+  private AppEvents appEvents;
+
+  @MockBean
   private PubSdkApi pubSdkApi;
 
   private SharedPreferences defaultSharedPreferences;
@@ -172,16 +169,14 @@ public class BearcatPrivacyFunctionalTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
     defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-    doReturn(pubSdkApi).when(dependencyProvider).providePubSdkApi();
     mockedDependenciesRule.givenMockedRemoteConfigResponse(pubSdkApi);
   }
 
   @After
   public void after() {
-    defaultSharedPreferences.edit().clear().commit();
+    defaultSharedPreferences.edit().clear().apply();
   }
 
   @Test
@@ -206,7 +201,7 @@ public class BearcatPrivacyFunctionalTest {
 
     givenInitializedCriteo(TestAdUnits.BANNER_320_50);
 
-    activityRule.launchActivity(new Intent());
+    appEvents.sendLaunchEvent();
 
     mockedDependenciesRule.waitForIdleState();
 
@@ -224,6 +219,6 @@ public class BearcatPrivacyFunctionalTest {
   private void writeIntoDefaultSharedPrefs(String key, String value) {
     Editor edit = defaultSharedPreferences.edit();
     edit.putString(key, value);
-    edit.commit();
+    edit.apply();
   }
 }

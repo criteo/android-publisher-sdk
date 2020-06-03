@@ -10,9 +10,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,9 +20,10 @@ import android.os.Looper;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.BidManager;
 import com.criteo.publisher.Criteo;
-import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.TestAdUnits;
+import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbResponse;
@@ -55,18 +53,19 @@ public class CriteoFunctionalTest {
   @Inject
   private Application application;
 
+  @MockBean
   private PubSdkApi api;
 
-  private DependencyProvider dependencyProvider;
+  @SpyBean
+  private BuildConfigWrapper buildConfigWrapper;
+
+  @SpyBean
+  private BidManager bidManager;
 
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-
-    dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-
-    api = spy(dependencyProvider.providePubSdkApi());
-    doReturn(api).when(dependencyProvider).providePubSdkApi();
+    mockedDependenciesRule.givenMockedRemoteConfigResponse(api);
   }
 
   @Test
@@ -121,9 +120,6 @@ public class CriteoFunctionalTest {
 
   @Test
   public void init_WaitingForIdleState_BidManagerIsPrefetchOnMainThread() throws Exception {
-    BidManager bidManager = mock(BidManager.class);
-    doReturn(bidManager).when(dependencyProvider).provideBidManager();
-
     doAnswer(answerVoid((List<AdUnit> adUnits) -> {
       assertTrue(adUnits.isEmpty());
       assertSame(Thread.currentThread(), Looper.getMainLooper().getThread());
@@ -137,8 +133,6 @@ public class CriteoFunctionalTest {
 
   @Test
   public void init_GivenCpIdAppIdAndVersion_CallConfigWithThose() throws Exception {
-    BuildConfigWrapper buildConfigWrapper = spy(dependencyProvider.provideBuildConfigWrapper());
-    doReturn(buildConfigWrapper).when(dependencyProvider).provideBuildConfigWrapper();
     when(buildConfigWrapper.getSdkVersion()).thenReturn("1.2.3");
 
     givenInitializedCriteo();
