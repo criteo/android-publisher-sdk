@@ -3,14 +3,17 @@ package com.criteo.publisher.advancednative;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
-import androidx.test.rule.ActivityTestRule;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.test.activity.DummyActivity;
@@ -151,7 +154,16 @@ public class AdChoiceOverlayTest {
 
     assertEquals(adChoiceView, viewInside1);
     assertEquals(adChoiceView, viewInside2);
-    assertEquals(viewWrappedInOverlay, viewOutside);
+
+    // On small devices, we may hit the content inside the viewWrappedInOverlay
+    assertEqualsOrIsParent(viewWrappedInOverlay, viewOutside);
+  }
+
+  private void assertEqualsOrIsParent(@NonNull View parent, @Nullable View other) {
+    if (parent.equals(other)) {
+      return;
+    }
+    assertTrue(uiHelper.isParent(parent, other));
   }
 
   /**

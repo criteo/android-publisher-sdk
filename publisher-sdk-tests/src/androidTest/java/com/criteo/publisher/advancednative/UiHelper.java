@@ -4,14 +4,14 @@ import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWa
 
 import android.app.Activity;
 import android.graphics.Rect;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.test.rule.ActivityTestRule;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.test.rule.ActivityTestRule;
 import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -161,6 +161,22 @@ public class UiHelper {
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public boolean isParent(@NonNull View parent, @Nullable View other) {
+    if (other == null || !(parent instanceof ViewGroup)) {
+      return false;
+    }
+
+    ViewGroup parentGroup = (ViewGroup) parent;
+    for (int i = 0; i < parentGroup.getChildCount(); i++) {
+      View child = parentGroup.getChildAt(i);
+      if (child.equals(other) || isParent(child, other)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**

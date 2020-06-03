@@ -14,6 +14,7 @@ android {
 dependencies {
   implementation(project(":publisher-sdk"))
   implementation(project(":test-utils"))
+  implementation(Deps.Kotlin.Stdlib)
   implementation(Deps.AndroidX.MultiDex)
   implementation(Deps.AndroidX.Annotations)
   implementation(Deps.AndroidX.RecyclerView)
@@ -22,6 +23,8 @@ dependencies {
   androidTestImplementation(Deps.AndroidX.Test.Runner)
   androidTestImplementation(Deps.AndroidX.Test.Rules)
   androidTestImplementation(Deps.Mockito.Android)
+  androidTestImplementation(Deps.Mockito.Kotlin)
+  androidTestImplementation(Deps.AssertJ.AssertJ)
   androidTestImplementation(Deps.Square.Tape.Tape)
   androidTestImplementation(Deps.Google.AdMob)
 
