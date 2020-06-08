@@ -3,6 +3,14 @@
   package="com.criteo.publisher.tests">
 
   <application>
+    <!-- Required for tests since AdMob 17.0.0:
+    https://developers.google.com/ad-manager/mobile-ads-sdk/android/quick-start#update_your_androidmanifestxml
+    https://developers.google.com/admob/android/quick-start#update_your_androidmanifestxml
+    -->
+    <meta-data
+      android:name="com.google.android.gms.ads.AD_MANAGER_APP"
+      android:value="true"/>
+
     <activity android:name="com.criteo.publisher.test.activity.DummyActivity"/>
     <activity android:name="com.criteo.publisher.activity.TestNativeActivity"/>
 

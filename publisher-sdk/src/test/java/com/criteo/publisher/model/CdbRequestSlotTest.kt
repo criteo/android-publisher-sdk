@@ -92,7 +92,7 @@ class CdbRequestSlotTest {
       expectedKeys.add(IS_NATIVE)
     }
 
-    assertThat(keys()).containsExactlyInAnyOrderElementsOf(expectedKeys)
+    assertThat(keys()).toIterable().containsExactlyInAnyOrderElementsOf(expectedKeys)
 
     assertThat(this[IMPRESSION_ID]).isEqualTo(expectedImpressionId)
     assertThat(this[PLACEMENT_ID]).isEqualTo(expectedPlacementId)

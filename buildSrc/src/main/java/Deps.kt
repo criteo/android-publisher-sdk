@@ -10,7 +10,7 @@ object Deps {
     const val AppCompat = "androidx.appcompat:appcompat:1.1.0"
     const val Annotations = "androidx.annotation:annotation:1.0.0"
     const val MaterialComponents = "com.google.android.material:material:1.0.0"
-    const val MultiDex = "androidx.multidex:multidex:2.0.0"
+    const val MultiDex = "androidx.multidex:multidex:2.0.1"
     const val RecyclerView = "androidx.recyclerview:recyclerview:1.1.0"
     const val SupportCoreUtils = "androidx.legacy:legacy-support-core-utils:1.0.0"
 
@@ -27,13 +27,13 @@ object Deps {
   }
 
   object AssertJ {
-    private const val version = "3.11.1"
+    private const val version = "3.16.1"
 
     const val AssertJ = "org.assertj:assertj-core:$version"
   }
 
   object AutoValue {
-    private const val googleVersion = "1.6.6"
+    private const val googleVersion = "1.7.2"
     private const val gsonVersion = "1.3.0"
 
     const val Annotation = "com.google.auto.value:auto-value-annotations:$googleVersion"
@@ -55,13 +55,13 @@ object Deps {
   }
 
   object EqualsVerifier {
-    private const val version = "3.1.10"
+    private const val version = "3.3"
 
     const val EqualsVerifier = "nl.jqno.equalsverifier:equalsverifier:$version"
   }
 
   object Google {
-    private const val version = "15.0.1"
+    private const val version = "19.0.1"
 
     const val AdMob = "com.google.android.gms:play-services-ads:$version"
   }
@@ -75,13 +75,19 @@ object Deps {
   }
 
   object JUnit {
-    private const val version = "4.12"
+    private const val version = "4.13"
 
     const val JUnit = "junit:junit:$version"
   }
 
+  object Json {
+    private const val version = "20200518"
+
+    const val Json = "org.json:json:$version"
+  }
+
   object Kotlin {
-    private const val version = "1.3.70"
+    private const val version = "1.3.72"
 
     const val GradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
     const val JUnit = "org.jetbrains.kotlin:kotlin-test-junit:$version"
@@ -97,10 +103,11 @@ object Deps {
   }
 
   object MockServer {
-    private const val version = "5.8.1"
+    private const val version = "5.10.0"
 
     const val Netty = "org.mock-server:mockserver-netty:$version"
     const val Client = "org.mock-server:mockserver-client-java:$version"
+    const val JUnit = "org.mock-server:mockserver-junit-rule:$version"
   }
 
   object MoPub {
