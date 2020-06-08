@@ -1,12 +1,14 @@
 package com.criteo.publisher.advancednative;
 
 import android.graphics.drawable.Drawable;
+import android.widget.ImageView;
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import android.widget.ImageView;
 import androidx.annotation.UiThread;
 import java.net.URL;
 
+@Keep
 public interface ImageLoader {
 
   /**

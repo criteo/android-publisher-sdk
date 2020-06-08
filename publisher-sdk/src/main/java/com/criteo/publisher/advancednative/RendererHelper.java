@@ -13,16 +13,16 @@ import java.net.URL;
 public class RendererHelper {
 
   @NonNull
-  private final ImageLoader imageLoader;
+  private final ImageLoaderHolder imageLoaderHolder;
 
   @NonNull
   private final RunOnUiThreadExecutor uiExecutor;
 
   public RendererHelper(
-      @NonNull ImageLoader imageLoader,
+      @NonNull ImageLoaderHolder imageLoaderHolder,
       @NonNull RunOnUiThreadExecutor uiExecutor
   ) {
-    this.imageLoader = imageLoader;
+    this.imageLoaderHolder = imageLoaderHolder;
     this.uiExecutor = uiExecutor;
   }
 
@@ -30,7 +30,7 @@ public class RendererHelper {
     new SafeRunnable() {
       @Override
       public void runSafely() throws Throwable {
-        imageLoader.preload(url);
+        imageLoaderHolder.get().preload(url);
       }
     }.run();
   }
@@ -43,7 +43,7 @@ public class RendererHelper {
     uiExecutor.execute(new SafeRunnable() {
       @Override
       public void runSafely() throws Throwable {
-        imageLoader.loadImageInto(url, imageView, placeholder);
+        imageLoaderHolder.get().loadImageInto(url, imageView, placeholder);
       }
     });
   }

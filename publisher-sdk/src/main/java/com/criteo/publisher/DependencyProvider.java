@@ -14,6 +14,8 @@ import com.criteo.publisher.advancednative.AdChoiceOverlay;
 import com.criteo.publisher.advancednative.ClickDetection;
 import com.criteo.publisher.advancednative.ClickHelper;
 import com.criteo.publisher.advancednative.CriteoImageLoader;
+import com.criteo.publisher.advancednative.ImageLoader;
+import com.criteo.publisher.advancednative.ImageLoaderHolder;
 import com.criteo.publisher.advancednative.ImpressionHelper;
 import com.criteo.publisher.advancednative.NativeAdMapper;
 import com.criteo.publisher.advancednative.RendererHelper;
@@ -63,9 +65,7 @@ import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -111,13 +111,13 @@ public class DependencyProvider {
 
   private void checkApplicationIsSet() {
     if (application == null) {
-      throw new IllegalArgumentException("Application reference is required.");
+      throw new IllegalArgumentException("Application reference is required. Did you initialized the Criteo SDK ?");
     }
   }
 
   private void checkCriteoPublisherIdIsSet() {
     if (TextUtils.isEmpty(criteoPublisherId)) {
-      throw new IllegalArgumentException("Criteo Publisher Id is required.");
+      throw new IllegalArgumentException("Criteo Publisher Id is required. Did you initialized the Criteo SDK ?");
     }
   }
 
@@ -494,13 +494,35 @@ public class DependencyProvider {
   }
 
   @NonNull
+  public ImageLoader provideDefaultImageLoader() {
+    return getOrCreate(ImageLoader.class, new Factory<ImageLoader>() {
+      @NonNull
+      @Override
+      public ImageLoader create() {
+        return new CriteoImageLoader(providePicasso());
+      }
+    });
+  }
+
+  @NonNull
+  public ImageLoaderHolder provideImageLoaderHolder() {
+    return getOrCreate(ImageLoaderHolder.class, new Factory<ImageLoaderHolder>() {
+      @NonNull
+      @Override
+      public ImageLoaderHolder create() {
+        return new ImageLoaderHolder(provideDefaultImageLoader());
+      }
+    });
+  }
+
+  @NonNull
   public RendererHelper provideRendererHelper() {
     return getOrCreate(RendererHelper.class, new Factory<RendererHelper>() {
       @NonNull
       @Override
       public RendererHelper create() {
         return new RendererHelper(
-            new CriteoImageLoader(providePicasso()),
+            provideImageLoaderHolder(),
             provideRunOnUiThreadExecutor()
         );
       }

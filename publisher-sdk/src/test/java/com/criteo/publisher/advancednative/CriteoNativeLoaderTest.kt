@@ -12,12 +12,14 @@ import com.criteo.publisher.model.Slot
 import com.criteo.publisher.model.nativeads.NativeAssets
 import com.criteo.publisher.util.BuildConfigWrapper
 import com.nhaarman.mockitokotlin2.*
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import javax.inject.Inject
 
 class CriteoNativeLoaderTest {
 
@@ -33,6 +35,12 @@ class CriteoNativeLoaderTest {
 
   @MockBean
   private lateinit var nativeAdMapper: NativeAdMapper
+
+  @MockBean
+  private lateinit var defaultImageLoader: ImageLoader
+
+  @Inject
+  private lateinit var imageLoaderHolder: ImageLoaderHolder
 
   @SpyBean
   private lateinit var buildConfigWrapper: BuildConfigWrapper
@@ -60,6 +68,17 @@ class CriteoNativeLoaderTest {
 
     adUnit = NativeAdUnit("myAdUnit")
     nativeLoader = CriteoNativeLoader(adUnit, listener, renderer)
+  }
+
+  @Test
+  fun setImageLoader_GivenLoader_SetItInTheHolder() {
+    val customImageLoader = mock<ImageLoader>()
+
+    val previousImageLoader = imageLoaderHolder.get()
+    CriteoNativeLoader.setImageLoader(customImageLoader)
+
+    assertThat(previousImageLoader).isSameAs(defaultImageLoader)
+    assertThat(imageLoaderHolder.get()).isSameAs(customImageLoader)
   }
 
   @Test

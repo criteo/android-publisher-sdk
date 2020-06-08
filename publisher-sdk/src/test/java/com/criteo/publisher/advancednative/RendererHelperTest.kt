@@ -23,7 +23,7 @@ class RendererHelperTest {
   @Before
   fun setUp() {
     MockitoAnnotations.initMocks(this)
-    helper = RendererHelper(imageLoader, uiExecutor)
+    helper = RendererHelper(ImageLoaderHolder(imageLoader), uiExecutor)
   }
 
   @Test

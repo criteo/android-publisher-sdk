@@ -45,6 +45,24 @@ public class CriteoNativeLoader {
   }
 
   /**
+   * Inject a custom {@link ImageLoader} for native ads produced by all loader.
+   * <p>
+   * When {@link RendererHelper#setMediaInView(CriteoMedia, CriteoMediaView) setting media in view},
+   * if the media is an image, then the given image loader is used to load and display the media.
+   * This lets you inject your own loading mechanism so that the application has exactly the same
+   * image loading experience for both content and native ads.
+   * <p>
+   * If not set, a default implementation is used instead.
+   * <p>
+   * Warning: You should call this method after the SDK is initialized
+   *
+   * @param imageLoader custom global image loader to set
+   */
+  public static void setImageLoader(@NonNull ImageLoader imageLoader) {
+    getImageLoaderHolder().set(imageLoader);
+  }
+
+  /**
    * Create a new empty native view.
    * <p>
    * You can add it to your view hierarchy, but it is empty and not rendered yet. To render it, you
@@ -169,6 +187,11 @@ public class CriteoNativeLoader {
   @NonNull
   private AdChoiceOverlay getAdChoiceOverlay() {
     return DependencyProvider.getInstance().provideAdChoiceOverlay();
+  }
+
+  @NonNull
+  private static ImageLoaderHolder getImageLoaderHolder() {
+    return DependencyProvider.getInstance().provideImageLoaderHolder();
   }
 
 }
