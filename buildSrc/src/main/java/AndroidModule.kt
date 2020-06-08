@@ -75,7 +75,7 @@ private fun Project.defaultAndroidModule() {
 
     defaultConfig {
       minSdkVersion(16)
-      targetSdkVersion(27)
+      targetSdkVersion(29)
       versionCode = 1
       versionName = sdkVersion()
       testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
