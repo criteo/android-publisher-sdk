@@ -8,8 +8,8 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 # Set default build arguments.
 ARG SDK_VERSION=sdk-tools-linux-4333796.zip
-ARG ANDROID_BUILD_VERSION=28
-ARG ANDROID_TOOLS_VERSION=28.0.3
+ARG ANDROID_BUILD_VERSION=29
+ARG ANDROID_TOOLS_VERSION=29.0.3
 
 # Set default user (overriden in the command line with Jenkins' actual user).
 ARG UNAME=jenkins

@@ -70,7 +70,8 @@ fun Project.androidLibModule(configure: AndroidModule.() -> Unit = {}) {
 
 private fun Project.defaultAndroidModule() {
   androidBase {
-    compileSdkVersion(28)
+    compileSdkVersion(29)
+    buildToolsVersion("29.0.3")
 
     defaultConfig {
       minSdkVersion(16)
