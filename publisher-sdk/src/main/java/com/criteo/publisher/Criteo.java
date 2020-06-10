@@ -115,7 +115,7 @@ public abstract class Criteo {
   public static Criteo getInstance() {
     if (criteo == null) {
       throw new CriteoNotInitializedException(
-          "You must call Criteo.Init() before calling Criteo.getInstance()");
+          "You must initialize the SDK before calling Criteo.getInstance()");
     }
 
     return criteo;
