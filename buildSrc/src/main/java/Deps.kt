@@ -20,6 +20,7 @@ object Deps {
 
     object Test {
       private const val version = "1.2.0"
+      const val Core = "androidx.test:core:$version"
       const val Monitor = "androidx.test:monitor:$version"
       const val Runner = "androidx.test:runner:$version"
       const val Rules = "androidx.test:rules:$version"

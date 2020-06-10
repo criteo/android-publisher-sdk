@@ -1,9 +1,9 @@
 package com.criteo.publisher;
 
 import android.app.Application;
+import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import android.util.Log;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
@@ -114,7 +114,7 @@ public abstract class Criteo {
 
   public static Criteo getInstance() {
     if (criteo == null) {
-      throw new IllegalStateException(
+      throw new CriteoNotInitializedException(
           "You must call Criteo.Init() before calling Criteo.getInstance()");
     }
 

@@ -1,6 +1,5 @@
 package com.criteo.publisher.mock;
 
-import static com.criteo.publisher.util.InstrumentationUtil.isRunningInInstrumentationTest;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
@@ -9,7 +8,6 @@ import static org.mockito.Mockito.spy;
 import android.app.Application;
 import android.os.Build.VERSION_CODES;
 import androidx.annotation.RequiresApi;
-import androidx.test.InstrumentationRegistry;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.MockableDependencyProvider;
@@ -18,6 +16,7 @@ import com.criteo.publisher.concurrent.TrackingCommandsExecutor;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.RemoteConfigResponse;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.util.InstrumentationUtil;
 import java.io.IOException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
@@ -78,7 +77,7 @@ public class MockedDependenciesRule implements MethodRule {
   private void setUpDependencyProvider() {
     DependencyProvider originalDependencyProvider = DependencyProvider.getInstance();
 
-    Application application = getApplication();
+    Application application = InstrumentationUtil.getApplication();
     originalDependencyProvider.setApplication(application);
     originalDependencyProvider.setCriteoPublisherId(CriteoUtil.TEST_CP_ID);
 
@@ -88,14 +87,6 @@ public class MockedDependenciesRule implements MethodRule {
     dependencyProvider = spy(originalDependencyProvider);
     MockableDependencyProvider.setInstance(dependencyProvider);
     doReturn(trackingCommandsExecutor).when(dependencyProvider).provideThreadPoolExecutor();
-  }
-
-  private Application getApplication() {
-    if (isRunningInInstrumentationTest()) {
-      return (Application) InstrumentationRegistry.getTargetContext().getApplicationContext();
-    } else {
-      return ApplicationMock.newMock();
-    }
   }
 
   @RequiresApi(api = VERSION_CODES.O)

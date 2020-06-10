@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import androidx.test.InstrumentationRegistry;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.util.InstrumentationUtil;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,8 +15,7 @@ public class CriteoUtil {
 
   public static Criteo givenInitializedCriteo(AdUnit... preloadedAdUnits)
       throws CriteoInitException {
-    Application app = (Application) InstrumentationRegistry.getTargetContext()
-        .getApplicationContext();
+    Application app = InstrumentationUtil.getApplication();
 
     clearCriteo();
 

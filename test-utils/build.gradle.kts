@@ -15,6 +15,7 @@ dependencies {
   }
 
   compileOnly(Deps.AndroidX.Annotations)
+  implementation(Deps.AndroidX.Test.Core)
   implementation(Deps.AndroidX.Test.Monitor)
 
   api(Deps.Javax.Inject.Inject)

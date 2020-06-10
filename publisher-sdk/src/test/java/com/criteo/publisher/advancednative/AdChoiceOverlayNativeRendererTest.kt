@@ -3,8 +3,13 @@ package com.criteo.publisher.advancednative
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import com.criteo.publisher.CriteoNotInitializedException
+import com.criteo.publisher.CriteoUtil.clearCriteo
+import com.criteo.publisher.CriteoUtil.givenInitializedCriteo
+import com.criteo.publisher.MockableDependencyProvider
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -25,6 +30,25 @@ class AdChoiceOverlayNativeRendererTest {
     MockitoAnnotations.initMocks(this)
 
     renderer = AdChoiceOverlayNativeRenderer(delegate, adChoiceOverlay)
+  }
+
+  @Test
+  fun moPubAdapterConstructor_GivenSdkNotInitialized_ThrowException() {
+    clearCriteo()
+    MockableDependencyProvider.setInstance(null)
+
+    assertThatCode {
+      AdChoiceOverlayNativeRenderer(delegate)
+    }.isInstanceOf(CriteoNotInitializedException::class.java)
+  }
+
+  @Test
+  fun moPubAdapterConstructor_GivenSdkInitialized_DoNotThrowException() {
+    givenInitializedCriteo()
+
+    assertThatCode {
+      AdChoiceOverlayNativeRenderer(delegate)
+    }.doesNotThrowAnyException()
   }
 
   @Test

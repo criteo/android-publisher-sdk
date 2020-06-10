@@ -111,13 +111,13 @@ public class DependencyProvider {
 
   private void checkApplicationIsSet() {
     if (application == null) {
-      throw new IllegalArgumentException("Application reference is required. Did you initialized the Criteo SDK ?");
+      throw new CriteoNotInitializedException("Application reference is required");
     }
   }
 
   private void checkCriteoPublisherIdIsSet() {
     if (TextUtils.isEmpty(criteoPublisherId)) {
-      throw new IllegalArgumentException("Criteo Publisher Id is required. Did you initialized the Criteo SDK ?");
+      throw new CriteoNotInitializedException("Criteo Publisher Id is required");
     }
   }
 
