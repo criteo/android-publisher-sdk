@@ -62,12 +62,12 @@ public abstract class Criteo {
     }
   }
 
+  @Deprecated
   public static Criteo init(
       @NonNull Application application,
       @NonNull String criteoPublisherId,
       @Nullable List<AdUnit> adUnits
   ) throws CriteoInitException {
-
     Criteo.Builder builder = new Criteo.Builder(application, criteoPublisherId);
     builder.adUnits(adUnits);
     return builder.init();
