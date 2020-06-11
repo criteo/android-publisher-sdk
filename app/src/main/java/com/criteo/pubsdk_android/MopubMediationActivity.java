@@ -3,23 +3,33 @@ package com.criteo.pubsdk_android;
 import static com.criteo.pubsdk_android.MopubActivity.initializeMoPubSdk;
 import static com.criteo.pubsdk_android.PubSdkDemoApplication.MOPUB_BANNER_ADUNIT_ID;
 import static com.criteo.pubsdk_android.PubSdkDemoApplication.MOPUB_INTERSTITIAL_ADUNIT_ID;
+import static com.criteo.pubsdk_android.PubSdkDemoApplication.MOPUB_NATIVE_ADUNIT_ID;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
+import com.criteo.mediation.mopub.advancednative.CriteoNativeEventRenderer;
 import com.criteo.pubsdk_android.listener.TestAppMoPubInterstitialAdListener;
 import com.mopub.mobileads.MoPubInterstitial;
 import com.mopub.mobileads.MoPubView;
+import com.mopub.nativeads.AdapterHelper;
+import com.mopub.nativeads.MoPubNative;
+import com.mopub.nativeads.MoPubNative.MoPubNativeNetworkListener;
+import com.mopub.nativeads.NativeAd;
+import com.mopub.nativeads.NativeErrorCode;
 
 // TODO: Move this class to the test app repo
 public class MopubMediationActivity extends AppCompatActivity {
 
   private static final String TAG = MopubActivity.class.getSimpleName();
+
   private MoPubView publisherAdView;
   private LinearLayout linearLayout;
 
+  MoPubNative moPubNative;
   MoPubInterstitial mInterstitial;
 
   @Override
@@ -29,12 +39,34 @@ public class MopubMediationActivity extends AppCompatActivity {
 
     initializeMoPubSdk(this);
 
+    initMoPubNative();
+    mInterstitial = new MoPubInterstitial(this, MOPUB_INTERSTITIAL_ADUNIT_ID);
+
     linearLayout = findViewById(R.id.AdLayout);
     findViewById(R.id.buttonMopubMediationBanner).setOnClickListener((View v) -> onBannerClick());
     findViewById(R.id.buttonMopubMediationInterstitial)
         .setOnClickListener((View v) -> onInterstitialClick());
+    findViewById(R.id.buttonMopubMediationNative).setOnClickListener((View v) -> onNativeClick());
+  }
 
-    mInterstitial = new MoPubInterstitial(this, MOPUB_INTERSTITIAL_ADUNIT_ID);
+  private void initMoPubNative() {
+    moPubNative = new MoPubNative(this, MOPUB_NATIVE_ADUNIT_ID, new MoPubNativeNetworkListener() {
+      @Override
+      public void onNativeLoad(NativeAd nativeAd) {
+        Log.d(TAG, "Native onNativeLoad");
+        AdapterHelper adapterHelper = new AdapterHelper(MopubMediationActivity.this, 0, 2);
+        View adView = adapterHelper.getAdView(linearLayout, null, nativeAd);
+        linearLayout.removeAllViews();
+        linearLayout.addView(adView);
+      }
+
+      @Override
+      public void onNativeFail(NativeErrorCode errorCode) {
+        Log.d(TAG, "Native onNativeFail, reason: " + errorCode);
+      }
+    });
+
+    moPubNative.registerAdRenderer(new CriteoNativeEventRenderer(new TestAppNativeRenderer()));
   }
 
   private void onBannerClick() {
@@ -55,10 +87,15 @@ public class MopubMediationActivity extends AppCompatActivity {
     mInterstitial.load();
   }
 
+  private void onNativeClick() {
+    moPubNative.makeRequest();
+  }
+
   @Override
   protected void onDestroy() {
     super.onDestroy();
 
+    moPubNative.destroy();
     mInterstitial.destroy();
     if (publisherAdView != null) {
       publisherAdView.destroy();

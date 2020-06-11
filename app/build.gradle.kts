@@ -67,5 +67,9 @@ dependencies {
         isTransitive = true
     }
 
+    implementation(Deps.MoPub.Native) {
+        isTransitive = true
+    }
+
     "memoryLeaksHuntImplementation"(Deps.Square.LeakCanary.LeakCanary)
 }

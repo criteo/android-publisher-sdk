@@ -116,6 +116,7 @@ object Deps {
 
     const val Banner = "com.mopub:mopub-sdk-banner:$version@aar"
     const val Interstitial = "com.mopub:mopub-sdk-interstitial:$version@aar"
+    const val Native = "com.mopub:mopub-sdk-native-static:$version@aar"
   }
 
   object Square {
