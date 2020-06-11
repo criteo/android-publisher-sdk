@@ -35,7 +35,7 @@ public class CriteoNativeAd {
   private final AdChoiceOverlay adChoiceOverlay;
 
   @NonNull
-  private final CriteoNativeRenderer renderer;
+  private CriteoNativeRenderer renderer;
 
   @NonNull
   private final RendererHelper rendererHelper;
@@ -150,6 +150,11 @@ public class CriteoNativeAd {
           /* placeholder */ null // No placeholder is expected for AdChoice
       );
     }
+  }
+
+  @SuppressWarnings("unused") // Used by MoPub mediation adapter
+  void setRenderer(@NonNull CriteoNativeRenderer renderer) {
+    this.renderer = renderer;
   }
 
   /**
