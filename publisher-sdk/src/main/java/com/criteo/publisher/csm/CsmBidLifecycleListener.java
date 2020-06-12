@@ -12,6 +12,7 @@ import com.criteo.publisher.model.CdbRequestSlot;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.Slot;
+import java.io.InterruptedIOException;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.Executor;
 
@@ -182,7 +183,11 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
     executor.execute(new SafeRunnable() {
       @Override
       public void runSafely() {
-        boolean isTimeout = exception instanceof SocketTimeoutException;
+        // InterruptedIOException was thrown in older versions of Okio
+        // See https://github.com/square/okhttp/blob/master/docs/changelog_2x.md
+        boolean isTimeout = (exception instanceof SocketTimeoutException)
+            || (exception instanceof InterruptedIOException);
+
         if (isTimeout) {
           onCdbCallTimeout(request);
         } else {

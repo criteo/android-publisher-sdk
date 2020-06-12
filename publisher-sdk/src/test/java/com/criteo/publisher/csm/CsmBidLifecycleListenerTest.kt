@@ -11,6 +11,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import java.io.IOException
+import java.io.InterruptedIOException
 import java.net.SocketTimeoutException
 import java.util.concurrent.Executor
 
@@ -210,7 +211,7 @@ class CsmBidLifecycleListenerTest {
   }
 
   @Test
-  fun onCdbCallFailed_GivenTimeoutExceptionAndMultipleRequestSlots_UpdateAllByIdForTimeout() {
+  fun onCdbCallFailed_GivenSocketTimeoutExceptionAndMultipleRequestSlots_UpdateAllByIdForTimeout() {
     val request = givenCdbRequestWithSlots("id1", "id2")
 
     clock.stub {
@@ -218,6 +219,23 @@ class CsmBidLifecycleListenerTest {
     }
 
     listener.onCdbCallFailed(request, mock<SocketTimeoutException>())
+
+    assertTimeoutErrorIsReceived("id1")
+    assertTimeoutErrorIsReceived("id2")
+
+    verify(sendingQueueProducer).pushInQueue(repository, "id1")
+    verify(sendingQueueProducer).pushInQueue(repository, "id2")
+  }
+
+  @Test
+  fun onCdbCallFailed_GivenInterruptedIOExceptionAndMultipleRequestSlots_UpdateAllByIdForTimeout() {
+    val request = givenCdbRequestWithSlots("id1", "id2")
+
+    clock.stub {
+      on { currentTimeInMillis } doReturn 1337
+    }
+
+    listener.onCdbCallFailed(request, mock<InterruptedIOException>())
 
     assertTimeoutErrorIsReceived("id1")
     assertTimeoutErrorIsReceived("id2")
