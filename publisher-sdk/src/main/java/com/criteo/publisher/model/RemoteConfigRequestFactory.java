@@ -24,7 +24,8 @@ public class RemoteConfigRequestFactory {
     return RemoteConfigRequest.create(
         publisher.getCriteoPublisherId(),
         publisher.getBundleId(),
-        buildConfigWrapper.getSdkVersion()
+        buildConfigWrapper.getSdkVersion(),
+        buildConfigWrapper.getProfileId()
     );
   }
 }

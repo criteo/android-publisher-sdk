@@ -325,7 +325,9 @@ public class PubSdkApiTest {
     RemoteConfigRequest request = RemoteConfigRequest.create(
         "myCpId",
         "myAppId",
-        "myVersion");
+        "myVersion",
+        456
+    );
 
     mockServerClient.when(request()).respond(response().withStatusCode(204));
 

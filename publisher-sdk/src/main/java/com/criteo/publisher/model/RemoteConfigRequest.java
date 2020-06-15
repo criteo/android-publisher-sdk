@@ -13,9 +13,10 @@ public abstract class RemoteConfigRequest {
   public static RemoteConfigRequest create(
       @NonNull String criteoPublisherId,
       @NonNull String bundleId,
-      @NonNull String sdkVersion
+      @NonNull String sdkVersion,
+      int profileId
   ) {
-    return new AutoValue_RemoteConfigRequest(criteoPublisherId, bundleId, sdkVersion);
+    return new AutoValue_RemoteConfigRequest(criteoPublisherId, bundleId, sdkVersion, profileId);
   }
 
   public static TypeAdapter<RemoteConfigRequest> typeAdapter(Gson gson) {
@@ -31,5 +32,8 @@ public abstract class RemoteConfigRequest {
 
   @NonNull
   public abstract String getSdkVersion();
+
+  @SerializedName("rtbProfileId")
+  public abstract int getProfileId();
 
 }
