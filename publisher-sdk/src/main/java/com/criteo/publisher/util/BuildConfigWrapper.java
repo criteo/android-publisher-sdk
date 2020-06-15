@@ -19,11 +19,6 @@ public class BuildConfigWrapper {
   }
 
   @NonNull
-  public String getRemoteConfigUrl() {
-    return BuildConfig.remoteConfigUrl;
-  }
-
-  @NonNull
   public String getEventUrl() {
     return BuildConfig.eventUrl;
   }

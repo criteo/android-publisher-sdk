@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import static org.mockserver.model.HttpError.error;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
+import static org.mockserver.model.JsonBody.json;
 import static org.mockserver.model.NottableString.not;
 import static org.mockserver.verify.VerificationTimes.once;
 
@@ -60,7 +61,7 @@ public class PubSdkApiTest {
   @Mock
   private GdprData gdprData;
 
-  @Mock
+  @SpyBean
   private JsonSerializer serializer;
 
   private PubSdkApi api;
@@ -73,7 +74,6 @@ public class PubSdkApiTest {
 
     when(buildConfigWrapper.getCdbUrl()).thenReturn(serverUrl.toString());
     when(buildConfigWrapper.getEventUrl()).thenReturn(serverUrl.toString());
-    when(buildConfigWrapper.getRemoteConfigUrl()).thenReturn(serverUrl.toString());
 
     when(gdprData.consentData()).thenReturn("fake_consent_data");
     when(gdprData.gdprApplies()).thenReturn(false);
@@ -329,16 +329,20 @@ public class PubSdkApiTest {
         456
     );
 
-    mockServerClient.when(request()).respond(response().withStatusCode(204));
+    mockServerClient.when(request()).respond(response().withStatusCode(200).withBody("{}"));
 
     api.loadConfig(request);
 
     mockServerClient.verify(request()
-        .withMethod("GET")
-        .withPath("/v2.0/api/config")
-        .withQueryStringParameter("cpId", "myCpId")
-        .withQueryStringParameter("appId", "myAppId")
-        .withQueryStringParameter("sdkVersion", "myVersion"), once());
+        .withMethod("POST")
+        .withPath("/config/app")
+        .withBody(json(""
+            + "{\n"
+            + "  \"cpId\" : \"myCpId\",\n"
+            + "  \"bundleId\" : \"myAppId\",\n"
+            + "  \"sdkVersion\" : \"myVersion\",\n"
+            + "  \"rtbProfileId\": 456\n"
+            + "}")), once());
   }
 
   @Test

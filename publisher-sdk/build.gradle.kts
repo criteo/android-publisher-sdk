@@ -9,7 +9,6 @@ plugins {
 androidLibModule() {
     // Network
     addBuildConfigField<String>("cdbUrl")
-    addBuildConfigField<String>("remoteConfigUrl")
     addBuildConfigField<String>("eventUrl")
     addBuildConfigField<Int>("networkTimeoutInMillis")
 

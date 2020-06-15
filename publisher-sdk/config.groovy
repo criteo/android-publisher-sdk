@@ -64,7 +64,6 @@ environments {
     debug {
         cdbUrl = 'http://directbidder-test-app.par.preprod.crto.in'
         // cdbUrl = 'http://10.0.2.2:9991' // Uncomment to use local CDB instead of preprod
-        remoteConfigUrl = 'https://pub-sdk-cfg.par.preprod.crto.in'
         eventUrl = 'https://gum.par.preprod.crto.in'
 
         minLogLevel = 2 // All
@@ -73,7 +72,6 @@ environments {
 
     staging {
         cdbUrl = 'https://bidder.criteo.com'
-        remoteConfigUrl = 'https://pub-sdk-cfg.criteo.com'
         eventUrl = 'https://gum.criteo.com'
 
         minLogLevel = 2 // All
@@ -81,7 +79,6 @@ environments {
 
     release {
         cdbUrl = 'https://bidder.criteo.com'
-        remoteConfigUrl = 'https://pub-sdk-cfg.criteo.com'
         eventUrl = 'https://gum.criteo.com'
     }
 }

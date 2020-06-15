@@ -32,9 +32,7 @@ public class PubSdkApi {
 
   private static final String TAG = PubSdkApi.class.getSimpleName();
 
-  private static final String CRITEO_PUBLISHER_ID = "cpId";
   private static final String APP_ID = "appId";
-  private static final String SDK_VERSION = "sdkVersion";
   private static final String GAID = "gaid";
   private static final String EVENT_TYPE = "eventType";
   private static final String LIMITED_AD_TRACKING = "limitedAdTracking";
@@ -56,15 +54,11 @@ public class PubSdkApi {
 
   @NonNull
   public RemoteConfigResponse loadConfig(@NonNull RemoteConfigRequest request) throws IOException {
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(CRITEO_PUBLISHER_ID, request.getCriteoPublisherId());
-    parameters.put(APP_ID, request.getBundleId());
-    parameters.put(SDK_VERSION, request.getSdkVersion());
-    String paramsString = getParamsString(parameters);
+    URL url = new URL(buildConfigWrapper.getCdbUrl() + "/config/app");
+    HttpURLConnection urlConnection = prepareConnection(url, null, "POST");
+    writePayload(urlConnection, request);
 
-    URL url = new URL(buildConfigWrapper.getRemoteConfigUrl() + "/v2.0/api/config" + "?" + paramsString);
-
-    try (InputStream inputStream = executeRawGet(url, null)) {
+    try (InputStream inputStream = readResponseStreamIfSuccess(urlConnection)) {
       return jsonSerializer.read(RemoteConfigResponse.class, inputStream);
     }
   }
@@ -155,12 +149,7 @@ public class PubSdkApi {
   public void postCsm(@NonNull MetricRequest request) throws IOException {
     URL url = new URL(buildConfigWrapper.getCdbUrl() + "/csm");
     HttpURLConnection urlConnection = prepareConnection(url, null, "POST");
-
-    urlConnection.setDoOutput(true);
-    try (OutputStream outputStream = urlConnection.getOutputStream()) {
-      jsonSerializer.write(request, outputStream);
-    }
-
+    writePayload(urlConnection, request);
     readResponseStreamIfSuccess(urlConnection).close();
   }
 
@@ -232,6 +221,15 @@ public class PubSdkApi {
     try (OutputStream outputStream = urlConnection.getOutputStream()) {
       outputStream.write(payload);
       outputStream.flush();
+    }
+  }
+
+  private void writePayload(
+      @NonNull HttpURLConnection urlConnection,
+      @NonNull Object request) throws IOException {
+    urlConnection.setDoOutput(true);
+    try (OutputStream outputStream = urlConnection.getOutputStream()) {
+      jsonSerializer.write(request, outputStream);
     }
   }
 
