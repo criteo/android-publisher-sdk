@@ -21,7 +21,7 @@ public class RemoteConfigRequestFactory {
 
   @NonNull
   public RemoteConfigRequest createRequest() {
-    return new RemoteConfigRequest(
+    return RemoteConfigRequest.create(
         publisher.getCriteoPublisherId(),
         publisher.getBundleId(),
         buildConfigWrapper.getSdkVersion()

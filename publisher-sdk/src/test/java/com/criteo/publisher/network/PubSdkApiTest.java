@@ -322,7 +322,7 @@ public class PubSdkApiTest {
 
   @Test
   public void loadConfig_GivenInput_SendGetRequestWithQueryParameters() throws Exception {
-    RemoteConfigRequest request = new RemoteConfigRequest(
+    RemoteConfigRequest request = RemoteConfigRequest.create(
         "myCpId",
         "myAppId",
         "myVersion");

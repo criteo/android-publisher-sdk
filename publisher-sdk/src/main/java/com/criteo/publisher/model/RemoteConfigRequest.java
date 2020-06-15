@@ -1,41 +1,35 @@
 package com.criteo.publisher.model;
 
 import androidx.annotation.NonNull;
+import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
+import com.google.gson.annotations.SerializedName;
 
-public class RemoteConfigRequest {
+@AutoValue
+public abstract class RemoteConfigRequest {
 
   @NonNull
-  private final String criteoPublisherId;
-
-  @NonNull
-  private final String bundleId;
-
-  @NonNull
-  private final String sdkVersion;
-
-  public RemoteConfigRequest(
+  public static RemoteConfigRequest create(
       @NonNull String criteoPublisherId,
       @NonNull String bundleId,
       @NonNull String sdkVersion
   ) {
-    this.criteoPublisherId = criteoPublisherId;
-    this.bundleId = bundleId;
-    this.sdkVersion = sdkVersion;
+    return new AutoValue_RemoteConfigRequest(criteoPublisherId, bundleId, sdkVersion);
+  }
+
+  public static TypeAdapter<RemoteConfigRequest> typeAdapter(Gson gson) {
+    return new AutoValue_RemoteConfigRequest.GsonTypeAdapter(gson);
   }
 
   @NonNull
-  public String getCriteoPublisherId() {
-    return criteoPublisherId;
-  }
+  @SerializedName("cpId")
+  public abstract String getCriteoPublisherId();
 
   @NonNull
-  public String getBundleId() {
-    return bundleId;
-  }
+  public abstract String getBundleId();
 
   @NonNull
-  public String getSdkVersion() {
-    return sdkVersion;
-  }
+  public abstract String getSdkVersion();
 
 }
