@@ -2,15 +2,15 @@ package com.criteo.publisher.network;
 
 import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static java.util.Collections.singletonList;
-import static junit.framework.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import androidx.test.runner.AndroidJUnit4;
-import com.criteo.publisher.DependencyProvider;
+import androidx.annotation.NonNull;
 import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdSize;
@@ -18,6 +18,9 @@ import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.model.RemoteConfigRequest;
+import com.criteo.publisher.model.RemoteConfigRequestFactory;
+import com.criteo.publisher.model.RemoteConfigResponse;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.privacy.gdpr.GdprData;
 import javax.inject.Inject;
@@ -26,10 +29,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 
-@RunWith(AndroidJUnit4.class)
 public class PubSdkApiIntegrationTest {
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
@@ -39,12 +40,22 @@ public class PubSdkApiIntegrationTest {
   private String gaid;
   private String eventType;
   private String appId;
+  private GdprData gdprData;
+
   @Inject
   private Context context;
+
+  @Inject
   private CdbRequestFactory cdbRequestFactory;
+
+  @Inject
   private PubSdkApi api;
-  private GdprData gdprData;
+
+  @Inject
   private UserPrivacyUtil userPrivacyUtil;
+
+  @Inject
+  private RemoteConfigRequestFactory remoteConfigRequestFactory;
 
   @Before
   public void setup() {
@@ -53,17 +64,22 @@ public class PubSdkApiIntegrationTest {
     limitedAdTracking = 0;
     gaid = "021a86de-ef82-4f69-867b-61ca66688c9c";
     eventType = "Launch";
-
-    DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-    cdbRequestFactory = dependencyProvider.provideCdbRequestFactory();
-    api = dependencyProvider.providePubSdkApi();
-    userPrivacyUtil = mockedDependenciesRule.getDependencyProvider().provideUserPrivacyUtil();
   }
 
   @After
   public void tearDown() {
     cleanupTcf1();
     cleanupTcf2();
+  }
+
+  @Test
+  public void loadConfig_GivenNotConfiguredDimensions_ReturnDefaultValues() throws Exception {
+    // The app represented by the android tests is not (and should not) be configured.
+    RemoteConfigRequest request = remoteConfigRequestFactory.createRequest();
+
+    RemoteConfigResponse response = api.loadConfig(request);
+
+    assertThat(response).isEqualTo(defaultRemoteConfigResponse());
   }
 
   @Test
@@ -219,5 +235,17 @@ public class PubSdkApiIntegrationTest {
     editor.remove("IABTCF_gdprApplies");
     editor.remove("IABTCF_TCString");
     editor.apply();
+  }
+
+  @NonNull
+  private RemoteConfigResponse defaultRemoteConfigResponse() {
+    return RemoteConfigResponse.create(
+        false,
+        "%%displayUrl%%",
+        "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script src=\"%%displayUrl%%\"></script></body></html>",
+        "%%adTagData%%",
+        "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>",
+        true
+    );
   }
 }

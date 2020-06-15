@@ -42,7 +42,7 @@ public abstract class RemoteConfigResponse {
   }
 
   @NonNull
-  RemoteConfigResponse withKillSwitch(@Nullable Boolean killSwitch) {
+  public RemoteConfigResponse withKillSwitch(@Nullable Boolean killSwitch) {
     return create(
         killSwitch,
         getAndroidDisplayUrlMacro(),
