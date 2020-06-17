@@ -93,7 +93,7 @@ public class DfpActivity extends AppCompatActivity {
         if (mPublisherInterstitialAd.isLoaded()) {
           mPublisherInterstitialAd.show();
         } else {
-          Log.d("TAG", "The interstitial wasn't loaded yet.");
+          Log.d(TAG, "The interstitial wasn't loaded yet.");
         }
       }
     });
