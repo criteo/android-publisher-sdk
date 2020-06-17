@@ -30,6 +30,7 @@ import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
 import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
@@ -56,6 +57,7 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
+import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -94,12 +96,13 @@ public class BidManagerFunctionalTest {
   @MockBean
   private BidLifecycleListener bidLifecycleListener;
 
-  @MockBean
+  @SpyBean
   private BuildConfigWrapper buildConfigWrapper;
 
   @MockBean
   private MetricSendingQueueConsumer metricSendingQueueConsumer;
 
+  @Inject
   private DeviceUtil deviceUtil;
 
   private int adUnitId = 0;
@@ -111,7 +114,8 @@ public class BidManagerFunctionalTest {
 
     dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
-    deviceUtil = dependencyProvider.provideDeviceUtil();
+    when(publisher.getCriteoPublisherId()).thenReturn("cpId");
+    when(publisher.getBundleId()).thenReturn("bundle.id");
 
     // Should be set to at least 1 because user-level silent mode is set the 0 included
     givenMockedClockSetTo(1);
