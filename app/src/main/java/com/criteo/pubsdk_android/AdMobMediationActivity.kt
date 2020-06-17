@@ -5,9 +5,13 @@ import android.provider.Settings
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.criteo.pubsdk_android.listener.TestAppDfpAdListener
 import com.google.android.gms.ads.*
+import com.google.android.gms.ads.formats.UnifiedNativeAd
+import com.google.android.gms.ads.formats.UnifiedNativeAdView
 
 
 class AdMobMediationActivity: AppCompatActivity() {
@@ -18,6 +22,9 @@ class AdMobMediationActivity: AppCompatActivity() {
 
     /** This AdMob AdUnit is mapped to this Criteo AdUnit: /140800857/Endeavour_320x480 */
     const val ADMOB_INTERSTITIAL = "ca-app-pub-8459323526901202/6462812944"
+
+    /** This AdMob AdUnit is mapped to this Criteo AdUnit: /140800857/Endeavour_Native */
+    const val ADMOB_NATIVE = "ca-app-pub-8459323526901202/2863808899"
   }
 
   private val tag = javaClass.simpleName
@@ -33,6 +40,7 @@ class AdMobMediationActivity: AppCompatActivity() {
 
     findViewById<Button>(R.id.buttonAdMobMediationBanner).setOnClickListener { loadBanner() }
     findViewById<Button>(R.id.buttonAdMobMediationInterstitial).setOnClickListener { loadInterstitial() }
+    findViewById<Button>(R.id.buttonAdMobMediationNative).setOnClickListener { loadNative() }
   }
 
   private fun initializeAdMobSdk() {
@@ -77,6 +85,36 @@ class AdMobMediationActivity: AppCompatActivity() {
 
     val adRequest = AdRequest.Builder().build()
     interstitialAd.loadAd(adRequest)
+  }
+
+  private fun loadNative() {
+    val adLoader = AdLoader.Builder(this, ADMOB_NATIVE)
+        .forUnifiedNativeAd {
+          val adView = layoutInflater.inflate(R.layout.native_admob_ad, null) as UnifiedNativeAdView
+          it.renderInView(adView)
+          adLayout.removeAllViews()
+          adLayout.addView(adView)
+        }
+        .withAdListener(TestAppDfpAdListener(tag, "Native"))
+        .build()
+
+    val adRequest = AdRequest.Builder().build()
+    adLoader.loadAd(adRequest)
+  }
+
+  private fun UnifiedNativeAd.renderInView(nativeView: UnifiedNativeAdView) {
+    nativeView.findViewById<TextView>(R.id.ad_headline).text = headline
+    nativeView.findViewById<TextView>(R.id.ad_body).text = body
+    nativeView.findViewById<TextView>(R.id.ad_price).text = price
+    nativeView.findViewById<TextView>(R.id.ad_call_to_action).text = callToAction
+    nativeView.findViewById<TextView>(R.id.ad_advertiser).text = advertiser
+    nativeView.findViewById<TextView>(R.id.ad_store).text = extras["crtn_advdomain"] as String?
+    nativeView.findViewById<ImageView>(R.id.ad_app_icon).setImageDrawable(icon.drawable)
+
+    nativeView.mediaView = nativeView.findViewById(R.id.ad_media)
+    nativeView.mediaView.setMediaContent(mediaContent)
+
+    nativeView.setNativeAd(this)
   }
 
 }
