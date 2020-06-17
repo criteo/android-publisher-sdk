@@ -62,7 +62,7 @@ adChoiceIconHeightInDp = 15
 
 environments {
     debug {
-        cdbUrl = 'http://directbidder-test-app.par.preprod.crto.in'
+        cdbUrl = 'https://directbidder-test-app.par.preprod.crto.in'
         // cdbUrl = 'http://10.0.2.2:9991' // Uncomment to use local CDB instead of preprod
         eventUrl = 'https://gum.par.preprod.crto.in'
 
