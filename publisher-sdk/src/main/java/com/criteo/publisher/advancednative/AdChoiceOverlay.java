@@ -4,15 +4,15 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import java.lang.ref.WeakReference;
@@ -79,6 +79,8 @@ public class AdChoiceOverlay {
     adChoiceLayoutParams.gravity = Gravity.RIGHT;
     adChoiceLayoutParams.width = androidUtil.dpToPixel(buildConfigWrapper.getAdChoiceIconWidthInDp());
     adChoiceLayoutParams.height = androidUtil.dpToPixel(buildConfigWrapper.getAdChoiceIconHeightInDp());
+    adChoiceImageView.setMinimumWidth(adChoiceLayoutParams.width);
+    adChoiceImageView.setMinimumHeight(adChoiceLayoutParams.height);
 
     if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
       // From Android 21, Buttons and some other views have an elevation above 0 so they can cast
