@@ -22,8 +22,8 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Looper;
-import androidx.test.rule.ActivityTestRule;
 import android.view.View;
+import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
@@ -43,7 +43,6 @@ import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.view.WebViewLookup;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
@@ -164,11 +163,9 @@ public class StandaloneFunctionalTest {
     CriteoBannerView bannerView = whenLoadingABanner(invalidBannerAdUnit);
 
     // Empty webview may not be totally empty. When tested, it contains "ul" inside.
-    // So instead of testing that HTML is empty, we could test that no resources in fetched.
     String html = webViewLookup.lookForHtmlContent(bannerView).get();
-    List<String> loadedResources = webViewLookup.lookForLoadedResources(html, CHARSET).get();
 
-    assertTrue(loadedResources.isEmpty());
+    assertTrue(html.isEmpty() || html.equals("ul"));
   }
 
   @Test
