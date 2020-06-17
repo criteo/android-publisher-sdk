@@ -27,8 +27,8 @@
     </activity>
 
     <meta-data
-      android:name="com.google.android.gms.ads.AD_MANAGER_APP"
-      android:value="true"/>
+      android:name="com.google.android.gms.ads.APPLICATION_ID"
+      android:value="ca-app-pub-8459323526901202~2792049297"/>
 
     <activity
       android:name=".MainActivity"
@@ -68,6 +68,15 @@
     </activity>
     <activity
       android:name=".InHouseActivity"
+      android:configChanges="orientation|screenSize"
+      android:theme="@style/AppTheme">
+      <meta-data
+        android:name="android.support.PARENT_ACTIVITY"
+        android:value="com.criteo.pubsdk_android.MainActivity"/>
+    </activity>
+
+    <activity
+      android:name=".AdMobMediationActivity"
       android:configChanges="orientation|screenSize"
       android:theme="@style/AppTheme">
       <meta-data

@@ -60,6 +60,7 @@
       android:text="@string/btn_mopub"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"/>
+
     <Button
       android:id="@+id/buttonMopubMediation"
       style="@style/Widget.AppCompat.Button.Colored"
@@ -68,6 +69,15 @@
       android:layout_marginTop="20dp"
       android:background="#81D4FA"
       android:text="@string/btn_mopub_mediation"/>
+
+    <Button
+      android:id="@+id/buttonAdMobMediation"
+      style="@style/Widget.AppCompat.Button.Colored"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="20dp"
+      android:background="#81D4FA"
+      android:text="@string/btn_admob_mediation"/>
 
     <Button
       android:id="@+id/buttonConsentSelector"

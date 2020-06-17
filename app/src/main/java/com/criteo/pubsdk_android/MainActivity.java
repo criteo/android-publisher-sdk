@@ -51,6 +51,11 @@ public class MainActivity extends AppCompatActivity {
       startActivity(intent);
     });
 
+    findViewById(R.id.buttonAdMobMediation).setOnClickListener((View v) -> {
+      Intent intent = new Intent(getApplicationContext(), AdMobMediationActivity.class);
+      startActivity(intent);
+    });
+
     findViewById(R.id.buttonConsentSelector).setOnClickListener((View v) -> {
       Intent intent = new Intent(getApplicationContext(), PrivacyConsentSelectorActivity.class);
       startActivity(intent);

@@ -21,6 +21,7 @@
   <string name="btn_in_house_mediation">In-house Mediation</string>
   <string name="btn_mopub">Mopub</string>
   <string name="btn_mopub_mediation">Mopub-Mediation</string>
+  <string name="btn_admob_mediation">AdMob-Mediation</string>
   <string name="btn_ccpa_consent_selector">CCPA Consent Selector</string>
   <string name="btn_tcf_consent_selector">TCF Consent Selector</string>
   <string name="hint_ccpa_iab">CCPA IAB String</string>
