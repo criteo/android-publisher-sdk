@@ -92,7 +92,12 @@ public class TopActivityFinderTest {
 
   private Activity openAnotherActivity(Class<? extends Activity> activityClass) throws Exception {
     return lookup.lookForResumedActivity(() -> {
-      context.startActivity(new Intent(context, activityClass));
+      // The injected context represents an application context and require flag to open a new
+      // activity. It would be possible to not flag the intent by using directly the activity
+      // context, but the SDK use application context, then those tests would not represent anymore
+      // what is done in prod.
+      Intent intent = new Intent(context, activityClass).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      context.startActivity(intent);
     }).get();
   }
 
