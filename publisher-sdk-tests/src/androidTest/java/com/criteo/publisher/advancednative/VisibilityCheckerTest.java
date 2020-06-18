@@ -84,7 +84,7 @@ public class VisibilityCheckerTest {
 
   @Test
   public void isVisible_GivenViewInScrollView_ReturnAccordinglyToScrolling() throws Exception {
-    int screenHeightPixels = uiHelper.getScreenHeightPixels();
+    int screenHeightPixels = uiHelper.getActivityHeightPixels();
     int viewHeightPixels = 200;
 
     View viewAtTop = uiHelper.createView();

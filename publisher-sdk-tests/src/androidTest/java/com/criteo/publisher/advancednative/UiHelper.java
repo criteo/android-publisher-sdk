@@ -48,8 +48,21 @@ public class UiHelper {
     return new FrameLayout(activityRule.getActivity());
   }
 
-  public int getScreenHeightPixels() {
-    return getDisplayMetrics().heightPixels;
+  /**
+   * Return the height in pixel of the usable space in this activity.
+   * <p>
+   * This may be different than the screen size because this height does not count elements such
+   * as:
+   * <ul>
+   *   <li>navigation bar</li>
+   *   <li>status bar</li>
+   *   <li>action bar</li>
+   * </ul>
+   */
+  public int getActivityHeightPixels() {
+    FrameLayout layout = createFrameLayout();
+    drawViews(layout);
+    return layout.getHeight();
   }
 
   @NonNull
