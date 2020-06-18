@@ -1,5 +1,8 @@
 package com.criteo.publisher.advancednative;
 
+import static com.criteo.publisher.annotation.Internal.ADMOB_ADAPTER;
+import static com.criteo.publisher.annotation.Internal.MOPUB_ADAPTER;
+
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +11,7 @@ import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.annotation.Internal;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 
 @Keep
@@ -152,7 +156,7 @@ public class CriteoNativeAd {
     }
   }
 
-  @SuppressWarnings("unused") // Used by MoPub mediation adapter
+  @Internal({MOPUB_ADAPTER, ADMOB_ADAPTER})
   void setRenderer(@NonNull CriteoNativeRenderer renderer) {
     this.renderer = renderer;
   }
@@ -196,7 +200,7 @@ public class CriteoNativeAd {
    * @param adChoiceView view to start watching for clicks
    * @see #setProductClickableView(View)
    */
-  @VisibleForTesting
+  @Internal(ADMOB_ADAPTER)
   void setAdChoiceClickableView(@NonNull View adChoiceView) {
     clickDetection.watch(adChoiceView, clickOnAdChoiceHandler);
   }
@@ -209,7 +213,7 @@ public class CriteoNativeAd {
    * @see AdChoiceOverlay#getAdChoiceView(View)
    */
   @Nullable
-  @VisibleForTesting
+  @Internal(ADMOB_ADAPTER)
   ImageView getAdChoiceView(@NonNull View overlappedView) {
     return adChoiceOverlay.getAdChoiceView(overlappedView);
   }

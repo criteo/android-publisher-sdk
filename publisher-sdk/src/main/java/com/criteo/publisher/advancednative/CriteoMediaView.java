@@ -1,5 +1,7 @@
 package com.criteo.publisher.advancednative;
 
+import static com.criteo.publisher.annotation.Internal.ADMOB_ADAPTER;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
@@ -11,6 +13,7 @@ import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import com.criteo.publisher.annotation.Internal;
 
 /**
  * Displays {@linkplain CriteoMedia Ad media} such as product image or advertiser logo.
@@ -112,6 +115,7 @@ public class CriteoMediaView extends FrameLayout {
   }
 
   @NonNull
+  @Internal(ADMOB_ADAPTER)
   ImageView getImageView() {
     return imageView;
   }

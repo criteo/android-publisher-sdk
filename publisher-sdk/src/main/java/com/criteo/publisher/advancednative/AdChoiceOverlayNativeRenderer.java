@@ -1,5 +1,8 @@
 package com.criteo.publisher.advancednative;
 
+import static com.criteo.publisher.annotation.Internal.ADMOB_ADAPTER;
+import static com.criteo.publisher.annotation.Internal.MOPUB_ADAPTER;
+
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,6 +10,7 @@ import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.DependencyProvider;
+import com.criteo.publisher.annotation.Internal;
 
 @Keep
 class AdChoiceOverlayNativeRenderer implements CriteoNativeRenderer {
@@ -18,12 +22,13 @@ class AdChoiceOverlayNativeRenderer implements CriteoNativeRenderer {
   private final AdChoiceOverlay adChoiceOverlay;
 
   /**
-   * Used by MoPub Mediation adapter because it has no access to the dependency provider.
+   * Used by MoMediation adapter because it has no access to the dependency provider.
    *
    * As this constructor eagerly accesses the dependency provider, an exception will be thrown if
    * the publisher did not call the SDK initialisation (but with a fancy message indicating how to
    * fix the issue).
    */
+  @Internal({MOPUB_ADAPTER, ADMOB_ADAPTER})
   AdChoiceOverlayNativeRenderer(@NonNull CriteoNativeRenderer delegate) {
     this(delegate, DependencyProvider.getInstance().provideAdChoiceOverlay());
   }

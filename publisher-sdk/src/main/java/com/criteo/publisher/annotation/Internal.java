@@ -1,0 +1,30 @@
+package com.criteo.publisher.annotation;
+
+import androidx.annotation.Keep;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/**
+ * Indicate that the annotated element is part of the internal API and should not be used.
+ *
+ * By default, all elements that are not public or obfuscated (or protected in case of public
+ * inheritance) are considered as internal.
+ */
+@Keep
+@Documented
+@Retention(RetentionPolicy.CLASS)
+@Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.FIELD})
+public @interface Internal {
+
+  String MOPUB_ADAPTER = "MoPub Adapter";
+  String ADMOB_ADAPTER = "AdMob Adapter";
+
+  /**
+   * Marker to indicate which part of the project the annotated element is used by.
+   */
+  String[] value() default {};
+
+}
