@@ -45,10 +45,12 @@ dependencies {
     //  one dependency should be cut off.
     implementation(Deps.Criteo.Mediation.MoPub("${sdkVersion()}+")) {
         exclude(group = Deps.Criteo.PublisherSdk.group)
+        isChanging = true
     }
 
     implementation(Deps.Criteo.Mediation.AdMob("${sdkVersion()}+")) {
         exclude(group = Deps.Criteo.PublisherSdk.group)
+        isChanging = true
     }
 
     implementation(Deps.Kotlin.Stdlib)
