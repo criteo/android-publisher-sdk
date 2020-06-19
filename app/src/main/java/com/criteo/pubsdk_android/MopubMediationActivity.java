@@ -19,12 +19,12 @@ import com.mopub.nativeads.AdapterHelper;
 import com.mopub.nativeads.MoPubNative;
 import com.mopub.nativeads.MoPubNative.MoPubNativeNetworkListener;
 import com.mopub.nativeads.NativeAd;
+import com.mopub.nativeads.NativeAd.MoPubNativeEventListener;
 import com.mopub.nativeads.NativeErrorCode;
 
-// TODO: Move this class to the test app repo
 public class MopubMediationActivity extends AppCompatActivity {
 
-  private static final String TAG = MopubActivity.class.getSimpleName();
+  private static final String TAG = MopubMediationActivity.class.getSimpleName();
 
   private MoPubView publisherAdView;
   private LinearLayout linearLayout;
@@ -54,6 +54,8 @@ public class MopubMediationActivity extends AppCompatActivity {
       @Override
       public void onNativeLoad(NativeAd nativeAd) {
         Log.d(TAG, "Native onNativeLoad");
+        nativeAd.setMoPubNativeEventListener(new NativeEventListener());
+
         AdapterHelper adapterHelper = new AdapterHelper(MopubMediationActivity.this, 0, 2);
         View adView = adapterHelper.getAdView(linearLayout, null, nativeAd);
         linearLayout.removeAllViews();
@@ -99,6 +101,18 @@ public class MopubMediationActivity extends AppCompatActivity {
     mInterstitial.destroy();
     if (publisherAdView != null) {
       publisherAdView.destroy();
+    }
+  }
+
+  private static class NativeEventListener implements MoPubNativeEventListener {
+    @Override
+    public void onImpression(View view) {
+      Log.d(TAG, "Native onImpression");
+    }
+
+    @Override
+    public void onClick(View view) {
+      Log.d(TAG, "Native onClick");
     }
   }
 }
