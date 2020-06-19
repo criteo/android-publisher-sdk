@@ -20,8 +20,7 @@ public abstract class CriteoNativeAdListener {
    * @param nativeAd native ad with the native data that may be used to render it
    */
   @UiThread
-  public void onAdReceived(@NonNull CriteoNativeAd nativeAd) {
-  }
+  public abstract void onAdReceived(@NonNull CriteoNativeAd nativeAd);
 
   /**
    * Callback invoked when a native ad is requested but none may be provided by the SDK.
