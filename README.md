@@ -1,5 +1,5 @@
 # Code Style
-This project uses the Criteo Java code style. Please follow the instructions contained on this [page](https://confluence.criteois.com/pages/viewpage.action?pageId=320439753)
+This project uses the Criteo Java code style. Please follow the instructions contained on this [page](https://go.crto.in/publisher-sdk-java-code-style)
 
 # Testing
 ## Tests organisation
@@ -7,7 +7,7 @@ This project uses the Criteo Java code style. Please follow the instructions con
 The tests in this project are organised according to the following convention:
 - Unit tests are located within the [test](src/test/) directory.
 - Integration tests, which are written as instrumentation tests, are located within the [androidTest directory](src/androidTest)
-- The subset of integration tests which represent one of the functional tests defined [here](https://confluence.criteois.com/display/EE/Functional+Tests)
+- The subset of integration tests which represent one of the functional tests defined [here](https://go.crto.in/publisher-sdk-functional-tests)
  are post-fixed with `FunctionTests`. The rest are post-fixed with `IntegrationTests`.
 
 ## Testing against a local CDB
@@ -76,7 +76,7 @@ dependencies {
 Publishers consume PubSDK artifacts from the Azure maven repository.
 To select a new version of the SDK:
 - Select a commit representing the new version (the one validated by bugfest)
-- Go on [Jenkins deploy job](https://build.crto.in/job/pub-sdk-mochi-prod-deployment/build)
+- Go on [Jenkins deploy job](https://go.crto.in/publisher-sdk-prod-deployment)
 - Insert the commit SHA1 and validate
 
 ### Use public releases on Azure

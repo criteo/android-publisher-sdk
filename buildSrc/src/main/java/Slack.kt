@@ -22,8 +22,8 @@ fun Project.addSlackDeploymentMessages() {
   val webHookUrl = System.getenv("SLACK_WEBHOOK") ?: return
   val teamChannel = "#pub-sdk-private"
   val rcChannel = "#pub-sdk-release-candidates"
-  val confluenceSpaceUrl = "https://confluence.criteois.com/display/PUBSDK/"
-  val gerritProjectBranchesUrl = "http://review.crto.in/#/admin/projects/pub-sdk/mochi,branches"
+  val confluenceSpaceUrl = "https://go.crto.in/publisher-sdk-bugfest"
+  val gerritProjectBranchesUrl = "https://go.crto.in/publisher-sdk-android-branches"
 
   afterEvaluate {
     tasks.withType<PublishToMavenRepository>()
@@ -70,7 +70,7 @@ fun Project.addSlackDeploymentMessages() {
 - Install the <${testAppUrl(publication.version)}|TestApp APK>
 - Go on <$confluenceSpaceUrl/Bugfest+Android+${publication.version}|Bugfest page> and execute tests
 *Release the RC*
-- Go on <https://build.crto.in/job/pub-sdk-mochi-prod-deployment/build|Jenkins deploy job> and insert this commit SHA-1
+- Go on <https://go.crto.in/publisher-sdk-prod-deployment|Jenkins deploy job> and insert this commit SHA-1
 """.trimIndent())
                   }
                 }

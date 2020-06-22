@@ -35,7 +35,7 @@ import java.util.concurrent.Executor;
 /**
  * Update metrics files accordingly to received events.
  * <p>
- * This follows specifications given by <a href="https://confluence.criteois.com/display/PUBSDK/Publisher+SDK+-+Client+Side+Metrics">Client
+ * This follows specifications given by <a href="https://go.crto.in/publisher-sdk-csm">Client
  * Side Metrics</a>.
  */
 public class CsmBidLifecycleListener implements BidLifecycleListener {

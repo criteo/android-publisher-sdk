@@ -111,7 +111,7 @@ public class UserPrivacyUtil {
    *   <li>If the IAB string is not well-formatted, we consider that the user has not opted-out</li>
    * </ul>
    * <p>
-   * More information can be found here: https://confluence.criteois.com/display/PP/CCPA+Buying+Policy
+   * More information can be found here: https://go.crto.in/publisher-sdk-ccpa
    *
    * @return {@code true} if consent is given, {@code false} otherwise
    */

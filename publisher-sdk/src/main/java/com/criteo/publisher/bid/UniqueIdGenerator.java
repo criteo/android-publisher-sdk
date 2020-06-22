@@ -48,9 +48,9 @@ public class UniqueIdGenerator {
    *   <li>Impression ID</li>
    * </ul>
    *
-   * @see <a href="https://review.crto.in/gitweb?p=publisher/direct-bidder.git;a=blob;f=directbidder-app/src/main/scala/com/criteo/directbidder/helpers/ImpressionIdHelper.scala;hb=master">
+   * @see <a href="https://go.crto.in/publisher-sdk-cdb-impressionidhelper">
    *   CDB ImpressionIdHelper</a>
-   * @see <a href="https://review.crto.in/gitweb?p=adserving-backend/criteo-arbitration.git;a=blob;f=Criteo.Arbitration.Protocol/ArbitrageId.cs;hb=master">
+   * @see <a href="https://go.crto.in/publisher-sdk-arbitrage-arbitrageid">
    *   Arbitrage ArtbitrageId</a>
    *
    * @return a new ID
