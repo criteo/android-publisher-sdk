@@ -2,7 +2,6 @@ package com.criteo.publisher.privacy.gdpr;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.DependencyProvider;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
@@ -13,7 +12,6 @@ import org.json.JSONObject;
 @AutoValue
 public abstract class GdprData {
 
-  @VisibleForTesting
   public static GdprData create(
       @NonNull String consentData,
       @Nullable Boolean gdprApplies,
