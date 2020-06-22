@@ -59,7 +59,7 @@ public class SdkCache {
   //  Note that the AdUnitId are not necessary unique (for instance if a publisher ask for same
   //  banner but in different size). So it could not be used as a key between request and
   //  response.
-  //  See https://jira.criteois.com/browse/EE-608
+  //  See EE-608
   private AdUnitType findAdUnitType(Slot slot) {
     if (slot.isNative()) {
       return CRITEO_CUSTOM_NATIVE;

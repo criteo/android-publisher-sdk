@@ -8,7 +8,7 @@
     <ignore path="src/main/AndroidManifest.xml" />
   </issue>
 
-  <!-- https://jira.criteois.com/browse/EE-579 -->
+  <!-- EE-579 -->
   <issue id="StaticFieldLeak" severity="ignore">
     <ignore path="src/main/java/com/criteo/pubsdk_android/StandaloneActivity.java" />
   </issue>

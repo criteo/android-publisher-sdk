@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
-  <!-- https://jira.criteois.com/browse/EE-569 -->
+  <!-- EE-569 -->
   <issue id="IconLocation" severity="ignore">
     <ignore path="src/main/res/drawable/closebtn.png" />
   </issue>
@@ -13,7 +13,7 @@
     <ignore path="src/main/java/com/criteo/publisher/CriteoBannerView.java" />
   </issue>
 
-  <!-- https://jira.criteois.com/browse/EE-579 -->
+  <!-- EE-579 -->
   <issue id="StaticFieldLeak" severity="ignore">
     <ignore path="src/main/java/com/criteo/publisher/network/AppEventTask.java" />
   </issue>

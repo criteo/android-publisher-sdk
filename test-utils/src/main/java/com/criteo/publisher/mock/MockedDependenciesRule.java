@@ -134,7 +134,7 @@ public class MockedDependenciesRule implements MethodRule {
     return captor;
   }
 
-  // FIXME (ma.chentir) https://jira.criteois.com/browse/EE-1040
+  // FIXME (ma.chentir) EE-1040
   // To be removed when we are able to mock backend responses. Ideally, this behavior should be
   // defined in MockedDependenciesRule#setupNetworkDependencies(). However, this would require
   // mocking PubSdkApi and overriding its behavior (like what is done below). But... PubSdkApi, would
