@@ -1,13 +1,4 @@
-package com.criteo.publisher.util;
-
-import android.util.Base64OutputStream;
-import java.io.UnsupportedEncodingException;
-
-/**
- * Code copied as is from android.util.Base64 to use in unit tests
- */
-
-/**
+/*
  * Copyright (C) 2010 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +12,15 @@ import java.io.UnsupportedEncodingException;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ */
+
+package com.criteo.publisher.util;
+
+import android.util.Base64OutputStream;
+import java.io.UnsupportedEncodingException;
+
+/**
+ * Code copied as is from android.util.Base64 to use in unit tests
  */
 
 /**

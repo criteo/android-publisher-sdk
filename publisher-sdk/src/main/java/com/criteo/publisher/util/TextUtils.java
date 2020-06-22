@@ -1,15 +1,4 @@
-package com.criteo.publisher.util;
-
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-/**
- * This class contains some code from {@link android.text.TextUtils}. This is to enable unit testing
- * code that relies on it, on the JVM.
- */
-
-/**
+/*
  * Copyright (C) 2010 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +12,16 @@ import androidx.annotation.Nullable;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ */
+
+package com.criteo.publisher.util;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+/**
+ * This class contains some code from {@link android.text.TextUtils}. This is to enable unit testing
+ * code that relies on it, on the JVM.
  */
 
 public class TextUtils {
