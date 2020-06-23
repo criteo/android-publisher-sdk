@@ -16,29 +16,44 @@
 
 package com.criteo.publisher.network;
 
+import static com.criteo.publisher.TestAdUnits.BANNER_320_50;
+import static com.criteo.publisher.TestAdUnits.BANNER_UNKNOWN;
+import static com.criteo.publisher.TestAdUnits.INTERSTITIAL;
+import static com.criteo.publisher.TestAdUnits.INTERSTITIAL_UNKNOWN;
+import static com.criteo.publisher.TestAdUnits.NATIVE;
+import static com.criteo.publisher.TestAdUnits.NATIVE_UNKNOWN;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
+import com.criteo.publisher.CriteoUtil;
+import com.criteo.publisher.StubConstants;
 import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdSize;
+import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.RemoteConfigRequest;
 import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.model.RemoteConfigResponse;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.privacy.gdpr.GdprData;
+import com.criteo.publisher.util.DeviceUtil;
+import java.util.List;
 import javax.inject.Inject;
 import org.json.JSONObject;
 import org.junit.After;
@@ -60,6 +75,15 @@ public class PubSdkApiIntegrationTest {
 
   @Inject
   private Context context;
+
+  @SpyBean
+  private Publisher publisher;
+
+  @SpyBean
+  private DeviceUtil deviceUtil;
+
+  @Inject
+  private AdUnitMapper adUnitMapper;
 
   @Inject
   private CdbRequestFactory cdbRequestFactory;
@@ -147,6 +171,118 @@ public class PubSdkApiIntegrationTest {
     CdbResponse response = api.loadCdb(request, "myUserAgent");
 
     assertNotNull(response);
+  }
+
+  @Test
+  public void loadCdb_GivenValidBannerAdUnit_ReturnBid() throws Exception {
+    when(publisher.getCriteoPublisherId()).thenReturn(CriteoUtil.TEST_CP_ID);
+
+    CacheAdUnit validAdUnit = adUnitMapper.map(BANNER_320_50);
+    CdbRequest request = cdbRequestFactory.createRequest(singletonList(validAdUnit));
+
+    CdbResponse response = api.loadCdb(request, "myUserAgent");
+
+    assertThat(response.getTimeToNextCall()).isZero();
+    assertThat(response.getSlots()).hasSize(1).allSatisfy(slot -> {
+      assertThat(slot.getImpressionId()).isNotNull();
+      assertThat(slot.isNative()).isFalse();
+      assertThat(slot.getPlacementId()).isEqualTo(BANNER_320_50.getAdUnitId());
+      assertThat(slot.getCpm()).isNotEmpty();
+      assertThat(slot.getWidth()).isEqualTo(320);
+      assertThat(slot.getHeight()).isEqualTo(50);
+      assertThat(slot.getCurrency()).isNotEmpty();
+      assertThat(slot.getTtl()).isEqualTo(0);
+      assertThat(slot.getDisplayUrl()).isNotEmpty().matches(StubConstants.STUB_DISPLAY_URL);
+      assertThat(slot.getNativeAssets()).isNull();
+      assertThat(slot.isValid()).isTrue();
+    });
+  }
+
+  @Test
+  public void loadCdb_GivenValidInterstitialAdUnit_ReturnBid() throws Exception {
+    when(publisher.getCriteoPublisherId()).thenReturn(CriteoUtil.TEST_CP_ID);
+    when(deviceUtil.getSizePortrait()).thenReturn(new AdSize(42, 1337));
+
+    CacheAdUnit validAdUnit = adUnitMapper.map(INTERSTITIAL);
+    CdbRequest request = cdbRequestFactory.createRequest(singletonList(validAdUnit));
+
+    CdbResponse response = api.loadCdb(request, "myUserAgent");
+
+    assertThat(response.getTimeToNextCall()).isZero();
+    assertThat(response.getSlots()).hasSize(1).allSatisfy(slot -> {
+      assertThat(slot.getImpressionId()).isNotNull();
+      assertThat(slot.isNative()).isFalse();
+      assertThat(slot.getPlacementId()).isEqualTo(INTERSTITIAL.getAdUnitId());
+      assertThat(slot.getCpm()).isNotEmpty();
+      assertThat(slot.getWidth()).isEqualTo(42);
+      assertThat(slot.getHeight()).isEqualTo(1337);
+      assertThat(slot.getCurrency()).isNotEmpty();
+      assertThat(slot.getTtl()).isEqualTo(0);
+      assertThat(slot.getDisplayUrl()).isNotEmpty().matches(StubConstants.STUB_DISPLAY_URL);
+      assertThat(slot.getNativeAssets()).isNull();
+      assertThat(slot.isValid()).isTrue();
+    });
+  }
+
+  @Test
+  public void loadCdb_GivenValidNativeAdUnit_ReturnBid() throws Exception {
+    when(publisher.getCriteoPublisherId()).thenReturn(CriteoUtil.TEST_CP_ID);
+
+    CacheAdUnit validAdUnit = adUnitMapper.map(NATIVE);
+    CdbRequest request = cdbRequestFactory.createRequest(singletonList(validAdUnit));
+
+    CdbResponse response = api.loadCdb(request, "myUserAgent");
+
+    assertThat(response.getTimeToNextCall()).isZero();
+    assertThat(response.getSlots()).hasSize(1).allSatisfy(slot -> {
+      assertThat(slot.getImpressionId()).isNotNull();
+      assertThat(slot.isNative()).isTrue();
+      assertThat(slot.getPlacementId()).isEqualTo(NATIVE.getAdUnitId());
+      assertThat(slot.getCpm()).isNotEmpty();
+      assertThat(slot.getWidth()).isEqualTo(2);
+      assertThat(slot.getHeight()).isEqualTo(2);
+      assertThat(slot.getCurrency()).isNotEmpty();
+      assertThat(slot.getTtl()).isEqualTo(0);
+      assertThat(slot.getDisplayUrl()).isNull();
+      assertThat(slot.getNativeAssets()).isEqualTo(StubConstants.STUB_NATIVE_ASSETS);
+      assertThat(slot.isValid()).isTrue();
+    });
+  }
+
+  @Test
+  public void loadCdb_GivenMultipleValidAdUnits_ReturnBids() throws Exception {
+    when(publisher.getCriteoPublisherId()).thenReturn(CriteoUtil.TEST_CP_ID);
+    when(deviceUtil.getSizePortrait()).thenReturn(new AdSize(42, 1337));
+
+    List<CacheAdUnit> validAdUnits = adUnitMapper.mapToChunks(asList(
+        BANNER_320_50,
+        INTERSTITIAL,
+        NATIVE
+    )).get(0);
+
+    CdbRequest request = cdbRequestFactory.createRequest(validAdUnits);
+    CdbResponse response = api.loadCdb(request, "myUserAgent");
+
+    assertThat(validAdUnits).hasSize(3);
+    assertThat(response.getSlots()).hasSize(3);
+  }
+
+  @Test
+  public void loadCdb_GivenMultipleInvalidAdUnits_ReturnNoBids() throws Exception {
+    when(publisher.getCriteoPublisherId()).thenReturn(CriteoUtil.TEST_CP_ID);
+    when(deviceUtil.getSizePortrait()).thenReturn(new AdSize(42, 1337));
+
+    List<CacheAdUnit> validAdUnits = adUnitMapper.mapToChunks(asList(
+        BANNER_UNKNOWN,
+        INTERSTITIAL_UNKNOWN,
+        NATIVE_UNKNOWN
+    )).get(0);
+
+    CdbRequest request = cdbRequestFactory.createRequest(validAdUnits);
+    CdbResponse response = api.loadCdb(request, "myUserAgent");
+
+    assertThat(validAdUnits).hasSize(3);
+    assertThat(response.getSlots()).hasSize(0);
   }
 
   @Test
