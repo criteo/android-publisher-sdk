@@ -23,29 +23,24 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockserver.model.HttpError.error;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
 
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.WebViewData;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockserver.client.MockServerClient;
-import org.mockserver.junit.MockServerRule;
 
 public class WebViewDataTaskTest {
 
   @Rule
-  public MockServerRule mockServerRule = new MockServerRule(this);
-
-  @SuppressWarnings("unused")
-  private MockServerClient mockServerClient;
+  public MockWebServer mockWebServer = new MockWebServer();
 
   @Mock
   private WebViewData webViewData;
@@ -69,35 +64,35 @@ public class WebViewDataTaskTest {
 
   @Test
   public void backgroundJob_GivenUrlAndUserAgent_SetItInHttpRequest() throws Exception {
+    mockWebServer.enqueue(new MockResponse());
     when(deviceInfo.getUserAgent()).thenReturn(completedFuture("myUserAgent"));
 
-    task.doInBackground("http://localhost:" + mockServerRule.getPort() + "/path");
+    task.doInBackground("http://localhost:" + mockWebServer.getPort() + "/path");
 
-    mockServerClient.verify(request()
-        .withPath("/path")
-        .withMethod("GET")
-        .withHeader("Content-Type", "text/plain")
-        .withHeader("User-Agent", "myUserAgent")
-    );
+    RecordedRequest request = mockWebServer.takeRequest();
+    assertThat(request.getPath()).isEqualTo("/path");
+    assertThat(request.getMethod()).isEqualTo("GET");
+    assertThat(request.getHeader("Content-Type")).isEqualTo("text/plain");
+    assertThat(request.getHeader("User-Agent")).isEqualTo("myUserAgent");
   }
 
   @Test
   public void backgroundJob_GivenServerRespondingContent_ReturnIt() throws Exception {
-    mockServerClient.when(request()).respond(response()
-        .withStatusCode(200)
-        .withHeader("content-type", "text/javascript")
-        .withBody("<script />"));
+    mockWebServer.enqueue(new MockResponse()
+        .setResponseCode(200)
+        .addHeader("content-type", "text/javascript")
+        .setBody("<script />"));
 
-    String creative = task.doInBackground("http://localhost:" + mockServerRule.getPort() + "/path");
+    String creative = task.doInBackground("http://localhost:" + mockWebServer.getPort() + "/path");
 
     assertThat(creative).isEqualTo("<script />");
   }
 
   @Test
   public void backgroundJob_GivenServerRespondingNoBody_ReturnEmpty() throws Exception {
-    mockServerClient.when(request()).respond(response().withStatusCode(200));
+    mockWebServer.enqueue(new MockResponse().setResponseCode(200));
 
-    String creative = task.doInBackground("http://localhost:" + mockServerRule.getPort() + "/path");
+    String creative = task.doInBackground("http://localhost:" + mockWebServer.getPort() + "/path");
 
     assertThat(creative).isEqualTo("");
   }
@@ -118,18 +113,18 @@ public class WebViewDataTaskTest {
 
   @Test
   public void backgroundJob_GivenConnectionError_ReturnNull() throws Exception {
-    mockServerClient.when(request()).error(error().withDropConnection(true));
+    mockWebServer.shutdown();
 
-    String creative = task.doInBackground("http://localhost:" + mockServerRule.getPort() + "/path");
+    String creative = task.doInBackground("http://localhost:" + mockWebServer.getPort() + "/path");
 
     assertThat(creative).isNull();
   }
 
   @Test
   public void backgroundJob_GivenHttpError_ReturnNull() throws Exception {
-    mockServerClient.when(request()).respond(response().withStatusCode(400));
+    mockWebServer.enqueue(new MockResponse().setResponseCode(400));
 
-    String creative = task.doInBackground("http://localhost:" + mockServerRule.getPort() + "/path");
+    String creative = task.doInBackground("http://localhost:" + mockWebServer.getPort() + "/path");
 
     assertThat(creative).isNull();
   }

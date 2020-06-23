@@ -119,15 +119,8 @@ object Deps {
     const val Kotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
   }
 
-  object MockServer {
-    private const val version = "5.10.0"
-
-    const val Netty = "org.mock-server:mockserver-netty:$version"
-    const val Client = "org.mock-server:mockserver-client-java:$version"
-    const val JUnit = "org.mock-server:mockserver-junit-rule:$version"
-  }
-
   object MoPub {
+
     private const val version = "5.10.0"
 
     const val Banner = "com.mopub:mopub-sdk-banner:$version@aar"
@@ -140,6 +133,12 @@ object Deps {
       private const val version = "2.4"
 
       const val LeakCanary = "com.squareup.leakcanary:leakcanary-android:$version"
+    }
+
+    object OkHttp {
+      private const val version = "4.7.2"
+
+      const val MockWebServer = "com.squareup.okhttp3:mockwebserver:$version"
     }
 
     object Picasso {

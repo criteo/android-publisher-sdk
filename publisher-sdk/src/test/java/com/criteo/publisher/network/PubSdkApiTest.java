@@ -24,12 +24,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockserver.model.HttpError.error;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
-import static org.mockserver.model.JsonBody.json;
-import static org.mockserver.model.NottableString.not;
-import static org.mockserver.verify.VerificationTimes.once;
 
 import androidx.annotation.NonNull;
 import com.criteo.publisher.csm.MetricRequest;
@@ -48,15 +42,15 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockserver.client.MockServerClient;
-import org.mockserver.junit.MockServerRule;
-import org.mockserver.model.MediaType;
 
 public class PubSdkApiTest {
 
@@ -64,10 +58,7 @@ public class PubSdkApiTest {
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   @Rule
-  public MockServerRule mockServerRule = new MockServerRule(this);
-
-  @SuppressWarnings("unused")
-  private MockServerClient mockServerClient;
+  public MockWebServer mockWebServer = new MockWebServer();
 
   @SpyBean
   private BuildConfigWrapper buildConfigWrapper;
@@ -86,7 +77,7 @@ public class PubSdkApiTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    serverUrl = new URL("http://localhost:" + mockServerRule.getPort());
+    serverUrl = new URL("http://localhost:" + mockWebServer.getPort());
 
     when(buildConfigWrapper.getCdbUrl()).thenReturn(serverUrl.toString());
     when(buildConfigWrapper.getEventUrl()).thenReturn(serverUrl.toString());
@@ -108,22 +99,22 @@ public class PubSdkApiTest {
       stream.write(json.getBytes(StandardCharsets.UTF_8));
     })).when(serializer).write(eq(request), any());
 
-    mockServerClient.when(request()).respond(response().withStatusCode(204));
+    mockWebServer.enqueue(new MockResponse().setResponseCode(204));
 
     api.postCsm(request);
 
-    mockServerClient.verify(request()
-        .withPath("/csm")
-        .withMethod("POST")
-        .withContentType(MediaType.TEXT_PLAIN)
-        .withBody(json, StandardCharsets.UTF_8), once());
+    RecordedRequest webRequest = mockWebServer.takeRequest();
+    assertThat(webRequest.getPath()).isEqualTo("/csm");
+    assertThat(webRequest.getMethod()).isEqualTo("POST");
+    assertThat(webRequest.getHeader("Content-Type")).isEqualTo("text/plain");
+    assertThat(webRequest.getBody().snapshot().utf8()).isEqualTo(json);
   }
 
   @Test
   public void postCsm_GivenConnectionError_ThrowIOException() throws Exception {
     MetricRequest request = mock(MetricRequest.class);
 
-    mockServerClient.when(request()).error(error().withDropConnection(true));
+    givenConnectionError();
 
     assertThatCode(() -> api.postCsm(request)).isInstanceOf(IOException.class);
   }
@@ -132,7 +123,7 @@ public class PubSdkApiTest {
   public void postCsm_GivenHttpError_ThrowIOException() throws Exception {
     MetricRequest request = mock(MetricRequest.class);
 
-    mockServerClient.when(request()).respond(response().withStatusCode(400));
+    mockWebServer.enqueue(new MockResponse().setResponseCode(400));
 
     assertThatCode(() -> api.postCsm(request)).isInstanceOf(IOException.class);
   }
@@ -143,63 +134,67 @@ public class PubSdkApiTest {
 
     MetricRequest request = mock(MetricRequest.class);
 
-    mockServerClient.when(request()).respond(response()
-        .withDelay(TimeUnit.MILLISECONDS, 100)
-        .withStatusCode(200));
+    mockWebServer.enqueue(new MockResponse()
+        .throttleBody(1, 100, TimeUnit.MILLISECONDS)
+        .setResponseCode(200));
 
     assertThatCode(() -> api.postCsm(request)).isInstanceOf(SocketTimeoutException.class);
   }
 
   @Test
   public void postAppEvent_GivenSenderId_SendGetRequest() throws Exception {
+    mockWebServer.enqueue(new MockResponse());
+
     api.postAppEvent(42, "", null, "", 0, "", gdprData);
 
-    mockServerClient.verify(request()
-        .withPath("/appevent/v1/42")
-        .withMethod("GET")
-        .withContentType(MediaType.TEXT_PLAIN), once());
+    RecordedRequest request = mockWebServer.takeRequest();
+    assertThat(request.getRequestUrl().encodedPath()).isEqualTo("/appevent/v1/42");
+    assertThat(request.getMethod()).isEqualTo("GET");
+    assertThat(request.getHeader("Content-Type")).isEqualTo("text/plain");
   }
 
   @Test
   public void postAppEvent_GivenRequest_SendThemInQueryString() throws Exception {
+    mockWebServer.enqueue(new MockResponse());
+
     api.postAppEvent(42, "myApp", "myGaid", "myEvent", 1337, "", gdprData);
 
-    mockServerClient.verify(request()
-        .withQueryStringParameter("appId", "myApp")
-        .withQueryStringParameter("gaid", "myGaid")
-        .withQueryStringParameter("eventType", "myEvent")
-        .withQueryStringParameter("limitedAdTracking", "1337")
-        .withQueryStringParameter("gdprString", "eyJjb25zZW50RGF0YSI6ImZha2VfY29uc2VudF9kYXRhIiwiZ2RwckFwcGxpZXMiOmZhbHNlLCJ2ZXJzaW9uIjoxfQ==")
-    );
+    RecordedRequest request = mockWebServer.takeRequest();
+    assertThat(request.getRequestUrl().queryParameter("appId")).isEqualTo("myApp");
+    assertThat(request.getRequestUrl().queryParameter("gaid")).isEqualTo("myGaid");
+    assertThat(request.getRequestUrl().queryParameter("eventType")).isEqualTo("myEvent");
+    assertThat(request.getRequestUrl().queryParameter("limitedAdTracking")).isEqualTo("1337");
+    assertThat(request.getRequestUrl().queryParameter("gdprString")).isEqualTo("eyJjb25zZW50RGF0YSI6ImZha2VfY29uc2VudF9kYXRhIiwiZ2RwckFwcGxpZXMiOmZhbHNlLCJ2ZXJzaW9uIjoxfQ==");
   }
 
   @Test
   public void postAppEvent_GivenNoGaid_IsNotPutInQueryString() throws Exception {
+    mockWebServer.enqueue(new MockResponse());
+
     api.postAppEvent(42, "", null, "", 0, "", gdprData);
 
-    mockServerClient.verify(request()
-        .withQueryStringParameter(not("gaid"))
-    );
+    RecordedRequest request = mockWebServer.takeRequest();
+    assertThat(request.getRequestUrl().queryParameter("gaid")).isNull();
   }
 
   @Test
   public void postAppEvent_GivenNoGdprData_IsNotPutInQueryString() throws Exception {
-    when(gdprData.consentData()).thenReturn("");
+    mockWebServer.enqueue(new MockResponse());
 
-    api.postAppEvent(42, "", "myGaid", "", 0, "", gdprData);
+    api.postAppEvent(42, "", "myGaid", "", 0, "", null);
 
-    mockServerClient.verify(request()
-        .withQueryStringParameter(not("gdprString"))
-    );
+    RecordedRequest request = mockWebServer.takeRequest();
+    assertThat(request.getRequestUrl().queryParameter("gdprString")).isNull();
   }
 
   @Test
   public void postAppEvent_GivenUserAgent_SetItInHttpHeader() throws Exception {
+    mockWebServer.enqueue(new MockResponse());
+
     api.postAppEvent(42, "", null, "", 0, "myUserAgent", gdprData);
 
-    mockServerClient.verify(request()
-        .withHeader("User-Agent", "myUserAgent")
-    );
+    RecordedRequest request = mockWebServer.takeRequest();
+    assertThat(request.getHeader("User-Agent")).isEqualTo("myUserAgent");
   }
 
   @Test
@@ -209,16 +204,15 @@ public class PubSdkApiTest {
     CdbRequest cdbRequest = mock(CdbRequest.class);
     when(cdbRequest.toJson()).thenReturn(new JSONObject(json));
 
-    mockServerClient.when(request()).respond(response().withStatusCode(204));
+    mockWebServer.enqueue(new MockResponse().setResponseCode(204));
 
     api.loadCdb(cdbRequest, "");
 
-    mockServerClient.verify(request()
-        .withPath("/inapp/v2")
-        .withMethod("POST")
-        .withContentType(MediaType.TEXT_PLAIN)
-        .withBody(json, StandardCharsets.UTF_8), once()
-    );
+    RecordedRequest webRequest = mockWebServer.takeRequest();
+    assertThat(webRequest.getPath()).isEqualTo("/inapp/v2");
+    assertThat(webRequest.getMethod()).isEqualTo("POST");
+    assertThat(webRequest.getHeader("Content-Type")).isEqualTo("text/plain");
+    assertThat(webRequest.getBody().snapshot().utf8()).isEqualTo(json);
   }
 
   @Test
@@ -252,7 +246,7 @@ public class PubSdkApiTest {
         + "  ]\n"
         + "}";
 
-    mockServerClient.when(request()).respond(response(json));
+    mockWebServer.enqueue(new MockResponse().setBody(json));
 
     CdbResponse cdbResponse = api.loadCdb(cdbRequest, "");
 
@@ -280,8 +274,9 @@ public class PubSdkApiTest {
   @Test
   public void loadCdb_GivenNoBidWithSilentMode_ReturnResponseWithSilence() throws Exception {
     CdbRequest cdbRequest = givenEmptyCdbRequest();
+    String json = "{\"slots\":[],\"timeToNextCall\":300}";
 
-    mockServerClient.when(request()).respond(response("{\"slots\":[],\"timeToNextCall\":300}"));
+    mockWebServer.enqueue(new MockResponse().setBody(json));
 
     CdbResponse cdbResponse = api.loadCdb(cdbRequest, "");
 
@@ -294,7 +289,7 @@ public class PubSdkApiTest {
   public void loadCdb_GivenNoBid_ReturnEmptyResponse() throws Exception {
     CdbRequest cdbRequest = givenEmptyCdbRequest();
 
-    mockServerClient.when(request()).respond(response().withStatusCode(204));
+    mockWebServer.enqueue(new MockResponse().setResponseCode(204));
 
     CdbResponse cdbResponse = api.loadCdb(cdbRequest, "");
 
@@ -307,20 +302,19 @@ public class PubSdkApiTest {
   public void loadCdb_GivenUserAgent_SetItInHttpHeader() throws Exception {
     CdbRequest cdbRequest = givenEmptyCdbRequest();
 
-    mockServerClient.when(request()).respond(response().withStatusCode(204));
+    mockWebServer.enqueue(new MockResponse().setResponseCode(204));
 
     api.loadCdb(cdbRequest, "myUserAgent");
 
-    mockServerClient.verify(request()
-        .withHeader("User-Agent", "myUserAgent")
-    );
+    RecordedRequest request = mockWebServer.takeRequest();
+    assertThat(request.getHeader("User-Agent")).isEqualTo("myUserAgent");
   }
 
   @Test
   public void loadCdb_GivenConnectionError_ThrowException() throws Exception {
     CdbRequest cdbRequest = givenEmptyCdbRequest();
 
-    mockServerClient.when(request()).error(error().withDropConnection(true));
+    givenConnectionError();
 
     assertThatCode(() -> api.loadCdb(cdbRequest, ""))
         .isInstanceOf(IOException.class);
@@ -330,7 +324,7 @@ public class PubSdkApiTest {
   public void loadCdb_GivenHttpError_ThrowException() throws Exception {
     CdbRequest cdbRequest = givenEmptyCdbRequest();
 
-    mockServerClient.when(request()).respond(response().withStatusCode(400));
+    mockWebServer.enqueue(new MockResponse().setResponseCode(400));
 
     assertThatCode(() -> api.loadCdb(cdbRequest, ""))
         .isInstanceOf(IOException.class);
@@ -345,25 +339,27 @@ public class PubSdkApiTest {
         456
     );
 
-    mockServerClient.when(request()).respond(response().withStatusCode(200).withBody("{}"));
+    String expectedJson = ""
+        + "{\n"
+        + "  \"cpId\" : \"myCpId\",\n"
+        + "  \"bundleId\" : \"myAppId\",\n"
+        + "  \"sdkVersion\" : \"myVersion\",\n"
+        + "  \"rtbProfileId\": 456\n"
+        + "}";
+
+    mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody("{}"));
 
     api.loadConfig(request);
 
-    mockServerClient.verify(request()
-        .withMethod("POST")
-        .withPath("/config/app")
-        .withBody(json(""
-            + "{\n"
-            + "  \"cpId\" : \"myCpId\",\n"
-            + "  \"bundleId\" : \"myAppId\",\n"
-            + "  \"sdkVersion\" : \"myVersion\",\n"
-            + "  \"rtbProfileId\": 456\n"
-            + "}")), once());
+    RecordedRequest webRequest = mockWebServer.takeRequest();
+    assertThat(webRequest.getPath()).isEqualTo("/config/app");
+    assertThat(webRequest.getMethod()).isEqualTo("POST");
+    assertThat(webRequest.getBody().snapshot().utf8()).isEqualToIgnoringWhitespace(expectedJson);
   }
 
   @Test
   public void executeRawGet_GivenConnectionError_ThrowIt() throws Exception {
-    mockServerClient.when(request()).error(error().withDropConnection(true));
+    givenConnectionError();
 
     assertThatCode(() -> api.executeRawGet(serverUrl))
         .isInstanceOf(IOException.class);
@@ -371,7 +367,7 @@ public class PubSdkApiTest {
 
   @Test
   public void executeRawGet_GivenHttpError_ThrowIOException() throws Exception {
-    mockServerClient.when(request()).respond(response().withStatusCode(400));
+    mockWebServer.enqueue(new MockResponse().setResponseCode(400));
 
     assertThatCode(() -> api.executeRawGet(serverUrl))
         .isInstanceOf(IOException.class);
@@ -379,7 +375,7 @@ public class PubSdkApiTest {
 
   @Test
   public void executeRawGet_GivenOkResponse_ReturnIt() throws Exception {
-    mockServerClient.when(request()).respond(response("myResponse"));
+    mockWebServer.enqueue(new MockResponse().setBody("myResponse"));
 
     InputStream response = api.executeRawGet(serverUrl);
 
@@ -391,6 +387,10 @@ public class PubSdkApiTest {
     CdbRequest cdbRequest = mock(CdbRequest.class);
     when(cdbRequest.toJson()).thenReturn(new JSONObject());
     return cdbRequest;
+  }
+
+  private void givenConnectionError() throws IOException {
+    mockWebServer.shutdown();
   }
 
 }
