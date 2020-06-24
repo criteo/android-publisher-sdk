@@ -17,7 +17,7 @@
 package com.criteo.publisher.csm;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
@@ -28,6 +28,7 @@ import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.squareup.tape.ObjectQueue;
+import com.squareup.tape.QueueFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
@@ -93,7 +94,7 @@ public class MetricObjectQueueFactoryTest {
     ObjectQueue<Metric> queue = factory.create();
 
     assertTrue(queueFile.exists());
-    assertNotNull(queue);
+    assertNull(queue.peek());
   }
 
 
@@ -111,7 +112,24 @@ public class MetricObjectQueueFactoryTest {
     byte[] fileContent = Files.readAllBytes(queueFile.toPath());
     assertTrue(queueFile.exists());
     assertFalse(Arrays.equals(fileContent, garbage));
-    assertNotNull(metricObjectQueue);
+    assertNull(metricObjectQueue.peek());
+  }
+
+  /**
+   * This scenario seems to happen randomly: the queue seems to get stale, maybe when writing
+   * during a crash.
+   */
+  @Test
+  public void create_GivenCorruptedQueueFileWithEmptyElements_RecreateFileAndQueueIsWorking() throws Exception {
+    givenDeactivatedPreconditionUtils();
+
+    QueueFile rawQueueFile = new QueueFile(queueFile);
+    rawQueueFile.add(new byte[0]);
+
+    ObjectQueue<Metric> metricObjectQueue = factory.create();
+
+    assertTrue(queueFile.exists());
+    assertNull(metricObjectQueue.peek());
   }
 
   @Test
@@ -124,7 +142,7 @@ public class MetricObjectQueueFactoryTest {
 
     assertTrue(queueFile.exists());
     assertFalse(queueFile.isDirectory());
-    assertNotNull(metricObjectQueue);
+    assertNull(metricObjectQueue.peek());
   }
 
   @Test
@@ -138,7 +156,7 @@ public class MetricObjectQueueFactoryTest {
 
     assertTrue(queueFile.exists());
     assertFalse(queueFile.isDirectory());
-    assertNotNull(metricObjectQueue);
+    assertNull(metricObjectQueue.peek());
   }
 
   @Test

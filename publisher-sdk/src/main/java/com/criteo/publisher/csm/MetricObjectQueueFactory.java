@@ -66,8 +66,13 @@ public class MetricObjectQueueFactory {
   private ObjectQueue<Metric> createTapeObjectQueue(@NonNull File file) {
     Exception exception;
     try {
-      return new FileObjectQueue<>(file, new MetricConverter(metricParser));
-    } catch (IOException e) {
+      FileObjectQueue<Metric> queue = new FileObjectQueue<>(file, new MetricConverter(metricParser));
+
+      // Try to peek to be sure that the queue is not corrupted.
+      queue.peek();
+
+      return queue;
+    } catch (Exception e) {
       exception = e;
     }
 
