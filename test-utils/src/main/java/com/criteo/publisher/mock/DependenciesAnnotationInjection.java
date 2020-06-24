@@ -29,6 +29,7 @@ import androidx.annotation.NonNull;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,6 +41,7 @@ import org.mockito.MockingDetails;
 import org.mockito.Mockito;
 import org.mockito.exceptions.base.MockitoException;
 import org.mockito.stubbing.Answer;
+import org.mockito.stubbing.Stubbing;
 
 class DependenciesAnnotationInjection {
 
@@ -92,20 +94,21 @@ class DependenciesAnnotationInjection {
     checkDependencyProviderIsAMock();
 
     Set<Field> fields = getAllAnnotatedFields(testInstance, SpyBean.class);
-    Map<Field, Method> providerMethods = getAllProviderMethods(testInstance, fields);
-    injectDeferredDependencies(providerMethods);
+    Map<Field, Method> providerMethods = getAllProviderMethods(testInstance, fields, false /* acceptParameters */);
+    injectDeferredDependencies(providerMethods, true /* useSpy */);
     injectDependenciesIntoFields(testInstance, providerMethods);
   }
 
   @NonNull
   private Map<Field, Method> getAllProviderMethods(
       @NonNull Object testInstance,
-      @NonNull Set<Field> fields
+      @NonNull Set<Field> fields,
+      boolean acceptParameters
   ) {
     Map<Field, Method> providerMethods = new HashMap<>();
 
     for (Field field : fields) {
-      Method providerMethod = findProviderMethod(testInstance, field, false /* acceptParameters */);
+      Method providerMethod = findProviderMethod(testInstance, field, acceptParameters);
       providerMethods.put(field, providerMethod);
     }
     return providerMethods;
@@ -129,7 +132,8 @@ class DependenciesAnnotationInjection {
    * </ul>
    */
   private void injectDeferredDependencies(
-      @NonNull Map<Field, Method> providerMethods
+      @NonNull Map<Field, Method> providerMethods,
+      boolean useSpy
   ) throws ReflectiveOperationException {
     Map<Field, Object> deferredDependencies = new HashMap<>();
 
@@ -141,9 +145,13 @@ class DependenciesAnnotationInjection {
         Object dependency = deferredDependencies.get(field);
 
         if (dependency == null) {
-          // Generate spy from real dependency
-          Object realDependency = invocationOnMock.callRealMethod();
-          dependency = spy(realDependency);
+          if (useSpy) {
+            // Generate spy from real dependency
+            Object realDependency = invocationOnMock.callRealMethod();
+            dependency = spy(realDependency);
+          } else {
+            dependency = mock(field.getType());
+          }
           deferredDependencies.put(field, dependency);
         }
 
@@ -160,27 +168,20 @@ class DependenciesAnnotationInjection {
       Field field = entry.getKey();
       Method providerMethod = entry.getValue();
 
-      Object spyDependency = providerMethod.invoke(dependencyProvider);
-      setFieldValue(testInstance, field, spyDependency);
+      int parameterCount = getParameterCount(providerMethod);
+      Object[] args = new Object[parameterCount];
+      Object dependency = providerMethod.invoke(dependencyProvider, args);
+      setFieldValue(testInstance, field, dependency);
     }
   }
 
   private void injectMocks(@NonNull Object testInstance) throws ReflectiveOperationException {
     checkDependencyProviderIsAMock();
 
-    Collection<Field> fields = getAllAnnotatedFields(testInstance, MockBean.class);
-    for (Field field : fields) {
-      injectMocksInto(field, testInstance);
-    }
-  }
-
-  private void injectMocksInto(
-      @NonNull Field field, @NonNull Object testInstance
-  ) throws ReflectiveOperationException {
-    Method providerMethod = findProviderMethod(testInstance, field, true /* acceptParameters */);
-    Object dependency = mock(field.getType());
-    setFieldValue(testInstance, field, dependency);
-    stubDependencyProvider(providerMethod, ignored -> dependency);
+    Set<Field> fields = getAllAnnotatedFields(testInstance, MockBean.class);
+    Map<Field, Method> providerMethods = getAllProviderMethods(testInstance, fields, true /* acceptParameters */);
+    injectDeferredDependencies(providerMethods, false /* useSpy */);
+    injectDependenciesIntoFields(testInstance, providerMethods);
   }
 
   private void checkDependencyProviderIsAMock() {
@@ -194,6 +195,13 @@ class DependenciesAnnotationInjection {
       @NonNull Method providerMethod,
       @NonNull Answer<Object> dependencyAnswer
   ) throws ReflectiveOperationException {
+    for (Stubbing stubbing : mockingDetails(dependencyProvider).getStubbings()) {
+      if (match(providerMethod, stubbing)) {
+        // This method was already stubbed by someone
+        return;
+      }
+    }
+
     // Execute a doAnswer(dependencyAnswer).when(dependencyProvider).invokeMethod(with enough any())
     Object stubbing = doAnswer(dependencyAnswer).when(dependencyProvider);
 
@@ -214,6 +222,14 @@ class DependenciesAnnotationInjection {
         throw e;
       }
     }
+  }
+
+  private boolean match(@NonNull Method method, @NonNull Stubbing stubbing) {
+    Method stubbedMethod = stubbing.getInvocation().getMethod();
+    if (!method.getName().equals(stubbedMethod.getName())) {
+      return false;
+    }
+    return Arrays.equals(method.getParameterTypes(), stubbedMethod.getParameterTypes());
   }
 
   private void injectDependencies(@NonNull Object testInstance) throws ReflectiveOperationException {

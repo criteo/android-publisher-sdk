@@ -17,6 +17,7 @@
 package com.criteo.publisher.mock
 
 import com.criteo.publisher.mock.DependenciesAnnotationInjection.InjectionException
+import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.spy
@@ -83,6 +84,27 @@ class DependenciesAnnotationInjectionTest {
     assertThatCode {
       dummyTest.ignoredDependency
     }.isInstanceOf(UninitializedPropertyAccessException::class.java)
+  }
+
+  @Test
+  fun processInject_GivenADependencyProviderWithSpyAndMock_InjectDependencies() {
+    val mockDummyDependency = mock<MockDummyDependency>()
+    val spyDummyDependency = mock<SpyDummyDependency>()
+
+    val dependencyProvider = spy(DummyDependencyProvider()) {
+      on { provideMockDummyDependency(anyOrNull()) } doReturn mockDummyDependency
+      on { provideSpyDummyDependency() } doReturn spyDummyDependency
+    }
+
+    val dummyTest = DummyTest()
+
+    val injection = DependenciesAnnotationInjection(dependencyProvider)
+    injection.process(dummyTest)
+
+    assertThat(dummyTest.spyDependency).isSameAs(spyDummyDependency)
+    assertThat(dummyTest.mockDependency).isSameAs(mockDummyDependency)
+    assertThat(dummyTest.injectedDependency().mock).isSameAs(mockDummyDependency)
+    assertThat(dummyTest.superDependency.mock).isSameAs(mockDummyDependency)
   }
 
   @Test
