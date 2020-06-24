@@ -31,7 +31,7 @@ public class StubConstants {
    * to check that the URL looks like a CDB stub URL.
    */
   public static final Pattern STUB_DISPLAY_URL = Pattern.compile(
-      "https://(.+)/delivery/ajs.php\\?width=[0-9]+(&|&amp;)height=[0-9]+");
+      "https?://(.+)/delivery/ajs.php\\?width=[0-9]+(&|&amp;)height=[0-9]+");
 
   /**
    * Image that is shown in the AJS creative (see {@link #STUB_DISPLAY_URL}) returned by CDB stub.

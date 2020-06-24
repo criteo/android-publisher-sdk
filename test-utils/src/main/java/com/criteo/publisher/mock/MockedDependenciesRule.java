@@ -20,9 +20,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 import android.app.Application;
 import android.os.Build.VERSION_CODES;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.DependencyProvider;
@@ -32,6 +34,7 @@ import com.criteo.publisher.concurrent.TrackingCommandsExecutor;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.RemoteConfigResponse;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.InstrumentationUtil;
 import java.io.IOException;
 import java.util.concurrent.Executor;
@@ -64,8 +67,21 @@ public class MockedDependenciesRule implements MethodRule {
 
   private final boolean iAmDebuggingDoNotTimeoutMe = true;
 
+  /**
+   * If set to <code>true</code>, then a CDB mock server is instantiated and started before each
+   * tests, and shutdown after.
+   * <p>
+   * This server answers like the preprod of CDB, except that it works only for Ad Units defined in
+   * {@link com.criteo.publisher.TestAdUnits}.
+   */
+  @SuppressWarnings("FieldCanBeLocal")
+  private final boolean injectCdbMockServer = true;
+
   protected DependencyProvider dependencyProvider;
   private TrackingCommandsExecutor trackingCommandsExecutor = null;
+
+  @Nullable
+  private CdbMock cdbMock;
 
   @Override
   public Statement apply(Statement base, FrameworkMethod method, Object target) {
@@ -75,6 +91,7 @@ public class MockedDependenciesRule implements MethodRule {
       public void evaluate() throws Throwable {
         try {
           setUpDependencyProvider();
+          setUpCdbMock();
           injectDependencies(target);
 
           if (iAmDebuggingDoNotTimeoutMe) {
@@ -85,6 +102,10 @@ public class MockedDependenciesRule implements MethodRule {
         } finally {
           // clean after self and ensures no side effects for subsequent tests
           MockableDependencyProvider.setInstance(null);
+
+          if (cdbMock != null) {
+            cdbMock.shutdown();
+          }
         }
       }
     };
@@ -103,6 +124,19 @@ public class MockedDependenciesRule implements MethodRule {
     dependencyProvider = spy(originalDependencyProvider);
     MockableDependencyProvider.setInstance(dependencyProvider);
     doReturn(trackingCommandsExecutor).when(dependencyProvider).provideThreadPoolExecutor();
+  }
+
+  private void setUpCdbMock() {
+    if (!injectCdbMockServer) {
+      return;
+    }
+
+    cdbMock = new CdbMock(dependencyProvider.provideJsonSerializer());
+    cdbMock.start();
+
+    BuildConfigWrapper buildConfigWrapper = spy(dependencyProvider.provideBuildConfigWrapper());
+    when(buildConfigWrapper.getCdbUrl()).thenReturn(cdbMock.getUrl());
+    when(dependencyProvider.provideBuildConfigWrapper()).thenReturn(buildConfigWrapper);
   }
 
   @RequiresApi(api = VERSION_CODES.O)

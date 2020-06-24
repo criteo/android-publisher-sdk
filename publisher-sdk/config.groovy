@@ -62,9 +62,15 @@ adChoiceIconHeightInDp = 15
 
 environments {
     debug {
-        cdbUrl = 'https://directbidder-test-app.par.preprod.crto.in'
-        // cdbUrl = 'http://10.0.2.2:9991' // Uncomment to use local CDB instead of preprod
         eventUrl = 'https://gum.par.preprod.crto.in'
+
+        // In tests, if DI rule is set, a CDB stub server is spawn and injected
+        cdbUrl = 'https://an.url.that.does.not.exist'
+
+        // Uncomment to use another CDB, you'll also need to deactivate the CDB stub in
+        // MockedDependenciesRule
+        // cdbUrl = 'https://directbidder-test-app.par.preprod.crto.in' // preprod
+        // cdbUrl = 'http://10.0.2.2:9991' // local
 
         minLogLevel = 2 // All
         preconditionThrowsOnException = true
