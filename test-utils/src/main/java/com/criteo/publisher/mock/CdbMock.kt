@@ -30,6 +30,11 @@ import java.util.*
 
 class CdbMock(private val jsonSerializer: JsonSerializer) {
 
+  companion object {
+    const val TCF2_CONSENT_NOT_GIVEN = "COwJDpQOwJDpQIAAAAENAPCgAAAAAAAAAAAAAxQAgAsABiAAAAAA"
+    const val TCF1_CONSENT_NOT_GIVEN = "BOnz82JOnz82JABABBFRCPgAAAAFuABABAA"
+  }
+
   private val mockWebServer = MockWebServer()
 
   val url: String
@@ -83,6 +88,10 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
   private fun handleBidRequest(body: Buffer): MockResponse {
     val cdbRequest = jsonSerializer.read(CdbRequest::class.java, body.inputStream())
 
+    if (shouldNotBid(cdbRequest)) {
+      return MockResponse().setResponseCode(204)
+    }
+
     val responseSlots = cdbRequest.slots.mapNotNull { it.toResponseSlot() }.joinToString()
     val requestId = UUID.randomUUID().toString()
     val cdbResponse = """
@@ -96,6 +105,9 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
         .setHeader("content-type", "application/json; charset=utf-8")
         .setBody(cdbResponse)
   }
+
+  private fun shouldNotBid(cdbRequest: CdbRequest) =
+      cdbRequest.gdprData?.consentData() in setOf(TCF1_CONSENT_NOT_GIVEN, TCF2_CONSENT_NOT_GIVEN)
 
   private fun CdbRequestSlot.toResponseSlot(): String? {
     val size = sizes.first().toAdSize()
