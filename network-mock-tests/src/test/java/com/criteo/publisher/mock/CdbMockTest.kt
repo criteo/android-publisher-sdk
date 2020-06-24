@@ -16,16 +16,14 @@
 
 package com.criteo.publisher.mock
 
+import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.SoftAssertions
-import org.assertj.core.api.SoftAssertionsRule
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 
 class CdbMockTest {
@@ -140,16 +138,34 @@ class CdbMockTest {
       client.newCall(mockRequest).execute().use { mockResponse ->
         assertSoftly {
           assertThat(mockResponse.code).isEqualTo(cdbResponse.code)
-          assertThat(mockResponse.body?.bytes()).isEqualTo(cdbResponse.body?.bytes())
+          assertThat(mockResponse.body?.string()).isEqualTo(cdbResponse.body?.string())
+          assertItContainsExpectedCdbKeys(cdbResponse.headers)
+        }
+      }
+    }
+  }
 
-          // There is no interesting value to assert on. But we keep track of headers, in case there
-          // is a change
-          assertThat(cdbResponse.headers.names()).containsExactlyInAnyOrder(
-              "date",
-              "server",
-              "timing-allow-origin",
-              "vary"
-          )
+  @Test
+  fun config_GivenValidInputWithoutSpecialConfig_BothServerReturnSame() {
+    val body = """
+      {
+        "cpId": "B-000001",
+        "bundleId": "com.criteo.publisher.tests.test",
+        "sdkVersion": "3.6.1",
+        "rtbProfileId": 235
+      }
+    """.trimIndent()
+
+    val cdbRequest = body.toConfigRequest(cdbUrl)
+    val mockRequest = body.toConfigRequest(mockUrl)
+
+    client.newCall(cdbRequest).execute().use { cdbResponse ->
+      client.newCall(mockRequest).execute().use { mockResponse ->
+        assertSoftly {
+          assertThat(mockResponse.code).isEqualTo(cdbResponse.code)
+          assertThat(mockResponse.body?.string()).isEqualToIgnoringWhitespace(cdbResponse.body?.string())
+          assertThat(mockResponse.headers["content-type"]).isEqualTo(cdbResponse.headers["content-type"])
+          assertItContainsExpectedCdbKeys(cdbResponse.headers, contentType=true)
         }
       }
     }
@@ -161,11 +177,31 @@ class CdbMockTest {
     }
   }
 
-  private fun String.toCsmRequest(baseUrl: String): Request {
+  private fun String.toCsmRequest(baseUrl: String) = toCdbRequest("$baseUrl/csm")
+  private fun String.toConfigRequest(baseUrl: String) = toCdbRequest("$baseUrl/config/app")
+
+  private fun String.toCdbRequest(url: String): Request {
     return Request.Builder()
-        .url("$baseUrl/csm")
+        .url(url)
         .post(toRequestBody(textPlain))
         .build()
+  }
+
+  private fun SoftAssertions.assertItContainsExpectedCdbKeys(headers: Headers, contentType: Boolean = false) {
+    // There is no interesting value to assert on. But we keep track of headers, in case there
+    // is a change
+    val expected = mutableSetOf(
+        "date",
+        "server",
+        "timing-allow-origin",
+        "vary"
+    )
+
+    if (contentType) {
+      expected.add("content-type")
+    }
+
+    assertThat(headers.names()).isEqualTo(expected)
   }
 
 }

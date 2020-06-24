@@ -37,6 +37,7 @@ class CdbMock {
       override fun dispatch(request: RecordedRequest): MockResponse {
         return when (request.path) {
           "/csm" -> handleCsmRequest()
+          "/config/app" -> handleConfigRequest()
           else -> MockResponse().setResponseCode(404)
         }
       }
@@ -51,6 +52,24 @@ class CdbMock {
 
   private fun handleCsmRequest(): MockResponse {
     return MockResponse().setStatus("HTTP/1.1 204 No Content")
+  }
+
+  private fun handleConfigRequest(): MockResponse {
+    return MockResponse()
+        .setHeader("content-type", "application/json; charset=utf-8")
+        .setBody("""
+            {
+              "killSwitch": false,
+              "AndroidDisplayUrlMacro": "%%displayUrl%%",
+              "AndroidAdTagUrlMode": "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script src=\"%%displayUrl%%\"></script></body></html>",
+              "AndroidAdTagDataMacro": "%%adTagData%%",
+              "AndroidAdTagDataMode": "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>",
+              "iOSDisplayUrlMacro": "%%displayUrl%%",
+              "iOSWidthMacro": "%%width%%",
+              "iOSAdTagUrlMode": "<!doctype html><html><head><meta charset=\"utf-8\"><style>body{margin:0;padding:0}</style><meta name=\"viewport\" content=\"width=%%width%%, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no\" ></head><body><script src=\"%%displayUrl%%\"></script></body></html>",
+              "csmEnabled": true
+            }
+          """)
   }
 
 }
