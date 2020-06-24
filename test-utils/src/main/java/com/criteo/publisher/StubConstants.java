@@ -44,7 +44,7 @@ public class StubConstants {
    */
   public static final NativeAssets STUB_NATIVE_ASSETS;
 
-  private static final String STUB_NATIVE_JSON = "{\n"
+  public static final String STUB_NATIVE_JSON = "{\n"
       + "  \"products\": [\n"
       + "    {\n"
       + "      \"title\": \"Criteo native solution\",\n"

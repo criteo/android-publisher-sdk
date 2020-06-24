@@ -16,13 +16,19 @@
 
 package com.criteo.publisher.mock
 
+import com.criteo.publisher.StubConstants.STUB_NATIVE_JSON
+import com.criteo.publisher.TestAdUnits.*
+import com.criteo.publisher.model.*
+import com.criteo.publisher.util.JsonSerializer
 import okhttp3.Protocol
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
+import okio.Buffer
+import java.util.*
 
-class CdbMock {
+class CdbMock(private val jsonSerializer: JsonSerializer) {
 
   private val mockWebServer = MockWebServer()
 
@@ -38,6 +44,7 @@ class CdbMock {
         return when (request.path) {
           "/csm" -> handleCsmRequest()
           "/config/app" -> handleConfigRequest()
+          "/inapp/v2" -> handleBidRequest(request.body)
           else -> MockResponse().setResponseCode(404)
         }
       }
@@ -70,6 +77,74 @@ class CdbMock {
               "csmEnabled": true
             }
           """)
+  }
+
+  private fun handleBidRequest(body: Buffer): MockResponse {
+    val cdbRequest = jsonSerializer.read(CdbRequest::class.java, body.inputStream())
+
+    val responseSlots = cdbRequest.slots.mapNotNull { it.toResponseSlot() }.joinToString()
+    val requestId = UUID.randomUUID().toString()
+    val cdbResponse = """
+      {
+        "slots": [$responseSlots],
+        "requestId":"$requestId"
+      }
+    """.trimIndent()
+
+    return MockResponse()
+        .setHeader("content-type", "application/json; charset=utf-8")
+        .setBody(cdbResponse)
+  }
+
+  private fun CdbRequestSlot.toResponseSlot(): String? {
+    val size = sizes.first().toAdSize()
+    val width = size.width
+    val height = size.height
+
+    val bannerAdUnit = BannerAdUnit(placementId, size)
+    val interstitialAdUnit = InterstitialAdUnit(placementId)
+    val nativeAdUnit = NativeAdUnit(placementId)
+
+    if (bannerAdUnit == BANNER_320_50 || bannerAdUnit == BANNER_320_480 || interstitialAdUnit == INTERSTITIAL) {
+      return """
+        {
+          "impId": "$impressionId",
+          "placementId": "$placementId",
+          "arbitrageId": "arbitrage_id",
+          "cpm": "1.12",
+          "currency": "EUR",
+          "width": $width,
+          "height": $height,
+          "ttl": 0,
+          "displayUrl": "https://directbidder-stubs.par.preprod.crto.in/delivery/ajs.php?width=$width&height=$height"
+        }
+      """.trimIndent()
+    }
+
+    if (nativeAdUnit == NATIVE) {
+      return """
+        {
+          "impId": "$impressionId",
+          "placementId": "$placementId",
+          "arbitrageId": "",
+          "cpm": "1.12",
+          "currency": "EUR",
+          "width": $width,
+          "height": $height,
+          "ttl": 0,
+          "native": $STUB_NATIVE_JSON
+        }
+      """.trimIndent()
+    }
+
+    return null
+  }
+
+  private fun String.toAdSize(): AdSize {
+    val split = split("x")
+    val width = split[0].toInt()
+    val height = split[1].toInt()
+    return AdSize(width, height)
   }
 
 }

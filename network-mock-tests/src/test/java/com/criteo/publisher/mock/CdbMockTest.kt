@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.mock
 
+import com.criteo.publisher.DependencyProvider
 import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -38,7 +39,8 @@ class CdbMockTest {
 
   @Before
   fun setUp() {
-    cdbMock = CdbMock()
+    val jsonSerializer = DependencyProvider.getInstance().provideJsonSerializer()
+    cdbMock = CdbMock(jsonSerializer)
     cdbMock.start()
     mockUrl = cdbMock.url
   }
@@ -171,6 +173,79 @@ class CdbMockTest {
     }
   }
 
+  @Test
+  fun bid_GivenValidAndInvalidAdUnit_BothServerReturnSame() {
+    val body = """
+      {
+        "id": "myRequestId",
+        "user": {
+          "deviceId": "b171073b-b504-4267-95b7-a79c9e511361",
+          "deviceIdType": "gaid",
+          "deviceOs": "android"
+        },
+        "publisher": {
+          "bundleId": "com.criteo.publisher.test",
+          "cpId": "B-000001"
+        },
+        "sdkVersion": "3.6.0",
+        "profileId": 235,
+        "slots": [
+          {
+            "impId": "5ecb8ae9cfd9dd5ed1fa238cd61be691",
+            "placementId": "test-PubSdk-Base",
+            "sizes": [
+              "320x50"
+            ]
+          },
+          {
+            "impId": "5ecb8ae9cfd9dd5ed1fa238cd61be692",
+            "placementId": "test-PubSdk-Base",
+            "sizes": [
+              "321x51"
+            ]
+          },
+          {
+            "impId": "5ecb8ae9cfd9dd5ed1fa238cd61be693",
+            "placementId": "test-PubSdk-Interstitial",
+            "interstitial": true,
+            "sizes": [
+              "42x24"
+            ]
+          },
+          {
+            "impId": "5ecb8ae9cfd9dd5ed1fa238cd61be694",
+            "placementId": "test-PubSdk-Unknown",
+            "sizes": [
+              "320x50"
+            ]
+          },
+          {
+            "impId": "5ecb8ae9cfd9dd5ed1fa238cd61be695",
+            "placementId": "test-PubSdk-Native",
+            "isNative": true,
+            "sizes": [
+              "2x2"
+            ]
+          }
+        ]
+      }
+    """.trimIndent()
+
+    val cdbRequest = body.toBidRequest(cdbUrl)
+    val mockRequest = body.toBidRequest(mockUrl)
+
+    client.newCall(cdbRequest).execute().use { cdbResponse ->
+      client.newCall(mockRequest).execute().use { mockResponse ->
+        assertSoftly {
+          assertThat(mockResponse.code).isEqualTo(cdbResponse.code)
+          assertThat(mockResponse.body?.string()?.normalizeBid()).isEqualToIgnoringWhitespace(cdbResponse.body?.string()?.normalizeBid())
+          assertThat(mockResponse.headers["content-type"]).isEqualTo(cdbResponse.headers["content-type"])
+          assertItContainsExpectedCdbKeys(cdbResponse.headers, contentType=true)
+        }
+      }
+    }
+  }
+
   private fun assertSoftly(softly: SoftAssertions.() -> Unit) {
     SoftAssertions.assertSoftly {
       softly(it)
@@ -179,6 +254,7 @@ class CdbMockTest {
 
   private fun String.toCsmRequest(baseUrl: String) = toCdbRequest("$baseUrl/csm")
   private fun String.toConfigRequest(baseUrl: String) = toCdbRequest("$baseUrl/config/app")
+  private fun String.toBidRequest(baseUrl: String) = toCdbRequest("$baseUrl/inapp/v2")
 
   private fun String.toCdbRequest(url: String): Request {
     return Request.Builder()
@@ -202,6 +278,10 @@ class CdbMockTest {
     }
 
     assertThat(headers.names()).isEqualTo(expected)
+  }
+
+  private fun String.normalizeBid(): String {
+    return replace(""""requestId":"[0-9a-f-]{36}"""".toRegex(), """"requestId": "dummy"""")
   }
 
 }
