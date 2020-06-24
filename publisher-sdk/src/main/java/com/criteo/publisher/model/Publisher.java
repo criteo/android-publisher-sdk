@@ -17,73 +17,39 @@
 package com.criteo.publisher.model;
 
 import android.content.Context;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.text.TextUtils;
 import androidx.annotation.NonNull;
+import com.criteo.publisher.DependencyProvider;
+import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
+import com.google.gson.annotations.SerializedName;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Publisher implements Parcelable {
-
-  private static final String BUNDLE_ID = "bundleId";
-  private static final String CRITEO_PUBLISHER_ID = "cpId";
+@AutoValue
+public abstract class Publisher {
 
   @NonNull
-  private final String bundleId;
+  public static Publisher create(@NonNull Context context, @NonNull String criteoPublisherId) {
+    return new AutoValue_Publisher(context.getPackageName(), criteoPublisherId);
+  }
 
-  @NonNull
-  private final String criteoPublisherId;
-
-  public Publisher(@NonNull Context context, @NonNull String criteoPublisherId) {
-    this.bundleId = context.getPackageName();
-    this.criteoPublisherId = criteoPublisherId;
+  public static TypeAdapter<Publisher> typeAdapter(Gson gson) {
+    return new AutoValue_Publisher.GsonTypeAdapter(gson);
   }
 
   @NonNull
-  public String getBundleId() {
-    return bundleId;
-  }
+  public abstract String getBundleId();
 
   @NonNull
-  public String getCriteoPublisherId() {
-    return criteoPublisherId;
-  }
+  @SerializedName("cpId")
+  public abstract String getCriteoPublisherId();
 
+  @NonNull
   public JSONObject toJson() throws JSONException {
-    JSONObject json = new JSONObject();
-    json.put(BUNDLE_ID, bundleId);
-    if (!TextUtils.isEmpty(criteoPublisherId)) {
-      json.put(CRITEO_PUBLISHER_ID, criteoPublisherId);
-    }
-    return json;
+    String s = DependencyProvider.getInstance().provideGson().toJson(this);
+
+    return new JSONObject(s);
   }
 
-  @Override
-  public int describeContents() {
-    return 0;
-  }
-
-  @Override
-  public void writeToParcel(Parcel dest, int flags) {
-    dest.writeString(this.bundleId);
-    dest.writeString(this.criteoPublisherId);
-  }
-
-  protected Publisher(Parcel in) {
-    this.bundleId = in.readString();
-    this.criteoPublisherId = in.readString();
-  }
-
-  public static final Parcelable.Creator<Publisher> CREATOR = new Parcelable.Creator<Publisher>() {
-    @Override
-    public Publisher createFromParcel(Parcel source) {
-      return new Publisher(source);
-    }
-
-    @Override
-    public Publisher[] newArray(int size) {
-      return new Publisher[size];
-    }
-  };
 }

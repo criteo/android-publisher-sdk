@@ -325,7 +325,7 @@ public class DependencyProvider {
       @NonNull
       @Override
       public Publisher create() {
-        return new Publisher(provideContext(), provideCriteoPublisherId());
+        return Publisher.create(provideContext(), provideCriteoPublisherId());
       }
     });
   }

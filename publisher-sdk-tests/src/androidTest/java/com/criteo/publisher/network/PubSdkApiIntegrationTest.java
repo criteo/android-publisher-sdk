@@ -35,7 +35,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
-import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.StubConstants;
 import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.mock.MockedDependenciesRule;
@@ -46,7 +45,6 @@ import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.CdbResponse;
-import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.RemoteConfigRequest;
 import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.model.RemoteConfigResponse;
@@ -75,9 +73,6 @@ public class PubSdkApiIntegrationTest {
 
   @Inject
   private Context context;
-
-  @SpyBean
-  private Publisher publisher;
 
   @SpyBean
   private DeviceUtil deviceUtil;
@@ -175,8 +170,6 @@ public class PubSdkApiIntegrationTest {
 
   @Test
   public void loadCdb_GivenValidBannerAdUnit_ReturnBid() throws Exception {
-    when(publisher.getCriteoPublisherId()).thenReturn(CriteoUtil.TEST_CP_ID);
-
     CacheAdUnit validAdUnit = adUnitMapper.map(BANNER_320_50);
     CdbRequest request = cdbRequestFactory.createRequest(singletonList(validAdUnit));
 
@@ -200,7 +193,6 @@ public class PubSdkApiIntegrationTest {
 
   @Test
   public void loadCdb_GivenValidInterstitialAdUnit_ReturnBid() throws Exception {
-    when(publisher.getCriteoPublisherId()).thenReturn(CriteoUtil.TEST_CP_ID);
     when(deviceUtil.getSizePortrait()).thenReturn(new AdSize(42, 1337));
 
     CacheAdUnit validAdUnit = adUnitMapper.map(INTERSTITIAL);
@@ -226,8 +218,6 @@ public class PubSdkApiIntegrationTest {
 
   @Test
   public void loadCdb_GivenValidNativeAdUnit_ReturnBid() throws Exception {
-    when(publisher.getCriteoPublisherId()).thenReturn(CriteoUtil.TEST_CP_ID);
-
     CacheAdUnit validAdUnit = adUnitMapper.map(NATIVE);
     CdbRequest request = cdbRequestFactory.createRequest(singletonList(validAdUnit));
 
@@ -251,7 +241,6 @@ public class PubSdkApiIntegrationTest {
 
   @Test
   public void loadCdb_GivenMultipleValidAdUnits_ReturnBids() throws Exception {
-    when(publisher.getCriteoPublisherId()).thenReturn(CriteoUtil.TEST_CP_ID);
     when(deviceUtil.getSizePortrait()).thenReturn(new AdSize(42, 1337));
 
     List<CacheAdUnit> validAdUnits = adUnitMapper.mapToChunks(asList(
@@ -269,7 +258,6 @@ public class PubSdkApiIntegrationTest {
 
   @Test
   public void loadCdb_GivenMultipleInvalidAdUnits_ReturnNoBids() throws Exception {
-    when(publisher.getCriteoPublisherId()).thenReturn(CriteoUtil.TEST_CP_ID);
     when(deviceUtil.getSizePortrait()).thenReturn(new AdSize(42, 1337));
 
     List<CacheAdUnit> validAdUnits = adUnitMapper.mapToChunks(asList(

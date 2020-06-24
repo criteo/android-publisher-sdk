@@ -29,6 +29,7 @@ import android.content.Context;
 import com.criteo.publisher.csm.MetricSendingQueue;
 import com.criteo.publisher.mock.ApplicationMock;
 import com.criteo.publisher.model.Config;
+import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.DeviceUtil;
@@ -134,6 +135,7 @@ public class DependencyProviderTest {
       doReturn(mock(DeviceUtil.class)).when(provider).provideDeviceUtil();
       doReturn(mock(Config.class)).when(provider).provideConfig();
       doReturn(mock(MetricSendingQueue.class)).when(provider).provideMetricSendingQueue();
+      doReturn(mock(Publisher.class)).when(provider).providePublisher();
 
       return provider.provideBidManager();
     });
