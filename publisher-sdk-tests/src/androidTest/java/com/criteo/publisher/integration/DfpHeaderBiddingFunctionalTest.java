@@ -16,6 +16,8 @@
 
 package com.criteo.publisher.integration;
 
+import static com.criteo.publisher.CriteoUtil.PROD_CDB_URL;
+import static com.criteo.publisher.CriteoUtil.PROD_CP_ID;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE;
 import static com.criteo.publisher.StubConstants.STUB_DISPLAY_URL;
@@ -27,8 +29,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import androidx.test.rule.ActivityTestRule;
@@ -36,6 +38,7 @@ import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.ResultCaptor;
+import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbResponse;
@@ -44,6 +47,7 @@ import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeProduct;
 import com.criteo.publisher.test.activity.DummyActivity;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.view.WebViewLookup;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -61,7 +65,6 @@ import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -121,12 +124,8 @@ public class DfpHeaderBiddingFunctionalTest {
 
   private final WebViewLookup webViewLookup = new WebViewLookup();
 
-  private Context context;
-
-  @Before
-  public void setUp() throws Exception {
-    context = activityRule.getActivity().getApplicationContext();
-  }
+  @SpyBean
+  private BuildConfigWrapper buildConfigWrapper;
 
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchValidBannerId_CriteoMacroAreInjectedInDfpBuilder()
@@ -246,6 +245,7 @@ public class DfpHeaderBiddingFunctionalTest {
   @Test
   public void whenGettingTestBid_GivenValidCpIdAndPrefetchDemoBannerId_CriteoMacroAreInjectedInDfpBuilder()
       throws Exception {
+    givenUsingCdbProd();
     whenGettingTestBid_GivenValidCpIdAndPrefetchDemoAdUnit_CriteoMacroAreInjectedInDfpBuilder(
         demoBannerAdUnit);
   }
@@ -253,6 +253,7 @@ public class DfpHeaderBiddingFunctionalTest {
   @Test
   public void whenGettingTestBid_GivenValidCpIdAndPrefetchDemoInterstitialId_CriteoMacroAreInjectedInDfpBuilder()
       throws Exception {
+    givenUsingCdbProd();
     whenGettingTestBid_GivenValidCpIdAndPrefetchDemoAdUnit_CriteoMacroAreInjectedInDfpBuilder(
         demoInterstitialAdUnit);
   }
@@ -425,6 +426,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
   @Test
   public void loadingDfpBanner_GivenDemoBanner_DfpViewContainsDisplayUrl() throws Exception {
+    givenUsingCdbProd();
     ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
 
     String html = loadDfpHtmlBanner(demoBannerAdUnit);
@@ -435,6 +437,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
   @Test
   public void loadingDfpBanner_GivenDemoInterstitial_DfpViewContainsDisplayUrl() throws Exception {
+    givenUsingCdbProd();
     ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
 
     String html = loadDfpHtmlInterstitial(demoInterstitialAdUnit);
@@ -562,6 +565,11 @@ public class DfpHeaderBiddingFunctionalTest {
 
   private void waitForBids() {
     mockedDependenciesRule.waitForIdleState();
+  }
+
+  private void givenUsingCdbProd() {
+    when(buildConfigWrapper.getCdbUrl()).thenReturn(PROD_CDB_URL);
+    when(mockedDependenciesRule.getDependencyProvider().provideCriteoPublisherId()).thenReturn(PROD_CP_ID);
   }
 
   private static final class DfpSync {

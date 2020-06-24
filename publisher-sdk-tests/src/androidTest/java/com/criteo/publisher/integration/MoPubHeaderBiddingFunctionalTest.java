@@ -16,6 +16,8 @@
 
 package com.criteo.publisher.integration;
 
+import static com.criteo.publisher.CriteoUtil.PROD_CDB_URL;
+import static com.criteo.publisher.CriteoUtil.PROD_CP_ID;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
@@ -24,6 +26,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -35,11 +38,13 @@ import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.ResultCaptor;
+import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.test.activity.DummyActivity;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.view.WebViewLookup;
 import com.mopub.common.MoPub;
 import com.mopub.common.SdkConfiguration;
@@ -87,6 +92,9 @@ public class MoPubHeaderBiddingFunctionalTest {
   private final InterstitialAdUnit demoInterstitialAdUnit = TestAdUnits.INTERSTITIAL_DEMO;
 
   private final WebViewLookup webViewLookup = new WebViewLookup();
+
+  @SpyBean
+  private BuildConfigWrapper buildConfigWrapper;
 
   @Test
   public void exampleOfExpectedKeywords() throws Exception {
@@ -152,6 +160,7 @@ public class MoPubHeaderBiddingFunctionalTest {
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchDemoBannerId_CriteoKeywordsAreInjectedInMoPubBuilder()
       throws Exception {
+    givenUsingCdbProd();
     whenGettingBid_GivenValidCpIdAndPrefetchValidBannerAdUnit_CriteoKeywordsAreInjectedInMoPubBuilder(
         demoBannerAdUnit);
   }
@@ -178,6 +187,7 @@ public class MoPubHeaderBiddingFunctionalTest {
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchDemoInterstitialId_CriteoKeywordsAreInjectedInMoPubBuilder()
       throws Exception {
+    givenUsingCdbProd();
     whenGettingBid_GivenValidCpIdAndPrefetchInterstitialId_CriteoKeywordsAreInjectedInMoPubBuilder(
         demoInterstitialAdUnit);
   }
@@ -204,6 +214,7 @@ public class MoPubHeaderBiddingFunctionalTest {
 
   @Test
   public void loadingMoPubBanner_GivenDemoBanner_MoPubViewUsesDemoDisplayUrl() throws Exception {
+    givenUsingCdbProd();
     ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
 
     String html = loadMoPubHtmlBanner(demoBannerAdUnit);
@@ -223,6 +234,7 @@ public class MoPubHeaderBiddingFunctionalTest {
   @Test
   public void loadingMoPubInterstitial_GivenDemoInterstitial_MoPubViewUsesDemoDisplayUrl()
       throws Exception {
+    givenUsingCdbProd();
     ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
 
     String html = loadMoPubHtmlInterstitial(demoInterstitialAdUnit);
@@ -325,6 +337,11 @@ public class MoPubHeaderBiddingFunctionalTest {
           .set(new MoPubInterstitial(activityRule.getActivity(), MOPUB_INTERSTITIAL_ID));
     });
     return moPubInterstitialRef.get();
+  }
+
+  private void givenUsingCdbProd() {
+    when(buildConfigWrapper.getCdbUrl()).thenReturn(PROD_CDB_URL);
+    when(mockedDependenciesRule.getDependencyProvider().provideCriteoPublisherId()).thenReturn(PROD_CP_ID);
   }
 
   private void givenInitializedMoPub() throws InterruptedException {
