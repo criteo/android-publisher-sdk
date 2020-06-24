@@ -32,6 +32,7 @@ class CdbMockTest {
   private val client = OkHttpClient()
 
   private val cdbUrl = "https://directbidder-test-app.par.preprod.crto.in"
+  private val cdbStubUrl = "https://directbidder-stubs.par.preprod.crto.in"
   private val textPlain = "text/plain".toMediaType()
 
   private lateinit var cdbMock: CdbMock
@@ -246,6 +247,28 @@ class CdbMockTest {
     }
   }
 
+  @Test
+  fun casper_GivenDimension_BothServerReturnSame() {
+    val cdbRequest = casperRequest(cdbStubUrl)
+    val mockRequest = casperRequest(mockUrl)
+
+    client.newCall(cdbRequest).execute().use { cdbResponse ->
+      client.newCall(mockRequest).execute().use { mockResponse ->
+        assertSoftly {
+          assertThat(mockResponse.code).isEqualTo(cdbResponse.code)
+          assertThat(mockResponse.body?.string()).isEqualTo(cdbResponse.body?.string())
+          assertThat(mockResponse.headers["content-type"]).isEqualTo(cdbResponse.headers["content-type"])
+          assertThat(cdbResponse.headers.names()).containsExactlyInAnyOrder(
+              "content-type",
+              "date",
+              "server",
+              "vary"
+          )
+        }
+      }
+    }
+  }
+
   private fun assertSoftly(softly: SoftAssertions.() -> Unit) {
     SoftAssertions.assertSoftly {
       softly(it)
@@ -260,6 +283,12 @@ class CdbMockTest {
     return Request.Builder()
         .url(url)
         .post(toRequestBody(textPlain))
+        .build()
+  }
+
+  private fun casperRequest(baseUrl: String): Request {
+    return Request.Builder()
+        .url("$baseUrl/delivery/ajs.php?width=42&height=24")
         .build()
   }
 
@@ -282,6 +311,7 @@ class CdbMockTest {
 
   private fun String.normalizeBid(): String {
     return replace(""""requestId":"[0-9a-f-]{36}"""".toRegex(), """"requestId": "dummy"""")
+        .replace(""""displayUrl":"$cdbStubUrl""", """ "displayUrl":"$mockUrl """)
   }
 
 }

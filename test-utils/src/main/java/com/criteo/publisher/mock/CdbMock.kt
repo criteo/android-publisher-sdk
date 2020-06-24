@@ -16,11 +16,11 @@
 
 package com.criteo.publisher.mock
 
+import com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE
 import com.criteo.publisher.StubConstants.STUB_NATIVE_JSON
 import com.criteo.publisher.TestAdUnits.*
 import com.criteo.publisher.model.*
 import com.criteo.publisher.util.JsonSerializer
-import okhttp3.Protocol
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -41,10 +41,11 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
   fun start() {
     mockWebServer.dispatcher = object: Dispatcher() {
       override fun dispatch(request: RecordedRequest): MockResponse {
-        return when (request.path) {
+        return when (request.requestUrl?.encodedPath) {
           "/csm" -> handleCsmRequest()
           "/config/app" -> handleConfigRequest()
           "/inapp/v2" -> handleBidRequest(request.body)
+          "/delivery/ajs.php" -> handleCasperRequest(request)
           else -> MockResponse().setResponseCode(404)
         }
       }
@@ -116,7 +117,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
           "width": $width,
           "height": $height,
           "ttl": 0,
-          "displayUrl": "https://directbidder-stubs.par.preprod.crto.in/delivery/ajs.php?width=$width&height=$height"
+          "displayUrl": "$url/delivery/ajs.php?width=$width&height=$height"
         }
       """.trimIndent()
     }
@@ -145,6 +146,25 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
     val width = split[0].toInt()
     val height = split[1].toInt()
     return AdSize(width, height)
+  }
+
+  private fun handleCasperRequest(request: RecordedRequest): MockResponse {
+    val width = request.requestUrl!!.queryParameter("width")!!.toInt()
+    val height = request.requestUrl!!.queryParameter("height")!!.toInt()
+
+    val response = """
+      (function(){
+      var s = "";
+      s += "<"+"a href=\"https://criteo.com\">\n";
+      s += "  <"+"img width='$width' height='$height' src=\"$STUB_CREATIVE_IMAGE\"/>\n";
+      s += "<"+"/a>\n";
+      s += "\n";
+      document.write(s);})();
+    """.trimIndent()
+
+    return MockResponse()
+        .setHeader("content-type", "text/plain; charset=utf-8")
+        .setBody(response)
   }
 
 }
