@@ -341,10 +341,7 @@ public class StandaloneFunctionalTest {
     verify(api).loadCdb(requestCaptor.capture(), anyString());
     CdbRequest request = requestCaptor.getValue();
 
-    boolean interstitialFlag = request.toJson()
-        .getJSONArray("slots")
-        .getJSONObject(0)
-        .getBoolean("interstitial");
+    boolean interstitialFlag = request.getSlots().get(0).isInterstitial();
 
     assertTrue(interstitialFlag);
   }

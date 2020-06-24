@@ -194,6 +194,11 @@ class CdbRequestFactoryTest {
             on { generateId() }.doReturn("impId1", "impId2")
         }
 
+        buildConfigWrapper.stub {
+            on { sdkVersion } doReturn "1.2.3"
+            on { profileId } doReturn 1337
+        }
+
         val request = factory.createRequest(adUnits)
 
         assertThat(request.slots).containsExactlyInAnyOrder(expectedSlot1, expectedSlot2)

@@ -45,7 +45,6 @@ import java.util.concurrent.TimeUnit;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -95,9 +94,7 @@ public class PubSdkApiTest {
     MetricRequest request = mock(MetricRequest.class);
     String json = "{\"expectedJson\": 42}";
 
-    doAnswer(answerVoid((Object ignored, OutputStream stream) -> {
-      stream.write(json.getBytes(StandardCharsets.UTF_8));
-    })).when(serializer).write(eq(request), any());
+    givenSerializerWriting(request, json);
 
     mockWebServer.enqueue(new MockResponse().setResponseCode(204));
 
@@ -200,9 +197,8 @@ public class PubSdkApiTest {
   @Test
   public void loadCdb_GivenCdbRequest_SendPostRequestWithJsonPayload() throws Exception {
     String json = "{\"payload\":\"my awesome payload\"}";
-
     CdbRequest cdbRequest = mock(CdbRequest.class);
-    when(cdbRequest.toJson()).thenReturn(new JSONObject(json));
+    givenSerializerWriting(cdbRequest, json);
 
     mockWebServer.enqueue(new MockResponse().setResponseCode(204));
 
@@ -385,8 +381,14 @@ public class PubSdkApiTest {
   @NonNull
   private CdbRequest givenEmptyCdbRequest() throws Exception {
     CdbRequest cdbRequest = mock(CdbRequest.class);
-    when(cdbRequest.toJson()).thenReturn(new JSONObject());
+    givenSerializerWriting(cdbRequest, "{}");
     return cdbRequest;
+  }
+
+  private void givenSerializerWriting(Object expected, String json) throws IOException {
+    doAnswer(answerVoid((Object ignored, OutputStream stream) -> {
+      stream.write(json.getBytes(StandardCharsets.UTF_8));
+    })).when(serializer).write(eq(expected), any());
   }
 
   private void givenConnectionError() throws IOException {

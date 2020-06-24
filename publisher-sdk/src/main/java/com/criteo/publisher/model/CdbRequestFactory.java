@@ -72,7 +72,7 @@ public class CdbRequestFactory {
         getNotEmptyOrNullValue(userPrivacyUtil.getUsPrivacyOptout())
     );
 
-    return new CdbRequest(
+    return CdbRequest.create(
         publisher,
         user,
         buildConfigWrapper.getSdkVersion(),

@@ -19,112 +19,53 @@ package com.criteo.publisher.model;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.privacy.gdpr.GdprData;
+import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
+import com.google.gson.annotations.SerializedName;
 import java.util.List;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-public class CdbRequest {
-
-  private static final String PUBLISHER = "publisher";
-  private static final String USER = "user";
-  private static final String SDK_VERSION = "sdkVersion";
-  private static final String PROFILE_ID = "profileId";
-  private static final String GDPR_CONSENT = "gdprConsent";
-  private static final String SLOTS = "slots";
+@AutoValue
+public abstract class CdbRequest {
 
   @NonNull
-  private final Publisher publisher;
-
-  @NonNull
-  private final User user;
-
-  @NonNull
-  private final String sdkVersion;
-
-  private final int profileId;
-
-  @Nullable
-  private final GdprData gdprData;
-
-  @NonNull
-  private final List<CdbRequestSlot> slots;
-
-  public CdbRequest(
+  public static CdbRequest create(
       @NonNull Publisher publisher,
       @NonNull User user,
       @NonNull String sdkVersion,
       int profileId,
       @Nullable GdprData gdprData,
       @NonNull List<CdbRequestSlot> slots) {
-    this.publisher = publisher;
-    this.user = user;
-    this.sdkVersion = sdkVersion;
-    this.profileId = profileId;
-    this.gdprData = gdprData;
-    this.slots = slots;
+    return new AutoValue_CdbRequest(
+        publisher,
+        user,
+        sdkVersion,
+        profileId,
+        gdprData,
+        slots
+    );
+  }
+
+  public static TypeAdapter<CdbRequest> typeAdapter(Gson gson) {
+    return new AutoValue_CdbRequest.GsonTypeAdapter(gson);
   }
 
   @NonNull
-  public Publisher getPublisher() {
-    return publisher;
-  }
+  public abstract Publisher getPublisher();
 
   @NonNull
-  public User getUser() {
-    return user;
-  }
+  public abstract User getUser();
 
   @NonNull
-  public String getSdkVersion() {
-    return sdkVersion;
-  }
+  public abstract String getSdkVersion();
 
-  public int getProfileId() {
-    return profileId;
-  }
+  public abstract int getProfileId();
 
   @Nullable
-  public GdprData getGdprData() {
-    return gdprData;
-  }
+  @SerializedName("gdprConsent")
+  public abstract GdprData getGdprData();
 
   @NonNull
-  public List<CdbRequestSlot> getSlots() {
-    return slots;
-  }
+  public abstract List<CdbRequestSlot> getSlots();
 
-  @NonNull
-  public JSONObject toJson() throws JSONException {
-    JSONObject json = new JSONObject();
-    json.put(USER, user.toJson());
-    json.put(PUBLISHER, publisher.toJson());
-    json.put(SDK_VERSION, sdkVersion);
-    json.put(PROFILE_ID, profileId);
-
-    JSONArray jsonAdUnits = new JSONArray();
-    for (CdbRequestSlot slot : slots) {
-      jsonAdUnits.put(slot.toJson());
-    }
-    if (jsonAdUnits.length() > 0) {
-      json.put(SLOTS, jsonAdUnits);
-    }
-    if (gdprData != null) {
-      json.put(GDPR_CONSENT, gdprData.toJSONObject());
-    }
-    return json;
-  }
-
-  @NonNull
-  @Override
-  public String toString() {
-    return "CdbRequest{" +
-        "publisher=" + publisher +
-        ", user=" + user +
-        ", sdkVersion='" + sdkVersion + '\'' +
-        ", profileId=" + profileId +
-        ", gdprConsent=" + gdprData +
-        ", slots=" + slots +
-        '}';
-  }
 }

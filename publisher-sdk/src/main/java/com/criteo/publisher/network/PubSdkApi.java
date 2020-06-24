@@ -80,11 +80,15 @@ public class PubSdkApi {
   }
 
   @NonNull
-  public CdbResponse loadCdb(@NonNull CdbRequest cdbRequest, @NonNull String userAgent) throws Exception {
+  public CdbResponse loadCdb(@NonNull CdbRequest request, @NonNull String userAgent) throws Exception {
     URL url = new URL(buildConfigWrapper.getCdbUrl() + "/inapp/v2");
-    JSONObject cdbRequestJson = cdbRequest.toJson();
-    JSONObject result = executePost(url, cdbRequestJson, userAgent);
-    return CdbResponse.fromJson(result);
+    HttpURLConnection urlConnection = prepareConnection(url, userAgent, "POST");
+    writePayload(urlConnection, request);
+
+    try (InputStream inputStream = readResponseStreamIfSuccess(urlConnection)) {
+      JSONObject result = readJson(inputStream);
+      return CdbResponse.fromJson(result);
+    }
   }
 
   @Nullable
@@ -173,20 +177,6 @@ public class PubSdkApi {
   private InputStream executeRawGet(URL url, @Nullable String userAgent) throws IOException {
     HttpURLConnection urlConnection = prepareConnection(url, userAgent, "GET");
     return readResponseStreamIfSuccess(urlConnection);
-  }
-
-  @NonNull
-  private JSONObject executePost(
-      @NonNull URL url,
-      @NonNull JSONObject requestJson,
-      @NonNull String userAgent)
-      throws IOException, JSONException {
-    HttpURLConnection urlConnection = prepareConnection(url, userAgent, "POST");
-    writePayload(urlConnection, requestJson);
-
-    try (InputStream inputStream = readResponseStreamIfSuccess(urlConnection)) {
-      return readJson(inputStream);
-    }
   }
 
   private JSONObject executeGet(URL url, @Nullable String userAgent) throws IOException, JSONException {
