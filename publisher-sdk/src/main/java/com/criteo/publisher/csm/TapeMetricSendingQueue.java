@@ -19,6 +19,9 @@ package com.criteo.publisher.csm;
 import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.util.PreconditionsUtil;
 import com.squareup.tape.FileException;
 import com.squareup.tape.FileObjectQueue;
@@ -31,6 +34,10 @@ import java.util.List;
 
 class TapeMetricSendingQueue extends MetricSendingQueue {
 
+  @NonNull
+  private final Logger logger = LoggerFactory.getLogger(TapeMetricSendingQueue.class);
+
+  @NonNull
   private final Object queueLock = new Object();
 
   @Nullable
@@ -74,21 +81,48 @@ class TapeMetricSendingQueue extends MetricSendingQueue {
       createQueueIfNecessary();
 
       List<Metric> metrics = new ArrayList<>();
-      try {
-        for (int i = 0; i < max; i++) {
+      Exception exception = null;
+
+      for (int i = 0; i < max; i++) {
+        try {
           Metric metric = queue.peek();
+
           if (metric == null) {
             break;
           }
 
           metrics.add(metric);
-          queue.remove();
+        } catch (FileException e) {
+          if (exception == null) {
+            exception = e;
+          } else {
+            exception.addSuppressed(e);
+          }
+        } finally {
+          try {
+            // There is a bug in tape queue implementation making byte array full of 0 written. To
+            // recover and not block the queue at this point, we always remove the first element
+            // even in case of error.
+            // It is not possible to detect this in the offer method, because elements are added at
+            // the end of the queue and we can only peek at the beginning of it.
+            if (queue.size() > 0) {
+              queue.remove();
+            }
+          } catch (FileException e) {
+            if (exception == null) {
+              exception = e;
+            } else {
+              exception.addSuppressed(e);
+            }
+          }
         }
-        return metrics;
-      } catch (FileException e) {
-        PreconditionsUtil.throwOrLog(e);
-        return metrics;
       }
+
+      if (exception != null) {
+        logger.error("Error when polling CSM metrics", exception);
+      }
+
+      return metrics;
     }
   }
 
@@ -133,7 +167,8 @@ class TapeMetricSendingQueue extends MetricSendingQueue {
   }
 
   @NonNull
-  private QueueFile getQueueFile(@NonNull FileObjectQueue fileObjectQueue) throws ReflectiveOperationException, ClassCastException {
+  @VisibleForTesting
+  QueueFile getQueueFile(@NonNull FileObjectQueue fileObjectQueue) throws ReflectiveOperationException, ClassCastException {
       if (queueFile == null) {
         Field queueFileField = FileObjectQueue.class.getDeclaredField("queueFile");
         queueFileField.setAccessible(true);
