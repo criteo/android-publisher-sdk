@@ -62,7 +62,8 @@ adChoiceIconHeightInDp = 15
 
 environments {
     debug {
-        eventUrl = 'https://gum.par.preprod.crto.in'
+        eventUrl = 'https://an.url.that.does.not.exist'
+        // eventUrl = 'https://gum.par.preprod.crto.in' // Uncomment to use preprod GUM
 
         // In tests, if DI rule is set, a CDB stub server is spawn and injected
         cdbUrl = 'https://an.url.that.does.not.exist'
