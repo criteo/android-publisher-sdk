@@ -29,4 +29,5 @@ dependencies {
     testImplementation(Deps.JUnit.JUnit)
     testImplementation(Deps.AssertJ.AssertJ)
     testImplementation(Deps.Square.OkHttp.OkHttp)
+    testImplementation(Deps.GitHub.Kevinmost.JUnitRetryRule)
 }

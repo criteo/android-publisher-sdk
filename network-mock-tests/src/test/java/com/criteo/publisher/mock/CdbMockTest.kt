@@ -17,6 +17,8 @@
 package com.criteo.publisher.mock
 
 import com.criteo.publisher.DependencyProvider
+import com.kevinmost.junit_retry_rule.Retry
+import com.kevinmost.junit_retry_rule.RetryRule
 import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -25,9 +27,14 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.assertj.core.api.SoftAssertions
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 
 class CdbMockTest {
+
+  @Rule
+  @JvmField
+  val retryRule = RetryRule()
 
   private val client = OkHttpClient()
 
@@ -52,6 +59,7 @@ class CdbMockTest {
   }
 
   @Test
+  @Retry
   fun csm_GivenValidInput_BothServerReturnSame() {
     val body = """
       {
@@ -149,6 +157,7 @@ class CdbMockTest {
   }
 
   @Test
+  @Retry
   fun config_GivenValidInputWithoutSpecialConfig_BothServerReturnSame() {
     val body = """
       {
@@ -175,6 +184,7 @@ class CdbMockTest {
   }
 
   @Test
+  @Retry
   fun bid_GivenValidAndInvalidAdUnit_BothServerReturnSame() {
     val body = """
       {
@@ -248,6 +258,7 @@ class CdbMockTest {
   }
 
   @Test
+  @Retry
   fun casper_GivenDimension_BothServerReturnSame() {
     val cdbRequest = casperRequest(cdbStubUrl)
     val mockRequest = casperRequest(mockUrl)

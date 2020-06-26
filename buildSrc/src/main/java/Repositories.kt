@@ -44,6 +44,9 @@ internal fun RepositoryHandler.addDefaultInputRepository() {
   maven {
     setUrl("http://nexus.criteo.prod/content/groups/android/")
   }
+  maven {
+    setUrl("https://jitpack.io")
+  }
 }
 
 /**
