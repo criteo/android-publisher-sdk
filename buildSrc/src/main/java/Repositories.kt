@@ -95,10 +95,7 @@ private fun MavenArtifactRepository.withMavenCredentialsIfPresent() {
 
 fun Project.addAzureRepository() {
   val blobStorage = AzureBlobStorage(containerName = "publishersdk") {
-    credentials {
-      username = System.getenv("AZURE_USER")
-      password = System.getenv("AZURE_PASSWORD")
-    }
+    connectionString = System.getenv("AZURE_STORAGE_CONNECTION_STRING")
   }
 
   val localRepository = Paths.get("${buildDir}/azure-${sdkPublicationVersion()}/android")

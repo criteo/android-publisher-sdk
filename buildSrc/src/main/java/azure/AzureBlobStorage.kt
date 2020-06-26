@@ -17,27 +17,19 @@
 package azure
 
 import com.microsoft.azure.storage.CloudStorageAccount
-import com.microsoft.azure.storage.StorageCredentialsAccountAndKey
 import com.microsoft.azure.storage.blob.CloudBlobContainer
 import org.gradle.api.Action
-import org.gradle.api.credentials.PasswordCredentials
-import org.gradle.internal.credentials.DefaultPasswordCredentials
 import java.nio.file.Files
 import java.nio.file.Path
 
-class AzureBlobStorage(
-    private val containerName: String,
-    private val credentials: PasswordCredentials = DefaultPasswordCredentials()
-) {
+class AzureBlobStorage(private val containerName: String) {
+
+  var connectionString: String? = null
 
   private val blobContainer: CloudBlobContainer by lazy(::createBlobContainer)
 
   constructor(containerName: String, configure: Action<in AzureBlobStorage>): this(containerName) {
     configure.execute(this)
-  }
-
-  fun credentials(configure: Action<in PasswordCredentials>) {
-    configure.execute(credentials)
   }
 
   /**
@@ -117,12 +109,7 @@ class AzureBlobStorage(
   }
 
   private fun createBlobContainer(): CloudBlobContainer {
-    val storageCredentials = StorageCredentialsAccountAndKey(
-        credentials.username,
-        credentials.password
-    )
-
-    val cloudStorageAccount = CloudStorageAccount(storageCredentials)
+    val cloudStorageAccount = CloudStorageAccount.parse(connectionString)
     val serviceClient = cloudStorageAccount.createCloudBlobClient()
     return serviceClient.getContainerReference(containerName)
   }
