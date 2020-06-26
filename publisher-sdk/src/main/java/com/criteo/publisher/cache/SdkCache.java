@@ -54,7 +54,7 @@ public class SdkCache {
   //  When receiving slots from CDB, then this information is forgotten, and a new CacheAdUnit
   //  is created from the Slot received from CDB but with fuzzy methods like this one.
   //  Instead, we could generate a random slotid (not same concept as adunit id, see
-  //  http://review.criteois.lan/gitweb?p=publisher/direct-bidder.git;a=blob;f=directbidder-app/src/main/scala/com/criteo/directbidder/models/Types.scala;h=e50edc2d7d3916b91a746b43674d76aafd0e9521;hb=HEAD#l27),
+  //  https://review.crto.in/gitweb?p=publisher/direct-bidder.git;a=blob;f=directbidder-app/src/main/scala/com/criteo/directbidder/models/Types.scala;h=e50edc2d7d3916b91a746b43674d76aafd0e9521;hb=HEAD#l27),
   //  give it to CDB, and reread it from CDB response.
   //  Note that the AdUnitId are not necessary unique (for instance if a publisher ask for same
   //  banner but in different size). So it could not be used as a key between request and
