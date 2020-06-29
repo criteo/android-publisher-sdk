@@ -27,7 +27,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
-import com.criteo.mediation.mopub.advancednative.CriteoNativeEventRenderer;
 import com.criteo.pubsdk_android.listener.TestAppMoPubInterstitialAdListener;
 import com.mopub.mobileads.MoPubInterstitial;
 import com.mopub.mobileads.MoPubView;
@@ -84,7 +83,7 @@ public class MopubMediationActivity extends AppCompatActivity {
       }
     });
 
-    moPubNative.registerAdRenderer(new CriteoNativeEventRenderer(new TestAppNativeRenderer()));
+    // moPubNative.registerAdRenderer(new CriteoNativeEventRenderer(new TestAppNativeRenderer()));
   }
 
   private void onBannerClick() {

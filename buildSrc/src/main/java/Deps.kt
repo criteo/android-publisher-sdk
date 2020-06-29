@@ -1,3 +1,5 @@
+import org.gradle.api.Project
+
 /*
  *    Copyright 2020 Criteo
  *
@@ -66,8 +68,17 @@ object Deps {
     }
 
     object Mediation {
-      fun MoPub(version: String) = "com.criteo.mediation.mopub:criteo-adapter:$version"
-      fun AdMob(version: String) = "com.criteo.mediation.google:criteo-adapter:$version"
+      fun Project.moPubAdapter(version: String) = if (isSnapshot()) {
+        "com.criteo.mediation.mopub:criteo-adapter-development:$version"
+      } else {
+        "com.criteo.mediation.mopub:criteo-adapter:$version"
+      }
+
+      fun Project.adMobAdapter(version: String) = if (isSnapshot()) {
+        "com.criteo.mediation.google:criteo-adapter-development:$version"
+      } else {
+        "com.criteo.mediation.google:criteo-adapter:$version"
+      }
     }
   }
 

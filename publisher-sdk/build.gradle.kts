@@ -52,7 +52,12 @@ addAzureRepository()
 addPublication("release") {
     from(components["release"])
     groupId = "com.criteo.publisher"
-    artifactId = "criteo-publisher-sdk"
+
+    artifactId = if (isSnapshot()) {
+        "criteo-publisher-sdk-development"
+    } else {
+        "criteo-publisher-sdk"
+    }
 }
 
 // Declare both debug and staging publication with sources
