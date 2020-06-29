@@ -13,5 +13,6 @@ git checkout FETCH_HEAD
 ./scripts/do-pre-submit.sh
 ./gradlew clean \
     publishReleasePublicationToAzureRepository \
-    sendReleaseDeployedToAzureMessageToSlack
+    sendReleaseDeployedToAzureMessageToSlack \
+    -PisRelease=true
 

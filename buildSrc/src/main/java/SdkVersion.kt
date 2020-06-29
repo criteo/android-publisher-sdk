@@ -26,9 +26,13 @@ fun sdkVersion(): String {
   return sdkBaseVersion
 }
 
+fun Project.isSnapshot(): Boolean {
+  return properties["isRelease"] != "true"
+}
+
 fun Project.sdkPublicationVersion(): String {
   val sdkVersion = sdkVersion()
-  return if (properties["appendTimestamp"] == "true") {
+  return if (isSnapshot()) {
     "$sdkVersion-$timestamp"
   } else {
     sdkVersion
