@@ -65,6 +65,8 @@ android.libraryVariants.all {
         } else {
             "criteo-publisher-sdk-$variantName"
         }
+
+        pom.description.set("SDK of Direct Bidder for App")
     }
 }
 

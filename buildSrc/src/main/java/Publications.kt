@@ -23,7 +23,6 @@ fun Project.addPublication(name: String, publication: SdkPublication.() -> Unit)
   publishing {
     publications {
       register(name, MavenPublication::class.java) {
-        version = project.sdkPublicationVersion()
         afterEvaluate {
           publication(SdkPublication(this, this@register))
         }
@@ -36,6 +35,10 @@ class SdkPublication(
     private val project: Project,
     mavenPublication: MavenPublication
 ) : MavenPublication by mavenPublication {
+
+  init {
+    setDefaultValue()
+  }
 
   fun addSourcesJar(variantName: String) {
     artifact(project.createSourcesJarTask(variantName))
@@ -59,6 +62,34 @@ class SdkPublication(
 
   private fun Project.getJavadocTask(variant: String): Jar {
     return project.tasks.getByName("generate${variant.capitalize()}JavadocJar") as Jar
+  }
+
+  private fun setDefaultValue() {
+    version = project.sdkPublicationVersion()
+
+    pom {
+      name.set(project.provider { "$groupId:$artifactId" })
+      url.set("https://publisherdocs.criteotilt.com/app/android/get-started/")
+
+      licenses {
+        license {
+          name.set("Apache License, Version 2.0")
+          url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+          distribution.set("repo")
+        }
+      }
+
+      developers {
+        // We rely on Git to recognize contributors
+      }
+
+      scm {
+        // TODO Replace "todo" with the name of the repository
+        url.set("http://github.com/criteo/todo/tree/master")
+        connection.set("scm:git:git://github.com/criteo/todo.git")
+        developerConnection.set("scm:git:ssh://github.com:criteo/todo.git")
+      }
+    }
   }
 
 }

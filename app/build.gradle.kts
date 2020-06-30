@@ -40,7 +40,11 @@ android {
 addPublication("Apk") {
     groupId = "com.criteo.pubsdk_android"
     artifactId = "publisher-app"
-    pom.packaging = "apk"
+
+    pom {
+        description.set("Test Application for the Criteo Publisher SDK")
+        packaging = "apk"
+    }
 
     android.applicationVariants.all {
         outputs.all {
