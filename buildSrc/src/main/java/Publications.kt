@@ -33,9 +33,13 @@ fun Project.addPublication(name: String, publication: MavenPublication.() -> Uni
 }
 
 fun Project.createSourcesJarTask(variant: String): Jar {
-  return tasks.create("${variant}SourcesJar", Jar::class.java) {
+  return tasks.create("generate${variant.capitalize()}SourcesJar", Jar::class.java) {
+    group = "documentation"
+    description = "Generate a source JAR for $variant variant."
+
     archiveClassifier.set("sources")
     from(androidBase.sourceSets["main"].java.srcDirs)
     from(androidBase.sourceSets[variant].java.srcDirs)
+    archiveBaseName.set("${project.name}-${androidBase.defaultConfig.versionName}-$variant")
   }
 }

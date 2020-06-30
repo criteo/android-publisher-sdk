@@ -18,7 +18,8 @@ plugins {
     id("com.android.library")
     `maven-publish`
     kotlin("android")
-    id("com.vanniktech.dependency.graph.generator")
+    id("com.vanniktech.dependency.graph.generator") version "0.5.0"
+    id("com.vanniktech.android.javadoc") version "0.3.0"
     id("fr.pturpin.slack-publish")
 }
 
@@ -68,6 +69,7 @@ for (variant in listOf("debug", "staging")) {
         artifactId = "criteo-publisher-sdk-$variant"
 
         artifact(createSourcesJarTask(variant))
+        artifact(tasks["generate${variant.capitalize()}JavadocJar"])
     }
 }
 

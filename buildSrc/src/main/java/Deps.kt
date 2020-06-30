@@ -171,9 +171,4 @@ object Deps {
       const val Tape = "com.squareup:tape:$version"
     }
   }
-
-  object Vanniktech {
-    private const val version = "0.5.0"
-    const val DependencyGraphGenerator = "com.vanniktech:gradle-dependency-graph-generator-plugin:$version"
-  }
 }
