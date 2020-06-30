@@ -49,27 +49,22 @@ androidLibModule() {
 
 addAzureRepository()
 
-// Declare release publication without sources
-addPublication("release") {
-    from(components["release"])
-    groupId = "com.criteo.publisher"
+android.libraryVariants.all {
+    val variantName = name
+    addPublication(variantName) {
+        from(components[variantName])
+        addSourcesJar(variantName)
+        addJavadocJar(variantName)
 
-    artifactId = if (isSnapshot()) {
-        "criteo-publisher-sdk-development"
-    } else {
-        "criteo-publisher-sdk"
-    }
-}
-
-// Declare both debug and staging publication with sources
-for (variant in listOf("debug", "staging")) {
-    addPublication(variant) {
-        from(components[variant])
         groupId = "com.criteo.publisher"
-        artifactId = "criteo-publisher-sdk-$variant"
 
-        artifact(createSourcesJarTask(variant))
-        artifact(tasks["generate${variant.capitalize()}JavadocJar"])
+        artifactId = if (variantName == "release" && isSnapshot()) {
+            "criteo-publisher-sdk-development"
+        } else if (variantName == "release") {
+            "criteo-publisher-sdk"
+        } else {
+            "criteo-publisher-sdk-$variantName"
+        }
     }
 }
 

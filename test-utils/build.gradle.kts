@@ -18,6 +18,7 @@ plugins {
   id("com.android.library")
   `maven-publish`
   kotlin("android")
+  id("com.vanniktech.android.javadoc") version "0.3.0"
 }
 
 androidLibModule()
@@ -45,8 +46,9 @@ dependencies {
 
 addPublication("debug") {
   from(components["debug"])
+  addSourcesJar("debug")
+  addJavadocJar("debug")
+
   groupId = "com.criteo.publisher"
   artifactId = "criteo-publisher-sdk-test-utils"
-
-  artifact(createSourcesJarTask("debug"))
 }
