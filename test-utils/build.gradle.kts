@@ -19,6 +19,7 @@ plugins {
   `maven-publish`
   kotlin("android")
   id("com.vanniktech.android.javadoc") version "0.3.0"
+  id("com.jfrog.bintray")
 }
 
 androidLibModule()
@@ -45,11 +46,15 @@ dependencies {
 }
 
 addPublication("debug") {
-  from(components["debug"])
-  addSourcesJar("debug")
-  addJavadocJar("debug")
+  afterEvaluate {
+    from(components["debug"])
+    addSourcesJar("debug")
+    addJavadocJar("debug")
+  }
 
   groupId = "com.criteo.publisher"
   artifactId = "criteo-publisher-sdk-test-utils"
   pom.description.set("Utilities for tests on the Criteo Publisher SDK")
 }
+
+addBintrayRepository()

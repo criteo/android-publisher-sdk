@@ -21,6 +21,7 @@ plugins {
     id("com.android.application")
     `maven-publish`
     kotlin("android")
+    id("com.jfrog.bintray")
 }
 
 androidAppModule("com.criteo.pubsdk_android")
@@ -58,6 +59,8 @@ addPublication("Apk") {
         }
     }
 }
+
+addBintrayRepository()
 
 dependencies {
     implementation(project(":publisher-sdk"))

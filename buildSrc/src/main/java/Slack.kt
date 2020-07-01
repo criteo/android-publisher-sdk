@@ -15,53 +15,60 @@
  */
 
 import org.gradle.api.Project
-import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
+import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.kotlin.dsl.withType
 
 fun Project.addSlackDeploymentMessages() {
+  afterEvaluate {
+    for (repoName in listOf("Azure", "Bintray")) {
+      publishing.publications.withType<MavenPublication> {
+        addSlackDeploymentMessage(this, repoName)
+      }
+    }
+  }
+}
+
+private fun Project.addSlackDeploymentMessage(publication: MavenPublication, repoName: String) {
   val webHookUrl = System.getenv("SLACK_WEBHOOK") ?: return
   val teamChannel = "#pub-sdk-private"
   val rcChannel = "#pub-sdk-release-candidates"
   val confluenceSpaceUrl = "https://go.crto.in/publisher-sdk-bugfest"
   val gerritProjectBranchesUrl = "https://go.crto.in/publisher-sdk-android-branches"
 
-  afterEvaluate {
-    tasks.withType<PublishToMavenRepository>()
-        .matching { it.repository.isAzure() || it.repository.isNexusProd() }
-        .all {
-      slack {
-        messages {
-          register("${publication.name}DeployedTo${repository.name.capitalize()}") {
-            webHook.set(webHookUrl)
+  slack {
+    messages {
+      register("${publication.name}DeployedTo${repoName.capitalize()}") {
+        webHook.set(webHookUrl)
 
-            payload {
-              channel = if (repository.isAzure()) {
-                teamChannel
-              } else {
-                rcChannel
-              }
-              username = "Android Release"
-              iconEmoji = ":android:"
-            }
+        payload {
+          channel = if (isSnapshot()) {
+            rcChannel
+          } else {
+            teamChannel
+          }
+          username = "Android Release"
+          iconEmoji = ":android:"
+        }
 
-            publication {
-              publicName.set("PublisherSDK")
-              publication(publication)
-              repository(repository)
-            }
+        publication {
+          publicName.set("PublisherSDK")
+          publication(publication)
+          repositoryName.set(repoName)
+        }
 
-            git()
+        git()
 
-            changelog {
-              version.set(sdkVersion())
-              versionLinesStartWith("# Version")
-            }
+        changelog {
+          version.set(sdkVersion())
+          versionLinesStartWith("# Version")
+        }
 
-            if (repository.isNexusProd()) {
-              git {
-                format {
-                  context {
-                    markdown("""
+        if (isSnapshot()) {
+          git {
+            format {
+              context {
+                markdown(
+                    """
 *Promote as a RC*
 - Go on <$confluenceSpaceUrl/Bugfest+process|Bugfest creation page> and insert `${publication.version}` as RC name
 - Go on <$gerritProjectBranchesUrl|Gerrit> and create the `v${sdkVersion()}` branch on this commit SHA-1 (only for new version)
@@ -71,9 +78,8 @@ fun Project.addSlackDeploymentMessages() {
 - Go on <$confluenceSpaceUrl/Bugfest+Android+${publication.version}|Bugfest page> and execute tests
 *Release the RC*
 - Go on <https://go.crto.in/publisher-sdk-prod-deployment|Jenkins deploy job> and insert this commit SHA-1
-""".trimIndent())
-                  }
-                }
+""".trimIndent()
+                )
               }
             }
           }
@@ -88,5 +94,5 @@ private fun testAppUrl(version: String): String {
   //  broken. A proper solution could be to get the publication from the test-app module, but it may
   //  be extracted outside this project.
   //  But coordinates are pretty constant, so this is not a big deal for now.
-  return "http://nexus.criteo.prod/content/groups/android/com/criteo/pubsdk_android/publisher-app/$version/publisher-app-$version-staging.apk"
+  return "https://bintray.com/criteo/mobile/download_file?file_path=com%2Fcriteo%2Fpublisher%2Fcriteo-publisher-sdk-test-app%2F$version%2Fcriteo-publisher-sdk-test-app-$version-staging.apk"
 }

@@ -45,29 +45,19 @@ Releasing a new version of the PubSDK involves a few steps:
 8. Release the new _android-google-mediation_ version on Azure (see its README)
 9. Release the new _android-mopub-mediation_ version on Azure (see its README)
 
-## Internal releases on Nexus
-Each new version is published on the internal Nexus repository on post-submit. No manual action is needed
+## Development releases
+Each new version is published on the Bintray repository on post-submit. No manual action is needed
 at this point.
 
-### Use internal releases on Nexus
+### Development releases
 
-To use an internal release of the SDK as a dependency, you need to install the Nexus as a Maven
-repository, and then declare the dependency.
-
-In the root `build.gradle`:
-```Groovy
-allprojects {
-    repositories {
-        maven { url "http://nexus.criteo.prod/content/groups/android/" }
-    }
-}
-```
+To use a development release of the SDK as a dependency, you need to declare the dependency.
 
 In your module `build.gradle`:
 ```Groovy
 dependencies {
     // Adapt the version accordingly to your needs
-    implementation "com.criteo.publisher:criteo-publisher-sdk:3.4.0-20200317.1720"
+    implementation "com.criteo.publisher:criteo-publisher-sdk-development:3.4.0-20200317.1720"
 }
 ```
 

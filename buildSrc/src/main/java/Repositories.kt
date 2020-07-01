@@ -15,16 +15,16 @@
  */
 
 import azure.AzureBlobStorage
+import com.jfrog.bintray.gradle.BintrayExtension
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.dsl.RepositoryHandler
-import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.initialization.dsl.ScriptHandler
-import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.publish.maven.tasks.PublishToMavenRepository
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.kotlin.dsl.the
 import java.nio.file.Paths
 
 fun Project.addDefaultInputRepository() {
@@ -42,6 +42,8 @@ internal fun RepositoryHandler.addDefaultInputRepository() {
     setUrl("https://s3.amazonaws.com/moat-sdk-builds")
   }
   maven {
+    // TODO Remove this after migrating to another repository. This eases the migration: while
+    //  adapters are not migrated, we can fetch them from Nexus
     setUrl("http://nexus.criteo.prod/content/groups/android/")
   }
   maven {
@@ -67,31 +69,30 @@ internal fun Project.addDevRepository() {
   }
 }
 
-internal fun PublishingExtension.addNexusPreProdRepository() {
-  repositories {
-    maven {
-      name = "NexusPreProd"
-      setUrl("http://nexus.criteo.preprod/content/repositories/criteo.android.releases/")
-      withMavenCredentialsIfPresent()
-    }
-  }
-}
+fun Project.addBintrayRepository() {
+  the<BintrayExtension>().apply {
+    user = System.getenv("BINTRAY_USER")
+    key = System.getenv("BINTRAY_PASSWORD")
+    publish = true
 
-internal fun PublishingExtension.addNexusProdRepository() {
-  repositories {
-    maven {
-      name = "NexusProd"
-      setUrl("http://nexus.criteo.prod/content/repositories/criteo.android.releases/")
-      withMavenCredentialsIfPresent()
-    }
-  }
-}
+    with(pkg) {
+      repo = "mobile"
+      userOrg = "criteo"
+      name = "publisher-sdk"
+      desc = Publications.sdkDescription
+      websiteUrl = Publications.website
+      vcsUrl = Publications.githubUrl
+      setLicenses("Apache-2.0")
+      publicDownloadNumbers = true
 
-private fun MavenArtifactRepository.withMavenCredentialsIfPresent() {
-  if (System.getenv("MAVEN_USER") != null) {
-    credentials {
-      username = System.getenv("MAVEN_USER")
-      password = System.getenv("MAVEN_PASSWORD")
+      with(version) {
+        name = sdkPublicationVersion()
+      }
+    }
+
+    afterEvaluate {
+      val publicationNames = publishing.publications.map { it.name }.toTypedArray()
+      setPublications(*publicationNames)
     }
   }
 }
@@ -151,6 +152,3 @@ fun Project.addAzureRepository() {
     }
   }
 }
-
-fun MavenArtifactRepository.isNexusProd(): Boolean = name == "NexusProd"
-fun MavenArtifactRepository.isAzure(): Boolean = name == "azure"

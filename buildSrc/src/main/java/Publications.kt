@@ -19,13 +19,20 @@ import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.get
 
+object Publications {
+  const val sdkDescription = "SDK of Direct Bidder for App"
+  const val website = "https://publisherdocs.criteotilt.com/app/android/get-started/"
+  private const val githubRepo = "android-publisher-sdk"
+  const val githubUrl = "http://github.com/criteo/$githubRepo"
+  const val githubReadOnlyUrl = "scm:git:git://github.com/criteo/$githubRepo.git"
+  const val githubReadWriteUrl = "scm:git:ssh://github.com:criteo/$githubRepo.git"
+}
+
 fun Project.addPublication(name: String, publication: SdkPublication.() -> Unit) {
   publishing {
     publications {
       register(name, MavenPublication::class.java) {
-        afterEvaluate {
-          publication(SdkPublication(this, this@register))
-        }
+        publication(SdkPublication(this@addPublication, this@register))
       }
     }
   }
@@ -69,7 +76,7 @@ class SdkPublication(
 
     pom {
       name.set(project.provider { "$groupId:$artifactId" })
-      url.set("https://publisherdocs.criteotilt.com/app/android/get-started/")
+      url.set(Publications.website)
 
       licenses {
         license {
@@ -84,10 +91,9 @@ class SdkPublication(
       }
 
       scm {
-        // TODO Replace "todo" with the name of the repository
-        url.set("http://github.com/criteo/todo/tree/master")
-        connection.set("scm:git:git://github.com/criteo/todo.git")
-        developerConnection.set("scm:git:ssh://github.com:criteo/todo.git")
+        url.set(Publications.githubUrl)
+        connection.set(Publications.githubReadOnlyUrl)
+        developerConnection.set(Publications.githubReadWriteUrl)
       }
     }
   }

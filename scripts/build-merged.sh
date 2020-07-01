@@ -1,6 +1,6 @@
 #!/bin/bash -l
 
-# Run this script to assemble and publish artifacts to Criteo nexus.
+# Run this script to assemble and publish development artifacts.
 # You do not need to set up any environment, as a docker container will execute it.
 
 set -Eeuo pipefail

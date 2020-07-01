@@ -4,8 +4,8 @@
 # You do not need to set up any environment, as a docker container will execute it.
 
 # Explicitly bound environment variables
-MAVEN_USER="${MAVEN_USER}"
-MAVEN_PASSWORD="${MAVEN_PASSWORD}"
+BINTRAY_USER="${BINTRAY_USER}"
+BINTRAY_PASSWORD="${BINTRAY_PASSWORD}"
 AZURE_STORAGE_CONNECTION_STRING="${AZURE_STORAGE_CONNECTION_STRING}"
 SLACK_WEBHOOK="${SLACK_WEBHOOK}"
 
@@ -56,8 +56,8 @@ docker run \
     --rm \
     -v "${SRC}:${DST}" \
     -w "${DST}" \
-    -e "MAVEN_USER=${MAVEN_USER}" \
-    -e "MAVEN_PASSWORD=${MAVEN_PASSWORD}" \
+    -e "BINTRAY_USER=${BINTRAY_USER}" \
+    -e "BINTRAY_PASSWORD=${BINTRAY_PASSWORD}" \
     -e "AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING}" \
     -e "SLACK_WEBHOOK=${SLACK_WEBHOOK}" \
     ${DOCKER_IMAGE} \

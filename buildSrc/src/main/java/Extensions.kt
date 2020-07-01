@@ -24,6 +24,9 @@ import org.gradle.api.publish.PublishingExtension
 internal val Project.androidBase: BaseExtension get() =
   (this as ExtensionAware).extensions.getByName("android") as BaseExtension
 
+internal val Project.publishing: PublishingExtension get() =
+  (this as ExtensionAware).extensions.getByName("publishing") as PublishingExtension
+
 internal fun Project.androidBase(configure: BaseExtension.() -> Unit): Unit =
     (this as ExtensionAware).extensions.configure("android", configure)
 
@@ -34,7 +37,7 @@ internal fun Project.publishing(configure: PublishingExtension.() -> Unit): Unit
     (this as ExtensionAware).extensions.configure("publishing", configure)
 
 internal fun Project.hasPublishing(): Boolean =
-    hasProperty("publishing")
+    (this as ExtensionAware).extensions.findByName("publishing") != null
 
 internal fun Project.slack(configure: SlackPublishExtension.() -> Unit): Unit =
   (this as ExtensionAware).extensions.configure("slack", configure)

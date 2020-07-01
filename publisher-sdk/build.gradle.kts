@@ -21,6 +21,7 @@ plugins {
     id("com.vanniktech.dependency.graph.generator") version "0.5.0"
     id("com.vanniktech.android.javadoc") version "0.3.0"
     id("fr.pturpin.slack-publish")
+    id("com.jfrog.bintray")
 }
 
 androidLibModule() {
@@ -47,14 +48,14 @@ androidLibModule() {
     addBuildConfigField<Boolean>("preconditionThrowsOnException")
 }
 
-addAzureRepository()
-
 android.libraryVariants.all {
     val variantName = name
     addPublication(variantName) {
-        from(components[variantName])
-        addSourcesJar(variantName)
-        addJavadocJar(variantName)
+        afterEvaluate {
+            from(components[variantName])
+            addSourcesJar(variantName)
+            addJavadocJar(variantName)
+        }
 
         groupId = "com.criteo.publisher"
 
@@ -66,10 +67,12 @@ android.libraryVariants.all {
             "criteo-publisher-sdk-$variantName"
         }
 
-        pom.description.set("SDK of Direct Bidder for App")
+        pom.description.set(Publications.sdkDescription)
     }
 }
 
+addAzureRepository()
+addBintrayRepository()
 addSlackDeploymentMessages()
 
 dependencies {
