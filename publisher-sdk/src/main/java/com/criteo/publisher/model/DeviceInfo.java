@@ -90,7 +90,7 @@ public class DeviceInfo {
       userAgent = getWebViewUserAgent();
     } catch (Throwable ignore) {
       // FIXME this is not a RuntimeException, this is a throwable that should not be
-      //  catch and ignore so easily.
+      // caught and ignored so easily.
     }
 
     // If we failed to get a WebView UA, try to fall back to a system UA, instead

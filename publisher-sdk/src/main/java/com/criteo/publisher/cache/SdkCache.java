@@ -48,18 +48,7 @@ public class SdkCache {
     slotMap.put(key, slot);
   }
 
-  // FIXME: this kind of method should not exist:
-  //  The CacheAdUnit are used as slot description in the request sent to CDB.
-  //  This means that ad unit type is known before sending the CDB request.
-  //  When receiving slots from CDB, then this information is forgotten, and a new CacheAdUnit
-  //  is created from the Slot received from CDB but with fuzzy methods like this one.
-  //  Instead, we could generate a random slotid (not same concept as adunit id, see
-  //  https://review.crto.in/gitweb?p=publisher/direct-bidder.git;a=blob;f=directbidder-app/src/main/scala/com/criteo/directbidder/models/Types.scala;h=e50edc2d7d3916b91a746b43674d76aafd0e9521;hb=HEAD#l27),
-  //  give it to CDB, and reread it from CDB response.
-  //  Note that the AdUnitId are not necessary unique (for instance if a publisher ask for same
-  //  banner but in different size). So it could not be used as a key between request and
-  //  response.
-  //  See EE-608
+  // FIXME: EE-608
   private AdUnitType findAdUnitType(Slot slot) {
     if (slot.isNative()) {
       return CRITEO_CUSTOM_NATIVE;

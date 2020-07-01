@@ -18,7 +18,8 @@ package com.criteo.publisher.model;
 
 import androidx.annotation.NonNull;
 import com.criteo.publisher.util.AdUnitType;
-import com.criteo.publisher.util.ObjectsUtil;
+import com.criteo.publisher.util.ObjectUtils;
+import java.util.Arrays;
 
 public abstract class AdUnit {
 
@@ -50,12 +51,12 @@ public abstract class AdUnit {
       return false;
     }
     AdUnit adUnit = (AdUnit) o;
-    return ObjectsUtil.equals(adUnitId, adUnit.adUnitId) &&
+    return ObjectUtils.equals(adUnitId, adUnit.adUnitId) &&
         adUnitType == adUnit.adUnitType;
   }
 
   @Override
   public int hashCode() {
-    return ObjectsUtil.hash(adUnitId, adUnitType);
+    return Arrays.hashCode(new Object[] { adUnitId, adUnitType });
   }
 }

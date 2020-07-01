@@ -17,7 +17,8 @@
 package com.criteo.publisher.model;
 
 import com.criteo.publisher.util.AdUnitType;
-import com.criteo.publisher.util.ObjectsUtil;
+import com.criteo.publisher.util.ObjectUtils;
+import java.util.Arrays;
 
 public final class BannerAdUnit extends AdUnit {
 
@@ -44,11 +45,11 @@ public final class BannerAdUnit extends AdUnit {
       return false;
     }
     BannerAdUnit that = (BannerAdUnit) o;
-    return ObjectsUtil.equals(adSize, that.adSize);
+    return ObjectUtils.equals(adSize, that.adSize);
   }
 
   @Override
   public int hashCode() {
-    return ObjectsUtil.hash(super.hashCode(), adSize);
+    return Arrays.hashCode(new Object [] { super.hashCode(), adSize });
   }
 }

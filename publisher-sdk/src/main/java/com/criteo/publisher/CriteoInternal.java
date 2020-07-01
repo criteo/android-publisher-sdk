@@ -118,7 +118,7 @@ final class CriteoInternal extends Criteo {
   private void prefetchAdUnits(Executor executor, List<AdUnit> adUnits) {
     executor.execute(new SafeRunnable() {
       @Override
-      public void runSafely()  {
+      public void runSafely() {
         bidManager.prefetch(adUnits);
       }
     });

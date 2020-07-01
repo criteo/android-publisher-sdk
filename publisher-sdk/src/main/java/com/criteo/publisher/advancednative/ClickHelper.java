@@ -86,7 +86,7 @@ public class ClickHelper {
   }
 
   void redirectUserTo(@NonNull URI uri, @NonNull RedirectionListener listener) {
-    // We are here because a user clicked on ad. So we assume that there is currently an activity
+    // We are here because a user clicked on an Ad. So we assume that there is currently an activity
     // running which we use as the leaving activity for the redirection.
     ComponentName hostActivityName = topActivityFinder.getTopActivityName();
     redirection.redirect(uri.toString(), hostActivityName, listener);

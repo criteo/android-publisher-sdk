@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-// FIXME (ma.chentir) this class should be broken down into specific classes to handle each consent
-//  mechanism separately EE-823
 public class UserPrivacyUtil {
 
   // Regex according to the CCPA IAB String format defined in

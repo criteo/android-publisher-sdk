@@ -23,7 +23,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.model.BannerAdUnit;
-import com.criteo.publisher.util.ObjectsUtil;
+import com.criteo.publisher.util.ObjectUtils;
 
 public class CriteoBannerView extends WebView {
 
@@ -89,7 +89,7 @@ public class CriteoBannerView extends WebView {
   }
 
   private void doLoadAd(@Nullable BidToken bidToken) {
-    if (bidToken != null && !ObjectsUtil.equals(bannerAdUnit, bidToken.getAdUnit())) {
+    if (bidToken != null && !ObjectUtils.equals(bannerAdUnit, bidToken.getAdUnit())) {
       return;
     }
 

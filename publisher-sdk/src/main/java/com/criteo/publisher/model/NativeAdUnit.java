@@ -18,7 +18,8 @@ package com.criteo.publisher.model;
 
 import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 
-import com.criteo.publisher.util.ObjectsUtil;
+import com.criteo.publisher.util.ObjectUtils;
+import java.util.Arrays;
 
 public final class NativeAdUnit extends AdUnit {
 
@@ -45,11 +46,11 @@ public final class NativeAdUnit extends AdUnit {
       return false;
     }
     NativeAdUnit that = (NativeAdUnit) o;
-    return ObjectsUtil.equals(adSize, that.adSize);
+    return ObjectUtils.equals(adSize, that.adSize);
   }
 
   @Override
   public int hashCode() {
-    return ObjectsUtil.hash(super.hashCode(), adSize);
+    return Arrays.hashCode(new Object [] { super.hashCode(), adSize });
   }
 }

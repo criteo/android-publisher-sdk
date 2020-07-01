@@ -50,7 +50,6 @@ public class Slot {
   private String placementId;
   private String displayUrl;
   private int ttl;
-  //required for cache
   private long timeOfDownload;
   private double cpmValue;
   private NativeAssets nativeAssets;
@@ -180,22 +179,15 @@ public class Slot {
         '}';
   }
 
-  /// Checks if displayUrl is not null/empty
-  /// and if cpm is a valid number > 0
   public boolean isValid() {
-    //check cpm
     Double testCpm = this.getCpmAsNumber();
     if (testCpm == null || testCpm < 0.0d) {
       return false;
     }
 
-    // Check display Url
     return isNative() || URLUtil.isValidUrl(displayUrl);
   }
 
-  // Get the cpm as a double
-  // Returns null if conversion fails
-  // use isValid() to check if Slot is a valid slot
   public Double getCpmAsNumber() {
     try {
       this.cpmValue = Double.parseDouble(getCpm());

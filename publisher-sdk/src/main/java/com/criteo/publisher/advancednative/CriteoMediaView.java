@@ -48,8 +48,8 @@ import com.criteo.publisher.annotation.Internal;
  * &lt;/LinearLayout&gt;
  * </code></pre>
  * <p>
- * The <code>android:src</code> attribute let you define image placeholder while Ad's media are not
- * loaded (either because of slow network or even network timeout).
+ * The <code>android:src</code> attribute lets you define an image placeholder while Ad's media is
+ * loading (important under slow network conditions).
  *
  * @attr ref android.R.styleable#ImageView_src
  */

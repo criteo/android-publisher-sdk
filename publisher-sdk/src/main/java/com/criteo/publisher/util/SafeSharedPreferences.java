@@ -21,7 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
- * Wrapper around {@link SharedPreferences} that provide type safety when accessing data saved under
+ * Wrapper around {@link SharedPreferences} that provides type safety when accessing data saved under
  * keys in DefaultSharedPreferences storage (which we can't necessarily control). This is to prevent
  * the apps using our SDK from crashing in case of type mismatch.
  */
@@ -69,7 +69,7 @@ public class SafeSharedPreferences {
       value = sharedPreferences.getBoolean(key, defaultValue);
     } catch (ClassCastException e) {
       PreconditionsUtil.throwOrLog(
-          new IllegalStateException("Expect an boolean type when reading " + key, e)
+          new IllegalStateException("Expect a boolean type when reading " + key, e)
       );
     }
 

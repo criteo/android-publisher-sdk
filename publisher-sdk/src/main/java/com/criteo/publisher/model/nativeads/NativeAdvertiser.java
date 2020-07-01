@@ -36,7 +36,7 @@ public abstract class NativeAdvertiser {
   abstract String getDescription();
 
   /**
-   * This is an {@link URI} and not an {@link java.net.URL}, because deeplink are acceptable.
+   * This is an {@link URI} and not an {@link java.net.URL}, because deeplinks are acceptable.
    */
   @NonNull
   abstract URI getLogoClickUrl();

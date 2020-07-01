@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
  * Indicate that the annotated element will soon be part of the public API, but the entire feature
  * is not ready yet to be published publicly.
  *
- * This help the rollout of new APIs. Once a feature is finished, one may replace this annotation by
+ * This helps the rollout of new APIs. Once a feature is finished, one may replace this annotation by
  * {@link androidx.annotation.Keep} or add a matching proguard rule.
  */
 @Documented

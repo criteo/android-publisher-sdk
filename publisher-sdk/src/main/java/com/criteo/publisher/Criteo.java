@@ -32,7 +32,6 @@ import com.criteo.publisher.util.DeviceUtil;
 import java.util.List;
 
 public abstract class Criteo {
-
   private static final String TAG = Criteo.class.getSimpleName();
   private static Criteo criteo;
 

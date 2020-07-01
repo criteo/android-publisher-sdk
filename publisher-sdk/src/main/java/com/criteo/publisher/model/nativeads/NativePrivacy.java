@@ -32,7 +32,7 @@ public abstract class NativePrivacy {
   }
 
   /**
-   * This is an {@link URI} and not an {@link URL}, because deeplink are acceptable.
+   * This is an {@link URI} and not an {@link URL}, because deeplinks are acceptable.
    */
   @NonNull
   @SerializedName("optoutClickUrl")

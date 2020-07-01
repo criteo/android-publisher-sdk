@@ -21,7 +21,6 @@ import com.criteo.publisher.model.AdUnit;
 import java.util.UUID;
 
 public final class BidToken {
-
   @NonNull
   private final UUID tokenId;
 

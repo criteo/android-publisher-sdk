@@ -159,7 +159,7 @@ public class BidRequestSender {
   }
 
   /**
-   * Attempts to cancel all pending tasks of bid request.
+   * Attempt to cancel all pending tasks of bid request.
    */
   public void cancelAllPendingTasks() {
     synchronized (pendingTasksLock) {

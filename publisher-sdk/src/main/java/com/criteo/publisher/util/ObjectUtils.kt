@@ -14,11 +14,22 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher;
+package com.criteo.publisher.util
 
-public interface CriteoInterstitialAdDisplayListener {
-
-  void onAdReadyToDisplay();
-
-  void onAdFailedToDisplay(CriteoErrorCode error);
+object ObjectUtils {
+  @JvmStatic
+  fun equals(
+    a: Any?,
+    b: Any?
+  ): Boolean {
+    return a == b
+  }
+  
+  @JvmStatic
+  fun <T> getOrElse(
+    value: T?,
+    defaultValue: T?
+  ): T? {
+    return value ?: defaultValue
+  }
 }

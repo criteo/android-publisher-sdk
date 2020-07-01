@@ -40,7 +40,6 @@ import java.lang.ref.WeakReference;
 
 
 public class CriteoBannerEventController {
-
   @NonNull
   private final WeakReference<CriteoBannerView> view;
 

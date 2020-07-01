@@ -23,7 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.WebViewData;
-import com.criteo.publisher.util.ObjectsUtil;
+import com.criteo.publisher.util.ObjectUtils;
 
 public class CriteoInterstitial {
 
@@ -96,7 +96,7 @@ public class CriteoInterstitial {
   }
 
   private void doLoadAd(@Nullable BidToken bidToken) {
-    if (bidToken != null && !ObjectsUtil.equals(interstitialAdUnit, bidToken.getAdUnit())) {
+    if (bidToken != null && !ObjectUtils.equals(interstitialAdUnit, bidToken.getAdUnit())) {
       return;
     }
 

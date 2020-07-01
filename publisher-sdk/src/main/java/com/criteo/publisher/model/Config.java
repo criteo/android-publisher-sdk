@@ -16,7 +16,7 @@
 
 package com.criteo.publisher.model;
 
-import static com.criteo.publisher.util.ObjectsUtil.getOrElse;
+import static com.criteo.publisher.util.ObjectUtils.getOrElse;
 
 import android.content.Context;
 import android.content.SharedPreferences;
