@@ -41,8 +41,8 @@ android {
 
 // Export APK for all build types (release, staging, debug)
 addPublication("Apk") {
-    groupId = "com.criteo.pubsdk_android"
-    artifactId = "publisher-app"
+    groupId = "com.criteo.publisher"
+    artifactId = "criteo-publisher-sdk-test-app"
 
     pom {
         description.set("Test Application for the Criteo Publisher SDK")
