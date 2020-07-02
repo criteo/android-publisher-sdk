@@ -42,11 +42,6 @@ internal fun RepositoryHandler.addDefaultInputRepository() {
     setUrl("https://s3.amazonaws.com/moat-sdk-builds")
   }
   maven {
-    // TODO Remove this after migrating to another repository. This eases the migration: while
-    //  adapters are not migrated, we can fetch them from Nexus
-    setUrl("http://nexus.criteo.prod/content/groups/android/")
-  }
-  maven {
     // TODO EE-1167: remove this once development artifacts are sync on jcenter
     setUrl("https://dl.bintray.com/criteo/mobile")
   }
