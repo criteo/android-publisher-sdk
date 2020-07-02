@@ -14,3 +14,9 @@ jobs:
 
       - name: Build & Run Java tests
         run: ./gradlew build assembleAndroidTest --info --stacktrace
+
+      - name: Report test failures
+        uses: ashley-taylor/junit-report-annotations-action@1.2
+          if: always()
+          with:
+            access-token: ${{ secrets.GITHUB_TOKEN }}

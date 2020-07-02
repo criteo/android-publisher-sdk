@@ -40,6 +40,9 @@ dependencies {
   implementation(Deps.AndroidX.Annotations)
   implementation(Deps.AndroidX.RecyclerView)
 
+  testImplementation(Deps.JUnit.JUnit)
+  testImplementation(Deps.AssertJ.AssertJ)
+
   androidTestImplementation(Deps.AndroidX.SupportCoreUtils)
   androidTestImplementation(Deps.AndroidX.Test.Runner)
   androidTestImplementation(Deps.AndroidX.Test.Rules)
