@@ -24,8 +24,11 @@ androidLibModule()
 dependencies {
     implementation(kotlin("stdlib"))
 
-    testImplementation(project(":publisher-sdk"))
-    testImplementation(project(":test-utils"))
+    // Using dynamic version is expected here: this module tests the last CDB mock against the CDB
+    // preprod.
+    testImplementation("com.criteo.publisher:criteo-publisher-sdk-debug:+")
+    testImplementation("com.criteo.publisher:criteo-publisher-sdk-test-utils:+")
+
     testImplementation(Deps.JUnit.JUnit)
     testImplementation(Deps.AssertJ.AssertJ)
     testImplementation(Deps.Square.OkHttp.OkHttp)
