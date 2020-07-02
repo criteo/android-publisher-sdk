@@ -1,0 +1,16 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Android SDK
+        uses: malinskiy/action-android/install-sdk@release/0.0.7
+
+      - name: Build & Run Java tests
+        run: ./gradlew build assembleAndroidTest --info --stacktrace
