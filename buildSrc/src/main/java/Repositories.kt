@@ -45,9 +45,6 @@ internal fun RepositoryHandler.addDefaultInputRepository() {
     // TODO EE-1167: remove this once development artifacts are sync on jcenter
     setUrl("https://dl.bintray.com/criteo/mobile")
   }
-  maven {
-    setUrl("https://jitpack.io")
-  }
 }
 
 /**

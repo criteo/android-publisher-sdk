@@ -88,12 +88,6 @@ object Deps {
     const val EqualsVerifier = "nl.jqno.equalsverifier:equalsverifier:$version"
   }
 
-  object GitHub {
-    object Kevinmost {
-      const val JUnitRetryRule = "com.github.kevinmost:junit-retry-rule:cbdd972d7c"
-    }
-  }
-
   object Google {
     private const val version = "19.0.1"
 
@@ -156,7 +150,6 @@ object Deps {
       private const val version = "4.7.2"
 
       const val MockWebServer = "com.squareup.okhttp3:mockwebserver:$version"
-      const val OkHttp = "com.squareup.okhttp3:okhttp:$version"
     }
 
     object Picasso {
