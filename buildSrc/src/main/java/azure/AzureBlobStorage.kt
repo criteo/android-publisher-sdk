@@ -103,9 +103,10 @@ class AzureBlobStorage(private val containerName: String) {
     val blob = blobContainer.getBlockBlobReference(blobName)
 
     println("Upload $path to $blobName")
-    Files.newInputStream(path).use {
-      blob.upload(it, Files.size(path))
-    }
+    // TODO This temporary deactivate the publishing on Azure to test the new deployment pipeline.
+//    Files.newInputStream(path).use {
+//      blob.upload(it, Files.size(path))
+//    }
   }
 
   private fun createBlobContainer(): CloudBlobContainer {
