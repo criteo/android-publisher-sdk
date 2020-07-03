@@ -1,0 +1,23 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    if: "!github.event.release.prerelease"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Android SDK
+        uses: malinskiy/action-android/install-sdk@release/0.0.7
+
+      - name: Deploy artifacts and notify on Slack
+        env:
+          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+        run: ./gradlew publishReleasePublicationToAzureRepository \
+          sendReleaseDeployedToAzureMessageToSlack \
+          -PisRelease=true
