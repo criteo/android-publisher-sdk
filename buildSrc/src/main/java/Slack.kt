@@ -14,6 +14,7 @@
  *    limitations under the License.
  */
 
+import com.slack.api.model.block.composition.BlockCompositions.markdownText
 import org.gradle.api.Project
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.kotlin.dsl.withType
@@ -33,7 +34,6 @@ private fun Project.addSlackDeploymentMessage(publication: MavenPublication, rep
   val teamChannel = "#pub-sdk-private"
   val rcChannel = "#pub-sdk-release-candidates"
   val confluenceSpaceUrl = "https://go.crto.in/publisher-sdk-bugfest"
-  val gerritProjectBranchesUrl = "https://go.crto.in/publisher-sdk-android-branches"
 
   slack {
     messages {
@@ -61,23 +61,39 @@ private fun Project.addSlackDeploymentMessage(publication: MavenPublication, rep
         changelog {
           version.set(sdkVersion())
           versionLinesStartWith("# Version")
+
+          if (isSnapshot()) {
+            // On snapshots, we show the changelog in a code block so we can copy/paste it.
+            format {
+              section {
+                text = markdownText("```${changelog.get()}```")
+              }
+            }
+          }
         }
 
         if (isSnapshot()) {
           git {
             format {
               context {
+                val gitCommand = "git fetch origin ${lastCommitSha1()}" +
+                    " && git checkout FETCH_HEAD" +
+                    " && git switch -c v${sdkVersion()}" +
+                    " && git push"
+
                 markdown(
                     """
 *Promote as a RC*
 - Go on <$confluenceSpaceUrl/Bugfest+process|Bugfest creation page> and insert `${publication.version}` as RC name
-- Go on <$gerritProjectBranchesUrl|Gerrit> and create the `v${sdkVersion()}` branch on this commit SHA-1 (only for new version)
+- Run `$gitCommand`
 - Share this message on $teamChannel
 *Validate the RC*
 - Install the <${testAppUrl(publication.version)}|TestApp APK>
 - Go on <$confluenceSpaceUrl/Bugfest+Android+${publication.version}|Bugfest page> and execute tests
 *Release the RC*
-- Go on <https://go.crto.in/publisher-sdk-prod-deployment|Jenkins deploy job> and insert this commit SHA-1
+- Create a <https://github.com/criteo/android-publisher-sdk/releases/new|new GitHub release> and insert:
+  - Tag version, target, Release title: `v${sdkVersion()}`
+  - Description: the changelog above
 """.trimIndent()
                 )
               }
