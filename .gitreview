@@ -1,5 +1,0 @@
-[gerrit]
-host=review.crto.in
-port=29418
-project=pub-sdk/mochi
-defaultbranch=master
