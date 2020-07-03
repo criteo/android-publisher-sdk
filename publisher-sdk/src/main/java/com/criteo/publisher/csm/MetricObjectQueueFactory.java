@@ -20,8 +20,9 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.util.BuildConfigWrapper;
-import com.criteo.publisher.util.PreconditionsUtil;
 import com.squareup.tape.FileObjectQueue;
 import com.squareup.tape.InMemoryObjectQueue;
 import com.squareup.tape.ObjectQueue;
@@ -31,6 +32,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class MetricObjectQueueFactory {
+
+  @NonNull
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @NonNull
   private final Context context;
@@ -54,8 +58,7 @@ public class MetricObjectQueueFactory {
   @NonNull
   public ObjectQueue<Metric> create() {
     File file = getQueueFile();
-    ObjectQueue<Metric> tapeObjectQueue = createTapeObjectQueue(file);
-    return tapeObjectQueue;
+    return createTapeObjectQueue(file);
   }
 
   @VisibleForTesting
@@ -86,7 +89,8 @@ public class MetricObjectQueueFactory {
       } catch (IOException e) {
         exception.addSuppressed(e);
       } finally {
-        PreconditionsUtil.throwOrLog(exception);
+        logger.error("Error while reading CSM queue file. "
+            + "Recovering by recreating it or using in-memory queue", exception);
       }
     }
 
