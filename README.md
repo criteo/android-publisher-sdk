@@ -13,4 +13,4 @@ for detailed setup and usage instructions.
 Please contact your technical support representative for any questions about the SDK.
 
 ## License
-[Apache Licence, v2.0](LICENSE)
+[Apache License v2.0](LICENSE)
