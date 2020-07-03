@@ -1,6 +1,12 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -22,3 +28,24 @@ jobs:
           access-token: ${{ secrets.GITHUB_TOKEN }}
           path: "**/TEST-*.xml"
           testSrcPath: "**/test/"
+
+  deploy-development-artifacts:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    needs:
+      - build
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Android SDK
+        uses: malinskiy/action-android/install-sdk@release/0.0.7
+
+      - name: Deploy artifacts and notify on Slack
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
+          BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
+        run: ./gradlew bintrayUpload sendReleaseDeployedToBintrayMessageToSlack
