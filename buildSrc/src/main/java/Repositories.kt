@@ -68,7 +68,7 @@ internal fun Project.addDevRepository() {
 fun Project.addBintrayRepository() {
   the<BintrayExtension>().apply {
     user = System.getenv("BINTRAY_USER")
-    key = System.getenv("BINTRAY_PASSWORD")
+    key = System.getenv("BINTRAY_KEY")
     publish = true
 
     with(pkg) {
