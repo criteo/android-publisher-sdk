@@ -92,6 +92,7 @@ class NativeAdMapperTest {
       on { advertiserDescription } doReturn "advDescription"
       on { this.advertiserLogoUrl } doReturn advertiserLogoUrl
       on { privacyOptOutImageUrl } doReturn adChoiceUrl
+      on { privacyLongLegalText } doReturn "longLegalText"
     }
 
     val nativeAd = mapper.map(assets, WeakReference(null), mock())
@@ -104,6 +105,7 @@ class NativeAdMapperTest {
     assertThat(nativeAd.advertiserDomain).isEqualTo("advDomain")
     assertThat(nativeAd.advertiserDescription).isEqualTo("advDescription")
     assertThat(nativeAd.advertiserLogoMedia).isEqualTo(CriteoMedia.create(advertiserLogoUrl))
+    assertThat(nativeAd.legalText).isEqualTo("longLegalText")
 
     verify(rendererHelper).preloadMedia(productImageUrl)
     verify(rendererHelper).preloadMedia(advertiserLogoUrl)

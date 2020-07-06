@@ -48,6 +48,7 @@ public class TestAppNativeRenderer implements CriteoNativeRenderer {
     nativeView.<TextView>findViewById(R.id.ad_call_to_action).setText(nativeAd.getCallToAction());
     nativeView.<TextView>findViewById(R.id.ad_advertiser).setText(nativeAd.getAdvertiserDomain());
     nativeView.<TextView>findViewById(R.id.ad_store).setText(nativeAd.getAdvertiserDescription());
+    nativeView.<TextView>findViewById(R.id.ad_legal_text).setText(nativeAd.getLegalText());
 
     helper.setMediaInView(nativeAd.getProductMedia(), nativeView.findViewById(R.id.ad_media));
     helper.setMediaInView(nativeAd.getAdvertiserLogoMedia(), nativeView.findViewById(R.id.ad_app_icon));

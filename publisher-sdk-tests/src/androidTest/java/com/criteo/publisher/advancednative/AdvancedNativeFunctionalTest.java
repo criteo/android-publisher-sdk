@@ -25,6 +25,7 @@ import static com.criteo.publisher.activity.TestNativeActivity.AD_LAYOUT_TAG;
 import static com.criteo.publisher.activity.TestNativeActivity.CALL_TO_ACTION_TAG;
 import static com.criteo.publisher.activity.TestNativeActivity.DESCRIPTION_TAG;
 import static com.criteo.publisher.activity.TestNativeActivity.PRICE_TAG;
+import static com.criteo.publisher.activity.TestNativeActivity.PRIVACY_LEGAL_TEXT_TAG;
 import static com.criteo.publisher.activity.TestNativeActivity.PRODUCT_IMAGE_TAG;
 import static com.criteo.publisher.activity.TestNativeActivity.RECYCLER_VIEW_TAG;
 import static com.criteo.publisher.activity.TestNativeActivity.TITLE_TAG;
@@ -157,6 +158,7 @@ public class AdvancedNativeFunctionalTest {
     assertEquals(product.getCallToAction(), textInView(nativeAdView, CALL_TO_ACTION_TAG));
     assertEquals(expectedAssets.getAdvertiserDomain(), textInView(nativeAdView, ADVERTISER_DOMAIN_TAG));
     assertEquals(expectedAssets.getAdvertiserDescription(), textInView(nativeAdView, ADVERTISER_DESCRIPTION_TAG));
+    assertEquals(expectedAssets.getPrivacyLongLegalText(), textInView(nativeAdView, PRIVACY_LEGAL_TEXT_TAG));
 
     // Check product image that should be replaced
     Drawable defaultDrawable = activityRule.getActivity().getDefaultDrawable();
@@ -183,6 +185,7 @@ public class AdvancedNativeFunctionalTest {
     checkClickOnViewRedirectTo(nativeAdView, ADVERTISER_LOGO_TAG, clickUrl);
     checkClickOnViewRedirectTo(nativeAdView, clickUrl);
     checkClickOnViewRedirectTo(adChoiceView, expectedAssets.getPrivacyOptOutClickUrl().toString());
+    checkClickOnViewRedirectTo(nativeAdView, PRIVACY_LEGAL_TEXT_TAG, clickUrl);
   }
 
   private ViewGroup getAdLayout() {

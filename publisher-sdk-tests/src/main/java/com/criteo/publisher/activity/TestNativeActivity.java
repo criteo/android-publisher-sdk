@@ -62,6 +62,7 @@ public class TestNativeActivity extends Activity {
   public static final Object ADVERTISER_DOMAIN_TAG = new Object();
   public static final Object ADVERTISER_DESCRIPTION_TAG = new Object();
   public static final Object ADVERTISER_LOGO_TAG = new Object();
+  public static final Object PRIVACY_LEGAL_TEXT_TAG = new Object();
 
   private CriteoNativeLoader nativeLoaderInAdLayout;
   private ViewGroup adLayout;
@@ -195,6 +196,7 @@ public class TestNativeActivity extends Activity {
       layout.addView(createTextView(context, ADVERTISER_DOMAIN_TAG));
       layout.addView(createTextView(context, ADVERTISER_DESCRIPTION_TAG));
       layout.addView(createMediaView(context, ADVERTISER_LOGO_TAG));
+      layout.addView(createTextView(context, PRIVACY_LEGAL_TEXT_TAG));
       return layout;
     }
 
@@ -217,6 +219,7 @@ public class TestNativeActivity extends Activity {
       ((TextView) layout.getChildAt(6)).setText(nativeAd.getAdvertiserDescription());
       ((CriteoMediaView) layout.getChildAt(7)).setPlaceholder(getDefaultDrawable());
       helper.setMediaInView(nativeAd.getAdvertiserLogoMedia(), (CriteoMediaView) layout.getChildAt(7));
+      ((TextView) layout.getChildAt(8)).setText(nativeAd.getLegalText());
     }
 
     private TextView createTextView(@NonNull Context context, @NonNull Object tag) {
