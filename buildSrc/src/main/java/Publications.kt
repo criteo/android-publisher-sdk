@@ -23,7 +23,7 @@ object Publications {
   const val sdkDescription = "SDK of Direct Bidder for App"
   const val website = "https://publisherdocs.criteotilt.com/app/android/get-started/"
   private const val githubRepo = "android-publisher-sdk"
-  const val githubUrl = "http://github.com/criteo/$githubRepo"
+  const val githubUrl = "https://github.com/criteo/$githubRepo"
   const val githubReadOnlyUrl = "scm:git:git://github.com/criteo/$githubRepo.git"
   const val githubReadWriteUrl = "scm:git:ssh://github.com:criteo/$githubRepo.git"
 }
