@@ -1,3 +1,8 @@
+# Version 3.7.1
+
+- Features
+  - Provide legal privacy text for native in `CriteoNativeAd#getLegalText`
+
 # Version 3.7.0
 
 - Features

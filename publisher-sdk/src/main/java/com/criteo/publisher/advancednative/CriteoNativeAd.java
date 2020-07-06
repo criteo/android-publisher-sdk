@@ -122,6 +122,11 @@ public class CriteoNativeAd {
     return CriteoMedia.create(assets.getAdvertiserLogoUrl());
   }
 
+  @NonNull
+  public String getLegalText() {
+    return assets.getPrivacyLongLegalText();
+  }
+
   /**
    * Create a new rendered native view.
    * <p>
