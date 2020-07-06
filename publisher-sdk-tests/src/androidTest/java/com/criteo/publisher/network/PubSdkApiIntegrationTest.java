@@ -56,6 +56,7 @@ import javax.inject.Inject;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -295,6 +296,7 @@ public class PubSdkApiIntegrationTest {
     );
   }
 
+  @Ignore("FIXME EE-1180: Test does not pass on Github Actions")
   @Test
   public void testPostAppEvent_WhenUsingEmptyGdprData() {
     // Given

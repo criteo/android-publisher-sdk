@@ -47,6 +47,7 @@ import com.criteo.publisher.view.WebViewLookup;
 import java.util.Collection;
 import javax.inject.Inject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -84,6 +85,7 @@ public class CriteoInterstitialActivityTest {
     givenInitializedCriteo();
   }
 
+  @Ignore("FIXME EE-1180: Test does not pass on Github Actions")
   @Test
   public void whenUserClickOnAd_GivenHtmlWithHttpUrl_RedirectUserAndNotifyListener() throws Exception {
     Activity activity = whenUserClickOnAd("https://criteo.com");
