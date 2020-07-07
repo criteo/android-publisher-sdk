@@ -1,6 +1,3 @@
-import Deps.Criteo.Mediation.adMobAdapter
-import Deps.Criteo.Mediation.moPubAdapter
-
 /*
  *    Copyright 2020 Criteo
  *
@@ -16,6 +13,9 @@ import Deps.Criteo.Mediation.moPubAdapter
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
+import Deps.Criteo.Mediation.adMobAdapter
+import Deps.Criteo.Mediation.moPubAdapter
 
 plugins {
     id("com.android.application")
@@ -60,7 +60,14 @@ addPublication("Apk") {
     }
 }
 
-addBintrayRepository()
+addBintrayRepository {
+    // JCenter only accepts packages representing library with .jar or .aar
+    // The test app is not in this case. Hence, we push it on Bintray but in a dedicated package,
+    // that will not get sync with JCenter (as it is not needed).
+    with(pkg) {
+        name = "publisher-sdk-test-app"
+    }
+}
 
 dependencies {
     implementation(project(":publisher-sdk"))

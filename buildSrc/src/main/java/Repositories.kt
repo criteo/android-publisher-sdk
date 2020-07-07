@@ -65,7 +65,7 @@ internal fun Project.addDevRepository() {
   }
 }
 
-fun Project.addBintrayRepository() {
+fun Project.addBintrayRepository(configure: BintrayExtension.() -> Unit = {}) {
   the<BintrayExtension>().apply {
     user = System.getenv("BINTRAY_USER")
     key = System.getenv("BINTRAY_KEY")
@@ -90,6 +90,8 @@ fun Project.addBintrayRepository() {
       val publicationNames = publishing.publications.map { it.name }.toTypedArray()
       setPublications(*publicationNames)
     }
+
+    configure(this)
   }
 }
 
