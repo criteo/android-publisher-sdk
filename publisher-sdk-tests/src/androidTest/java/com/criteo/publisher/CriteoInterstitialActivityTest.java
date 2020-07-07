@@ -106,6 +106,7 @@ public class CriteoInterstitialActivityTest {
     verifyNoMoreInteractions(listener);
   }
 
+  @Ignore("FIXME EE-1180: Test does not pass on Github Actions")
   @Test
   public void whenUserClickOnAd_GivenHtmlWithHandledDeepLink_RedirectUserAndNotifyListener() throws Exception {
     Activity activity = whenUserClickOnAd("criteo-test://dummy-ad-activity");
