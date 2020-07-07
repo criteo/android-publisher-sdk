@@ -41,10 +41,6 @@ internal fun RepositoryHandler.addDefaultInputRepository() {
   maven {
     setUrl("https://s3.amazonaws.com/moat-sdk-builds")
   }
-  maven {
-    // TODO EE-1167: remove this once development artifacts are sync on jcenter
-    setUrl("https://dl.bintray.com/criteo/mobile")
-  }
 }
 
 /**
