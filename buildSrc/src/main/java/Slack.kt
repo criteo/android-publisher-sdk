@@ -63,6 +63,8 @@ private fun Project.addSlackDeploymentMessage(publication: MavenPublication, rep
           versionLinesStartWith("# Version")
 
           if (isSnapshot()) {
+            versionLinesStartWith("# Next version")
+
             // On snapshots, we show the changelog in a code block so we can copy/paste it.
             format {
               section {
