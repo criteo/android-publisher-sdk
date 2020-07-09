@@ -21,19 +21,18 @@ import org.gradle.kotlin.dsl.withType
 
 fun Project.addSlackDeploymentMessages() {
   afterEvaluate {
-    for (repoName in listOf("Azure", "Bintray")) {
-      publishing.publications.withType<MavenPublication> {
-        addSlackDeploymentMessage(this, repoName)
-      }
+    publishing.publications.withType<MavenPublication> {
+      addSlackDeploymentMessage(this)
     }
   }
 }
 
-private fun Project.addSlackDeploymentMessage(publication: MavenPublication, repoName: String) {
+private fun Project.addSlackDeploymentMessage(publication: MavenPublication) {
   val webHookUrl = System.getenv("SLACK_WEBHOOK") ?: return
   val teamChannel = "#pub-sdk-private"
   val rcChannel = "#pub-sdk-release-candidates"
   val confluenceSpaceUrl = "https://go.crto.in/publisher-sdk-bugfest"
+  val repoName = "Bintray"
 
   slack {
     messages {
