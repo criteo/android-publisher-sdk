@@ -2,6 +2,9 @@
 
 - Features
   - Provide legal privacy text for native in `CriteoNativeAd#getLegalText`
+  - Artifacts are now delivered through `JCenter` repository instead of a custom one: from this
+  version, the line `maven { url "https://pubsdk-bin.criteo.com/publishersdk/android" }` can be
+  removed.
 
 # Version 3.7.0
 

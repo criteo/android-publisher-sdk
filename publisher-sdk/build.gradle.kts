@@ -71,7 +71,6 @@ android.libraryVariants.all {
     }
 }
 
-addAzureRepository()
 addBintrayRepository()
 addSlackDeploymentMessages()
 

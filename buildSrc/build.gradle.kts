@@ -27,7 +27,6 @@ repositories {
 dependencies {
   implementation(gradleApi())
   implementation("com.android.tools.build:gradle:3.6.1")
-  implementation("com.microsoft.azure:azure-storage:8.6.5")
   implementation("gradle.plugin.fr.pturpin.slackpublish:slack-publish:0.2.0")
   implementation("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5")
 }
