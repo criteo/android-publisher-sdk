@@ -1,8 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
   package="com.criteo.pubsdk_android">
 
   <uses-permission android:name="android.permission.INTERNET"/>
+
+  <!--
+  MoPub requires minSdk=19, while the SDK had minSdk=16
+  See https://developer.android.com/studio/build/manifest-merge#override_uses-sdk_for_imported_libraries
+  -->
+  <uses-sdk tools:overrideLibrary="com.criteo.mediation.mopub,
+      com.mopub.mobileads.base,
+      com.mopub.mobileads.banner,
+      com.mopub.mobileads.interstitial,
+      com.mopub.mobileads.native_static,
+      androidx.media2.common,
+      androidx.media2.player,
+      androidx.media2.session,
+      androidx.media2.widget" />
 
   <application
     android:allowBackup="true"
