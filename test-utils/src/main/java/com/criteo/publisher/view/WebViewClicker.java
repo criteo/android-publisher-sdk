@@ -17,7 +17,6 @@
 package com.criteo.publisher.view;
 
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
-import static org.junit.Assert.assertEquals;
 
 import android.os.Build.VERSION_CODES;
 import android.webkit.WebView;
@@ -29,10 +28,8 @@ import java.util.concurrent.CountDownLatch;
 
 public class WebViewClicker {
 
-  private static final String AD_ID = "click";
-
   public String getAdHtmlWithClickUrl(@NonNull String clickUrl) {
-    return "<html><body><a href='" + clickUrl + "' id='" + AD_ID + "'>My Awesome Ad</a></body></html>";
+    return "<html><body><a href='" + clickUrl + "'>My Awesome Ad</a></body></html>";
   }
 
   @RequiresApi(api = VERSION_CODES.O)
@@ -55,11 +52,11 @@ public class WebViewClicker {
     // Simulate click via JavaScript
     runOnMainThreadAndWait(() -> {
       webView.evaluateJavascript("(function() {\n"
-          + "  var element = document.getElementById('" + AD_ID + "');\n"
-          + "  if (element === null) {\n"
+          + "  var elements = document.getElementsByTagName('a');\n"
+          + "  if (elements.length != 1) {\n"
           + "    return false;\n"
           + "  }\n"
-          + "  element.click();\n"
+          + "  elements[0].click();\n"
           + "  return true;\n"
           + "})();", value -> {
         if (!"true".equals(value)) {
@@ -67,7 +64,6 @@ public class WebViewClicker {
         } else {
           isClickDone.complete(null);
         }
-        assertEquals("Clickable element was not found in the WebView", "true", value);
       });
     });
 
@@ -75,7 +71,7 @@ public class WebViewClicker {
   }
 
   @RequiresApi(api = VERSION_CODES.M)
-  private void waitUntilWebViewIsLoaded(@NonNull WebView webView) throws Exception {
+  public void waitUntilWebViewIsLoaded(@NonNull WebView webView) throws Exception {
     CountDownLatch isHtmlLoaded = new CountDownLatch(1);
 
     runOnMainThreadAndWait(() -> {
