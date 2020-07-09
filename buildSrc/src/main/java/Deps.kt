@@ -131,11 +131,10 @@ object Deps {
   }
 
   object MoPub {
-
-    private const val version = "5.10.0"
+    private const val version = "5.13.1"
 
     const val Banner = "com.mopub:mopub-sdk-banner:$version@aar"
-    const val Interstitial = "com.mopub:mopub-sdk-interstitial:$version@aar"
+    const val Interstitial = "com.mopub:mopub-sdk-fullscreen:$version@aar"
     const val Native = "com.mopub:mopub-sdk-native-static:$version@aar"
   }
 

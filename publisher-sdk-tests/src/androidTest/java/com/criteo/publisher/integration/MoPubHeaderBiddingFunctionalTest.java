@@ -50,9 +50,9 @@ import com.mopub.common.MoPub;
 import com.mopub.common.SdkConfiguration;
 import com.mopub.common.logging.MoPubLog.LogLevel;
 import com.mopub.mobileads.DefaultBannerAdListener;
-import com.mopub.mobileads.DefaultInterstitialAdListener;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubInterstitial;
+import com.mopub.mobileads.MoPubInterstitial.InterstitialAdListener;
 import com.mopub.mobileads.MoPubView;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -411,7 +411,7 @@ public class MoPubHeaderBiddingFunctionalTest {
       }
     }
 
-    private class SyncInterstitialAdListener extends DefaultInterstitialAdListener {
+    private class SyncInterstitialAdListener implements InterstitialAdListener {
 
       @Override
       public void onInterstitialLoaded(MoPubInterstitial interstitial) {
@@ -421,6 +421,18 @@ public class MoPubHeaderBiddingFunctionalTest {
       @Override
       public void onInterstitialFailed(MoPubInterstitial interstitial, MoPubErrorCode errorCode) {
         onFailed();
+      }
+
+      @Override
+      public void onInterstitialShown(MoPubInterstitial interstitial) {
+      }
+
+      @Override
+      public void onInterstitialClicked(MoPubInterstitial interstitial) {
+      }
+
+      @Override
+      public void onInterstitialDismissed(MoPubInterstitial interstitial) {
       }
     }
   }
