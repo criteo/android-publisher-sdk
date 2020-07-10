@@ -47,11 +47,12 @@ import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.util.BuildConfigWrapper;
+import com.kevinmost.junit_retry_rule.Retry;
+import com.kevinmost.junit_retry_rule.RetryRule;
 import java.util.Collections;
 import java.util.List;
 import javax.inject.Inject;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
@@ -59,10 +60,17 @@ import org.mockito.MockitoAnnotations;
 public class CriteoFunctionalTest {
 
   @Rule
+  public final RetryRule retry = new RetryRule();
+
+  @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   @Rule
-  public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(DummyActivity.class);
+  public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(
+      DummyActivity.class,
+      false,
+      false
+  );
 
   private final BannerAdUnit validBannerAdUnit = TestAdUnits.BANNER_320_50;
   private final InterstitialAdUnit validInterstitialAdUnit = TestAdUnits.INTERSTITIAL;
@@ -121,8 +129,8 @@ public class CriteoFunctionalTest {
     verify(api, times(1)).loadCdb(any(), any());
   }
 
-  @Ignore("FIXME EE-1180: Test does not pass on Github Actions")
   @Test
+  @Retry(timeout = 2000)
   public void init_GivenPrefetchAdUnitAndLaunchedActivity_CallConfigAndCdbAndBearcat()
       throws Exception {
     givenInitializedCriteo(validBannerAdUnit);

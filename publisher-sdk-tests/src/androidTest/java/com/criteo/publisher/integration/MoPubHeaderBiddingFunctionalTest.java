@@ -46,6 +46,8 @@ import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.view.WebViewLookup;
+import com.kevinmost.junit_retry_rule.Retry;
+import com.kevinmost.junit_retry_rule.RetryRule;
 import com.mopub.common.MoPub;
 import com.mopub.common.SdkConfiguration;
 import com.mopub.common.logging.MoPubLog.LogLevel;
@@ -59,7 +61,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -77,6 +78,9 @@ public class MoPubHeaderBiddingFunctionalTest {
    */
   private static final String MOPUB_BANNER_ID = "d2f3ed80e5da4ae1acde0971eac30fa4";
   private static final String MOPUB_INTERSTITIAL_ID = "83a2996696284da881edaf1a480e5d7c";
+
+  @Rule
+  public final RetryRule retry = new RetryRule();
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
@@ -206,16 +210,16 @@ public class MoPubHeaderBiddingFunctionalTest {
     assertCriteoKeywordsAreInjectedInMoPubView(moPubInterstitial.getKeywords(), interstitialAdUnit);
   }
 
-  @Ignore("FIXME EE-1180: Test does not pass on Github Actions")
   @Test
+  @Retry
   public void loadingMoPubBanner_GivenValidBanner_MoPubViewContainsCreative() throws Exception {
     String html = loadMoPubHtmlBanner(validBannerAdUnit);
 
     assertTrue(html.contains(STUB_CREATIVE_IMAGE));
   }
 
-  @Ignore("FIXME EE-1180: Test does not pass on Github Actions")
   @Test
+  @Retry
   public void loadingMoPubBanner_GivenDemoBanner_MoPubViewUsesDemoDisplayUrl() throws Exception {
     givenUsingCdbProd();
     ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
