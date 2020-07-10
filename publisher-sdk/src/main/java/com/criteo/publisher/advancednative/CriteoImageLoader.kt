@@ -13,37 +13,47 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.criteo.publisher.advancednative
 
-package com.criteo.publisher.advancednative;
+import android.graphics.drawable.Drawable
+import android.widget.ImageView
+import androidx.annotation.UiThread
+import com.criteo.publisher.concurrent.AsyncResources
+import com.squareup.picasso.Callback
+import com.squareup.picasso.Picasso
+import com.squareup.picasso.RequestCreator
+import java.net.URL
 
-import android.graphics.drawable.Drawable;
-import android.widget.ImageView;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.UiThread;
-import com.squareup.picasso.Picasso;
-import java.net.URL;
+class CriteoImageLoader(
+    private val picasso: Picasso,
+    private val asyncResources: AsyncResources
+) : ImageLoader {
 
-public class CriteoImageLoader implements ImageLoader {
-
-  private final Picasso picasso;
-
-  public CriteoImageLoader(@NonNull Picasso picasso) {
-    this.picasso = picasso;
-  }
-
-  @Override
-  public void preload(@NonNull URL imageUrl) {
-    picasso.load(imageUrl.toString()).fetch();
+  override fun preload(imageUrl: URL) {
+    picasso.load(imageUrl.toString()).fetch()
   }
 
   @UiThread
-  @Override
-  public void loadImageInto(
-      @NonNull URL imageUrl,
-      @NonNull ImageView imageView,
-      @Nullable Drawable placeholder
+  override fun loadImageInto(
+      imageUrl: URL,
+      imageView: ImageView,
+      placeholder: Drawable?
   ) {
-    picasso.load(imageUrl.toString()).placeholder(placeholder).into(imageView);
+    asyncResources.newResource {
+      picasso.load(imageUrl.toString())
+          .placeholder(placeholder)
+          .into(imageView, object : Callback {
+            override fun onSuccess() = release()
+            override fun onError(e: Exception) = release()
+          })
+    }
   }
+
+  private fun RequestCreator.placeholder(placeholder: Drawable?): RequestCreator {
+    if (placeholder != null) {
+      return placeholder(placeholder)
+    }
+    return this
+  }
+
 }

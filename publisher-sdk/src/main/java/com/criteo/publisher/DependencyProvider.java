@@ -43,6 +43,8 @@ import com.criteo.publisher.bid.CompositeBidLifecycleListener;
 import com.criteo.publisher.bid.LoggingBidLifecycleListener;
 import com.criteo.publisher.bid.UniqueIdGenerator;
 import com.criteo.publisher.cache.SdkCache;
+import com.criteo.publisher.concurrent.AsyncResources;
+import com.criteo.publisher.concurrent.NoOpAsyncResources;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.concurrent.ThreadPoolExecutorFactory;
 import com.criteo.publisher.csm.CsmBidLifecycleListener;
@@ -515,7 +517,7 @@ public class DependencyProvider {
       @NonNull
       @Override
       public ImageLoader create() {
-        return new CriteoImageLoader(providePicasso());
+        return new CriteoImageLoader(providePicasso(), provideAsyncResources());
       }
     });
   }
@@ -541,6 +543,17 @@ public class DependencyProvider {
             provideImageLoaderHolder(),
             provideRunOnUiThreadExecutor()
         );
+      }
+    });
+  }
+
+  @NonNull
+  public AsyncResources provideAsyncResources() {
+    return getOrCreate(AsyncResources.class, new Factory<AsyncResources>() {
+      @NonNull
+      @Override
+      public AsyncResources create() {
+        return new NoOpAsyncResources();
       }
     });
   }

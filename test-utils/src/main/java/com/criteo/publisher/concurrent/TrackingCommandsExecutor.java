@@ -45,6 +45,10 @@ public class TrackingCommandsExecutor implements Executor {
     delegate.execute(trackedCommand);
   }
 
+  public AsyncResources asAsyncResources() {
+    return new TrackingAsyncResources();
+  }
+
   /**
    * Wait for all the commands passed to the {@link Executor} to finish executing
    *
@@ -58,6 +62,28 @@ public class TrackingCommandsExecutor implements Executor {
       } catch (InterruptedException e) {
         commandLatches.add(latch);
         throw e;
+      }
+    }
+  }
+
+  private class TrackingAsyncResources extends AsyncResources {
+
+    // Keep a local copy of latches to release. The order is not important, but this async resources
+    // should only release latches coming from this #onNewAsyncResource call.
+    private final Queue<CountDownLatch> resourcesLatches = new ConcurrentLinkedQueue<>();
+
+    @Override
+    protected void onNewAsyncResource() {
+      CountDownLatch latch = new CountDownLatch(1);
+      resourcesLatches.add(latch);
+      commandLatches.add(latch);
+    }
+
+    @Override
+    protected void onReleasedAsyncResource() {
+      CountDownLatch latch = resourcesLatches.poll();
+      if (latch != null) {
+        latch.countDown();
       }
     }
   }

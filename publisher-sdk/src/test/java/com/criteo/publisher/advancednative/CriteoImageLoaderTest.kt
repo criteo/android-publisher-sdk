@@ -18,6 +18,9 @@ package com.criteo.publisher.advancednative
 
 import android.graphics.drawable.Drawable
 import android.widget.ImageView
+import com.criteo.publisher.concurrent.AsyncResources
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.whenever
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.RequestCreator
@@ -41,6 +44,9 @@ class CriteoImageLoaderTest {
 
     @Mock
     private lateinit var requestCreatorAfterFetch: RequestCreator
+
+    @Mock
+    private lateinit var asyncResources: AsyncResources
 
     @InjectMocks
     private lateinit var criteoImageLoader: CriteoImageLoader
@@ -68,7 +74,7 @@ class CriteoImageLoaderTest {
         // then
         verify(picasso).load("http://fake_url")
         verify(requestCreatorAfterLoad).placeholder(placeholder)
-        verify(requestCreatorAfterPlaceholder).into(imageView)
+        verify(requestCreatorAfterPlaceholder).into(eq(imageView), any())
     }
 
     @Test

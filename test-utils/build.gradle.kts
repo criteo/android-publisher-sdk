@@ -40,6 +40,7 @@ dependencies {
 
   api(Deps.Javax.Inject.Inject)
 
+  testImplementation(project(":publisher-sdk"))
   testImplementation(Deps.Kotlin.Stdlib)
   testImplementation(Deps.Mockito.Kotlin)
   testImplementation(Deps.AssertJ.AssertJ)
