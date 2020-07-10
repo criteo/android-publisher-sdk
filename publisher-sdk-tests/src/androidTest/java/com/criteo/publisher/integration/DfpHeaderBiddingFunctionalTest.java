@@ -32,10 +32,13 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
+import com.criteo.publisher.bid.LoggingBidLifecycleListener;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.ResultCaptor;
 import com.criteo.publisher.mock.SpyBean;
@@ -386,7 +389,8 @@ public class DfpHeaderBiddingFunctionalTest {
     // URL are encoded because they are given, as query param, to a Google URL that will redirect
     // user.
     // TODO add a test that verify that users are properly redirected to the expected URL.
-    String expectedClickUrl = URLEncoder.encode(expectedProduct.getClickUrl().toString(), CHARSET.name());
+    String expectedClickUrl =
+        URLEncoder.encode(expectedProduct.getClickUrl().toString(), CHARSET.name());
     String expectedPrivacyUrl = URLEncoder
         .encode(expectedAssets.getPrivacyOptOutClickUrl().toString(), CHARSET.name());
 
@@ -432,7 +436,6 @@ public class DfpHeaderBiddingFunctionalTest {
     String html = loadDfpHtmlBanner(demoBannerAdUnit);
 
     assertDfpViewContainsDisplayUrl(cdbResultCaptor, html);
-
   }
 
   @Test
@@ -569,7 +572,8 @@ public class DfpHeaderBiddingFunctionalTest {
 
   private void givenUsingCdbProd() {
     when(buildConfigWrapper.getCdbUrl()).thenReturn(PROD_CDB_URL);
-    when(mockedDependenciesRule.getDependencyProvider().provideCriteoPublisherId()).thenReturn(PROD_CP_ID);
+    when(mockedDependenciesRule.getDependencyProvider().provideCriteoPublisherId()).thenReturn(
+        PROD_CP_ID);
   }
 
   private static final class DfpSync {
@@ -597,9 +601,12 @@ public class DfpHeaderBiddingFunctionalTest {
 
       @Override
       public void onAdFailedToLoad(int i) {
+        LoggerFactory.getLogger(DfpHeaderBiddingFunctionalTest.class)
+            .debug("onAdFailedToLoad for reason %d. "
+                    + "See: https://developers.google.com/android/reference/com/google/android/gms/ads/doubleclick/PublisherAdRequest",
+                i);
         isLoaded.countDown();
       }
     }
   }
-
 }
