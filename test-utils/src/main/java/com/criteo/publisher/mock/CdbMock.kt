@@ -51,12 +51,17 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
           "/config/app" -> handleConfigRequest()
           "/inapp/v2" -> handleBidRequest(request.body)
           "/delivery/ajs.php" -> handleCasperRequest(request)
+          "/appevent/v1/2379" -> handleBearcatRequest()
           else -> MockResponse().setResponseCode(404)
         }
       }
     }
 
     mockWebServer.start()
+  }
+
+  private fun handleBearcatRequest(): MockResponse {
+    return MockResponse().setHeader("content-type", "text/html")
   }
 
   fun shutdown() {
