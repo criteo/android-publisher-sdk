@@ -25,6 +25,16 @@ jobs:
       - name: Set up Android SDK
         uses: malinskiy/action-android/install-sdk@release/0.0.7
 
+      # This cache below is not fully working: it should go above the "Set up Android SDK" but:
+      # - The action does not support having a SDK already setup -> platform-tools, licenses are re-downloaded
+      # - Having this cache still prevents Gradle to re-download every time the build-tools.
+      - name: Store Android SDK
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.ANDROID_HOME }}
+          key: ${{ runner.os }}-android-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: ${{ runner.os }}-android-
+
       - name: Build & Run Java tests
         run: ./gradlew build assembleAndroidTest
 
