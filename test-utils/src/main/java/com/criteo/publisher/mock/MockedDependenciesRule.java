@@ -138,6 +138,7 @@ public class MockedDependenciesRule implements MethodRule {
 
     BuildConfigWrapper buildConfigWrapper = spy(dependencyProvider.provideBuildConfigWrapper());
     when(buildConfigWrapper.getCdbUrl()).thenReturn(cdbMock.getUrl());
+    when(buildConfigWrapper.getEventUrl()).thenReturn(cdbMock.getUrl());
     when(dependencyProvider.provideBuildConfigWrapper()).thenReturn(buildConfigWrapper);
   }
 
