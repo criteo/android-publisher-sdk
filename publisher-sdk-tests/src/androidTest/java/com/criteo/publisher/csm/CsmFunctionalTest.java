@@ -17,6 +17,7 @@
 package com.criteo.publisher.csm;
 
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -40,6 +41,8 @@ import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.util.BuildConfigWrapper;
+import com.kevinmost.junit_retry_rule.Retry;
+import com.kevinmost.junit_retry_rule.RetryRule;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,12 +53,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
 public class CsmFunctionalTest {
+
+  @Rule
+  public final RetryRule retry = new RetryRule();
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
@@ -87,8 +92,8 @@ public class CsmFunctionalTest {
     cleanState();
   }
 
-  @Ignore("FIXME EE-1180: Test does not pass on Github Actions")
   @Test
+  @Retry
   public void givenPrefetchAdUnitsWithBidsThenConsumption_CallApiWithCsmOfConsumedBid() throws Exception {
     givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
     waitForIdleState();
@@ -139,8 +144,8 @@ public class CsmFunctionalTest {
     }));
   }
 
-  @Ignore("FIXME EE-1180: Test does not pass on Github Actions")
   @Test
+  @Retry
   public void givenConsumedExpiredBid_CallApiWithCsmOfConsumedExpiredBid() throws Exception {
     when(clock.getCurrentTimeInMillis()).thenReturn(0L);
     givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
@@ -170,6 +175,7 @@ public class CsmFunctionalTest {
   }
 
   @Test
+  @Retry
   public void givenNoBidFromCdb_CallApiWithCsmOfNoBid() throws Exception {
     givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL_UNKNOWN);
     waitForIdleState();
@@ -189,6 +195,7 @@ public class CsmFunctionalTest {
   }
 
   @Test
+  @Retry
   public void givenNetworkErrorFromCdb_CallApiWithCsmOfNetworkError() throws Exception {
     doThrow(IOException.class).when(api).loadCdb(any(), any());
 
@@ -218,8 +225,8 @@ public class CsmFunctionalTest {
     }));
   }
 
-  @Ignore("FIXME EE-1180: Test does not pass on Github Actions")
   @Test
+  @Retry
   public void givenTimeoutErrorFromCdb_CallApiWithCsmOfTimeoutError() throws Exception {
     when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenReturn(1);
 
@@ -251,8 +258,8 @@ public class CsmFunctionalTest {
     }));
   }
 
-  @Ignore("FIXME EE-1180: Test does not pass on Github Actions")
   @Test
+  @Retry
   public void givenErrorWhenSendingCsm_QueueMetricsUntilCsmRequestWorksAgain() throws Exception {
     when(buildConfigWrapper.preconditionThrowsOnException()).thenReturn(false);
     doThrow(IOException.class).when(api).postCsm(any());
@@ -332,7 +339,11 @@ public class CsmFunctionalTest {
       }
     }
 
-    assertEquals(expectedNumberOfValidatedElements, validatedElements.size());
+    assertThat(validatedElements).describedAs(
+        "%d elements should match given validation among %s",
+        expectedNumberOfValidatedElements,
+        elements
+    ).hasSize(expectedNumberOfValidatedElements);
   }
 
   private void assertRequestHeaderIsExpected(MetricRequest request) {

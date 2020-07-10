@@ -32,7 +32,7 @@ internal fun RepositoryHandler.addDefaultInputRepository() {
   google()
   jcenter()
   maven {
-    setUrl("https://s3.amazonaws.com/moat-sdk-builds")
+    setUrl("https://jitpack.io")
   }
 }
 
