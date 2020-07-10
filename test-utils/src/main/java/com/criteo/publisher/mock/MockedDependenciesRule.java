@@ -124,6 +124,8 @@ public class MockedDependenciesRule implements MethodRule {
     dependencyProvider = spy(originalDependencyProvider);
     MockableDependencyProvider.setInstance(dependencyProvider);
     doReturn(trackingCommandsExecutor).when(dependencyProvider).provideThreadPoolExecutor();
+    doReturn(trackingCommandsExecutor.asAsyncResources()).when(dependencyProvider)
+        .provideAsyncResources();
   }
 
   private void setUpCdbMock() {

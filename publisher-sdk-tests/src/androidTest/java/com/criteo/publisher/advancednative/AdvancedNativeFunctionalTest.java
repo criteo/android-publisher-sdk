@@ -80,7 +80,6 @@ public class AdvancedNativeFunctionalTest {
     TestNativeActivity activity = activityRule.getActivity();
     activity.loadStandaloneAdInAdLayout();
     mockedDependenciesRule.waitForIdleState();
-    waitForPicasso();
 
     // Check there is one ad
     ViewGroup adLayout = getAdLayout();
@@ -98,7 +97,6 @@ public class AdvancedNativeFunctionalTest {
     BidResponse bidResponse = Criteo.getInstance().getBidResponse(TestAdUnits.NATIVE);
     activity.loadInHouseAdInAdLayout(bidResponse.getBidToken());
     mockedDependenciesRule.waitForIdleState();
-    waitForPicasso();
 
     // Check there is one ad
     ViewGroup adLayout = getAdLayout();
@@ -118,7 +116,6 @@ public class AdvancedNativeFunctionalTest {
 
     activity.loadStandaloneAdInRecyclerView();
     mockedDependenciesRule.waitForIdleState();
-    waitForPicasso();
 
     // Check there is two ads
     ViewGroup recyclerView = getRecyclerView();
@@ -141,7 +138,6 @@ public class AdvancedNativeFunctionalTest {
     BidResponse bidResponse2 = Criteo.getInstance().getBidResponse(TestAdUnits.NATIVE);
     activity.loadInHouseAdInRecyclerView(bidResponse2.getBidToken());
     mockedDependenciesRule.waitForIdleState();
-    waitForPicasso();
 
     // Check there is two ads
     ViewGroup recyclerView = getRecyclerView();
@@ -227,13 +223,6 @@ public class AdvancedNativeFunctionalTest {
         eq(activityRule.getActivity().getComponentName()),
         any()
     );
-  }
-
-  private void waitForPicasso() throws InterruptedException {
-    // Picasso is not synchronized through the waitForIdleState.
-    // Hence it is not possible to reliably wait for downloaded images.
-    // This sleep should at least do the job.
-    Thread.sleep(1000);
   }
 
 }
