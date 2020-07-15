@@ -19,6 +19,7 @@ package com.criteo.publisher.interstitial;
 import static com.criteo.publisher.interstitial.InterstitialActivityHelper.CALLING_ACTIVITY;
 import static com.criteo.publisher.interstitial.InterstitialActivityHelper.RESULT_RECEIVER;
 import static com.criteo.publisher.interstitial.InterstitialActivityHelper.WEB_VIEW_DATA;
+import static com.criteo.publisher.view.WebViewClicker.waitUntilWebViewIsLoaded;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -31,6 +32,8 @@ import static org.mockito.Mockito.when;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
+import android.view.View;
+import android.webkit.WebView;
 import androidx.annotation.NonNull;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.CriteoInterstitialActivity;
@@ -40,8 +43,6 @@ import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.util.CriteoResultReceiver;
 import com.criteo.publisher.view.WebViewLookup;
-import com.kevinmost.junit_retry_rule.Retry;
-import com.kevinmost.junit_retry_rule.RetryRule;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,9 +51,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class InterstitialActivityHelperTest {
-
-  @Rule
-  public final RetryRule retry = new RetryRule();
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
@@ -119,7 +117,6 @@ public class InterstitialActivityHelperTest {
   }
 
   @Test
-  @Retry
   public void openActivity_GivenTwoOpening_OpenItTwice() throws Exception {
     String html1 = openInterstitialAndGetHtml("myContent1");
     String html2 = openInterstitialAndGetHtml("myContent2");
@@ -133,13 +130,16 @@ public class InterstitialActivityHelperTest {
       helper.openActivity(content, listener);
     }).get();
 
-    waitForWebViewToBeReady();
+    View root = activity.getWindow().getDecorView();
+    waitForWebViewToBeReady(root);
 
-    return webViewLookup.lookForHtmlContent(activity.getWindow().getDecorView()).get();
+    return webViewLookup.lookForHtmlContent(root).get();
   }
 
-  private void waitForWebViewToBeReady() throws InterruptedException {
-    Thread.sleep(500);
+  private void waitForWebViewToBeReady(@NonNull View root) throws Exception {
+    for (WebView webView : webViewLookup.lookForWebViews(root)) {
+      waitUntilWebViewIsLoaded(webView);
+    }
   }
 
   @NonNull
