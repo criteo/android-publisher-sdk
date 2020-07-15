@@ -1,5 +1,7 @@
 # Next version
 
+# Version 3.8.0
+
 - Features
   - Provide legal privacy text for native in `CriteoNativeAd#getLegalText`
   - Artifacts are now delivered through `JCenter` repository instead of a custom one: from this
