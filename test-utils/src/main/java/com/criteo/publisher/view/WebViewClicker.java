@@ -71,7 +71,7 @@ public class WebViewClicker {
   }
 
   @RequiresApi(api = VERSION_CODES.M)
-  public void waitUntilWebViewIsLoaded(@NonNull WebView webView) throws Exception {
+  public static void waitUntilWebViewIsLoaded(@NonNull WebView webView) throws Exception {
     CountDownLatch isHtmlLoaded = new CountDownLatch(1);
 
     runOnMainThreadAndWait(() -> {
