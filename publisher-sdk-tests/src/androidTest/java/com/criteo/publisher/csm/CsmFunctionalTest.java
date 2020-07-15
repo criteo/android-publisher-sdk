@@ -406,10 +406,12 @@ public class CsmFunctionalTest {
   }
 
   private void cleanState() {
-    queue.poll(Integer.MAX_VALUE);
-
+    // Empty metric repository
     for (Metric metric : repository.getAllStoredMetrics()) {
       repository.moveById(metric.getImpressionId(), ignored -> true);
     }
+
+    // Empty sending queue
+    queue.poll(Integer.MAX_VALUE);
   }
 }
