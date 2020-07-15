@@ -49,6 +49,7 @@ import com.kevinmost.junit_retry_rule.RetryRule;
 import java.util.Collection;
 import javax.inject.Inject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -90,7 +91,7 @@ public class CriteoInterstitialActivityTest {
   }
 
   @Test
-  @Retry
+  @Ignore("FIXME EE-1191")
   public void whenUserClickOnAd_GivenHtmlWithHttpUrl_RedirectUserAndNotifyListener() throws Exception {
     Activity activity = whenUserClickOnAd("https://criteo.com");
 
