@@ -38,7 +38,6 @@ import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -55,19 +54,28 @@ public class WebViewLookup {
    * Look inside the given view for {@link android.webkit.WebView}. Then if exactly one webview is
    * found, then its HTML content is fetch.
    * <p>
-   * If no webview is found, then the future will fail with a {@link java.util.NoSuchElementException}.
-   * And if more than one webview are found, then the future will fail with a {@link
-   * TooManyWebViewsException}.
+   * If no webview is found, then the future will sleep a little and try again. And if more than one
+   * webview are found, then the future will fail with a {@link TooManyWebViewsException}.
    *
    * @param root the view to look into
    * @return either the HTML content of the found webview, either an error state.
    */
   public Future<String> lookForHtmlContent(View root) {
     CompletableFuture<String> future = new CompletableFuture<>();
+    lookForHtmlContent(root, future);
+    return future;
+  }
+
+  private void lookForHtmlContent(View root, CompletableFuture<String> future) {
     List<WebView> webViews = lookForWebViews(root);
 
     if (webViews.isEmpty()) {
-      future.completeExceptionally(new NoSuchElementException());
+      // Sleep a little and retry to search for webview
+      executor.submit(() -> {
+        Thread.sleep(20);
+        lookForHtmlContent(root, future);
+        return null;
+      });
     } else if (webViews.size() > 1) {
       future.completeExceptionally(new TooManyWebViewsException());
     } else {
@@ -82,8 +90,6 @@ public class WebViewLookup {
         });
       });
     }
-
-    return future;
   }
 
   private String decodeHtmlString(String value) throws UnsupportedEncodingException {
