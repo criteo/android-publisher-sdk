@@ -57,6 +57,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -204,6 +205,7 @@ public class MoPubHeaderBiddingFunctionalTest {
   }
 
   @Test
+  @Ignore("JIRA EE-1192")
   public void loadingMoPubBanner_GivenValidBanner_MoPubViewContainsCreative() throws Exception {
     String html = loadMoPubHtmlBanner(validBannerAdUnit);
 
@@ -211,6 +213,7 @@ public class MoPubHeaderBiddingFunctionalTest {
   }
 
   @Test
+  @Ignore("JIRA EE-1192")
   public void loadingMoPubBanner_GivenDemoBanner_MoPubViewUsesDemoDisplayUrl() throws Exception {
     givenUsingCdbProd();
     ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
