@@ -63,9 +63,9 @@ public class MockedDependenciesRule implements MethodRule {
    * it, you may set the {@link #iAmDebuggingDoNotTimeoutMe} variable to <code>true</code>.
    */
   private final FailOnTimeout.Builder timeout = FailOnTimeout.builder()
-      .withTimeout(30, TimeUnit.SECONDS);
+      .withTimeout(60, TimeUnit.SECONDS);
 
-  private final boolean iAmDebuggingDoNotTimeoutMe = true;
+  private final boolean iAmDebuggingDoNotTimeoutMe = false; // Do not commit this set to true
 
   /**
    * If set to <code>true</code>, then a CDB mock server is instantiated and started before each
