@@ -23,8 +23,8 @@ import android.webkit.WebView;
 import androidx.annotation.NonNull;
 import androidx.annotation.UiThread;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.util.CompletableFuture;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -33,11 +33,11 @@ public class DeviceInfo {
   private static final String TAG = DeviceInfo.class.getSimpleName();
 
   private final Context context;
-  private final Executor runOnUiThreadExecutor;
+  private final RunOnUiThreadExecutor runOnUiThreadExecutor;
   private final CompletableFuture<String> userAgentFuture = new CompletableFuture<>();
   private final AtomicBoolean isInitialized = new AtomicBoolean(false);
 
-  public DeviceInfo(Context context, Executor runOnUiThreadExecutor) {
+  public DeviceInfo(Context context, RunOnUiThreadExecutor runOnUiThreadExecutor) {
     this.context = context;
     this.runOnUiThreadExecutor = runOnUiThreadExecutor;
   }
@@ -75,7 +75,7 @@ public class DeviceInfo {
       }
     };
 
-    runOnUiThreadExecutor.execute(safeRunnable);
+    runOnUiThreadExecutor.executeAsync(safeRunnable);
   }
 
   @VisibleForTesting
