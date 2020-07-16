@@ -16,20 +16,17 @@
 
 package com.criteo.publisher.model;
 
+import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.mock.MockedDependenciesRule;
-import com.criteo.publisher.util.UserAgentCallback;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Rule;
@@ -43,7 +40,7 @@ public class DeviceInfoIntegrationTest {
   @Inject
   private Context context;
 
-  private Executor runOnUiThreadExecutor;
+  private RunOnUiThreadExecutor runOnUiThreadExecutor;
 
   @Before
   public void setUp() throws Exception {
@@ -68,7 +65,6 @@ public class DeviceInfoIntegrationTest {
   public void getUserAgent_GivenInitializedDeviceInfo_ReturnsCompletedFuture() throws Exception {
     DeviceInfo deviceInfo = new DeviceInfo(context, runOnUiThreadExecutor);
 
-    UserAgentCallback mock = mock(UserAgentCallback.class);
     deviceInfo.initialize();
     Future<String> userAgent = deviceInfo.getUserAgent();
 
@@ -87,20 +83,16 @@ public class DeviceInfoIntegrationTest {
   }
 
   @Test
-  public void getUserAgent_WhenOnMainThreadAndWaitForIdleState_DoNotBlockAndReturnCompletedFuture()
+  public void getUserAgent_WhenOnMainThreadAndWaitForIdleState_RunAsyncAndReturnUncompletedFuture()
       throws Exception {
     DeviceInfo deviceInfo = new DeviceInfo(context, runOnUiThreadExecutor);
+    AtomicReference<Future<String>> userAgentAsyncRef = new AtomicReference<>();
 
-    new Handler(Looper.getMainLooper()).post(() -> {
-      String userAgent;
-      try {
-        userAgent = deviceInfo.getUserAgent().get();
-      } catch (InterruptedException | ExecutionException e) {
-        throw new RuntimeException(e);
-      }
-
-      assertNotNull(userAgent);
+    runOnMainThreadAndWait(() -> {
+      userAgentAsyncRef.set(deviceInfo.getUserAgent());
     });
+
+    assertNotNull(userAgentAsyncRef.get().get());
   }
 
   private void waitForIdleState() {

@@ -1,5 +1,8 @@
 # Next version
 
+- Features
+  - Fetch User-Agent asynchronously to speed up the SDK initialization.
+
 # Version 3.8.0
 
 - Features
