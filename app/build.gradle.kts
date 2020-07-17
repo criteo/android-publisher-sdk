@@ -14,8 +14,8 @@
  *    limitations under the License.
  */
 
-import Deps.Criteo.Mediation.adMobAdapter
-import Deps.Criteo.Mediation.moPubAdapter
+import Deps.Criteo.Mediation.AdMob
+import Deps.Criteo.Mediation.MoPub
 
 plugins {
     id("com.android.application")
@@ -74,26 +74,30 @@ dependencies {
 
     implementation(Deps.Square.Picasso.Picasso)
 
-    implementation(moPubAdapter("(,${sdkVersion()}.99)")) {
+    implementation(MoPub("(,${sdkVersion()}.99)")) {
         exclude(group = Deps.Criteo.PublisherSdk.group)
         isChanging = true
-        because("""
+        because(
+            """
             Select the biggest available version up to the current SDK version.
             This allows bumping the SDK version without having trouble even if this adapter is not
             yet upgraded.
             The .99 is needed because Gradle range does not support + syntax in the range syntax
-            """.trimIndent())
+            """.trimIndent()
+        )
     }
 
-    implementation(adMobAdapter("(,${sdkVersion()}.99)")) {
+    implementation(AdMob("(,${sdkVersion()}.99)")) {
         exclude(group = Deps.Criteo.PublisherSdk.group)
         isChanging = true
-        because("""
+        because(
+            """
             Select the biggest available version up to the current SDK version.
             This allows bumping the SDK version without having trouble even if this adapter is not
             yet upgraded.
             The .99 is needed because Gradle range does not support + syntax in the range syntax
-            """.trimIndent())
+            """.trimIndent()
+        )
     }
 
     implementation(Deps.Kotlin.Stdlib)
