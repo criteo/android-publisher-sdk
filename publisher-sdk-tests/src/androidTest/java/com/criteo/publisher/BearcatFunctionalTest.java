@@ -118,11 +118,12 @@ public class BearcatFunctionalTest {
     verify(api).postAppEvent(
         anyInt(),
         any(),
-        eq("00000000-0000-0000-0000-000000000000"),
+        eq("myAdvertisingId"),
         any(),
         eq(1),
         any(),
-        eq(gdprData));
+        eq(gdprData)
+    );
   }
 
   private void waitForIdleState() {

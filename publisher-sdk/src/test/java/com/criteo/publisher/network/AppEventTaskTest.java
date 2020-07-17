@@ -28,8 +28,8 @@ import android.content.Context;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.privacy.gdpr.GdprData;
+import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.AppEventResponseListener;
-import com.criteo.publisher.util.DeviceUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -51,7 +51,7 @@ public class AppEventTaskTest {
   private Context context;
 
   @Mock
-  private DeviceUtil deviceUtil;
+  private AdvertisingInfo advertisingInfo;
 
   @Mock
   private PubSdkApi api;
@@ -68,7 +68,14 @@ public class AppEventTaskTest {
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    appEventTask = new AppEventTask(context, responseListener, deviceUtil, api, deviceInfo, userPrivacyUtil);
+    appEventTask = new AppEventTask(
+        context,
+        responseListener,
+        advertisingInfo,
+        api,
+        deviceInfo,
+        userPrivacyUtil
+    );
     json = new JSONObject();
   }
 

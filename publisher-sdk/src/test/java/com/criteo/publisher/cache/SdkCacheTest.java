@@ -29,7 +29,6 @@ import android.content.Context;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Slot;
-import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.DeviceUtil;
 import junit.framework.Assert;
 import org.json.JSONArray;
@@ -45,9 +44,6 @@ public class SdkCacheTest {
   @Mock
   private Context context;
 
-  @Mock
-  private AdvertisingInfo advertisingInfo;
-
   private JSONArray slots;
   private DeviceUtil deviceUtil;
   private SdkCache cache;
@@ -55,7 +51,7 @@ public class SdkCacheTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    deviceUtil = new DeviceUtil(context, advertisingInfo);
+    deviceUtil = new DeviceUtil(context);
     cache = new SdkCache(deviceUtil);
   }
 

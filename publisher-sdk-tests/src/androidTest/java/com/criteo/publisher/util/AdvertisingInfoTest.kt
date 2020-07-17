@@ -17,6 +17,8 @@ package com.criteo.publisher.util
 
 import android.content.Context
 import com.criteo.publisher.mock.MockedDependenciesRule
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.spy
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Rule
@@ -24,6 +26,10 @@ import org.junit.Test
 import javax.inject.Inject
 
 class AdvertisingInfoTest {
+
+  private companion object {
+    const val DEVICE_ID_LIMITED = "00000000-0000-0000-0000-000000000000"
+  }
 
   @Rule
   @JvmField
@@ -46,6 +52,17 @@ class AdvertisingInfoTest {
     val advertisingId = advertisingInfo.advertisingId
 
     assertThat(advertisingId).isNotNull()
+  }
+
+  @Test
+  fun getAdvertisingId_GivenLimitedAdTracking_ReturnLimitedDeviceId() {
+    advertisingInfo = spy(advertisingInfo) {
+      on { isLimitAdTrackingEnabled } doReturn true
+    }
+
+    val advertisingId = advertisingInfo.advertisingId
+
+    assertThat(advertisingId).isEqualTo(DEVICE_ID_LIMITED)
   }
 
   @Test

@@ -17,8 +17,6 @@
 package com.criteo.publisher.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
@@ -31,76 +29,15 @@ import org.mockito.MockitoAnnotations;
 
 public class DeviceUtilTest {
 
-  private static final String DEVICE_ID_LIMITED = "00000000-0000-0000-0000-000000000000";
-
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private Context context;
-
-  @Mock
-  private AdvertisingInfo info;
 
   private DeviceUtil deviceUtil;
 
   @Before
   public void setup() throws Exception {
     MockitoAnnotations.initMocks(this);
-    deviceUtil = new DeviceUtil(context, info);
-  }
-
-  @Test
-  public void isLimitAdTrackingEnabled_GivenLimitedAdTrackingEnabled_Return1() throws Exception {
-    when(info.isLimitAdTrackingEnabled()).thenReturn(true);
-
-    int isLimited = deviceUtil.isLimitAdTrackingEnabled();
-
-    assertEquals(1, isLimited);
-  }
-
-  @Test
-  public void isLimitAdTrackingEnabled_GivenNotLimitedAdTrackingEnabled_Return0() throws Exception {
-    when(info.isLimitAdTrackingEnabled()).thenReturn(false);
-
-    int isLimited = deviceUtil.isLimitAdTrackingEnabled();
-
-    assertEquals(0, isLimited);
-  }
-
-  @Test
-  public void getAdvertisingId_GivenLimitedAdTracking_ReturnLimitedDeviceId() {
-    when(info.isLimitAdTrackingEnabled()).thenReturn(true);
-
-    String advertisingId = deviceUtil.getAdvertisingId();
-
-    assertEquals(DEVICE_ID_LIMITED, advertisingId);
-  }
-
-  @Test
-  public void getAdvertisingId_GivenNotLimitedAdTracking_ReturnFetchedDeviceId() {
-    when(info.isLimitAdTrackingEnabled()).thenReturn(false);
-    when(info.getAdvertisingId()).thenReturn("expected");
-
-    String advertisingId = deviceUtil.getAdvertisingId();
-
-    assertEquals("expected", advertisingId);
-  }
-
-  @Test
-  public void getAdvertisingId_GivenErrorWhenCheckingLimitedAdTracking_ReturnNull()
-      throws Exception {
-    when(info.isLimitAdTrackingEnabled()).thenThrow(RuntimeException.class);
-
-    String advertisingId = deviceUtil.getAdvertisingId();
-
-    assertNull(advertisingId);
-  }
-
-  @Test
-  public void getAdvertisingId_GivenErrorWhenFetchingDeviceId_ReturnNull() throws Exception {
-    when(info.getAdvertisingId()).thenThrow(RuntimeException.class);
-
-    String advertisingId = deviceUtil.getAdvertisingId();
-
-    assertNull(advertisingId);
+    deviceUtil = new DeviceUtil(context);
   }
 
   @Test

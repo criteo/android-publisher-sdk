@@ -63,8 +63,8 @@ import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.privacy.gdpr.GdprData;
 import com.criteo.publisher.util.AdUnitType;
+import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.BuildConfigWrapper;
-import com.criteo.publisher.util.DeviceUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -117,7 +117,7 @@ public class BidManagerFunctionalTest {
   private MetricSendingQueueConsumer metricSendingQueueConsumer;
 
   @Inject
-  private DeviceUtil deviceUtil;
+  private AdvertisingInfo advertisingInfo;
 
   private int adUnitId = 0;
 
@@ -348,7 +348,7 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     User expectedUser = User.create(
-        deviceUtil.getAdvertisingId(),
+        advertisingInfo.getAdvertisingId(),
         null,
         null,
         null

@@ -25,9 +25,9 @@ import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.network.AppEventTask;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
+import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.AppEventResponseListener;
 import com.criteo.publisher.util.ApplicationStoppedListener;
-import com.criteo.publisher.util.DeviceUtil;
 import java.util.concurrent.Executor;
 
 public class AppEvents implements AppEventResponseListener, ApplicationStoppedListener {
@@ -41,7 +41,7 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
   private int appEventThrottle = -1;
   private long throttleSetTime = 0;
 
-  private final DeviceUtil deviceUtil;
+  private final AdvertisingInfo advertisingInfo;
   private final Clock clock;
   private final PubSdkApi api;
   private final UserPrivacyUtil userPrivacyUtil;
@@ -51,14 +51,14 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
 
   public AppEvents(
       @NonNull Context context,
-      @NonNull DeviceUtil deviceUtil,
+      @NonNull AdvertisingInfo advertisingInfo,
       @NonNull Clock clock,
       @NonNull PubSdkApi api,
       @NonNull UserPrivacyUtil userPrivacyUtil,
       @NonNull DeviceInfo deviceInfo
   ) {
     this.mContext = context;
-    this.deviceUtil = deviceUtil;
+    this.advertisingInfo = advertisingInfo;
     this.clock = clock;
     this.api = api;
     this.userPrivacyUtil = userPrivacyUtil;
@@ -84,7 +84,7 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
 
   @NonNull
   private AppEventTask createEventTask() {
-    return new AppEventTask(mContext, this, deviceUtil, api, deviceInfo, userPrivacyUtil);
+    return new AppEventTask(mContext, this, advertisingInfo, api, deviceInfo, userPrivacyUtil);
   }
 
   @Override
