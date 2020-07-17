@@ -84,17 +84,8 @@ object Deps {
     }
 
     object Mediation {
-      fun Project.moPubAdapter(version: String) = if (isSnapshot()) {
-        "com.criteo.mediation.mopub:criteo-adapter-development:$version"
-      } else {
-        "com.criteo.mediation.mopub:criteo-adapter:$version"
-      }
-
-      fun Project.adMobAdapter(version: String) = if (isSnapshot()) {
-        "com.criteo.mediation.google:criteo-adapter-development:$version"
-      } else {
-        "com.criteo.mediation.google:criteo-adapter:$version"
-      }
+      fun MoPub(version: String) = "com.criteo.mediation.mopub:criteo-adapter-development:$version"
+      fun AdMob(version: String) = "com.criteo.mediation.google:criteo-adapter-development:$version"
     }
   }
 
