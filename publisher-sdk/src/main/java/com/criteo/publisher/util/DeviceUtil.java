@@ -32,7 +32,10 @@ public class DeviceUtil {
   private static AdSize sizePortrait = new AdSize(0, 0);
   private static AdSize sizeLandscape = new AdSize(0, 0);
 
+  @NonNull
   private final Context context;
+
+  @NonNull
   private final AdvertisingInfo advertisingInfo;
 
   public DeviceUtil(@NonNull Context context, @NonNull AdvertisingInfo advertisingInfo) {
@@ -87,27 +90,15 @@ public class DeviceUtil {
 
   @Nullable
   public String getAdvertisingId() {
-    try {
-      if (advertisingInfo.isLimitAdTrackingEnabled(context)) {
-        return DEVICE_ID_LIMITED;
-      }
-      return advertisingInfo.getAdvertisingId(context);
-    } catch (Exception e) {
-      // FIXME This seems like a dead code, because AdvertisingInfo already catch exceptions
-      Log.e("DeviceUtil", "Error trying to get Advertising id: " + e.getMessage());
+    if (advertisingInfo.isLimitAdTrackingEnabled(context)) {
+      return DEVICE_ID_LIMITED;
     }
-    return null;
+    return advertisingInfo.getAdvertisingId(context);
   }
 
   public int isLimitAdTrackingEnabled() {
     // FIXME This entire method seems dumb. It's just a mapping from bool to 0,1
-    try {
-      return advertisingInfo.isLimitAdTrackingEnabled(context) ? 1 : 0;
-    } catch (Exception e) {
-      // FIXME This seems like a dead code, because AdvertisingInfo already catch exceptions
-      Log.e("DeviceUtil", "Error trying to check limited ad tracking: " + e.getMessage());
-    }
-    return 0;
+    return advertisingInfo.isLimitAdTrackingEnabled(context) ? 1 : 0;
   }
 
   public boolean isVersionSupported() {
