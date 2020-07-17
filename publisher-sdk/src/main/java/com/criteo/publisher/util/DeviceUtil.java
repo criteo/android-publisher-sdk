@@ -22,12 +22,9 @@ import android.content.Context;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import com.criteo.publisher.model.AdSize;
 
 public class DeviceUtil {
-
-  private static final String DEVICE_ID_LIMITED = "00000000-0000-0000-0000-000000000000";
 
   private static AdSize sizePortrait = new AdSize(0, 0);
   private static AdSize sizeLandscape = new AdSize(0, 0);
@@ -35,12 +32,8 @@ public class DeviceUtil {
   @NonNull
   private final Context context;
 
-  @NonNull
-  private final AdvertisingInfo advertisingInfo;
-
-  public DeviceUtil(@NonNull Context context, @NonNull AdvertisingInfo advertisingInfo) {
+  public DeviceUtil(@NonNull Context context) {
     this.context = context;
-    this.advertisingInfo = advertisingInfo;
   }
 
   /**
@@ -86,19 +79,6 @@ public class DeviceUtil {
 
   public AdSize getSizeLandscape() {
     return sizeLandscape;
-  }
-
-  @Nullable
-  public String getAdvertisingId() {
-    if (advertisingInfo.isLimitAdTrackingEnabled()) {
-      return DEVICE_ID_LIMITED;
-    }
-    return advertisingInfo.getAdvertisingId();
-  }
-
-  public int isLimitAdTrackingEnabled() {
-    // FIXME This entire method seems dumb. It's just a mapping from bool to 0,1
-    return advertisingInfo.isLimitAdTrackingEnabled() ? 1 : 0;
   }
 
   public boolean isVersionSupported() {

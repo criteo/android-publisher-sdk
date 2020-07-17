@@ -24,8 +24,8 @@ import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
+import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.AppEventResponseListener;
-import com.criteo.publisher.util.DeviceUtil;
 import org.json.JSONObject;
 
 public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
@@ -42,7 +42,7 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
   private final AppEventResponseListener responseListener;
 
   @NonNull
-  private final DeviceUtil deviceUtil;
+  private final AdvertisingInfo advertisingInfo;
 
   @NonNull
   private final PubSdkApi api;
@@ -56,14 +56,14 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
   public AppEventTask(
       @NonNull Context context,
       @NonNull AppEventResponseListener responseListener,
-      @NonNull DeviceUtil deviceUtil,
+      @NonNull AdvertisingInfo advertisingInfo,
       @NonNull PubSdkApi api,
       @NonNull DeviceInfo deviceInfo,
       @NonNull UserPrivacyUtil userPrivacyUtil
   ) {
     this.mContext = context;
     this.responseListener = responseListener;
-    this.deviceUtil = deviceUtil;
+    this.advertisingInfo = advertisingInfo;
     this.api = api;
     this.deviceInfo = deviceInfo;
     this.userPrivacyUtil = userPrivacyUtil;
@@ -84,8 +84,8 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
 
   private JSONObject doAppEventTask(Object[] objects) throws Exception {
     String eventType = (String) objects[0];
-    int limitedAdTracking = deviceUtil.isLimitAdTrackingEnabled();
-    String gaid = deviceUtil.getAdvertisingId();
+    int limitedAdTracking = advertisingInfo.isLimitAdTrackingEnabled() ? 1 : 0;
+    String gaid = advertisingInfo.getAdvertisingId();
     String appId = mContext.getPackageName();
 
     String userAgent = deviceInfo.getUserAgent().get();

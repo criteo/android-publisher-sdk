@@ -20,8 +20,8 @@ import com.criteo.publisher.bid.UniqueIdGenerator
 import com.criteo.publisher.privacy.UserPrivacyUtil
 import com.criteo.publisher.privacy.gdpr.GdprData
 import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
+import com.criteo.publisher.util.AdvertisingInfo
 import com.criteo.publisher.util.BuildConfigWrapper
-import com.criteo.publisher.util.DeviceUtil
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
@@ -43,7 +43,7 @@ class CdbRequestFactoryTest {
     private lateinit var deviceInfo: DeviceInfo
 
     @Mock
-    private lateinit var deviceUtil: DeviceUtil
+    private lateinit var advertisingInfo: AdvertisingInfo
 
     @Mock
     private lateinit var userPrivacyUtil: UserPrivacyUtil
@@ -67,12 +67,12 @@ class CdbRequestFactoryTest {
         whenever(userPrivacyUtil.usPrivacyOptout).thenReturn("usPrivacyoptout")
 
         factory = CdbRequestFactory(
-                publisher,
-                deviceInfo,
-                deviceUtil,
-                userPrivacyUtil,
-                uniqueIdGenerator,
-                buildConfigWrapper
+            publisher,
+            deviceInfo,
+            advertisingInfo,
+            userPrivacyUtil,
+            uniqueIdGenerator,
+            buildConfigWrapper
         )
     }
 

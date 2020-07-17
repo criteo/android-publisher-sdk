@@ -198,10 +198,7 @@ public class DependencyProvider {
       @NonNull
       @Override
       public DeviceUtil create() {
-        return new DeviceUtil(
-            provideContext(),
-            provideAdvertisingInfo()
-        );
+        return new DeviceUtil(provideContext());
       }
     });
   }
@@ -311,7 +308,7 @@ public class DependencyProvider {
       public AppEvents create() {
         return new AppEvents(
             provideContext(),
-            provideDeviceUtil(),
+            provideAdvertisingInfo(),
             provideClock(),
             providePubSdkApi(),
             provideUserPrivacyUtil(),
@@ -352,7 +349,7 @@ public class DependencyProvider {
         return new CdbRequestFactory(
             providePublisher(),
             provideDeviceInfo(),
-            provideDeviceUtil(),
+            provideAdvertisingInfo(),
             provideUserPrivacyUtil(),
             provideUniqueIdGenerator(),
             provideBuildConfigWrapper()

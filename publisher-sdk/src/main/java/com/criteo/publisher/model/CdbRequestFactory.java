@@ -21,8 +21,8 @@ import static com.criteo.publisher.util.TextUtils.getNotEmptyOrNullValue;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.bid.UniqueIdGenerator;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
+import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.BuildConfigWrapper;
-import com.criteo.publisher.util.DeviceUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -36,7 +36,7 @@ public class CdbRequestFactory {
   private final DeviceInfo deviceInfo;
 
   @NonNull
-  private final DeviceUtil deviceUtil;
+  private final AdvertisingInfo advertisingInfo;
 
   @NonNull
   private final UserPrivacyUtil userPrivacyUtil;
@@ -50,14 +50,14 @@ public class CdbRequestFactory {
   public CdbRequestFactory(
       @NonNull Publisher publisher,
       @NonNull DeviceInfo deviceInfo,
-      @NonNull DeviceUtil deviceUtil,
+      @NonNull AdvertisingInfo advertisingInfo,
       @NonNull UserPrivacyUtil userPrivacyUtil,
       @NonNull UniqueIdGenerator uniqueIdGenerator,
       @NonNull BuildConfigWrapper buildConfigWrapper
   ) {
     this.publisher = publisher;
     this.deviceInfo = deviceInfo;
-    this.deviceUtil = deviceUtil;
+    this.advertisingInfo = advertisingInfo;
     this.userPrivacyUtil = userPrivacyUtil;
     this.uniqueIdGenerator = uniqueIdGenerator;
     this.buildConfigWrapper = buildConfigWrapper;
@@ -66,7 +66,7 @@ public class CdbRequestFactory {
   @NonNull
   public CdbRequest createRequest(List<CacheAdUnit> requestedAdUnits) {
     User user = User.create(
-        deviceUtil.getAdvertisingId(),
+        advertisingInfo.getAdvertisingId(),
         getNotEmptyOrNullValue(userPrivacyUtil.getMopubConsent()),
         getNotEmptyOrNullValue(userPrivacyUtil.getIabUsPrivacyString()),
         getNotEmptyOrNullValue(userPrivacyUtil.getUsPrivacyOptout())

@@ -44,7 +44,7 @@ import org.mockito.MockitoAnnotations;
  * This test file is purposefully located within the <code>com.criteo.publisher.network</code>
  * package as it needs to access {@link PubSdkApi#loadCdb(CdbRequest, String)} method.
  */
-public class DeviceIdTest {
+public class AdvertisingInfoFunctionalTest {
 
   private static final String FAKE_DEVICE_ID = "FAKE_DEVICE_ID";
   private static final String DEVICE_ID_LIMITED = "00000000-0000-0000-0000-000000000000";
@@ -72,53 +72,8 @@ public class DeviceIdTest {
   }
 
   @Test
-  public void testBearcatCall_EmptyGAID_TrackingAllowed() throws Exception {
-    when(advertisingInfo.getAdvertisingId()).thenReturn(null);
-    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(false);
-
-    givenInitializedCriteo(bannerAdUnit);
-    waitForIdleState();
-
-    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
-
-    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
-    assertDeviceIdNotInCdbRequest(cdbArgumentCaptor.getValue());
-  }
-
-  @Test
-  public void testBearcatCall_EmptyGAID_TrackingNotAllowed() throws Exception {
-    when(advertisingInfo.getAdvertisingId()).thenReturn(null);
-    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(true);
-
-    givenInitializedCriteo(bannerAdUnit);
-    waitForIdleState();
-
-    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
-
-    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
-    assertEquals(DEVICE_ID_LIMITED, fetchDeviceIdSentInCdbRequest(cdbArgumentCaptor.getValue()));
-  }
-
-  @Test
-  public void testBearcatCall_NotEmptyGAID_TrackingAllowed() throws Exception {
-    when(advertisingInfo.getAdvertisingId()).thenReturn(FAKE_DEVICE_ID);
-    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(false);
-
-    givenInitializedCriteo(bannerAdUnit);
-    waitForIdleState();
-
-    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
-
-    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
-    CdbRequest cdb = cdbArgumentCaptor.getValue();
-
-    assertEquals(FAKE_DEVICE_ID, fetchDeviceIdSentInCdbRequest(cdb));
-  }
-
-  @Test
-  public void testBearcatCall_NotEmptyGAID_TrackingNotAllowed() throws Exception {
-    when(advertisingInfo.getAdvertisingId()).thenReturn(FAKE_DEVICE_ID);
-    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(true);
+  public void testBearcatCall_LimitedGAID() throws Exception {
+    when(advertisingInfo.getAdvertisingId()).thenReturn(DEVICE_ID_LIMITED);
 
     givenInitializedCriteo(bannerAdUnit);
     waitForIdleState();
@@ -132,9 +87,23 @@ public class DeviceIdTest {
   }
 
   @Test
-  public void testStandaloneBannerRequest_EmptyGAID_TrackingAllowed() throws Exception {
-    when(advertisingInfo.getAdvertisingId()).thenReturn(null);
-    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(false);
+  public void testBearcatCall_NotEmptyGAID() throws Exception {
+    when(advertisingInfo.getAdvertisingId()).thenReturn(FAKE_DEVICE_ID);
+
+    givenInitializedCriteo(bannerAdUnit);
+    waitForIdleState();
+
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
+
+    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
+    CdbRequest cdb = cdbArgumentCaptor.getValue();
+
+    assertEquals(FAKE_DEVICE_ID, fetchDeviceIdSentInCdbRequest(cdb));
+  }
+
+  @Test
+  public void testStandaloneBannerRequest_LimitedGAID() throws Exception {
+    when(advertisingInfo.getAdvertisingId()).thenReturn(DEVICE_ID_LIMITED);
 
     givenInitializedCriteo();
     waitForIdleState();
@@ -149,13 +118,12 @@ public class DeviceIdTest {
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
 
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
-    assertDeviceIdNotInCdbRequest(cdbArgumentCaptor.getValue());
+    assertEquals(DEVICE_ID_LIMITED, fetchDeviceIdSentInCdbRequest(cdbArgumentCaptor.getValue()));
   }
 
   @Test
-  public void testStandaloneBannerRequest_NonEmptyGAID_TrackingAllowed() throws Exception {
+  public void testStandaloneBannerRequest_NonEmptyGAID() throws Exception {
     when(advertisingInfo.getAdvertisingId()).thenReturn(FAKE_DEVICE_ID);
-    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(false);
 
     givenInitializedCriteo();
     waitForIdleState();
@@ -171,48 +139,6 @@ public class DeviceIdTest {
 
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
     assertEquals(FAKE_DEVICE_ID, fetchDeviceIdSentInCdbRequest(cdbArgumentCaptor.getValue()));
-  }
-
-  @Test
-  public void testStandaloneBannerRequest_EmptyGAID_TrackingNotAllowed() throws Exception {
-    when(advertisingInfo.getAdvertisingId()).thenReturn(null);
-    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(true);
-
-    givenInitializedCriteo();
-    waitForIdleState();
-
-    runOnMainThreadAndWait(() -> {
-      CriteoBannerView bannerView = new CriteoBannerView(context, bannerAdUnit);
-      bannerView.loadAd();
-    });
-
-    waitForIdleState();
-
-    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
-
-    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
-    assertEquals(DEVICE_ID_LIMITED, fetchDeviceIdSentInCdbRequest(cdbArgumentCaptor.getValue()));
-  }
-
-  @Test
-  public void testStandaloneBannerRequest_NonEmptyGAID_TrackingNotAllowed() throws Exception {
-    when(advertisingInfo.getAdvertisingId()).thenReturn(FAKE_DEVICE_ID);
-    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(true);
-
-    givenInitializedCriteo();
-    waitForIdleState();
-
-    runOnMainThreadAndWait(() -> {
-      CriteoBannerView bannerView = new CriteoBannerView(context, bannerAdUnit);
-      bannerView.loadAd();
-    });
-
-    waitForIdleState();
-
-    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
-
-    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
-    assertEquals(DEVICE_ID_LIMITED, fetchDeviceIdSentInCdbRequest(cdbArgumentCaptor.getValue()));
   }
 
   private String fetchDeviceIdSentInCdbRequest(CdbRequest cdb) {

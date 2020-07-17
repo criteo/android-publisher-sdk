@@ -26,6 +26,8 @@ import com.google.android.gms.ads.identifier.AdvertisingIdClient.Info;
 
 public class AdvertisingInfo {
 
+  private static final String DEVICE_ID_LIMITED = "00000000-0000-0000-0000-000000000000";
+
   @NonNull
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -41,6 +43,10 @@ public class AdvertisingInfo {
 
   @Nullable
   public String getAdvertisingId() {
+    if (isLimitAdTrackingEnabled()) {
+      return DEVICE_ID_LIMITED;
+    }
+
     try {
       return advertisingIdClient.getId(context);
     } catch (Exception e) {
