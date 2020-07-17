@@ -179,7 +179,7 @@ public class DependencyProvider {
       @NonNull
       @Override
       public AdvertisingInfo create() {
-        return new AdvertisingInfo();
+        return new AdvertisingInfo(provideContext());
       }
     });
   }

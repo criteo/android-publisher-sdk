@@ -73,8 +73,8 @@ public class DeviceIdTest {
 
   @Test
   public void testBearcatCall_EmptyGAID_TrackingAllowed() throws Exception {
-    when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(null);
-    when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(false);
+    when(advertisingInfo.getAdvertisingId()).thenReturn(null);
+    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(false);
 
     givenInitializedCriteo(bannerAdUnit);
     waitForIdleState();
@@ -87,8 +87,8 @@ public class DeviceIdTest {
 
   @Test
   public void testBearcatCall_EmptyGAID_TrackingNotAllowed() throws Exception {
-    when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(null);
-    when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(true);
+    when(advertisingInfo.getAdvertisingId()).thenReturn(null);
+    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(true);
 
     givenInitializedCriteo(bannerAdUnit);
     waitForIdleState();
@@ -101,8 +101,8 @@ public class DeviceIdTest {
 
   @Test
   public void testBearcatCall_NotEmptyGAID_TrackingAllowed() throws Exception {
-    when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(FAKE_DEVICE_ID);
-    when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(false);
+    when(advertisingInfo.getAdvertisingId()).thenReturn(FAKE_DEVICE_ID);
+    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(false);
 
     givenInitializedCriteo(bannerAdUnit);
     waitForIdleState();
@@ -117,8 +117,8 @@ public class DeviceIdTest {
 
   @Test
   public void testBearcatCall_NotEmptyGAID_TrackingNotAllowed() throws Exception {
-    when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(FAKE_DEVICE_ID);
-    when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(true);
+    when(advertisingInfo.getAdvertisingId()).thenReturn(FAKE_DEVICE_ID);
+    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(true);
 
     givenInitializedCriteo(bannerAdUnit);
     waitForIdleState();
@@ -133,8 +133,8 @@ public class DeviceIdTest {
 
   @Test
   public void testStandaloneBannerRequest_EmptyGAID_TrackingAllowed() throws Exception {
-    when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(null);
-    when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(false);
+    when(advertisingInfo.getAdvertisingId()).thenReturn(null);
+    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(false);
 
     givenInitializedCriteo();
     waitForIdleState();
@@ -154,8 +154,8 @@ public class DeviceIdTest {
 
   @Test
   public void testStandaloneBannerRequest_NonEmptyGAID_TrackingAllowed() throws Exception {
-    when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(FAKE_DEVICE_ID);
-    when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(false);
+    when(advertisingInfo.getAdvertisingId()).thenReturn(FAKE_DEVICE_ID);
+    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(false);
 
     givenInitializedCriteo();
     waitForIdleState();
@@ -175,8 +175,8 @@ public class DeviceIdTest {
 
   @Test
   public void testStandaloneBannerRequest_EmptyGAID_TrackingNotAllowed() throws Exception {
-    when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(null);
-    when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(true);
+    when(advertisingInfo.getAdvertisingId()).thenReturn(null);
+    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(true);
 
     givenInitializedCriteo();
     waitForIdleState();
@@ -196,8 +196,8 @@ public class DeviceIdTest {
 
   @Test
   public void testStandaloneBannerRequest_NonEmptyGAID_TrackingNotAllowed() throws Exception {
-    when(advertisingInfo.getAdvertisingId(any(Context.class))).thenReturn(FAKE_DEVICE_ID);
-    when(advertisingInfo.isLimitAdTrackingEnabled(any(Context.class))).thenReturn(true);
+    when(advertisingInfo.getAdvertisingId()).thenReturn(FAKE_DEVICE_ID);
+    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(true);
 
     givenInitializedCriteo();
     waitForIdleState();

@@ -70,12 +70,12 @@ via IntelliJ delegating test run to Gradle.
     MockitoAnnotations.initMocks(this)
     doReturn(logger).whenever(loggerFactory).createLogger(any())
 
-    advertisingInfo = AdvertisingInfo()
+    advertisingInfo = AdvertisingInfo(context)
   }
 
   @Test
   fun getAdvertisingId_GivenPlayServiceAdsIdentifierNotInClasspath_ReturnNull() {
-    val advertisingId = advertisingInfo.getAdvertisingId(context)
+    val advertisingId = advertisingInfo.advertisingId
 
     assertThat(advertisingId).isNull()
     verify(logger).debug(any(), any<MissingPlayServicesAdsIdentifierException>())
@@ -83,7 +83,7 @@ via IntelliJ delegating test run to Gradle.
 
   @Test
   fun isLimitAdTrackingEnabled_GivenPlayServiceAdsIdentifierNotInClasspath_ReturnFalse() {
-    val isLimitAdTrackingEnabled = advertisingInfo.isLimitAdTrackingEnabled(context)
+    val isLimitAdTrackingEnabled = advertisingInfo.isLimitAdTrackingEnabled
 
     assertThat(isLimitAdTrackingEnabled).isFalse()
     verify(logger).debug(any(), any<MissingPlayServicesAdsIdentifierException>())
