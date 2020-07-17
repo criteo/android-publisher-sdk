@@ -49,7 +49,7 @@ public class DeviceUtilTest {
 
   @Test
   public void isLimitAdTrackingEnabled_GivenLimitedAdTrackingEnabled_Return1() throws Exception {
-    when(info.isLimitAdTrackingEnabled(context)).thenReturn(true);
+    when(info.isLimitAdTrackingEnabled()).thenReturn(true);
 
     int isLimited = deviceUtil.isLimitAdTrackingEnabled();
 
@@ -58,7 +58,7 @@ public class DeviceUtilTest {
 
   @Test
   public void isLimitAdTrackingEnabled_GivenNotLimitedAdTrackingEnabled_Return0() throws Exception {
-    when(info.isLimitAdTrackingEnabled(context)).thenReturn(false);
+    when(info.isLimitAdTrackingEnabled()).thenReturn(false);
 
     int isLimited = deviceUtil.isLimitAdTrackingEnabled();
 
@@ -67,7 +67,7 @@ public class DeviceUtilTest {
 
   @Test
   public void getAdvertisingId_GivenLimitedAdTracking_ReturnLimitedDeviceId() {
-    when(info.isLimitAdTrackingEnabled(context)).thenReturn(true);
+    when(info.isLimitAdTrackingEnabled()).thenReturn(true);
 
     String advertisingId = deviceUtil.getAdvertisingId();
 
@@ -76,8 +76,8 @@ public class DeviceUtilTest {
 
   @Test
   public void getAdvertisingId_GivenNotLimitedAdTracking_ReturnFetchedDeviceId() {
-    when(info.isLimitAdTrackingEnabled(context)).thenReturn(false);
-    when(info.getAdvertisingId(context)).thenReturn("expected");
+    when(info.isLimitAdTrackingEnabled()).thenReturn(false);
+    when(info.getAdvertisingId()).thenReturn("expected");
 
     String advertisingId = deviceUtil.getAdvertisingId();
 
@@ -87,7 +87,7 @@ public class DeviceUtilTest {
   @Test
   public void getAdvertisingId_GivenErrorWhenCheckingLimitedAdTracking_ReturnNull()
       throws Exception {
-    when(info.isLimitAdTrackingEnabled(context)).thenThrow(RuntimeException.class);
+    when(info.isLimitAdTrackingEnabled()).thenThrow(RuntimeException.class);
 
     String advertisingId = deviceUtil.getAdvertisingId();
 
@@ -96,7 +96,7 @@ public class DeviceUtilTest {
 
   @Test
   public void getAdvertisingId_GivenErrorWhenFetchingDeviceId_ReturnNull() throws Exception {
-    when(info.getAdvertisingId(context)).thenThrow(RuntimeException.class);
+    when(info.getAdvertisingId()).thenThrow(RuntimeException.class);
 
     String advertisingId = deviceUtil.getAdvertisingId();
 

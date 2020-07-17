@@ -83,8 +83,8 @@ public class BearcatFunctionalTest {
   @Test
   public void init_GivenInputAndLaunchedActivity_SendInitEventWithGivenData() throws Exception {
     AdvertisingInfo advertisingInfo = mock(AdvertisingInfo.class);
-    when(advertisingInfo.isLimitAdTrackingEnabled(any())).thenReturn(false);
-    when(advertisingInfo.getAdvertisingId(any())).thenReturn("myAdvertisingId");
+    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(false);
+    when(advertisingInfo.getAdvertisingId()).thenReturn("myAdvertisingId");
 
     doReturn(advertisingInfo).when(dependencyProvider).provideAdvertisingInfo();
 
@@ -106,8 +106,8 @@ public class BearcatFunctionalTest {
   public void init_GivenLimitedAdTracking_SendInitEventWithDummyGaidAndLimitation()
       throws Exception {
     AdvertisingInfo advertisingInfo = mock(AdvertisingInfo.class);
-    when(advertisingInfo.isLimitAdTrackingEnabled(any())).thenReturn(true);
-    when(advertisingInfo.getAdvertisingId(any())).thenReturn("myAdvertisingId");
+    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(true);
+    when(advertisingInfo.getAdvertisingId()).thenReturn("myAdvertisingId");
 
     doReturn(advertisingInfo).when(dependencyProvider).provideAdvertisingInfo();
 

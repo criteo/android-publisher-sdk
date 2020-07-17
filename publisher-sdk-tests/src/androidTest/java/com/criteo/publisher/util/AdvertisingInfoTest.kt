@@ -36,14 +36,14 @@ class AdvertisingInfoTest {
 
   @Before
   fun setUp() {
-    advertisingInfo = AdvertisingInfo()
+    advertisingInfo = AdvertisingInfo(context)
   }
 
   @Test
   fun getAdvertisingId_GivenPlayServiceAdsIdentifierInClasspath_ReturnNonNull() {
     // Assume that the advertising ID is available, this is a case on new clean emulators/devices
 
-    val advertisingId = advertisingInfo.getAdvertisingId(context)
+    val advertisingId = advertisingInfo.advertisingId
 
     assertThat(advertisingId).isNotNull()
   }
@@ -52,7 +52,7 @@ class AdvertisingInfoTest {
   fun isLimitAdTrackingEnabled_GivenPlayServiceAdsIdentifierInClasspath_ReturnFalse() {
     // Assume that the advertising ID is available, this is a case on new clean emulators/devices
 
-    val isLimitAdTrackingEnabled = advertisingInfo.isLimitAdTrackingEnabled(context)
+    val isLimitAdTrackingEnabled = advertisingInfo.isLimitAdTrackingEnabled
 
     assertThat(isLimitAdTrackingEnabled).isFalse()
   }

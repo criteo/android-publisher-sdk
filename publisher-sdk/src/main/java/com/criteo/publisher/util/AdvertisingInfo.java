@@ -32,8 +32,15 @@ public class AdvertisingInfo {
   @NonNull
   private final SafeAdvertisingIdClient advertisingIdClient = new SafeAdvertisingIdClient();
 
+  @NonNull
+  private final Context context;
+
+  public AdvertisingInfo(@NonNull Context context) {
+    this.context = context;
+  }
+
   @Nullable
-  public String getAdvertisingId(@NonNull Context context) {
+  public String getAdvertisingId() {
     try {
       return advertisingIdClient.getId(context);
     } catch (Exception e) {
@@ -42,7 +49,7 @@ public class AdvertisingInfo {
     }
   }
 
-  public boolean isLimitAdTrackingEnabled(@NonNull Context context) {
+  public boolean isLimitAdTrackingEnabled() {
     try {
       return advertisingIdClient.isLimitAdTrackingEnabled(context);
     } catch (Exception e) {

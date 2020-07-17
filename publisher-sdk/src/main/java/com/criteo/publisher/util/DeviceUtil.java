@@ -90,15 +90,15 @@ public class DeviceUtil {
 
   @Nullable
   public String getAdvertisingId() {
-    if (advertisingInfo.isLimitAdTrackingEnabled(context)) {
+    if (advertisingInfo.isLimitAdTrackingEnabled()) {
       return DEVICE_ID_LIMITED;
     }
-    return advertisingInfo.getAdvertisingId(context);
+    return advertisingInfo.getAdvertisingId();
   }
 
   public int isLimitAdTrackingEnabled() {
     // FIXME This entire method seems dumb. It's just a mapping from bool to 0,1
-    return advertisingInfo.isLimitAdTrackingEnabled(context) ? 1 : 0;
+    return advertisingInfo.isLimitAdTrackingEnabled() ? 1 : 0;
   }
 
   public boolean isVersionSupported() {
