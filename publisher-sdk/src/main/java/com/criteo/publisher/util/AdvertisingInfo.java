@@ -17,30 +17,66 @@
 package com.criteo.publisher.util;
 
 import android.content.Context;
-import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
+import com.google.android.gms.ads.identifier.AdvertisingIdClient;
+import com.google.android.gms.ads.identifier.AdvertisingIdClient.Info;
 
 public class AdvertisingInfo {
 
-  private static final String GET_ADVERTISING_ID = "getId";
-  private static final String IS_LIMIT_AD_TRACKING_ENABLED = "isLimitAdTrackingEnabled";
+  @NonNull
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  public String getAdvertisingId(Context context) {
+  @NonNull
+  private final SafeAdvertisingIdClient advertisingIdClient = new SafeAdvertisingIdClient();
+
+  @Nullable
+  public String getAdvertisingId(@NonNull Context context) {
     try {
-      return (String) ReflectionUtil.callAdvertisingIdInfo(GET_ADVERTISING_ID, context);
+      return advertisingIdClient.getId(context);
     } catch (Exception e) {
-      Log.e("AdvertisingInfo", "Error getting advertising id: " + e.getMessage());
+      logger.debug("Error getting advertising id", e);
+      return null;
     }
-    return null;
   }
 
-  public boolean isLimitAdTrackingEnabled(Context context) {
+  public boolean isLimitAdTrackingEnabled(@NonNull Context context) {
     try {
-      Object isLimitAdTrackingEnabled = ReflectionUtil
-          .callAdvertisingIdInfo(IS_LIMIT_AD_TRACKING_ENABLED, context);
-      return (boolean) isLimitAdTrackingEnabled;
+      return advertisingIdClient.isLimitAdTrackingEnabled(context);
     } catch (Exception e) {
-      Log.e("AdvertisingInfo", "Error checking if ad tracking is limited: " + e.getMessage());
+      logger.debug("Error checking if ad tracking is limited", e);
+      return false;
     }
-    return false;
+  }
+
+  private static class SafeAdvertisingIdClient {
+
+    public String getId(@NonNull Context context) throws Exception {
+      try {
+        Info advertisingIdInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
+        return advertisingIdInfo.getId();
+      } catch (LinkageError e) {
+        throw new MissingPlayServicesAdsIdentifierException(e);
+      }
+    }
+
+    public boolean isLimitAdTrackingEnabled(@NonNull Context context) throws Exception {
+      try {
+        Info advertisingIdInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
+        return advertisingIdInfo.isLimitAdTrackingEnabled();
+      } catch (LinkageError e) {
+        throw new MissingPlayServicesAdsIdentifierException(e);
+      }
+    }
+
+  }
+
+  static class MissingPlayServicesAdsIdentifierException extends Exception {
+
+    MissingPlayServicesAdsIdentifierException(Throwable cause) {
+      super("play-services-ads-identifier does not seems to be in the classpath", cause);
+    }
   }
 }

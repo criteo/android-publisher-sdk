@@ -16,31 +16,24 @@
 
 package com.criteo.publisher.util;
 
-import android.content.Context;
-import android.util.Log;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class ReflectionUtil {
 
-  private static final String GOOGLE_ADVERTISING_ID_CLIENT = "com.google.android.gms.ads.identifier.AdvertisingIdClient";
-  private static final String GET_ADVERTISING_ID_INFO = "getAdvertisingIdInfo";
+  @NonNull
+  private static final Logger logger = LoggerFactory.getLogger(ReflectionUtil.class);
 
-  public static Class getClassFromString(String className) {
-    try {
-      return Class.forName(className);
-    } catch (ClassNotFoundException e) {
-      Log.e("ReflectionUtil"
-          , "Failed to get Class: " + className + " : " + e.getMessage());
-    }
-    return null;
-  }
-
-  public static Object callMethodOnObject(Object object, String methodName, Object... params) {
-    if (object == null || methodName == null || params == null) {
-      return null;
-    }
-
+  @Nullable
+  public static Object callMethodOnObject(
+      @NonNull Object object,
+      @NonNull String methodName,
+      @NonNull Object... params
+  ) {
     try {
       int len = params.length;
       Class<?>[] classes = new Class[len];
@@ -49,36 +42,10 @@ public class ReflectionUtil {
       }
       Method method = object.getClass().getMethod(methodName, classes);
       return method.invoke(object, params);
-    } catch (NullPointerException e) {
-      e.printStackTrace();
-    } catch (NoSuchMethodException e) {
-      e.printStackTrace();
-    } catch (InvocationTargetException e) {
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
-
-  public static Object callAdvertisingIdInfo(String methodName, Context context) {
-    if (methodName == null || context == null) {
+    } catch (NullPointerException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+      logger.debug("Failed to call " + methodName, e);
       return null;
     }
-
-    try {
-      Class<?> googleAdvertisingIdClient = getClassFromString(GOOGLE_ADVERTISING_ID_CLIENT);
-      Method getAdvertisingIdInfo = googleAdvertisingIdClient
-          .getMethod(GET_ADVERTISING_ID_INFO, Context.class);
-      Object advertisingInfo = getAdvertisingIdInfo.invoke(googleAdvertisingIdClient, context);
-      Method method = advertisingInfo.getClass().getDeclaredMethod(methodName);
-      return method.invoke(advertisingInfo);
-    } catch (Exception e) {
-      Log.e("ReflectionUtil"
-          , "Failed to callAdvertisingIdClient method: " + methodName
-              + " with context: " + context.getClass().getName()
-              + " : " + e.getMessage());
-    }
-    return null;
   }
+
 }
