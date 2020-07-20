@@ -38,6 +38,11 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler{
   }
 
   @Override
+  public void cleanPreviousBid(@NonNull Object object) {
+    // TODO
+  }
+
+  @Override
   public void enrichBid(@NonNull Object object, @Nullable AdUnit adUnit, @NonNull Slot slot) {
     if (!canHandle(object)) {
       return;

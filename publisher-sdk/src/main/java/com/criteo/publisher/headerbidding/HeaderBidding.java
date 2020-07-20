@@ -47,11 +47,13 @@ public class HeaderBidding {
     for (HeaderBiddingHandler handler : handlers) {
       if (handler.canHandle(object)) {
         Slot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
+        handler.cleanPreviousBid(object);
+
         if (slot == null) {
           return;
         }
 
-        handler.enrichBid(object,adUnit, slot);
+        handler.enrichBid(object, adUnit, slot);
         return;
       }
     }
