@@ -2,6 +2,7 @@
 
 - Features
   - Fetch User-Agent asynchronously to speed up the SDK initialization.
+  - MoPub Header-Bidding: clean MoPub's keyword to support Auto-Refreshing banners
 
 # Version 3.8.0
 
