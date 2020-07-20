@@ -605,10 +605,12 @@ public class DependencyProvider {
       @Override
       public InHouse create() {
         return new InHouse(
-            DependencyProvider.this.provideBidManager(),
+            provideBidManager(),
             new TokenCache(),
-            DependencyProvider.this.provideClock(),
-            DependencyProvider.this.provideInterstitialActivityHelper());
+            provideClock(),
+            provideInterstitialActivityHelper(),
+            provideIntegrationRegistry()
+        );
       }
     });
   }

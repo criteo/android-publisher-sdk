@@ -18,9 +18,11 @@ package com.criteo.publisher.integration
 
 import android.content.SharedPreferences
 import androidx.annotation.VisibleForTesting
+import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.util.PreconditionsUtil
 import com.criteo.publisher.util.SafeSharedPreferences
 
+@OpenForTesting
 class IntegrationRegistry(private val sharedPreferences: SharedPreferences) {
 
   private val safeSharedPreferences = SafeSharedPreferences(sharedPreferences)
