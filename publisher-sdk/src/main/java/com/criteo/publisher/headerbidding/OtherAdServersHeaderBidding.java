@@ -35,8 +35,16 @@ public class OtherAdServersHeaderBidding implements HeaderBiddingHandler {
   }
 
   @Override
+  @SuppressWarnings("rawtypes")
   public void cleanPreviousBid(@NonNull Object object) {
-    // TODO
+    if (!canHandle(object)) {
+      return;
+    }
+
+    Map map = (Map) object;
+    map.remove(CRT_CPM);
+    map.remove(CRT_DISPLAY_URL);
+    map.remove(CRT_SIZE);
   }
 
   @Override

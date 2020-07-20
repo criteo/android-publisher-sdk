@@ -53,6 +53,37 @@ class OtherAdServersHeaderBiddingTest {
   }
 
   @Test
+  fun cleanPreviousBid_GivenNotHandledObject_DoNothing() {
+    val builder = mock<Any>()
+
+    headerBidding.cleanPreviousBid(builder)
+
+    verifyZeroInteractions(builder)
+  }
+
+  @Test
+  fun cleanPreviousBid_GivenMapWithoutCriteoInfo_DoNothing() {
+    val map = mutableMapOf<Any, Any>("garbage" to "should stay")
+
+    headerBidding.cleanPreviousBid(map)
+
+    assertThat(map).hasSize(1).containsEntry("garbage", "should stay")
+  }
+
+  @Test
+  fun cleanPreviousBid_GivenMapWithCriteoInfo_RemovingOnlyCriteoInfo() {
+    val map = mutableMapOf<Any, Any>(
+        "garbage" to "should stay",
+        CRT_CPM to "0.10",
+        CRT_DISPLAY_URL to "http://display.url"
+    )
+
+    headerBidding.cleanPreviousBid(map)
+
+    assertThat(map).hasSize(1).containsEntry("garbage", "should stay")
+  }
+
+  @Test
   fun enrichBid_GivenNotHandledObject_DoNothing() {
     val builder = mock<Any>()
 
