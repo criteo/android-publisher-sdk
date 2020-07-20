@@ -22,8 +22,11 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.util.ReflectionUtil;
+import java.util.Arrays;
+import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
-public class MoPubHeaderBidding implements HeaderBiddingHandler{
+public class MoPubHeaderBidding implements HeaderBiddingHandler {
 
   private static final String MOPUB_ADVIEW_CLASS = "com.mopub.mobileads.MoPubView";
   private static final String MOPUB_INTERSTITIAL_CLASS = "com.mopub.mobileads.MoPubInterstitial";
@@ -32,6 +35,12 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler{
   private static final String CRT_DISPLAY_URL = "crt_displayUrl";
   private static final String CRT_SIZE = "crt_size";
 
+  private static final List<String> CRITEO_KEYWORDS = Arrays.asList(
+      CRT_CPM,
+      CRT_DISPLAY_URL,
+      CRT_SIZE
+  );
+
   public boolean canHandle(@NonNull Object object) {
     return object.getClass().getName().equals(MOPUB_ADVIEW_CLASS)
         || object.getClass().getName().equals(MOPUB_INTERSTITIAL_CLASS);
@@ -39,7 +48,38 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler{
 
   @Override
   public void cleanPreviousBid(@NonNull Object object) {
-    // TODO
+    if (!canHandle(object)) {
+      return;
+    }
+
+    String keywords = (String) ReflectionUtil.callMethodOnObject(object, "getKeywords");
+    if (keywords == null) {
+      return;
+    }
+
+    String cleanedKeywords = removeCriteoKeywords(keywords);
+    ReflectionUtil.callMethodOnObject(object, "setKeywords", cleanedKeywords);
+  }
+
+  @NotNull
+  private String removeCriteoKeywords(@NonNull String keywords) {
+    // clean previous Criteo keywords starting with "crt_"
+    StringBuilder cleanedKeywords = new StringBuilder();
+    for (String keyword : keywords.split(",")) {
+      if (!isCriteoKeyword(keyword)) {
+        cleanedKeywords.append(keyword).append(",");
+      }
+    }
+    return cleanedKeywords.toString().replaceAll(",$", "");
+  }
+
+  private boolean isCriteoKeyword(@NonNull String keyword) {
+    for (String criteoKeyword : CRITEO_KEYWORDS) {
+      if (keyword.startsWith(criteoKeyword + ":")) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
