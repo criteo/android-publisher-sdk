@@ -22,6 +22,8 @@ import android.webkit.WebView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.integration.Integration;
+import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.util.ObjectUtils;
 
@@ -77,6 +79,7 @@ public class CriteoBannerView extends WebView {
   }
 
   private void doLoadAd() {
+    getIntegrationRegistry().declare(Integration.STANDALONE);
     getOrCreateController().fetchAdAsync(bannerAdUnit);
   }
 
@@ -108,6 +111,11 @@ public class CriteoBannerView extends WebView {
   @NonNull
   private Criteo getCriteo() {
     return criteo == null ? Criteo.getInstance() : criteo;
+  }
+
+  @NonNull
+  private IntegrationRegistry getIntegrationRegistry() {
+    return DependencyProvider.getInstance().provideIntegrationRegistry();
   }
 
 }

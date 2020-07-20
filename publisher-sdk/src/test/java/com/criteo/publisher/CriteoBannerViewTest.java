@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -28,17 +29,27 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import android.content.Context;
+import com.criteo.publisher.integration.Integration;
+import com.criteo.publisher.integration.IntegrationRegistry;
+import com.criteo.publisher.mock.MockBean;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import java.util.UUID;
+import kotlin.jvm.JvmField;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class CriteoBannerViewTest {
+
+  @Rule
+  @JvmField
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   @Mock
   private Context context;
@@ -48,6 +59,9 @@ public class CriteoBannerViewTest {
 
   @Mock
   private Criteo criteo;
+
+  @MockBean
+  private IntegrationRegistry integrationRegistry;
 
   private CriteoBannerView bannerView;
 
@@ -72,6 +86,7 @@ public class CriteoBannerViewTest {
 
     verify(controller).fetchAdAsync(bannerAdUnit);
     verifyNoMoreInteractions(controller);
+    verify(integrationRegistry).declare(Integration.STANDALONE);
   }
 
   @Test
@@ -81,6 +96,7 @@ public class CriteoBannerViewTest {
 
     verify(controller, times(2)).fetchAdAsync(bannerAdUnit);
     verifyNoMoreInteractions(controller);
+    verify(integrationRegistry, times(2)).declare(Integration.STANDALONE);
   }
 
   @Test
@@ -92,6 +108,7 @@ public class CriteoBannerViewTest {
 
     verify(controller).fetchAdAsync((AdUnit) null);
     verifyNoMoreInteractions(controller);
+    verify(integrationRegistry).declare(Integration.STANDALONE);
   }
 
   @Test
@@ -114,6 +131,7 @@ public class CriteoBannerViewTest {
 
     verify(controller).fetchAdAsync(bidToken);
     verifyNoMoreInteractions(controller);
+    verify(integrationRegistry, never()).declare(any());
   }
 
   @Test
@@ -123,6 +141,7 @@ public class CriteoBannerViewTest {
 
     verify(controller, times(2)).fetchAdAsync(bidToken);
     verifyNoMoreInteractions(controller);
+    verify(integrationRegistry, never()).declare(any());
   }
 
   @Test
@@ -131,6 +150,7 @@ public class CriteoBannerViewTest {
 
     verify(controller).fetchAdAsync((BidToken) null);
     verifyNoMoreInteractions(controller);
+    verify(integrationRegistry, never()).declare(any());
   }
 
   @Test

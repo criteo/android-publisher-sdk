@@ -28,6 +28,8 @@ import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.InHouse;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
+import com.criteo.publisher.integration.Integration;
+import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.nativeads.NativeAssets;
@@ -119,6 +121,8 @@ public class CriteoNativeLoader {
   }
 
   private void doLoad() {
+    getIntegrationRegistry().declare(Integration.STANDALONE);
+
     BidManager bidManager = getBidManager();
     Slot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
     NativeAssets assets = bid == null ? null : bid.getNativeAssets();
@@ -208,6 +212,11 @@ public class CriteoNativeLoader {
   @NonNull
   private static ImageLoaderHolder getImageLoaderHolder() {
     return DependencyProvider.getInstance().provideImageLoaderHolder();
+  }
+
+  @NonNull
+  private IntegrationRegistry getIntegrationRegistry() {
+    return DependencyProvider.getInstance().provideIntegrationRegistry();
   }
 
 }
