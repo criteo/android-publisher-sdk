@@ -17,6 +17,7 @@
 package com.criteo.publisher.headerbidding;
 
 import static com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -66,6 +67,112 @@ public class MoPubHeaderBiddingTest {
     boolean handling = headerBidding.canHandle(moPub);
 
     assertTrue(handling);
+  }
+
+  @Test
+  public void cleanPreviousBid_GivenNotHandledObject_DoNothing() throws Exception {
+    Object builder = mock(Object.class);
+
+    headerBidding.cleanPreviousBid(builder);
+
+    verifyNoMoreInteractions(builder);
+  }
+
+  @Test
+  public void cleanPreviousBid_GivenMoPubViewWithPreviousNonCriteoData_DoNothing()
+      throws Exception {
+    MoPubView moPub = givenMoPubView();
+    moPub.setKeywords("previousData,that:\"shouldn't be cleaned\"");
+
+    headerBidding.cleanPreviousBid(moPub);
+    String keywords = moPub.getKeywords();
+
+    assertThat(keywords).isEqualTo("previousData,that:\"shouldn't be cleaned\"");
+  }
+
+  @Test
+  public void cleanPreviousBid_GivenMoPubInterstitialWithPreviousNonCriteoData_DoNothing()
+      throws Exception {
+    MoPubInterstitial moPub = givenMoPubInterstitial();
+    moPub.setKeywords("previousData,that:\"shouldn't be cleaned\"");
+
+    headerBidding.cleanPreviousBid(moPub);
+    String keywords = moPub.getKeywords();
+
+    assertThat(keywords).isEqualTo("previousData,that:\"shouldn't be cleaned\"");
+  }
+
+  @Test
+  public void cleanPreviousBid_GivenMoPubViewWithOnlyCriteoData_RemoveAll() throws Exception {
+    MoPubView moPub = givenMoPubView();
+    moPub.setKeywords("crt_cpm:0.10,crt_displayUrl:http://url,crt_size:42x1337");
+
+    headerBidding.cleanPreviousBid(moPub);
+    String keywords = moPub.getKeywords();
+
+    assertThat(keywords).isEmpty();
+  }
+
+  @Test
+  public void cleanPreviousBid_GivenMoPubInterstitialWithOnlyCriteoData_RemoveAll()
+      throws Exception {
+    MoPubInterstitial moPub = givenMoPubInterstitial();
+    moPub.setKeywords("crt_cpm:0.10,crt_displayUrl:http://url,crt_size:42x1337");
+
+    headerBidding.cleanPreviousBid(moPub);
+    String keywords = moPub.getKeywords();
+
+    assertThat(keywords).isEmpty();
+  }
+
+  @Test
+  public void cleanPreviousBid_GivenMoPubViewWithoutKeywords_DoNothing() throws Exception {
+    MoPubView moPub = givenMoPubView();
+
+    headerBidding.cleanPreviousBid(moPub);
+    String keywords = moPub.getKeywords();
+
+    assertThat(keywords).isNull();
+  }
+
+  @Test
+  public void cleanPreviousBid_GivenMoPubInterstitialWithoutKeywords_DoNothing() throws Exception {
+    MoPubInterstitial moPub = givenMoPubInterstitial();
+
+    headerBidding.cleanPreviousBid(moPub);
+    String keywords = moPub.getKeywords();
+
+    assertThat(keywords).isNull();
+  }
+
+  @Test
+  public void cleanPreviousBid_GivenMoPubViewWithPreviousCriteoData_RemoveOnlyCriteoData()
+      throws Exception {
+    MoPubView moPub = givenMoPubView();
+    moPub.setKeywords(
+        "previousData,that:\"shouldn't be cleaned\",crt_cpm:0.10,crt_displayUrl:http://url,crt_size:42x1337,crt_cpm_notcriteo,this:\"one neither\"");
+
+    headerBidding.cleanPreviousBid(moPub);
+    String keywords = moPub.getKeywords();
+
+    assertThat(keywords)
+        .isEqualTo(
+            "previousData,that:\"shouldn't be cleaned\",crt_cpm_notcriteo,this:\"one neither\"");
+  }
+
+  @Test
+  public void cleanPreviousBid_GivenMoPubInterstitialWithPreviousCriteoData_RemoveOnlyCriteoData()
+      throws Exception {
+    MoPubInterstitial moPub = givenMoPubInterstitial();
+    moPub.setKeywords(
+        "previousData,that:\"shouldn't be cleaned\",crt_cpm:0.10,crt_displayUrl:http://url,crt_size:42x1337,crt_cpm_notcriteo,this:\"one neither\"");
+
+    headerBidding.cleanPreviousBid(moPub);
+    String keywords = moPub.getKeywords();
+
+    assertThat(keywords)
+        .isEqualTo(
+            "previousData,that:\"shouldn't be cleaned\",crt_cpm_notcriteo,this:\"one neither\"");
   }
 
   @Test
