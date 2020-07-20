@@ -81,7 +81,9 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
 
   @Override
   public void cleanPreviousBid(@NonNull Object object) {
-    // TODO
+    // Do nothing: DFP bid object is a builder object. By definition, it should not be reused by
+    // publisher. And it's an append only object so removing data is not supported.
+    // Moreover, doing not make Auto-Refreshing Ads work.
   }
 
   @Override
