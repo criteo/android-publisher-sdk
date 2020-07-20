@@ -47,7 +47,7 @@ class HeaderBiddingTest {
   }
 
   @Test
-  fun enrichBid_GivenHandlerAcceptingObjectButNoBid_Return() {
+  fun enrichBid_GivenHandlerAcceptingObjectButNoBid_CleanBidAndReturn() {
     val obj = mock<Any>()
     val adUnit = mock<AdUnit>()
     val handler = givenHandler(obj, true)
@@ -60,6 +60,7 @@ class HeaderBiddingTest {
 
     headerBidding.enrichBid(obj, adUnit)
 
+    verify(handler).cleanPreviousBid(obj)
     verify(handler, never()).enrichBid(any(), anyOrNull(), any())
   }
 
@@ -80,13 +81,16 @@ class HeaderBiddingTest {
 
     headerBidding.enrichBid(obj, adUnit)
 
+    verify(handler1, never()).cleanPreviousBid(any())
     verify(handler1, never()).enrichBid(any(), anyOrNull(), any())
+    verify(handler2).cleanPreviousBid(obj)
     verify(handler2).enrichBid(obj, adUnit, slot)
+    verify(handler3, never()).cleanPreviousBid(any())
     verify(handler3, never()).enrichBid(any(), anyOrNull(), any())
   }
 
   private fun givenHandler(obj: Any, accepting: Boolean): HeaderBiddingHandler {
-    return mock() {
+    return mock {
       on { canHandle(obj) } doReturn accepting
     }
   }

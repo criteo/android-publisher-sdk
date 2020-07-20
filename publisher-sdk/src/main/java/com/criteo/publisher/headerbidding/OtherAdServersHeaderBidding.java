@@ -35,6 +35,11 @@ public class OtherAdServersHeaderBidding implements HeaderBiddingHandler {
   }
 
   @Override
+  public void cleanPreviousBid(@NonNull Object object) {
+    // TODO
+  }
+
+  @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   public void enrichBid(@NonNull Object object, @Nullable AdUnit adUnit, @NonNull Slot slot) {
     if (!canHandle(object)) {

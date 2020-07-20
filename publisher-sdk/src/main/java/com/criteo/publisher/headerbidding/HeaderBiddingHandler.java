@@ -23,8 +23,38 @@ import com.criteo.publisher.model.Slot;
 
 public interface HeaderBiddingHandler {
 
+  /**
+   * Indicate if this handler can handle the given object.
+   * <p>
+   * This means that this handler is ready to accept this object for all other methods in this
+   * interface.
+   *
+   * @param object object to test
+   * @return <code>true</code> if the object is supported
+   */
   boolean canHandle(@NonNull Object object);
 
-  void enrichBid(@NonNull Object object, @Nullable AdUnit adUnit, @NonNull Slot slot);
+  /**
+   * Remove previous state that may have been stored in the object.
+   * <p>
+   * This cancels any modification done by a {@link #enrichBid(Object, AdUnit, Slot)} call.
+   * <p>
+   * This method is only called on {@linkplain #canHandle(Object) handled objects}. If there is a
+   * bid, but also if there is no bid to avoid having a third-party considering that Criteo bids
+   * again.
+   *
+   * @param object bid object to clean
+   */
+  void cleanPreviousBid(@NonNull Object object);
 
+  /**
+   * Enrich the given bid object with a bid for the given ad unit.
+   * <p>
+   * This method is only called on {@linkplain #canHandle(Object) handled objects}.
+   *
+   * @param object bid object to fill
+   * @param adUnit ad unit representing the requested bid
+   * @param slot bid to use
+   */
+  void enrichBid(@NonNull Object object, @Nullable AdUnit adUnit, @NonNull Slot slot);
 }
