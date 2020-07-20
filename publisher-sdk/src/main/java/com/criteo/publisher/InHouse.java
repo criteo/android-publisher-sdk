@@ -20,6 +20,8 @@ import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.criteo.publisher.integration.Integration;
+import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AbstractTokenValue;
 import com.criteo.publisher.model.AdUnit;
@@ -43,19 +45,27 @@ public class InHouse {
   @NonNull
   private final InterstitialActivityHelper interstitialActivityHelper;
 
+  @NonNull
+  private final IntegrationRegistry integrationRegistry;
+
   public InHouse(
       @NonNull BidManager bidManager,
       @NonNull TokenCache tokenCache,
       @NonNull Clock clock,
-      @NonNull InterstitialActivityHelper interstitialActivityHelper) {
+      @NonNull InterstitialActivityHelper interstitialActivityHelper,
+      @NonNull IntegrationRegistry integrationRegistry
+  ) {
     this.bidManager = bidManager;
     this.tokenCache = tokenCache;
     this.clock = clock;
     this.interstitialActivityHelper = interstitialActivityHelper;
+    this.integrationRegistry = integrationRegistry;
   }
 
   @NonNull
   public BidResponse getBidResponse(@Nullable AdUnit adUnit) {
+    integrationRegistry.declare(Integration.IN_HOUSE);
+
     if (adUnit instanceof InterstitialAdUnit && !interstitialActivityHelper.isAvailable()) {
       return new BidResponse();
     }

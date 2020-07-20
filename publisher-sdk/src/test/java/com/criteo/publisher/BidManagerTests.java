@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
+import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
@@ -87,6 +88,9 @@ public class BidManagerTests {
 
   @Mock
   private InterstitialActivityHelper interstitialActivityHelper;
+
+  @Mock
+  private IntegrationRegistry integrationRegistry;
 
   @Before
   public void setup() {
@@ -214,7 +218,13 @@ public class BidManagerTests {
 
   @NonNull
   private InHouse createInHouse(BidManager bidManager) {
-    return new InHouse(bidManager, mock(TokenCache.class), clock, interstitialActivityHelper);
+    return new InHouse(
+        bidManager,
+        mock(TokenCache.class),
+        clock,
+        interstitialActivityHelper,
+        integrationRegistry
+    );
   }
 
 }

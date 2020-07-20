@@ -20,9 +20,12 @@ import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
+import com.criteo.publisher.integration.Integration;
+import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
@@ -49,13 +52,22 @@ public class InHouseTest {
   @Mock
   private InterstitialActivityHelper interstitialActivityHelper;
 
+  @Mock
+  private IntegrationRegistry integrationRegistry;
+
   private InHouse inHouse;
 
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    inHouse = new InHouse(bidManager, tokenCache, clock, interstitialActivityHelper);
+    inHouse = new InHouse(
+        bidManager,
+        tokenCache,
+        clock,
+        interstitialActivityHelper,
+        integrationRegistry
+    );
   }
 
   @Test
@@ -87,6 +99,7 @@ public class InHouseTest {
     BidResponse bidResponse = inHouse.getBidResponse(null);
 
     assertIsNoBid(bidResponse);
+    verify(integrationRegistry).declare(Integration.IN_HOUSE);
   }
 
   @Test
@@ -98,6 +111,7 @@ public class InHouseTest {
     BidResponse bidResponse = inHouse.getBidResponse(adUnit);
 
     assertIsNoBid(bidResponse);
+    verify(integrationRegistry).declare(Integration.IN_HOUSE);
   }
 
   @Test
@@ -112,6 +126,7 @@ public class InHouseTest {
 
     assertThat(bidResponse.isBidSuccess()).isTrue();
     assertThat(bidResponse.getPrice()).isEqualTo(42.1337);
+    verify(integrationRegistry).declare(Integration.IN_HOUSE);
   }
 
   @Test
@@ -123,6 +138,7 @@ public class InHouseTest {
 
     assertIsNoBid(bidResponse);
     verifyZeroInteractions(bidManager);
+    verify(integrationRegistry).declare(Integration.IN_HOUSE);
   }
 
   private void assertIsNoBid(BidResponse bidResponse) {
