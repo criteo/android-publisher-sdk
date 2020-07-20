@@ -61,6 +61,7 @@ import com.criteo.publisher.headerbidding.DfpHeaderBidding;
 import com.criteo.publisher.headerbidding.HeaderBidding;
 import com.criteo.publisher.headerbidding.MoPubHeaderBidding;
 import com.criteo.publisher.headerbidding.OtherAdServersHeaderBidding;
+import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.AdUnitMapper;
@@ -569,6 +570,17 @@ public class DependencyProvider {
             BuildConfig.pubSdkSharedPreferences,
             Context.MODE_PRIVATE
         );
+      }
+    });
+  }
+
+  @NonNull
+  public IntegrationRegistry provideIntegrationRegistry() {
+    return getOrCreate(IntegrationRegistry.class, new Factory<IntegrationRegistry>() {
+      @NonNull
+      @Override
+      public IntegrationRegistry create() {
+        return new IntegrationRegistry(provideSharedPreferences());
       }
     });
   }
