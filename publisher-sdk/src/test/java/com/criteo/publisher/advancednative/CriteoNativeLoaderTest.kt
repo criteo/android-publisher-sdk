@@ -20,6 +20,8 @@ import com.criteo.publisher.BidManager
 import com.criteo.publisher.CriteoErrorCode
 import com.criteo.publisher.InHouse
 import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor
+import com.criteo.publisher.integration.Integration
+import com.criteo.publisher.integration.IntegrationRegistry
 import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
@@ -54,6 +56,9 @@ class CriteoNativeLoaderTest {
 
   @MockBean
   private lateinit var defaultImageLoader: ImageLoader
+
+  @MockBean
+  private lateinit var integrationRegistry: IntegrationRegistry
 
   @Inject
   private lateinit var imageLoaderHolder: ImageLoaderHolder
@@ -105,6 +110,7 @@ class CriteoNativeLoaderTest {
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
     verifyNoMoreInteractions(listener)
+    verifyZeroInteractions(integrationRegistry)
     runOnUiThreadExecutor.verifyExpectations()
   }
 
@@ -118,6 +124,7 @@ class CriteoNativeLoaderTest {
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
     verifyNoMoreInteractions(listener)
+    verify(integrationRegistry).declare(Integration.IN_HOUSE)
     runOnUiThreadExecutor.verifyExpectations()
   }
 
@@ -131,6 +138,7 @@ class CriteoNativeLoaderTest {
 
     verify(listener).onAdReceived(nativeAd)
     verifyNoMoreInteractions(listener)
+    verify(integrationRegistry).declare(Integration.IN_HOUSE)
     runOnUiThreadExecutor.verifyExpectations()
   }
 
@@ -143,6 +151,7 @@ class CriteoNativeLoaderTest {
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
     verifyNoMoreInteractions(listener)
+    verify(integrationRegistry).declare(Integration.STANDALONE)
     runOnUiThreadExecutor.verifyExpectations()
   }
 
@@ -155,6 +164,7 @@ class CriteoNativeLoaderTest {
 
     verify(listener).onAdReceived(nativeAd)
     verifyNoMoreInteractions(listener)
+    verify(integrationRegistry).declare(Integration.STANDALONE)
     runOnUiThreadExecutor.verifyExpectations()
   }
 
@@ -167,6 +177,7 @@ class CriteoNativeLoaderTest {
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
     verifyNoMoreInteractions(listener)
+    verify(integrationRegistry).declare(Integration.STANDALONE)
     runOnUiThreadExecutor.verifyExpectations()
   }
 

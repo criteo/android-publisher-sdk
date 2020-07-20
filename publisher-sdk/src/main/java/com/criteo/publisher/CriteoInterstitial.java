@@ -21,6 +21,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.integration.Integration;
+import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.WebViewData;
 import com.criteo.publisher.util.ObjectUtils;
@@ -84,6 +86,7 @@ public class CriteoInterstitial {
   }
 
   private void doLoadAd() {
+    getIntegrationRegistry().declare(Integration.STANDALONE);
     getOrCreateController().fetchAdAsync(interstitialAdUnit);
   }
 
@@ -146,5 +149,9 @@ public class CriteoInterstitial {
     return criteo == null ? Criteo.getInstance() : criteo;
   }
 
+  @NonNull
+  private IntegrationRegistry getIntegrationRegistry() {
+    return DependencyProvider.getInstance().provideIntegrationRegistry();
+  }
 
 }
