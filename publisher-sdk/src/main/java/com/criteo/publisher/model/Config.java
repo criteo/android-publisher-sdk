@@ -18,13 +18,11 @@ package com.criteo.publisher.model;
 
 import static com.criteo.publisher.util.ObjectUtils.getOrElse;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.criteo.publisher.BuildConfig;
 import com.criteo.publisher.util.JsonSerializer;
 import com.criteo.publisher.util.SafeSharedPreferences;
 import java.io.ByteArrayInputStream;
@@ -70,7 +68,7 @@ public class Config {
   private volatile RemoteConfigResponse cachedRemoteConfig;
 
   @Nullable
-  private final Context context;
+  private final SharedPreferences sharedPreferences;
 
   @Nullable
   private final JsonSerializer jsonSerializer;
@@ -79,16 +77,16 @@ public class Config {
    * used by {@link com.criteo.publisher.DummyCriteo} to create a Config object
    **/
   public Config() {
-    this.context = null;
+    this.sharedPreferences = null;
     this.jsonSerializer = null;
     this.cachedRemoteConfig = RemoteConfigResponse.createEmpty();
   }
 
   public Config(
-      @NonNull Context context,
+      @NonNull SharedPreferences sharedPreferences,
       @NonNull JsonSerializer jsonSerializer
   ) {
-    this.context = context;
+    this.sharedPreferences = sharedPreferences;
     this.jsonSerializer = jsonSerializer;
     this.cachedRemoteConfig = readConfigOrEmpty();
   }
@@ -97,11 +95,10 @@ public class Config {
   private RemoteConfigResponse readConfigOrEmpty() {
     RemoteConfigResponse config = RemoteConfigResponse.createEmpty();
 
-    if (context == null || jsonSerializer == null) {
+    if (sharedPreferences == null || jsonSerializer == null) {
       return config;
     }
 
-    SharedPreferences sharedPreferences = getSharedPreferences(context);
     SafeSharedPreferences safeSharedPreferences = new SafeSharedPreferences(sharedPreferences);
 
     // Keep compatibility with old kill switches stored in local storage
@@ -172,7 +169,7 @@ public class Config {
     //  However, the null check is done for safety purposes. when we implement CSM,
     //  we would need to trigger an event if context is null as it would indicate a
     //  potential problem.
-    if (context == null || jsonSerializer == null) {
+    if (sharedPreferences == null || jsonSerializer == null) {
       return;
     }
 
@@ -185,15 +182,9 @@ public class Config {
       return;
     }
 
-    Editor editor = getSharedPreferences(context).edit();
+    Editor editor = sharedPreferences.edit();
     editor.putString(CONFIG_STORAGE_KEY, remoteConfigJson);
     editor.apply();
-  }
-
-  private static SharedPreferences getSharedPreferences(@NonNull Context context) {
-    return context.getSharedPreferences(
-        BuildConfig.pubSdkSharedPreferences,
-        Context.MODE_PRIVATE);
   }
 
   public boolean isKillSwitchEnabled() {
