@@ -17,8 +17,6 @@
 package com.criteo.publisher;
 
 import android.app.Application;
-import android.content.Context;
-import android.content.SharedPreferences;
 import androidx.test.InstrumentationRegistry;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.util.InstrumentationUtil;
@@ -56,23 +54,6 @@ public class CriteoUtil {
 
     List<AdUnit> adUnits = Arrays.asList(preloadedAdUnits);
     return new Criteo.Builder(app, TEST_CP_ID).adUnits(adUnits);
-  }
-
-  /**
-   * Clear all states retained in shared preferences used by the SDK.
-   */
-  public static void clearSharedPreferences() {
-    SharedPreferences sharedPreferences = getSharedPreferences();
-
-    sharedPreferences.edit().clear().apply();
-  }
-
-  private static SharedPreferences getSharedPreferences() {
-    Context context = InstrumentationRegistry.getTargetContext().getApplicationContext();
-
-    return context.getSharedPreferences(
-        BuildConfig.pubSdkSharedPreferences,
-        Context.MODE_PRIVATE);
   }
 
 }

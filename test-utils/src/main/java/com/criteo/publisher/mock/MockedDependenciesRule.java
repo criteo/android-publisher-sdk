@@ -101,6 +101,9 @@ public class MockedDependenciesRule implements MethodRule {
             timeout.build(base).evaluate();
           }
         } finally {
+          // Clear all states retained in shared preferences used by the SDK.
+          dependencyProvider.provideSharedPreferences().edit().clear().apply();
+
           // clean after self and ensures no side effects for subsequent tests
           MockableDependencyProvider.setInstance(null);
 

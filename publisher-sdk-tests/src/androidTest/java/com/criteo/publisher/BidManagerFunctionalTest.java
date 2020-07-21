@@ -16,7 +16,6 @@
 
 package com.criteo.publisher;
 
-import static com.criteo.publisher.CriteoUtil.clearSharedPreferences;
 import static com.criteo.publisher.concurrent.ThreadingUtil.waitForMessageQueueToBeIdle;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static com.criteo.publisher.util.CompletableFuture.completedFuture;
@@ -74,7 +73,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import javax.inject.Inject;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -126,7 +124,6 @@ public class BidManagerFunctionalTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    clearSharedPreferences();
 
     dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
@@ -143,11 +140,6 @@ public class BidManagerFunctionalTest {
     givenExpiredSilentModeBidCached(sampleAdUnit());
     givenNoBidCached(sampleAdUnit());
     givenNoLastBid(sampleAdUnit());
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    clearSharedPreferences();
   }
 
   @Test

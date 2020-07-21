@@ -24,11 +24,14 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 
 public class ApplicationMock {
 
+  @SuppressLint("CommitPrefEdits")
   public static Application newMock() {
     // Explicitly mock shared preferences because it is a pain to handle them in unit tests.
     // This is more true for the getString one, because, since String class is final, it is
@@ -39,6 +42,9 @@ public class ApplicationMock {
     when(sharedPreferences.getInt(any(), anyInt())).thenAnswer(returnsArgAt(1));
     when(sharedPreferences.getBoolean(any(), anyBoolean())).thenAnswer(returnsArgAt(1));
     when(sharedPreferences.getString(any(), any())).thenAnswer(returnsArgAt(1));
+
+    Editor editor = mock(Editor.class, RETURNS_DEEP_STUBS);
+    when(sharedPreferences.edit()).thenReturn(editor);
 
     Application application = mock(Application.class, RETURNS_DEEP_STUBS);
     when(application.getApplicationContext().getSharedPreferences(any(), anyInt()))

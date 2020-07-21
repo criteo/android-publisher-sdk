@@ -35,7 +35,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.criteo.publisher.BuildConfig;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.CriteoUtil;
@@ -69,6 +68,9 @@ public class ConfigIntegrationTests {
 
   @Inject
   private Application application;
+
+  @Inject
+  private SharedPreferences sharedPreferences;
 
   @SpyBean
   private BuildConfigWrapper buildConfigWrapper;
@@ -425,8 +427,6 @@ public class ConfigIntegrationTests {
 
   @Nullable
   private RemoteConfigResponse getRemoteConfigInLocalStorage() throws Exception {
-    SharedPreferences sharedPreferences = getSharedPreferences();
-
     if (!sharedPreferences.contains(CACHED_CONFIG)) {
       return null;
     } else {
@@ -437,12 +437,10 @@ public class ConfigIntegrationTests {
   }
 
   private void givenEmptyLocalStorage() {
-    CriteoUtil.clearSharedPreferences();
+    sharedPreferences.edit().clear().apply();
   }
 
   private void givenKillSwitchInOldLocalStorage(boolean isEnabled) {
-    SharedPreferences sharedPreferences = getSharedPreferences();
-
     sharedPreferences.edit()
         .putBoolean(CACHED_KILL_SWITCH, isEnabled)
         .apply();
@@ -454,8 +452,6 @@ public class ConfigIntegrationTests {
   }
 
   private void givenRemoteConfigInLocalStorage(RemoteConfigResponse remoteConfigResponse) throws Exception{
-    SharedPreferences sharedPreferences = getSharedPreferences();
-
     String json;
     try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
       jsonSerializer.write(remoteConfigResponse, baos);
@@ -467,18 +463,12 @@ public class ConfigIntegrationTests {
         .apply();
   }
 
-  private SharedPreferences getSharedPreferences() {
-    return context.getSharedPreferences(
-        BuildConfig.pubSdkSharedPreferences,
-        Context.MODE_PRIVATE);
-  }
-
   private void waitForIdleState() {
     mockedDependenciesRule.waitForIdleState();
   }
 
   @NonNull
   private Config createConfig() {
-    return new Config(context, jsonSerializer);
+    return new Config(sharedPreferences, jsonSerializer);
   }
 }

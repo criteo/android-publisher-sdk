@@ -20,6 +20,7 @@ import static java.util.Arrays.asList;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build.VERSION_CODES;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -229,7 +230,7 @@ public class DependencyProvider {
       @Override
       public Config create() {
         return new Config(
-            provideContext(),
+            provideSharedPreferences(),
             provideJsonSerializer()
         );
       }
@@ -554,6 +555,20 @@ public class DependencyProvider {
       @Override
       public AsyncResources create() {
         return new NoOpAsyncResources();
+      }
+    });
+  }
+
+  @NonNull
+  public SharedPreferences provideSharedPreferences() {
+    return getOrCreate(SharedPreferences.class, new Factory<SharedPreferences>() {
+      @NonNull
+      @Override
+      public SharedPreferences create() {
+        return provideContext().getSharedPreferences(
+            BuildConfig.pubSdkSharedPreferences,
+            Context.MODE_PRIVATE
+        );
       }
     });
   }

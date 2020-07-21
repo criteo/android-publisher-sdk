@@ -30,7 +30,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import com.criteo.publisher.mock.MockedDependenciesRule;
@@ -62,18 +61,12 @@ public class ConfigTest {
 
   private Config config;
 
-  @Mock
-  private Context context;
-
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private SharedPreferences sharedPreferences;
 
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-
-    when(context.getSharedPreferences(any(), eq(Context.MODE_PRIVATE)))
-        .thenReturn(sharedPreferences);
 
     when(sharedPreferences.getString(any(), any()))
         .thenAnswer(invocation -> invocation.getArguments()[1]);
@@ -271,7 +264,7 @@ public class ConfigTest {
   }
 
   private void givenNewConfig() {
-    config = new Config(context, jsonSerializer);
+    config = new Config(sharedPreferences, jsonSerializer);
   }
 
   private RemoteConfigResponse givenFullNewPayload(Config config) {
