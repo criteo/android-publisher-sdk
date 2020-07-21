@@ -23,7 +23,10 @@ import com.criteo.publisher.util.PreconditionsUtil
 import com.criteo.publisher.util.SafeSharedPreferences
 
 @OpenForTesting
-class IntegrationRegistry(private val sharedPreferences: SharedPreferences) {
+class IntegrationRegistry(
+    private val sharedPreferences: SharedPreferences,
+    private val integrationDetector: IntegrationDetector
+) {
 
   private val safeSharedPreferences = SafeSharedPreferences(sharedPreferences)
 
@@ -35,6 +38,11 @@ class IntegrationRegistry(private val sharedPreferences: SharedPreferences) {
 
   @VisibleForTesting
   fun readIntegration(): Integration {
+    if (integrationDetector.isMoPubMediationPresent()) {
+      return Integration.MOPUB_MEDIATION
+    } else if (integrationDetector.isAdMobMediationPresent()) {
+      return Integration.ADMOB_MEDIATION
+    }
     val integrationName = safeSharedPreferences.getString(
         IntegrationStorageKey,
         Integration.FALLBACK.name
