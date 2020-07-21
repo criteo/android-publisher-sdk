@@ -18,6 +18,7 @@ package com.criteo.publisher.headerbidding;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.Slot;
@@ -32,6 +33,12 @@ public class OtherAdServersHeaderBidding implements HeaderBiddingHandler {
   @Override
   public boolean canHandle(@NonNull Object object) {
     return object instanceof Map;
+  }
+
+  @NonNull
+  @Override
+  public Integration getIntegration() {
+    return Integration.CUSTOM_APP_BIDDING;
   }
 
   @Override

@@ -19,6 +19,7 @@ package com.criteo.publisher.headerbidding;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.BidManager;
+import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Slot;
 import java.util.List;
@@ -31,12 +32,17 @@ public class HeaderBidding {
   @NonNull
   private final List<HeaderBiddingHandler> handlers;
 
+  @NonNull
+  private final IntegrationRegistry integrationRegistry;
+
   public HeaderBidding(
       @NonNull BidManager bidManager,
-      @NonNull List<HeaderBiddingHandler> handlers
+      @NonNull List<HeaderBiddingHandler> handlers,
+      @NonNull IntegrationRegistry integrationRegistry
   ) {
     this.bidManager = bidManager;
     this.handlers = handlers;
+    this.integrationRegistry = integrationRegistry;
   }
 
   public void enrichBid(@Nullable Object object, @Nullable AdUnit adUnit) {
@@ -46,6 +52,8 @@ public class HeaderBidding {
 
     for (HeaderBiddingHandler handler : handlers) {
       if (handler.canHandle(object)) {
+        integrationRegistry.declare(handler.getIntegration());
+
         Slot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
         handler.cleanPreviousBid(object);
 

@@ -17,6 +17,7 @@
 package com.criteo.publisher.headerbidding;
 
 import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.when;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdSize;
@@ -87,6 +89,13 @@ public class DfpHeaderBiddingTest {
   @Before
   public void setUp() throws Exception {
     headerBidding = new DfpHeaderBidding(androidUtil, deviceUtil);
+  }
+
+  @Test
+  public void getIntegration_ReturnGamAppBidding() throws Exception {
+    Integration integration = headerBidding.getIntegration();
+
+    assertThat(integration).isEqualTo(Integration.GAM_APP_BIDDING);
   }
 
   @Test

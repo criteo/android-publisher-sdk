@@ -18,6 +18,7 @@ package com.criteo.publisher.headerbidding;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.Slot;
@@ -44,6 +45,12 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler {
   public boolean canHandle(@NonNull Object object) {
     return object.getClass().getName().equals(MOPUB_ADVIEW_CLASS)
         || object.getClass().getName().equals(MOPUB_INTERSTITIAL_CLASS);
+  }
+
+  @NonNull
+  @Override
+  public Integration getIntegration() {
+    return Integration.MOPUB_APP_BIDDING;
   }
 
   @Override

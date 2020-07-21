@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.headerbidding
 
+import com.criteo.publisher.integration.Integration
 import com.criteo.publisher.model.AdSize
 import com.criteo.publisher.model.BannerAdUnit
 import com.criteo.publisher.model.InterstitialAdUnit
@@ -35,6 +36,13 @@ class OtherAdServersHeaderBiddingTest {
   }
 
   private val headerBidding = OtherAdServersHeaderBidding()
+
+  @Test
+  fun getIntegration_ReturnCustomAppBidding() {
+    val integration = headerBidding.integration
+
+    assertThat(integration).isEqualTo(Integration.CUSTOM_APP_BIDDING)
+  }
 
   @Test
   fun canHandle_GivenSimpleObject_ReturnFalse() {
