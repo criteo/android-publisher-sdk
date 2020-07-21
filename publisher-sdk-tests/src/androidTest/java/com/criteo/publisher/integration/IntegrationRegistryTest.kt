@@ -46,6 +46,9 @@ class IntegrationRegistryTest {
   @Inject
   private lateinit var sharedPreferences: SharedPreferences
 
+  @SpyBean
+  private lateinit var integrationDetector: IntegrationDetector
+
   @Inject
   private lateinit var integrationRegistry: IntegrationRegistry
 
@@ -95,6 +98,26 @@ class IntegrationRegistryTest {
     val integration = integrationRegistry.readIntegration()
 
     assertThat(integration).isEqualTo(Integration.IN_HOUSE)
+  }
+
+  @Test
+  fun integration_GivenStandaloneDeclaredButMoPubMediationIsDetected_ReturnMoPubMediation() {
+    whenever(integrationDetector.isMoPubMediationPresent()).doReturn(true)
+
+    integrationRegistry.declare(Integration.STANDALONE)
+    val integration = integrationRegistry.readIntegration()
+
+    assertThat(integration).isEqualTo(Integration.MOPUB_MEDIATION)
+  }
+
+  @Test
+  fun integration_GivenStandaloneDeclaredButAdMobMediationIsDetected_ReturnAdMobMediation() {
+    whenever(integrationDetector.isAdMobMediationPresent()).doReturn(true)
+
+    integrationRegistry.declare(Integration.STANDALONE)
+    val integration = integrationRegistry.readIntegration()
+
+    assertThat(integration).isEqualTo(Integration.ADMOB_MEDIATION)
   }
 
 }
