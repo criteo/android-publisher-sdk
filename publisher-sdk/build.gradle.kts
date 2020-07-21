@@ -47,7 +47,6 @@ androidLibModule() {
     addBuildConfigField<Int>("adChoiceIconHeightInDp")
 
     // Misc
-    addBuildConfigField<Int>("profileId")
     addBuildConfigField<String>("pubSdkSharedPreferences")
     addBuildConfigField<Int>("minLogLevel")
     addBuildConfigField<Boolean>("preconditionThrowsOnException")

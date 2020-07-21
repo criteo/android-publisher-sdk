@@ -30,6 +30,10 @@ class IntegrationRegistry(
 
   private val safeSharedPreferences = SafeSharedPreferences(sharedPreferences)
 
+  /**
+   * Profile ID used by the SDK, so CDB and the Supply chain can recognize that the request comes
+   * from the PublisherSDK.
+   */
   val profileId: Int
     get() = readIntegration().profileId
 

@@ -48,14 +48,6 @@ public class BuildConfigWrapper {
     return BuildConfig.preconditionThrowsOnException;
   }
 
-  /**
-   * Profile ID used by the SDK, so CDB and the Supply chain can recognize that the request comes
-   * from the PublisherSDK.
-   */
-  public int getProfileId() {
-    return BuildConfig.profileId;
-  }
-
   public int getCsmBatchSize() {
     return BuildConfig.csmBatchSize;
   }
