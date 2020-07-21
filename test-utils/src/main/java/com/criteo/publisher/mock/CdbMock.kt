@@ -27,6 +27,8 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import okio.Buffer
 import java.util.*
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 
 class CdbMock(private val jsonSerializer: JsonSerializer) {
 
@@ -36,6 +38,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
   }
 
   private val mockWebServer = MockWebServer()
+  private var simulateSlowNetwork = AtomicBoolean(false)
 
   val url: String
     get() = mockWebServer.url("").toString().let {
@@ -53,11 +56,19 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
           "/delivery/ajs.php" -> handleCasperRequest(request)
           "/appevent/v1/2379" -> handleBearcatRequest()
           else -> MockResponse().setResponseCode(404)
+        }.also {
+          if (simulateSlowNetwork.compareAndSet(true, false)) {
+            it.throttleBody(1, 1, TimeUnit.SECONDS)
+          }
         }
       }
     }
 
     mockWebServer.start()
+  }
+
+  fun simulatorSlowNetworkOnNextRequest() {
+    simulateSlowNetwork.set(true)
   }
 
   private fun handleBearcatRequest(): MockResponse {
