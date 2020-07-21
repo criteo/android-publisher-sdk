@@ -117,6 +117,7 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
           public void update(@NonNull Metric.Builder builder) {
             builder.setRequestGroupId(requestGroupId);
             builder.setCdbCallStartTimestamp(currentTimeInMillis);
+            builder.setProfileId(request.getProfileId());
           }
         });
       }

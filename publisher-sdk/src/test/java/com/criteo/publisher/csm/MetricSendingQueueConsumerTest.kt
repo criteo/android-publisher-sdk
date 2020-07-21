@@ -17,6 +17,7 @@
 package com.criteo.publisher.csm
 
 import com.criteo.publisher.concurrent.DirectMockExecutor
+import com.criteo.publisher.integration.Integration.FALLBACK
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.model.Config
@@ -132,12 +133,11 @@ class MetricSendingQueueConsumerTest {
 
   @Test
   fun sendMetricBatch_GivenSomeMetricsInBatch_SendThemAsyncWithApi() {
-    val metric1 = Metric.builder("id1").build()
-    val metric2 = Metric.builder("id2").build()
+    val metric1 = Metric.builder("id1").setProfileId(1337).build()
+    val metric2 = Metric.builder("id2").setProfileId(1337).build()
 
     buildConfigWrapper.stub {
       on { sdkVersion } doReturn "1.2.3"
-      on { profileId } doReturn 1337
       on { csmBatchSize } doReturn 42
     }
 
@@ -154,6 +154,67 @@ class MetricSendingQueueConsumerTest {
     consumer.sendMetricBatch()
 
     verify(api).postCsm(expectedRequest)
+  }
+
+  @Test
+  fun sendMetricBatch_GivenSomeMetricsWithDifferentProfileId_SendThemGroupedByProfileId() {
+    val metric1 = Metric.builder("id1").setProfileId(1337).build()
+    val metric2 = Metric.builder("id2").build()
+    val metric3 = Metric.builder("id3").setProfileId(1337).build()
+    val metric4 = Metric.builder("id4").build()
+
+    buildConfigWrapper.stub {
+      on { sdkVersion } doReturn "1.2.3"
+      on { csmBatchSize } doReturn 42
+    }
+
+    queue.stub {
+      on { poll(42) } doReturn listOf(metric1, metric2, metric3, metric4)
+    }
+
+    doNothing().doThrow(IOException::class.java).whenever(api).postCsm(any())
+
+    consumer.sendMetricBatch()
+
+    verify(queue, never()).offer(metric1)
+    verify(queue).offer(metric2)
+    verify(queue, never()).offer(metric3)
+    verify(queue).offer(metric4)
+  }
+
+  @Test
+  fun sendMetricBatch_GivenOneProfileIdSentButExceptionAfter_RollbackOnlyRemainingMetrics() {
+    val metric1 = Metric.builder("id1").build()
+    val metric2 = Metric.builder("id2").setProfileId(1337).build()
+    val metric3 = Metric.builder("id3").setProfileId(FALLBACK.profileId).build()
+    val metric4 = Metric.builder("id4").setProfileId(1337).build()
+
+    buildConfigWrapper.stub {
+      on { sdkVersion } doReturn "1.2.3"
+      on { csmBatchSize } doReturn 42
+    }
+
+    queue.stub {
+      on { poll(42) } doReturn listOf(metric1, metric2, metric3, metric4)
+    }
+
+    val expectedRequest1 = MetricRequest.create(
+        listOf(metric1, metric3),
+        "1.2.3",
+        FALLBACK.profileId
+    )
+
+    val expectedRequest2 = MetricRequest.create(
+        listOf(metric2, metric4),
+        "1.2.3",
+        1337
+    )
+
+    consumer.sendMetricBatch()
+
+    verify(api).postCsm(expectedRequest1)
+    verify(api).postCsm(expectedRequest2)
+    verifyNoMoreInteractions(api)
   }
 
   @Test
