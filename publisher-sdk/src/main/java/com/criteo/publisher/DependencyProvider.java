@@ -355,7 +355,8 @@ public class DependencyProvider {
             provideAdvertisingInfo(),
             provideUserPrivacyUtil(),
             provideUniqueIdGenerator(),
-            provideBuildConfigWrapper()
+            provideBuildConfigWrapper(),
+            provideIntegrationRegistry()
         );
       }
     });

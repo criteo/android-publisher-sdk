@@ -26,6 +26,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.view.View;
@@ -41,6 +45,7 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.view.WebViewLookup;
@@ -95,15 +100,23 @@ public class MoPubHeaderBiddingFunctionalTest {
   @SpyBean
   private BuildConfigWrapper buildConfigWrapper;
 
+  @SpyBean
+  private PubSdkApi api;
+
   @Test
   public void exampleOfExpectedKeywords() throws Exception {
-    assertFalse("Keywords should not be empty",
-        EXPECTED_KEYWORDS.matcher("").matches());
+    assertFalse(
+        "Keywords should not be empty",
+        EXPECTED_KEYWORDS.matcher("").matches()
+    );
 
-    assertFalse("Keywords should not be empty",
-        EXPECTED_KEYWORDS_FOR_BANNER.matcher("").matches());
+    assertFalse(
+        "Keywords should not be empty",
+        EXPECTED_KEYWORDS_FOR_BANNER.matcher("").matches()
+    );
 
-    assertTrue("Keywords should use crt_cpm and crt_displayUrl",
+    assertTrue(
+        "Keywords should use crt_cpm and crt_displayUrl",
         EXPECTED_KEYWORDS.matcher("crt_cpm:1234.56,crt_displayUrl:http://my.super/creative")
             .matches());
 
@@ -172,8 +185,14 @@ public class MoPubHeaderBiddingFunctionalTest {
     MoPubView moPubView = createMoPubView();
 
     Criteo.getInstance().setBidsForAdUnit(moPubView, adUnit);
+    waitForBids();
 
     assertCriteoKeywordsAreInjectedInMoPubView(moPubView.getKeywords(), adUnit);
+
+    verify(api, atLeastOnce()).loadCdb(
+        argThat(request -> request.getProfileId() == Integration.MOPUB_APP_BIDDING.getProfileId()),
+        any()
+    );
   }
 
   @Test
@@ -200,8 +219,14 @@ public class MoPubHeaderBiddingFunctionalTest {
     MoPubInterstitial moPubInterstitial = createMoPubInterstitial();
 
     Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, interstitialAdUnit);
+    waitForBids();
 
     assertCriteoKeywordsAreInjectedInMoPubView(moPubInterstitial.getKeywords(), interstitialAdUnit);
+
+    verify(api, atLeastOnce()).loadCdb(
+        argThat(request -> request.getProfileId() == Integration.MOPUB_APP_BIDDING.getProfileId()),
+        any()
+    );
   }
 
   @Test

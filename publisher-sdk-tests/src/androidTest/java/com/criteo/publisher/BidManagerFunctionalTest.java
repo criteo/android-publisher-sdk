@@ -43,6 +43,7 @@ import androidx.annotation.NonNull;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
+import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
@@ -112,6 +113,9 @@ public class BidManagerFunctionalTest {
 
   @SpyBean
   private BuildConfigWrapper buildConfigWrapper;
+
+  @SpyBean
+  private IntegrationRegistry integrationRegistry;
 
   @MockBean
   private MetricSendingQueueConsumer metricSendingQueueConsumer;
@@ -339,7 +343,7 @@ public class BidManagerFunctionalTest {
     doReturn(userPrivacyUtil).when(dependencyProvider).provideUserPrivacyUtil();
 
     when(buildConfigWrapper.getSdkVersion()).thenReturn("1.2.3");
-    when(buildConfigWrapper.getProfileId()).thenReturn(235);
+    when(integrationRegistry.getProfileId()).thenReturn(42);
 
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
@@ -359,7 +363,7 @@ public class BidManagerFunctionalTest {
       assertEquals(expectedUser, cdb.getUser());
       assertEquals(singletonList(cacheAdUnit), getRequestedAdUnits(cdb));
       assertEquals("1.2.3", cdb.getSdkVersion());
-      assertEquals(235, cdb.getProfileId());
+      assertEquals(42, cdb.getProfileId());
       assertEquals(expectedGdpr, cdb.getGdprData());
 
       return true;

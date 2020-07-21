@@ -24,10 +24,14 @@ import static com.criteo.publisher.view.WebViewLookup.getRootView;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -270,6 +274,10 @@ public class StandaloneFunctionalTest {
 
     verify(listener).onAdReceived(bannerView);
     verifyNoMoreInteractions(listener);
+    verify(api, atLeastOnce()).loadCdb(
+        argThat(request -> request.getProfileId() == Integration.STANDALONE.getProfileId()),
+        any()
+    );
   }
 
   @Test
@@ -380,6 +388,11 @@ public class StandaloneFunctionalTest {
     inOrder.verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
     inOrder.verify(listener).onAdReceived();
     inOrder.verifyNoMoreInteractions();
+
+    verify(api, times(2)).loadCdb(
+        argThat(request -> request.getProfileId() == Integration.STANDALONE.getProfileId()),
+        any()
+    );
   }
 
   private void givenDeviceInPortrait() {

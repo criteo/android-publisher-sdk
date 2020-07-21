@@ -19,6 +19,9 @@ package com.criteo.publisher.integration;
 import static com.criteo.publisher.CriteoErrorCode.ERROR_CODE_NO_FILL;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -34,9 +37,11 @@ import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import com.criteo.publisher.network.PubSdkApi;
 import javax.inject.Inject;
 import org.junit.Rule;
 import org.junit.Test;
@@ -56,6 +61,9 @@ public class InHouseFunctionalTest {
   @Inject
   private Context context;
 
+  @SpyBean
+  private PubSdkApi api;
+
   @Test
   public void loadBannerAd_GivenValidAdUnit_ThenListenerIsNotifiedOfTheSuccess() throws Exception {
     Criteo criteo = givenInitializedSdk(validBannerAdUnit);
@@ -69,6 +77,11 @@ public class InHouseFunctionalTest {
     waitForIdleState();
 
     verify(listener).onAdReceived(bannerView);
+
+    verify(api, atLeastOnce()).loadCdb(
+        argThat(request -> request.getProfileId() == Integration.IN_HOUSE.getProfileId()),
+        any()
+    );
   }
 
   @Test
@@ -120,6 +133,11 @@ public class InHouseFunctionalTest {
     waitForIdleState();
 
     verify(listener).onAdReceived();
+
+    verify(api, atLeastOnce()).loadCdb(
+        argThat(request -> request.getProfileId() == Integration.IN_HOUSE.getProfileId()),
+        any()
+    );
   }
 
   @Test

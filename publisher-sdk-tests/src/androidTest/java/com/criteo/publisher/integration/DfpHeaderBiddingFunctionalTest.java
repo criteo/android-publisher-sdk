@@ -29,15 +29,17 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
-import com.criteo.publisher.bid.LoggingBidLifecycleListener;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.ResultCaptor;
@@ -49,6 +51,7 @@ import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeProduct;
+import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.view.WebViewLookup;
@@ -130,6 +133,9 @@ public class DfpHeaderBiddingFunctionalTest {
   @SpyBean
   private BuildConfigWrapper buildConfigWrapper;
 
+  @SpyBean
+  private PubSdkApi api;
+
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchValidBannerId_CriteoMacroAreInjectedInDfpBuilder()
       throws Exception {
@@ -153,8 +159,14 @@ public class DfpHeaderBiddingFunctionalTest {
     Builder builder = new Builder();
 
     Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
+    waitForBids();
 
     assertCriteoMacroAreInjectedInDfpBuilder(builder);
+
+    verify(api, atLeastOnce()).loadCdb(
+        argThat(request -> request.getProfileId() == Integration.GAM_APP_BIDDING.getProfileId()),
+        any()
+    );
   }
 
   @Test
@@ -166,6 +178,7 @@ public class DfpHeaderBiddingFunctionalTest {
     Builder builder = new Builder();
 
     Criteo.getInstance().setBidsForAdUnit(builder, validNativeAdUnit);
+    waitForBids();
 
     Bundle customTargeting = builder.build().getCustomTargeting();
 
@@ -189,6 +202,11 @@ public class DfpHeaderBiddingFunctionalTest {
     assertNotNull(customTargeting.getString(MACRO_NATIVE_PIXEL_2));
     assertEquals("2", customTargeting.getString(MACRO_NATIVE_PIXEL_COUNT));
     assertEquals(16, customTargeting.size());
+
+    verify(api, atLeastOnce()).loadCdb(
+        argThat(request -> request.getProfileId() == Integration.GAM_APP_BIDDING.getProfileId()),
+        any()
+    );
   }
 
   @Test
