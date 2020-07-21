@@ -14,16 +14,15 @@
  *    limitations under the License.
  */
 
-buildscript {
-  addDefaultInputRepository()
+package com.criteo.publisher.annotation
 
-  dependencies {
-    classpath(Deps.Android.GradlePlugin)
-    classpath(Deps.Kotlin.GradlePlugin)
-    classpath(Deps.Kotlin.AllOpenPlugin)
-  }
-}
-
-allprojects {
-  addDefaultInputRepository()
-}
+/**
+ * Kotlin classes and their members are `final` by default, which make it inconvenient to use
+ * frameworks such as Mockito that require classes to be `open`.
+ *
+ * This annotation is configured to indicate to the all-open compiler plugin that annotated
+ * elements, and their members are open without the explicit `open` keyword.
+ *
+ * See [https://kotlinlang.org/docs/reference/compiler-plugins.html#all-open-compiler-plugin]
+ */
+annotation class OpenForTesting
