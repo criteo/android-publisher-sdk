@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.model
 
+import com.criteo.publisher.integration.IntegrationRegistry
 import com.criteo.publisher.util.BuildConfigWrapper
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.stub
@@ -33,18 +34,24 @@ class RemoteConfigRequestFactoryTest {
     @Mock
     private lateinit var buildConfigWrapper: BuildConfigWrapper
 
+    @Mock
+    private lateinit var integrationRegistry: IntegrationRegistry
+
     private lateinit var factory: RemoteConfigRequestFactory
 
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        factory = RemoteConfigRequestFactory(publisher, buildConfigWrapper)
+        factory = RemoteConfigRequestFactory(publisher, buildConfigWrapper, integrationRegistry)
     }
 
     @Test
     fun createRequest_GivenInput_CreateRemoteConfigRequest() {
         buildConfigWrapper.stub {
             on { sdkVersion } doReturn "1.2.3"
+        }
+
+        integrationRegistry.stub {
             on { profileId } doReturn 456
         }
 

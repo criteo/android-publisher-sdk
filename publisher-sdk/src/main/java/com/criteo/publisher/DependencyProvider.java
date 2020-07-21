@@ -381,7 +381,8 @@ public class DependencyProvider {
       public RemoteConfigRequestFactory create() {
         return new RemoteConfigRequestFactory(
             providePublisher(),
-            provideBuildConfigWrapper()
+            provideBuildConfigWrapper(),
+            provideIntegrationRegistry()
         );
       }
     });
