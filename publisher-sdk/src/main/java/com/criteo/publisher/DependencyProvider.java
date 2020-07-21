@@ -627,7 +627,8 @@ public class DependencyProvider {
                 new MoPubHeaderBidding(),
                 new DfpHeaderBidding(provideAndroidUtil(), provideDeviceUtil()),
                 new OtherAdServersHeaderBidding()
-            )
+            ),
+            provideIntegrationRegistry()
         );
       }
     });

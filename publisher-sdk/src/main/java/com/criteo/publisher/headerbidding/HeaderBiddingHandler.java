@@ -18,6 +18,7 @@ package com.criteo.publisher.headerbidding;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Slot;
 
@@ -33,6 +34,12 @@ public interface HeaderBiddingHandler {
    * @return <code>true</code> if the object is supported
    */
   boolean canHandle(@NonNull Object object);
+
+  /**
+   * Indicate which kind of integration is this handler doing.
+   */
+  @NonNull
+  Integration getIntegration();
 
   /**
    * Remove previous state that may have been stored in the object.

@@ -17,6 +17,8 @@
 package com.criteo.publisher.headerbidding
 
 import com.criteo.publisher.BidManager
+import com.criteo.publisher.integration.Integration
+import com.criteo.publisher.integration.IntegrationRegistry
 import com.criteo.publisher.model.AdUnit
 import com.criteo.publisher.model.Slot
 import com.nhaarman.mockitokotlin2.*
@@ -30,6 +32,9 @@ class HeaderBiddingTest {
   @Mock
   private lateinit var bidManager: BidManager
 
+  @Mock
+  private lateinit var integrationRegistry: IntegrationRegistry
+
   @Before
   fun setUp() {
     MockitoAnnotations.initMocks(this)
@@ -38,30 +43,32 @@ class HeaderBiddingTest {
   @Test
   fun enrichBid_GivenNullObject_DoNothing() {
     val handler = mock<HeaderBiddingHandler>()
-    val headerBidding = HeaderBidding(bidManager, listOf(handler))
+    val headerBidding = HeaderBidding(bidManager, listOf(handler), integrationRegistry)
 
     headerBidding.enrichBid(null, mock())
 
     verifyZeroInteractions(bidManager)
     verifyZeroInteractions(handler)
+    verifyZeroInteractions(integrationRegistry)
   }
 
   @Test
   fun enrichBid_GivenHandlerAcceptingObjectButNoBid_CleanBidAndReturn() {
     val obj = mock<Any>()
     val adUnit = mock<AdUnit>()
-    val handler = givenHandler(obj, true)
+    val handler = givenHandler(obj, true, Integration.STANDALONE)
 
     bidManager.stub {
       on { getBidForAdUnitAndPrefetch(adUnit) } doReturn null
     }
 
-    val headerBidding = HeaderBidding(bidManager, listOf(handler))
+    val headerBidding = HeaderBidding(bidManager, listOf(handler), integrationRegistry)
 
     headerBidding.enrichBid(obj, adUnit)
 
     verify(handler).cleanPreviousBid(obj)
     verify(handler, never()).enrichBid(any(), anyOrNull(), any())
+    verify(integrationRegistry).declare(Integration.STANDALONE)
   }
 
   @Test
@@ -70,14 +77,18 @@ class HeaderBiddingTest {
     val adUnit = mock<AdUnit>()
     val slot = mock<Slot>()
     val handler1 = givenHandler(obj, false)
-    val handler2 = givenHandler(obj, true)
-    val handler3 = givenHandler(obj, true)
+    val handler2 = givenHandler(obj, true, Integration.IN_HOUSE)
+    val handler3 = givenHandler(obj, true, Integration.STANDALONE)
 
     bidManager.stub {
       on { getBidForAdUnitAndPrefetch(adUnit) } doReturn slot
     }
 
-    val headerBidding = HeaderBidding(bidManager, listOf(handler1, handler2, handler3))
+    val headerBidding = HeaderBidding(
+        bidManager,
+        listOf(handler1, handler2, handler3),
+        integrationRegistry
+    )
 
     headerBidding.enrichBid(obj, adUnit)
 
@@ -87,11 +98,18 @@ class HeaderBiddingTest {
     verify(handler2).enrichBid(obj, adUnit, slot)
     verify(handler3, never()).cleanPreviousBid(any())
     verify(handler3, never()).enrichBid(any(), anyOrNull(), any())
+    verify(integrationRegistry).declare(Integration.IN_HOUSE)
+    verifyNoMoreInteractions(integrationRegistry)
   }
 
-  private fun givenHandler(obj: Any, accepting: Boolean): HeaderBiddingHandler {
+  private fun givenHandler(
+      obj: Any,
+      accepting: Boolean,
+      integration: Integration = Integration.FALLBACK
+  ): HeaderBiddingHandler {
     return mock {
       on { canHandle(obj) } doReturn accepting
+      on { this.integration } doReturn integration
     }
   }
 

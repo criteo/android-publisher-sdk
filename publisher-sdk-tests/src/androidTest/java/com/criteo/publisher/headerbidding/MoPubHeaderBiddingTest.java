@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import androidx.test.rule.ActivityTestRule;
+import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
@@ -43,6 +44,13 @@ public class MoPubHeaderBiddingTest {
   public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(DummyActivity.class);
 
   private final MoPubHeaderBidding headerBidding = new MoPubHeaderBidding();
+
+  @Test
+  public void getIntegration_ReturnMoPubAppBidding() throws Exception {
+    Integration integration = headerBidding.getIntegration();
+
+    assertThat(integration).isEqualTo(Integration.MOPUB_APP_BIDDING);
+  }
 
   @Test
   public void canHandle_GivenSimpleObject_ReturnFalse() throws Exception {

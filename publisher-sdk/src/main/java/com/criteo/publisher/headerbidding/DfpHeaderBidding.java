@@ -21,6 +21,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
@@ -77,6 +78,12 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
   @Override
   public boolean canHandle(@NonNull Object object) {
     return SafeDfpBuilder.isDfpBuilder(object);
+  }
+
+  @NonNull
+  @Override
+  public Integration getIntegration() {
+    return Integration.GAM_APP_BIDDING;
   }
 
   @Override
