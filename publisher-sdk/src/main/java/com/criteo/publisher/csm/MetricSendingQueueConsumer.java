@@ -17,17 +17,9 @@
 package com.criteo.publisher.csm;
 
 import androidx.annotation.NonNull;
-import com.criteo.publisher.SafeRunnable;
-import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.util.BuildConfigWrapper;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.Executor;
 
 public class MetricSendingQueueConsumer {
@@ -77,84 +69,4 @@ public class MetricSendingQueueConsumer {
     }
   }
 
-  private static class MetricSendingTask extends SafeRunnable {
-
-    @NonNull
-    private final MetricSendingQueue queue;
-
-    @NonNull
-    private final PubSdkApi api;
-
-    @NonNull
-    private final BuildConfigWrapper buildConfigWrapper;
-
-    private MetricSendingTask(
-        @NonNull MetricSendingQueue queue,
-        @NonNull PubSdkApi api,
-        @NonNull BuildConfigWrapper buildConfigWrapper
-    ) {
-      this.queue = queue;
-      this.api = api;
-      this.buildConfigWrapper = buildConfigWrapper;
-    }
-
-    @Override
-    public void runSafely() throws IOException {
-      Collection<Metric> metrics = queue.poll(buildConfigWrapper.getCsmBatchSize());
-      if (metrics.isEmpty()) {
-        return;
-      }
-
-      Collection<Metric> metricsToRollback = new ArrayList<>(metrics);
-      try {
-        Map<MetricRequest, Collection<Metric>> requests = createRequests(metrics);
-        for (Entry<MetricRequest, Collection<Metric>> entry : requests.entrySet()) {
-          api.postCsm(entry.getKey());
-          metricsToRollback.removeAll(entry.getValue());
-        }
-      } finally {
-        if (!metricsToRollback.isEmpty()) {
-          rollback(metricsToRollback);
-        }
-      }
-    }
-
-    private Map<MetricRequest, Collection<Metric>> createRequests(Collection<Metric> metrics) {
-      Map<Integer, Collection<Metric>> metricsPerProfile = new LinkedHashMap<>();
-      for (Metric metric : metrics) {
-        Integer profileId = metric.getProfileId();
-        if (profileId == null) {
-          profileId = Integration.FALLBACK.getProfileId();
-        }
-
-        Collection<Metric> metricsForProfile = metricsPerProfile.get(profileId);
-        if (metricsForProfile == null) {
-          metricsForProfile = new ArrayList<>();
-          metricsPerProfile.put(profileId, metricsForProfile);
-        }
-        metricsForProfile.add(metric);
-      }
-
-      String sdkVersion = buildConfigWrapper.getSdkVersion();
-      Map<MetricRequest, Collection<Metric>> metricRequests = new LinkedHashMap<>();
-      for (Entry<Integer, Collection<Metric>> entry : metricsPerProfile.entrySet()) {
-        int profileId = entry.getKey();
-        Collection<Metric> metricsForProfile = entry.getValue();
-        MetricRequest metricRequest = MetricRequest.create(
-            metricsForProfile,
-            sdkVersion,
-            profileId
-        );
-        metricRequests.put(metricRequest, metricsForProfile);
-      }
-
-      return metricRequests;
-    }
-
-    private void rollback(Collection<Metric> metrics) {
-      for (Metric metric : metrics) {
-        queue.offer(metric);
-      }
-    }
-  }
 }
