@@ -16,18 +16,18 @@
 
 package com.criteo.publisher.integration
 
-enum class Integration {
-  FALLBACK,
+enum class Integration(val profileId: Int) {
+  FALLBACK(235),
 
-  STANDALONE,
-  IN_HOUSE,
+  STANDALONE(295),
+  IN_HOUSE(296),
 
   // Mediation
-  MOPUB_MEDIATION,
-  ADMOB_MEDIATION,
+  MOPUB_MEDIATION(297),
+  ADMOB_MEDIATION(298),
 
   // AppBidding
-  MOPUB_APP_BIDDING,
-  GAM_APP_BIDDING,
-  CUSTOM_APP_BIDDING
+  MOPUB_APP_BIDDING(299),
+  GAM_APP_BIDDING(300),
+  CUSTOM_APP_BIDDING(301)
 }
