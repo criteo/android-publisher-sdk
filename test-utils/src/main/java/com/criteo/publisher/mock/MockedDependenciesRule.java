@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import android.app.Application;
 import android.os.Build.VERSION_CODES;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import com.criteo.publisher.CriteoUtil;
@@ -185,5 +186,13 @@ public class MockedDependenciesRule implements MethodRule {
     doReturn(false).when(remoteConfigResponse).getKillSwitch();
     doReturn(true).when(remoteConfigResponse).getCsmEnabled();
     doReturn(remoteConfigResponse).when(pubSdkApi).loadConfig(any());
+  }
+
+  @NonNull
+  public CdbMock getCdbMock() {
+    if (cdbMock == null) {
+      throw new IllegalStateException("CDB mock is only available while test is running");
+    }
+    return cdbMock;
   }
 }

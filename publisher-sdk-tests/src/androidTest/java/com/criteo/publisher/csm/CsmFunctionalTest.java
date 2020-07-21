@@ -283,6 +283,7 @@ public class CsmFunctionalTest {
     waitForIdleState();
 
     // Timeout
+    mockedDependenciesRule.getCdbMock().simulatorSlowNetworkOnNextRequest();
     when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenReturn(1);
     criteo.getBidResponse(TestAdUnits.INTERSTITIAL);
     waitForIdleState();
