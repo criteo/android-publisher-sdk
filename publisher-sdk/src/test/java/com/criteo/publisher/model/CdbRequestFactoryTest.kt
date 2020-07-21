@@ -17,6 +17,7 @@
 package com.criteo.publisher.model
 
 import com.criteo.publisher.bid.UniqueIdGenerator
+import com.criteo.publisher.integration.IntegrationRegistry
 import com.criteo.publisher.privacy.UserPrivacyUtil
 import com.criteo.publisher.privacy.gdpr.GdprData
 import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
@@ -54,6 +55,9 @@ class CdbRequestFactoryTest {
   @Mock
   private lateinit var buildConfigWrapper: BuildConfigWrapper
 
+  @Mock
+  private lateinit var integrationRegistry: IntegrationRegistry
+
   private lateinit var factory: CdbRequestFactory
 
   private val adUnitId = AtomicInteger()
@@ -72,7 +76,8 @@ class CdbRequestFactoryTest {
         advertisingInfo,
         userPrivacyUtil,
         uniqueIdGenerator,
-        buildConfigWrapper
+        buildConfigWrapper,
+        integrationRegistry
     )
   }
 
@@ -102,9 +107,9 @@ class CdbRequestFactoryTest {
 
     buildConfigWrapper.stub {
       on { sdkVersion } doReturn "1.2.3"
-      on { profileId } doReturn 42
     }
 
+    whenever(integrationRegistry.profileId).thenReturn(42)
     whenever(userPrivacyUtil.gdprData).thenReturn(expectedGdpr)
     whenever(uniqueIdGenerator.generateId()).thenReturn("impId")
 
@@ -133,7 +138,6 @@ class CdbRequestFactoryTest {
 
     buildConfigWrapper.stub {
       on { sdkVersion } doReturn "1.2.3"
-      on { profileId } doReturn 1337
     }
 
     userPrivacyUtil.stub {
@@ -143,6 +147,7 @@ class CdbRequestFactoryTest {
       on { mopubConsent } doReturn "mopubConsent"
     }
 
+    whenever(integrationRegistry.profileId).thenReturn(1337)
     whenever(uniqueIdGenerator.generateId()).thenReturn("impId")
 
     var request = factory.createRequest(adUnits)
@@ -196,8 +201,9 @@ class CdbRequestFactoryTest {
 
     buildConfigWrapper.stub {
       on { sdkVersion } doReturn "1.2.3"
-      on { profileId } doReturn 1337
     }
+
+    whenever(integrationRegistry.profileId).thenReturn(1337)
 
     val request = factory.createRequest(adUnits)
 

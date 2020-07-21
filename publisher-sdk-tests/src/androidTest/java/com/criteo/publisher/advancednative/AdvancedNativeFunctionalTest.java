@@ -34,7 +34,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.verify;
 
@@ -50,10 +52,13 @@ import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.activity.TestNativeActivity;
 import com.criteo.publisher.adview.Redirection;
+import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeProduct;
+import com.criteo.publisher.network.PubSdkApi;
 import javax.inject.Inject;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,7 +66,8 @@ import org.junit.Test;
 public class AdvancedNativeFunctionalTest {
 
   @Rule
-  public ActivityTestRule<TestNativeActivity> activityRule = new ActivityTestRule<>(TestNativeActivity.class);
+  public ActivityTestRule<TestNativeActivity> activityRule = new ActivityTestRule<>(
+      TestNativeActivity.class);
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
@@ -72,8 +78,12 @@ public class AdvancedNativeFunctionalTest {
   @MockBean
   private Redirection redirection;
 
+  @SpyBean
+  private PubSdkApi api;
+
   @Test
-  public void loadStandaloneAdInAdLayout_GivenValidBid_DisplayAllInformationInViews() throws Exception {
+  public void loadStandaloneAdInAdLayout_GivenValidBid_DisplayAllInformationInViews()
+      throws Exception {
     givenInitializedCriteo(TestAdUnits.NATIVE);
     mockedDependenciesRule.waitForIdleState();
 
@@ -86,6 +96,11 @@ public class AdvancedNativeFunctionalTest {
     assertEquals(1, adLayout.getChildCount());
 
     checkAllInformationAreDisplayed((ViewGroup) adLayout.getChildAt(0));
+
+    verify(api, atLeastOnce()).loadCdb(
+        argThat(request -> request.getProfileId() == Integration.STANDALONE.getProfileId()),
+        any()
+    );
   }
 
   @Test
@@ -103,6 +118,11 @@ public class AdvancedNativeFunctionalTest {
     assertEquals(1, adLayout.getChildCount());
 
     checkAllInformationAreDisplayed((ViewGroup) adLayout.getChildAt(0));
+
+    verify(api, atLeastOnce()).loadCdb(
+        argThat(request -> request.getProfileId() == Integration.IN_HOUSE.getProfileId()),
+        any()
+    );
   }
 
   @Test

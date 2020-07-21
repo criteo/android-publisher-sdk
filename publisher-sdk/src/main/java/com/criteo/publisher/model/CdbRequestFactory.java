@@ -20,6 +20,7 @@ import static com.criteo.publisher.util.TextUtils.getNotEmptyOrNullValue;
 
 import androidx.annotation.NonNull;
 import com.criteo.publisher.bid.UniqueIdGenerator;
+import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.BuildConfigWrapper;
@@ -47,13 +48,17 @@ public class CdbRequestFactory {
   @NonNull
   private final BuildConfigWrapper buildConfigWrapper;
 
+  @NonNull
+  private final IntegrationRegistry integrationRegistry;
+
   public CdbRequestFactory(
       @NonNull Publisher publisher,
       @NonNull DeviceInfo deviceInfo,
       @NonNull AdvertisingInfo advertisingInfo,
       @NonNull UserPrivacyUtil userPrivacyUtil,
       @NonNull UniqueIdGenerator uniqueIdGenerator,
-      @NonNull BuildConfigWrapper buildConfigWrapper
+      @NonNull BuildConfigWrapper buildConfigWrapper,
+      @NonNull IntegrationRegistry integrationRegistry
   ) {
     this.publisher = publisher;
     this.deviceInfo = deviceInfo;
@@ -61,6 +66,7 @@ public class CdbRequestFactory {
     this.userPrivacyUtil = userPrivacyUtil;
     this.uniqueIdGenerator = uniqueIdGenerator;
     this.buildConfigWrapper = buildConfigWrapper;
+    this.integrationRegistry = integrationRegistry;
   }
 
   @NonNull
@@ -76,7 +82,7 @@ public class CdbRequestFactory {
         publisher,
         user,
         buildConfigWrapper.getSdkVersion(),
-        buildConfigWrapper.getProfileId(),
+        integrationRegistry.getProfileId(),
         userPrivacyUtil.getGdprData(),
         createRequestSlots(requestedAdUnits)
     );
