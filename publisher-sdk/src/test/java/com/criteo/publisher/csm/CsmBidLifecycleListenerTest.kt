@@ -99,7 +99,9 @@ class CsmBidLifecycleListenerTest {
 
   @Test
   fun onCdbCallStarted_GivenMultipleSlots_UpdateAllStartTimeAndRequestIdOfMetricsById() {
-    val request = givenCdbRequestWithSlots("id1", "id2")
+    val request = givenCdbRequestWithSlots("id1", "id2").stub {
+      on { profileId } doReturn 1337
+    }
 
     clock.stub {
       on { currentTimeInMillis } doReturn 42
@@ -111,10 +113,10 @@ class CsmBidLifecycleListenerTest {
 
     listener.onCdbCallStarted(request)
 
-
     assertRepositoryIsUpdatedByIds("id1", "id2") {
       verify(it).setCdbCallStartTimestamp(42)
       verify(it).setRequestGroupId("myRequestId")
+      verify(it).setProfileId(1337)
     }
   }
 
@@ -326,12 +328,12 @@ class CsmBidLifecycleListenerTest {
 
   private fun givenCdbRequestWithSlots(vararg impressionIds: String): CdbRequest {
     val slots = impressionIds.map { impressionId ->
-      mock<CdbRequestSlot>() {
+      mock<CdbRequestSlot> {
         on { getImpressionId() } doReturn impressionId
       }
     }.toList()
 
-    return mock() {
+    return mock {
       on { getSlots() } doReturn slots
     }
   }

@@ -37,6 +37,8 @@ import com.criteo.publisher.Clock;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.csm.MetricRequest.MetricRequestFeedback;
+import com.criteo.publisher.integration.Integration;
+import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.network.PubSdkApi;
@@ -71,6 +73,9 @@ public class CsmFunctionalTest {
   @Inject
   private MetricRepository repository;
 
+  @Inject
+  private IntegrationRegistry integrationRegistry;
+
   @SpyBean
   private BuildConfigWrapper buildConfigWrapper;
 
@@ -85,6 +90,8 @@ public class CsmFunctionalTest {
     MockitoAnnotations.initMocks(this);
     mockedDependenciesRule.givenMockedRemoteConfigResponse(api);
     cleanState();
+
+    integrationRegistry.declare(Integration.IN_HOUSE);
   }
 
   @After
@@ -348,7 +355,7 @@ public class CsmFunctionalTest {
   }
 
   private void assertRequestHeaderIsExpected(MetricRequest request) {
-    assertEquals(buildConfigWrapper.getProfileId(), request.getProfileId());
+    assertEquals(integrationRegistry.getProfileId(), request.getProfileId());
     assertEquals(buildConfigWrapper.getSdkVersion(), request.getWrapperVersion());
   }
 

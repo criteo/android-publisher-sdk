@@ -18,6 +18,7 @@ package com.criteo.publisher.csm;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.criteo.publisher.integration.Integration;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
@@ -67,6 +68,14 @@ public abstract class Metric {
   @Nullable
   abstract String getRequestGroupId();
 
+  /**
+   * Indicate from which integration comes this metric.
+   *
+   * @see Integration#getProfileId()
+   */
+  @Nullable // For retro-compat
+  abstract Integer getProfileId();
+
   abstract boolean isReadyToSend();
 
   @NonNull
@@ -75,13 +84,18 @@ public abstract class Metric {
 
   @AutoValue.Builder
   abstract static class Builder {
+
     abstract Builder setCdbCallStartTimestamp(Long absoluteTimeInMillis);
     abstract Builder setCdbCallEndTimestamp(Long absoluteTimeInMillis);
     abstract Builder setCdbCallTimeout(boolean isTimeout);
     abstract Builder setCachedBidUsed(boolean isCachedBidUsed);
     abstract Builder setElapsedTimestamp(Long absoluteTimeInMillis);
     abstract Builder setRequestGroupId(String requestGroupId);
+
     abstract Builder setReadyToSend(boolean isReadyToSend);
+
+    abstract Builder setProfileId(Integer profileId);
+
     abstract Metric build();
 
     /**
