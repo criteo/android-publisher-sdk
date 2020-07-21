@@ -30,6 +30,9 @@ class IntegrationRegistry(
 
   private val safeSharedPreferences = SafeSharedPreferences(sharedPreferences)
 
+  val profileId: Int
+    get() = readIntegration().profileId
+
   fun declare(integration: Integration) {
     sharedPreferences.edit()
         .putString(IntegrationStorageKey, integration.name)
