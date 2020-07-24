@@ -27,9 +27,11 @@ import android.view.View;
 import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import com.criteo.pubsdk_android.integration.MockedIntegrationRegistry;
 import com.criteo.pubsdk_android.listener.TestAppMoPubInterstitialAdListener;
 import com.mopub.common.MoPub;
 import com.mopub.common.SdkConfiguration;
@@ -59,6 +61,7 @@ public class MopubActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_mopub);
+    MockedIntegrationRegistry.force(Integration.MOPUB_APP_BIDDING);
     criteo = Criteo.getInstance();
 
     initializeMoPubSdk(this);

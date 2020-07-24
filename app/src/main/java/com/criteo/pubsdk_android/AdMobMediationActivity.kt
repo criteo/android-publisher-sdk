@@ -24,6 +24,8 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.criteo.publisher.integration.Integration
+import com.criteo.pubsdk_android.integration.MockedIntegrationRegistry
 import com.criteo.pubsdk_android.listener.TestAppDfpAdListener
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.formats.UnifiedNativeAd
@@ -50,6 +52,7 @@ class AdMobMediationActivity: AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_admob_mediation)
+    MockedIntegrationRegistry.force(Integration.ADMOB_MEDIATION)
     adLayout = findViewById(R.id.adLayout)
 
     initializeAdMobSdk()

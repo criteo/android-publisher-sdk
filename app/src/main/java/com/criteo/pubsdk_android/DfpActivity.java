@@ -24,10 +24,12 @@ import android.view.View;
 import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.NativeAdUnit;
+import com.criteo.pubsdk_android.integration.MockedIntegrationRegistry;
 import com.criteo.pubsdk_android.listener.TestAppDfpAdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
@@ -55,6 +57,7 @@ public class DfpActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_dfp);
+    MockedIntegrationRegistry.force(Integration.GAM_APP_BIDDING);
 
     linearLayout = findViewById(R.id.adViewHolder);
     findViewById(R.id.buttonBanner).setOnClickListener((View v) -> {

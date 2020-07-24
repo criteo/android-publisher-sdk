@@ -19,6 +19,7 @@ package com.criteo.pubsdk_android.integration
 import android.content.Context
 import android.content.SharedPreferences
 import android.widget.Toast
+import com.criteo.publisher.DependencyProvider
 import com.criteo.publisher.integration.Integration
 import com.criteo.publisher.integration.IntegrationDetector
 import com.criteo.publisher.integration.IntegrationRegistry
@@ -64,6 +65,15 @@ internal class MockedIntegrationRegistry(
           message,
           Toast.LENGTH_SHORT
       ).show()
+    }
+  }
+
+  internal companion object {
+    @JvmStatic
+    fun force(integration: Integration) {
+      val integrationRegistry = DependencyProvider.getInstance().provideIntegrationRegistry()
+      val mockedIntegrationRegistry = integrationRegistry as? MockedIntegrationRegistry
+      mockedIntegrationRegistry?.forceDeclaration(integration)
     }
   }
 

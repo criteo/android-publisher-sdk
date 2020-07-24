@@ -28,6 +28,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import com.criteo.mediation.mopub.advancednative.CriteoNativeEventRenderer;
+import com.criteo.publisher.integration.Integration;
+import com.criteo.pubsdk_android.integration.MockedIntegrationRegistry;
 import com.criteo.pubsdk_android.listener.TestAppMoPubInterstitialAdListener;
 import com.mopub.mobileads.MoPubInterstitial;
 import com.mopub.mobileads.MoPubView;
@@ -52,6 +54,7 @@ public class MopubMediationActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_mopub_mediation);
+    MockedIntegrationRegistry.force(Integration.MOPUB_MEDIATION);
 
     initializeMoPubSdk(this);
 
