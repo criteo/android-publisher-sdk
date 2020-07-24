@@ -71,8 +71,7 @@ addBintrayRepository {
 
 dependencies {
     implementation(project(":publisher-sdk"))
-
-    implementation(Deps.Square.Picasso.Picasso)
+    implementation(project(":test-utils"))
 
     implementation(MoPub("(,${sdkVersion()}.99)")) {
         exclude(group = Deps.Criteo.PublisherSdk.group)
@@ -105,6 +104,9 @@ dependencies {
     implementation(Deps.AndroidX.AppCompat)
     implementation(Deps.AndroidX.Constraint.ConstraintLayout)
     implementation(Deps.AndroidX.MaterialComponents)
+    implementation(Deps.Square.Picasso.Picasso)
+    implementation(Deps.Mockito.Android)
+    implementation(Deps.Mockito.Kotlin)
 
     implementation(Deps.Google.AdMob)
 
