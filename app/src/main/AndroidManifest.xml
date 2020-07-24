@@ -109,6 +109,15 @@
     </activity>
 
     <activity
+      android:name=".integration.IntegrationSelectorActivity"
+      android:configChanges="orientation|screenSize"
+      android:theme="@style/AppTheme">
+      <meta-data
+        android:name="android.support.PARENT_ACTIVITY"
+        android:value="com.criteo.pubsdk_android.MainActivity"/>
+    </activity>
+
+    <activity
       android:name=".GdprActivity"
       android:configChanges="orientation|screenSize"
       android:theme="@style/AppTheme">
