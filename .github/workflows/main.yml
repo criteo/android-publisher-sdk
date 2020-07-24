@@ -43,7 +43,7 @@ jobs:
           access-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload JUnit report
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: junit-report
@@ -75,7 +75,7 @@ jobs:
           cmdOptions: -no-snapshot-save -noaudio -no-boot-anim -skin 360x640
 
       - name: Upload logcat output
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: logcat
@@ -88,7 +88,7 @@ jobs:
           access-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload JUnit report
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: junit-report
