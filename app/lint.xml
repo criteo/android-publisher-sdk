@@ -22,11 +22,17 @@
   </issue>
 
   <issue id="UselessParent" severity="ignore">
-    <ignore path="src/main/res/layout/activity_in_house.xml" />
-    <ignore path="src/main/res/layout/activity_main.xml" />
-    <ignore path="src/main/res/layout/activity_mediation.xml" />
-    <ignore path="src/main/res/layout/activity_mopub_mediation.xml" />
-    <ignore path="src/main/res/layout/activity_stand_alone.xml" />
-    <ignore path="src/main/res/layout/content_dfp.xml" />
+    <ignore path="src/main/res/layout/activity_in_house.xml"/>
+    <ignore path="src/main/res/layout/activity_main.xml"/>
+    <ignore path="src/main/res/layout/activity_mediation.xml"/>
+    <ignore path="src/main/res/layout/activity_mopub_mediation.xml"/>
+    <ignore path="src/main/res/layout/activity_stand_alone.xml"/>
+    <ignore path="src/main/res/layout/content_dfp.xml"/>
+  </issue>
+
+  <issue id="InvalidPackage">
+    <!-- Mockito expects to be in test, containing instrumentation classes -->
+    <ignore path="**/byte-buddy-agent*.jar"/>
+    <ignore path="**/mockito-core*.jar"/>
   </issue>
 </lint>
