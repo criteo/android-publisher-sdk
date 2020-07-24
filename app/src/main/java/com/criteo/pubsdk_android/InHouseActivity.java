@@ -30,9 +30,11 @@ import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.advancednative.CriteoNativeLoader;
+import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import com.criteo.pubsdk_android.integration.MockedIntegrationRegistry;
 import com.criteo.pubsdk_android.listener.TestAppBannerAdListener;
 import com.criteo.pubsdk_android.listener.TestAppInterstitialAdDisplayListener;
 import com.criteo.pubsdk_android.listener.TestAppInterstitialAdListener;
@@ -60,6 +62,7 @@ public class InHouseActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_in_house);
+    MockedIntegrationRegistry.force(Integration.IN_HOUSE);
 
     adLayout = findViewById(R.id.AdLayout);
     btnShowInterstitial = findViewById(R.id.buttonInhouseInterstitial);

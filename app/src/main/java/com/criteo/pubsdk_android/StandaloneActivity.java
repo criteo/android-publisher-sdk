@@ -29,7 +29,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.advancednative.CriteoNativeLoader;
+import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import com.criteo.pubsdk_android.integration.MockedIntegrationRegistry;
 import com.criteo.pubsdk_android.listener.TestAppBannerAdListener;
 import com.criteo.pubsdk_android.listener.TestAppInterstitialAdDisplayListener;
 import com.criteo.pubsdk_android.listener.TestAppInterstitialAdListener;
@@ -54,6 +56,7 @@ public class StandaloneActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_stand_alone);
+    MockedIntegrationRegistry.force(Integration.STANDALONE);
 
     adLayout = findViewById(R.id.AdLayout);
     btnShowInterstitial = findViewById(R.id.buttonStandAloneInterstitial);
