@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical">
+
+  <RadioGroup
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:orientation="vertical"
+    android:checkedButton="@id/radioNoMock">
+    <RadioButton
+      android:id="@+id/radioNoMock"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="8dp"
+      android:text="@string/integration_no_mock"/>
+    <RadioButton
+      android:id="@+id/radioNoMediation"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="8dp"
+      android:text="@string/integration_no_mediation"/>
+    <RadioButton
+      android:id="@+id/radioAllMocked"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:padding="8dp"
+      android:text="@string/integration_mocked_detection"/>
+  </RadioGroup>
+
+  <TextView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:text="@string/integration_bid_caching_warning"/>
+
+  <CheckBox
+    android:id="@+id/checkboxVerboseIntegrationDetection"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:text="@string/integration_verbose"/>
+
+  <Button
+    android:id="@+id/btnSaveIntegrationDetectionValues"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:text="@string/btn_save"
+    />
+
+</LinearLayout>

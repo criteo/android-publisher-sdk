@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import androidx.appcompat.app.AppCompatActivity;
+import com.criteo.pubsdk_android.integration.IntegrationSelectorActivity;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
@@ -79,6 +80,11 @@ public class MainActivity extends AppCompatActivity {
 
     findViewById(R.id.buttonTcfSelector).setOnClickListener((View v) -> {
       Intent intent = new Intent(getApplicationContext(), GdprActivity.class);
+      startActivity(intent);
+    });
+
+    findViewById(R.id.buttonIntegrationSelector).setOnClickListener((View v) -> {
+      Intent intent = new Intent(getApplicationContext(), IntegrationSelectorActivity.class);
       startActivity(intent);
     });
 
