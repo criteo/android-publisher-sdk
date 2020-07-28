@@ -45,11 +45,17 @@ class IntegrationRegistry(
 
   @VisibleForTesting
   fun readIntegration(): Integration {
-    if (integrationDetector.isMoPubMediationPresent()) {
+    val moPubMediationPresent = integrationDetector.isMoPubMediationPresent()
+    val adMobMediationPresent = integrationDetector.isAdMobMediationPresent()
+
+    if (moPubMediationPresent && adMobMediationPresent) {
+      return Integration.FALLBACK
+    } else if (moPubMediationPresent) {
       return Integration.MOPUB_MEDIATION
-    } else if (integrationDetector.isAdMobMediationPresent()) {
+    } else if (adMobMediationPresent) {
       return Integration.ADMOB_MEDIATION
     }
+
     val integrationName = safeSharedPreferences.getString(
         IntegrationStorageKey,
         Integration.FALLBACK.name

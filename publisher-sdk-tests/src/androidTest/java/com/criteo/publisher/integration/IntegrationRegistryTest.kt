@@ -120,4 +120,14 @@ class IntegrationRegistryTest {
     assertThat(integration).isEqualTo(Integration.ADMOB_MEDIATION)
   }
 
+  @Test
+  fun integration_GivenBothMediationAdaptersDetected_ReturnFallback() {
+    whenever(integrationDetector.isMoPubMediationPresent()).doReturn(true)
+    whenever(integrationDetector.isAdMobMediationPresent()).doReturn(true)
+
+    val integration = integrationRegistry.readIntegration()
+
+    assertThat(integration).isEqualTo(Integration.FALLBACK)
+  }
+
 }
