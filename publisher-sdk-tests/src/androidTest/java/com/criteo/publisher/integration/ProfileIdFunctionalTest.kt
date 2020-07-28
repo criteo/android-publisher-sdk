@@ -19,12 +19,12 @@ package com.criteo.publisher.integration
 import com.criteo.publisher.Criteo
 import com.criteo.publisher.CriteoUtil.givenInitializedCriteo
 import com.criteo.publisher.TestAdUnits.BANNER_320_480
+import com.criteo.publisher.csm.MetricHelper
+import com.criteo.publisher.csm.MetricSendingQueueConsumer
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.network.PubSdkApi
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.check
-import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -34,6 +34,9 @@ class ProfileIdFunctionalTest {
   @Rule
   @JvmField
   val mockedDependenciesRule = MockedDependenciesRule()
+
+  @SpyBean
+  private lateinit var metricSendingQueueConsumer: MetricSendingQueueConsumer
 
   @SpyBean
   private lateinit var api: PubSdkApi
@@ -88,6 +91,97 @@ class ProfileIdFunctionalTest {
     verify(api).loadConfig(check {
       assertThat(it.profileId).isEqualTo(Integration.IN_HOUSE.profileId)
     })
+  }
+
+  @Test
+  fun csm_GivenPrefetchWithSdkUsedForTheFirstTime_UseFallbackProfileId() {
+    givenInitializedCriteo(BANNER_320_480)
+    mockedDependenciesRule.waitForIdleState()
+
+    triggerMetricRequest()
+
+    verify(api).postCsm(check {
+      with(MetricHelper) {
+        assertThat(it.internalProfileId).isEqualTo(Integration.FALLBACK.profileId)
+      }
+    })
+  }
+
+  @Test
+  fun csm_GivenPrefetchWithUsedSdk_UseLatestProfileId() {
+    givenInitializedCriteo()
+    Criteo.getInstance().getBidResponse(BANNER_320_480)
+    mockedDependenciesRule.waitForIdleState()
+
+    // Clean the metric yields above to avoid interference
+    triggerMetricRequest()
+
+    mockedDependenciesRule.resetAllDependencies()
+
+    givenInitializedCriteo(BANNER_320_480)
+    mockedDependenciesRule.waitForIdleState()
+
+    triggerMetricRequest()
+
+    verify(api).postCsm(check {
+      with(MetricHelper) {
+        assertThat(it.internalProfileId).isEqualTo(Integration.IN_HOUSE.profileId)
+        assertThat(it.internalFeedbacks).hasSize(1)
+      }
+    })
+  }
+
+  @Test
+  fun csm_GivenIntegrationSpecificBidConsumedWithSdkUsedForTheFirstTime_UseIntegrationProfileId() {
+    givenInitializedCriteo()
+    Criteo.getInstance().getBidResponse(BANNER_320_480)
+    mockedDependenciesRule.waitForIdleState()
+
+    triggerMetricRequest()
+
+    verify(api).postCsm(check {
+      with(MetricHelper) {
+        assertThat(it.internalProfileId).isEqualTo(Integration.IN_HOUSE.profileId)
+      }
+    })
+  }
+
+  @Test
+  fun csm_GivenIntegrationSpecificBidConsumedWithUsedSdkByAnotherIntegration_GroupMetricsByProfileId() {
+    // Deactivate the CSM sending to show that SDK is handling sending different profile IDs
+    doNothing().whenever(metricSendingQueueConsumer).sendMetricBatch()
+
+    givenInitializedCriteo()
+    Criteo.getInstance().getBidResponse(BANNER_320_480)
+    mockedDependenciesRule.waitForIdleState()
+
+    Criteo.getInstance().setBidsForAdUnit(mutableMapOf<Any, Any>(), BANNER_320_480)
+    mockedDependenciesRule.waitForIdleState()
+
+    doCallRealMethod().whenever(metricSendingQueueConsumer).sendMetricBatch()
+    triggerMetricRequest()
+
+    verify(api).postCsm(check {
+      with(MetricHelper) {
+        assertThat(it.internalProfileId).isEqualTo(Integration.IN_HOUSE.profileId)
+        assertThat(it.internalFeedbacks).hasSize(1)
+      }
+    })
+
+    verify(api).postCsm(check {
+      with(MetricHelper) {
+        assertThat(it.internalProfileId).isEqualTo(Integration.CUSTOM_APP_BIDDING.profileId)
+        assertThat(it.internalFeedbacks).hasSize(1)
+      }
+    })
+  }
+
+  private fun triggerMetricRequest() {
+    // CSM are put in queue during SDK init but they are not sent, so we need to trigger it.
+    givenInitializedCriteo()
+    mockedDependenciesRule.waitForIdleState()
+    metricSendingQueueConsumer.sendMetricBatch()
+    mockedDependenciesRule.waitForIdleState()
   }
 
 }
