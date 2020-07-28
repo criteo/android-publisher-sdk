@@ -64,4 +64,30 @@ class ProfileIdFunctionalTest {
     }, any())
   }
 
+  @Test
+  fun remoteConfig_GivenSdkUsedForTheFirstTime_UseFallbackProfileId() {
+    givenInitializedCriteo()
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(api).loadConfig(check {
+      assertThat(it.profileId).isEqualTo(Integration.FALLBACK.profileId)
+    })
+  }
+
+  @Test
+  fun remoteConfig_GivenUsedSdk_UseLastProfileId() {
+    givenInitializedCriteo()
+    Criteo.getInstance().getBidResponse(BANNER_320_480)
+    mockedDependenciesRule.waitForIdleState()
+
+    mockedDependenciesRule.resetAllDependencies()
+
+    givenInitializedCriteo()
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(api).loadConfig(check {
+      assertThat(it.profileId).isEqualTo(Integration.IN_HOUSE.profileId)
+    })
+  }
+
 }
