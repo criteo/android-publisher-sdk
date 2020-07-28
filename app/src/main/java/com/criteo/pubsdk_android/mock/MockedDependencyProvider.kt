@@ -38,11 +38,11 @@ internal object MockedDependencyProvider {
    * dependency graph.
    */
   fun startMocking(injections: MockInjection.() -> Unit) {
-    // Mockito needs this property to know were to store generated classes
+    // Mockito needs this property to know where to store generated classes
     val application = DependencyProvider.getInstance().provideApplication()
     System.setProperty("org.mockito.android.target", application.cacheDir.path);
 
-    initAgainCriteo {
+    resetCriteo {
       MockableDependencyProvider.setInstance(null)
       val newInstance = DependencyProvider.getInstance()
       val dependencyProvider = spy(newInstance)
@@ -61,12 +61,12 @@ internal object MockedDependencyProvider {
    * dependency graph.
    */
   fun stopMocking() {
-    initAgainCriteo {
+    resetCriteo {
       MockableDependencyProvider.setInstance(null)
     }
   }
 
-  private fun initAgainCriteo(action: () -> Unit) {
+  private fun resetCriteo(action: () -> Unit) {
     val oldInstance = DependencyProvider.getInstance()
     val application = oldInstance.provideApplication()
     val criteoPublisherId = oldInstance.provideCriteoPublisherId()
@@ -79,7 +79,10 @@ internal object MockedDependencyProvider {
 
   internal class MockInjection(private val dependencyProvider: DependencyProvider) {
     fun <T> inject(bean: T) {
-      // Nullify the call because Kotlin throw NPE on provide* method that are non null.
+      // When mocking using the doReturn API of mockito, the method call return a null. But all
+      // provide* methods of the dependency provider are @NonNull so Kotlin compiler automatically
+      // inject a null check, which is trigger by Mockito returning null. The stubbing call is then
+      // nullify to avoid triggering this and getting an NPE.
       val stubCall: DependencyProvider? = doReturn(bean).whenever(dependencyProvider)
 
       when (bean) {
