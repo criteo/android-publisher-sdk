@@ -16,24 +16,36 @@
 
 package com.criteo.publisher.integration
 
+import android.content.Context
 import com.criteo.publisher.Criteo
+import com.criteo.publisher.CriteoBannerView
+import com.criteo.publisher.CriteoInterstitial
 import com.criteo.publisher.CriteoUtil.givenInitializedCriteo
-import com.criteo.publisher.TestAdUnits.BANNER_320_480
+import com.criteo.publisher.TestAdUnits.*
+import com.criteo.publisher.advancednative.CriteoNativeLoader
+import com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait
 import com.criteo.publisher.csm.MetricHelper
 import com.criteo.publisher.csm.MetricSendingQueueConsumer
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.network.PubSdkApi
+import com.google.android.gms.ads.doubleclick.PublisherAdRequest
+import com.mopub.mobileads.MoPubInterstitial
+import com.mopub.mobileads.MoPubView
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
+import javax.inject.Inject
 
 class ProfileIdFunctionalTest {
 
   @Rule
   @JvmField
   val mockedDependenciesRule = MockedDependenciesRule()
+
+  @Inject
+  private lateinit var context: Context
 
   @SpyBean
   private lateinit var metricSendingQueueConsumer: MetricSendingQueueConsumer
@@ -46,25 +58,17 @@ class ProfileIdFunctionalTest {
     givenInitializedCriteo(BANNER_320_480)
     mockedDependenciesRule.waitForIdleState()
 
-    verify(api).loadCdb(check {
-      assertThat(it.profileId).isEqualTo(Integration.FALLBACK.profileId)
-    }, any())
+    verifyCdbIsCalledWith(Integration.FALLBACK)
   }
 
   @Test
   fun prefetch_GivenUsedSdk_UseLatestProfileId() {
-    givenInitializedCriteo()
-    Criteo.getInstance().getBidResponse(BANNER_320_480)
-    mockedDependenciesRule.waitForIdleState()
-
-    mockedDependenciesRule.resetAllDependencies()
+    givenPreviousInHouseIntegration()
 
     givenInitializedCriteo(BANNER_320_480)
     mockedDependenciesRule.waitForIdleState()
 
-    verify(api).loadCdb(check {
-      assertThat(it.profileId).isEqualTo(Integration.IN_HOUSE.profileId)
-    }, any())
+    verifyCdbIsCalledWith(Integration.IN_HOUSE)
   }
 
   @Test
@@ -79,11 +83,7 @@ class ProfileIdFunctionalTest {
 
   @Test
   fun remoteConfig_GivenUsedSdk_UseLastProfileId() {
-    givenInitializedCriteo()
-    Criteo.getInstance().getBidResponse(BANNER_320_480)
-    mockedDependenciesRule.waitForIdleState()
-
-    mockedDependenciesRule.resetAllDependencies()
+    givenPreviousInHouseIntegration()
 
     givenInitializedCriteo()
     mockedDependenciesRule.waitForIdleState()
@@ -109,14 +109,11 @@ class ProfileIdFunctionalTest {
 
   @Test
   fun csm_GivenPrefetchWithUsedSdk_UseLatestProfileId() {
-    givenInitializedCriteo()
-    Criteo.getInstance().getBidResponse(BANNER_320_480)
-    mockedDependenciesRule.waitForIdleState()
+    givenPreviousInHouseIntegration()
 
     // Clean the metric yields above to avoid interference
     triggerMetricRequest()
-
-    mockedDependenciesRule.resetAllDependencies()
+    clearInvocations(api)
 
     givenInitializedCriteo(BANNER_320_480)
     mockedDependenciesRule.waitForIdleState()
@@ -176,12 +173,125 @@ class ProfileIdFunctionalTest {
     })
   }
 
+  @Test
+  fun bidStandaloneBanner_GivenAnyPreviousIntegration_UseStandaloneProfileId() {
+    givenPreviousInHouseIntegration()
+
+    givenInitializedCriteo()
+    runOnMainThreadAndWait {
+      CriteoBannerView(context, BANNER_320_480).loadAd()
+    }
+    mockedDependenciesRule.waitForIdleState()
+
+    verifyCdbIsCalledWith(Integration.STANDALONE)
+  }
+
+  @Test
+  fun bidStandaloneInterstitial_GivenAnyPreviousIntegration_UseStandaloneProfileId() {
+    givenPreviousInHouseIntegration()
+
+    givenInitializedCriteo()
+    runOnMainThreadAndWait {
+      CriteoInterstitial(context, INTERSTITIAL).loadAd()
+    }
+    mockedDependenciesRule.waitForIdleState()
+
+    verifyCdbIsCalledWith(Integration.STANDALONE)
+  }
+
+  @Test
+  fun bidStandaloneNative_GivenAnyPreviousIntegration_UseStandaloneProfileId() {
+    givenPreviousInHouseIntegration()
+
+    givenInitializedCriteo()
+    CriteoNativeLoader(NATIVE, mock(), mock()).loadAd()
+    mockedDependenciesRule.waitForIdleState()
+
+    verifyCdbIsCalledWith(Integration.STANDALONE)
+  }
+
+  @Test
+  fun bidInHouse_GivenAnyPreviousIntegration_UseInHouseProfileId() {
+    givenInitializedCriteo()
+    Criteo.getInstance().setBidsForAdUnit(mutableMapOf<Any, Any>(), BANNER_320_480)
+    mockedDependenciesRule.waitForIdleState()
+    mockedDependenciesRule.resetAllDependencies()
+
+    givenInitializedCriteo()
+    Criteo.getInstance().getBidResponse(BANNER_320_480)
+    mockedDependenciesRule.waitForIdleState()
+
+    verifyCdbIsCalledWith(Integration.IN_HOUSE)
+  }
+
+  @Test
+  fun bidCustomAppBidding_GivenAnyPreviousIntegration_UseCustomAppBiddingProfileId() {
+    givenPreviousInHouseIntegration()
+
+    givenInitializedCriteo()
+    Criteo.getInstance().setBidsForAdUnit(mutableMapOf<Any, Any>(), BANNER_320_480)
+    mockedDependenciesRule.waitForIdleState()
+
+    verifyCdbIsCalledWith(Integration.CUSTOM_APP_BIDDING)
+  }
+
+  @Test
+  fun bidGamAppBidding_GivenAnyPreviousIntegration_UseGamAppBiddingProfileId() {
+    givenPreviousInHouseIntegration()
+
+    givenInitializedCriteo()
+    Criteo.getInstance().setBidsForAdUnit(PublisherAdRequest.Builder(), BANNER_320_480)
+    mockedDependenciesRule.waitForIdleState()
+
+    verifyCdbIsCalledWith(Integration.GAM_APP_BIDDING)
+  }
+
+  @Test
+  fun bidMoPubAppBiddingBanner_GivenAnyPreviousIntegration_UseMoPubAppBiddingProfileId() {
+    givenPreviousInHouseIntegration()
+
+    givenInitializedCriteo()
+    runOnMainThreadAndWait {
+      Criteo.getInstance().setBidsForAdUnit(MoPubView(context), BANNER_320_480)
+    }
+    mockedDependenciesRule.waitForIdleState()
+
+    verifyCdbIsCalledWith(Integration.MOPUB_APP_BIDDING)
+  }
+
+  @Test
+  fun bidMoPubAppBiddingInterstitial_GivenAnyPreviousIntegration_UseMoPubAppBiddingProfileId() {
+    givenPreviousInHouseIntegration()
+
+    givenInitializedCriteo()
+    runOnMainThreadAndWait {
+      val moPubInterstitial = MoPubInterstitial(mock(), "adUnit")
+      Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, BANNER_320_480)
+    }
+    mockedDependenciesRule.waitForIdleState()
+
+    verifyCdbIsCalledWith(Integration.MOPUB_APP_BIDDING)
+  }
+
+  private fun givenPreviousInHouseIntegration() {
+    givenInitializedCriteo()
+    Criteo.getInstance().getBidResponse(BANNER_320_480)
+    mockedDependenciesRule.waitForIdleState()
+    mockedDependenciesRule.resetAllDependencies()
+  }
+
   private fun triggerMetricRequest() {
     // CSM are put in queue during SDK init but they are not sent, so we need to trigger it.
     givenInitializedCriteo()
     mockedDependenciesRule.waitForIdleState()
     metricSendingQueueConsumer.sendMetricBatch()
     mockedDependenciesRule.waitForIdleState()
+  }
+
+  private fun verifyCdbIsCalledWith(integration: Integration) {
+    verify(api).loadCdb(check {
+      assertThat(it.profileId).isEqualTo(integration.profileId)
+    }, any())
   }
 
 }
