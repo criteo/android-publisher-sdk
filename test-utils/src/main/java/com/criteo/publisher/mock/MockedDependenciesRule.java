@@ -80,20 +80,21 @@ public class MockedDependenciesRule implements MethodRule {
 
   protected DependencyProvider dependencyProvider;
   private TrackingCommandsExecutor trackingCommandsExecutor = null;
+  private Object target;
 
   @Nullable
   private CdbMock cdbMock;
 
   @Override
   public Statement apply(Statement base, FrameworkMethod method, Object target) {
+    this.target = target;
+
     return new Statement() {
       @RequiresApi(api = VERSION_CODES.O)
       @Override
       public void evaluate() throws Throwable {
         try {
-          setUpDependencyProvider();
-          setUpCdbMock();
-          injectDependencies(target);
+          resetAllDependencies();
 
           if (iAmDebuggingDoNotTimeoutMe) {
             base.evaluate();
@@ -147,8 +148,9 @@ public class MockedDependenciesRule implements MethodRule {
   }
 
   @RequiresApi(api = VERSION_CODES.O)
-  private void injectDependencies(Object target) {
-    DependenciesAnnotationInjection injection = new DependenciesAnnotationInjection(dependencyProvider);
+  private void injectDependencies() {
+    DependenciesAnnotationInjection injection = new DependenciesAnnotationInjection(
+        dependencyProvider);
     injection.process(target);
   }
 
@@ -197,5 +199,30 @@ public class MockedDependenciesRule implements MethodRule {
       throw new IllegalStateException("CDB mock is only available while test is running");
     }
     return cdbMock;
+  }
+
+  /**
+   * Clean in-memory state of all dependencies, including the dependency provider itself and the
+   * criteo singleton.
+   * <p>
+   * This simulate a restart of an application with a new SDK instance.
+   * <p>
+   * Note that persistent data such as shared preferences are not cleaned.
+   * <p>
+   * If calling test is injecting dependencies via annotation, then after this call, all
+   * dependencies fields would get updated with new ones.
+   */
+  @RequiresApi(api = VERSION_CODES.O)
+  public void resetAllDependencies() {
+    MockableDependencyProvider.setInstance(null);
+    CriteoUtil.clearCriteo();
+
+    if (cdbMock != null) {
+      cdbMock.shutdown();
+    }
+
+    setUpDependencyProvider();
+    setUpCdbMock();
+    injectDependencies();
   }
 }
