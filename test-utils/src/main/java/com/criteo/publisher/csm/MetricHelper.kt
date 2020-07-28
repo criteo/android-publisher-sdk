@@ -36,4 +36,10 @@ object MetricHelper {
     queue.poll(Integer.MAX_VALUE)
   }
 
+  val MetricRequest.internalProfileId: Int
+    get() = profileId
+
+  val MetricRequest.internalFeedbacks: List<MetricRequest.MetricRequestFeedback>
+    get() = feedbacks
+
 }
