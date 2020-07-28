@@ -53,7 +53,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -66,12 +65,6 @@ public class CsmFunctionalTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
-
-  @Inject
-  private MetricSendingQueue queue;
-
-  @Inject
-  private MetricRepository repository;
 
   @Inject
   private IntegrationRegistry integrationRegistry;
@@ -89,14 +82,7 @@ public class CsmFunctionalTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     mockedDependenciesRule.givenMockedRemoteConfigResponse(api);
-    cleanState();
-
     integrationRegistry.declare(Integration.IN_HOUSE);
-  }
-
-  @After
-  public void tearDown() throws Exception {
-    cleanState();
   }
 
   @Test
@@ -411,15 +397,5 @@ public class CsmFunctionalTest {
 
   private void waitForIdleState() {
     mockedDependenciesRule.waitForIdleState();
-  }
-
-  private void cleanState() {
-    // Empty metric repository
-    for (Metric metric : repository.getAllStoredMetrics()) {
-      repository.moveById(metric.getImpressionId(), ignored -> true);
-    }
-
-    // Empty sending queue
-    queue.poll(Integer.MAX_VALUE);
   }
 }
