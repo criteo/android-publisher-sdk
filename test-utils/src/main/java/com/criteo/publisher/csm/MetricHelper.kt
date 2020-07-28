@@ -14,25 +14,26 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.util;
+package com.criteo.publisher.csm
 
-import android.app.Application;
-import android.os.Build.VERSION;
-import androidx.test.core.app.ApplicationProvider;
-import com.criteo.publisher.mock.ApplicationMock;
+import android.os.Build
+import androidx.annotation.RequiresApi
+import com.criteo.publisher.DependencyProvider
 
-public class InstrumentationUtil {
+object MetricHelper {
 
-  public static boolean isRunningInInstrumentationTest() {
-    return VERSION.SDK_INT != 0;
-  }
-
-  public static Application getApplication() {
-    if (isRunningInInstrumentationTest()) {
-      return ApplicationProvider.getApplicationContext();
-    } else {
-      return ApplicationMock.newMock();
+  @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+  @JvmStatic
+  fun cleanState(dependencyProvider: DependencyProvider) {
+    // Empty metric repository
+    val repository = dependencyProvider.provideMetricRepository()
+    for (metric in repository.allStoredMetrics) {
+      repository.moveById(metric.impressionId) { true }
     }
+
+    // Empty sending queue
+    val queue = dependencyProvider.provideMetricSendingQueue()
+    queue.poll(Integer.MAX_VALUE)
   }
 
 }

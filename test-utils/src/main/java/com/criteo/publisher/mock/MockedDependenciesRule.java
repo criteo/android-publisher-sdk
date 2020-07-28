@@ -32,6 +32,7 @@ import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.MockableDependencyProvider;
 import com.criteo.publisher.concurrent.ThreadingUtil;
 import com.criteo.publisher.concurrent.TrackingCommandsExecutor;
+import com.criteo.publisher.csm.MetricHelper;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.RemoteConfigResponse;
 import com.criteo.publisher.network.PubSdkApi;
@@ -95,6 +96,7 @@ public class MockedDependenciesRule implements MethodRule {
       public void evaluate() throws Throwable {
         try {
           resetAllDependencies();
+          resetAllPersistedData();
 
           if (iAmDebuggingDoNotTimeoutMe) {
             base.evaluate();
@@ -102,8 +104,7 @@ public class MockedDependenciesRule implements MethodRule {
             timeout.build(base).evaluate();
           }
         } finally {
-          // Clear all states retained in shared preferences used by the SDK.
-          dependencyProvider.provideSharedPreferences().edit().clear().apply();
+          resetAllPersistedData();
 
           // clean after self and ensures no side effects for subsequent tests
           MockableDependencyProvider.setInstance(null);
@@ -224,5 +225,14 @@ public class MockedDependenciesRule implements MethodRule {
     setUpDependencyProvider();
     setUpCdbMock();
     injectDependencies();
+  }
+
+  @RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)
+  private void resetAllPersistedData() {
+    // Clear all states retained in shared preferences used by the SDK.
+    dependencyProvider.provideSharedPreferences().edit().clear().apply();
+
+    // Clear CSM
+    MetricHelper.cleanState(dependencyProvider);
   }
 }

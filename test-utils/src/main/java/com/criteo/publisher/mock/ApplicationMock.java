@@ -28,10 +28,14 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import java.io.File;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
 
 public class ApplicationMock {
 
-  @SuppressLint("CommitPrefEdits")
+  @SuppressLint({"CommitPrefEdits", "NewApi"})
   public static Application newMock() {
     // Explicitly mock shared preferences because it is a pain to handle them in unit tests.
     // This is more true for the getString one, because, since String class is final, it is
@@ -46,9 +50,18 @@ public class ApplicationMock {
     Editor editor = mock(Editor.class, RETURNS_DEEP_STUBS);
     when(sharedPreferences.edit()).thenReturn(editor);
 
+    // Used by CSM to store metric on filesystem
+    File filesDir;
+    try {
+      filesDir = Files.createTempDirectory(ApplicationMock.class.getName()).toFile();
+    } catch (IOException e) {
+      throw new UncheckedIOException(e);
+    }
+
     Application application = mock(Application.class, RETURNS_DEEP_STUBS);
     when(application.getApplicationContext().getSharedPreferences(any(), anyInt()))
         .thenReturn(sharedPreferences);
+    when(application.getApplicationContext().getFilesDir()).thenReturn(filesDir);
     return application;
   }
 
