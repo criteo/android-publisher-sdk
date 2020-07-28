@@ -35,9 +35,9 @@
   <string name="btn_advanced_native">Advanced Native</string>
   <string name="btn_content">Content</string>
   <string name="btn_standalone_recycler_view">Standalone + Recycler View</string>
-  <string name="integration_no_mock">No mock\nNothing is mocked, but as mediation adapters are a priority, no other profile ID are expected to be detected.</string>
+  <string name="integration_no_mock">No mock\nNothing is mocked, but mediation adapters are both present and have a higher precedence, so SDK is using the fallback profile ID.</string>
   <string name="integration_no_mediation">Ignore mediation adapters\nIntegration are detected normally without considering mediation adapters.</string>
-  <string name="integration_mocked_detection">Mock detection\nIntegration are forced by each activities.</string>
+  <string name="integration_mocked_detection">Mock detection\nIntegrations are forced by the Activities that represent them.</string>
   <string name="integration_bid_caching_warning">Note that because of bid caching, you may need to ask twice for a bid to have the correct profile ID.</string>
   <string name="integration_verbose">Display a toast on forced/detected integration</string>
   <string name="btn_integration_selector">Integration Selector</string>
