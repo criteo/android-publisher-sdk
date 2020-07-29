@@ -47,8 +47,6 @@ import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.util.BuildConfigWrapper;
-import com.kevinmost.junit_retry_rule.Retry;
-import com.kevinmost.junit_retry_rule.RetryRule;
 import java.util.Collections;
 import java.util.List;
 import javax.inject.Inject;
@@ -58,9 +56,6 @@ import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
 public class CriteoFunctionalTest {
-
-  @Rule
-  public final RetryRule retry = new RetryRule();
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
@@ -130,7 +125,6 @@ public class CriteoFunctionalTest {
   }
 
   @Test
-  @Retry(timeout = 2000)
   public void init_GivenPrefetchAdUnitAndLaunchedActivity_CallConfigAndCdbAndBearcat()
       throws Exception {
     givenInitializedCriteo(validBannerAdUnit);

@@ -95,12 +95,6 @@ object Deps {
     const val EqualsVerifier = "nl.jqno.equalsverifier:equalsverifier:$version"
   }
 
-  object GitHub {
-    object Kevinmost {
-      const val JUnitRetryRule = "com.github.kevinmost:junit-retry-rule:cbdd972d7c"
-    }
-  }
-
   object Google {
     private const val version = "19.0.1"
 

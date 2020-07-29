@@ -29,16 +29,11 @@ import com.criteo.publisher.concurrent.ThreadingUtil;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.view.WebViewLookup;
-import com.kevinmost.junit_retry_rule.Retry;
-import com.kevinmost.junit_retry_rule.RetryRule;
 import javax.inject.Inject;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class TopActivityFinderTest {
-
-  @Rule
-  public RetryRule retryRule = new RetryRule();
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
@@ -79,7 +74,6 @@ public class TopActivityFinderTest {
   }
 
   @Test
-  @Retry(timeout = 3000)
   public void topActivityName_GivenFinishedActivityWithoutPredecessor_ReturnNull() throws Exception {
     givenInitializedCriteo();
     activityRule.launchActivity(new Intent());

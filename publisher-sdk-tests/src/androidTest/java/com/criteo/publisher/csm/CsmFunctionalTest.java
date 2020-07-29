@@ -43,8 +43,6 @@ import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.util.BuildConfigWrapper;
-import com.kevinmost.junit_retry_rule.Retry;
-import com.kevinmost.junit_retry_rule.RetryRule;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,9 +57,6 @@ import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
 public class CsmFunctionalTest {
-
-  @Rule
-  public final RetryRule retry = new RetryRule();
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
@@ -86,7 +81,6 @@ public class CsmFunctionalTest {
   }
 
   @Test
-  @Retry
   public void givenPrefetchAdUnitsWithBidsThenConsumption_CallApiWithCsmOfConsumedBid() throws Exception {
     givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
     waitForIdleState();
@@ -138,7 +132,6 @@ public class CsmFunctionalTest {
   }
 
   @Test
-  @Retry
   public void givenConsumedExpiredBid_CallApiWithCsmOfConsumedExpiredBid() throws Exception {
     when(clock.getCurrentTimeInMillis()).thenReturn(0L);
     givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
@@ -168,7 +161,6 @@ public class CsmFunctionalTest {
   }
 
   @Test
-  @Retry
   public void givenNoBidFromCdb_CallApiWithCsmOfNoBid() throws Exception {
     givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL_UNKNOWN);
     waitForIdleState();
@@ -188,7 +180,6 @@ public class CsmFunctionalTest {
   }
 
   @Test
-  @Retry
   public void givenNetworkErrorFromCdb_CallApiWithCsmOfNetworkError() throws Exception {
     doThrow(IOException.class).when(api).loadCdb(any(), any());
 
@@ -219,7 +210,6 @@ public class CsmFunctionalTest {
   }
 
   @Test
-  @Retry
   public void givenTimeoutErrorFromCdb_CallApiWithCsmOfTimeoutError() throws Exception {
     when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenReturn(1);
 
@@ -252,7 +242,6 @@ public class CsmFunctionalTest {
   }
 
   @Test
-  @Retry
   public void givenErrorWhenSendingCsm_QueueMetricsUntilCsmRequestWorksAgain() throws Exception {
     when(buildConfigWrapper.preconditionThrowsOnException()).thenReturn(false);
     doThrow(IOException.class).when(api).postCsm(any());

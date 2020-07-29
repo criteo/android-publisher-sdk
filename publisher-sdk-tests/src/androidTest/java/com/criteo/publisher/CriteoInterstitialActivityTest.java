@@ -44,8 +44,6 @@ import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.view.WebViewClicker;
 import com.criteo.publisher.view.WebViewLookup;
-import com.kevinmost.junit_retry_rule.Retry;
-import com.kevinmost.junit_retry_rule.RetryRule;
 import java.util.Collection;
 import javax.inject.Inject;
 import org.junit.Before;
@@ -59,9 +57,6 @@ import org.mockito.junit.MockitoRule;
 
 
 public class CriteoInterstitialActivityTest {
-
-  @Rule
-  public final RetryRule retry = new RetryRule();
 
   @Rule
   public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(DummyActivity.class);
@@ -112,7 +107,6 @@ public class CriteoInterstitialActivityTest {
   }
 
   @Test
-  @Retry(timeout = 2000)
   public void whenUserClickOnAd_GivenHtmlWithHandledDeepLink_RedirectUserAndNotifyListener() throws Exception {
     Activity activity = whenUserClickOnAd("criteo-test://dummy-ad-activity");
 
