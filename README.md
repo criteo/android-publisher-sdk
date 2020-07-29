@@ -1,3 +1,6 @@
+[![CI](https://github.com/criteo/android-publisher-sdk/workflows/CI/badge.svg)]()
+[![License](https://img.shields.io/github/license/criteo/android-publisher-sdk.svg)]()
+
 # Criteo Publisher SDK
 > Criteo Publisher SDK is meant for app publishers wanting to integrate in their app the Criteo Direct 
 > Bidder product. Direct Bidder for App allows you to monetize your mobile apps by accessing Criteo’s 
