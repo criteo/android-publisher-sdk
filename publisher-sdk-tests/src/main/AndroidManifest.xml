@@ -41,10 +41,6 @@
         <data android:scheme="criteo-test" android:host="dummy-ad-activity" />
       </intent-filter>
     </activity>
-
-    <activity
-      android:configChanges="keyboardHidden|orientation|screenSize"
-      android:name="com.mopub.mobileads.MoPubActivity"/>
   </application>
 
 </manifest>
