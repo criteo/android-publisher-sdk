@@ -54,7 +54,6 @@ dependencies {
   androidTestImplementation(Deps.AssertJ.AssertJ)
   androidTestImplementation(Deps.Square.Tape.Tape)
   androidTestImplementation(Deps.Google.AdMob)
-  androidTestImplementation(Deps.GitHub.Kevinmost.JUnitRetryRule)
 
   androidTestImplementation(Deps.MoPub.Banner) {
     isTransitive = true

@@ -27,17 +27,12 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.test.activity.DummyActivity;
-import com.kevinmost.junit_retry_rule.Retry;
-import com.kevinmost.junit_retry_rule.RetryRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
 public class VisibilityCheckerTest {
-
-  @Rule
-  public final RetryRule retry = new RetryRule();
 
   @Rule
   public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(DummyActivity.class);
@@ -104,7 +99,6 @@ public class VisibilityCheckerTest {
   }
 
   @Test
-  @Retry(timeout = 2000)
   public void isVisible_GivenViewInScrollView_ReturnAccordinglyToScrolling() throws Exception {
     int screenHeightPixels = uiHelper.getActivityHeightPixels();
     int viewHeightPixels = 200;
