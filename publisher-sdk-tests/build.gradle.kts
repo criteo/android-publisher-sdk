@@ -17,7 +17,10 @@
 plugins {
   id("com.android.library")
   kotlin("android")
+  id("com.banno.gordon")
 }
+
+gordon.retryQuota.set(5)
 
 androidLibModule()
 
