@@ -140,18 +140,6 @@
       android:name=".MopubActivity"
       android:configChanges="orientation|screenSize"
       android:theme="@style/AppTheme"/>
-    <activity
-      android:configChanges="keyboardHidden|orientation|screenSize"
-      android:name="com.mopub.common.MoPubBrowser"/>
-    <activity
-      android:configChanges="keyboardHidden|orientation|screenSize"
-      android:name="com.mopub.mobileads.MraidVideoPlayerActivity"/>
-    <activity
-      android:configChanges="keyboardHidden|orientation|screenSize"
-      android:name="com.mopub.mobileads.MoPubActivity"/>
-    <activity
-      android:configChanges="keyboardHidden|orientation|screenSize"
-      android:name="com.mopub.mobileads.MraidActivity"/>
 
   </application>
 
