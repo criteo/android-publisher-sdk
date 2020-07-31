@@ -54,7 +54,11 @@ public class AdChoiceOverlayTest {
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   @SuppressWarnings("rawtypes")
-  @Parameterized.Parameters(name = "{index}: {0}")
+  // FIXME Gordon runner does not support named parameterized test => they appear as IGNORED.
+  //  Issue come from Android tools not supporting this neither.
+  //  See https://github.com/Banno/Gordon/issues/47
+  // @Parameterized.Parameters(name = "{index}: {0}")
+  @Parameterized.Parameters
   public static Collection consents() {
     return Arrays.asList(new Object[][]{
         { new SimpleViewFactory() },
