@@ -43,6 +43,7 @@ class CdbRequestTest {
     }
 
     val request = CdbRequest.create(
+        "myRequestId",
         Publisher.create(context, "myCpId"),
         User.create(null, null, null, null),
         "1.2.3",
@@ -53,8 +54,10 @@ class CdbRequestTest {
 
     val json = serializer.writeIntoString(request)
 
-    assertThat(json).isEqualToIgnoringWhitespace("""
+    assertThat(json).isEqualToIgnoringWhitespace(
+        """
       {
+        "id": "myRequestId",
         "publisher": {
           "bundleId": "myBundleId",
           "cpId": "myCpId"
@@ -82,6 +85,7 @@ class CdbRequestTest {
     }
 
     val request = CdbRequest.create(
+        "myRequestId",
         Publisher.create(context, "myCpId"),
         User.create(null, null, null, null),
         "1.2.3",

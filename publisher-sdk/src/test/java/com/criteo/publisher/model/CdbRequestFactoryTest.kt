@@ -111,10 +111,13 @@ class CdbRequestFactoryTest {
 
     whenever(integrationRegistry.profileId).thenReturn(42)
     whenever(userPrivacyUtil.gdprData).thenReturn(expectedGdpr)
-    whenever(uniqueIdGenerator.generateId()).thenReturn("impId")
+    whenever(uniqueIdGenerator.generateId())
+        .thenReturn("myRequestId")
+        .thenReturn("impId")
 
     val request = factory.createRequest(adUnits)
 
+    assertThat(request.id).isEqualTo("myRequestId")
     assertThat(request.publisher).isEqualTo(publisher)
     assertThat(request.sdkVersion).isEqualTo("1.2.3")
     assertThat(request.profileId).isEqualTo(42)
@@ -148,10 +151,13 @@ class CdbRequestFactoryTest {
     }
 
     whenever(integrationRegistry.profileId).thenReturn(1337)
-    whenever(uniqueIdGenerator.generateId()).thenReturn("impId")
+    whenever(uniqueIdGenerator.generateId())
+        .thenReturn("myRequestId")
+        .thenReturn("impId")
 
     var request = factory.createRequest(adUnits)
 
+    assertThat(request.id).isEqualTo("myRequestId")
     assertThat(request.publisher).isEqualTo(publisher)
     assertThat(request.sdkVersion).isEqualTo("1.2.3")
     assertThat(request.profileId).isEqualTo(1337)
@@ -196,7 +202,7 @@ class CdbRequestFactoryTest {
     )
 
     uniqueIdGenerator.stub {
-      on { generateId() }.doReturn("impId1", "impId2")
+      on { generateId() }.doReturn("myRequestId", "impId1", "impId2")
     }
 
     buildConfigWrapper.stub {

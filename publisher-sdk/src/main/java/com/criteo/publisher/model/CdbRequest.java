@@ -30,13 +30,16 @@ public abstract class CdbRequest {
 
   @NonNull
   public static CdbRequest create(
+      @NonNull String id,
       @NonNull Publisher publisher,
       @NonNull User user,
       @NonNull String sdkVersion,
       int profileId,
       @Nullable GdprData gdprData,
-      @NonNull List<CdbRequestSlot> slots) {
+      @NonNull List<CdbRequestSlot> slots
+  ) {
     return new AutoValue_CdbRequest(
+        id,
         publisher,
         user,
         sdkVersion,
@@ -49,6 +52,9 @@ public abstract class CdbRequest {
   public static TypeAdapter<CdbRequest> typeAdapter(Gson gson) {
     return new AutoValue_CdbRequest.GsonTypeAdapter(gson);
   }
+
+  @NonNull
+  public abstract String getId();
 
   @NonNull
   public abstract Publisher getPublisher();

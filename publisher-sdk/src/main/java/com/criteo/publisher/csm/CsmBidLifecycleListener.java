@@ -20,7 +20,6 @@ import androidx.annotation.NonNull;
 import com.criteo.publisher.Clock;
 import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.bid.BidLifecycleListener;
-import com.criteo.publisher.bid.UniqueIdGenerator;
 import com.criteo.publisher.csm.MetricRepository.MetricUpdater;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
@@ -50,9 +49,6 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
   private final Clock clock;
 
   @NonNull
-  private final UniqueIdGenerator uniqueIdGenerator;
-
-  @NonNull
   private final Config config;
 
   @NonNull
@@ -62,14 +58,12 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
       @NonNull MetricRepository repository,
       @NonNull MetricSendingQueueProducer sendingQueueProducer,
       @NonNull Clock clock,
-      @NonNull UniqueIdGenerator uniqueIdGenerator,
       @NonNull Config config,
       @NonNull Executor executor
   ) {
     this.repository = repository;
     this.sendingQueueProducer = sendingQueueProducer;
     this.clock = clock;
-    this.uniqueIdGenerator = uniqueIdGenerator;
     this.config = config;
     this.executor = executor;
   }
@@ -110,12 +104,11 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
       @Override
       public void runSafely() {
         long currentTimeInMillis = clock.getCurrentTimeInMillis();
-        String requestGroupId = uniqueIdGenerator.generateId();
 
         updateByCdbRequestIds(request, new MetricUpdater() {
           @Override
           public void update(@NonNull Metric.Builder builder) {
-            builder.setRequestGroupId(requestGroupId);
+            builder.setRequestGroupId(request.getId());
             builder.setCdbCallStartTimestamp(currentTimeInMillis);
             builder.setProfileId(request.getProfileId());
           }
