@@ -28,6 +28,17 @@ public class ReflectionUtil {
   @NonNull
   private static final Logger logger = LoggerFactory.getLogger(ReflectionUtil.class);
 
+  public static boolean isInstanceOf(@NonNull Object object, @NonNull String className) {
+    try {
+      ClassLoader classLoader = ReflectionUtil.class.getClassLoader();
+      Class<?> klass = Class.forName(className, false, classLoader);
+      return klass.isAssignableFrom(object.getClass());
+    } catch (ClassNotFoundException | LinkageError e) {
+      logger.debug("Failed to load class by name to check if instanceof", e);
+      return false;
+    }
+  }
+
   @Nullable
   public static Object callMethodOnObject(
       @NonNull Object object,
