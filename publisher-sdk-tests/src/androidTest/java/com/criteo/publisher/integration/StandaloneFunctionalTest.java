@@ -43,6 +43,7 @@ import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import androidx.test.filters.FlakyTest;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
@@ -130,6 +131,7 @@ public class StandaloneFunctionalTest {
   }
 
   @Test
+  @FlakyTest
   public void whenLoadingAnInterstitial_GivenBidAvailableAndDeviceInPortrait_DisplayUrlIsProperlyLoadedInInterstitialActivity()
       throws Exception {
     givenDeviceInPortrait();
@@ -137,6 +139,7 @@ public class StandaloneFunctionalTest {
   }
 
   @Test
+  @FlakyTest
   public void whenLoadingAnInterstitial_GivenBidAvailableAndDeviceInLandscape_DisplayUrlIsProperlyLoadedInInterstitialActivity()
       throws Exception {
     givenDeviceInLandscape();
@@ -156,6 +159,7 @@ public class StandaloneFunctionalTest {
   }
 
   @Test
+  @FlakyTest
   public void whenLoadingAnInterstitial_GivenBidAvailableTwice_DisplayUrlIsProperlyLoadedInInterstitialActivityTwice()
       throws Exception {
     givenInitializedSdk(validInterstitialAdUnit);

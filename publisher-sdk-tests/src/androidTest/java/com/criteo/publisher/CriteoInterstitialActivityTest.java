@@ -34,6 +34,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.webkit.WebView;
 import androidx.annotation.NonNull;
+import androidx.test.filters.FlakyTest;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitor;
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
@@ -97,6 +98,7 @@ public class CriteoInterstitialActivityTest {
   }
 
   @Test
+  @FlakyTest
   public void whenUserClickOnAd_GivenHtmlWithNotHandledDeepLink_DoNothing() throws Exception {
     // We assume that no application can handle such URL.
 
@@ -107,6 +109,7 @@ public class CriteoInterstitialActivityTest {
   }
 
   @Test
+  @FlakyTest
   public void whenUserClickOnAd_GivenHtmlWithHandledDeepLink_RedirectUserAndNotifyListener() throws Exception {
     Activity activity = whenUserClickOnAd("criteo-test://dummy-ad-activity");
 
@@ -117,6 +120,7 @@ public class CriteoInterstitialActivityTest {
   }
 
   @Test
+  @FlakyTest
   public void whenUserClickOnAdAndGoBack_GivenHtmlWithHandledDeepLink_NotifyListener() throws Exception {
     String html = clicker.getAdHtmlWithClickUrl("criteo-test://dummy-ad-activity");
     CriteoInterstitialActivity activity = givenOpenedInterstitialActivity(html);
