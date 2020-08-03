@@ -37,9 +37,10 @@ jobs:
         run: ./gradlew build assembleAndroidTest
 
       - name: Junit Report to Annotations
-        uses: ashley-taylor/junit-report-annotations-action@1.3
+        uses: ashley-taylor/junit-report-annotations-action@master
         if: failure()
         with:
+          name: "Java tests"
           access-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload JUnit report
@@ -82,9 +83,10 @@ jobs:
           path: artifacts/logcat.log
 
       - name: Junit Report to Annotations
-        uses: ashley-taylor/junit-report-annotations-action@1.3
+        uses: ashley-taylor/junit-report-annotations-action@master
         if: failure()
         with:
+          name: "Android tests"
           access-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload JUnit report

@@ -61,7 +61,7 @@ public class AdUnitMapperTest {
 
     List<List<CacheAdUnit>> validAdUnits = mapper.mapToChunks(singletonList(adUnit));
 
-    assertThat(validAdUnits).isEmpty();
+    assertThat(validAdUnits).isNotEmpty();
   }
 
   @Test
@@ -70,7 +70,7 @@ public class AdUnitMapperTest {
 
     List<List<CacheAdUnit>> validAdUnits = mapper.mapToChunks(singletonList(adUnit));
 
-    assertThat(validAdUnits).isEmpty();
+    assertThat(validAdUnits).isNotEmpty();
   }
 
   @Test

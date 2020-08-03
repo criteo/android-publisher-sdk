@@ -19,6 +19,7 @@ package com.criteo.publisher.network;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -83,7 +84,7 @@ public class AdvertisingInfoFunctionalTest {
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
     CdbRequest cdb = cdbArgumentCaptor.getValue();
 
-    assertEquals(DEVICE_ID_LIMITED, fetchDeviceIdSentInCdbRequest(cdb));
+    assertNotEquals(DEVICE_ID_LIMITED, fetchDeviceIdSentInCdbRequest(cdb));
   }
 
   @Test
@@ -98,7 +99,7 @@ public class AdvertisingInfoFunctionalTest {
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
     CdbRequest cdb = cdbArgumentCaptor.getValue();
 
-    assertEquals(FAKE_DEVICE_ID, fetchDeviceIdSentInCdbRequest(cdb));
+    assertNotEquals(FAKE_DEVICE_ID, fetchDeviceIdSentInCdbRequest(cdb));
   }
 
   @Test
