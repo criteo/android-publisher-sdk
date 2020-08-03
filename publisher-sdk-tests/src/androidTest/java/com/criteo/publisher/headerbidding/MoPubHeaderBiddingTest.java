@@ -69,8 +69,29 @@ public class MoPubHeaderBiddingTest {
   }
 
   @Test
+  public void canHandle_GivenSubClassOfMoPubView_ReturnTrue() throws Exception {
+    MoPubView moPub = callOnMainThreadAndWait(() -> new MoPubView(activityRule.getActivity()) {
+    });
+
+    boolean handling = headerBidding.canHandle(moPub);
+
+    assertTrue(handling);
+  }
+
+  @Test
   public void canHandle_GivenMoPubInterstitial_ReturnTrue() throws Exception {
     MoPubInterstitial moPub = givenMoPubInterstitial();
+
+    boolean handling = headerBidding.canHandle(moPub);
+
+    assertTrue(handling);
+  }
+
+  @Test
+  public void canHandle_GivenSubClassOfMoPubInterstitial_ReturnTrue() throws Exception {
+    MoPubInterstitial moPub = callOnMainThreadAndWait(() ->
+        new MoPubInterstitial(activityRule.getActivity(), "adUnit") {
+        });
 
     boolean handling = headerBidding.canHandle(moPub);
 

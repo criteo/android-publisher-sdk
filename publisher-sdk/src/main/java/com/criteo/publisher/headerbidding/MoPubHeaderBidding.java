@@ -16,6 +16,8 @@
 
 package com.criteo.publisher.headerbidding;
 
+import static com.criteo.publisher.util.ReflectionUtil.isInstanceOf;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.integration.Integration;
@@ -43,8 +45,8 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler {
   );
 
   public boolean canHandle(@NonNull Object object) {
-    return object.getClass().getName().equals(MOPUB_ADVIEW_CLASS)
-        || object.getClass().getName().equals(MOPUB_INTERSTITIAL_CLASS);
+    return isInstanceOf(object, MOPUB_ADVIEW_CLASS)
+        || isInstanceOf(object, MOPUB_INTERSTITIAL_CLASS);
   }
 
   @NonNull
