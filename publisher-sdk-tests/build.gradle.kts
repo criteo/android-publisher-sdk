@@ -17,6 +17,21 @@
 plugins {
   id("com.android.library")
   kotlin("android")
+  id("marathon")
+}
+
+marathon {
+  batchingStrategy {
+    fixedSize {
+      size = 10
+    }
+  }
+  retryStrategy {
+    fixedQuota {
+      totalAllowedRetryQuota = 200
+      retryPerTestQuota = 3
+    }
+  }
 }
 
 androidLibModule()
