@@ -33,6 +33,7 @@ import static org.mockito.Mockito.when;
 import android.app.Application;
 import android.content.Intent;
 import android.os.Looper;
+import androidx.test.filters.FlakyTest;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.BidManager;
 import com.criteo.publisher.Criteo;
@@ -125,6 +126,7 @@ public class CriteoFunctionalTest {
   }
 
   @Test
+  @FlakyTest
   public void init_GivenPrefetchAdUnitAndLaunchedActivity_CallConfigAndCdbAndBearcat()
       throws Exception {
     givenInitializedCriteo(validBannerAdUnit);

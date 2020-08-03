@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import androidx.test.filters.FlakyTest;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.test.activity.DummyActivity;
 import org.junit.Before;
@@ -99,6 +100,7 @@ public class VisibilityCheckerTest {
   }
 
   @Test
+  @FlakyTest(detail = "Flakiness comes from UI + concurrency")
   public void isVisible_GivenViewInScrollView_ReturnAccordinglyToScrolling() throws Exception {
     int screenHeightPixels = uiHelper.getActivityHeightPixels();
     int viewHeightPixels = 200;

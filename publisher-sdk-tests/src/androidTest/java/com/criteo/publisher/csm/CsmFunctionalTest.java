@@ -33,6 +33,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import androidx.core.util.Consumer;
+import androidx.test.filters.FlakyTest;
 import com.criteo.publisher.Clock;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
@@ -56,6 +57,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
 
+@FlakyTest(detail = "CSM are triggered concurrently of bid")
 public class CsmFunctionalTest {
 
   @Rule

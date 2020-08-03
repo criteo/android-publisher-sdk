@@ -24,6 +24,7 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import androidx.test.filters.FlakyTest;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.concurrent.ThreadingUtil;
 import com.criteo.publisher.mock.MockedDependenciesRule;
@@ -74,6 +75,7 @@ public class TopActivityFinderTest {
   }
 
   @Test
+  @FlakyTest(detail = "Flakiness comes from UI and concurrency")
   public void topActivityName_GivenFinishedActivityWithoutPredecessor_ReturnNull() throws Exception {
     givenInitializedCriteo();
     activityRule.launchActivity(new Intent());

@@ -37,6 +37,7 @@ import static org.mockito.Mockito.when;
 
 import android.os.Bundle;
 import android.view.View;
+import androidx.test.filters.FlakyTest;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
@@ -74,6 +75,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Rule;
 import org.junit.Test;
 
+@FlakyTest(detail = "DFP network is flaky")
 public class DfpHeaderBiddingFunctionalTest {
 
   private static final String MACRO_CPM = "crt_cpm";
