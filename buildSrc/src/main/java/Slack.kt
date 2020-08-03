@@ -55,7 +55,9 @@ private fun Project.addSlackDeploymentMessage(publication: MavenPublication) {
           repositoryName.set(repoName)
         }
 
-        git()
+        if (isSnapshot()) {
+          git()
+        }
 
         changelog {
           version.set(sdkVersion())
