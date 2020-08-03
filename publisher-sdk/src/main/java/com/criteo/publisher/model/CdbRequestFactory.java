@@ -79,6 +79,7 @@ public class CdbRequestFactory {
     );
 
     return CdbRequest.create(
+        uniqueIdGenerator.generateId(),
         publisher,
         user,
         buildConfigWrapper.getSdkVersion(),

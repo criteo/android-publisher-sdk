@@ -418,7 +418,6 @@ public class DependencyProvider {
               provideMetricRepository(),
               new MetricSendingQueueProducer(provideMetricSendingQueue()),
               provideClock(),
-              provideUniqueIdGenerator(),
               provideConfig(),
               provideThreadPoolExecutor()
           ));

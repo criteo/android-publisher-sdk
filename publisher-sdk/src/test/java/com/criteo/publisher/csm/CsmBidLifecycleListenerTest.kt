@@ -17,7 +17,6 @@
 package com.criteo.publisher.csm
 
 import com.criteo.publisher.Clock
-import com.criteo.publisher.bid.UniqueIdGenerator
 import com.criteo.publisher.model.*
 import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
 import com.nhaarman.mockitokotlin2.*
@@ -43,9 +42,6 @@ class CsmBidLifecycleListenerTest {
   private lateinit var clock: Clock
 
   @Mock
-  private lateinit var uniqueIdGenerator: UniqueIdGenerator
-
-  @Mock
   private lateinit var config: Config
 
   private lateinit var executor: Executor
@@ -66,7 +62,6 @@ class CsmBidLifecycleListenerTest {
         repository,
         sendingQueueProducer,
         clock,
-        uniqueIdGenerator,
         config,
         executor
     )
@@ -101,14 +96,11 @@ class CsmBidLifecycleListenerTest {
   fun onCdbCallStarted_GivenMultipleSlots_UpdateAllStartTimeAndRequestIdOfMetricsById() {
     val request = givenCdbRequestWithSlots("id1", "id2").stub {
       on { profileId } doReturn 1337
+      on { id } doReturn "myRequestId"
     }
 
     clock.stub {
       on { currentTimeInMillis } doReturn 42
-    }
-
-    uniqueIdGenerator.stub {
-      on { generateId() } doReturn "myRequestId"
     }
 
     listener.onCdbCallStarted(request)
@@ -409,7 +401,6 @@ class CsmBidLifecycleListenerTest {
   private fun verifyFeatureIsDeactivated() {
     verifyZeroInteractions(repository)
     verifyZeroInteractions(clock)
-    verifyZeroInteractions(uniqueIdGenerator)
     verifyZeroInteractions(sendingQueueProducer)
   }
 
