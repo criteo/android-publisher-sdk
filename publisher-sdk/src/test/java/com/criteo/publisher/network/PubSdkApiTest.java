@@ -255,7 +255,7 @@ public class PubSdkApiTest {
     assertThat(cdbResponse.getSlots().get(0).getCurrency()).isEqualTo("EUR");
     assertThat(cdbResponse.getSlots().get(0).getWidth()).isEqualTo(100);
     assertThat(cdbResponse.getSlots().get(0).getHeight()).isEqualTo(100);
-    assertThat(cdbResponse.getSlots().get(0).getTtl()).isEqualTo(0);
+    assertThat(cdbResponse.getSlots().get(0).getTtlInSeconds()).isEqualTo(0);
     assertThat(cdbResponse.getSlots().get(0).getDisplayUrl()).isEqualTo("http://url.com");
 
     assertThat(cdbResponse.getSlots().get(1).getPlacementId()).isEqualTo("adunit_2");
@@ -263,7 +263,7 @@ public class PubSdkApiTest {
     assertThat(cdbResponse.getSlots().get(1).getCurrency()).isEqualTo("USD");
     assertThat(cdbResponse.getSlots().get(1).getWidth()).isEqualTo(200);
     assertThat(cdbResponse.getSlots().get(1).getHeight()).isEqualTo(300);
-    assertThat(cdbResponse.getSlots().get(1).getTtl()).isEqualTo(10);
+    assertThat(cdbResponse.getSlots().get(1).getTtlInSeconds()).isEqualTo(10);
     assertThat(cdbResponse.getSlots().get(1).getDisplayUrl()).isEqualTo("https://url.fr");
   }
 

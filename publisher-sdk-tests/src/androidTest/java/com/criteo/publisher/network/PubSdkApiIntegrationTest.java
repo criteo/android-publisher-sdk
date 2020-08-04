@@ -184,7 +184,7 @@ public class PubSdkApiIntegrationTest {
       assertThat(slot.getWidth()).isEqualTo(320);
       assertThat(slot.getHeight()).isEqualTo(50);
       assertThat(slot.getCurrency()).isNotEmpty();
-      assertThat(slot.getTtl()).isEqualTo(3600);
+      assertThat(slot.getTtlInSeconds()).isEqualTo(3600);
       assertThat(slot.getDisplayUrl()).isNotEmpty().matches(StubConstants.STUB_DISPLAY_URL);
       assertThat(slot.getNativeAssets()).isNull();
       assertThat(slot.isValid()).isTrue();
@@ -209,7 +209,7 @@ public class PubSdkApiIntegrationTest {
       assertThat(slot.getWidth()).isEqualTo(42);
       assertThat(slot.getHeight()).isEqualTo(1337);
       assertThat(slot.getCurrency()).isNotEmpty();
-      assertThat(slot.getTtl()).isEqualTo(3600);
+      assertThat(slot.getTtlInSeconds()).isEqualTo(3600);
       assertThat(slot.getDisplayUrl()).isNotEmpty().matches(StubConstants.STUB_DISPLAY_URL);
       assertThat(slot.getNativeAssets()).isNull();
       assertThat(slot.isValid()).isTrue();
@@ -232,7 +232,7 @@ public class PubSdkApiIntegrationTest {
       assertThat(slot.getWidth()).isEqualTo(2);
       assertThat(slot.getHeight()).isEqualTo(2);
       assertThat(slot.getCurrency()).isNotEmpty();
-      assertThat(slot.getTtl()).isEqualTo(0);
+      assertThat(slot.getTtlInSeconds()).isEqualTo(0);
       assertThat(slot.getDisplayUrl()).isNull();
       assertThat(slot.getNativeAssets()).isEqualTo(StubConstants.STUB_NATIVE_ASSETS);
       assertThat(slot.isValid()).isTrue();

@@ -115,7 +115,7 @@ public class CriteoFunctionalTest {
       Object response = invocation.callRealMethod();
       CdbResponse cdbResponse = (CdbResponse) response;
       cdbResponse.getSlots().forEach(slot -> {
-        slot.setTtl(dayTtl);
+        slot.setTtlInSeconds(dayTtl);
       });
       return cdbResponse;
     }).when(api).loadCdb(any(), any());
