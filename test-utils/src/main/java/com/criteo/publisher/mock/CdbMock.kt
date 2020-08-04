@@ -144,7 +144,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
           "currency": "EUR",
           "width": $width,
           "height": $height,
-          "ttl": 0,
+          "ttl": 3600,
           "displayUrl": "$url/delivery/ajs.php?width=$width&height=$height"
         }
       """.trimIndent()
