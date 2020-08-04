@@ -64,7 +64,7 @@ public class CdbResponseSlotTest {
     assertThat(slot.getCurrency()).isNull();
     assertThat(slot.getWidth()).isZero();
     assertThat(slot.getHeight()).isZero();
-    assertThat(slot.getTtl()).isZero();
+    assertThat(slot.getTtlInSeconds()).isZero();
     assertThat(slot.getDisplayUrl()).isNull();
     assertThat(slot.getNativeAssets()).isNull();
   }
@@ -75,7 +75,7 @@ public class CdbResponseSlotTest {
     response.put(TTL, 0);
     CdbResponseSlot result = CdbResponseSlot.fromJson(response);
     assertEquals("0", result.getCpm());
-    assertEquals(0, result.getTtl());
+    assertEquals(0, result.getTtlInSeconds());
   }
 
   @Test
@@ -85,7 +85,7 @@ public class CdbResponseSlotTest {
     response.put(TTL, ttlval);
     CdbResponseSlot result = CdbResponseSlot.fromJson(response);
     assertEquals("0", result.getCpm());
-    assertEquals(ttlval, result.getTtl());
+    assertEquals(ttlval, result.getTtlInSeconds());
   }
 
   @Test
@@ -96,7 +96,7 @@ public class CdbResponseSlotTest {
     response.put(TTL, ttlval);
     CdbResponseSlot result = CdbResponseSlot.fromJson(response);
     assertEquals(cpmval, result.getCpm());
-    assertEquals(ttlval, result.getTtl());
+    assertEquals(ttlval, result.getTtlInSeconds());
   }
 
   @Test
@@ -233,9 +233,11 @@ public class CdbResponseSlotTest {
     assertEquals("EUR", slot.getCurrency());
     assertEquals(320, slot.getWidth());
     assertEquals(50, slot.getHeight());
-    assertEquals(555, slot.getTtl());
-    assertEquals("https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js",
-        slot.getDisplayUrl());
+    assertEquals(555, slot.getTtlInSeconds());
+    assertEquals(
+        "https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js",
+        slot.getDisplayUrl()
+    );
     assertFalse(slot.isNative());
     assertNull(slot.getNativeAssets());
     assertTrue(slot.isValid());
@@ -422,7 +424,7 @@ public class CdbResponseSlotTest {
         + "}";
     CdbResponseSlot slot = CdbResponseSlot.fromJson(new JSONObject(json));
 
-    assertThat(slot.getTtl()).isZero();
+    assertThat(slot.getTtlInSeconds()).isZero();
   }
 
   @Test
@@ -437,7 +439,7 @@ public class CdbResponseSlotTest {
         + "}";
     CdbResponseSlot slot = CdbResponseSlot.fromJson(new JSONObject(json));
 
-    assertThat(slot.getTtl()).isZero();
+    assertThat(slot.getTtlInSeconds()).isZero();
   }
 
   @Test
@@ -472,7 +474,7 @@ public class CdbResponseSlotTest {
     when(clock.getCurrentTimeInMillis()).thenReturn(10_000L);
 
     CdbResponseSlot slot = CdbResponseSlot.fromJson((getJSONSlot()));
-    slot.setTtl(2);
+    slot.setTtlInSeconds(2);
     slot.setTimeOfDownload(9000);
     boolean expired = slot.isExpired(clock);
 
@@ -485,7 +487,7 @@ public class CdbResponseSlotTest {
     when(clock.getCurrentTimeInMillis()).thenReturn(10_000L);
 
     CdbResponseSlot slot = CdbResponseSlot.fromJson((getJSONSlot()));
-    slot.setTtl(2);
+    slot.setTtlInSeconds(2);
     slot.setTimeOfDownload(3000);
     boolean expired = slot.isExpired(clock);
 
@@ -498,7 +500,7 @@ public class CdbResponseSlotTest {
     when(clock.getCurrentTimeInMillis()).thenReturn(10_000L);
 
     CdbResponseSlot slot = CdbResponseSlot.fromJson((getJSONSlot()));
-    slot.setTtl(2);
+    slot.setTtlInSeconds(2);
     slot.setTimeOfDownload(8000);
     boolean expired = slot.isExpired(clock);
 

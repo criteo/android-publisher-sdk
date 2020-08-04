@@ -81,7 +81,7 @@ public class CdbResponseTest {
     assertEquals(bid.getString(CURRENCY), cdbResponse.getSlots().get(0).getCurrency());
     assertEquals(bid.getInt(WIDTH), cdbResponse.getSlots().get(0).getWidth());
     assertEquals(bid.getInt(HEIGHT), cdbResponse.getSlots().get(0).getHeight());
-    assertEquals(bid.getInt(TTL), cdbResponse.getSlots().get(0).getTtl());
+    assertEquals(bid.getInt(TTL), cdbResponse.getSlots().get(0).getTtlInSeconds());
     assertEquals(bid.getString(DISPLAY_URL), cdbResponse.getSlots().get(0).getDisplayUrl());
     assertEquals(0, cdbResponse.getTimeToNextCall());
   }

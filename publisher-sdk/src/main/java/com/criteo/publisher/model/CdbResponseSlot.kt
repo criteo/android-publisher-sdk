@@ -36,11 +36,7 @@ data class CdbResponseSlot(
     @SerializedName("height") val height: Int = 0,
     @SerializedName("displayUrl") val displayUrl: String? = null,
     @SerializedName("native") val nativeAssets: NativeAssets? = null,
-
-    /**
-     * The TTL in seconds for this bid response.
-     */
-    @SerializedName("ttl") var ttl: Int = 0,
+    @SerializedName("ttl") var ttlInSeconds: Int = 0,
 
     /**
      * The time of download in milliseconds for this bid response. This time represent a
@@ -77,7 +73,7 @@ data class CdbResponseSlot(
   }
 
   fun isExpired(clock: Clock): Boolean {
-    val expiryTimeMillis: Long = ttl * SECOND_TO_MILLI + timeOfDownload
+    val expiryTimeMillis: Long = ttlInSeconds * SECOND_TO_MILLI + timeOfDownload
     return expiryTimeMillis <= clock.currentTimeInMillis
   }
 }

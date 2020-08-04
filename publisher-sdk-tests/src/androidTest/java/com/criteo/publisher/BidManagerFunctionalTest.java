@@ -764,14 +764,14 @@ public class BidManagerFunctionalTest {
     // Immediate bid means CPM > 0, TTL = 0
     CdbResponseSlot slot = givenMockedCdbRespondingSlot();
     when(slot.getCpmAsNumber()).thenReturn(1.);
-    when(slot.getTtl()).thenReturn(0);
+    when(slot.getTtlInSeconds()).thenReturn(0);
 
     BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit);
     waitForIdleState();
 
     InOrder inOrder = inOrder(cache, slot);
-    inOrder.verify(slot).setTtl(DEFAULT_TTL_IN_SECONDS);
+    inOrder.verify(slot).setTtlInSeconds(DEFAULT_TTL_IN_SECONDS);
     inOrder.verify(cache).add(slot);
   }
 
@@ -843,7 +843,7 @@ public class BidManagerFunctionalTest {
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
     when(slot.getCpmAsNumber()).thenReturn(1.);
     when(slot.isExpired(clock)).thenReturn(false);
-    when(slot.getTtl()).thenReturn(60);
+    when(slot.getTtlInSeconds()).thenReturn(60);
 
     when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
     return slot;
@@ -853,7 +853,7 @@ public class BidManagerFunctionalTest {
   private CdbResponseSlot givenExpiredValidCachedBid(CacheAdUnit cacheAdUnit) {
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
     when(slot.getCpmAsNumber()).thenReturn(1.);
-    when(slot.getTtl()).thenReturn(60);
+    when(slot.getTtlInSeconds()).thenReturn(60);
     when(slot.isExpired(clock)).thenReturn(true);
 
     when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
@@ -865,7 +865,7 @@ public class BidManagerFunctionalTest {
   private CdbResponseSlot givenNoBidCached(CacheAdUnit cacheAdUnit) {
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
     when(slot.getCpmAsNumber()).thenReturn(0.);
-    when(slot.getTtl()).thenReturn(0);
+    when(slot.getTtlInSeconds()).thenReturn(0);
     when(slot.isExpired(clock)).thenReturn(false);
 
     when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
@@ -880,7 +880,7 @@ public class BidManagerFunctionalTest {
   private void givenNotExpiredSilentModeBidCached(CacheAdUnit cacheAdUnit) {
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
     when(slot.getCpmAsNumber()).thenReturn(0.);
-    when(slot.getTtl()).thenReturn(60);
+    when(slot.getTtlInSeconds()).thenReturn(60);
     when(slot.isExpired(clock)).thenReturn(false);
 
     when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
@@ -890,7 +890,7 @@ public class BidManagerFunctionalTest {
   private CdbResponseSlot givenExpiredSilentModeBidCached(CacheAdUnit cacheAdUnit) {
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
     when(slot.getCpmAsNumber()).thenReturn(0.);
-    when(slot.getTtl()).thenReturn(60);
+    when(slot.getTtlInSeconds()).thenReturn(60);
     when(slot.isExpired(clock)).thenReturn(true);
 
     when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);

@@ -157,7 +157,7 @@ public class BidManager implements ApplicationStoppedListener {
       }
 
       double cpm = (peekSlot.getCpmAsNumber() == null ? 0.0 : peekSlot.getCpmAsNumber());
-      long ttl = peekSlot.getTtl();
+      long ttl = peekSlot.getTtlInSeconds();
 
       boolean isNotExpired = !peekSlot.isExpired(clock);
       boolean isValidBid = (cpm > 0) && (ttl > 0);
@@ -187,9 +187,9 @@ public class BidManager implements ApplicationStoppedListener {
     synchronized (cacheLock) {
       for (CdbResponseSlot slot : slots) {
         if (slot.isValid()) {
-          boolean isImmediateBid = slot.getCpmAsNumber() > 0 && slot.getTtl() == 0;
+          boolean isImmediateBid = slot.getCpmAsNumber() > 0 && slot.getTtlInSeconds() == 0;
           if (isImmediateBid) {
-            slot.setTtl(DEFAULT_TTL_IN_SECONDS);
+            slot.setTtlInSeconds(DEFAULT_TTL_IN_SECONDS);
           }
 
           slot.setTimeOfDownload(instant);
