@@ -17,34 +17,18 @@
 package com.criteo.publisher.model.nativeads;
 
 import androidx.annotation.NonNull;
-import com.criteo.publisher.DependencyProvider;
-import com.criteo.publisher.util.JsonSerializer;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.annotations.SerializedName;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import org.json.JSONObject;
 
 @AutoValue
 public abstract class NativeAssets {
-
-  public static NativeAssets fromJson(JSONObject json) throws IOException {
-    // TODO remove this after CDB response parsing is totally migrated to Gson
-    JsonSerializer jsonSerializer = DependencyProvider.getInstance().provideJsonSerializer();
-    String jsonStr = json.toString();
-
-    try (InputStream input = new ByteArrayInputStream(jsonStr.getBytes())) {
-      return jsonSerializer.read(NativeAssets.class, input);
-    }
-  }
 
   public static TypeAdapter<NativeAssets> typeAdapter(Gson gson) {
     return new AutoValue_NativeAssets.GsonTypeAdapter(gson);

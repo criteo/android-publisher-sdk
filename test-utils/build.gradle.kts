@@ -29,6 +29,7 @@ dependencies {
 
   implementation(Deps.JUnit.JUnit)
   implementation(Deps.Square.OkHttp.MockWebServer)
+  compileOnly(Deps.AutoValue.GsonRuntime)
 
   compileOnly(Deps.Mockito.Core) {
     because("Brings injected mock mechanism. Caller should provide its own Mockito deps.")

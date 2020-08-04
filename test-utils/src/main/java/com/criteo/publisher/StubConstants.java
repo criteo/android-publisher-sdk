@@ -17,10 +17,7 @@
 package com.criteo.publisher;
 
 import com.criteo.publisher.model.nativeads.NativeAssets;
-import java.io.IOException;
 import java.util.regex.Pattern;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class StubConstants {
 
@@ -38,11 +35,6 @@ public class StubConstants {
    * This is also the image of the single product in case of native response from CDB.
    */
   public static final String STUB_CREATIVE_IMAGE = "https://publisherdirect.criteo.com/publishertag/preprodtest/creative_cas.png";
-
-  /**
-   * Native assets that are always returned by CDB stub. See {@link #STUB_NATIVE_JSON}.
-   */
-  public static final NativeAssets STUB_NATIVE_ASSETS;
 
   public static final String STUB_NATIVE_JSON = "{\n"
       + "  \"products\": [\n"
@@ -84,12 +76,11 @@ public class StubConstants {
       + "  ]\n"
       + "}";
 
-  static {
-    try {
-      STUB_NATIVE_ASSETS = NativeAssets.fromJson(new JSONObject(STUB_NATIVE_JSON));
-    } catch (JSONException | IOException e) {
-      throw new IllegalStateException(e);
-    }
-  }
+  /**
+   * Native assets that are always returned by CDB stub. See {@link #STUB_NATIVE_JSON}.
+   */
+  public static final NativeAssets STUB_NATIVE_ASSETS = DependencyProvider.getInstance()
+      .provideGson()
+      .fromJson(STUB_NATIVE_JSON, NativeAssets.class);
 
 }

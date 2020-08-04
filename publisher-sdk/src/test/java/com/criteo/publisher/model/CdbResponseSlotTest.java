@@ -27,6 +27,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.criteo.publisher.Clock;
+import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 import java.util.List;
 import org.json.JSONException;
@@ -206,11 +207,16 @@ public class CdbResponseSlotTest {
         "    }]\n" +
         "}";
 
+    NativeAssets expectedNativeAssets = DependencyProvider.getInstance().provideGson().fromJson(
+        nativeJson,
+        NativeAssets.class
+    );
+
     JSONObject cdbResponse = new JSONObject(cdbStringResponse);
     JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
     CdbResponseSlot slot = CdbResponseSlot.fromJson(cdbSlot);
 
-    assertEquals(NativeAssets.fromJson(new JSONObject(nativeJson)), slot.getNativeAssets());
+    assertEquals(expectedNativeAssets, slot.getNativeAssets());
     assertTrue(slot.isNative());
     assertTrue(slot.isValid());
   }
