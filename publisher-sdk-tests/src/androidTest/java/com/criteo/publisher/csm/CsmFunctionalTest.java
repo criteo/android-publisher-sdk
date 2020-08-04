@@ -353,6 +353,7 @@ public class CsmFunctionalTest {
     assertNotNull(feedback.getRequestGroupId());
     assertEquals(1, feedback.getSlots().size());
     assertTrue(feedback.getSlots().get(0).getCachedBidUsed());
+    assertNotNull(feedback.getSlots().get(0).getZoneId());
   }
 
   private void assertItRepresentsExpiredConsumedBid(MetricRequestFeedback feedback) {
@@ -363,6 +364,7 @@ public class CsmFunctionalTest {
     assertNotNull(feedback.getRequestGroupId());
     assertEquals(1, feedback.getSlots().size());
     assertTrue(feedback.getSlots().get(0).getCachedBidUsed());
+    assertNotNull(feedback.getSlots().get(0).getZoneId());
   }
 
   private void assertItRepresentsNoBid(MetricRequestFeedback feedback) {
@@ -373,6 +375,7 @@ public class CsmFunctionalTest {
     assertNotNull(feedback.getRequestGroupId());
     assertEquals(1, feedback.getSlots().size());
     assertFalse(feedback.getSlots().get(0).getCachedBidUsed());
+    assertNull(feedback.getSlots().get(0).getZoneId());
   }
 
   private void assertItRepresentsNetworkError(MetricRequestFeedback feedback) {
@@ -383,6 +386,7 @@ public class CsmFunctionalTest {
     assertNotNull(feedback.getRequestGroupId());
     assertEquals(1, feedback.getSlots().size());
     assertFalse(feedback.getSlots().get(0).getCachedBidUsed());
+    assertNull(feedback.getSlots().get(0).getZoneId());
   }
 
   private void assertItRepresentsTimeoutError(MetricRequestFeedback feedback) {
@@ -393,6 +397,7 @@ public class CsmFunctionalTest {
     assertNotNull(feedback.getRequestGroupId());
     assertEquals(1, feedback.getSlots().size());
     assertFalse(feedback.getSlots().get(0).getCachedBidUsed());
+    assertNull(feedback.getSlots().get(0).getZoneId());
   }
 
   private void waitForIdleState() {

@@ -70,7 +70,9 @@ public abstract class MetricRequest {
     static MetricRequestFeedback create(@NonNull Metric metric) {
       List<MetricRequestSlot> slots = singletonList(MetricRequestSlot.create(
           metric.getImpressionId(),
-          metric.isCachedBidUsed())
+          metric.getZoneId(),
+          metric.isCachedBidUsed()
+          )
       );
 
       Long elapsed = calculateDifferenceSafely(
@@ -130,8 +132,12 @@ public abstract class MetricRequest {
   public abstract static class MetricRequestSlot {
 
     @NonNull
-    static MetricRequestSlot create(@NonNull String impressionId, boolean cachedBidUsed) {
-      return new AutoValue_MetricRequest_MetricRequestSlot(impressionId, cachedBidUsed);
+    static MetricRequestSlot create(
+        @NonNull String impressionId,
+        @Nullable Integer zoneId,
+        boolean cachedBidUsed
+    ) {
+      return new AutoValue_MetricRequest_MetricRequestSlot(impressionId, zoneId, cachedBidUsed);
     }
 
     public static TypeAdapter<MetricRequestSlot> typeAdapter(Gson gson) {
@@ -141,6 +147,9 @@ public abstract class MetricRequest {
 
     @Nullable
     abstract String getImpressionId();
+
+    @Nullable
+    abstract Integer getZoneId();
 
     abstract boolean getCachedBidUsed();
   }

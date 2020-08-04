@@ -69,6 +69,14 @@ public abstract class Metric {
   abstract String getRequestGroupId();
 
   /**
+   * Zone ID that was mapped during bidding to the CDB slot response.
+   * <p>
+   * This should be present in case of valid bid.
+   */
+  @Nullable
+  abstract Integer getZoneId();
+
+  /**
    * Indicate from which integration comes this metric.
    *
    * @see Integration#getProfileId()
@@ -91,10 +99,11 @@ public abstract class Metric {
     abstract Builder setCachedBidUsed(boolean isCachedBidUsed);
     abstract Builder setElapsedTimestamp(Long absoluteTimeInMillis);
     abstract Builder setRequestGroupId(String requestGroupId);
-
     abstract Builder setReadyToSend(boolean isReadyToSend);
 
     abstract Builder setProfileId(Integer profileId);
+
+    abstract Builder setZoneId(Integer zoneId);
 
     abstract Metric build();
 
