@@ -56,6 +56,7 @@ class MetricRequestTest {
         .setCdbCallEndTimestamp(43L)
         .setCachedBidUsed(true)
         .setElapsedTimestamp(1338L)
+        .setZoneId(1339)
         .build()
 
     val request = MetricRequest.create(listOf(metric1, metric2), "1.2.3", 456)
@@ -73,7 +74,9 @@ class MetricRequestTest {
                 impressionId = "id2",
                 cdbCallEndElapsed = 43 - 1,
                 cachedBidUsed = true,
-                elapsed = 1338 - 1)
+                elapsed = 1338 - 1,
+                zoneId = 1339
+            )
         )
     ))
   }
@@ -215,6 +218,7 @@ class MetricRequestTest {
         .setCdbCallEndTimestamp(43L)
         .setCachedBidUsed(true)
         .setElapsedTimestamp(1338L)
+        .setZoneId(1339)
         .build()
 
     val request = MetricRequest.create(listOf(metric), "3.2.1", 654)
@@ -225,13 +229,17 @@ class MetricRequestTest {
     assertThat(request.wrapperVersion).isEqualTo("3.2.1")
     assertThat(request.profileId).isEqualTo(654)
 
-    assertThat(serializer.writeIntoString(request)).isEqualToIgnoringWhitespace(expectedSingleJson(
-        impressionId = "impId",
-        cdbCallEndElapsed = 43 - 1,
-        cachedBidUsed = true,
-        elapsed = 1338 - 1,
-        wrapperVersion = "3.2.1",
-        profileId = 654))
+    assertThat(serializer.writeIntoString(request)).isEqualToIgnoringWhitespace(
+        expectedSingleJson(
+            impressionId = "impId",
+            cdbCallEndElapsed = 43 - 1,
+            cachedBidUsed = true,
+            elapsed = 1338 - 1,
+            wrapperVersion = "3.2.1",
+            profileId = 654,
+            zoneId = 1339
+        )
+    )
   }
 
   private fun ObjectAssert<MetricRequest.MetricRequestFeedback>.matchEmptyMetric(
@@ -256,11 +264,13 @@ class MetricRequestTest {
       requestGroupId: String = "requestId",
       cdbCallStartTimestamp: Long = 1L,
       cdbCallEndTimestamp: Long = 43L,
-      elapsedTimestamp: Long = 1338L
+      elapsedTimestamp: Long = 1338L,
+      zoneId: Int = 1339
   ) {
     satisfies {
       assertThat(it.slots).hasSize(1).allSatisfy {
         assertThat(it.impressionId).isEqualTo(impressionId)
+        assertThat(it.zoneId).isEqualTo(zoneId)
         assertThat(it.cachedBidUsed).isTrue()
       }
       assertThat(it.elapsed).isEqualTo(elapsedTimestamp - cdbCallStartTimestamp)
@@ -282,7 +292,8 @@ class MetricRequestTest {
       cdbCallEndElapsed: Long? = null,
       elapsed: Long? = null,
       wrapperVersion: String = "1.2.3",
-      profileId: Int = 456
+      profileId: Int = 456,
+      zoneId: Int? = null
   ): String {
     val feedbackJson = feedbackJson(
         impressionId,
@@ -290,7 +301,8 @@ class MetricRequestTest {
         cachedBidUsed,
         isTimeout,
         cdbCallEndElapsed,
-        elapsed
+        elapsed,
+        zoneId
     )
 
     return expectedMultipleJson(listOf(feedbackJson), wrapperVersion, profileId)
@@ -317,11 +329,13 @@ class MetricRequestTest {
       cachedBidUsed: Boolean = false,
       isTimeout: Boolean = false,
       cdbCallEndElapsed: Long? = null,
-      elapsed: Long? = null
+      elapsed: Long? = null,
+      zoneId: Int? = null
   ): String {
     return """{
       "slots": [{
           "impressionId": "$impressionId",
+          ${zoneId?.let { "\"zoneId\": $it," } ?: ""}
           "cachedBidUsed": $cachedBidUsed
       }],
       ${elapsed?.let { "\"elapsed\": $it," } ?: ""}

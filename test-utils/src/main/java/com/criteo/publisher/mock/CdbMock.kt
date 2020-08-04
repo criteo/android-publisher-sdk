@@ -130,6 +130,9 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
     val width = size.width
     val height = size.height
 
+    // Use any ZoneId as CDB preprod returns an auto-incremented ID coming from DB
+    val zoneId = 1337
+
     val bannerAdUnit = BannerAdUnit(placementId, size)
     val interstitialAdUnit = InterstitialAdUnit(placementId)
     val nativeAdUnit = NativeAdUnit(placementId)
@@ -140,6 +143,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
           "impId": "$impressionId",
           "placementId": "$placementId",
           "arbitrageId": "arbitrage_id",
+          "zoneId": $zoneId,
           "cpm": "1.12",
           "currency": "EUR",
           "width": $width,
@@ -156,6 +160,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
           "impId": "$impressionId",
           "placementId": "$placementId",
           "arbitrageId": "",
+          "zoneId": $zoneId,
           "cpm": "1.12",
           "currency": "EUR",
           "width": $width,

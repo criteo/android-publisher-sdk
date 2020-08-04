@@ -162,6 +162,7 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
               } else /* if isValidBid */ {
                 builder.setCdbCallEndTimestamp(currentTimeInMillis);
                 builder.setCachedBidUsed(true);
+                builder.setZoneId(responseSlot.getZoneId());
               }
             }
           });

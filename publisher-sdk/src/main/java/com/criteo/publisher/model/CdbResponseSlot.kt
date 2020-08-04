@@ -29,6 +29,7 @@ import java.io.ByteArrayInputStream
 data class CdbResponseSlot(
     @SerializedName("impId") val impressionId: String? = null,
     @SerializedName("placementId") val placementId: String? = null,
+    @SerializedName("zoneId") val zoneId: Int? = null,
     @SerializedName("cpm") val cpm: String = "0.0",
     @SerializedName("currency") val currency: String? = null,
     @SerializedName("width") val width: Int = 0,

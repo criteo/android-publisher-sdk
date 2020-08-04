@@ -178,6 +178,7 @@ class CsmBidLifecycleListenerTest {
 
     val validSlot = mock<CdbResponseSlot>() {
       on { isValid() } doReturn true
+      on { zoneId } doReturn 42
     }
 
     val response = mock<CdbResponse>() {
@@ -194,7 +195,7 @@ class CsmBidLifecycleListenerTest {
 
     assertNoBidSlotIsReceived("noBidId")
     assertInvalidBidSlotIsReceived("invalidId")
-    assertValidBidSlotIsReceived("validId")
+    assertValidBidSlotIsReceived("validId", 42)
 
     verify(sendingQueueProducer).pushInQueue(repository, "noBidId")
     verify(sendingQueueProducer).pushInQueue(repository, "invalidId")
@@ -348,10 +349,11 @@ class CsmBidLifecycleListenerTest {
     verify(repository).addOrUpdateById(eq(impressionId), verifier.asArgChecker())
   }
 
-  private fun assertValidBidSlotIsReceived(impressionId: String) {
+  private fun assertValidBidSlotIsReceived(impressionId: String, zoneId: Int) {
     assertRepositoryIsUpdatedById(impressionId) {
       verify(it).setCdbCallEndTimestamp(clock.currentTimeInMillis)
-      verify(it).setCachedBidUsed(true);
+      verify(it).setCachedBidUsed(true)
+      verify(it).setZoneId(zoneId)
       verifyNoMoreInteractions(it)
     }
   }

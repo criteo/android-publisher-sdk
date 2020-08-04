@@ -58,6 +58,7 @@ public class CdbResponseSlotTest {
 
     assertThat(slot.getImpressionId()).isNull();
     assertThat(slot.getPlacementId()).isNull();
+    assertThat(slot.getZoneId()).isNull();
     assertThat(slot.getCpm()).isEqualTo("0.0");
     assertThat(slot.getCpmAsNumber()).isZero();
     assertThat(slot.getCurrency()).isNull();
@@ -454,6 +455,15 @@ public class CdbResponseSlotTest {
     CdbResponseSlot slot = CdbResponseSlot.fromJson(new JSONObject(json));
 
     assertThat(slot.getImpressionId()).isEqualTo("5e296936d48e8392e3382c45a8d9a389");
+  }
+
+  @Test
+  public void getZoneId_GivenAZoneId_ReturnIt() throws Exception {
+    String json = "{ \"zoneId\": 42 }";
+
+    CdbResponseSlot slot = CdbResponseSlot.fromJson(new JSONObject(json));
+
+    assertThat(slot.getZoneId()).isEqualTo(42);
   }
 
   @Test
