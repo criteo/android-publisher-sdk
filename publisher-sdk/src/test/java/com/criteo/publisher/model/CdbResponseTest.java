@@ -113,9 +113,9 @@ public class CdbResponseTest {
 
   @Test
   public void getSlotByImpressionId_GivenSlotsThatDoesNotMatchGivenId_ReturnNull() throws Exception {
-    Slot slot1 = mock(Slot.class);
-    Slot slot2 = mock(Slot.class);
-    Slot slot3 = mock(Slot.class);
+    CdbResponseSlot slot1 = mock(CdbResponseSlot.class);
+    CdbResponseSlot slot2 = mock(CdbResponseSlot.class);
+    CdbResponseSlot slot3 = mock(CdbResponseSlot.class);
 
     when(slot1.getImpressionId()).thenReturn("impId1");
     when(slot2.getImpressionId()).thenReturn(null);
@@ -128,9 +128,9 @@ public class CdbResponseTest {
 
   @Test
   public void getSlotByImpressionId_GivenSlotsMatchingGivenId_ReturnSlot() throws Exception {
-    Slot slot1 = mock(Slot.class);
-    Slot slot2 = mock(Slot.class);
-    Slot slot3 = mock(Slot.class);
+    CdbResponseSlot slot1 = mock(CdbResponseSlot.class);
+    CdbResponseSlot slot2 = mock(CdbResponseSlot.class);
+    CdbResponseSlot slot3 = mock(CdbResponseSlot.class);
 
     when(slot1.getImpressionId()).thenReturn("impId1");
     when(slot2.getImpressionId()).thenReturn(null);

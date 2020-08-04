@@ -18,12 +18,14 @@ package com.criteo.publisher.model
 
 import com.criteo.publisher.Clock
 import com.criteo.publisher.DependencyProvider
+import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.model.nativeads.NativeAssets
 import com.criteo.publisher.util.URLUtil
 import com.google.gson.annotations.SerializedName
 import org.json.JSONObject
 import java.io.ByteArrayInputStream
 
+@OpenForTesting
 data class CdbResponseSlot(
     @SerializedName("impId") val impressionId: String? = null,
     @SerializedName("placementId") val placementId: String? = null,
@@ -51,6 +53,7 @@ data class CdbResponseSlot(
 
     @JvmStatic
     fun fromJson(json: JSONObject): CdbResponseSlot {
+      // TODO remove this after CDB response parsing is totally migrated to Gson
       val jsonSerializer = DependencyProvider.getInstance().provideJsonSerializer()
       val jsonStr = json.toString()
 

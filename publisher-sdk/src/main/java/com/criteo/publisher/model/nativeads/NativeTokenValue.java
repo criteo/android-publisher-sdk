@@ -19,7 +19,7 @@ package com.criteo.publisher.model.nativeads;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.Clock;
 import com.criteo.publisher.model.AbstractTokenValue;
-import com.criteo.publisher.model.Slot;
+import com.criteo.publisher.model.CdbResponseSlot;
 
 /**
  * Token given to publisher so that he can asynchronously fetch an native ad.
@@ -31,7 +31,7 @@ public class NativeTokenValue extends AbstractTokenValue {
 
   public NativeTokenValue(
       @NonNull NativeAssets assets,
-      @NonNull Slot slot,
+      @NonNull CdbResponseSlot slot,
       @NonNull Clock clock
   ) {
     super(slot, clock);

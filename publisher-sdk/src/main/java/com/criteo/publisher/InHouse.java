@@ -25,9 +25,9 @@ import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AbstractTokenValue;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.InterstitialAdUnit;
-import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.nativeads.NativeTokenValue;
 import com.criteo.publisher.util.AdUnitType;
 
@@ -70,7 +70,7 @@ public class InHouse {
       return new BidResponse();
     }
 
-    Slot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    CdbResponseSlot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
     if (slot == null || adUnit == null) {
       return new BidResponse();
     }

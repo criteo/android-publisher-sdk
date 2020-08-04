@@ -20,7 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.Slot;
+import com.criteo.publisher.model.CdbResponseSlot;
 
 public interface HeaderBiddingHandler {
 
@@ -44,7 +44,8 @@ public interface HeaderBiddingHandler {
   /**
    * Remove previous state that may have been stored in the object.
    * <p>
-   * This cancels any modification done by a {@link #enrichBid(Object, AdUnit, Slot)} call.
+   * This cancels any modification done by a {@link #enrichBid(Object, AdUnit, CdbResponseSlot)}
+   * call.
    * <p>
    * This method is only called on {@linkplain #canHandle(Object) handled objects}. If there is a
    * bid, but also if there is no bid to avoid having a third-party considering that Criteo bids
@@ -63,5 +64,5 @@ public interface HeaderBiddingHandler {
    * @param adUnit ad unit representing the requested bid
    * @param slot bid to use
    */
-  void enrichBid(@NonNull Object object, @Nullable AdUnit adUnit, @NonNull Slot slot);
+  void enrichBid(@NonNull Object object, @Nullable AdUnit adUnit, @NonNull CdbResponseSlot slot);
 }

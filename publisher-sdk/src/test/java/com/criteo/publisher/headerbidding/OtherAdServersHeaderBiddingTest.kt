@@ -19,8 +19,8 @@ package com.criteo.publisher.headerbidding
 import com.criteo.publisher.integration.Integration
 import com.criteo.publisher.model.AdSize
 import com.criteo.publisher.model.BannerAdUnit
+import com.criteo.publisher.model.CdbResponseSlot
 import com.criteo.publisher.model.InterstitialAdUnit
-import com.criteo.publisher.model.Slot
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
@@ -104,7 +104,7 @@ class OtherAdServersHeaderBiddingTest {
   fun enrichBid_GivenMapAndBannerBidAvailable_EnrichMap() {
     val adUnit = BannerAdUnit("adUnit", AdSize(42, 1337))
 
-    val slot = mock<Slot>() {
+    val slot = mock<CdbResponseSlot>() {
       on { isNative } doReturn false
       on { cpm } doReturn "0.10"
       on { displayUrl } doReturn "http://display.url"
@@ -129,7 +129,7 @@ class OtherAdServersHeaderBiddingTest {
   fun enrichBid_GivenMapAndInterstitialBidAvailable_EnrichMap() {
     val adUnit = InterstitialAdUnit("adUnit")
 
-    val slot = mock<Slot>() {
+    val slot = mock<CdbResponseSlot>() {
       on { isNative } doReturn false
       on { cpm } doReturn "0.10"
       on { displayUrl } doReturn "http://display.url"

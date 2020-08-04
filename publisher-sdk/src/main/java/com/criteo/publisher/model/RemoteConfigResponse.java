@@ -84,8 +84,8 @@ public abstract class RemoteConfigResponse {
   public abstract Boolean getKillSwitch();
 
   /**
-   * e.g. %%displayUrl%%, replaced by the {@linkplain Slot#getDisplayUrl() displayUrl} provided by
-   * CDB, in the wrapper HTML that is loaded in a {@link android.webkit.WebView}.
+   * e.g. %%displayUrl%%, replaced by the {@linkplain CdbResponseSlot#getDisplayUrl() displayUrl}
+   * provided by CDB, in the wrapper HTML that is loaded in a {@link android.webkit.WebView}.
    */
   @Nullable
   @SerializedName("AndroidDisplayUrlMacro")
@@ -110,8 +110,8 @@ public abstract class RemoteConfigResponse {
   abstract String getAndroidAdTagUrlMode();
 
   /**
-   * e.g. %%adTagData%%, replaced by the contents of {@linkplain Slot#getDisplayUrl() displayUrl},
-   * meaning the JavaScript code to display the ad.
+   * e.g. %%adTagData%%, replaced by the contents of {@linkplain CdbResponseSlot#getDisplayUrl()
+   * displayUrl}, meaning the JavaScript code to display the ad.
    */
   @Nullable
   @SerializedName("AndroidAdTagDataMacro")

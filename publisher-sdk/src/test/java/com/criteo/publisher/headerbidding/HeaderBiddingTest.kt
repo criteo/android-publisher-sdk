@@ -20,7 +20,7 @@ import com.criteo.publisher.BidManager
 import com.criteo.publisher.integration.Integration
 import com.criteo.publisher.integration.IntegrationRegistry
 import com.criteo.publisher.model.AdUnit
-import com.criteo.publisher.model.Slot
+import com.criteo.publisher.model.CdbResponseSlot
 import com.nhaarman.mockitokotlin2.*
 import org.junit.Before
 import org.junit.Test
@@ -75,7 +75,7 @@ class HeaderBiddingTest {
   fun enrichBid_GivenManyHandlerAndBid_EnrichWithFirstAcceptingHandler() {
     val obj = mock<Any>()
     val adUnit = mock<AdUnit>()
-    val slot = mock<Slot>()
+    val slot = mock<CdbResponseSlot>()
     val handler1 = givenHandler(obj, false)
     val handler2 = givenHandler(obj, true, Integration.IN_HOUSE)
     val handler3 = givenHandler(obj, true, Integration.STANDALONE)

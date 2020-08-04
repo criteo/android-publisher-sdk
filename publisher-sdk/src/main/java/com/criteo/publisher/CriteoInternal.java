@@ -25,10 +25,10 @@ import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.headerbidding.HeaderBidding;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
-import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.AppLifecycleUtil;
@@ -142,7 +142,7 @@ final class CriteoInternal extends Criteo {
    */
   @Nullable
   @Override
-  Slot getBidForAdUnit(AdUnit adUnit) {
+  CdbResponseSlot getBidForAdUnit(AdUnit adUnit) {
     return bidManager.getBidForAdUnitAndPrefetch(adUnit);
   }
 

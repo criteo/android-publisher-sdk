@@ -39,8 +39,8 @@ import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
-import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.util.AdUnitType;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -152,7 +152,7 @@ public class CriteoBannerEventControllerTest {
   @Test
   public void fetchAdAsyncAdUnit_GivenBid_NotifyListenerForSuccessAndDisplayAd() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
-    Slot slot = mock(Slot.class);
+    CdbResponseSlot slot = mock(CdbResponseSlot.class);
 
     when(criteo.getBidForAdUnit(adUnit)).thenReturn(slot);
     when(slot.getDisplayUrl()).thenReturn("http://my.display.url");
@@ -167,7 +167,7 @@ public class CriteoBannerEventControllerTest {
   @Test
   public void fetchAdAsyncAdUnit_GivenBidTwice_NotifyListenerForSuccessAndDisplayAdTwice() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
-    Slot slot = mock(Slot.class);
+    CdbResponseSlot slot = mock(CdbResponseSlot.class);
 
     when(criteo.getBidForAdUnit(adUnit)).thenReturn(slot);
     when(slot.getDisplayUrl())

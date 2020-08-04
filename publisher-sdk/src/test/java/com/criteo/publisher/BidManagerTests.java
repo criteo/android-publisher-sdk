@@ -33,8 +33,8 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CacheAdUnit;
+import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.Config;
-import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.network.BidRequestSender;
 import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.DeviceUtil;
@@ -55,7 +55,7 @@ public class BidManagerTests {
   private String cpm = "0.10";
   private String displayUrl = "https://www.example.com/lone?par1=abcd";
   private SdkCache sdkCache;
-  private Slot testSlot;
+  private CdbResponseSlot testSlot;
 
   @Mock
   private DependencyProvider dependencyProvider;
@@ -126,7 +126,7 @@ public class BidManagerTests {
 
     Assert.assertNotNull(slotJson);
 
-    testSlot = new Slot(slotJson);
+    testSlot = CdbResponseSlot.fromJson(slotJson);
     when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
 
     DependencyProvider.setInstance(dependencyProvider);
@@ -145,7 +145,7 @@ public class BidManagerTests {
     BidManager bidManager = createBidManager();
 
     //test
-    Slot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    CdbResponseSlot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
     Assert.assertNull(slot);
   }
 
@@ -157,7 +157,7 @@ public class BidManagerTests {
     BidManager bidManager = createBidManager();
 
     //test
-    Slot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    CdbResponseSlot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
     Assert.assertNotNull(slot);
     Assert.assertEquals(testSlot, slot);
   }

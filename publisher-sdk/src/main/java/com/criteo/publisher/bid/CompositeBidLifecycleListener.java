@@ -20,7 +20,7 @@ import androidx.annotation.NonNull;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
-import com.criteo.publisher.model.Slot;
+import com.criteo.publisher.model.CdbResponseSlot;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,7 +62,7 @@ public class CompositeBidLifecycleListener implements BidLifecycleListener {
   }
 
   @Override
-  public void onBidConsumed(@NonNull CacheAdUnit adUnit, @NonNull Slot consumedBid) {
+  public void onBidConsumed(@NonNull CacheAdUnit adUnit, @NonNull CdbResponseSlot consumedBid) {
     for (BidLifecycleListener delegate : delegates) {
       delegate.onBidConsumed(adUnit, consumedBid);
     }

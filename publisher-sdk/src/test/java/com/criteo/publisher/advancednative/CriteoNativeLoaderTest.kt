@@ -25,8 +25,8 @@ import com.criteo.publisher.integration.IntegrationRegistry
 import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
+import com.criteo.publisher.model.CdbResponseSlot
 import com.criteo.publisher.model.NativeAdUnit
-import com.criteo.publisher.model.Slot
 import com.criteo.publisher.model.nativeads.NativeAssets
 import com.criteo.publisher.util.BuildConfigWrapper
 import com.nhaarman.mockitokotlin2.*
@@ -210,7 +210,7 @@ class CriteoNativeLoaderTest {
   private fun givenNativeBidAvailable(): CriteoNativeAd {
     val nativeAssets = mock<NativeAssets>()
     val nativeAd = mock<CriteoNativeAd>()
-    val slot = mock<Slot>() {
+    val slot = mock<CdbResponseSlot>() {
       on { this.nativeAssets } doReturn nativeAssets
     }
 
@@ -225,7 +225,7 @@ class CriteoNativeLoaderTest {
   }
 
   private fun givenNotANativeBidAvailable() {
-    val slot = mock<Slot>() {
+    val slot = mock<CdbResponseSlot>() {
       on { nativeAssets } doReturn null
     }
 

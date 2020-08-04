@@ -32,12 +32,12 @@ public class CdbResponse {
   private static final String SLOTS = "slots";
 
   @NonNull
-  private final List<Slot> slots;
+  private final List<CdbResponseSlot> slots;
 
   private final int timeToNextCall;
 
   public CdbResponse(
-      @NonNull List<Slot> slots,
+      @NonNull List<CdbResponseSlot> slots,
       int timeToNextCall
   ) {
     this.slots = slots;
@@ -47,7 +47,7 @@ public class CdbResponse {
   @NonNull
   public static CdbResponse fromJson(@NonNull JSONObject json) {
     int timeToNextCall = 0;
-    List<Slot> slots = new ArrayList<>();
+    List<CdbResponseSlot> slots = new ArrayList<>();
 
     if (json.has(TIME_TO_NEXT_CALL)) {
       try {
@@ -67,7 +67,7 @@ public class CdbResponse {
       for (int i = 0; i < array.length(); i++) {
         try {
           JSONObject slotStr = array.getJSONObject(i);
-          slots.add(new Slot(slotStr));
+          slots.add(CdbResponseSlot.fromJson(slotStr));
         } catch (Exception ex) {
           Log.d(TAG, "Exception while reading slot from slots array" + ex.getMessage());
         }
@@ -78,7 +78,7 @@ public class CdbResponse {
   }
 
   @NonNull
-  public List<Slot> getSlots() {
+  public List<CdbResponseSlot> getSlots() {
     return slots;
   }
 
@@ -87,8 +87,8 @@ public class CdbResponse {
   }
 
   @Nullable
-  public Slot getSlotByImpressionId(@NonNull String impressionId) {
-    for (Slot slot : slots) {
+  public CdbResponseSlot getSlotByImpressionId(@NonNull String impressionId) {
+    for (CdbResponseSlot slot : slots) {
       if (impressionId.equals(slot.getImpressionId())) {
         return slot;
       }

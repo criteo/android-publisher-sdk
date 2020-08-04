@@ -138,8 +138,8 @@ class CsmBidLifecycleListenerTest {
   fun onCdbCallFinished_GivenOnlyInvalidBid_PushReadyToSendInQueue() {
     val request = givenCdbRequestWithSlots("id")
 
-    val invalidSlot = mock<Slot>() {
-      on { isValid } doReturn false
+    val invalidSlot = mock<CdbResponseSlot>() {
+      on { isValid() } doReturn false
     }
 
     val response = mock<CdbResponse>() {
@@ -155,8 +155,8 @@ class CsmBidLifecycleListenerTest {
   fun onCdbCallFinished_GivenOnlyValidBid_DoNotPushReadyToSendInQueue() {
     val request = givenCdbRequestWithSlots("id")
 
-    val validSlot = mock<Slot>() {
-      on { isValid } doReturn true
+    val validSlot = mock<CdbResponseSlot>() {
+      on { isValid() } doReturn true
     }
 
     val response = mock<CdbResponse>() {
@@ -172,12 +172,12 @@ class CsmBidLifecycleListenerTest {
   fun onCdbCallFinished_GivenNoBidAndInvalidBidAndValidBidReceived_UpdateThemByIdAccordingly() {
     val request = givenCdbRequestWithSlots("noBidId", "invalidId", "validId")
 
-    val invalidSlot = mock<Slot>() {
-      on { isValid } doReturn false
+    val invalidSlot = mock<CdbResponseSlot>() {
+      on { isValid() } doReturn false
     }
 
-    val validSlot = mock<Slot>() {
-      on { isValid } doReturn true
+    val validSlot = mock<CdbResponseSlot>() {
+      on { isValid() } doReturn true
     }
 
     val response = mock<CdbResponse>() {
@@ -268,7 +268,7 @@ class CsmBidLifecycleListenerTest {
   fun onBidConsumed_GivenNotExpiredBid_SetElapsedTimeAndReadyToSend() {
     val adUnit = CacheAdUnit(AdSize(1, 2), "myAdUnit", CRITEO_BANNER)
 
-    val slot = mock<Slot>() {
+    val slot = mock<CdbResponseSlot>() {
       on { impressionId } doReturn "id"
       on { isExpired(clock) } doReturn false
     }
@@ -291,7 +291,7 @@ class CsmBidLifecycleListenerTest {
   fun onBidConsumed_GivenExpiredBid_SetReadyToSend() {
     val adUnit = CacheAdUnit(AdSize(1, 2), "myAdUnit", CRITEO_BANNER)
 
-    val slot = mock<Slot>() {
+    val slot = mock<CdbResponseSlot>() {
       on { impressionId } doReturn "id"
       on { isExpired(clock) } doReturn true
     }
@@ -309,7 +309,7 @@ class CsmBidLifecycleListenerTest {
   fun onBidConsumed_GivenBidWithoutImpressionId_DoNothing() {
     val adUnit = CacheAdUnit(AdSize(1, 2), "myAdUnit", CRITEO_BANNER)
 
-    val slot = mock<Slot>() {
+    val slot = mock<CdbResponseSlot>() {
       on { impressionId } doReturn null
     }
 

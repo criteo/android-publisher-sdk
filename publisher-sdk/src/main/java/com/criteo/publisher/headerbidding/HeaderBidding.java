@@ -21,7 +21,7 @@ import androidx.annotation.Nullable;
 import com.criteo.publisher.BidManager;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.Slot;
+import com.criteo.publisher.model.CdbResponseSlot;
 import java.util.List;
 
 public class HeaderBidding {
@@ -54,7 +54,7 @@ public class HeaderBidding {
       if (handler.canHandle(object)) {
         integrationRegistry.declare(handler.getIntegration());
 
-        Slot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
+        CdbResponseSlot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
         handler.cleanPreviousBid(object);
 
         if (slot == null) {

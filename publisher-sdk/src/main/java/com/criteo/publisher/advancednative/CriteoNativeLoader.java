@@ -30,8 +30,8 @@ import com.criteo.publisher.InHouse;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
+import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.NativeAdUnit;
-import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeTokenValue;
 import com.criteo.publisher.util.PreconditionsUtil;
@@ -124,7 +124,7 @@ public class CriteoNativeLoader {
     getIntegrationRegistry().declare(Integration.STANDALONE);
 
     BidManager bidManager = getBidManager();
-    Slot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
+    CdbResponseSlot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
     NativeAssets assets = bid == null ? null : bid.getNativeAssets();
     handleNativeAssets(assets);
   }

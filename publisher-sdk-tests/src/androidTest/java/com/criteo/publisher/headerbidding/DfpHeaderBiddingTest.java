@@ -34,8 +34,8 @@ import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.InterstitialAdUnit;
-import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeProduct;
 import com.criteo.publisher.util.AndroidUtil;
@@ -118,7 +118,7 @@ public class DfpHeaderBiddingTest {
   public void enrichBid_GivenNotHandledObject_DoNothing() throws Exception {
     Object builder = mock(Object.class);
 
-    headerBidding.enrichBid(builder, mock(AdUnit.class), mock(Slot.class));
+    headerBidding.enrichBid(builder, mock(AdUnit.class), mock(CdbResponseSlot.class));
 
     verifyNoMoreInteractions(builder);
   }
@@ -127,7 +127,7 @@ public class DfpHeaderBiddingTest {
   public void enrichBid_GivenDfpBuilderAndBannerBidAvailable_EnrichBuilder() throws Exception {
     BannerAdUnit adUnit = new BannerAdUnit("adUnit", new AdSize(42, 1337));
 
-    Slot slot = mock(Slot.class);
+    CdbResponseSlot slot = mock(CdbResponseSlot.class);
     when(slot.isNative()).thenReturn(false);
     when(slot.getCpm()).thenReturn("0.10");
     when(slot.getDisplayUrl()).thenReturn("http://display.url");
@@ -196,7 +196,7 @@ public class DfpHeaderBiddingTest {
   private void enrichBid_GivenInterstitialBidAvailable_EnrichBuilder(int slotWidth, int slotHeight, String expectedInjectedSize) {
     InterstitialAdUnit adUnit = new InterstitialAdUnit("adUnit");
 
-    Slot slot = mock(Slot.class);
+    CdbResponseSlot slot = mock(CdbResponseSlot.class);
     when(slot.isNative()).thenReturn(false);
     when(slot.getCpm()).thenReturn("0.10");
     when(slot.getDisplayUrl()).thenReturn("http://display.url");
@@ -239,7 +239,7 @@ public class DfpHeaderBiddingTest {
         URI.create("http://pixel.url/0").toURL(),
         URI.create("http://pixel.url/1").toURL()));
 
-    Slot slot = mock(Slot.class);
+    CdbResponseSlot slot = mock(CdbResponseSlot.class);
     when(slot.isNative()).thenReturn(true);
     when(slot.getCpm()).thenReturn("0.42");
     when(slot.getNativeAssets()).thenReturn(nativeAssets);

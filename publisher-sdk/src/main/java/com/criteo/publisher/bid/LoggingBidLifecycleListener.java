@@ -22,7 +22,7 @@ import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
-import com.criteo.publisher.model.Slot;
+import com.criteo.publisher.model.CdbResponseSlot;
 
 /**
  * Listener that logs debug messages given the different steps of a bid lifecycle.
@@ -52,7 +52,7 @@ public class LoggingBidLifecycleListener implements BidLifecycleListener {
   }
 
   @Override
-  public void onBidConsumed(@NonNull CacheAdUnit adUnit, @NonNull Slot consumedBid) {
+  public void onBidConsumed(@NonNull CacheAdUnit adUnit, @NonNull CdbResponseSlot consumedBid) {
     logger.debug("onBidConsumed: %s", consumedBid);
   }
 

@@ -25,7 +25,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.CacheAdUnit;
-import com.criteo.publisher.model.Slot;
+import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.DeviceUtil;
 import java.util.HashMap;
@@ -33,7 +33,7 @@ import java.util.Map;
 
 public class SdkCache {
 
-  private final Map<CacheAdUnit, Slot> slotMap;
+  private final Map<CacheAdUnit, CdbResponseSlot> slotMap;
   private final DeviceUtil deviceUtil;
 
   public SdkCache(@NonNull DeviceUtil deviceUtil) {
@@ -41,7 +41,7 @@ public class SdkCache {
     this.deviceUtil = deviceUtil;
   }
 
-  public void add(@NonNull Slot slot) {
+  public void add(@NonNull CdbResponseSlot slot) {
     AdUnitType adUnitType = findAdUnitType(slot);
     CacheAdUnit key = new CacheAdUnit(new AdSize(slot.getWidth(), slot.getHeight())
         , slot.getPlacementId(), adUnitType);
@@ -49,7 +49,7 @@ public class SdkCache {
   }
 
   // FIXME: EE-608
-  private AdUnitType findAdUnitType(Slot slot) {
+  private AdUnitType findAdUnitType(CdbResponseSlot slot) {
     if (slot.isNative()) {
       return CRITEO_CUSTOM_NATIVE;
     }
@@ -73,7 +73,7 @@ public class SdkCache {
    * @return found slot or null if not found
    */
   @Nullable
-  public Slot peekAdUnit(CacheAdUnit key) {
+  public CdbResponseSlot peekAdUnit(CacheAdUnit key) {
     return slotMap.get(key);
   }
 
