@@ -52,6 +52,22 @@ public class SlotTest {
   }
 
   @Test
+  public void givenEmptyPayload_UseFallback() {
+    Slot slot = new Slot(new JSONObject());
+
+    assertThat(slot.getImpressionId()).isNull();
+    assertThat(slot.getPlacementId()).isNull();
+    assertThat(slot.getCpm()).isEqualTo("0.0");
+    assertThat(slot.getCpmAsNumber()).isZero();
+    assertThat(slot.getCurrency()).isNull();
+    assertThat(slot.getWidth()).isZero();
+    assertThat(slot.getHeight()).isZero();
+    assertThat(slot.getTtl()).isZero();
+    assertThat(slot.getDisplayUrl()).isNull();
+    assertThat(slot.getNativeAssets()).isNull();
+  }
+
+  @Test
   public void noBidTest() throws JSONException {
     response.put(CPM, "0");
     response.put(TTL, 0);
