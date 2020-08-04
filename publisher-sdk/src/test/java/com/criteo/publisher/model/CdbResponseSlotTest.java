@@ -35,14 +35,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 
-public class SlotTest {
+public class CdbResponseSlotTest {
 
   private static final String CPM = "cpm";
   private static final String DISPLAY_URL = "displayUrl";
   private static final String PLACEMENT_ID = "placementId";
   private static final String TTL = "ttl";
 
-  private Slot slot;
+  private CdbResponseSlot slot;
   private JSONObject response;
 
   @Before
@@ -53,7 +53,7 @@ public class SlotTest {
 
   @Test
   public void givenEmptyPayload_UseFallback() {
-    Slot slot = new Slot(new JSONObject());
+    CdbResponseSlot slot = CdbResponseSlot.fromJson(new JSONObject());
 
     assertThat(slot.getImpressionId()).isNull();
     assertThat(slot.getPlacementId()).isNull();
@@ -71,7 +71,7 @@ public class SlotTest {
   public void noBidTest() throws JSONException {
     response.put(CPM, "0");
     response.put(TTL, 0);
-    Slot result = new Slot(response);
+    CdbResponseSlot result = CdbResponseSlot.fromJson(response);
     assertEquals("0", result.getCpm());
     assertEquals(0, result.getTtl());
   }
@@ -81,7 +81,7 @@ public class SlotTest {
     int ttlval = 50 * 60;
     response.put(CPM, "0");
     response.put(TTL, ttlval);
-    Slot result = new Slot(response);
+    CdbResponseSlot result = CdbResponseSlot.fromJson(response);
     assertEquals("0", result.getCpm());
     assertEquals(ttlval, result.getTtl());
   }
@@ -92,7 +92,7 @@ public class SlotTest {
     int ttlval = 50 * 60;
     response.put(CPM, cpmval);
     response.put(TTL, ttlval);
-    Slot result = new Slot(response);
+    CdbResponseSlot result = CdbResponseSlot.fromJson(response);
     assertEquals(cpmval, result.getCpm());
     assertEquals(ttlval, result.getTtl());
   }
@@ -101,20 +101,20 @@ public class SlotTest {
   public void testSlot() throws JSONException {
     response.put(CPM, "10.0");
     response.put(DISPLAY_URL, "https://www.criteo.com/");
-    slot = new Slot(response);
+    slot = CdbResponseSlot.fromJson(response);
     assertTrue(slot.isValid());
   }
 
   @Test
   public void testSlotWithNullDisplayUrlNullCmp() {
-    slot = new Slot(response);
+    slot = CdbResponseSlot.fromJson(response);
     assertFalse(slot.isValid());
   }
 
   @Test
   public void testSlotWithNullDisplayUrl() throws JSONException {
     response.put(CPM, "10.0");
-    slot = new Slot(response);
+    slot = CdbResponseSlot.fromJson(response);
     assertFalse(slot.isValid());
   }
 
@@ -122,14 +122,14 @@ public class SlotTest {
   public void testSlotWithEmptyDisplayUrl() throws JSONException {
     response.put(CPM, "10.0");
     response.put(DISPLAY_URL, "");
-    slot = new Slot(response);
+    slot = CdbResponseSlot.fromJson(response);
     assertFalse(slot.isValid());
   }
 
   @Test
   public void testSlotWithNullCmp() throws JSONException {
     response.put(DISPLAY_URL, "https://www.criteo.com/");
-    slot = new Slot(response);
+    slot = CdbResponseSlot.fromJson(response);
     assertTrue(slot.isValid());
   }
 
@@ -137,7 +137,7 @@ public class SlotTest {
   public void testSlotWithInvalidCmp() throws JSONException {
     response.put(DISPLAY_URL, "https://www.criteo.com/");
     response.put(CPM, "abc");
-    slot = new Slot(response);
+    slot = CdbResponseSlot.fromJson(response);
     assertFalse(slot.isValid());
   }
 
@@ -145,7 +145,7 @@ public class SlotTest {
   public void testSlotWithNegativeValueCmp() throws JSONException {
     response.put(DISPLAY_URL, "https://www.criteo.com/");
     response.put(CPM, "-10.0");
-    slot = new Slot(response);
+    slot = CdbResponseSlot.fromJson(response);
     assertFalse(slot.isValid());
   }
 
@@ -153,7 +153,7 @@ public class SlotTest {
   public void testSlotWithEmptyValueCmp() throws JSONException {
     response.put(DISPLAY_URL, "https://www.criteo.com/");
     response.put(CPM, "");
-    slot = new Slot(response);
+    slot = CdbResponseSlot.fromJson(response);
     assertFalse(slot.isValid());
   }
 
@@ -208,7 +208,7 @@ public class SlotTest {
 
     JSONObject cdbResponse = new JSONObject(cdbStringResponse);
     JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
-    Slot slot = new Slot(cdbSlot);
+    CdbResponseSlot slot = CdbResponseSlot.fromJson(cdbSlot);
 
     assertEquals(NativeAssets.fromJson(new JSONObject(nativeJson)), slot.getNativeAssets());
     assertTrue(slot.isNative());
@@ -220,7 +220,7 @@ public class SlotTest {
     String cdbStringResponse = "{\"slots\":[{\"placementId\":\"/140800857/Endeavour_320x50\",\"cpm\":\"1.12\",\"currency\":\"EUR\",\"width\":320,\"height\":50,\"ttl\":555,\"displayUrl\":\"https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js\"}]}";
     JSONObject cdbResponse = new JSONObject(cdbStringResponse);
     JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
-    Slot slot = new Slot(cdbSlot);
+    CdbResponseSlot slot = CdbResponseSlot.fromJson(cdbSlot);
     assertEquals("/140800857/Endeavour_320x50", slot.getPlacementId());
     assertEquals("1.12", slot.getCpm());
     assertEquals("EUR", slot.getCurrency());
@@ -282,14 +282,14 @@ public class SlotTest {
 
     JSONObject cdbResponse = new JSONObject(cdbStringResponse);
     JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);
-    Slot slot = new Slot(cdbSlot);
-    Slot expectedSlot = new Slot(cdbSlot);
+    CdbResponseSlot slot = CdbResponseSlot.fromJson(cdbSlot);
+    CdbResponseSlot expectedSlot = CdbResponseSlot.fromJson(cdbSlot);
     assertEquals(expectedSlot, slot);
   }
 
   @Test
   public void testValidityWhenSlotIsNative() throws Exception{
-    Slot slot = new Slot(getNativeJSONSlot());
+    CdbResponseSlot slot = CdbResponseSlot.fromJson(getNativeJSONSlot());
     assertTrue(slot.isValid());
     assertTrue(slot.isNative());
     // if a slot claims it is native and valid then all the following conditions have to be met
@@ -302,7 +302,7 @@ public class SlotTest {
 
   @Test
   public void testValidity() throws Exception{
-    Slot slot = new Slot(getJSONSlot());
+    CdbResponseSlot slot = CdbResponseSlot.fromJson(getJSONSlot());
     assertTrue(slot.isValid());
     assertFalse(slot.isNative());
     // if a slot claims it is NOT native and valid then all the following conditions have to be met
@@ -322,9 +322,9 @@ public class SlotTest {
     // One is missing a displayUrl and the other has a negative cpm
     // Neither bid should be added to the cache
     String json = "{\"slots\":[{\"placementId\":\"/140800857/Endeavour_320x50\",\"cpm\":\"0.00\",\"currency\":\"EUR\",\"width\":320,\"height\":50,\"ttl\":0,\"displayUrl\":\"\"},{\"placementId\":\"/140800857/Endeavour_Interstitial_320x480\",\"cpm\":\"-1.00\",\"currency\":\"EUR\",\"width\":320,\"height\":480,\"ttl\":0,\"displayUrl\":\"https://publisherdirect.criteo.com/publishertag/preprodtest/FakeAJS.js\"}]}";
-    List<Slot> slots = CdbResponse.fromJson(new JSONObject(json)).getSlots();
+    List<CdbResponseSlot> slots = CdbResponse.fromJson(new JSONObject(json)).getSlots();
 
-    for (Slot slot : slots) {
+    for (CdbResponseSlot slot : slots) {
       assertThat(slot.isValid()).isFalse();
     }
   }
@@ -375,9 +375,10 @@ public class SlotTest {
         "    }]\n" +
         "}";
 
-    List<Slot> slots = CdbResponse.fromJson(new JSONObject(cdbStringResponse)).getSlots();
+    List<CdbResponseSlot> slots = CdbResponse.fromJson(new JSONObject(cdbStringResponse))
+        .getSlots();
 
-    for (Slot slot : slots) {
+    for (CdbResponseSlot slot : slots) {
       assertThat(slot.isValid()).isFalse();
     }
   }
@@ -393,7 +394,7 @@ public class SlotTest {
         + "  \"ttl\": 60,\n"
         + "  \"displayUrl\": \"notAValidUrl\"\n"
         + "}";
-    Slot slot = new Slot(new JSONObject(json));
+    CdbResponseSlot slot = CdbResponseSlot.fromJson(new JSONObject(json));
 
     assertThat(slot.isValid()).isFalse();
   }
@@ -412,7 +413,7 @@ public class SlotTest {
         + "  \"ttl\": 0,\n"
         + "  \"displayUrl\": \"http://criteo.com\"\n"
         + "}";
-    Slot slot = new Slot(new JSONObject(json));
+    CdbResponseSlot slot = CdbResponseSlot.fromJson(new JSONObject(json));
 
     assertThat(slot.getTtl()).isZero();
   }
@@ -427,7 +428,7 @@ public class SlotTest {
         + "  \"height\": 100,\n"
         + "  \"displayUrl\": \"http://criteo.com\"\n"
         + "}";
-    Slot slot = new Slot(new JSONObject(json));
+    CdbResponseSlot slot = CdbResponseSlot.fromJson(new JSONObject(json));
 
     assertThat(slot.getTtl()).isZero();
   }
@@ -444,7 +445,7 @@ public class SlotTest {
         + "  \"impId\": \"5e296936d48e8392e3382c45a8d9a389\"\n"
         + "}";
 
-    Slot slot = new Slot(new JSONObject(json));
+    CdbResponseSlot slot = CdbResponseSlot.fromJson(new JSONObject(json));
 
     assertThat(slot.getImpressionId()).isEqualTo("5e296936d48e8392e3382c45a8d9a389");
   }
@@ -454,7 +455,7 @@ public class SlotTest {
     Clock clock = mock(Clock.class);
     when(clock.getCurrentTimeInMillis()).thenReturn(10_000L);
 
-    Slot slot = new Slot((getJSONSlot()));
+    CdbResponseSlot slot = CdbResponseSlot.fromJson((getJSONSlot()));
     slot.setTtl(2);
     slot.setTimeOfDownload(9000);
     boolean expired = slot.isExpired(clock);
@@ -467,7 +468,7 @@ public class SlotTest {
     Clock clock = mock(Clock.class);
     when(clock.getCurrentTimeInMillis()).thenReturn(10_000L);
 
-    Slot slot = new Slot((getJSONSlot()));
+    CdbResponseSlot slot = CdbResponseSlot.fromJson((getJSONSlot()));
     slot.setTtl(2);
     slot.setTimeOfDownload(3000);
     boolean expired = slot.isExpired(clock);
@@ -480,7 +481,7 @@ public class SlotTest {
     Clock clock = mock(Clock.class);
     when(clock.getCurrentTimeInMillis()).thenReturn(10_000L);
 
-    Slot slot = new Slot((getJSONSlot()));
+    CdbResponseSlot slot = CdbResponseSlot.fromJson((getJSONSlot()));
     slot.setTtl(2);
     slot.setTimeOfDownload(8000);
     boolean expired = slot.isExpired(clock);

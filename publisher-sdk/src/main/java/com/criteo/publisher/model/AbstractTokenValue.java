@@ -22,12 +22,12 @@ import com.criteo.publisher.Clock;
 public abstract class AbstractTokenValue {
 
   @NonNull
-  private final Slot slot;
+  private final CdbResponseSlot slot;
 
   @NonNull
   private final Clock clock;
 
-  protected AbstractTokenValue(@NonNull Slot slot, @NonNull Clock clock) {
+  protected AbstractTokenValue(@NonNull CdbResponseSlot slot, @NonNull Clock clock) {
     this.slot = slot;
     this.clock = clock;
   }

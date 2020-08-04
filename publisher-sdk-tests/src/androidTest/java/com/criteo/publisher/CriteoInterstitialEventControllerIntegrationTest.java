@@ -34,9 +34,9 @@ import android.os.Looper;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
-import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.WebViewData;
 import com.criteo.publisher.util.AdUnitType;
 import java.util.UUID;
@@ -146,7 +146,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   public void fetchAdAsyncStandalone_GivenBid_NotifyAdListenerForSuccessAndFetchCreative()
       throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
-    Slot slot = mock(Slot.class);
+    CdbResponseSlot slot = mock(CdbResponseSlot.class);
 
     when(slot.getDisplayUrl()).thenReturn("http://my.creative");
     when(criteo.getBidForAdUnit(adUnit)).thenReturn(slot);
@@ -163,7 +163,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   public void fetchAdAsyncStandalone_GivenBidTwice_NotifyAdListenerForSuccessAndFetchCreativeTwice()
       throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
-    Slot slot = mock(Slot.class);
+    CdbResponseSlot slot = mock(CdbResponseSlot.class);
 
     when(criteo.getBidForAdUnit(adUnit)).thenReturn(slot);
     when(slot.getDisplayUrl())

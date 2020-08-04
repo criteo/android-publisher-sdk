@@ -34,9 +34,9 @@ import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor;
 import com.criteo.publisher.headerbidding.HeaderBidding;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
-import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AppLifecycleUtil;
 import com.criteo.publisher.util.DeviceUtil;
@@ -312,13 +312,13 @@ public class CriteoInternalUnitTest {
   @Test
   public void getBidForAdUnit_GivenBidManager_DelegateToIt() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
-    Slot expected = mock(Slot.class);
+    CdbResponseSlot expected = mock(CdbResponseSlot.class);
 
     BidManager bidManager = givenMockedBidManager();
     when(bidManager.getBidForAdUnitAndPrefetch(adUnit)).thenReturn(expected);
 
     CriteoInternal criteo = createCriteo();
-    Slot bid = criteo.getBidForAdUnit(adUnit);
+    CdbResponseSlot bid = criteo.getBidForAdUnit(adUnit);
 
     assertThat(bid).isSameAs(expected);
   }

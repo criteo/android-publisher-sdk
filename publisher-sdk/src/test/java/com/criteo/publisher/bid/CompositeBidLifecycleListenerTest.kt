@@ -92,7 +92,7 @@ class CompositeBidLifecycleListenerTest {
   @Test
   fun onBidConsumed_GivenDelegates_DelegateToThem() {
     val adUnit = CacheAdUnit(AdSize(1, 2), "myAdUnit", CRITEO_BANNER)
-    val slot = mock<Slot>()
+    val slot = mock<CdbResponseSlot>()
 
     listener.onBidConsumed(adUnit, slot)
 

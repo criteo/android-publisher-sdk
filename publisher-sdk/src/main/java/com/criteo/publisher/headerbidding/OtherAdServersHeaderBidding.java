@@ -21,7 +21,7 @@ import androidx.annotation.Nullable;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
-import com.criteo.publisher.model.Slot;
+import com.criteo.publisher.model.CdbResponseSlot;
 import java.util.Map;
 
 public class OtherAdServersHeaderBidding implements HeaderBiddingHandler {
@@ -56,7 +56,11 @@ public class OtherAdServersHeaderBidding implements HeaderBiddingHandler {
 
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
-  public void enrichBid(@NonNull Object object, @Nullable AdUnit adUnit, @NonNull Slot slot) {
+  public void enrichBid(
+      @NonNull Object object,
+      @Nullable AdUnit adUnit,
+      @NonNull CdbResponseSlot slot
+  ) {
     if (!canHandle(object)) {
       return;
     }

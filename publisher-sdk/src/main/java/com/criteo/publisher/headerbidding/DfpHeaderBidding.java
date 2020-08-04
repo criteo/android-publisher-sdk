@@ -24,8 +24,8 @@ import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.InterstitialAdUnit;
-import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeProduct;
 import com.criteo.publisher.util.AndroidUtil;
@@ -94,7 +94,11 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
   }
 
   @Override
-  public void enrichBid(@NonNull Object object, @Nullable AdUnit adUnit, @NonNull Slot slot) {
+  public void enrichBid(
+      @NonNull Object object,
+      @Nullable AdUnit adUnit,
+      @NonNull CdbResponseSlot slot
+  ) {
     if (!canHandle(object)) {
       return;
     }
@@ -124,7 +128,7 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
    * Those sizes are constant because they have a meaning in DFP.
    */
   @NonNull
-  private String getDfpSizeForInterstitial(@NonNull Slot slot) {
+  private String getDfpSizeForInterstitial(@NonNull CdbResponseSlot slot) {
     boolean isPortrait = androidUtil.getOrientation() == Configuration.ORIENTATION_PORTRAIT;
 
     if (deviceUtil.isTablet()) {
@@ -134,7 +138,8 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
 
       if (isPortrait && slot.getWidth() >= minTabletHeight && slot.getHeight() >= minTabletWidth) {
         return "768x1024";
-      } else if (!isPortrait && slot.getWidth() >= minTabletWidth && slot.getHeight() >= minTabletHeight) {
+      } else if (!isPortrait && slot.getWidth() >= minTabletWidth
+          && slot.getHeight() >= minTabletHeight) {
         return "1024x768";
       }
     }
@@ -146,7 +151,7 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
     }
   }
 
-  private void enrichNativeRequest(@NonNull SafeDfpBuilder builder, @NonNull Slot slot) {
+  private void enrichNativeRequest(@NonNull SafeDfpBuilder builder, @NonNull CdbResponseSlot slot) {
     NativeAssets nativeAssets = slot.getNativeAssets();
     if (nativeAssets == null) {
       return;

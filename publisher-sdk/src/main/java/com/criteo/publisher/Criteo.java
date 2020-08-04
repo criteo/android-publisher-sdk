@@ -23,10 +23,10 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
-import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.DeviceUtil;
 import java.util.List;
@@ -144,7 +144,7 @@ public abstract class Criteo {
   public abstract void setBidsForAdUnit(Object object, AdUnit adUnit);
 
   @Nullable
-  abstract Slot getBidForAdUnit(@Nullable AdUnit adUnit);
+  abstract CdbResponseSlot getBidForAdUnit(@Nullable AdUnit adUnit);
 
   public abstract BidResponse getBidResponse(AdUnit adUnit);
 

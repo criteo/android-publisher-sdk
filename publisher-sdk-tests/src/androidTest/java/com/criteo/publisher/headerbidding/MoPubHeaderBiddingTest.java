@@ -30,8 +30,8 @@ import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.InterstitialAdUnit;
-import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.mopub.mobileads.MoPubInterstitial;
 import com.mopub.mobileads.MoPubView;
@@ -208,7 +208,7 @@ public class MoPubHeaderBiddingTest {
   public void enrichBid_GivenNotHandledObject_DoNothing() throws Exception {
     Object builder = mock(Object.class);
 
-    headerBidding.enrichBid(builder, mock(AdUnit.class), mock(Slot.class));
+    headerBidding.enrichBid(builder, mock(AdUnit.class), mock(CdbResponseSlot.class));
 
     verifyNoMoreInteractions(builder);
   }
@@ -217,7 +217,7 @@ public class MoPubHeaderBiddingTest {
   public void enrichBid_GivenMoPubViewAndBannerBidAvailable_EnrichBuilder() throws Exception {
     AdUnit adUnit = new BannerAdUnit("adUnit", new AdSize(42, 1337));
 
-    Slot slot = mock(Slot.class);
+    CdbResponseSlot slot = mock(CdbResponseSlot.class);
     when(slot.getCpm()).thenReturn("0.10");
     when(slot.getDisplayUrl()).thenReturn("http://display.url");
     when(slot.getWidth()).thenReturn(42);
@@ -235,7 +235,7 @@ public class MoPubHeaderBiddingTest {
   public void enrichBid_GivenMoPubInterstitialAndInterstitialBidAvailable_EnrichBuilder() throws Exception {
     AdUnit adUnit = new InterstitialAdUnit("adUnit");
 
-    Slot slot = mock(Slot.class);
+    CdbResponseSlot slot = mock(CdbResponseSlot.class);
     when(slot.getCpm()).thenReturn("0.10");
     when(slot.getDisplayUrl()).thenReturn("http://display.url");
 

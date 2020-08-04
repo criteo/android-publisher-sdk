@@ -30,8 +30,9 @@ public class DisplayUrlTokenValue extends AbstractTokenValue {
 
   public DisplayUrlTokenValue(
       @NonNull String displayUrl,
-      @NonNull Slot slot,
-      @NonNull Clock clock) {
+      @NonNull CdbResponseSlot slot,
+      @NonNull Clock clock
+  ) {
     super(slot, clock);
     this.displayUrl = displayUrl;
   }

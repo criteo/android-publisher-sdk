@@ -21,11 +21,12 @@ import static org.mockito.Mockito.when;
 
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.InterstitialAdUnit;
-import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.util.AdUnitType;
 import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,24 +59,24 @@ public class TokenCacheTest {
     bannerAdUnit2 = new BannerAdUnit("banneradUnitId2", new AdSize(320, 50));
     interstitialAdUnit2 = new InterstitialAdUnit("interstitialadUnitId2");
 
-    DisplayUrlTokenValue tokenForBanner1 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
-        clock);
-    DisplayUrlTokenValue tokenForBanner2 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
-        clock);
-    DisplayUrlTokenValue tokenForInterstitial1 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
-        clock);
-    DisplayUrlTokenValue tokenForInterstitial2 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
-        clock);
+    DisplayUrlTokenValue tokenForBanner1 = newDisplayUrlToken();
+    DisplayUrlTokenValue tokenForBanner2 = newDisplayUrlToken();
+    DisplayUrlTokenValue tokenForInterstitial1 = newDisplayUrlToken();
+    DisplayUrlTokenValue tokenForInterstitial2 = newDisplayUrlToken();
 
     BidToken bidTokenForBanner1 = tokenCache.add(tokenForBanner1, bannerAdUnit1);
     BidToken bidTokenForBanner2 = tokenCache.add(tokenForBanner2, bannerAdUnit2);
     BidToken bidTokenForInterstitial1 = tokenCache.add(tokenForInterstitial1, interstitialAdUnit1);
     BidToken bidTokenForInterstitial2 = tokenCache.add(tokenForInterstitial2, interstitialAdUnit2);
 
-    Assert.assertEquals(tokenForBanner1,
-        tokenCache.getTokenValue(bidTokenForBanner1, AdUnitType.CRITEO_BANNER));
-    Assert.assertEquals(tokenForBanner2,
-        tokenCache.getTokenValue(bidTokenForBanner2, AdUnitType.CRITEO_BANNER));
+    Assert.assertEquals(
+        tokenForBanner1,
+        tokenCache.getTokenValue(bidTokenForBanner1, AdUnitType.CRITEO_BANNER)
+    );
+    Assert.assertEquals(
+        tokenForBanner2,
+        tokenCache.getTokenValue(bidTokenForBanner2, AdUnitType.CRITEO_BANNER)
+    );
     Assert.assertEquals(tokenForInterstitial1,
         tokenCache.getTokenValue(bidTokenForInterstitial1, AdUnitType.CRITEO_INTERSTITIAL));
     Assert.assertEquals(tokenForInterstitial2,
@@ -84,7 +85,7 @@ public class TokenCacheTest {
 
   @Test
   public void testReturnNullWhenTokenExpired() {
-    Slot slot = mock(Slot.class);
+    CdbResponseSlot slot = mock(CdbResponseSlot.class);
     when(slot.isExpired(clock)).thenReturn(true);
 
     DisplayUrlTokenValue tokenForBanner1 = new DisplayUrlTokenValue(TEST_CREATIVE, slot, clock);
@@ -100,8 +101,8 @@ public class TokenCacheTest {
 
   @Test
   public void testReturnNullWhenWrongAdUnitType() {
-    DisplayUrlTokenValue tokenForBanner1 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class), clock);
-    DisplayUrlTokenValue tokenForInterstitial1 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class), clock);
+    DisplayUrlTokenValue tokenForBanner1 = newDisplayUrlToken();
+    DisplayUrlTokenValue tokenForInterstitial1 = newDisplayUrlToken();
 
     BidToken bidTokenForBanner1 = tokenCache.add(tokenForBanner1, bannerAdUnit1);
     BidToken bidTokenForInterstitial1 = tokenCache.add(tokenForInterstitial1, interstitialAdUnit1);
@@ -115,30 +116,28 @@ public class TokenCacheTest {
     bannerAdUnit2 = new BannerAdUnit("banneradUnitId2", new AdSize(320, 50));
     interstitialAdUnit2 = new InterstitialAdUnit("interstitialadUnitId2");
 
-    DisplayUrlTokenValue tokenForBanner1 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
-        clock);
-    DisplayUrlTokenValue tokenForBanner2 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
-        clock);
-    DisplayUrlTokenValue tokenForInterstitial1 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
-        clock);
-    DisplayUrlTokenValue tokenForInterstitial2 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
-        clock);
+    DisplayUrlTokenValue tokenForBanner1 = newDisplayUrlToken();
+    DisplayUrlTokenValue tokenForBanner2 = newDisplayUrlToken();
+    DisplayUrlTokenValue tokenForInterstitial1 = newDisplayUrlToken();
+    DisplayUrlTokenValue tokenForInterstitial2 = newDisplayUrlToken();
 
     BidToken bidTokenForBanner2 = tokenCache.add(tokenForBanner2, bannerAdUnit2);
     BidToken bidTokenForInterstitial2 = tokenCache.add(tokenForInterstitial2, interstitialAdUnit2);
-    Assert.assertNotEquals(tokenForBanner1,
-        tokenCache.getTokenValue(bidTokenForBanner2, AdUnitType.CRITEO_BANNER));
-    Assert.assertNotEquals(tokenForInterstitial1,
-        tokenCache.getTokenValue(bidTokenForInterstitial2, AdUnitType.CRITEO_INTERSTITIAL));
+    Assert.assertNotEquals(
+        tokenForBanner1,
+        tokenCache.getTokenValue(bidTokenForBanner2, AdUnitType.CRITEO_BANNER)
+    );
+    Assert.assertNotEquals(
+        tokenForInterstitial1,
+        tokenCache.getTokenValue(bidTokenForInterstitial2, AdUnitType.CRITEO_INTERSTITIAL)
+    );
   }
 
   //Checks TokenCache removes token after call getTokenValue
   @Test
   public void testGetTokenForBidAndGetValueForTokenCheckNull() {
-    DisplayUrlTokenValue tokenForBanner1 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
-        clock);
-    DisplayUrlTokenValue tokenForInterstitial1 = new DisplayUrlTokenValue(TEST_CREATIVE, mock(Slot.class),
-        clock);
+    DisplayUrlTokenValue tokenForBanner1 = newDisplayUrlToken();
+    DisplayUrlTokenValue tokenForInterstitial1 = newDisplayUrlToken();
 
     BidToken bidTokenForBanner1 = tokenCache.add(tokenForBanner1, bannerAdUnit1);
     BidToken bidTokenForInterstitial1 = tokenCache.add(tokenForInterstitial1, interstitialAdUnit1);
@@ -155,6 +154,11 @@ public class TokenCacheTest {
     BidToken nullToken = null;
     Assert.assertNull(tokenCache.getTokenValue(unChachedToken, AdUnitType.CRITEO_BANNER));
     Assert.assertNull(tokenCache.getTokenValue(nullToken, AdUnitType.CRITEO_BANNER));
+  }
+
+  @NotNull
+  private DisplayUrlTokenValue newDisplayUrlToken() {
+    return new DisplayUrlTokenValue(TEST_CREATIVE, mock(CdbResponseSlot.class), clock);
   }
 
 }

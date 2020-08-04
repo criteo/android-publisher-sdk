@@ -31,8 +31,8 @@ import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.Config;
-import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.network.BidRequestSender;
 import com.criteo.publisher.util.ApplicationStoppedListener;
 import com.criteo.publisher.util.CdbCallListener;
@@ -138,7 +138,7 @@ public class BidManager implements ApplicationStoppedListener {
    * @return a valid bid that may be displayed or <code>null</code> that should be ignored
    */
   @Nullable
-  public Slot getBidForAdUnitAndPrefetch(@Nullable AdUnit adUnit) {
+  public CdbResponseSlot getBidForAdUnitAndPrefetch(@Nullable AdUnit adUnit) {
     if (killSwitchEngaged()) {
       return null;
     }
@@ -149,7 +149,7 @@ public class BidManager implements ApplicationStoppedListener {
     }
 
     synchronized (cacheLock) {
-      Slot peekSlot = cache.peekAdUnit(cacheAdUnit);
+      CdbResponseSlot peekSlot = cache.peekAdUnit(cacheAdUnit);
       if (peekSlot == null) {
         // If no matching bid response is found
         fetch(cacheAdUnit);
@@ -181,11 +181,11 @@ public class BidManager implements ApplicationStoppedListener {
 
 
   @VisibleForTesting
-  void setCacheAdUnits(@NonNull List<Slot> slots) {
+  void setCacheAdUnits(@NonNull List<CdbResponseSlot> slots) {
     long instant = clock.getCurrentTimeInMillis();
 
     synchronized (cacheLock) {
-      for (Slot slot : slots) {
+      for (CdbResponseSlot slot : slots) {
         if (slot.isValid()) {
           boolean isImmediateBid = slot.getCpmAsNumber() > 0 && slot.getTtl() == 0;
           if (isImmediateBid) {

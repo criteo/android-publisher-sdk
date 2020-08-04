@@ -28,9 +28,9 @@ import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.InterstitialAdUnit;
-import com.criteo.publisher.model.Slot;
 import com.criteo.publisher.model.nativeads.NativeTokenValue;
 import java.util.UUID;
 import org.junit.Before;
@@ -117,7 +117,7 @@ public class InHouseTest {
   @Test
   public void getBidResponse_GivenBidManagerYieldingBid_ReturnBid() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
-    Slot slot = mock(Slot.class);
+    CdbResponseSlot slot = mock(CdbResponseSlot.class);
 
     when(slot.getCpmAsNumber()).thenReturn(42.1337);
     when(bidManager.getBidForAdUnitAndPrefetch(adUnit)).thenReturn(slot);

@@ -25,8 +25,8 @@ import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestSlot;
 import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.Config;
-import com.criteo.publisher.model.Slot;
 import java.io.InterruptedIOException;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.Executor;
@@ -147,7 +147,7 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
 
         for (CdbRequestSlot requestSlot : request.getSlots()) {
           String impressionId = requestSlot.getImpressionId();
-          Slot responseSlot = response.getSlotByImpressionId(impressionId);
+          CdbResponseSlot responseSlot = response.getSlotByImpressionId(impressionId);
           boolean isNoBid = responseSlot == null;
           boolean isInvalidBid = responseSlot != null && !responseSlot.isValid();
 
@@ -244,7 +244,7 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
    * @param consumedBid bid that was consumed
    */
   @Override
-  public void onBidConsumed(@NonNull CacheAdUnit adUnit, @NonNull Slot consumedBid) {
+  public void onBidConsumed(@NonNull CacheAdUnit adUnit, @NonNull CdbResponseSlot consumedBid) {
     if (isCsmDisabled()) {
       return;
     }
