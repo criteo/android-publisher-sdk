@@ -1,5 +1,6 @@
 [![CI](https://github.com/criteo/android-publisher-sdk/workflows/CI/badge.svg)]()
-[![License](https://img.shields.io/github/license/criteo/android-publisher-sdk.svg)]()
+[![License](https://img.shields.io/github/license/criteo/android-publisher-sdk.svg)](LICENSE)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.0%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 
 # Criteo Publisher SDK
 > Criteo Publisher SDK is meant for app publishers wanting to integrate in their app the Criteo Direct 
@@ -17,3 +18,13 @@ Please contact your technical support representative for any questions about the
 
 ## License
 [Apache License v2.0](LICENSE)
+
+## Contributing
+
+Any contribution is welcome, as an issue or pull request. 
+
+When contributing to this repository, unless the changes are trivial (typos, obvious programming mistakes, ...),
+we encourage creating an issue first, to discuss the change you wish to make.
+
+Please note that we have a [code of conduct](CODE_OF_CONDUCT.md), please follow it in all your interactions with the
+project.
