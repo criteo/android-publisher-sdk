@@ -28,7 +28,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import android.content.Context;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.mock.MockBean;
@@ -51,9 +50,6 @@ public class CriteoInterstitialTest {
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   @Mock
-  private Context context;
-
-  @Mock
   private Criteo criteo;
 
   @MockBean
@@ -67,7 +63,7 @@ public class CriteoInterstitialTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    interstitial = spy(new CriteoInterstitial(context, adUnit, criteo));
+    interstitial = spy(new CriteoInterstitial(adUnit, criteo));
   }
 
   @Test

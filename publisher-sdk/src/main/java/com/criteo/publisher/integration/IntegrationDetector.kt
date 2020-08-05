@@ -51,5 +51,4 @@ class IntegrationDetector {
     const val MoPubMediationBannerAdapterClass = "com.criteo.mediation.mopub.CriteoBannerAdapter"
     const val AdMobMediationAdapterClass = "com.criteo.mediation.google.CriteoAdapter"
   }
-
 }

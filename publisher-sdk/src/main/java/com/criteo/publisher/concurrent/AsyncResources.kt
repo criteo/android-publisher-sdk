@@ -48,6 +48,11 @@ abstract class AsyncResources {
 }
 
 internal class NoOpAsyncResources : AsyncResources() {
-  override fun onNewAsyncResource() {}
-  override fun onReleasedAsyncResource() {}
+  override fun onNewAsyncResource() {
+    // no-op
+  }
+
+  override fun onReleasedAsyncResource() {
+    // no-op
+  }
 }

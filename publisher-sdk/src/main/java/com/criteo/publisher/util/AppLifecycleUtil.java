@@ -19,6 +19,7 @@ package com.criteo.publisher.util;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
+import androidx.annotation.NonNull;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.BidManager;
 
@@ -41,7 +42,7 @@ public class AppLifecycleUtil implements Application.ActivityLifecycleCallbacks 
   }
 
   @Override
-  public void onActivityCreated(Activity activity, Bundle bundle) {
+  public void onActivityCreated(@NonNull Activity activity, Bundle bundle) {
     if (!created) {
       created = true;
       appEvents.sendLaunchEvent();
@@ -49,12 +50,12 @@ public class AppLifecycleUtil implements Application.ActivityLifecycleCallbacks 
   }
 
   @Override
-  public void onActivityStarted(Activity activity) {
+  public void onActivityStarted(@NonNull Activity activity) {
     started += 1;
   }
 
   @Override
-  public void onActivityResumed(Activity activity) {
+  public void onActivityResumed(@NonNull Activity activity) {
     if (resumed == 0 && !transitionPossible) {
       appEvents.sendActiveEvent();
     }
@@ -63,13 +64,13 @@ public class AppLifecycleUtil implements Application.ActivityLifecycleCallbacks 
   }
 
   @Override
-  public void onActivityPaused(Activity activity) {
+  public void onActivityPaused(@NonNull Activity activity) {
     transitionPossible = true;
     resumed -= 1;
   }
 
   @Override
-  public void onActivityStopped(Activity activity) {
+  public void onActivityStopped(@NonNull Activity activity) {
     if (started == 1) {
       // All transitions pause and stop activities
       if (transitionPossible && resumed == 0) {
@@ -83,12 +84,12 @@ public class AppLifecycleUtil implements Application.ActivityLifecycleCallbacks 
   }
 
   @Override
-  public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
+  public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle bundle) {
     // intentionally left blank
   }
 
   @Override
-  public void onActivityDestroyed(Activity activity) {
+  public void onActivityDestroyed(@NonNull Activity activity) {
     // intentionally left blank
   }
 }

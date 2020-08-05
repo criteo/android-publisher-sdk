@@ -27,7 +27,6 @@ import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.util.ReflectionUtil;
 import java.util.Arrays;
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
 
 public class MoPubHeaderBidding implements HeaderBiddingHandler {
 
@@ -70,7 +69,7 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler {
     ReflectionUtil.callMethodOnObject(object, "setKeywords", cleanedKeywords);
   }
 
-  @NotNull
+  @NonNull
   private String removeCriteoKeywords(@NonNull String keywords) {
     // clean previous Criteo keywords starting with "crt_"
     StringBuilder cleanedKeywords = new StringBuilder();

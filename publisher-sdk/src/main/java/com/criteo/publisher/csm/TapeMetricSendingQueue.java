@@ -62,7 +62,7 @@ class TapeMetricSendingQueue extends MetricSendingQueue {
   @Override
   boolean offer(@NonNull Metric metric) {
     synchronized (queueLock) {
-      createQueueIfNecessary();
+      ObjectQueue<Metric> queue = createQueueIfNecessary();
 
       try {
         queue.add(metric);
@@ -78,7 +78,7 @@ class TapeMetricSendingQueue extends MetricSendingQueue {
   @Override
   List<Metric> poll(int max) {
     synchronized (queueLock) {
-      createQueueIfNecessary();
+      ObjectQueue<Metric> queue = createQueueIfNecessary();
 
       List<Metric> metrics = new ArrayList<>();
       Exception exception = null;
@@ -139,7 +139,7 @@ class TapeMetricSendingQueue extends MetricSendingQueue {
       // There is a usedBytes method in the internal queueFile of the file object queue. This method
       // is used to get the real size of the queue.
 
-      createQueueIfNecessary();
+      ObjectQueue<Metric> queue = createQueueIfNecessary();
 
       if (!(queue instanceof FileObjectQueue)) {
         return 0;
@@ -168,19 +168,21 @@ class TapeMetricSendingQueue extends MetricSendingQueue {
 
   @NonNull
   @VisibleForTesting
-  QueueFile getQueueFile(@NonNull FileObjectQueue fileObjectQueue) throws ReflectiveOperationException, ClassCastException {
-      if (queueFile == null) {
-        Field queueFileField = FileObjectQueue.class.getDeclaredField("queueFile");
-        queueFileField.setAccessible(true);
-        queueFile = (QueueFile) queueFileField.get(fileObjectQueue);
-      }
+  QueueFile getQueueFile(@NonNull FileObjectQueue<?> fileObjectQueue)
+      throws ReflectiveOperationException, ClassCastException {
+    if (queueFile == null) {
+      Field queueFileField = FileObjectQueue.class.getDeclaredField("queueFile");
+      queueFileField.setAccessible(true);
+      queueFile = (QueueFile) queueFileField.get(fileObjectQueue);
+    }
 
-      return queueFile;
+    return queueFile;
   }
 
-  private void createQueueIfNecessary() {
+  private ObjectQueue<Metric> createQueueIfNecessary() {
     if (queue == null) {
       queue = queueFactory.create();
     }
+    return queue;
   }
 }

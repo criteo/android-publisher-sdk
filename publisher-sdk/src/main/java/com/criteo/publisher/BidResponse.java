@@ -17,6 +17,7 @@
 package com.criteo.publisher;
 
 import androidx.annotation.Nullable;
+import com.criteo.publisher.util.ObjectUtils;
 
 public final class BidResponse {
 
@@ -69,7 +70,7 @@ public final class BidResponse {
     if (valid != that.valid) {
       return false;
     }
-    return token != null ? token.equals(that.token) : that.token == null;
+    return ObjectUtils.equals(token, that.token);
   }
 
   @Override

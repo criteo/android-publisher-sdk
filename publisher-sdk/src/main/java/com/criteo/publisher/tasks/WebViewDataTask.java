@@ -34,13 +34,13 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
   private static final String TAG = "Criteo.WVDT";
 
   @NonNull
-  private WebViewData webviewData;
+  private final WebViewData webviewData;
 
   @NonNull
   private final DeviceInfo deviceInfo;
 
   @Nullable
-  private CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
+  private final CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
 
   public WebViewDataTask(@NonNull WebViewData webviewData,
       @NonNull DeviceInfo deviceInfo,

@@ -51,13 +51,13 @@ public final class BidToken {
     if (!tokenId.equals(bidToken.tokenId)) {
       return false;
     }
-    return adUnit != null ? adUnit.equals(bidToken.adUnit) : bidToken.adUnit == null;
+    return adUnit.equals(bidToken.adUnit);
   }
 
   @Override
   public int hashCode() {
     int result = tokenId.hashCode();
-    result = 31 * result + (adUnit != null ? adUnit.hashCode() : 0);
+    result = 31 * result + adUnit.hashCode();
     return result;
   }
 

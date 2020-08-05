@@ -67,5 +67,4 @@ internal class MetricSendingTask(
       queue.offer(it)
     }
   }
-
 }

@@ -28,7 +28,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import java.lang.ref.WeakReference;
@@ -146,11 +145,6 @@ public class AdChoiceOverlay {
 
     ViewGroup viewGroup = (ViewGroup) overlappedView;
     return viewGroup.getChildAt(0);
-  }
-
-  @VisibleForTesting
-  int getAdChoiceCount() {
-    return adChoicePerView.size();
   }
 
 }
