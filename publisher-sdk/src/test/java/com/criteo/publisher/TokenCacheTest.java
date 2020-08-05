@@ -19,6 +19,7 @@ package com.criteo.publisher;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import androidx.annotation.NonNull;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
@@ -26,7 +27,6 @@ import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.util.AdUnitType;
 import java.util.UUID;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -156,7 +156,7 @@ public class TokenCacheTest {
     Assert.assertNull(tokenCache.getTokenValue(nullToken, AdUnitType.CRITEO_BANNER));
   }
 
-  @NotNull
+  @NonNull
   private DisplayUrlTokenValue newDisplayUrlToken() {
     return new DisplayUrlTokenValue(TEST_CREATIVE, mock(CdbResponseSlot.class), clock);
   }

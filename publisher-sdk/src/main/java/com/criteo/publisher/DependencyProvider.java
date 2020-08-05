@@ -96,7 +96,7 @@ public class DependencyProvider {
 
   protected static DependencyProvider instance;
 
-  private final Map<Class, Object> services = new HashMap<>();
+  private final Map<Class<?>, Object> services = new HashMap<>();
 
   private Application application;
   private String criteoPublisherId;

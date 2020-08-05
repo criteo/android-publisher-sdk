@@ -55,5 +55,4 @@ class CriteoImageLoader(
     }
     return this
   }
-
 }

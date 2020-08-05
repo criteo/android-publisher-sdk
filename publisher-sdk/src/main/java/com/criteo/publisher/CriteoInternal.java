@@ -70,7 +70,8 @@ final class CriteoInternal extends Criteo {
       List<AdUnit> adUnits,
       @Nullable Boolean usPrivacyOptout,
       @Nullable String mopubConsent,
-      DependencyProvider dependencyProvider) {
+      @NonNull DependencyProvider dependencyProvider
+  ) {
 
     if (adUnits == null) {
       adUnits = new ArrayList<>();

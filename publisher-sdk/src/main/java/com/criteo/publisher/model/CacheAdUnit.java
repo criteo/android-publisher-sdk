@@ -17,6 +17,7 @@
 package com.criteo.publisher.model;
 
 import com.criteo.publisher.util.AdUnitType;
+import com.criteo.publisher.util.ObjectUtils;
 
 public final class CacheAdUnit {
 
@@ -62,10 +63,10 @@ public final class CacheAdUnit {
 
     CacheAdUnit that = (CacheAdUnit) o;
 
-    if (adUnitId != null ? !adUnitId.equals(that.adUnitId) : that.adUnitId != null) {
+    if (!ObjectUtils.equals(adUnitId, that.adUnitId)) {
       return false;
     }
-    if (adSize != null ? !adSize.equals(that.adSize) : that.adSize != null) {
+    if (!ObjectUtils.equals(adSize, that.adSize)) {
       return false;
     }
     return adUnitType == that.adUnitType;

@@ -19,16 +19,16 @@ package com.criteo.publisher.util
 object ObjectUtils {
   @JvmStatic
   fun equals(
-    a: Any?,
-    b: Any?
+      a: Any?,
+      b: Any?
   ): Boolean {
     return a == b
   }
-  
+
   @JvmStatic
   fun <T> getOrElse(
-    value: T?,
-    defaultValue: T?
+      value: T?,
+      defaultValue: T?
   ): T? {
     return value ?: defaultValue
   }

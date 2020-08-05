@@ -42,10 +42,8 @@ public class CriteoInterstitialActivity extends Activity {
 
   private WebView webView;
   private ResultReceiver resultReceiver;
-  private ImageButton closeButton;
   private FrameLayout adLayout;
   private ComponentName callingActivityName;
-  private AdWebViewClient adWebViewClient;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +60,7 @@ public class CriteoInterstitialActivity extends Activity {
     webView = new WebView(getApplicationContext());
     adLayout.addView(webView, 0);
 
-    closeButton = findViewById(R.id.closeButton);
+    ImageButton closeButton = findViewById(R.id.closeButton);
 
     Bundle bundle = getIntent().getExtras();
     if (bundle != null && bundle.getString(WEB_VIEW_DATA) != null) {

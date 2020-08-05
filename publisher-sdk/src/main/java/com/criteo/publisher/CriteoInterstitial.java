@@ -33,9 +33,6 @@ public class CriteoInterstitial {
 
   private final InterstitialAdUnit interstitialAdUnit;
 
-  @NonNull
-  private final Context context;
-
   /**
    * Null means that the singleton Criteo should be used.
    * <p>
@@ -54,15 +51,18 @@ public class CriteoInterstitial {
   @Nullable
   private CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
 
-  public CriteoInterstitial(@NonNull Context context, InterstitialAdUnit interstitialAdUnit) {
-    this(context, interstitialAdUnit, null);
+  public CriteoInterstitial(
+      @SuppressWarnings("unused") @NonNull Context context,
+      InterstitialAdUnit interstitialAdUnit
+  ) {
+    this(interstitialAdUnit, null);
   }
 
   @VisibleForTesting
-  CriteoInterstitial(@NonNull Context context,
+  CriteoInterstitial(
       InterstitialAdUnit interstitialAdUnit,
-      @Nullable Criteo criteo) {
-    this.context = context;
+      @Nullable Criteo criteo
+  ) {
     this.interstitialAdUnit = interstitialAdUnit;
     this.criteo = criteo;
   }

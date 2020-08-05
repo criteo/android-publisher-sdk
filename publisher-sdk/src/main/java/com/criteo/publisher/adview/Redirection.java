@@ -93,7 +93,7 @@ public class Redirection {
     }
 
     @Override
-    public void onActivityResumed(Activity activity) {
+    public void onActivityResumed(@NonNull Activity activity) {
       if (!trackedActivity.equals(activity.getComponentName())) {
         return;
       }

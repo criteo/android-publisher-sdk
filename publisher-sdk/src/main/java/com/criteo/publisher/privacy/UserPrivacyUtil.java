@@ -35,7 +35,7 @@ public class UserPrivacyUtil {
 
   // Regex according to the CCPA IAB String format defined in
   // https://iabtechlab.com/wp-content/uploads/2019/11/U.S.-Privacy-String-v1.0-IAB-Tech-Lab.pdf
-  private static final Pattern IAB_USPRIVACY_PATTERN = Pattern.compile("^1(Y|N|-|y|n){3}$");
+  private static final Pattern IAB_USPRIVACY_PATTERN = Pattern.compile("^1([YN\\-yn]){3}$");
 
   // List of IAB Strings representing a positive consent
   private static final List<String> IAB_USPRIVACY_WITH_CONSENT = Arrays
@@ -59,7 +59,7 @@ public class UserPrivacyUtil {
 
   private final SharedPreferences sharedPreferences;
 
-  private GdprDataFetcher gdprDataFetcher;
+  private final GdprDataFetcher gdprDataFetcher;
 
   public UserPrivacyUtil(@NonNull Context context) {
     this(
@@ -123,7 +123,7 @@ public class UserPrivacyUtil {
 
   private boolean isBinaryConsentGiven() {
     String usPrivacyOptout = getUsPrivacyOptout();
-    return Boolean.parseBoolean(usPrivacyOptout) != true;
+    return !Boolean.parseBoolean(usPrivacyOptout);
   }
 
   private boolean isIABConsentGiven() {

@@ -26,7 +26,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import androidx.test.InstrumentationRegistry;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import java.util.UUID;
@@ -112,7 +111,7 @@ public class CriteoInterstitialIntegrationTest {
   }
 
   private CriteoInterstitial createInterstitial() {
-    return new CriteoInterstitial(InstrumentationRegistry.getContext(), interstitialAdUnit, criteo);
+    return new CriteoInterstitial(interstitialAdUnit, criteo);
   }
 
 }

@@ -45,15 +45,8 @@ class IntegrationRegistry(
 
   @VisibleForTesting
   fun readIntegration(): Integration {
-    val moPubMediationPresent = integrationDetector.isMoPubMediationPresent()
-    val adMobMediationPresent = integrationDetector.isAdMobMediationPresent()
-
-    if (moPubMediationPresent && adMobMediationPresent) {
-      return Integration.FALLBACK
-    } else if (moPubMediationPresent) {
-      return Integration.MOPUB_MEDIATION
-    } else if (adMobMediationPresent) {
-      return Integration.ADMOB_MEDIATION
+    detectMediationIntegration()?.let {
+      return it
     }
 
     val integrationName = safeSharedPreferences.getString(
@@ -69,8 +62,22 @@ class IntegrationRegistry(
     }
   }
 
+  private fun detectMediationIntegration(): Integration? {
+    val moPubMediationPresent = integrationDetector.isMoPubMediationPresent()
+    val adMobMediationPresent = integrationDetector.isAdMobMediationPresent()
+
+    return if (moPubMediationPresent && adMobMediationPresent) {
+      Integration.FALLBACK
+    } else if (moPubMediationPresent) {
+      Integration.MOPUB_MEDIATION
+    } else if (adMobMediationPresent) {
+      Integration.ADMOB_MEDIATION
+    } else {
+      null
+    }
+  }
+
   private companion object {
     const val IntegrationStorageKey = "CriteoCachedIntegration"
   }
-
 }

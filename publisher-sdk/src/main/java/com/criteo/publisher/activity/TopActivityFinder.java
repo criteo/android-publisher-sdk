@@ -84,12 +84,12 @@ public class TopActivityFinder {
   public void registerActivityLifecycleFor(@NonNull Application application) {
     application.registerActivityLifecycleCallbacks(new NoOpActivityLifecycleCallbacks() {
       @Override
-      public void onActivityResumed(Activity activity) {
+      public void onActivityResumed(@NonNull Activity activity) {
         topActivityRef = new WeakReference<>(activity);
       }
 
       @Override
-      public void onActivityPaused(Activity activity) {
+      public void onActivityPaused(@NonNull Activity activity) {
         if (activity.equals(topActivityRef.get())) {
           topActivityRef = new WeakReference<>(null);
         }
