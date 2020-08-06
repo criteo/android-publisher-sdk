@@ -21,9 +21,7 @@ import static com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE;
 import static com.criteo.publisher.StubConstants.STUB_DISPLAY_URL;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 import static com.criteo.publisher.view.WebViewLookup.getRootView;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -62,8 +60,6 @@ import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.view.WebViewLookup;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
@@ -78,8 +74,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class StandaloneFunctionalTest {
-
-  private static final Charset CHARSET = StandardCharsets.UTF_8;
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
@@ -127,7 +121,7 @@ public class StandaloneFunctionalTest {
     CriteoBannerView bannerView = whenLoadingABanner(validBannerAdUnit);
     String html = webViewLookup.lookForHtmlContent(bannerView).get();
 
-    assertTrue(STUB_DISPLAY_URL.matcher(html).find());
+    assertThat(html).containsPattern(STUB_DISPLAY_URL);
   }
 
   @Test
@@ -155,7 +149,7 @@ public class StandaloneFunctionalTest {
     View interstitialView = whenLoadingAndDisplayingAnInterstitial(interstitial, sync);
     String html = webViewLookup.lookForHtmlContent(interstitialView).get();
 
-    assertTrue(html.contains(STUB_CREATIVE_IMAGE));
+    assertThat(html).contains(STUB_CREATIVE_IMAGE);
   }
 
   @Test
@@ -175,8 +169,8 @@ public class StandaloneFunctionalTest {
     View interstitialView2 = whenLoadingAndDisplayingAnInterstitial(interstitial, sync);
     String html2 = webViewLookup.lookForHtmlContent(interstitialView2).get();
 
-    assertTrue(html1.contains(STUB_CREATIVE_IMAGE));
-    assertTrue(html2.contains(STUB_CREATIVE_IMAGE));
+    assertThat(html1).contains(STUB_CREATIVE_IMAGE);
+    assertThat(html2).contains(STUB_CREATIVE_IMAGE);
   }
 
   @Test
@@ -189,7 +183,10 @@ public class StandaloneFunctionalTest {
     // Empty webview may not be totally empty. When tested, it contains "ul" inside.
     String html = webViewLookup.lookForHtmlContent(bannerView).get();
 
-    assertTrue(html.isEmpty() || html.equals("ul"));
+    assertThat(html).satisfiesAnyOf(
+        str -> assertThat(str).isEmpty(),
+        str -> assertThat(str).isEqualTo("ul")
+    );
   }
 
   @Test
@@ -199,7 +196,7 @@ public class StandaloneFunctionalTest {
 
     CriteoInterstitial interstitial = whenLoadingAnInterstitial(invalidInterstitialAdUnit);
 
-    assertFalse(interstitial.isAdLoaded());
+    assertThat(interstitial.isAdLoaded()).isFalse();
 
     Activity activity = webViewLookup.lookForResumedActivity(() -> {
       runOnMainThreadAndWait(interstitial::show);
@@ -208,7 +205,7 @@ public class StandaloneFunctionalTest {
     }).get();
 
     // So launched activity is not the interstitial one
-    assertEquals(DummyActivity.class, activity.getClass());
+    assertThat(activity).isInstanceOf(DummyActivity.class);
   }
 
   private CriteoBannerView whenLoadingABanner(BannerAdUnit bannerAdUnit) throws Exception {
@@ -232,7 +229,7 @@ public class StandaloneFunctionalTest {
     runOnMainThreadAndWait(interstitial::loadAd);
     sync.waitForBid();
 
-    assertTrue(interstitial.isAdLoaded());
+    assertThat(interstitial.isAdLoaded()).isTrue();
 
     Future<Activity> activity = webViewLookup.lookForResumedActivity(() -> {
       runOnMainThreadAndWait(interstitial::show);
@@ -355,7 +352,7 @@ public class StandaloneFunctionalTest {
 
     boolean interstitialFlag = request.getSlots().get(0).isInterstitial();
 
-    assertTrue(interstitialFlag);
+    assertThat(interstitialFlag).isTrue();
   }
 
   @Test
