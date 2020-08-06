@@ -16,39 +16,25 @@
 
 package com.criteo.publisher.csm;
 
-import static com.criteo.publisher.csm.MetricDirectoryHelper.clear;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import android.content.Context;
 import com.criteo.publisher.csm.MetricRepository.MetricUpdater;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.util.BuildConfigWrapper;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import javax.inject.Inject;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.*;
+
+import static com.criteo.publisher.csm.MetricDirectoryHelper.clear;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 public class FileMetricRepositoryTest {
 
@@ -300,44 +286,48 @@ public class FileMetricRepositoryTest {
   }
 
   @Test
-  public void updateById_GivenReadDuringAnUpdate_ReadOccurBeforeOrAfterTheUpdate() throws Exception {
+  public void updateById_GivenReadDuringAnUpdate_ReadOccurAfterUpdateIndependentlyOfOtherIds() throws Exception {
     Metric expected = Metric.builder("id1")
-        .setCdbCallStartTimestamp(1337L)
-        .build();
+            .setCdbCallStartTimestamp(1337L)
+            .build();
 
     ExecutorService executor = Executors.newFixedThreadPool(3);
     CountDownLatch isInUpdate = new CountDownLatch(2);
+    CountDownLatch isReadFinished = new CountDownLatch(1);
 
     repository.addOrUpdateById("id1", builder -> {
       builder.setCdbCallStartTimestamp(0L);
     });
 
-    Future<?> future1 = executor.submit(() -> {
+    Future<?> updateTask = executor.submit(() -> {
       repository.addOrUpdateById("id1", builder -> {
         builder.setCdbCallStartTimestamp(42L);
         isInUpdate.countDown();
-        waitForPotentialIO();
         builder.setCdbCallStartTimestamp(1337L);
       });
     });
 
-    Future<?> future2 = executor.submit(() -> {
+    Future<?> independentUpdateTask = executor.submit(() -> {
       repository.addOrUpdateById("id2", builder -> {
         builder.setCdbCallStartTimestamp(1L);
         isInUpdate.countDown();
-        waitForPotentialIO();
+
+        // Block this update to show that it doesn't block the read
+        awaitShortly(isReadFinished);
+
         builder.setCdbCallStartTimestamp(2L);
       });
     });
 
-    Future<Collection<Metric>> future3 = executor.submit(() -> {
-      assertTrue(isInUpdate.await(1, TimeUnit.SECONDS));
+    Future<Collection<Metric>> readTask = executor.submit(() -> {
+      awaitShortly(isInUpdate);
       return repository.getAllStoredMetrics();
     });
 
-    future1.get();
-    future2.get();
-    Collection<Metric> metrics = future3.get();
+    Collection<Metric> metrics = readTask.get();
+    isReadFinished.countDown();
+    updateTask.get();
+    independentUpdateTask.get();
 
     // id1 already exists before the read started, so it is included in read, but only its committed
     // version is read. id2 was committed after the read start, hence it is not included.
@@ -635,9 +625,11 @@ public class FileMetricRepositoryTest {
     assertTrue(metrics.contains(Metric.builder("id").build()));
   }
 
-  private void waitForPotentialIO() {
+  private void awaitShortly(CountDownLatch latch) {
     try {
-      Thread.sleep(50);
+      // Timeout after 1 second to not block the test that is expected to only sleep for few IO operations.
+      latch.await();
+      assertTrue(latch.await(5, TimeUnit.SECONDS));
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
