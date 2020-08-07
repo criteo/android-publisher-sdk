@@ -108,6 +108,7 @@ public class StandaloneFunctionalTest {
 
     api = spy(dependencyProvider.providePubSdkApi());
     when(dependencyProvider.providePubSdkApi()).thenReturn(api);
+    when(androidUtil.isCurrentProcessInForeground(any())).thenReturn(true);
     when(dependencyProvider.provideAndroidUtil()).thenReturn(androidUtil);
 
     webViewLookup = new WebViewLookup();

@@ -16,8 +16,14 @@
 
 package com.criteo.publisher.util;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.content.Context;
+import android.util.Log;
 import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.DummyCriteo;
+import java.util.List;
 
 /**
  * Represent the state of the android application.
@@ -40,8 +46,8 @@ public class AndroidUtil {
   /**
    * Overall orientation of the screen.
    * <p>
-   * May be one of {@link android.content.res.Configuration#ORIENTATION_LANDSCAPE},
-   * {@link android.content.res.Configuration#ORIENTATION_PORTRAIT}.
+   * May be one of {@link android.content.res.Configuration#ORIENTATION_LANDSCAPE}, {@link
+   * android.content.res.Configuration#ORIENTATION_PORTRAIT}.
    */
   public int getOrientation() {
     return context.getResources().getConfiguration().orientation;
@@ -57,4 +63,25 @@ public class AndroidUtil {
     return (int) Math.ceil(dp * context.getResources().getDisplayMetrics().density);
   }
 
+  /**
+   * Check whether the current process is in foreground.
+   *
+   * @return {@code true} if the current process is in foreground, {@code false} otherwise
+   */
+  public boolean isCurrentProcessInForeground(@NonNull Context context) {
+    ActivityManager activityManager = (ActivityManager) context
+        .getSystemService(Context.ACTIVITY_SERVICE);
+
+    List<RunningAppProcessInfo> runningProcesses = activityManager.getRunningAppProcesses();
+    if (runningProcesses != null) {
+      for (ActivityManager.RunningAppProcessInfo runningAppProcessInfo : runningProcesses) {
+        if (runningAppProcessInfo.pid == android.os.Process.myPid()
+            && runningAppProcessInfo.importance > RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
 }

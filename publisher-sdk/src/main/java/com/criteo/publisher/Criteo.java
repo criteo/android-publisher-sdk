@@ -28,10 +28,12 @@ import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.util.AdUnitType;
+import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.DeviceUtil;
 import java.util.List;
 
 public abstract class Criteo {
+
   private static final String TAG = Criteo.class.getSimpleName();
   private static Criteo criteo;
 
@@ -95,7 +97,6 @@ public abstract class Criteo {
       @Nullable Boolean usPrivacyOptOut,
       @Nullable String mopubConsent
   ) throws CriteoInitException {
-
     synchronized (Criteo.class) {
       if (criteo == null) {
         try {
@@ -104,8 +105,11 @@ public abstract class Criteo {
           dependencyProvider.setCriteoPublisherId(criteoPublisherId);
 
           DeviceUtil deviceUtil = dependencyProvider.provideDeviceUtil();
+          AndroidUtil androidUtil = dependencyProvider.provideAndroidUtil();
 
-          if (deviceUtil.isVersionSupported()) {
+          if (!androidUtil.isCurrentProcessInForeground(application)) {
+            criteo = null;
+          } else if (deviceUtil.isVersionSupported()) {
             criteo = new CriteoInternal(
                 application,
                 adUnits,
@@ -149,7 +153,10 @@ public abstract class Criteo {
   public abstract BidResponse getBidResponse(AdUnit adUnit);
 
   @Nullable
-  abstract DisplayUrlTokenValue getTokenValue(@Nullable BidToken bidToken, @NonNull AdUnitType adUnitType);
+  abstract DisplayUrlTokenValue getTokenValue(
+      @Nullable BidToken bidToken,
+      @NonNull AdUnitType adUnitType
+  );
 
   @NonNull
   abstract DeviceInfo getDeviceInfo();

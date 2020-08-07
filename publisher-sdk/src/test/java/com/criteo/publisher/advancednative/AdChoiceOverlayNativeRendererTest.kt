@@ -23,15 +23,20 @@ import com.criteo.publisher.CriteoNotInitializedException
 import com.criteo.publisher.CriteoUtil.clearCriteo
 import com.criteo.publisher.CriteoUtil.givenInitializedCriteo
 import com.criteo.publisher.MockableDependencyProvider
+import com.criteo.publisher.mock.MockedDependenciesRule
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
 class AdChoiceOverlayNativeRendererTest {
+  @Rule
+  @JvmField
+  val mockedDependenciesRule = MockedDependenciesRule()
 
   @Mock
   private lateinit var delegate: CriteoNativeRenderer

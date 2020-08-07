@@ -18,6 +18,7 @@ package com.criteo.publisher.mock;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -36,6 +37,7 @@ import com.criteo.publisher.csm.MetricHelper;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.RemoteConfigResponse;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.InstrumentationUtil;
 import java.io.IOException;
@@ -224,7 +226,15 @@ public class MockedDependenciesRule implements MethodRule {
 
     setUpDependencyProvider();
     setUpCdbMock();
+    setupAndroidUtilMock();
     injectDependencies();
+  }
+
+  private void setupAndroidUtilMock() {
+    AndroidUtil androidUtil = new AndroidUtil(dependencyProvider.provideApplication());
+    AndroidUtil androidUtilSpy = Mockito.spy(androidUtil);
+    doReturn(true).when(androidUtilSpy).isCurrentProcessInForeground(any());
+    doReturn(androidUtilSpy).when(dependencyProvider).provideAndroidUtil();
   }
 
   @RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)

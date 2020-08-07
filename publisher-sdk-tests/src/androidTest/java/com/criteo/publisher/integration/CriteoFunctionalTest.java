@@ -18,7 +18,10 @@ package com.criteo.publisher.integration;
 
 import static com.criteo.publisher.CriteoUtil.TEST_CP_ID;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
+import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.AdditionalAnswers.answerVoid;
@@ -37,6 +40,7 @@ import androidx.test.filters.FlakyTest;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.BidManager;
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.DummyCriteo;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
@@ -47,6 +51,7 @@ import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
+import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import java.util.Collections;
 import java.util.List;
@@ -82,6 +87,9 @@ public class CriteoFunctionalTest {
 
   @SpyBean
   private BidManager bidManager;
+
+  @MockBean
+  private AndroidUtil androidUtil;
 
   @Before
   public void setUp() throws Exception {
@@ -167,6 +175,23 @@ public class CriteoFunctionalTest {
 
       return true;
     }));
+  }
+
+  @Test
+  public void init_GivenCurrentForegroundProcess_RealCriteoIsInitialized() throws Exception {
+    when(androidUtil.isCurrentProcessInForeground(application)).thenReturn(true);
+    Criteo criteo = givenInitializedCriteo();
+    waitForBids();
+    assertNotNull(criteo);
+    assertFalse(criteo instanceof DummyCriteo);
+  }
+
+  @Test
+  public void init_GivenCurrentForegroundProcess_DummyCriteoIsInitialized() throws Exception {
+    when(androidUtil.isCurrentProcessInForeground(application)).thenReturn(false);
+    Criteo criteo = givenInitializedCriteo();
+    waitForBids();
+    assertNull(criteo);
   }
 
   private void waitForBids() {
