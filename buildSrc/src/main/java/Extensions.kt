@@ -17,15 +17,22 @@
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.BaseExtension
 import fr.pturpin.slackpublish.SlackPublishExtension
+import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.publish.PublishingExtension
 
-internal val Project.androidBase: BaseExtension get() =
-  (this as ExtensionAware).extensions.getByName("android") as BaseExtension
+internal val Project.androidBase: BaseExtension
+  get() =
+    (this as ExtensionAware).extensions.getByName("android") as BaseExtension
 
-internal val Project.publishing: PublishingExtension get() =
-  (this as ExtensionAware).extensions.getByName("publishing") as PublishingExtension
+internal val Project.publishing: PublishingExtension
+  get() =
+    (this as ExtensionAware).extensions.getByName("publishing") as PublishingExtension
+
+internal val Project.detekt: DetektExtension?
+  get() =
+    (this as ExtensionAware).extensions.findByType(DetektExtension::class.java)
 
 internal fun Project.androidBase(configure: BaseExtension.() -> Unit): Unit =
     (this as ExtensionAware).extensions.configure("android", configure)

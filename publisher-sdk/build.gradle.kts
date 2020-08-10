@@ -23,6 +23,7 @@ plugins {
     id("com.vanniktech.android.javadoc") version "0.3.0"
     id("fr.pturpin.slack-publish")
     id("com.jfrog.bintray")
+    id("io.gitlab.arturbosch.detekt")
 }
 
 allOpen {

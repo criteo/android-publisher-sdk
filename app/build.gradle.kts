@@ -22,6 +22,7 @@ plugins {
     `maven-publish`
     kotlin("android")
     id("com.jfrog.bintray")
+    id("io.gitlab.arturbosch.detekt")
 }
 
 androidAppModule("com.criteo.pubsdk_android")

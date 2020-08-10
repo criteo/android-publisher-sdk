@@ -89,6 +89,10 @@ object Deps {
     }
   }
 
+  object Detekt {
+    const val version = "1.10.0"
+  }
+
   object EqualsVerifier {
     private const val version = "3.3"
 
