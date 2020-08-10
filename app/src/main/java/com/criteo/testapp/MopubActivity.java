@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.criteo.pubsdk_android;
+package com.criteo.testapp;
 
 import static com.mopub.common.logging.MoPubLog.LogLevel.DEBUG;
 import static com.mopub.common.logging.MoPubLog.LogLevel.INFO;
@@ -31,8 +31,8 @@ import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
-import com.criteo.pubsdk_android.integration.MockedIntegrationRegistry;
-import com.criteo.pubsdk_android.listener.TestAppMoPubInterstitialAdListener;
+import com.criteo.testapp.integration.MockedIntegrationRegistry;
+import com.criteo.testapp.listener.TestAppMoPubInterstitialAdListener;
 import com.mopub.common.MoPub;
 import com.mopub.common.SdkConfiguration;
 import com.mopub.common.SdkInitializationListener;

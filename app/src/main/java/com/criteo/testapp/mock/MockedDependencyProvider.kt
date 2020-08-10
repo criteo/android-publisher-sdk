@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.criteo.pubsdk_android.mock
+package com.criteo.testapp.mock
 
 import com.criteo.publisher.Criteo
 import com.criteo.publisher.CriteoUtil

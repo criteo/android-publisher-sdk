@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.criteo.pubsdk_android.integration
+package com.criteo.testapp.integration
 
 import com.criteo.publisher.integration.IntegrationDetector
 

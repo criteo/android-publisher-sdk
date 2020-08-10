@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.criteo.pubsdk_android
+package com.criteo.testapp
 
 import android.os.Bundle
 import android.provider.Settings
@@ -25,8 +25,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.criteo.publisher.integration.Integration
-import com.criteo.pubsdk_android.integration.MockedIntegrationRegistry
-import com.criteo.pubsdk_android.listener.TestAppDfpAdListener
+import com.criteo.testapp.integration.MockedIntegrationRegistry
+import com.criteo.testapp.listener.TestAppDfpAdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.criteo.pubsdk_android;
+package com.criteo.testapp;
 
 import android.content.res.Configuration;
 import android.os.Bundle;

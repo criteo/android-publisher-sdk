@@ -14,10 +14,10 @@
  *    limitations under the License.
  */
 
-package com.criteo.pubsdk_android;
+package com.criteo.testapp;
 
-import static com.criteo.pubsdk_android.PubSdkDemoApplication.INTERSTITIAL_IBV_DEMO;
-import static com.criteo.pubsdk_android.PubSdkDemoApplication.NATIVE;
+import static com.criteo.testapp.PubSdkDemoApplication.INTERSTITIAL_IBV_DEMO;
+import static com.criteo.testapp.PubSdkDemoApplication.NATIVE;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -34,11 +34,11 @@ import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
-import com.criteo.pubsdk_android.integration.MockedIntegrationRegistry;
-import com.criteo.pubsdk_android.listener.TestAppBannerAdListener;
-import com.criteo.pubsdk_android.listener.TestAppInterstitialAdDisplayListener;
-import com.criteo.pubsdk_android.listener.TestAppInterstitialAdListener;
-import com.criteo.pubsdk_android.listener.TestAppNativeAdListener;
+import com.criteo.testapp.integration.MockedIntegrationRegistry;
+import com.criteo.testapp.listener.TestAppBannerAdListener;
+import com.criteo.testapp.listener.TestAppInterstitialAdDisplayListener;
+import com.criteo.testapp.listener.TestAppInterstitialAdListener;
+import com.criteo.testapp.listener.TestAppNativeAdListener;
 
 public class InHouseActivity extends AppCompatActivity {
 
