@@ -20,6 +20,7 @@ plugins {
   kotlin("android")
   id("com.vanniktech.android.javadoc") version "0.3.0"
   id("com.jfrog.bintray")
+  id("io.gitlab.arturbosch.detekt")
 }
 
 androidLibModule()

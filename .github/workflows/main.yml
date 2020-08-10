@@ -34,7 +34,7 @@ jobs:
           restore-keys: ${{ runner.os }}-android-
 
       - name: Build & Run Java tests
-        run: ./gradlew build assembleAndroidTest
+        run: ./gradlew check assembleAndroidTest
 
       - name: Junit Report to Annotations
         uses: ashley-taylor/junit-report-annotations-action@1.3
@@ -42,12 +42,12 @@ jobs:
         with:
           access-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload JUnit report
+      - name: Upload all (JUnit+Lint+Detekt) reports
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: junit-report
-          path: "**/build/reports/tests"
+          path: "**/build/reports/**/*"
 
   android-tests:
     runs-on: macos-latest

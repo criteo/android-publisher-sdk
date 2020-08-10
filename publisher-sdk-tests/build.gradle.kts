@@ -18,6 +18,7 @@ plugins {
   id("com.android.library")
   kotlin("android")
   id("com.banno.gordon")
+  id("io.gitlab.arturbosch.detekt")
 }
 
 gordon.retryQuota.set(5)
