@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.integration
 
+@Suppress("MagicNumber")
 enum class Integration(val profileId: Int) {
   FALLBACK(235),
 

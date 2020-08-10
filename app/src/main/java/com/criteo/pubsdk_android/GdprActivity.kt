@@ -48,7 +48,6 @@ class GdprActivity : AppCompatActivity() {
         val gdprAppliesV1 = findViewById<EditText>(R.id.gdprAppliesV1)
         gdprAppliesV1.setText(defaultSharedPreferences.getString(TCF1_GDPR_APPLIES, ""))
 
-
         val saveBtn = findViewById<Button>(R.id.saveTcfData)
         saveBtn.setOnClickListener {
             val editor = defaultSharedPreferences.edit()

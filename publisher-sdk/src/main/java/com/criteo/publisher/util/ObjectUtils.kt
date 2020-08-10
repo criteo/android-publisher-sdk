@@ -21,15 +21,11 @@ object ObjectUtils {
   fun equals(
       a: Any?,
       b: Any?
-  ): Boolean {
-    return a == b
-  }
+  ): Boolean = a == b
 
   @JvmStatic
   fun <T> getOrElse(
       value: T?,
       defaultValue: T?
-  ): T? {
-    return value ?: defaultValue
-  }
+  ): T? = value ?: defaultValue
 }

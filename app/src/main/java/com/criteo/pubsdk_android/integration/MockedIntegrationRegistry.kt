@@ -76,5 +76,4 @@ internal class MockedIntegrationRegistry(
       mockedIntegrationRegistry?.forceDeclaration(integration)
     }
   }
-
 }

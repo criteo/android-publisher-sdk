@@ -40,7 +40,7 @@ internal object MockedDependencyProvider {
   fun startMocking(injections: MockInjection.() -> Unit) {
     // Mockito needs this property to know where to store generated classes
     val application = DependencyProvider.getInstance().provideApplication()
-    System.setProperty("org.mockito.android.target", application.cacheDir.path);
+    System.setProperty("org.mockito.android.target", application.cacheDir.path)
 
     resetCriteo {
       MockableDependencyProvider.setInstance(null)

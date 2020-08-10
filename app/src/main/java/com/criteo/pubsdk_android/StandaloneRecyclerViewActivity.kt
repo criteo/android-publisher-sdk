@@ -117,7 +117,7 @@ class StandaloneRecyclerViewActivity : AppCompatActivity() {
         else -> throw NotImplementedError()
       }
 
-      return object: RecyclerView.ViewHolder(view) {}
+      return object : RecyclerView.ViewHolder(view) {}
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -162,13 +162,13 @@ class StandaloneRecyclerViewActivity : AppCompatActivity() {
       dataset.add(nativeAd)
       notifyItemInserted(dataset.size - 1)
     }
-
   }
 
   data class Content(val text: String, val imageUrl: String) {
     companion object {
       private val random = Random.Default
 
+      @Suppress("MagicNumber")
       fun newRandom(): Content {
         val width = random.nextInt(300, 500)
         val height = random.nextInt(100, 300)
@@ -177,5 +177,4 @@ class StandaloneRecyclerViewActivity : AppCompatActivity() {
       }
     }
   }
-
 }

@@ -21,13 +21,9 @@ import com.criteo.publisher.annotation.OpenForTesting
 @OpenForTesting
 class IntegrationDetector {
 
-  fun isMoPubMediationPresent(): Boolean {
-    return MoPubMediationBannerAdapterClass.isClassPresent()
-  }
+  fun isMoPubMediationPresent(): Boolean = MoPubMediationBannerAdapterClass.isClassPresent()
 
-  fun isAdMobMediationPresent(): Boolean {
-    return AdMobMediationAdapterClass.isClassPresent()
-  }
+  fun isAdMobMediationPresent(): Boolean = AdMobMediationAdapterClass.isClassPresent()
 
   private fun String.isClassPresent(): Boolean {
     return try {

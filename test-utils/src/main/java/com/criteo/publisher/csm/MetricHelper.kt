@@ -41,5 +41,4 @@ object MetricHelper {
 
   val MetricRequest.internalFeedbacks: List<MetricRequest.MetricRequestFeedback>
     get() = feedbacks
-
 }
