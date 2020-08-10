@@ -18,15 +18,24 @@ package com.criteo.publisher.mock
 
 import com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE
 import com.criteo.publisher.StubConstants.STUB_NATIVE_JSON
-import com.criteo.publisher.TestAdUnits.*
-import com.criteo.publisher.model.*
+import com.criteo.publisher.TestAdUnits.BANNER_320_480
+import com.criteo.publisher.TestAdUnits.BANNER_320_50
+import com.criteo.publisher.TestAdUnits.INTERSTITIAL
+import com.criteo.publisher.TestAdUnits.NATIVE
+import com.criteo.publisher.model.AdSize
+import com.criteo.publisher.model.BannerAdUnit
+import com.criteo.publisher.model.CdbRequest
+import com.criteo.publisher.model.CdbRequestSlot
+import com.criteo.publisher.model.InterstitialAdUnit
+import com.criteo.publisher.model.NativeAdUnit
 import com.criteo.publisher.util.JsonSerializer
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import okio.Buffer
-import java.util.*
+import java.net.HttpURLConnection
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -35,6 +44,9 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
   companion object {
     const val TCF2_CONSENT_NOT_GIVEN = "COwJDpQOwJDpQIAAAAENAPCgAAAAAAAAAAAAAxQAgAsABiAAAAAA"
     const val TCF1_CONSENT_NOT_GIVEN = "BOnz82JOnz82JABABBFRCPgAAAAFuABABAA"
+
+    // Use any ZoneId as CDB preprod returns an auto-incremented ID coming from DB
+    private const val DUMMY_ZONE_ID = 1337
   }
 
   private val mockWebServer = MockWebServer()
@@ -55,7 +67,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
           "/inapp/v2" -> handleBidRequest(request.body)
           "/delivery/ajs.php" -> handleCasperRequest(request)
           "/appevent/v1/2379" -> handleBearcatRequest()
-          else -> MockResponse().setResponseCode(404)
+          else -> MockResponse().setResponseCode(HttpURLConnection.HTTP_NOT_FOUND)
         }.also {
           if (simulateSlowNetwork.compareAndSet(true, false)) {
             it.throttleBody(1, 1, TimeUnit.SECONDS)
@@ -83,6 +95,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
     return MockResponse().setStatus("HTTP/1.1 204 No Content")
   }
 
+  @Suppress("MaxLineLength")
   private fun handleConfigRequest(): MockResponse {
     return MockResponse()
         .setHeader("content-type", "application/json; charset=utf-8")
@@ -105,7 +118,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
     val cdbRequest = jsonSerializer.read(CdbRequest::class.java, body.inputStream())
 
     if (shouldNotBid(cdbRequest)) {
-      return MockResponse().setResponseCode(204)
+      return MockResponse().setResponseCode(HttpURLConnection.HTTP_NO_CONTENT)
     }
 
     val responseSlots = cdbRequest.slots.mapNotNull { it.toResponseSlot() }.joinToString()
@@ -130,20 +143,18 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
     val width = size.width
     val height = size.height
 
-    // Use any ZoneId as CDB preprod returns an auto-incremented ID coming from DB
-    val zoneId = 1337
-
     val bannerAdUnit = BannerAdUnit(placementId, size)
     val interstitialAdUnit = InterstitialAdUnit(placementId)
     val nativeAdUnit = NativeAdUnit(placementId)
 
-    if (bannerAdUnit == BANNER_320_50 || bannerAdUnit == BANNER_320_480 || interstitialAdUnit == INTERSTITIAL) {
-      return """
+    return when {
+      bannerAdUnit == BANNER_320_50 || bannerAdUnit == BANNER_320_480 || interstitialAdUnit == INTERSTITIAL -> {
+        """
         {
           "impId": "$impressionId",
           "placementId": "$placementId",
           "arbitrageId": "arbitrage_id",
-          "zoneId": $zoneId,
+          "zoneId": $DUMMY_ZONE_ID,
           "cpm": "1.12",
           "currency": "EUR",
           "width": $width,
@@ -152,15 +163,14 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
           "displayUrl": "$url/delivery/ajs.php?width=$width&height=$height"
         }
       """.trimIndent()
-    }
-
-    if (nativeAdUnit == NATIVE) {
-      return """
+      }
+      nativeAdUnit == NATIVE -> {
+        """
         {
           "impId": "$impressionId",
           "placementId": "$placementId",
           "arbitrageId": "",
-          "zoneId": $zoneId,
+          "zoneId": $DUMMY_ZONE_ID,
           "cpm": "1.12",
           "currency": "EUR",
           "width": $width,
@@ -169,9 +179,9 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
           "native": $STUB_NATIVE_JSON
         }
       """.trimIndent()
+      }
+      else -> null
     }
-
-    return null
   }
 
   private fun String.toAdSize(): AdSize {
@@ -199,5 +209,4 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
         .setHeader("content-type", "text/plain; charset=utf-8")
         .setBody(response)
   }
-
 }

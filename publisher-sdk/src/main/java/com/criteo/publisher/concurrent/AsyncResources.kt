@@ -19,6 +19,7 @@ package com.criteo.publisher.concurrent
 import java.util.concurrent.atomic.AtomicBoolean
 
 abstract class AsyncResources {
+  @Suppress("TooGenericExceptionCaught")
   fun newResource(resourceHandler: AsyncResource.() -> Unit) {
     val resource = AsyncResource()
     try {

@@ -27,12 +27,17 @@ import androidx.appcompat.app.AppCompatActivity
 import com.criteo.publisher.integration.Integration
 import com.criteo.pubsdk_android.integration.MockedIntegrationRegistry
 import com.criteo.pubsdk_android.listener.TestAppDfpAdListener
-import com.google.android.gms.ads.*
+import com.google.android.gms.ads.AdLoader
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.InterstitialAd
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.gms.ads.formats.UnifiedNativeAd
 import com.google.android.gms.ads.formats.UnifiedNativeAdView
 
-
-class AdMobMediationActivity: AppCompatActivity() {
+class AdMobMediationActivity : AppCompatActivity() {
 
   private companion object {
     /** This AdMob AdUnit is mapped to this Criteo AdUnit: /140800857/Endeavour_320x50 */
@@ -135,5 +140,4 @@ class AdMobMediationActivity: AppCompatActivity() {
 
     nativeView.setNativeAd(this)
   }
-
 }
