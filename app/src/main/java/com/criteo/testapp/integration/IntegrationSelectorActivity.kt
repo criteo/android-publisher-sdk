@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.criteo.pubsdk_android.integration
+package com.criteo.testapp.integration
 
 import android.os.Bundle
 import android.widget.Button
@@ -23,8 +23,8 @@ import android.widget.RadioButton
 import androidx.appcompat.app.AppCompatActivity
 import com.criteo.publisher.DependencyProvider
 import com.criteo.publisher.integration.IntegrationDetector
-import com.criteo.pubsdk_android.R
-import com.criteo.pubsdk_android.mock.MockedDependencyProvider
+import com.criteo.testapp.R
+import com.criteo.testapp.mock.MockedDependencyProvider
 
 class IntegrationSelectorActivity : AppCompatActivity() {
 

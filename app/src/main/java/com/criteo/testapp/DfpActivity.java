@@ -14,9 +14,9 @@
  *    limitations under the License.
  */
 
-package com.criteo.pubsdk_android;
+package com.criteo.testapp;
 
-import static com.criteo.pubsdk_android.PubSdkDemoApplication.NATIVE_AD_UNIT_ID;
+import static com.criteo.testapp.PubSdkDemoApplication.NATIVE_AD_UNIT_ID;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -29,8 +29,8 @@ import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.NativeAdUnit;
-import com.criteo.pubsdk_android.integration.MockedIntegrationRegistry;
-import com.criteo.pubsdk_android.listener.TestAppDfpAdListener;
+import com.criteo.testapp.integration.MockedIntegrationRegistry;
+import com.criteo.testapp.listener.TestAppDfpAdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;

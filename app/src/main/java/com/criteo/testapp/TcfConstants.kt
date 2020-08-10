@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.criteo.pubsdk_android
+package com.criteo.testapp
 
 const val TCF2_CONSENT_STRING = "IABTCF_TCString"
 const val TCF2_GDPR_APPLIES = "IABTCF_gdprApplies"

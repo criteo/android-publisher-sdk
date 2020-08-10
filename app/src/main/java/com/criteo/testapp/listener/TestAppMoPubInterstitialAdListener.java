@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.criteo.pubsdk_android.listener;
+package com.criteo.testapp.listener;
 
 import android.util.Log;
 import com.mopub.mobileads.MoPubErrorCode;

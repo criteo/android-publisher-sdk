@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.criteo.pubsdk_android
+package com.criteo.testapp
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -29,10 +29,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.criteo.publisher.CriteoBannerView
 import com.criteo.publisher.advancednative.CriteoNativeAd
 import com.criteo.publisher.advancednative.CriteoNativeLoader
-import com.criteo.pubsdk_android.PubSdkDemoApplication.NATIVE
-import com.criteo.pubsdk_android.PubSdkDemoApplication.STANDALONE_BANNER
-import com.criteo.pubsdk_android.listener.TestAppBannerAdListener
-import com.criteo.pubsdk_android.listener.TestAppNativeAdListener
+import com.criteo.testapp.PubSdkDemoApplication.NATIVE
+import com.criteo.testapp.PubSdkDemoApplication.STANDALONE_BANNER
+import com.criteo.testapp.listener.TestAppBannerAdListener
+import com.criteo.testapp.listener.TestAppNativeAdListener
 import com.squareup.picasso.Picasso
 import kotlin.random.Random
 

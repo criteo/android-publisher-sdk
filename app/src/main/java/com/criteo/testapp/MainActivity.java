@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.criteo.pubsdk_android;
+package com.criteo.testapp;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,7 +23,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import androidx.appcompat.app.AppCompatActivity;
-import com.criteo.pubsdk_android.integration.IntegrationSelectorActivity;
+import com.criteo.testapp.integration.IntegrationSelectorActivity;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {

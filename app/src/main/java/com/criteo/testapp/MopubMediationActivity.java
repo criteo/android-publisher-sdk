@@ -14,12 +14,12 @@
  *    limitations under the License.
  */
 
-package com.criteo.pubsdk_android;
+package com.criteo.testapp;
 
-import static com.criteo.pubsdk_android.MopubActivity.initializeMoPubSdk;
-import static com.criteo.pubsdk_android.PubSdkDemoApplication.MOPUB_BANNER_ADUNIT_ID;
-import static com.criteo.pubsdk_android.PubSdkDemoApplication.MOPUB_INTERSTITIAL_ADUNIT_ID;
-import static com.criteo.pubsdk_android.PubSdkDemoApplication.MOPUB_NATIVE_ADUNIT_ID;
+import static com.criteo.testapp.MopubActivity.initializeMoPubSdk;
+import static com.criteo.testapp.PubSdkDemoApplication.MOPUB_BANNER_ADUNIT_ID;
+import static com.criteo.testapp.PubSdkDemoApplication.MOPUB_INTERSTITIAL_ADUNIT_ID;
+import static com.criteo.testapp.PubSdkDemoApplication.MOPUB_NATIVE_ADUNIT_ID;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -29,8 +29,8 @@ import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import com.criteo.mediation.mopub.advancednative.CriteoNativeEventRenderer;
 import com.criteo.publisher.integration.Integration;
-import com.criteo.pubsdk_android.integration.MockedIntegrationRegistry;
-import com.criteo.pubsdk_android.listener.TestAppMoPubInterstitialAdListener;
+import com.criteo.testapp.integration.MockedIntegrationRegistry;
+import com.criteo.testapp.listener.TestAppMoPubInterstitialAdListener;
 import com.mopub.mobileads.MoPubInterstitial;
 import com.mopub.mobileads.MoPubView;
 import com.mopub.nativeads.AdapterHelper;
