@@ -21,7 +21,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
-import android.content.res.Configuration;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
@@ -103,9 +102,6 @@ public class BidManagerTests {
     CacheAdUnit cAdUnit = new CacheAdUnit(adSize, adUnitId, CRITEO_BANNER);
 
     when(context.getPackageName()).thenReturn("TestThisPackage");
-
-    // FIXME This seems useless because tests still works without.
-    when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_PORTRAIT);
 
     sdkCache = mock(SdkCache.class);
 

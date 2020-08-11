@@ -193,7 +193,7 @@ public class PubSdkApiIntegrationTest {
 
   @Test
   public void loadCdb_GivenValidInterstitialAdUnit_ReturnBid() throws Exception {
-    when(deviceUtil.getSizePortrait()).thenReturn(new AdSize(42, 1337));
+    when(deviceUtil.getCurrentScreenSize()).thenReturn(new AdSize(42, 1337));
 
     CacheAdUnit validAdUnit = adUnitMapper.map(INTERSTITIAL);
     CdbRequest request = cdbRequestFactory.createRequest(singletonList(validAdUnit));
@@ -241,7 +241,7 @@ public class PubSdkApiIntegrationTest {
 
   @Test
   public void loadCdb_GivenMultipleValidAdUnits_ReturnBids() throws Exception {
-    when(deviceUtil.getSizePortrait()).thenReturn(new AdSize(42, 1337));
+    when(deviceUtil.getCurrentScreenSize()).thenReturn(new AdSize(42, 1337));
 
     List<CacheAdUnit> validAdUnits = adUnitMapper.mapToChunks(asList(
         BANNER_320_50,
@@ -258,7 +258,7 @@ public class PubSdkApiIntegrationTest {
 
   @Test
   public void loadCdb_GivenMultipleInvalidAdUnits_ReturnNoBids() throws Exception {
-    when(deviceUtil.getSizePortrait()).thenReturn(new AdSize(42, 1337));
+    when(deviceUtil.getCurrentScreenSize()).thenReturn(new AdSize(42, 1337));
 
     List<CacheAdUnit> validAdUnits = adUnitMapper.mapToChunks(asList(
         BANNER_UNKNOWN,

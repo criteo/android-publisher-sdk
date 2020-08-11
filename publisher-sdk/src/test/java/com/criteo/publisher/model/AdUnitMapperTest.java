@@ -29,7 +29,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import android.content.res.Configuration;
 import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.DeviceUtil;
 import java.util.List;
@@ -164,8 +163,7 @@ public class AdUnitMapperTest {
   public void convertValidAdUnits_GivenValidInterstitialAndDeviceInPortrait_MapItWithPortraitSize()
       throws Exception {
     AdSize portraitSize = new AdSize(10, 30);
-    when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_PORTRAIT);
-    when(deviceUtil.getSizePortrait()).thenReturn(portraitSize);
+    when(deviceUtil.getCurrentScreenSize()).thenReturn(portraitSize);
 
     AdUnit adUnit = new InterstitialAdUnit("adUnit");
 
@@ -179,8 +177,7 @@ public class AdUnitMapperTest {
   public void convertValidAdUnits_GivenValidInterstitialAndDeviceInLandscape_MapItWithLandscapeSize()
       throws Exception {
     AdSize landscapeSize = new AdSize(30, 10);
-    when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_LANDSCAPE);
-    when(deviceUtil.getSizeLandscape()).thenReturn(landscapeSize);
+    when(deviceUtil.getCurrentScreenSize()).thenReturn(landscapeSize);
 
     AdUnit adUnit = new InterstitialAdUnit("adUnit");
 

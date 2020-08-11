@@ -190,7 +190,7 @@ public class DependencyProvider {
       @NonNull
       @Override
       public AndroidUtil create() {
-        return new AndroidUtil(provideContext());
+        return new AndroidUtil(provideContext(), provideDeviceUtil());
       }
     });
   }

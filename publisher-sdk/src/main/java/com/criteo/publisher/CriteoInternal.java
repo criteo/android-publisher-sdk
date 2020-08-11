@@ -32,7 +32,6 @@ import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.AppLifecycleUtil;
-import com.criteo.publisher.util.DeviceUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -78,9 +77,6 @@ final class CriteoInternal extends Criteo {
     }
 
     this.dependencyProvider = dependencyProvider;
-
-    DeviceUtil deviceUtil = dependencyProvider.provideDeviceUtil();
-    deviceUtil.createSupportedScreenSizes();
 
     deviceInfo = dependencyProvider.provideDeviceInfo();
     deviceInfo.initialize();

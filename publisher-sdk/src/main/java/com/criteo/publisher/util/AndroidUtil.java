@@ -17,7 +17,9 @@
 package com.criteo.publisher.util;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import androidx.annotation.NonNull;
+import com.criteo.publisher.model.AdSize;
 
 /**
  * Represent the state of the android application.
@@ -31,20 +33,31 @@ import androidx.annotation.NonNull;
  */
 public class AndroidUtil {
 
+  @NonNull
   private final Context context;
 
-  public AndroidUtil(@NonNull Context context) {
+  @NonNull
+  private final DeviceUtil deviceUtil;
+
+  public AndroidUtil(@NonNull Context context, @NonNull DeviceUtil deviceUtil) {
     this.context = context;
+    this.deviceUtil = deviceUtil;
   }
 
   /**
    * Overall orientation of the screen.
    * <p>
-   * May be one of {@link android.content.res.Configuration#ORIENTATION_LANDSCAPE},
-   * {@link android.content.res.Configuration#ORIENTATION_PORTRAIT}.
+   * May be one of {@link android.content.res.Configuration#ORIENTATION_LANDSCAPE}, {@link
+   * android.content.res.Configuration#ORIENTATION_PORTRAIT}.
    */
   public int getOrientation() {
-    return context.getResources().getConfiguration().orientation;
+    // We're not using Configuration#orientation because it seems to not work in some cases.
+    // For example, when starting an application with device in landscape, this property contains
+    // ORIENTATION_PORTRAIT.
+    AdSize currentScreenSize = deviceUtil.getCurrentScreenSize();
+    return currentScreenSize.getWidth() < currentScreenSize.getHeight()
+        ? Configuration.ORIENTATION_PORTRAIT
+        : Configuration.ORIENTATION_LANDSCAPE;
   }
 
   /**

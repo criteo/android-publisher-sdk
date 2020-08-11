@@ -54,14 +54,20 @@ public class SdkCache {
       return CRITEO_CUSTOM_NATIVE;
     }
 
-    if ((deviceUtil.getSizePortrait().getHeight() == slot.getHeight()
-        && deviceUtil.getSizePortrait().getWidth() == slot.getWidth())
-        || deviceUtil.getSizeLandscape().getHeight() == slot.getHeight()
-        && deviceUtil.getSizeLandscape().getWidth() == slot.getWidth()) {
+    AdSize currentScreenSize = deviceUtil.getCurrentScreenSize();
+    AdSize transposedScreenSize = transpose(currentScreenSize);
+    AdSize slotSize = new AdSize(slot.getWidth(), slot.getHeight());
+
+    if (slotSize.equals(currentScreenSize) || slotSize.equals(transposedScreenSize)) {
       return CRITEO_INTERSTITIAL;
     }
 
     return CRITEO_BANNER;
+  }
+
+  @NonNull
+  private AdSize transpose(@NonNull AdSize size) {
+    return new AdSize(size.getHeight(), size.getWidth());
   }
 
   /**

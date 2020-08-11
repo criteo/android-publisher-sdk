@@ -37,7 +37,6 @@ import static org.mockito.Mockito.when;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
@@ -52,6 +51,8 @@ import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
+import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbRequest;
@@ -59,6 +60,7 @@ import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.util.AndroidUtil;
+import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.view.WebViewLookup;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
@@ -91,6 +93,9 @@ public class StandaloneFunctionalTest {
 
   @Mock
   private AndroidUtil androidUtil;
+
+  @SpyBean
+  private DeviceUtil deviceUtil;
 
   private Context context;
 
@@ -397,11 +402,23 @@ public class StandaloneFunctionalTest {
   }
 
   private void givenDeviceInPortrait() {
-    when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_PORTRAIT);
+    AdSize currentScreenSize = deviceUtil.getCurrentScreenSize();
+    AdSize portraitScreenSize = new AdSize(
+        Math.min(currentScreenSize.getWidth(), currentScreenSize.getHeight()),
+        Math.max(currentScreenSize.getWidth(), currentScreenSize.getHeight())
+    );
+
+    when(deviceUtil.getCurrentScreenSize()).thenReturn(portraitScreenSize);
   }
 
   private void givenDeviceInLandscape() {
-    when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_LANDSCAPE);
+    AdSize currentScreenSize = deviceUtil.getCurrentScreenSize();
+    AdSize landscapeScreenSize = new AdSize(
+        Math.max(currentScreenSize.getWidth(), currentScreenSize.getHeight()),
+        Math.min(currentScreenSize.getWidth(), currentScreenSize.getHeight())
+    );
+
+    when(deviceUtil.getCurrentScreenSize()).thenReturn(landscapeScreenSize);
   }
 
   private void givenInitializedSdk(AdUnit... preloadedAdUnits) throws Exception {

@@ -21,27 +21,26 @@ import static org.junit.Assert.assertEquals;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import androidx.test.rule.ActivityTestRule;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.test.activity.DummyActivity;
-import org.junit.Before;
+import javax.inject.Inject;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class AndroidUtilTest {
 
   @Rule
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
+  @Rule
   public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(DummyActivity.class);
 
+  @Inject
   private AndroidUtil androidUtil;
-
-  @Before
-  public void setUp() throws Exception {
-    androidUtil = new AndroidUtil(activityRule.getActivity().getApplicationContext());
-  }
 
   @Test
   public void getOrientation_GivenDeviceInPortrait_ReturnPortrait() throws Exception {
-    activityRule.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-    waitForOrientation();
+    setOrientationAndWait(activityRule, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
     int orientation = androidUtil.getOrientation();
 
@@ -50,9 +49,7 @@ public class AndroidUtilTest {
 
   @Test
   public void getOrientation_GivenDeviceInReversePortrait_ReturnPortrait() throws Exception {
-    activityRule.getActivity()
-        .setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
-    waitForOrientation();
+    setOrientationAndWait(activityRule, ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT);
 
     int orientation = androidUtil.getOrientation();
 
@@ -61,8 +58,7 @@ public class AndroidUtilTest {
 
   @Test
   public void getOrientation_GivenDeviceInLandscape_ReturnLandscape() throws Exception {
-    activityRule.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-    waitForOrientation();
+    setOrientationAndWait(activityRule, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
     int orientation = androidUtil.getOrientation();
 
@@ -71,16 +67,20 @@ public class AndroidUtilTest {
 
   @Test
   public void getOrientation_GivenDeviceInReverseLandscape_ReturnLandscape() throws Exception {
-    activityRule.getActivity()
-        .setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
-    waitForOrientation();
+    setOrientationAndWait(activityRule, ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
 
     int orientation = androidUtil.getOrientation();
 
     assertEquals(Configuration.ORIENTATION_LANDSCAPE, orientation);
   }
 
-  private void waitForOrientation() throws InterruptedException {
+  static void setOrientationAndWait(ActivityTestRule<?> activityTestRule, int orientation)
+      throws InterruptedException {
+    activityTestRule.getActivity().setRequestedOrientation(orientation);
+    waitForOrientation();
+  }
+
+  private static void waitForOrientation() throws InterruptedException {
     Thread.sleep(1000); // FIXME EE-657
   }
 

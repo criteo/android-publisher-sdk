@@ -39,7 +39,6 @@ import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AppLifecycleUtil;
-import com.criteo.publisher.util.DeviceUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -111,18 +110,6 @@ public class CriteoInternalUnitTest {
     createCriteo();
 
     verify(bidManager).prefetch(Collections.emptyList());
-  }
-
-  @Test
-  public void whenCreatingNewCriteo_GivenApplication_ShouldCreateSupportedScreenSizes()
-      throws Exception {
-    DeviceUtil deviceUtil = mock(DeviceUtil.class);
-
-    when(dependencyProvider.provideDeviceUtil()).thenReturn(deviceUtil);
-
-    createCriteo();
-
-    verify(deviceUtil).createSupportedScreenSizes();
   }
 
   @Test

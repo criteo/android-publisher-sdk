@@ -22,7 +22,9 @@ import static com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
@@ -36,12 +38,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class SdkCacheTest {
 
-  @Mock
+  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private Context context;
 
   private JSONArray slots;
@@ -51,7 +54,7 @@ public class SdkCacheTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    deviceUtil = new DeviceUtil(context);
+    deviceUtil = spy(new DeviceUtil(context));
     cache = new SdkCache(deviceUtil);
   }
 
@@ -266,8 +269,8 @@ public class SdkCacheTest {
     when(slot.getHeight()).thenReturn(size.getHeight());
     when(slot.getPlacementId()).thenReturn("myAdUnit");
 
-    // FIXME this has side-effect. After fixing EE-608, this will have no meaning.
-    deviceUtil.setScreenSize(size.getWidth(), size.getHeight());
+    // FIXME After fixing EE-608, this will have no meaning.
+    doReturn(size).when(deviceUtil).getCurrentScreenSize();
 
     CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_INTERSTITIAL);
 
@@ -287,8 +290,8 @@ public class SdkCacheTest {
     when(slot.getHeight()).thenReturn(size.getHeight());
     when(slot.getPlacementId()).thenReturn("myAdUnit");
 
-    // FIXME this has side-effect. After fixing EE-608, this will have no meaning.
-    deviceUtil.setScreenSize(size.getHeight(), size.getWidth());
+    // FIXME After fixing EE-608, this will have no meaning.
+    doReturn(new AdSize(size.getHeight(), size.getWidth())).when(deviceUtil).getCurrentScreenSize();
 
     CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_INTERSTITIAL);
 
