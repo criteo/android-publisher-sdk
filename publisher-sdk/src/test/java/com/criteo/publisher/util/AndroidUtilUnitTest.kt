@@ -32,13 +32,16 @@ class AndroidUtilUnitTest {
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private lateinit var context: Context
 
+  @Mock
+  private lateinit var deviceUtil: DeviceUtil
+
   private lateinit var androidUtil: AndroidUtil
 
   @Before
   fun setUp() {
     MockitoAnnotations.initMocks(this)
 
-    androidUtil = AndroidUtil(context)
+    androidUtil = AndroidUtil(context, deviceUtil)
   }
 
   @Test
@@ -64,5 +67,4 @@ class AndroidUtilUnitTest {
       on { displayMetrics } doReturn metrics
     }
   }
-
 }

@@ -15,8 +15,12 @@
  */
 package com.criteo.publisher.util
 
+import android.content.pm.ActivityInfo
 import android.os.Build
+import androidx.test.rule.ActivityTestRule
 import com.criteo.publisher.mock.MockedDependenciesRule
+import com.criteo.publisher.test.activity.DummyActivity
+import com.criteo.publisher.util.AndroidUtilTest.setOrientationAndWait
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.AssumptionViolatedException
 import org.junit.Rule
@@ -29,10 +33,12 @@ class DeviceUtilIntegrationTest {
   @JvmField
   val mockedDependenciesRule = MockedDependenciesRule()
 
+  @Rule
+  @JvmField
+  val activityRule = ActivityTestRule(DummyActivity::class.java)
+
   @Inject
   private lateinit var deviceUtil: DeviceUtil
-
-  // TODO Create Intrumentation Test , change settings as Limited and test
 
   @Test
   fun isVersionSupported_GivenDeviceAboveOrEqual19_ReturnsTrue() {
@@ -44,4 +50,16 @@ class DeviceUtilIntegrationTest {
 
     assertThat(versionSupported).isTrue()
   }
+
+  @Test
+  fun getCurrentScreenSize_GivenOrientationChange_ReturnDifferentScreenSize() {
+    setOrientationAndWait(activityRule, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+    val portraitSize = deviceUtil.currentScreenSize
+
+    setOrientationAndWait(activityRule, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+    val landscapeSize = deviceUtil.currentScreenSize
+
+    assertThat(portraitSize).isNotEqualTo(landscapeSize)
+  }
+
 }

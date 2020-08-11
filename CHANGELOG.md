@@ -3,6 +3,9 @@
 - Features
   - MoPub Header-Bidding: Handle subclasses of `MoPubView` and `MoPubInterstitial`
 
+- Bug fixes
+  - Fix wrong interstitial orientation when user starts the application in landscape
+
 # Version 3.9.0
 
 - Features

@@ -20,7 +20,6 @@ import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL;
 
-import android.content.res.Configuration;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -86,13 +85,18 @@ public class AdUnitMapper {
 
         case CRITEO_INTERSTITIAL:
           InterstitialAdUnit interstitialAdUnit = (InterstitialAdUnit) adUnit;
-          cacheAdUnits.add(createInterstitialAdUnits(interstitialAdUnit.getAdUnitId()));
+          cacheAdUnits.add(new CacheAdUnit(
+              deviceUtil.getCurrentScreenSize(),
+              interstitialAdUnit.getAdUnitId(),
+              CRITEO_INTERSTITIAL
+          ));
           break;
 
         case CRITEO_CUSTOM_NATIVE:
           NativeAdUnit nativeAdUnit = (NativeAdUnit) adUnit;
           cacheAdUnits.add(new CacheAdUnit(nativeAdUnit.getAdSize(), nativeAdUnit.getAdUnitId(),
-              CRITEO_CUSTOM_NATIVE));
+              CRITEO_CUSTOM_NATIVE
+          ));
           break;
 
         default:
@@ -125,15 +129,6 @@ public class AdUnitMapper {
       return null;
     } else {
       return validAdUnits.get(0).get(0);
-    }
-  }
-
-  private CacheAdUnit createInterstitialAdUnits(String placementId) {
-    int orientation = androidUtil.getOrientation();
-    if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-      return new CacheAdUnit(deviceUtil.getSizePortrait(), placementId, CRITEO_INTERSTITIAL);
-    } else {
-      return new CacheAdUnit(deviceUtil.getSizeLandscape(), placementId, CRITEO_INTERSTITIAL);
     }
   }
 

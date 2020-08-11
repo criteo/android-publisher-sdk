@@ -26,9 +26,6 @@ import com.criteo.publisher.model.AdSize;
 
 public class DeviceUtil {
 
-  private static AdSize sizePortrait = new AdSize(0, 0);
-  private static AdSize sizeLandscape = new AdSize(0, 0);
-
   @NonNull
   private final Context context;
 
@@ -53,32 +50,15 @@ public class DeviceUtil {
     return smallestWidthInPixel >= thresholdInPixel;
   }
 
-  public void createSupportedScreenSizes() {
-    try {
-      DisplayMetrics metrics = getDisplayMetrics();
-      setScreenSize(Math.round(metrics.widthPixels / metrics.density),
-          Math.round(metrics.heightPixels / metrics.density));
-    } catch (Exception e) {
-      // FIXME(ma.chentir) message might be misleading as this could not be the only exception cause
-      throw new Error("Screen parameters can not be empty or null", e);
-    }
+  public AdSize getCurrentScreenSize() {
+    DisplayMetrics metrics = getDisplayMetrics();
+    int widthInDp = Math.round(metrics.widthPixels / metrics.density);
+    int heightInDp = Math.round(metrics.heightPixels / metrics.density);
+    return new AdSize(widthInDp, heightInDp);
   }
 
   private DisplayMetrics getDisplayMetrics() {
     return context.getResources().getDisplayMetrics();
-  }
-
-  public void setScreenSize(int screenWidth, int screenHeight) {
-    sizePortrait = new AdSize(screenWidth, screenHeight);
-    sizeLandscape = new AdSize(screenHeight, screenWidth);
-  }
-
-  public AdSize getSizePortrait() {
-    return sizePortrait;
-  }
-
-  public AdSize getSizeLandscape() {
-    return sizeLandscape;
   }
 
   public boolean isVersionSupported() {
