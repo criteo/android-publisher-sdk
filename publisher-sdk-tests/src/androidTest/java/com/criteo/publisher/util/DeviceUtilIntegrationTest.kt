@@ -13,44 +13,35 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.criteo.publisher.util
 
-package com.criteo.publisher.util;
+import android.os.Build
+import com.criteo.publisher.mock.MockedDependenciesRule
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.AssumptionViolatedException
+import org.junit.Rule
+import org.junit.Test
+import javax.inject.Inject
 
-import static org.junit.Assert.assertTrue;
-
-import android.os.Build.VERSION;
-import androidx.test.runner.AndroidJUnit4;
-import com.criteo.publisher.mock.MockedDependenciesRule;
-import org.junit.AssumptionViolatedException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-@RunWith(AndroidJUnit4.class)
-public class DeviceUtilIntegrationTest {
+class DeviceUtilIntegrationTest {
 
   @Rule
-  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+  @JvmField
+  val mockedDependenciesRule = MockedDependenciesRule()
 
-  private DeviceUtil deviceUtil;
-
-  @Before
-  public void setup() {
-    deviceUtil = mockedDependenciesRule.getDependencyProvider().provideDeviceUtil();
-  }
+  @Inject
+  private lateinit var deviceUtil: DeviceUtil
 
   // TODO Create Intrumentation Test , change settings as Limited and test
 
   @Test
-  public void isVersionSupported_GivenDeviceAboveOrEqual19_ReturnsTrue() {
-    if (VERSION.SDK_INT < 19) {
-      throw new AssumptionViolatedException("Version of device should be >= 19");
+  fun isVersionSupported_GivenDeviceAboveOrEqual19_ReturnsTrue() {
+    if (Build.VERSION.SDK_INT < 19) {
+      throw AssumptionViolatedException("Version of device should be >= 19")
     }
 
-    boolean versionSupported = deviceUtil.isVersionSupported();
+    val versionSupported = deviceUtil.isVersionSupported
 
-    assertTrue(versionSupported);
+    assertThat(versionSupported).isTrue()
   }
 }
-
