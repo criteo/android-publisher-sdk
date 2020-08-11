@@ -94,7 +94,6 @@ public class CriteoBannerEventController {
     executor.executeAsync(new CriteoBannerListenerCallTask(adListener, view, code));
   }
 
-  @VisibleForTesting
   void displayAd(@NonNull String displayUrl) {
     executor.executeAsync(new CriteoBannerLoadTask(
         view, createWebViewClient(), criteo.getConfig(), displayUrl));

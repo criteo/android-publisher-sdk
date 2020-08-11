@@ -28,6 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
+import android.content.Context;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.mock.MockBean;
@@ -40,6 +41,7 @@ import kotlin.jvm.JvmField;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -149,6 +151,13 @@ public class CriteoInterstitialTest {
     doThrow(RuntimeException.class).when(controller).show();
 
     assertThatCode(interstitial::show).doesNotThrowAnyException();
+  }
+
+  @Test
+  public void displayAd_GivenController_DelegateToIt() throws Exception {
+    CriteoInterstitialEventController controller = givenMockedController();
+    interstitial.displayAd("fake_display_data");
+    verify(controller).fetchCreativeAsync("fake_display_data");
   }
 
   private CriteoInterstitialEventController givenMockedController() {

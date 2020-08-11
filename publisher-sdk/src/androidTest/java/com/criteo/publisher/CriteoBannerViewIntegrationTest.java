@@ -18,13 +18,16 @@ package com.criteo.publisher;
 
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import androidx.test.InstrumentationRegistry;
+import android.content.Context;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.util.InstrumentationUtil;
 import java.util.UUID;
+import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,6 +42,9 @@ public class CriteoBannerViewIntegrationTest {
   @Mock
   private CriteoBannerAdListener criteoBannerAdListener;
 
+  @Inject
+  private Context context;
+
   private CriteoBannerView criteoBannerView;
 
   private BannerAdUnit bannerAdUnit = TestAdUnits.BANNER_320_50;
@@ -49,11 +55,19 @@ public class CriteoBannerViewIntegrationTest {
 
     runOnMainThreadAndWait(() -> {
       criteoBannerView = new CriteoBannerView(
-          InstrumentationRegistry.getContext(),
+          InstrumentationUtil.getApplication().getApplicationContext(),
           bannerAdUnit);
     });
 
     criteoBannerView.setCriteoBannerAdListener(criteoBannerAdListener);
+  }
+
+  @Test
+  public void instantiate_GivenContext_InitializeCorrectly() throws Exception {
+    runOnMainThreadAndWait(() -> {
+      CriteoBannerView criteoBannerView = new CriteoBannerView(context);
+      assertThat(criteoBannerView.getContext()).isEqualTo(context);
+    });
   }
 
   @Test

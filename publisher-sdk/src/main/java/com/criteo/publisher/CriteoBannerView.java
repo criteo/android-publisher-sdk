@@ -49,13 +49,25 @@ public class CriteoBannerView extends WebView {
   @Nullable
   private CriteoBannerEventController criteoBannerEventController;
 
+  /**
+   * Used by server side bidding and in-house auction
+   */
+  public CriteoBannerView(@NonNull Context context) {
+    this(context, null, null);
+  }
+
+  /**
+   * Used by Standalone
+   */
   public CriteoBannerView(@NonNull Context context, @Nullable BannerAdUnit bannerAdUnit) {
     this(context, bannerAdUnit, null);
   }
 
   @VisibleForTesting
-  CriteoBannerView(@NonNull Context context, @Nullable BannerAdUnit bannerAdUnit,
-      @Nullable Criteo criteo) {
+  CriteoBannerView(
+      @NonNull Context context, @Nullable BannerAdUnit bannerAdUnit,
+      @Nullable Criteo criteo
+  ) {
     super(context);
     this.bannerAdUnit = bannerAdUnit;
     this.criteo = criteo;
@@ -76,6 +88,10 @@ public class CriteoBannerView extends WebView {
     } catch (Throwable tr) {
       Log.e(TAG, "Internal error while loading banner.", tr);
     }
+  }
+
+  public void displayAd(@NonNull String displayData) {
+    getOrCreateController().displayAd(displayData);
   }
 
   private void doLoadAd() {

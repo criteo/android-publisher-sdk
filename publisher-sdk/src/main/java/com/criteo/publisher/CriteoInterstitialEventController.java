@@ -115,7 +115,6 @@ public class CriteoInterstitialEventController {
         .executeAsync(new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener, code));
   }
 
-  @VisibleForTesting
   void fetchCreativeAsync(@NonNull String displayUrl) {
     webViewData.fillWebViewHtmlContent(
         displayUrl,
