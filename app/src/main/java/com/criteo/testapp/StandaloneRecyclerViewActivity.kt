@@ -96,6 +96,7 @@ class StandaloneRecyclerViewActivity : AppCompatActivity() {
       const val NATIVE = 3
     }
 
+    @Suppress("NotImplementedDeclaration")
     override fun getItemViewType(position: Int): Int {
       return when (dataset[position]) {
         is Content -> CONTENT
@@ -105,6 +106,7 @@ class StandaloneRecyclerViewActivity : AppCompatActivity() {
       }
     }
 
+    @Suppress("NotImplementedDeclaration")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
       val context = parent.context
       val view = when (viewType) {

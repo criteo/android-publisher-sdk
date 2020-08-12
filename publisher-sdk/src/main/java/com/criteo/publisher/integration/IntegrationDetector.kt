@@ -34,9 +34,9 @@ class IntegrationDetector {
       // Initialization of the class may takes time and is not required to check its existence.
       Class.forName(this, /* initialize */ false, classLoader)
       true
-    } catch (e: LinkageError) {
+    } catch (expected: LinkageError) {
       false
-    } catch (e: ClassNotFoundException) {
+    } catch (expected: ClassNotFoundException) {
       false
     }
   }

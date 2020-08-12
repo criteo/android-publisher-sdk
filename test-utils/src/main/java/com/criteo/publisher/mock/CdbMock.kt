@@ -47,6 +47,8 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
 
     // Use any ZoneId as CDB preprod returns an auto-incremented ID coming from DB
     private const val DUMMY_ZONE_ID = 1337
+
+    private const val CONTENT_TYPE = "content-type"
   }
 
   private val mockWebServer = MockWebServer()
@@ -88,7 +90,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
     }
 
     private fun handleBearcatRequest(): MockResponse {
-      return MockResponse().setHeader("content-type", "text/html")
+      return MockResponse().setHeader(CONTENT_TYPE, "text/html")
     }
 
     private fun handleCsmRequest(): MockResponse {
@@ -98,7 +100,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
     @Suppress("MaxLineLength")
     private fun handleConfigRequest(): MockResponse {
       return MockResponse()
-          .setHeader("content-type", "application/json; charset=utf-8")
+          .setHeader(CONTENT_TYPE, "application/json; charset=utf-8")
           .setBody(
               """
             {
@@ -133,7 +135,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
     """.trimIndent()
 
       return MockResponse()
-          .setHeader("content-type", "application/json; charset=utf-8")
+          .setHeader(CONTENT_TYPE, "application/json; charset=utf-8")
           .setBody(cdbResponse)
     }
 
@@ -208,7 +210,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
     """.trimIndent()
 
       return MockResponse()
-          .setHeader("content-type", "text/plain; charset=utf-8")
+          .setHeader(CONTENT_TYPE, "text/plain; charset=utf-8")
           .setBody(response)
     }
   }
