@@ -46,6 +46,8 @@ dependencies {
   testImplementation(Deps.Kotlin.Stdlib)
   testImplementation(Deps.Mockito.Kotlin)
   testImplementation(Deps.AssertJ.AssertJ)
+
+  detektPlugins(Deps.Detekt.DetektFormatting)
 }
 
 addPublication("debug") {

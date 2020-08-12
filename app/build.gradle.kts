@@ -124,4 +124,5 @@ dependencies {
     }
 
     "memoryLeaksHuntImplementation"(Deps.Square.LeakCanary.LeakCanary)
+    detektPlugins(Deps.Detekt.DetektFormatting)
 }

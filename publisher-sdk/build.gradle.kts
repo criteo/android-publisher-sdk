@@ -108,4 +108,6 @@ dependencies {
     testImplementation(Deps.Kotlin.JUnit)
     testImplementation(Deps.Mockito.Kotlin)
     testImplementation(Deps.AndroidX.Annotations)
+
+    detektPlugins(Deps.Detekt.DetektFormatting)
 }

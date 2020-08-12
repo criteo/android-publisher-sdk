@@ -91,6 +91,7 @@ object Deps {
 
   object Detekt {
     const val version = "1.10.0"
+    const val DetektFormatting = "io.gitlab.arturbosch.detekt:detekt-formatting:$version"
   }
 
   object EqualsVerifier {

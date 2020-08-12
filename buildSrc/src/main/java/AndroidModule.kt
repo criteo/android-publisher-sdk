@@ -154,6 +154,6 @@ private fun Project.defaultAndroidModule() {
 
   detekt?.apply {
     toolVersion = Deps.Detekt.version
-    // config = files(rootDir.resolve(".detekt/config.yml"))
+    config = files(rootDir.resolve(".detekt/config.yml"))
   }
 }

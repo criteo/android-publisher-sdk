@@ -64,4 +64,6 @@ dependencies {
   debugImplementation(Deps.MoPub.Interstitial) {
     isTransitive = true
   }
+
+  detektPlugins(Deps.Detekt.DetektFormatting)
 }
