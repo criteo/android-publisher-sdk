@@ -6,4 +6,9 @@
       <certificates src="user"/>
     </trust-anchors>
   </debug-overrides>
+
+  <!-- Allow HTTP for localhost: it is used by tests hitting the CDB stub server -->
+  <domain-config cleartextTrafficPermitted="true">
+    <domain includeSubdomains="false">localhost</domain>
+  </domain-config>
 </network-security-config>
