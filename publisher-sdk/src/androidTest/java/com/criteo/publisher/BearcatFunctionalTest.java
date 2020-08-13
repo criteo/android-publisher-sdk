@@ -94,12 +94,13 @@ public class BearcatFunctionalTest {
 
     verify(api).postAppEvent(
         eq(2379),
-        eq("com.criteo.publisher.tests.test"),
+        eq("com.criteo.publisher.test"),
         eq("myAdvertisingId"),
         eq("Launch"),
         eq(0),
         any(),
-        eq(gdprData));
+        eq(gdprData)
+    );
   }
 
   @Test

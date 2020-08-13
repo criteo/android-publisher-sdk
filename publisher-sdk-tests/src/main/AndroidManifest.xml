@@ -17,25 +17,16 @@
       androidx.media2.session,
       androidx.media2.widget" />
 
-  <application
-    android:networkSecurityConfig="@xml/network_security_config"
-    tools:ignore="UnusedAttribute">
-    <!-- Required for tests since AdMob 17.0.0:
-    https://developers.google.com/ad-manager/mobile-ads-sdk/android/quick-start#update_your_androidmanifestxml
-    https://developers.google.com/admob/android/quick-start#update_your_androidmanifestxml
-    -->
-    <meta-data
-      android:name="com.google.android.gms.ads.AD_MANAGER_APP"
-      android:value="true"/>
-
+  <application>
     <activity android:name="com.criteo.publisher.test.activity.DummyActivity"/>
     <activity android:name="com.criteo.publisher.activity.TestNativeActivity"/>
 
     <activity android:name="com.criteo.publisher.activity.DummyAdActivity">
       <intent-filter>
-        <action android:name="android.intent.action.VIEW" />
-        <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.BROWSABLE" />
+        <action android:name="android.intent.action.VIEW"/>
+
+        <category android:name="android.intent.category.DEFAULT"/>
+        <category android:name="android.intent.category.BROWSABLE"/>
 
         <!-- Accepts URIs that begin with "criteo-test://dummy-ad-activity” -->
         <data android:scheme="criteo-test" android:host="dummy-ad-activity" />

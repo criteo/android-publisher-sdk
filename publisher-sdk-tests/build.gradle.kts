@@ -17,51 +17,20 @@
 plugins {
   id("com.android.library")
   kotlin("android")
-  id("com.banno.gordon")
   id("io.gitlab.arturbosch.detekt")
 }
 
-gordon.retryQuota.set(5)
-
 androidLibModule()
 
-android {
-  defaultConfig {
-    multiDexEnabled = true
-  }
-
-  packagingOptions {
-    // Both AssertJ and ByteBuddy (via Mockito) brings this and the duplication yield an error
-    exclude("META-INF/licenses/ASM")
-  }
-}
-
 dependencies {
-  implementation(project(":publisher-sdk"))
+  compileOnly(project(":publisher-sdk"))
   implementation(project(":test-utils"))
   implementation(Deps.Kotlin.Stdlib)
-  implementation(Deps.AndroidX.MultiDex)
   implementation(Deps.AndroidX.Annotations)
   implementation(Deps.AndroidX.RecyclerView)
 
-  testImplementation(Deps.JUnit.JUnit)
-  testImplementation(Deps.AssertJ.AssertJ)
-
-  androidTestImplementation(Deps.AndroidX.SupportCoreUtils)
-  androidTestImplementation(Deps.AndroidX.Test.Runner)
-  androidTestImplementation(Deps.AndroidX.Test.Rules)
-  androidTestImplementation(Deps.Mockito.Android)
-  androidTestImplementation(Deps.Mockito.Kotlin)
-  androidTestImplementation(Deps.AssertJ.AssertJ)
-  androidTestImplementation(Deps.Square.Tape.Tape)
-  androidTestImplementation(Deps.Google.AdMob)
-
-  androidTestImplementation(Deps.MoPub.Banner) {
-    isTransitive = true
-  }
-
-  // Debug is needed because MoPub need some activities to be declare in the AndroidManifest.xml
-  debugImplementation(Deps.MoPub.Interstitial) {
+  // Needed because MoPub need some activities to be declare in the AndroidManifest.xml
+  implementation(Deps.MoPub.Interstitial) {
     isTransitive = true
   }
 

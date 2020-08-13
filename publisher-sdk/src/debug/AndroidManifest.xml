@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
   package="com.criteo.publisher">
 
-  <application android:networkSecurityConfig="@xml/network_security_config" />
+  <application
+    android:networkSecurityConfig="@xml/network_security_config"
+    tools:ignore="UnusedAttribute">
+    <!-- Required for tests since AdMob 17.0.0:
+    https://developers.google.com/ad-manager/mobile-ads-sdk/android/quick-start#update_your_androidmanifestxml
+    https://developers.google.com/admob/android/quick-start#update_your_androidmanifestxml
+    -->
+    <meta-data
+      android:name="com.google.android.gms.ads.AD_MANAGER_APP"
+      android:value="true"/>
+  </application>
 
 </manifest>

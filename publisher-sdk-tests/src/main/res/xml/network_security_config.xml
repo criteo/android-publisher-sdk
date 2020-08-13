@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<network-security-config>
-  <!-- Allow HTTP for localhost: it is used by tests hitting the CDB stub server -->
-  <domain-config cleartextTrafficPermitted="true">
-    <domain includeSubdomains="false">localhost</domain>
-  </domain-config>
-</network-security-config>

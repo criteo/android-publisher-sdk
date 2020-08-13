@@ -24,7 +24,10 @@ plugins {
     id("fr.pturpin.slack-publish")
     id("com.jfrog.bintray")
     id("io.gitlab.arturbosch.detekt")
+    id("com.banno.gordon")
 }
+
+gordon.retryQuota.set(5)
 
 allOpen {
     annotation("com.criteo.publisher.annotation.OpenForTesting")
@@ -53,34 +56,53 @@ androidLibModule() {
     addBuildConfigField<Boolean>("preconditionThrowsOnException")
 }
 
-android.libraryVariants.all {
-    val variantName = name
-    addPublication(variantName) {
-        afterEvaluate {
-            from(components[variantName])
-            addSourcesJar(variantName)
-            addJavadocJar(variantName)
+android {
+    defaultConfig {
+        multiDexEnabled = true
+    }
+
+    packagingOptions {
+        // Both AssertJ and ByteBuddy (via Mockito) brings this and the duplication yield an error
+        exclude("META-INF/licenses/ASM")
+    }
+
+    libraryVariants.all {
+        val variantName = name
+        addPublication(variantName) {
+            afterEvaluate {
+                from(components[variantName])
+                addSourcesJar(variantName)
+                addJavadocJar(variantName)
+            }
+
+            groupId = "com.criteo.publisher"
+
+            artifactId = if (variantName == "release" && isSnapshot()) {
+                "criteo-publisher-sdk-development"
+            } else if (variantName == "release") {
+                "criteo-publisher-sdk"
+            } else {
+                "criteo-publisher-sdk-$variantName"
+            }
+
+            pom.description.set(Publications.sdkDescription)
         }
-
-        groupId = "com.criteo.publisher"
-
-        artifactId = if (variantName == "release" && isSnapshot()) {
-            "criteo-publisher-sdk-development"
-        } else if (variantName == "release") {
-            "criteo-publisher-sdk"
-        } else {
-            "criteo-publisher-sdk-$variantName"
-        }
-
-        pom.description.set(Publications.sdkDescription)
     }
 }
 
 addBintrayRepository()
 addSlackDeploymentMessages()
 
+configurations.configureEach {
+    resolutionStrategy {
+        // Picasso use a old version of OkHttp, but MockWebServer need a recent one
+        force(Deps.Square.OkHttp.OkHttp)
+    }
+}
+
 dependencies {
     implementation(Deps.Kotlin.Stdlib)
+    implementation(Deps.AndroidX.MultiDex) // TODO do not export this
 
     compileOnly(Deps.AndroidX.Annotations)
     implementation(Deps.Square.Tape.Tape)
@@ -108,6 +130,20 @@ dependencies {
     testImplementation(Deps.Kotlin.JUnit)
     testImplementation(Deps.Mockito.Kotlin)
     testImplementation(Deps.AndroidX.Annotations)
+
+    androidTestImplementation(project(":test-utils"))
+    androidTestImplementation(project(":publisher-sdk-tests"))
+    androidTestImplementation(Deps.AndroidX.SupportCoreUtils)
+    androidTestImplementation(Deps.AndroidX.Test.Runner)
+    androidTestImplementation(Deps.AndroidX.Test.Rules)
+    androidTestImplementation(Deps.Mockito.Android)
+    androidTestImplementation(Deps.Mockito.Kotlin)
+    androidTestImplementation(Deps.AssertJ.AssertJ)
+    androidTestImplementation(Deps.Square.Tape.Tape)
+    androidTestImplementation(Deps.Square.OkHttp.MockWebServer)
+    androidTestImplementation(Deps.Google.AdMob)
+    androidTestImplementation(Deps.MoPub.Banner) { isTransitive = true }
+    androidTestImplementation(Deps.MoPub.Interstitial) { isTransitive = true }
 
     detektPlugins(Deps.Detekt.DetektFormatting)
 }

@@ -21,7 +21,9 @@ import com.criteo.publisher.Criteo
 import com.criteo.publisher.CriteoBannerView
 import com.criteo.publisher.CriteoInterstitial
 import com.criteo.publisher.CriteoUtil.givenInitializedCriteo
-import com.criteo.publisher.TestAdUnits.*
+import com.criteo.publisher.TestAdUnits.BANNER_320_480
+import com.criteo.publisher.TestAdUnits.INTERSTITIAL
+import com.criteo.publisher.TestAdUnits.NATIVE
 import com.criteo.publisher.advancednative.CriteoNativeLoader
 import com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait
 import com.criteo.publisher.csm.MetricHelper
@@ -32,7 +34,14 @@ import com.criteo.publisher.network.PubSdkApi
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest
 import com.mopub.mobileads.MoPubInterstitial
 import com.mopub.mobileads.MoPubView
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.check
+import com.nhaarman.mockitokotlin2.clearInvocations
+import com.nhaarman.mockitokotlin2.doCallRealMethod
+import com.nhaarman.mockitokotlin2.doNothing
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test

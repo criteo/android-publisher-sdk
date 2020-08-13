@@ -62,13 +62,13 @@ Chris Beams - [How to Write a Git Commit Message](https://chris.beams.io/posts/g
 * Use Java 8 or below to run Gradle commands
 * Building project: `./gradlew build`
 * Running Java tests: `./gradlew check`
-* Running Android tests: `./gradlew :publisher-sdk-tests:connectedCheck`
+* Running Android tests: `./gradlew :publisher-sdk:connectedCheck`
 
 ### List of modules
 
 * `app`: test application to try the SDK
-* `publisher-sdk`: the Android SDK and its Java tests
-* `publisher-sdk-tests`: the Android tests of the SDK
+* `publisher-sdk`: the Android SDK and its tests
+* `publisher-sdk-tests`: activities for Android tests of the SDK
 * `test-utils`: helping module to assist both Java and Android tests
 
 ### Coding style
