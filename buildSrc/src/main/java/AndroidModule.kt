@@ -121,6 +121,7 @@ private fun Project.defaultAndroidModule() {
       val debug by getting {
         isMinifyEnabled = false
         isDebuggable = true
+        isTestCoverageEnabled = true
         addProguardIfExists()
         addConsumerProguardIfExists()
       }
