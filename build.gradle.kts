@@ -48,5 +48,14 @@ sonarqube {
       reportTree.files
     }
     property("sonar.coverage.jacoco.xmlReportPaths", jacocoReports)
+
+    // We do not expect to cover the test app nor the dummy activities for Android tests
+    property(
+        "sonar.coverage.exclusions",
+        listOf(
+            "app/src/main/**/*",
+            "publisher-sdk-tests/src/main/**/*"
+        )
+    )
   }
 }
