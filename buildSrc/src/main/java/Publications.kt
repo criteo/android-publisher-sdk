@@ -14,6 +14,8 @@
  *    limitations under the License.
  */
 
+import groovy.util.Node
+import groovy.util.NodeList
 import org.gradle.api.Project
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.jvm.tasks.Jar
@@ -75,6 +77,21 @@ class SdkPublication(
     version = project.sdkPublicationVersion()
 
     pom {
+      withXml {
+        val dependenciesNode = asNode()["dependencies"] as groovy.util.NodeList
+        val dependencyNode = dependenciesNode["dependency"]
+        dependencyNode.forEach {
+          val node = it as groovy.util.Node
+          val artifactIdNode = node["artifactId"] as groovy.util.NodeList
+          if (artifactIdNode.text() == "multidex") {
+            // Multidex is added for the tests so that we can use any dependencies we want. The SDK
+            // in itself is not really big and we should not impose this to publishers, so lets
+            // remove it.
+            node.parent().remove(node)
+          }
+        }
+      }
+
       name.set(project.provider { "$groupId:$artifactId" })
       url.set(Publications.website)
 
@@ -97,5 +114,7 @@ class SdkPublication(
       }
     }
   }
+
+  private operator fun NodeList.get(name: String): NodeList = getAt(name)
 
 }
