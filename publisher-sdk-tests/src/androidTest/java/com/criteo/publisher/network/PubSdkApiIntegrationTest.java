@@ -35,6 +35,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
+import com.criteo.publisher.BidPrefetchRateLimiter;
 import com.criteo.publisher.StubConstants;
 import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.mock.MockedDependenciesRule;
@@ -385,7 +386,8 @@ public class PubSdkApiIntegrationTest {
         "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script src=\"%%displayUrl%%\"></script></body></html>",
         "%%adTagData%%",
         "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>",
-        true
+        true,
+        null // FIXME: adjust once the remote config is added
     );
   }
 }

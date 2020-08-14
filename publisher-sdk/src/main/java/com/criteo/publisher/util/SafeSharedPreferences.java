@@ -62,6 +62,21 @@ public class SafeSharedPreferences {
     return value;
   }
 
+  public long getLong(@NonNull String key, long defaultValue) {
+    long value = defaultValue;
+
+    try {
+      value = sharedPreferences.getLong(key, defaultValue);
+    } catch (ClassCastException e) {
+      PreconditionsUtil.throwOrLog(
+          new IllegalStateException("Expect a Long type when reading " + key, e)
+      );
+    }
+
+    return value;
+  }
+
+
   public boolean getBoolean(@NonNull String key, boolean defaultValue) {
     boolean value = defaultValue;
 

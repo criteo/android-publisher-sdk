@@ -58,6 +58,7 @@ public class Config {
     private static final String AD_TAG_DATA_MACRO = "%%adTagData%%";
     private static final String AD_TAG_DATA_MODE = "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>";
     private static final boolean CSM_ENABLED = true;
+    private static final Long MIN_TIME_BETWEEN_BID_PREFETCHES_MILLIS = 30_000L;
 
   }
 
@@ -154,6 +155,10 @@ public class Config {
         getOrElse(
             overrideRemoteConfig.getCsmEnabled(),
             baseRemoteConfig.getCsmEnabled()
+        ),
+        getOrElse(
+            overrideRemoteConfig.getMinTimeBetweenBidPrefetchMillis(),
+            baseRemoteConfig.getMinTimeBetweenBidPrefetchMillis()
         )
     );
   }
@@ -234,6 +239,14 @@ public class Config {
     return getOrElse(
         cachedRemoteConfig.getAndroidAdTagDataMode(),
         DefaultConfig.AD_TAG_DATA_MODE
+    );
+  }
+
+  @NonNull
+  public Long getMinTimeBetweenPrefetchesMillis() {
+    return getOrElse(
+        cachedRemoteConfig.getMinTimeBetweenBidPrefetchMillis(),
+        DefaultConfig.MIN_TIME_BETWEEN_BID_PREFETCHES_MILLIS
     );
   }
 

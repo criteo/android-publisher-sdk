@@ -33,7 +33,8 @@ public abstract class RemoteConfigResponse {
       @Nullable String androidAdTagUrlMode,
       @Nullable String androidAdTagDataMacro,
       @Nullable String androidAdTagDataMode,
-      @Nullable Boolean csmEnabled
+      @Nullable Boolean csmEnabled,
+      @Nullable Long minTimeBetweenBidPrefetchMillis
   ) {
     return new AutoValue_RemoteConfigResponse(
         killSwitch,
@@ -41,13 +42,15 @@ public abstract class RemoteConfigResponse {
         androidAdTagUrlMode,
         androidAdTagDataMacro,
         androidAdTagDataMode,
-        csmEnabled
+        csmEnabled,
+        minTimeBetweenBidPrefetchMillis
     );
   }
 
   @NonNull
   public static RemoteConfigResponse createEmpty() {
     return create(
+        null,
         null,
         null,
         null,
@@ -65,7 +68,8 @@ public abstract class RemoteConfigResponse {
         getAndroidAdTagUrlMode(),
         getAndroidAdTagDataMacro(),
         getAndroidAdTagDataMode(),
-        getCsmEnabled()
+        getCsmEnabled(),
+        getMinTimeBetweenBidPrefetchMillis()
     );
   }
 
@@ -144,4 +148,9 @@ public abstract class RemoteConfigResponse {
   @Nullable
   public abstract Boolean getCsmEnabled();
 
+  /**
+   * Minimum elapsed time between two bids prefetch calls.
+   */
+  @Nullable
+  public abstract Long getMinTimeBetweenBidPrefetchMillis();
 }

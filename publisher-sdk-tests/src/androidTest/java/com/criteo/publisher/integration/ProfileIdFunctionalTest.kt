@@ -17,6 +17,7 @@
 package com.criteo.publisher.integration
 
 import android.content.Context
+import com.criteo.publisher.BidPrefetchRateLimiter
 import com.criteo.publisher.Criteo
 import com.criteo.publisher.CriteoBannerView
 import com.criteo.publisher.CriteoInterstitial
@@ -26,6 +27,7 @@ import com.criteo.publisher.advancednative.CriteoNativeLoader
 import com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait
 import com.criteo.publisher.csm.MetricHelper
 import com.criteo.publisher.csm.MetricSendingQueueConsumer
+import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.network.PubSdkApi
@@ -34,6 +36,7 @@ import com.mopub.mobileads.MoPubInterstitial
 import com.mopub.mobileads.MoPubView
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import javax.inject.Inject
@@ -53,8 +56,12 @@ class ProfileIdFunctionalTest {
   @SpyBean
   private lateinit var api: PubSdkApi
 
+  @MockBean
+  private lateinit var bidPrefetchRateLimiter: BidPrefetchRateLimiter
+
   @Test
   fun prefetch_GivenSdkUsedForTheFirstTime_UseFallbackProfileId() {
+    whenever(bidPrefetchRateLimiter.canPrefetch()).thenReturn(true)
     givenInitializedCriteo(BANNER_320_480)
     mockedDependenciesRule.waitForIdleState()
 
@@ -73,6 +80,7 @@ class ProfileIdFunctionalTest {
 
   @Test
   fun remoteConfig_GivenSdkUsedForTheFirstTime_UseFallbackProfileId() {
+    whenever(bidPrefetchRateLimiter.canPrefetch()).thenReturn(true)
     givenInitializedCriteo()
     mockedDependenciesRule.waitForIdleState()
 
@@ -95,6 +103,7 @@ class ProfileIdFunctionalTest {
 
   @Test
   fun csm_GivenPrefetchWithSdkUsedForTheFirstTime_UseFallbackProfileId() {
+    whenever(bidPrefetchRateLimiter.canPrefetch()).thenReturn(true)
     givenInitializedCriteo(BANNER_320_480)
     mockedDependenciesRule.waitForIdleState()
 
@@ -109,6 +118,7 @@ class ProfileIdFunctionalTest {
 
   @Test
   fun csm_GivenPrefetchWithUsedSdk_UseLatestProfileId() {
+    whenever(bidPrefetchRateLimiter.canPrefetch()).thenReturn(true)
     givenPreviousInHouseIntegration()
 
     // Clean the metric yields above to avoid interference
@@ -278,6 +288,7 @@ class ProfileIdFunctionalTest {
     Criteo.getInstance().getBidResponse(BANNER_320_480)
     mockedDependenciesRule.waitForIdleState()
     mockedDependenciesRule.resetAllDependencies()
+    whenever(bidPrefetchRateLimiter.canPrefetch()).thenReturn(true)
   }
 
   private fun triggerMetricRequest() {

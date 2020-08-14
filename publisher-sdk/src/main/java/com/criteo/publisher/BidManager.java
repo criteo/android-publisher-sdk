@@ -18,6 +18,8 @@ package com.criteo.publisher;
 
 import static android.content.ContentValues.TAG;
 
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.util.Log;
 import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
@@ -36,6 +38,7 @@ import com.criteo.publisher.model.Config;
 import com.criteo.publisher.network.BidRequestSender;
 import com.criteo.publisher.util.ApplicationStoppedListener;
 import com.criteo.publisher.util.CdbCallListener;
+import com.criteo.publisher.util.SafeSharedPreferences;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -72,6 +75,9 @@ public class BidManager implements ApplicationStoppedListener {
   @NonNull
   private final MetricSendingQueueConsumer metricSendingQueueConsumer;
 
+  @NonNull
+  private final BidPrefetchRateLimiter bidPrefetchRateLimiter;
+
   BidManager(
       @NonNull SdkCache sdkCache,
       @NonNull Config config,
@@ -79,7 +85,8 @@ public class BidManager implements ApplicationStoppedListener {
       @NonNull AdUnitMapper adUnitMapper,
       @NonNull BidRequestSender bidRequestSender,
       @NonNull BidLifecycleListener bidLifecycleListener,
-      @NonNull MetricSendingQueueConsumer metricSendingQueueConsumer
+      @NonNull MetricSendingQueueConsumer metricSendingQueueConsumer,
+      @NonNull BidPrefetchRateLimiter bidPrefetchRateLimiter
   ) {
     this.cache = sdkCache;
     this.config = config;
@@ -88,6 +95,7 @@ public class BidManager implements ApplicationStoppedListener {
     this.bidRequestSender = bidRequestSender;
     this.bidLifecycleListener = bidLifecycleListener;
     this.metricSendingQueueConsumer = metricSendingQueueConsumer;
+    this.bidPrefetchRateLimiter = bidPrefetchRateLimiter;
   }
 
   /**
@@ -217,12 +225,15 @@ public class BidManager implements ApplicationStoppedListener {
    * @param adUnits list of ad units to prefetch
    */
   public void prefetch(@NonNull List<AdUnit> adUnits) {
-    List<List<CacheAdUnit>> requestedAdUnitsChunks = adUnitMapper.mapToChunks(adUnits);
+    if (bidPrefetchRateLimiter.canPrefetch()) {
+      bidPrefetchRateLimiter.setPrefetchTime();
+      List<List<CacheAdUnit>> requestedAdUnitsChunks = adUnitMapper.mapToChunks(adUnits);
 
-    bidRequestSender.sendRemoteConfigRequest(config);
+      bidRequestSender.sendRemoteConfigRequest(config);
 
-    for (List<CacheAdUnit> requestedAdUnits : requestedAdUnitsChunks) {
-      sendBidRequest(requestedAdUnits);
+      for (List<CacheAdUnit> requestedAdUnits : requestedAdUnitsChunks) {
+        sendBidRequest(requestedAdUnits);
+      }
     }
   }
 

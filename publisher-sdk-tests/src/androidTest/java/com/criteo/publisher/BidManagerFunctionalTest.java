@@ -36,6 +36,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -190,6 +191,42 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     assertShouldCallCdbAndPopulateCacheOnlyOnce(mappedAdUnitsChunks.get(0), slot);
+  }
+
+  @Test
+  public void prefetch_GivenRateLimited_ShouldNotCallCdbAndPopulateCache() throws Exception {
+    when(config.getMinTimeBetweenPrefetchesMillis()).thenReturn(1L);
+    CdbResponseSlot slot = givenMockedCdbRespondingSlot();
+
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+
+    BidManager bidManager = createBidManager();
+    bidManager.prefetch(singletonList(adUnit));
+    waitForIdleState();
+
+    bidManager.prefetch(singletonList(adUnit));
+    waitForIdleState();
+
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(cacheAdUnit), slot);
+  }
+
+  @Test
+  public void prefetch_GivenNotRateLimited_ShouldCallCdbAndPopulateCacheTwice() throws Exception {
+    when(config.getMinTimeBetweenPrefetchesMillis()).thenReturn(0L);
+    CdbResponseSlot slot = givenMockedCdbRespondingSlot();
+
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+
+    BidManager bidManager = createBidManager();
+    bidManager.prefetch(singletonList(adUnit));
+    waitForIdleState();
+
+    bidManager.prefetch(singletonList(adUnit));
+    waitForIdleState();
+
+    assertShouldCallCdbAndPopulateCacheTwice(singletonList(cacheAdUnit), slot);
   }
 
   @Test
@@ -808,14 +845,26 @@ public class BidManagerFunctionalTest {
       List<CacheAdUnit> requestedAdUnits,
       CdbResponseSlot slot
   ) throws Exception {
-    verify(cache).add(slot);
-    verify(api).loadCdb(argThat(cdb -> {
+    assertShouldCAllCdbAndPopulatCache(requestedAdUnits, slot, 1);
+  }
+
+  private void assertShouldCallCdbAndPopulateCacheTwice(
+      List<CacheAdUnit> requestedAdUnits,
+      CdbResponseSlot slot
+  ) throws Exception {
+    assertShouldCAllCdbAndPopulatCache(requestedAdUnits, slot, 2);
+  }
+
+  private void assertShouldCAllCdbAndPopulatCache(List<CacheAdUnit> requestedAdUnits,
+      CdbResponseSlot slot, int times) throws Exception {
+    verify(cache, times(times)).add(slot);
+    verify(api, times(times)).loadCdb(argThat(cdb -> {
       assertEquals(requestedAdUnits, getRequestedAdUnits(cdb));
       return true;
     }), any());
-    verify(bidLifecycleListener).onCdbCallStarted(any());
-    verify(bidLifecycleListener).onCdbCallFinished(any(), any());
-    verify(metricSendingQueueConsumer).sendMetricBatch();
+    verify(bidLifecycleListener, times(times)).onCdbCallStarted(any());
+    verify(bidLifecycleListener, times(times)).onCdbCallFinished(any(), any());
+    verify(metricSendingQueueConsumer, times(times)).sendMetricBatch();
   }
 
   private void assertShouldNotCallCdbAndNotPopulateCache() throws Exception {
@@ -1004,7 +1053,8 @@ public class BidManagerFunctionalTest {
         dependencyProvider.provideAdUnitMapper(),
         dependencyProvider.provideBidRequestSender(),
         dependencyProvider.provideBidLifecycleListener(),
-        dependencyProvider.provideMetricSendingQueueConsumer()
+        dependencyProvider.provideMetricSendingQueueConsumer(),
+        dependencyProvider.provideBidPrefetchRateLimiter()
     );
   }
 

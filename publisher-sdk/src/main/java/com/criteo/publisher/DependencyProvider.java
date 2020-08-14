@@ -80,6 +80,7 @@ import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.CustomAdapterFactory;
 import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.util.JsonSerializer;
+import com.criteo.publisher.util.SafeSharedPreferences;
 import com.criteo.publisher.util.TextUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -271,7 +272,8 @@ public class DependencyProvider {
             provideAdUnitMapper(),
             provideBidRequestSender(),
             provideBidLifecycleListener(),
-            provideMetricSendingQueueConsumer()
+            provideMetricSendingQueueConsumer(),
+            provideBidPrefetchRateLimiter()
         );
       }
     });
@@ -285,7 +287,8 @@ public class DependencyProvider {
       public DeviceInfo create() {
         return new DeviceInfo(
             provideContext(),
-            provideRunOnUiThreadExecutor());
+            provideRunOnUiThreadExecutor()
+        );
       }
     });
   }
@@ -298,7 +301,8 @@ public class DependencyProvider {
       public AdUnitMapper create() {
         return new AdUnitMapper(
             DependencyProvider.this.provideAndroidUtil(),
-            DependencyProvider.this.provideDeviceUtil());
+            DependencyProvider.this.provideDeviceUtil()
+        );
       }
     });
   }
@@ -574,6 +578,17 @@ public class DependencyProvider {
   }
 
   @NonNull
+  public SafeSharedPreferences provideSafeSharedPreferences() {
+    return getOrCreate(SafeSharedPreferences.class, new Factory<SafeSharedPreferences>() {
+      @NonNull
+      @Override
+      public SafeSharedPreferences create() {
+        return new SafeSharedPreferences(provideSharedPreferences());
+      }
+    });
+  }
+
+  @NonNull
   public IntegrationRegistry provideIntegrationRegistry() {
     return getOrCreate(IntegrationRegistry.class, new Factory<IntegrationRegistry>() {
       @NonNull
@@ -770,7 +785,25 @@ public class DependencyProvider {
     });
   }
 
+  @NonNull
+  public BidPrefetchRateLimiter provideBidPrefetchRateLimiter() {
+    return getOrCreate(BidPrefetchRateLimiter.class, new Factory<BidPrefetchRateLimiter>() {
+      @NonNull
+      @Override
+      public BidPrefetchRateLimiter create() {
+        return new BidPrefetchRateLimiter(
+            provideClock(),
+            provideSharedPreferences(),
+            provideSafeSharedPreferences(),
+            provideConfig()
+        );
+      }
+    });
+  }
+
+
   public interface Factory<T> {
+
     @NonNull
     T create();
   }

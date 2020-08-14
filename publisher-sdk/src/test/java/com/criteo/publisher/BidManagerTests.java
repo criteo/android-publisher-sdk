@@ -91,6 +91,9 @@ public class BidManagerTests {
   @Mock
   private IntegrationRegistry integrationRegistry;
 
+  @Mock
+  private BidPrefetchRateLimiter bidPrefetchRateLimiter;
+
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
@@ -124,6 +127,8 @@ public class BidManagerTests {
 
     testSlot = CdbResponseSlot.fromJson(slotJson);
     when(this.sdkCache.peekAdUnit(cAdUnit)).thenReturn(testSlot);
+
+    when(bidPrefetchRateLimiter.canPrefetch()).thenReturn(true);
 
     DependencyProvider.setInstance(dependencyProvider);
   }
@@ -208,7 +213,8 @@ public class BidManagerTests {
         adUnitMapper,
         bidRequestSender,
         bidLifecycleListener,
-        metricSendingQueueConsumer
+        metricSendingQueueConsumer,
+        bidPrefetchRateLimiter
     );
   }
 

@@ -331,7 +331,8 @@ public class ConfigIntegrationTests {
         "mode1",
         "macro2",
         "mode2",
-        false
+        false,
+        30_000L
     );
 
     givenRemoteConfigInLocalStorage(persistedConfig);
@@ -354,6 +355,7 @@ public class ConfigIntegrationTests {
         "mode1",
         null,
         "mode2",
+        null,
         null
     );
 
@@ -363,7 +365,8 @@ public class ConfigIntegrationTests {
         "overriddenMode1",
         "overriddenMacro2",
         null,
-        false
+        false,
+        null
     );
 
     RemoteConfigResponse expectedRemoteConfig = RemoteConfigResponse.create(
@@ -372,7 +375,8 @@ public class ConfigIntegrationTests {
         "overriddenMode1",
         "overriddenMacro2",
         "mode2",
-        false
+        false,
+        null
     );
 
     givenRemoteConfigInLocalStorage(oldPersistedConfig);
