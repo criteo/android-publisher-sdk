@@ -102,7 +102,7 @@ configurations.configureEach {
 
 dependencies {
     implementation(Deps.Kotlin.Stdlib)
-    implementation(Deps.AndroidX.MultiDex) // TODO do not export this
+    implementation(Deps.AndroidX.MultiDex)
 
     compileOnly(Deps.AndroidX.Annotations)
     implementation(Deps.Square.Tape.Tape)
