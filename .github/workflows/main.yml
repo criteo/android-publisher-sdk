@@ -42,7 +42,7 @@ jobs:
         with:
           access-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload all (JUnit+Lint+Detekt) reports
+      - name: Upload all (JUnit+Lint+Detekt+Jacoco) reports
         uses: actions/upload-artifact@v2
         if: failure()
         with:

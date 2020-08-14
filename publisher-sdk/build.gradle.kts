@@ -17,6 +17,7 @@
 plugins {
     id("com.android.library")
     `maven-publish`
+    jacoco
     kotlin("android")
     id("kotlin-allopen")
     id("com.vanniktech.dependency.graph.generator") version "0.5.0"

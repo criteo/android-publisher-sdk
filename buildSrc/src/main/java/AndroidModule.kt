@@ -156,4 +156,6 @@ private fun Project.defaultAndroidModule() {
     toolVersion = Deps.Detekt.version
     config = files(rootDir.resolve(".detekt/config.yml"))
   }
+
+  generateCoverageReportForJvmTests()
 }
