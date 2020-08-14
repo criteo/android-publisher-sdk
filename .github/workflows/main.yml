@@ -49,6 +49,12 @@ jobs:
           name: junit-report
           path: "**/build/reports/**/*"
 
+      - name: Upload coverage report for quality-tests
+        uses: actions/upload-artifact@v2
+        with:
+          name: java-tests-coverage
+          path: "**/reports/jacoco/**/*.xml"
+
   android-tests:
     runs-on: macos-latest
     steps:
@@ -109,6 +115,39 @@ jobs:
         with:
           name: junit-report
           path: "**/build/reports"
+
+      - name: Upload coverage report for quality-tests
+        uses: actions/upload-artifact@v2
+        with:
+          name: android-tests-coverage
+          path: "**/reports/coverage/**/*.xml"
+
+  quality-tests:
+    runs-on: ubuntu-latest
+
+    needs:
+      - java-tests
+      - android-tests
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Download coverage reports of java-tests
+        uses: actions/download-artifact@v2
+        with:
+          name: java-tests-coverage
+
+      - name: Download coverage reports of android-tests
+        uses: actions/download-artifact@v2
+        with:
+          name: android-tests-coverage
+
+      - name: SonarQube Analysis
+        run: ./gradlew sonarqube
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   deploy-development-artifacts:
     runs-on: ubuntu-latest
