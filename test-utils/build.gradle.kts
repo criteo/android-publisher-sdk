@@ -48,6 +48,8 @@ dependencies {
   testImplementation(Deps.Mockito.Kotlin)
   testImplementation(Deps.AssertJ.AssertJ)
 
+  androidTestImplementation(Deps.AndroidX.Test.Runner)
+
   detektPlugins(Deps.Detekt.DetektFormatting)
 }
 
