@@ -17,6 +17,7 @@
 plugins {
   id("com.android.library")
   `maven-publish`
+  jacoco
   kotlin("android")
   id("com.vanniktech.android.javadoc") version "0.3.0"
   id("com.jfrog.bintray")
