@@ -6,6 +6,11 @@
 - Bug fixes
   - Fix wrong interstitial orientation when user starts the application in landscape
 
+# Version 4.0.0
+
+- Breaking changes
+  - Remove `Parcelable` implementation from `AdSize` class
+
 # Version 3.9.0
 
 - Features
