@@ -201,7 +201,7 @@ class ProfileIdFunctionalTest {
 
     givenInitializedCriteo()
     runOnMainThreadAndWait {
-      CriteoInterstitial(context, INTERSTITIAL).loadAd()
+      CriteoInterstitial(INTERSTITIAL).loadAd()
     }
     mockedDependenciesRule.waitForIdleState()
 

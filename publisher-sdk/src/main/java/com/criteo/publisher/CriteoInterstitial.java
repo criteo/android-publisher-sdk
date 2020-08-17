@@ -16,7 +16,6 @@
 
 package com.criteo.publisher;
 
-import android.content.Context;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -51,10 +50,7 @@ public class CriteoInterstitial {
   @Nullable
   private CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
 
-  public CriteoInterstitial(
-      @SuppressWarnings("unused") @NonNull Context context,
-      InterstitialAdUnit interstitialAdUnit
-  ) {
+  public CriteoInterstitial(InterstitialAdUnit interstitialAdUnit) {
     this(interstitialAdUnit, null);
   }
 

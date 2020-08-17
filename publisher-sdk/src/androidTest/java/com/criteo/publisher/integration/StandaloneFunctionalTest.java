@@ -260,7 +260,7 @@ public class StandaloneFunctionalTest {
     AtomicReference<CriteoInterstitial> interstitialRef = new AtomicReference<>();
 
     runOnMainThreadAndWait(() -> {
-      CriteoInterstitial interstitial = new CriteoInterstitial(context, adUnit);
+      CriteoInterstitial interstitial = new CriteoInterstitial(adUnit);
       interstitialRef.set(interstitial);
     });
 
@@ -333,7 +333,7 @@ public class StandaloneFunctionalTest {
     AtomicReference<CriteoInterstitial> interstitial = new AtomicReference<>();
 
     runOnMainThreadAndWait(() -> {
-      interstitial.set(new CriteoInterstitial(context, interstitialAdUnit));
+      interstitial.set(new CriteoInterstitial(interstitialAdUnit));
       interstitial.get().setCriteoInterstitialAdListener(listener);
     });
 
@@ -347,7 +347,7 @@ public class StandaloneFunctionalTest {
     Mockito.clearInvocations(api);
 
     runOnMainThreadAndWait(() -> {
-      CriteoInterstitial interstitial = new CriteoInterstitial(context, validInterstitialAdUnit);
+      CriteoInterstitial interstitial = new CriteoInterstitial(validInterstitialAdUnit);
       interstitial.loadAd();
     });
     waitForBids();

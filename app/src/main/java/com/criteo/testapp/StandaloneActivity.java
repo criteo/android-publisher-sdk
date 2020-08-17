@@ -117,7 +117,7 @@ public class StandaloneActivity extends AppCompatActivity {
   private void loadInterstitial(InterstitialAdUnit adUnit, Button btnShow) {
     String prefix = "Standalone " + adUnit.getAdUnitId();
 
-    CriteoInterstitial criteoInterstitial = new CriteoInterstitial(context, adUnit);
+    CriteoInterstitial criteoInterstitial = new CriteoInterstitial(adUnit);
     criteoInterstitial.setCriteoInterstitialAdListener(
         new TestAppInterstitialAdListener(TAG, prefix, btnShow));
     criteoInterstitial.setCriteoInterstitialAdDisplayListener(

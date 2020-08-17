@@ -124,7 +124,7 @@ public class InHouseActivity extends AppCompatActivity {
   private void loadInterstitialAd(InterstitialAdUnit adUnit, Button btnShow) {
     String prefix = "In-House " + adUnit.getAdUnitId();
 
-    CriteoInterstitial interstitial = new CriteoInterstitial(context, adUnit);
+    CriteoInterstitial interstitial = new CriteoInterstitial(adUnit);
     interstitial.setCriteoInterstitialAdListener(
         new TestAppInterstitialAdListener(TAG, prefix, btnShow));
     interstitial.setCriteoInterstitialAdDisplayListener(
