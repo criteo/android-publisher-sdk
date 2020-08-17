@@ -16,12 +16,13 @@
 
 package com.criteo.publisher
 
-import com.criteo.publisher.logging.Logger
-import com.criteo.publisher.logging.LoggerFactory
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.util.BuildConfigWrapper
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.check
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Rule
@@ -31,13 +32,10 @@ import java.io.IOException
 class SafeRunnableTest {
     @Rule
     @JvmField
-    var mockedDependenciesRule = MockedDependenciesRule()
+    var mockedDependenciesRule = MockedDependenciesRule().withMockedLogger()
 
     @SpyBean
     private lateinit var buildConfigWrapper: BuildConfigWrapper
-
-    @SpyBean
-    private lateinit var loggerFactory: LoggerFactory
 
     @Test
     fun dontThrowInProduction() {
@@ -50,8 +48,7 @@ class SafeRunnableTest {
 
     @Test
     fun givenCheckedException_DontThrowInDebugButLogIt() {
-        val logger = mock<Logger>()
-        doReturn(logger).whenever(loggerFactory).createLogger(any())
+        val logger = mockedDependenciesRule.mockedLogger!!
         doReturn(true).whenever(buildConfigWrapper).preconditionThrowsOnException()
 
         val throwable = IOException()
