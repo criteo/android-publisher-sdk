@@ -37,6 +37,7 @@ sonarqube {
     property("sonar.projectKey", "com.criteo.publisher:criteo-publisher-sdk")
     property("sonar.organization", "criteo")
     property("sonar.host.url", "https://sonarcloud.io")
+    property("sonar.projectVersion", sdkPublicationVersion())
 
     // There is no dependency in the Gradle graph here. One should first generate coverage
     // reports before invoking the sonarqube task. In this way, the CI can run JVM and
