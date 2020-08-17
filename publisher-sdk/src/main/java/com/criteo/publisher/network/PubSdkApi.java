@@ -91,7 +91,7 @@ public class PubSdkApi {
     }
   }
 
-  @Nullable
+  @NonNull
   public JSONObject postAppEvent(
       int senderId,
       @NonNull String appId,
@@ -100,8 +100,7 @@ public class PubSdkApi {
       int limitedAdTracking,
       @NonNull String userAgent,
       @Nullable GdprData gdprData
-  ) {
-
+  ) throws Exception {
     Map<String, String> parameters = new HashMap<>();
     parameters.put(APP_ID, appId);
 
@@ -120,16 +119,10 @@ public class PubSdkApi {
       }
     }
 
-    try {
-      URL url = new URL(
-          buildConfigWrapper.getEventUrl() + "/appevent/v1/" + senderId + "?"
-              + getParamsString(
-              parameters));
-      return executeGet(url, userAgent);
-    } catch (IOException | JSONException e) {
-      Log.d(TAG, "Unable to process request to post app event:" + e.getMessage());
-      e.printStackTrace();
-      return null;
+    String query = "/appevent/v1/" + senderId + "?" + getParamsString(parameters);
+    URL url = new URL(buildConfigWrapper.getEventUrl() + query);
+    try (InputStream inputStream = executeRawGet(url, userAgent)) {
+      return readJson(inputStream);
     }
   }
 
@@ -177,12 +170,6 @@ public class PubSdkApi {
   private InputStream executeRawGet(URL url, @Nullable String userAgent) throws IOException {
     HttpURLConnection urlConnection = prepareConnection(url, userAgent, "GET");
     return readResponseStreamIfSuccess(urlConnection);
-  }
-
-  private JSONObject executeGet(URL url, @Nullable String userAgent) throws IOException, JSONException {
-    try (InputStream inputStream = executeRawGet(url, userAgent)) {
-      return readJson(inputStream);
-    }
   }
 
   @NonNull
