@@ -22,6 +22,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.integration.Integration;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
@@ -66,6 +68,9 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
 
   @NonNull
   private final DeviceUtil deviceUtil;
+
+  @NonNull
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   public DfpHeaderBidding(
       @NonNull AndroidUtil androidUtil,
@@ -201,20 +206,21 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
       return null;
     }
 
+    byte[] byteUrl = stringToEncode.getBytes(Charset.forName("UTF-8"));
+    String base64Url = Base64.encodeToString(byteUrl, Base64.NO_WRAP);
+
     try {
-      byte[] byteUrl = stringToEncode.getBytes(Charset.forName("UTF-8"));
-      String base64Url = base64(byteUrl);
-      String utf8 = Charset.forName("UTF-8").name();
-      return URLEncoder.encode(URLEncoder.encode(base64Url, utf8), utf8);
+      return encode(encode(base64Url));
     } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
+      logger.error(e);
     }
+
     return null;
   }
 
-  @VisibleForTesting
-  String base64(byte[] input) {
-    return Base64.encodeToString(input, Base64.NO_WRAP);
+  @NonNull
+  String encode(@NonNull String encoded) throws UnsupportedEncodingException {
+    return URLEncoder.encode(encoded, Charset.forName("UTF-8").name());
   }
 
   private static class SafeDfpBuilder {

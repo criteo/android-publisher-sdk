@@ -22,7 +22,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -41,6 +45,7 @@ import com.criteo.publisher.model.nativeads.NativeProduct;
 import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.DeviceUtil;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import org.junit.Before;
 import org.junit.Rule;
@@ -76,7 +81,8 @@ public class DfpHeaderBiddingTest {
   private static final String TABLET_INTERSTITIAL_LANDSCAPE_SIZE = "1024x768";
 
   @Rule
-  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule()
+      .withMockedLogger();
 
   @MockBean
   private AndroidUtil androidUtil;
@@ -327,6 +333,20 @@ public class DfpHeaderBiddingTest {
 
     String encodedValue = headerBidding.createDfpCompatibleString(displayUrl);
     assertEquals(encodedValue, expectedEncodedValue);
+  }
+
+  @Test
+  public void createDfpCompatibleString_GivenExceptionDuringEncoding_ReturnNullAndLogError()
+      throws Exception {
+    UnsupportedEncodingException exception = mock(UnsupportedEncodingException.class);
+
+    headerBidding = spy(headerBidding);
+    doThrow(exception).when(headerBidding).encode(any());
+
+    String encodedValue = headerBidding.createDfpCompatibleString("displayUrl");
+
+    assertThat(encodedValue).isNull();
+    verify(mockedDependenciesRule.getMockedLogger()).error(exception);
   }
 
   private String encodeForDfp(String displayUrl) {
