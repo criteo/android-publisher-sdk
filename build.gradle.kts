@@ -63,6 +63,9 @@ sonarqube {
 
     val lintReports = allSubProjectsReports("reports/lint-results.xml")
     property("sonar.androidLint.reportPaths", lintReports)
+
+    val detektReports = allSubProjectsReports("reports/detekt/*.xml")
+    property("sonar.kotlin.detekt.reportPaths", detektReports)
   }
 }
 
