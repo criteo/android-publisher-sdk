@@ -186,7 +186,7 @@ public class InHouseFunctionalTest {
   @NonNull
   private CriteoInterstitial createInterstitial(InterstitialAdUnit interstitialAdUnit) {
     return callOnMainThreadAndWait(() ->
-        new CriteoInterstitial(context, interstitialAdUnit)
+        new CriteoInterstitial(interstitialAdUnit)
     );
   }
 

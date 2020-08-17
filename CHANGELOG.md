@@ -9,6 +9,7 @@
 # Version 4.0.0
 
 - Breaking changes
+  - Remove `Context` parameter from `CriteoInterstitial` constructor
   - Remove `Parcelable` implementation from `AdSize` class
 
 # Version 3.9.0

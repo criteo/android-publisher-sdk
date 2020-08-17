@@ -19,7 +19,6 @@ package com.criteo.publisher.manual;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 
-import android.content.Context;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
@@ -30,12 +29,11 @@ import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.util.CompletableFuture;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Ignore // Those are test that should only be run manually
+@Ignore("Those are test that should only be run manually")
 public class StandaloneInterstitialManualTest {
 
   private static final int INVESTIGATION_TIME_MS = 15_000;
@@ -49,15 +47,8 @@ public class StandaloneInterstitialManualTest {
   private final InterstitialAdUnit interstitialDemo = TestAdUnits.INTERSTITIAL_DEMO;
   private final InterstitialAdUnit interstitialIbvDemo = TestAdUnits.INTERSTITIAL_IBV_DEMO;
 
-  private Context context;
-
   private CriteoInterstitial interstitial;
   private ShowingInterstitialListener listener;
-
-  @Before
-  public void setUp() throws Exception {
-    context = activityRule.getActivity().getApplicationContext();
-  }
 
   /**
    * Here is the list of test scenarios that could be verified through this test case.
@@ -103,7 +94,7 @@ public class StandaloneInterstitialManualTest {
     waitForBids();
 
     runOnMainThreadAndWait(() -> {
-      interstitial = new CriteoInterstitial(context, adUnit);
+      interstitial = new CriteoInterstitial(adUnit);
 
       listener = new ShowingInterstitialListener(interstitial);
       interstitial.setCriteoInterstitialAdListener(listener);
