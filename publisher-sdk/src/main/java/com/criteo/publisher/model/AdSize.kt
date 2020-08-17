@@ -15,6 +15,9 @@
  */
 package com.criteo.publisher.model
 
+import androidx.annotation.Keep
+
+@Keep
 data class AdSize(val width: Int, val height: Int) {
 
   val formattedSize: String

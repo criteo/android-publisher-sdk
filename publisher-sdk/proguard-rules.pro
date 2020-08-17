@@ -61,11 +61,6 @@
    public *;
 }
 
--keep public class com.criteo.publisher.model.AdSize
--keepclassmembers class com.criteo.publisher.model.AdSize {
-   public *;
-}
-
 -keep public class com.criteo.publisher.model.AdUnit
 -keepclassmembers class com.criteo.publisher.model.AdUnit {
    public *;
