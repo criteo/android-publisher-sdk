@@ -13,22 +13,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.criteo.publisher.model
 
-package com.criteo.publisher.model;
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.Test
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import org.junit.Test;
-
-public class AdSizeTest {
+class AdSizeTest {
 
   @Test
-  public void testFormattedSize() {
-    AdSize adSize = new AdSize(42, 1337);
+  fun testFormattedSize() {
+    val adSize = AdSize(42, 1337)
 
-    String formattedSize = adSize.getFormattedSize();
+    val formattedSize = adSize.formattedSize
 
-    assertThat(formattedSize).isEqualTo("42x1337");
+    assertThat(formattedSize).isEqualTo("42x1337")
   }
-
 }
