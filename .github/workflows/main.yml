@@ -42,18 +42,20 @@ jobs:
         with:
           access-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload all (JUnit+Lint+Detekt+Jacoco) reports
+      - name: Upload all human readable reports (JUnit+Lint+Detekt+Jacoco)
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: junit-report
           path: "**/build/reports/**/*"
 
-      - name: Upload coverage report for quality-tests
+      - name: Upload XML reports for quality-tests
         uses: actions/upload-artifact@v2
         with:
-          name: java-tests-coverage
-          path: "**/reports/jacoco/**/*.xml"
+          name: java-quality-reports
+          path: |
+            **/reports/**/*.xml
+            **/TEST-*.xml
 
   android-tests:
     runs-on: macos-latest
@@ -113,20 +115,22 @@ jobs:
         if: failure()
         with:
           access-token: ${{ secrets.GITHUB_TOKEN }}
-          path: "**/build/(test-results|reports)/**/*.xml"
 
-      - name: Upload all (JUnit+Jacoco) report
+      - name: Upload all human readable reports (JUnit+Jacoco)
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: junit-report
           path: "**/build/reports"
 
-      - name: Upload coverage report for quality-tests
+      - name: Upload XML reports for quality-tests
         uses: actions/upload-artifact@v2
         with:
-          name: android-tests-coverage
-          path: "**/reports/coverage/**/*.xml"
+          name: android-quality-reports
+          path: |
+            **/reports/**/*.xml
+            **/TEST-*.xml
+            **/test-results/gordon/*.xml
 
   quality-tests:
     runs-on: ubuntu-latest
@@ -139,15 +143,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Download coverage reports of java-tests
+      - name: Download quality reports of java-tests
         uses: actions/download-artifact@v2
         with:
-          name: java-tests-coverage
+          name: java-quality-reports
 
-      - name: Download coverage reports of android-tests
+      - name: Download quality reports of android-tests
         uses: actions/download-artifact@v2
         with:
-          name: android-tests-coverage
+          name: android-quality-reports
 
       - name: SonarQube Analysis
         run: ./gradlew sonarqube

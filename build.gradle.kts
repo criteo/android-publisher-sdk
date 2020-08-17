@@ -39,15 +39,13 @@ sonarqube {
     property("sonar.host.url", "https://sonarcloud.io")
     property("sonar.projectVersion", sdkPublicationVersion())
 
-    // There is no dependency in the Gradle graph here. One should first generate coverage
+    // There is no dependency in the Gradle graph here. One should first generate quality
     // reports before invoking the sonarqube task. In this way, the CI can run JVM and
     // Android tests in parallel, and when both are finished, CI would invoke this task.
-    val jacocoReports = subprojects.flatMap {
-      val reportTree = it.fileTree(it.buildDir)
-      reportTree.include("reports/jacoco/**/*.xml") // Reports from JVM tests
-      reportTree.include("reports/coverage/**/*.xml") // Reports from Android tests
-      reportTree.files
-    }
+
+    val jacocoReports =
+        allSubProjectsReports("reports/jacoco/**/*.xml") + // Reports from JVM tests
+            allSubProjectsReports("reports/coverage/**/*.xml") // Reports from Android tests
     property("sonar.coverage.jacoco.xmlReportPaths", jacocoReports)
 
     // We do not expect to cover the test app nor the dummy activities for Android tests
@@ -58,5 +56,17 @@ sonarqube {
             "publisher-sdk-tests/src/main/**/*"
         )
     )
+
+    val junitReports = allSubProjectsReports("**/TEST-*.xml") + // Normal tests
+        allSubProjectsReports("test-results/gordon/*.xml") // Retried tests (Gordon runner)
+    property("sonar.junit.reportPaths", junitReports)
   }
+}
+
+fun Project.allSubProjectsReports(globPath: String): Set<File> {
+  return subprojects.flatMap {
+    val reportTree = it.fileTree(it.buildDir)
+    reportTree.include(globPath)
+    reportTree.files
+  }.toSet()
 }
