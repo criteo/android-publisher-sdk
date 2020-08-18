@@ -42,9 +42,6 @@ public class CriteoInterstitialEventControllerTest {
   private CriteoInterstitialAdListener listener;
 
   @Mock
-  private CriteoInterstitialAdDisplayListener displayListener;
-
-  @Mock
   private WebViewData webViewData;
 
   @Mock
@@ -153,7 +150,6 @@ public class CriteoInterstitialEventControllerTest {
   private CriteoInterstitialEventController createController() {
     return new CriteoInterstitialEventController(
         listener,
-        displayListener,
         webViewData,
         interstitialActivityHelper,
         criteo

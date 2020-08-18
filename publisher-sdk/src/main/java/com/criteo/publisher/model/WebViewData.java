@@ -18,7 +18,7 @@ package com.criteo.publisher.model;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
+import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.network.PubSdkApi;
@@ -85,7 +85,8 @@ public class WebViewData {
   public void fillWebViewHtmlContent(
       @NonNull String displayUrl,
       @NonNull DeviceInfo deviceInfo,
-      @Nullable CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener) {
+      @Nullable CriteoInterstitialAdListener listener
+  ) {
     Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
     RunOnUiThreadExecutor runOnUiThreadExecutor = DependencyProvider.getInstance()
         .provideRunOnUiThreadExecutor();
@@ -94,7 +95,7 @@ public class WebViewData {
         displayUrl,
         this,
         deviceInfo,
-        criteoInterstitialAdDisplayListener,
+        listener,
         api,
         runOnUiThreadExecutor
     );

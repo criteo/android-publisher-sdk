@@ -33,7 +33,6 @@ import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.testapp.integration.MockedIntegrationRegistry;
 import com.criteo.testapp.listener.TestAppBannerAdListener;
-import com.criteo.testapp.listener.TestAppInterstitialAdDisplayListener;
 import com.criteo.testapp.listener.TestAppInterstitialAdListener;
 import com.criteo.testapp.listener.TestAppNativeAdListener;
 
@@ -120,8 +119,6 @@ public class StandaloneActivity extends AppCompatActivity {
     CriteoInterstitial criteoInterstitial = new CriteoInterstitial(adUnit);
     criteoInterstitial.setCriteoInterstitialAdListener(
         new TestAppInterstitialAdListener(TAG, prefix, btnShow));
-    criteoInterstitial.setCriteoInterstitialAdDisplayListener(
-        new TestAppInterstitialAdDisplayListener(TAG, prefix));
 
     btnShow.setOnClickListener(v -> showInterstitial(criteoInterstitial));
 

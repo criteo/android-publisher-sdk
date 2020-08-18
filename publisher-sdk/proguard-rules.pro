@@ -101,8 +101,6 @@
 
 -keep public interface com.criteo.publisher.CriteoInterstitialAdListener {*;}
 
--keep public interface com.criteo.publisher.CriteoInterstitialAdDisplayListener {*;}
-
 -keep class com.google.android.gms.ads.** { *; }
 
 

@@ -38,9 +38,6 @@ public class CriteoInterstitialEventController {
   @Nullable
   private final CriteoInterstitialAdListener criteoInterstitialAdListener;
 
-  @Nullable
-  private final CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
-
   @NonNull
   private final WebViewData webViewData;
 
@@ -58,12 +55,11 @@ public class CriteoInterstitialEventController {
 
   public CriteoInterstitialEventController(
       @Nullable CriteoInterstitialAdListener listener,
-      @Nullable CriteoInterstitialAdDisplayListener adDisplayListener,
       @NonNull WebViewData webViewData,
       @NonNull InterstitialActivityHelper interstitialActivityHelper,
-      @NonNull Criteo criteo) {
+      @NonNull Criteo criteo
+  ) {
     this.criteoInterstitialAdListener = listener;
-    this.criteoInterstitialAdDisplayListener = adDisplayListener;
     this.webViewData = webViewData;
     this.interstitialActivityHelper = interstitialActivityHelper;
     this.criteo = criteo;
@@ -120,7 +116,8 @@ public class CriteoInterstitialEventController {
     webViewData.fillWebViewHtmlContent(
         displayUrl,
         deviceInfo,
-        criteoInterstitialAdDisplayListener);
+        criteoInterstitialAdListener
+    );
   }
 
   public void show() {
