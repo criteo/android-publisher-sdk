@@ -24,6 +24,7 @@ import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.WebViewData;
+import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.util.ObjectUtils;
 
 public class CriteoInterstitial {
@@ -132,7 +133,7 @@ public class CriteoInterstitial {
       criteoInterstitialEventController = new CriteoInterstitialEventController(
           criteoInterstitialAdListener,
           criteoInterstitialAdDisplayListener,
-          new WebViewData(criteo.getConfig()),
+          new WebViewData(criteo.getConfig(), getPubSdkApi()),
           criteo.getInterstitialActivityHelper(),
           criteo
       );
@@ -148,6 +149,11 @@ public class CriteoInterstitial {
   @NonNull
   private IntegrationRegistry getIntegrationRegistry() {
     return DependencyProvider.getInstance().provideIntegrationRegistry();
+  }
+
+  @NonNull
+  private PubSdkApi getPubSdkApi() {
+    return DependencyProvider.getInstance().providePubSdkApi();
   }
 
 }

@@ -19,6 +19,7 @@ package com.criteo.publisher.model;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import com.criteo.publisher.network.PubSdkApi;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -29,13 +30,16 @@ public class WebViewDataTest {
   @Mock
   private Config config;
 
+  @Mock
+  private PubSdkApi api;
+
   private WebViewData webViewData;
 
   @Before
   public void setup() {
     MockitoAnnotations.initMocks(this);
 
-    webViewData = new WebViewData(config);
+    webViewData = new WebViewData(config, api);
   }
 
   @Test

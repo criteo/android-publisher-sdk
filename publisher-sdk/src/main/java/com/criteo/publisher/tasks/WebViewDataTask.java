@@ -24,9 +24,10 @@ import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.WebViewData;
+import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.util.StreamUtil;
 import com.criteo.publisher.util.TextUtils;
-import java.net.HttpURLConnection;
+import java.io.InputStream;
 import java.net.URL;
 
 public class WebViewDataTask extends AsyncTask<String, Void, String> {
@@ -42,12 +43,19 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
   @Nullable
   private final CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
 
-  public WebViewDataTask(@NonNull WebViewData webviewData,
+  @NonNull
+  private final PubSdkApi api;
+
+  public WebViewDataTask(
+      @NonNull WebViewData webviewData,
       @NonNull DeviceInfo deviceInfo,
-      @Nullable CriteoInterstitialAdDisplayListener adDisplayListener) {
+      @Nullable CriteoInterstitialAdDisplayListener adDisplayListener,
+      @NonNull PubSdkApi api
+  ) {
     this.webviewData = webviewData;
     this.deviceInfo = deviceInfo;
     this.criteoInterstitialAdDisplayListener = adDisplayListener;
+    this.api = api;
   }
 
   @Override
@@ -63,22 +71,13 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
 
   private String doWebViewDataTask(String[] args) throws Exception {
     String displayUrl = args[0];
-    String userAgent = deviceInfo.getUserAgent().get();
-
     URL url = new URL(displayUrl);
 
-    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-    urlConnection.setRequestMethod("GET");
-    urlConnection.setRequestProperty("Content-Type", "text/plain");
-    if (!TextUtils.isEmpty(userAgent)) {
-      urlConnection.setRequestProperty("User-Agent", userAgent);
-    }
+    String userAgent = deviceInfo.getUserAgent().get();
 
-    if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-      return StreamUtil.readStream(urlConnection.getInputStream());
+    try (InputStream stream = api.executeRawGet(url, userAgent)) {
+      return StreamUtil.readStream(stream);
     }
-
-    return null;
   }
 
   @Override

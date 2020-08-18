@@ -38,10 +38,12 @@ import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.WebViewData;
+import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.util.AdUnitType;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,6 +57,12 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   private CriteoInterstitialEventController criteoInterstitialEventController;
+
+  @Inject
+  private Config config;
+
+  @Inject
+  private PubSdkApi api;
 
   private WebViewData webViewData;
 
@@ -74,8 +82,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   public void setup() throws CriteoInitException {
     MockitoAnnotations.initMocks(this);
 
-    Config config = mockedDependenciesRule.getDependencyProvider().provideConfig();
-    webViewData = new WebViewData(config);
+    webViewData = new WebViewData(config, api);
     webViewData.setContent("html content");
 
     when(interstitialActivityHelper.isAvailable()).thenReturn(true);
