@@ -24,6 +24,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import androidx.annotation.NonNull;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.mock.MockedDependenciesRule;
@@ -48,6 +49,8 @@ public class WebViewDataTaskTest {
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
+  private String displayUrl;
+
   @Mock
   private WebViewData webViewData;
 
@@ -66,9 +69,10 @@ public class WebViewDataTaskTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
+    displayUrl = "http://localhost:" + mockWebServer.getPort() + "/path";
     when(deviceInfo.getUserAgent()).thenReturn(completedFuture(""));
 
-    task = new WebViewDataTask(webViewData, deviceInfo, listener, api);
+    task = createTask();
   }
 
   @Test
@@ -76,7 +80,7 @@ public class WebViewDataTaskTest {
     mockWebServer.enqueue(new MockResponse());
     when(deviceInfo.getUserAgent()).thenReturn(completedFuture("myUserAgent"));
 
-    task.doInBackground("http://localhost:" + mockWebServer.getPort() + "/path");
+    task.doInBackground();
 
     RecordedRequest request = mockWebServer.takeRequest();
     assertThat(request.getPath()).isEqualTo("/path");
@@ -92,7 +96,7 @@ public class WebViewDataTaskTest {
         .addHeader("content-type", "text/javascript")
         .setBody("<script />"));
 
-    String creative = task.doInBackground("http://localhost:" + mockWebServer.getPort() + "/path");
+    String creative = task.doInBackground();
 
     assertThat(creative).isEqualTo("<script />");
   }
@@ -101,21 +105,25 @@ public class WebViewDataTaskTest {
   public void backgroundJob_GivenServerRespondingNoBody_ReturnEmpty() throws Exception {
     mockWebServer.enqueue(new MockResponse().setResponseCode(200));
 
-    String creative = task.doInBackground("http://localhost:" + mockWebServer.getPort() + "/path");
+    String creative = task.doInBackground();
 
     assertThat(creative).isEqualTo("");
   }
 
   @Test
   public void backgroundJob_GivenNotExistingUrl_ReturnNull() throws Exception {
-    String creative = task.doInBackground("http://url.that.does.not.exist/path");
+    givenDisplayUrl("http://url.that.does.not.exist/path");
+
+    String creative = task.doInBackground();
 
     assertThat(creative).isNull();
   }
 
   @Test
   public void backgroundJob_GivenIllFormedUrl_ReturnNull() throws Exception {
-    String creative = task.doInBackground("not.a.url");
+    givenDisplayUrl("not.a.url");
+
+    String creative = task.doInBackground();
 
     assertThat(creative).isNull();
   }
@@ -124,7 +132,7 @@ public class WebViewDataTaskTest {
   public void backgroundJob_GivenConnectionError_ReturnNull() throws Exception {
     mockWebServer.shutdown();
 
-    String creative = task.doInBackground("http://localhost:" + mockWebServer.getPort() + "/path");
+    String creative = task.doInBackground();
 
     assertThat(creative).isNull();
   }
@@ -133,7 +141,7 @@ public class WebViewDataTaskTest {
   public void backgroundJob_GivenHttpError_ReturnNull() throws Exception {
     mockWebServer.enqueue(new MockResponse().setResponseCode(400));
 
-    String creative = task.doInBackground("http://localhost:" + mockWebServer.getPort() + "/path");
+    String creative = task.doInBackground();
 
     assertThat(creative).isNull();
   }
@@ -202,12 +210,22 @@ public class WebViewDataTaskTest {
   }
 
   private void givenNoListener() {
-    task = new WebViewDataTask(webViewData, deviceInfo, null, api);
+    listener = null;
+    task = createTask();
   }
 
   private void givenThrowingListener() {
     doThrow(RuntimeException.class).when(listener).onAdReadyToDisplay();
     doThrow(RuntimeException.class).when(listener).onAdFailedToDisplay(any());
+  }
+
+  private void givenDisplayUrl(@NonNull String displayUrl) {
+    this.displayUrl = displayUrl;
+    task = createTask();
+  }
+
+  private WebViewDataTask createTask() {
+    return new WebViewDataTask(displayUrl, webViewData, deviceInfo, listener, api);
   }
 
 }

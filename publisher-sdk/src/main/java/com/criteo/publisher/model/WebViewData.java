@@ -86,7 +86,7 @@ public class WebViewData {
       @NonNull DeviceInfo deviceInfo,
       @Nullable CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener) {
     Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
-    new WebViewDataTask(this, deviceInfo, criteoInterstitialAdDisplayListener, api)
-        .executeOnExecutor(threadPoolExecutor, displayUrl);
+    new WebViewDataTask(displayUrl, this, deviceInfo, criteoInterstitialAdDisplayListener, api)
+        .executeOnExecutor(threadPoolExecutor);
   }
 }
