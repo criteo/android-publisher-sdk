@@ -174,7 +174,7 @@ public class PubSdkApi {
   }
 
   @NonNull
-  private InputStream executeRawGet(URL url, @Nullable String userAgent) throws IOException {
+  public InputStream executeRawGet(URL url, @Nullable String userAgent) throws IOException {
     HttpURLConnection urlConnection = prepareConnection(url, userAgent, "GET");
     return readResponseStreamIfSuccess(urlConnection);
   }

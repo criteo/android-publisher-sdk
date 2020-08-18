@@ -26,8 +26,11 @@ import static org.mockito.Mockito.when;
 
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.WebViewData;
+import com.criteo.publisher.network.PubSdkApi;
+import javax.inject.Inject;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -42,6 +45,9 @@ public class WebViewDataTaskTest {
   @Rule
   public MockWebServer mockWebServer = new MockWebServer();
 
+  @Rule
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
   @Mock
   private WebViewData webViewData;
 
@@ -51,6 +57,9 @@ public class WebViewDataTaskTest {
   @Mock
   private CriteoInterstitialAdDisplayListener listener;
 
+  @Inject
+  private PubSdkApi api;
+
   private WebViewDataTask task;
 
   @Before
@@ -59,7 +68,7 @@ public class WebViewDataTaskTest {
 
     when(deviceInfo.getUserAgent()).thenReturn(completedFuture(""));
 
-    task = new WebViewDataTask(webViewData, deviceInfo, listener);
+    task = new WebViewDataTask(webViewData, deviceInfo, listener, api);
   }
 
   @Test
@@ -193,7 +202,7 @@ public class WebViewDataTaskTest {
   }
 
   private void givenNoListener() {
-    task = new WebViewDataTask(webViewData, deviceInfo, null);
+    task = new WebViewDataTask(webViewData, deviceInfo, null, api);
   }
 
   private void givenThrowingListener() {
