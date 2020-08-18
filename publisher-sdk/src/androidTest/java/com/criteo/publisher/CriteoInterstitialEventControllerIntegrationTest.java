@@ -36,6 +36,7 @@ import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.Config;
+import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.WebViewData;
 import com.criteo.publisher.network.PubSdkApi;
@@ -78,6 +79,9 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   @Mock
   private Criteo criteo;
 
+  @Inject
+  private DeviceInfo deviceInfo;
+
   @Before
   public void setup() throws CriteoInitException {
     MockitoAnnotations.initMocks(this);
@@ -86,6 +90,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
     webViewData.setContent("html content");
 
     when(interstitialActivityHelper.isAvailable()).thenReturn(true);
+    when(criteo.getDeviceInfo()).thenReturn(deviceInfo);
 
     criteoInterstitialEventController = spy(new CriteoInterstitialEventController(
         criteoInterstitialAdListener,
