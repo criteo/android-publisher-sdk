@@ -16,6 +16,9 @@
 package com.criteo.publisher.concurrent
 
 import com.criteo.publisher.util.CompletableFuture
+import com.nhaarman.mockitokotlin2.doThrow
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Test
@@ -95,6 +98,29 @@ class ThreadingUtilTest {
     val result = ThreadingUtil.getUninterruptibly(future)
 
     assertThat(result).isEqualTo(42)
+    assertThat(Thread.currentThread().isInterrupted).isTrue()
+  }
+
+  @Test
+  fun waitForAllThread_GivenTrackingCommandExecutor_WaitForItsCommands() {
+    val executor = mock<TrackingCommandsExecutor>()
+
+    ThreadingUtil.waitForAllThreads(executor)
+
+    verify(executor).waitCommands()
+  }
+
+  @Test
+  fun waitForAllThread_GivenInterruption_StopWaitingByThrowingWrappedInterruptedExceptionAndSetInterruptionFlag() {
+    val exception = InterruptedException()
+    val executor = mock<TrackingCommandsExecutor>() {
+      on { waitCommands() } doThrow exception
+    }
+
+    assertThatCode {
+      ThreadingUtil.waitForAllThreads(executor)
+    }.hasCauseReference(exception)
+
     assertThat(Thread.currentThread().isInterrupted).isTrue()
   }
 }
