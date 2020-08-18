@@ -28,9 +28,5 @@ public interface CriteoInterstitialAdListener extends CriteoAdListener {
     //  fired instead of the current onAdReadyToDisplay.
   }
 
-  default void onAdFailedToDisplay(CriteoErrorCode error) {
-    // FIXME This is only temporary, onAdFailedToDisplay will be merged to onAdFailedToReceive
-  }
-
 }
 

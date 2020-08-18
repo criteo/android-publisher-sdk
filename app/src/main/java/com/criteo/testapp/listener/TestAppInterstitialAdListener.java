@@ -41,10 +41,6 @@ public class TestAppInterstitialAdListener implements CriteoInterstitialAdListen
     Log.d(tag, prefix + "Interstitial ad called onAdReadyToDisplay");
   }
 
-  @Override
-  public void onAdFailedToDisplay(CriteoErrorCode code) {
-    Log.d(tag, prefix + "Interstitial ad called onAdFailedToDisplay");
-  }
 
   @Override
   public void onAdReceived() {

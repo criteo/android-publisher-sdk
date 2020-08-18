@@ -536,11 +536,6 @@ public class StandaloneFunctionalTest {
       }
 
       @Override
-      public void onAdFailedToDisplay(CriteoErrorCode error) {
-        onFailed();
-      }
-
-      @Override
       public void onAdLeftApplication() {
       }
 

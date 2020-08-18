@@ -110,7 +110,6 @@ public class CriteoInterstitialEventControllerIntegrationTest {
     doAnswer(checkIsRunningOnUiThread).when(listener).onAdReceived();
     doAnswer(checkIsRunningOnUiThread).when(listener).onAdFailedToReceive(any());
     doAnswer(checkIsRunningOnUiThread).when(listener).onAdReadyToDisplay();
-    doAnswer(checkIsRunningOnUiThread).when(listener).onAdFailedToDisplay(any());
 
     doAnswer(invocation -> new ByteArrayInputStream(GOOD_CREATIVE.getBytes())).when(api)
         .executeRawGet(eq(new URL(GOOD_DISPLAY_URL)), any());
@@ -180,7 +179,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
     assertThat(criteoInterstitialEventController.isAdLoaded()).isFalse();
     assertThat(webViewData.getContent()).isEmpty();
     verify(listener).onAdReceived();
-    verify(listener).onAdFailedToDisplay(ERROR_CODE_NETWORK_ERROR);
+    verify(listener).onAdFailedToReceive(ERROR_CODE_NETWORK_ERROR);
     verifyNoMoreInteractions(listener);
     verify(criteoInterstitialEventController).fetchCreativeAsync(BAD_DISPLAY_URL);
   }
@@ -208,7 +207,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
     inOrder.verify(listener).onAdReadyToDisplay();
     inOrder.verify(listener).onAdReceived();
     inOrder.verify(criteoInterstitialEventController).fetchCreativeAsync(BAD_DISPLAY_URL);
-    inOrder.verify(listener).onAdFailedToDisplay(ERROR_CODE_NETWORK_ERROR);
+    inOrder.verify(listener).onAdFailedToReceive(ERROR_CODE_NETWORK_ERROR);
     inOrder.verifyNoMoreInteractions();
   }
 
@@ -260,7 +259,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
     assertThat(criteoInterstitialEventController.isAdLoaded()).isFalse();
     assertThat(webViewData.getContent()).isEmpty();
     verify(listener).onAdReceived();
-    verify(listener).onAdFailedToDisplay(ERROR_CODE_NETWORK_ERROR);
+    verify(listener).onAdFailedToReceive(ERROR_CODE_NETWORK_ERROR);
     verifyNoMoreInteractions(listener);
     verify(criteoInterstitialEventController).fetchCreativeAsync(BAD_DISPLAY_URL);
   }
@@ -288,7 +287,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
     inOrder.verify(listener).onAdReadyToDisplay();
     inOrder.verify(listener).onAdReceived();
     inOrder.verify(criteoInterstitialEventController).fetchCreativeAsync(BAD_DISPLAY_URL);
-    inOrder.verify(listener).onAdFailedToDisplay(ERROR_CODE_NETWORK_ERROR);
+    inOrder.verify(listener).onAdFailedToReceive(ERROR_CODE_NETWORK_ERROR);
     inOrder.verifyNoMoreInteractions();
   }
 
