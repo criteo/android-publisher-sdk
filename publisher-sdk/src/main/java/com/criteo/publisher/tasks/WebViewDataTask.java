@@ -118,7 +118,7 @@ public class WebViewDataTask extends SafeRunnable {
         @Override
         public void runSafely() {
           listener
-              .onAdFailedToDisplay(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
+              .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
         }
       });
     }

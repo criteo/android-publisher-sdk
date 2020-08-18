@@ -70,7 +70,7 @@ public class WebViewDataTaskTest {
   @Inject
   private PubSdkApi api;
 
-  private DirectMockRunOnUiThreadExecutor runOnUiThreadExecutor = new DirectMockRunOnUiThreadExecutor();
+  private final DirectMockRunOnUiThreadExecutor runOnUiThreadExecutor = new DirectMockRunOnUiThreadExecutor();
 
   private WebViewDataTask task;
 
@@ -84,7 +84,7 @@ public class WebViewDataTaskTest {
     doAnswer(invocation -> {
       runOnUiThreadExecutor.expectIsRunningInExecutor();
       return null;
-    }).when(listener).onAdFailedToDisplay(any());
+    }).when(listener).onAdFailedToReceive(any());
 
     doAnswer(invocation -> {
       runOnUiThreadExecutor.expectIsRunningInExecutor();
@@ -223,7 +223,7 @@ public class WebViewDataTaskTest {
 
   private void givenThrowingListener() {
     doThrow(RuntimeException.class).when(listener).onAdReadyToDisplay();
-    doThrow(RuntimeException.class).when(listener).onAdFailedToDisplay(any());
+    doThrow(RuntimeException.class).when(listener).onAdFailedToReceive(any());
   }
 
   private void givenDisplayUrl(@NonNull String displayUrl) {
@@ -239,7 +239,7 @@ public class WebViewDataTaskTest {
 
   private void assertNotifyForFailure() {
     verify(webViewData).downloadFailed();
-    verify(listener).onAdFailedToDisplay(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
+    verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
     runOnUiThreadExecutor.verifyExpectations();
   }
 
