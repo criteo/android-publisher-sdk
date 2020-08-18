@@ -16,12 +16,13 @@
 
 package com.criteo.publisher.tasks;
 
-import android.os.AsyncTask;
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
+import com.criteo.publisher.SafeRunnable;
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.WebViewData;
 import com.criteo.publisher.network.PubSdkApi;
@@ -29,10 +30,9 @@ import com.criteo.publisher.util.StreamUtil;
 import com.criteo.publisher.util.TextUtils;
 import java.io.InputStream;
 import java.net.URL;
+import org.jetbrains.annotations.NotNull;
 
-public class WebViewDataTask extends AsyncTask<String, Void, String> {
-
-  private static final String TAG = "Criteo.WVDT";
+public class WebViewDataTask extends SafeRunnable {
 
   @NonNull
   private final String displayUrl;
@@ -49,31 +49,43 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
   @NonNull
   private final PubSdkApi api;
 
+  @NonNull
+  private final RunOnUiThreadExecutor runOnUiThreadExecutor;
+
   public WebViewDataTask(
       @NonNull String displayUrl,
       @NonNull WebViewData webviewData,
       @NonNull DeviceInfo deviceInfo,
       @Nullable CriteoInterstitialAdDisplayListener adDisplayListener,
-      @NonNull PubSdkApi api
+      @NonNull PubSdkApi api,
+      @NonNull RunOnUiThreadExecutor runOnUiThreadExecutor
   ) {
     this.displayUrl = displayUrl;
     this.webviewData = webviewData;
     this.deviceInfo = deviceInfo;
     this.criteoInterstitialAdDisplayListener = adDisplayListener;
     this.api = api;
+    this.runOnUiThreadExecutor = runOnUiThreadExecutor;
   }
 
   @Override
-  protected String doInBackground(String... args) {
+  public void runSafely() throws Exception {
+    String creative = null;
+
     try {
-      return doWebViewDataTask();
-    } catch (Throwable tr) {
-      Log.e(TAG, "Internal WVDT exec error.", tr);
-      return null;
+      creative = downloadCreative();
+    } finally {
+      if (TextUtils.isEmpty(creative)) {
+        notifyForFailure();
+      } else {
+        notifyForSuccess(creative);
+      }
     }
   }
 
-  private String doWebViewDataTask() throws Exception {
+  @NonNull
+  @VisibleForTesting
+  String downloadCreative() throws Exception {
     URL url = new URL(displayUrl);
     String userAgent = deviceInfo.getUserAgent().get();
 
@@ -82,28 +94,33 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
     }
   }
 
-  @Override
-  protected void onPostExecute(@Nullable String data) {
-    try {
-      doOnPostExecute(data);
-    } catch (Throwable tr) {
-      Log.e(TAG, "Internal WVDT PostExec error.", tr);
+  @VisibleForTesting
+  void notifyForSuccess(@NotNull String creative) {
+    webviewData.setContent(creative);
+    webviewData.downloadSucceeded();
+
+    if (criteoInterstitialAdDisplayListener != null) {
+      runOnUiThreadExecutor.executeAsync(new SafeRunnable() {
+        @Override
+        public void runSafely() {
+          criteoInterstitialAdDisplayListener.onAdReadyToDisplay();
+        }
+      });
     }
   }
 
-  private void doOnPostExecute(@Nullable String data) {
-    if (TextUtils.isEmpty(data)) {
-      webviewData.downloadFailed();
-      if (criteoInterstitialAdDisplayListener != null) {
-        criteoInterstitialAdDisplayListener
-            .onAdFailedToDisplay(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
-      }
-    } else {
-      webviewData.setContent(data);
-      webviewData.downloadSucceeded();
-      if (criteoInterstitialAdDisplayListener != null) {
-        criteoInterstitialAdDisplayListener.onAdReadyToDisplay();
-      }
+  @VisibleForTesting
+  void notifyForFailure() {
+    webviewData.downloadFailed();
+
+    if (criteoInterstitialAdDisplayListener != null) {
+      runOnUiThreadExecutor.executeAsync(new SafeRunnable() {
+        @Override
+        public void runSafely() {
+          criteoInterstitialAdDisplayListener
+              .onAdFailedToDisplay(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
+        }
+      });
     }
   }
 
