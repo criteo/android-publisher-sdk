@@ -28,6 +28,7 @@ import com.criteo.publisher.util.CompletableFuture;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class ThreadingUtil {
 
@@ -50,9 +51,36 @@ public class ThreadingUtil {
     });
 
     try {
-      return future.get();
-    } catch (InterruptedException | ExecutionException e) {
+      return getUninterruptibly(future);
+    } catch (ExecutionException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Invokes {@link Future#get()} and ignore interruption of thread.
+   * <p>
+   * Once finished, if the thread was interrupted, the interruption flag is set back for further
+   * interruption control.
+   *
+   * @param future future to get the value from
+   * @return value of the future
+   * @throws ExecutionException if the future throw an exception during its execution
+   */
+  public static <T> T getUninterruptibly(Future<T> future) throws ExecutionException {
+    boolean wasInterrupted = false;
+    try {
+      while (true) {
+        try {
+          return future.get();
+        } catch (InterruptedException e) {
+          wasInterrupted = true;
+        }
+      }
+    } finally {
+      if (wasInterrupted) {
+        Thread.currentThread().interrupt();
+      }
     }
   }
 
