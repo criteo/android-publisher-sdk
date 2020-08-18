@@ -22,7 +22,6 @@ import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWa
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
-import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.mock.MockedDependenciesRule;
@@ -98,7 +97,6 @@ public class StandaloneInterstitialManualTest {
 
       listener = new ShowingInterstitialListener(interstitial);
       interstitial.setCriteoInterstitialAdListener(listener);
-      interstitial.setCriteoInterstitialAdDisplayListener(listener);
 
       interstitial.loadAd();
     });
@@ -115,8 +113,7 @@ public class StandaloneInterstitialManualTest {
     mockedDependenciesRule.waitForIdleState();
   }
 
-  private static class ShowingInterstitialListener implements CriteoInterstitialAdListener,
-      CriteoInterstitialAdDisplayListener {
+  private static class ShowingInterstitialListener implements CriteoInterstitialAdListener {
 
     private final CriteoInterstitial interstitial;
     private final CompletableFuture<Void> failure;

@@ -27,11 +27,23 @@ public class TestAppInterstitialAdListener implements CriteoInterstitialAdListen
   private final String prefix;
   private final Button btnShowInterstitial;
 
-  public TestAppInterstitialAdListener(String tag, String prefix,
-      Button btnShowInterstitial) {
+  public TestAppInterstitialAdListener(
+      String tag, String prefix,
+      Button btnShowInterstitial
+  ) {
     this.tag = tag;
     this.prefix = prefix;
     this.btnShowInterstitial = btnShowInterstitial;
+  }
+
+  @Override
+  public void onAdReadyToDisplay() {
+    Log.d(tag, prefix + "Interstitial ad called onAdReadyToDisplay");
+  }
+
+  @Override
+  public void onAdFailedToDisplay(CriteoErrorCode code) {
+    Log.d(tag, prefix + "Interstitial ad called onAdFailedToDisplay");
   }
 
   @Override

@@ -48,9 +48,6 @@ public class CriteoInterstitial {
   @Nullable
   private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
-  @Nullable
-  private CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
-
   public CriteoInterstitial(InterstitialAdUnit interstitialAdUnit) {
     this(interstitialAdUnit, null);
   }
@@ -67,11 +64,6 @@ public class CriteoInterstitial {
   public void setCriteoInterstitialAdListener(
       @Nullable CriteoInterstitialAdListener criteoInterstitialAdListener) {
     this.criteoInterstitialAdListener = criteoInterstitialAdListener;
-  }
-
-  public void setCriteoInterstitialAdDisplayListener(
-      @Nullable CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener) {
-    this.criteoInterstitialAdDisplayListener = criteoInterstitialAdDisplayListener;
   }
 
   public void loadAd() {
@@ -132,7 +124,6 @@ public class CriteoInterstitial {
 
       criteoInterstitialEventController = new CriteoInterstitialEventController(
           criteoInterstitialAdListener,
-          criteoInterstitialAdDisplayListener,
           new WebViewData(criteo.getConfig(), getPubSdkApi()),
           criteo.getInterstitialActivityHelper(),
           criteo

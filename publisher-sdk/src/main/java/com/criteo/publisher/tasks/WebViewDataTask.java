@@ -20,7 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.CriteoErrorCode;
-import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
+import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.model.DeviceInfo;
@@ -44,7 +44,7 @@ public class WebViewDataTask extends SafeRunnable {
   private final DeviceInfo deviceInfo;
 
   @Nullable
-  private final CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
+  private final CriteoInterstitialAdListener listener;
 
   @NonNull
   private final PubSdkApi api;
@@ -56,14 +56,14 @@ public class WebViewDataTask extends SafeRunnable {
       @NonNull String displayUrl,
       @NonNull WebViewData webviewData,
       @NonNull DeviceInfo deviceInfo,
-      @Nullable CriteoInterstitialAdDisplayListener adDisplayListener,
+      @Nullable CriteoInterstitialAdListener listener,
       @NonNull PubSdkApi api,
       @NonNull RunOnUiThreadExecutor runOnUiThreadExecutor
   ) {
     this.displayUrl = displayUrl;
     this.webviewData = webviewData;
     this.deviceInfo = deviceInfo;
-    this.criteoInterstitialAdDisplayListener = adDisplayListener;
+    this.listener = listener;
     this.api = api;
     this.runOnUiThreadExecutor = runOnUiThreadExecutor;
   }
@@ -99,11 +99,11 @@ public class WebViewDataTask extends SafeRunnable {
     webviewData.setContent(creative);
     webviewData.downloadSucceeded();
 
-    if (criteoInterstitialAdDisplayListener != null) {
+    if (listener != null) {
       runOnUiThreadExecutor.executeAsync(new SafeRunnable() {
         @Override
         public void runSafely() {
-          criteoInterstitialAdDisplayListener.onAdReadyToDisplay();
+          listener.onAdReadyToDisplay();
         }
       });
     }
@@ -113,11 +113,11 @@ public class WebViewDataTask extends SafeRunnable {
   void notifyForFailure() {
     webviewData.downloadFailed();
 
-    if (criteoInterstitialAdDisplayListener != null) {
+    if (listener != null) {
       runOnUiThreadExecutor.executeAsync(new SafeRunnable() {
         @Override
         public void runSafely() {
-          criteoInterstitialAdDisplayListener
+          listener
               .onAdFailedToDisplay(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
         }
       });

@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 import androidx.annotation.NonNull;
 import com.criteo.publisher.CriteoErrorCode;
-import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
+import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
@@ -62,7 +62,7 @@ public class WebViewDataTaskTest {
   private DeviceInfo deviceInfo;
 
   @Mock
-  private CriteoInterstitialAdDisplayListener listener;
+  private CriteoInterstitialAdListener listener;
 
   @SpyBean
   private BuildConfigWrapper buildConfigWrapper;

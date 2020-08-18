@@ -46,7 +46,6 @@ import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
-import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.TestAdUnits;
@@ -393,6 +392,7 @@ public class StandaloneFunctionalTest {
     InOrder inOrder = inOrder(listener);
     inOrder.verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
     inOrder.verify(listener).onAdReceived();
+    inOrder.verify(listener).onAdReadyToDisplay();
     inOrder.verifyNoMoreInteractions();
 
     verify(api, times(2)).loadCdb(
@@ -458,7 +458,6 @@ public class StandaloneFunctionalTest {
       reset();
 
       SyncAdListener listener = new SyncAdListener();
-      interstitial.setCriteoInterstitialAdDisplayListener(listener);
       interstitial.setCriteoInterstitialAdListener(listener);
     }
 
@@ -509,8 +508,7 @@ public class StandaloneFunctionalTest {
     }
 
     private class SyncAdListener implements CriteoBannerAdListener,
-        CriteoInterstitialAdListener,
-        CriteoInterstitialAdDisplayListener {
+        CriteoInterstitialAdListener {
 
       @Override
       public void onAdReceived(View view) {
