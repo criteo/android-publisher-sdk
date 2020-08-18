@@ -35,6 +35,9 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
   private static final String TAG = "Criteo.WVDT";
 
   @NonNull
+  private final String displayUrl;
+
+  @NonNull
   private final WebViewData webviewData;
 
   @NonNull
@@ -47,11 +50,13 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
   private final PubSdkApi api;
 
   public WebViewDataTask(
+      @NonNull String displayUrl,
       @NonNull WebViewData webviewData,
       @NonNull DeviceInfo deviceInfo,
       @Nullable CriteoInterstitialAdDisplayListener adDisplayListener,
       @NonNull PubSdkApi api
   ) {
+    this.displayUrl = displayUrl;
     this.webviewData = webviewData;
     this.deviceInfo = deviceInfo;
     this.criteoInterstitialAdDisplayListener = adDisplayListener;
@@ -61,18 +66,15 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
   @Override
   protected String doInBackground(String... args) {
     try {
-      return doWebViewDataTask(args);
+      return doWebViewDataTask();
     } catch (Throwable tr) {
       Log.e(TAG, "Internal WVDT exec error.", tr);
+      return null;
     }
-
-    return null;
   }
 
-  private String doWebViewDataTask(String[] args) throws Exception {
-    String displayUrl = args[0];
+  private String doWebViewDataTask() throws Exception {
     URL url = new URL(displayUrl);
-
     String userAgent = deviceInfo.getUserAgent().get();
 
     try (InputStream stream = api.executeRawGet(url, userAgent)) {
