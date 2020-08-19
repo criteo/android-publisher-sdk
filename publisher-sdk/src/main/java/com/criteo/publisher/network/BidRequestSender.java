@@ -21,24 +21,24 @@ import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.model.CacheAdUnit;
-import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestFactory;
-import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.RemoteConfigRequest;
 import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.model.RemoteConfigResponse;
-import com.criteo.publisher.util.CdbCallListener;
+import com.criteo.publisher.CdbCallListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class BidRequestSender {
 
@@ -55,7 +55,7 @@ public class BidRequestSender {
   private final Executor executor;
 
   @NonNull
-  @GuardedBy("lock")
+  @GuardedBy("pendingTasksLock")
   private final Map<CacheAdUnit, Future<?>> pendingTasks;
   private final Object pendingTasksLock = new Object();
 
@@ -63,7 +63,8 @@ public class BidRequestSender {
       @NonNull CdbRequestFactory cdbRequestFactory,
       @NonNull RemoteConfigRequestFactory remoteConfigRequestFactory,
       @NonNull PubSdkApi api,
-      @NonNull Executor executor) {
+      @NonNull Executor executor
+  ) {
     this.cdbRequestFactory = cdbRequestFactory;
     this.remoteConfigRequestFactory = remoteConfigRequestFactory;
     this.api = api;
@@ -103,7 +104,8 @@ public class BidRequestSender {
    */
   public void sendBidRequest(
       @NonNull List<CacheAdUnit> adUnits,
-      @NonNull CdbCallListener listener) {
+      @NonNull CdbCallListener listener
+  ) {
     List<CacheAdUnit> requestedAdUnits = new ArrayList<>(adUnits);
     FutureTask<Void> task;
 
@@ -135,8 +137,9 @@ public class BidRequestSender {
   @NonNull
   private FutureTask<Void> createCdbCallTask(
       @NonNull List<CacheAdUnit> requestedAdUnits,
-      @NonNull CdbCallListener listener) {
-    CdbCall task = new CdbCall(requestedAdUnits, listener);
+      @NonNull CdbCallListener listener
+  ) {
+    CdbCall task = new CdbCall(api, cdbRequestFactory, requestedAdUnits, listener);
 
     Runnable withRemovedPendingTasksAfterExecution = new Runnable() {
       @Override
@@ -170,38 +173,8 @@ public class BidRequestSender {
     }
   }
 
-  private class CdbCall extends SafeRunnable {
-
-    @NonNull
-    private final List<CacheAdUnit> requestedAdUnits;
-
-    @NonNull
-    private final CdbCallListener listener;
-
-    private CdbCall(
-        @NonNull List<CacheAdUnit> requestedAdUnits,
-        @NonNull CdbCallListener listener) {
-      this.requestedAdUnits = requestedAdUnits;
-      this.listener = listener;
-    }
-
-    @Override
-    public void runSafely() throws ExecutionException, InterruptedException {
-      CdbRequest cdbRequest = cdbRequestFactory.createRequest(requestedAdUnits);
-      String userAgent = cdbRequestFactory.getUserAgent().get();
-
-      listener.onCdbRequest(cdbRequest);
-
-      try {
-        CdbResponse cdbResponse = api.loadCdb(cdbRequest, userAgent);
-        listener.onCdbResponse(cdbRequest, cdbResponse);
-      } catch (Exception e) {
-        listener.onCdbError(cdbRequest, e);
-      }
-    }
-  }
-
   private class RemoteConfigCall extends SafeRunnable {
+
     @NonNull
     private final Config configToUpdate;
 

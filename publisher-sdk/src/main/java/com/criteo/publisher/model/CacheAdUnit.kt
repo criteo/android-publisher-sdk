@@ -13,18 +13,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.criteo.publisher.model
 
-package com.criteo.publisher.model;
+import com.criteo.publisher.annotation.OpenForTesting
+import com.criteo.publisher.util.AdUnitType
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import org.junit.Test;
-
-public class CacheAdUnitTest {
-
-  @Test
-  public void equalsContract() throws Exception {
-    EqualsVerifier.forClass(CacheAdUnit.class)
-        .verify();
-  }
-
-}
+@OpenForTesting
+data class CacheAdUnit(
+    val size: AdSize?,
+    val placementId: String?,
+    val adUnitType: AdUnitType
+)

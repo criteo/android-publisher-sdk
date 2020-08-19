@@ -42,6 +42,7 @@ import static org.mockito.Mockito.when;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
+import com.criteo.publisher.concurrent.TrackingCommandsExecutorWithDelay;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.mock.MockBean;
@@ -60,6 +61,7 @@ import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.RemoteConfigResponse;
 import com.criteo.publisher.model.User;
+import com.criteo.publisher.network.LiveBidRequestSender;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.privacy.gdpr.GdprData;
@@ -79,6 +81,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class BidManagerFunctionalTest {
@@ -173,11 +176,13 @@ public class BidManagerFunctionalTest {
     List<AdUnit> prefetchAdUnits = Arrays.asList(
         mock(AdUnit.class),
         mock(AdUnit.class),
-        mock(AdUnit.class));
+        mock(AdUnit.class)
+    );
 
     List<List<CacheAdUnit>> mappedAdUnitsChunks = singletonList(Arrays.asList(
         sampleAdUnit(),
-        sampleAdUnit()));
+        sampleAdUnit()
+    ));
 
     AdUnitMapper mapper = givenMockedAdUnitMapper();
 
@@ -206,7 +211,8 @@ public class BidManagerFunctionalTest {
     List<AdUnit> prefetchAdUnits = Arrays.asList(
         mock(AdUnit.class),
         mock(AdUnit.class),
-        mock(AdUnit.class));
+        mock(AdUnit.class)
+    );
 
     List<CacheAdUnit> requestedAdUnits1 = singletonList(sampleAdUnit());
     List<CacheAdUnit> requestedAdUnits2 = singletonList(sampleAdUnit());
@@ -214,7 +220,8 @@ public class BidManagerFunctionalTest {
     List<List<CacheAdUnit>> mappedAdUnitsChunks = Arrays.asList(
         requestedAdUnits1,
         requestedAdUnits2,
-        requestedAdUnits3);
+        requestedAdUnits3
+    );
 
     AdUnitMapper mapper = givenMockedAdUnitMapper();
     when(mapper.mapToChunks(prefetchAdUnits)).thenReturn(mappedAdUnitsChunks);
@@ -329,7 +336,8 @@ public class BidManagerFunctionalTest {
   }
 
   private void callingCdb_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo(
-      Consumer<AdUnit> callingCdb) throws Exception {
+      Consumer<AdUnit> callingCdb
+  ) throws Exception {
     DeviceInfo deviceInfo = mock(DeviceInfo.class);
     when(deviceInfo.getUserAgent()).thenReturn(completedFuture("expectedUserAgent"));
     doReturn(deviceInfo).when(dependencyProvider).provideDeviceInfo();
@@ -804,6 +812,100 @@ public class BidManagerFunctionalTest {
     assertShouldNotCallCdbAndNotPopulateCache();
   }
 
+  @Test
+  public void fetchForLiveBidRequest_GivenKillSwitchIsEnabledAndNoSilentMode_ShouldReturnNoBid()
+      throws Exception {
+    givenKillSwitchIs(true);
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    givenMockedCdbRespondingSlot();
+
+    BidManager bidManager = createBidManager();
+    BidListener bidListener = mock(BidListener.class);
+
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    verify(bidListener).onNoBid();
+    verify(metricSendingQueueConsumer, never()).sendMetricBatch();
+  }
+
+  @Test
+  public void fetchForLiveBidRequest_GivenKillSwitchNotEnabledAndNoSilentModeAndInvalidAdUnit_ShouldReturnNoBid()
+      throws Exception {
+    givenKillSwitchIs(false);
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    givenMockedCdbRespondingSlot();
+
+    BidManager bidManager = createBidManager();
+    BidManager bidManagerSpy = Mockito.spy(bidManager);
+    doReturn(null).when(bidManagerSpy).mapToCacheAdUnit(adUnit);
+
+    BidListener bidListener = mock(BidListener.class);
+
+    bidManagerSpy.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    verify(bidListener).onNoBid();
+    verify(metricSendingQueueConsumer, never()).sendMetricBatch();
+  }
+
+  @Test
+  public void fetchForLiveBidRequest_GivenKillSwitchNotEnabledAndNoSilentModeAndValidAdUnitWithinTimeBudget_ShouldReturnBid()
+      throws Exception {
+    givenKillSwitchIs(false);
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    CdbResponseSlot cdbResponseSlot = givenMockedCdbRespondingSlot();
+
+    BidManager bidManager = createBidManager();
+    BidListener bidListener = mock(BidListener.class);
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    verify(bidListener).onBidResponse(cdbResponseSlot);
+    verify(metricSendingQueueConsumer).sendMetricBatch();
+  }
+
+  @Test
+  public void fetchForLiveBidRequest_GivenResponseOutsideTimeBudget_ShouldReturnNoBid()
+      throws Exception {
+    givenDelayWhenFetchingBids(LiveBidRequestSender.DEFAULT_TIME_BUDGET_IN_MILLIS + 1_000);
+    givenKillSwitchIs(false);
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    givenMockedCdbRespondingSlot();
+
+    BidManager bidManager = createBidManager();
+    BidListener bidListener = mock(BidListener.class);
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    verify(bidListener).onNoBid();
+    verify(metricSendingQueueConsumer).sendMetricBatch();
+  }
+
+  @Test
+  public void fetchForLiveBidRequest_GivenResponseOutsideTimeBudgetWithExistingCacheEntry_ShouldReturnBidResponse()
+      throws Exception {
+    givenDelayWhenFetchingBids(LiveBidRequestSender.DEFAULT_TIME_BUDGET_IN_MILLIS + 1_000);
+    givenKillSwitchIs(false);
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    givenMockedCdbRespondingSlot();
+    CdbResponseSlot cdbResponseSlot = givenNotExpiredValidCachedBid(cacheAdUnit);
+
+    BidManager bidManager = createBidManager();
+    BidListener bidListener = mock(BidListener.class);
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    verify(bidListener).onBidResponse(cdbResponseSlot);
+    verify(metricSendingQueueConsumer).sendMetricBatch();
+  }
+
+
   private void assertShouldCallCdbAndPopulateCacheOnlyOnce(
       List<CacheAdUnit> requestedAdUnits,
       CdbResponseSlot slot
@@ -1003,9 +1105,19 @@ public class BidManagerFunctionalTest {
         dependencyProvider.provideClock(),
         dependencyProvider.provideAdUnitMapper(),
         dependencyProvider.provideBidRequestSender(),
+        dependencyProvider.provideLiveBidRequestSender(),
         dependencyProvider.provideBidLifecycleListener(),
         dependencyProvider.provideMetricSendingQueueConsumer()
     );
   }
 
+  private void givenDelayWhenFetchingBids(long delay) {
+    DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
+    Executor oldExecutor = dependencyProvider.provideThreadPoolExecutor();
+    TrackingCommandsExecutorWithDelay trackingCommandsExecutorWithDelay = new TrackingCommandsExecutorWithDelay(
+        oldExecutor,
+        delay
+    );
+    doReturn(trackingCommandsExecutorWithDelay).when(dependencyProvider).provideThreadPoolExecutor();
+  }
 }

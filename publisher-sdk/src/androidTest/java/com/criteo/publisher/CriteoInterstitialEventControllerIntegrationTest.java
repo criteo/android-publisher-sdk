@@ -20,6 +20,7 @@ import static com.criteo.publisher.CriteoErrorCode.ERROR_CODE_NETWORK_ERROR;
 import static com.criteo.publisher.CriteoErrorCode.ERROR_CODE_NO_FILL;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.AdditionalAnswers.answerVoid;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -143,7 +144,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   @Test
   public void fetchAdAsyncStandalone_GivenNoBid_NotifyAdListenerForFailure() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
-    when(criteo.getBidForAdUnit(adUnit)).thenReturn(null);
+    givenMockedNoBidResponse(adUnit);
 
     criteoInterstitialEventController.fetchAdAsync(adUnit);
     waitForIdleState();
@@ -158,9 +159,8 @@ public class CriteoInterstitialEventControllerIntegrationTest {
       throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
-
     when(slot.getDisplayUrl()).thenReturn(GOOD_DISPLAY_URL);
-    when(criteo.getBidForAdUnit(adUnit)).thenReturn(slot);
+    givenMockedBidResponse(adUnit, slot);
 
     criteoInterstitialEventController.fetchAdAsync(adUnit);
     waitForIdleState();
@@ -177,9 +177,8 @@ public class CriteoInterstitialEventControllerIntegrationTest {
       throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
-
     when(slot.getDisplayUrl()).thenReturn(BAD_DISPLAY_URL);
-    when(criteo.getBidForAdUnit(adUnit)).thenReturn(slot);
+    givenMockedBidResponse(adUnit, slot);
 
     criteoInterstitialEventController.fetchAdAsync(adUnit);
     waitForIdleState();
@@ -196,8 +195,8 @@ public class CriteoInterstitialEventControllerIntegrationTest {
       throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
+    givenMockedBidResponse(adUnit, slot);
 
-    when(criteo.getBidForAdUnit(adUnit)).thenReturn(slot);
     when(slot.getDisplayUrl())
         .thenReturn(GOOD_DISPLAY_URL)
         .thenReturn(BAD_DISPLAY_URL);
@@ -296,4 +295,21 @@ public class CriteoInterstitialEventControllerIntegrationTest {
     mockedDependenciesRule.waitForIdleState();
   }
 
+  private void givenMockedBidResponse(
+      AdUnit adUnit,
+      CdbResponseSlot cdbResponseSlot
+  ) {
+    doAnswer(answerVoid((AdUnit ignored, BidListener bidListener) -> bidListener
+        .onBidResponse(cdbResponseSlot)))
+        .when(criteo)
+        .getBidForAdUnit(eq(adUnit), any(BidListener.class));
+  }
+
+
+  private void givenMockedNoBidResponse(AdUnit adUnit) {
+    doAnswer(answerVoid((AdUnit adUnit1, BidListener bidListener) -> bidListener
+        .onNoBid()))
+        .when(criteo)
+        .getBidForAdUnit(eq(adUnit), any(BidListener.class));
+  }
 }

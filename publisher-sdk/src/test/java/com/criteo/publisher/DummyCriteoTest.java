@@ -18,6 +18,7 @@ package com.criteo.publisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.Mockito.times;
 
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
@@ -29,6 +30,7 @@ import java.util.HashMap;
 import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class DummyCriteoTest {
 
@@ -64,10 +66,12 @@ public class DummyCriteoTest {
 
   @Test
   public void getBidForAdUnit_GivenAnyAdUnit_ReturnNull() throws Exception {
-    assertThat(criteo.getBidForAdUnit(null)).isNull();
-    assertThat(criteo.getBidForAdUnit(banner)).isNull();
-    assertThat(criteo.getBidForAdUnit(interstitial)).isNull();
-    assertThat(criteo.getBidForAdUnit(aNative)).isNull();
+    BidListener bidListener = Mockito.mock(BidListener.class);
+    criteo.getBidForAdUnit(null, bidListener);
+    criteo.getBidForAdUnit(banner, bidListener);
+    criteo.getBidForAdUnit(interstitial, bidListener);
+    criteo.getBidForAdUnit(aNative, bidListener);
+    Mockito.verify(bidListener, times(4)).onNoBid();
   }
 
   @Test

@@ -14,17 +14,16 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.util;
+package com.criteo.publisher
 
-import androidx.annotation.NonNull;
-import com.criteo.publisher.model.CdbRequest;
-import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.model.CdbResponseSlot
 
-public interface CdbCallListener {
+/**
+ * Callback through which bid responses will be served asynchronously.
+ * Each of the callback methods will only be called once.
+ */
+interface BidListener {
+  fun onBidResponse(cdbResponseSlot: CdbResponseSlot)
 
-  void onCdbRequest(@NonNull CdbRequest request);
-
-  void onCdbResponse(@NonNull CdbRequest request, @NonNull CdbResponse response);
-
-  void onCdbError(@NonNull CdbRequest request, @NonNull Exception exception);
+  fun onNoBid()
 }

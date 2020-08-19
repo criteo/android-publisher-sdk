@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -53,19 +54,23 @@ import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.TestAdUnits;
+import com.criteo.publisher.concurrent.TrackingCommandsExecutorWithDelay;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbRequest;
+import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import com.criteo.publisher.network.LiveBidRequestSender;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.view.WebViewLookup;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 import org.jetbrains.annotations.NotNull;
@@ -100,6 +105,9 @@ public class StandaloneFunctionalTest {
 
   @SpyBean
   private DeviceUtil deviceUtil;
+
+  @SpyBean
+  private Config config;
 
   private Context context;
 
@@ -243,7 +251,10 @@ public class StandaloneFunctionalTest {
     return bannerViewRef.get();
   }
 
-  private View whenLoadingAndDisplayingAnInterstitial(CriteoInterstitial interstitial, CriteoSync sync)
+  private View whenLoadingAndDisplayingAnInterstitial(
+      CriteoInterstitial interstitial,
+      CriteoSync sync
+  )
       throws Exception {
     runOnMainThreadAndWait(interstitial::loadAd);
     sync.waitForBid();
@@ -330,8 +341,78 @@ public class StandaloneFunctionalTest {
     verifyNoMoreInteractions(listener);
   }
 
-  private CriteoBannerView createBanner(BannerAdUnit bannerAdUnit,
-      CriteoBannerAdListener listener) {
+  @Test
+  public void whenLoadingAnInterstitial_GivenTimeBudgetExceededAndNoBidInCache_OnAdFailedToReceivedIsCalledWithNoFill()
+      throws Exception {
+    givenLiveBidding(true);
+    givenDelayWhenFetchingBids(LiveBidRequestSender.DEFAULT_TIME_BUDGET_IN_MILLIS);
+
+    givenInitializedSdk();
+
+    CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
+    CriteoInterstitial interstitial = createInterstitial(validInterstitialAdUnit, listener);
+
+    runOnMainThreadAndWait(interstitial::loadAd);
+    waitForBids();
+
+    verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+    verifyNoMoreInteractions(listener);
+  }
+
+  @Test
+  public void whenLoadingAnInterstitial_GivenTimeBudgetNotExceeded_OnAdReceivedIsCalled()
+      throws Exception {
+    givenLiveBidding(true);
+    givenInitializedSdk();
+
+    CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
+    CriteoInterstitial interstitial = createInterstitial(validInterstitialAdUnit, listener);
+
+    runOnMainThreadAndWait(interstitial::loadAd);
+    waitForBids();
+
+    verify(listener).onAdReceived(interstitial);
+    verifyNoMoreInteractions(listener);
+  }
+
+  @Test
+  public void whenLoadingABanner_GivenTimeBudgetExceeded_NoBidInCache_OnAdFailedToReceivedIsCalledWithNoFill()
+      throws Exception {
+    givenLiveBidding(true);
+    givenDelayWhenFetchingBids(LiveBidRequestSender.DEFAULT_TIME_BUDGET_IN_MILLIS);
+
+    givenInitializedSdk();
+
+    CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
+    CriteoBannerView bannerView = createBanner(validBannerAdUnit, listener);
+
+    runOnMainThreadAndWait(bannerView::loadAd);
+    waitForBids();
+
+    verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+    verifyNoMoreInteractions(listener);
+  }
+
+  @Test
+  public void whenLoadingABanner_GivenTimeBudgetNotExceeded_NoBidInCache_OnAdRereceivedIsCalled()
+      throws Exception {
+    givenLiveBidding(true);
+    givenInitializedSdk();
+
+    CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
+    CriteoBannerView bannerView = createBanner(validBannerAdUnit, listener);
+
+    runOnMainThreadAndWait(bannerView::loadAd);
+    waitForBids();
+
+    verify(listener).onAdReceived(bannerView);
+    verifyNoMoreInteractions(listener);
+  }
+
+  private CriteoBannerView createBanner(
+      BannerAdUnit bannerAdUnit,
+      CriteoBannerAdListener listener
+  ) {
     AtomicReference<CriteoBannerView> bannerViewRef = new AtomicReference<>();
 
     runOnMainThreadAndWait(() -> {
@@ -342,8 +423,10 @@ public class StandaloneFunctionalTest {
     return bannerViewRef.get();
   }
 
-  private CriteoInterstitial createInterstitial(InterstitialAdUnit interstitialAdUnit,
-      CriteoInterstitialAdListener listener) {
+  private CriteoInterstitial createInterstitial(
+      InterstitialAdUnit interstitialAdUnit,
+      CriteoInterstitialAdListener listener
+  ) {
     AtomicReference<CriteoInterstitial> interstitial = new AtomicReference<>();
 
     runOnMainThreadAndWait(() -> {
@@ -391,6 +474,7 @@ public class StandaloneFunctionalTest {
   }
 
   private void whenLoadingAnInterstitial_NotifyListenerForSuccessOnNextCall() throws Exception {
+    givenLiveBidding(false);
     givenInitializedSdk();
 
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
@@ -400,7 +484,7 @@ public class StandaloneFunctionalTest {
     runOnMainThreadAndWait(interstitial::loadAd);
     waitForBids();
 
-    // Given a second bid (that should success)
+    // Given a second bid (that should succeed)
     runOnMainThreadAndWait(interstitial::loadAd);
     waitForBids();
 
@@ -442,6 +526,16 @@ public class StandaloneFunctionalTest {
 
   private void waitForBids() {
     mockedDependenciesRule.waitForIdleState();
+  }
+
+  private void givenDelayWhenFetchingBids(long delay) {
+    DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
+    Executor oldExecutor = dependencyProvider.provideThreadPoolExecutor();
+    TrackingCommandsExecutorWithDelay trackingCommandsExecutorWithDelay = new TrackingCommandsExecutorWithDelay(
+        oldExecutor,
+        delay
+    );
+    doReturn(trackingCommandsExecutorWithDelay).when(dependencyProvider).provideThreadPoolExecutor();
   }
 
   private static final class CriteoSync {
@@ -547,4 +641,7 @@ public class StandaloneFunctionalTest {
     }
   }
 
+  private void givenLiveBidding(boolean isEnabled) {
+    doReturn(isEnabled).when(config).isLiveBiddingEnabled();
+  }
 }

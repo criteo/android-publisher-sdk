@@ -35,6 +35,7 @@ import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.network.BidRequestSender;
+import com.criteo.publisher.network.LiveBidRequestSender;
 import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.DeviceUtil;
 import java.util.UUID;
@@ -78,6 +79,9 @@ public class BidManagerTests {
 
   @Mock
   private BidRequestSender bidRequestSender;
+
+  @Mock
+  private LiveBidRequestSender liveBidRequestSender;
 
   @Mock
   private BidLifecycleListener bidLifecycleListener;
@@ -207,6 +211,7 @@ public class BidManagerTests {
         clock,
         adUnitMapper,
         bidRequestSender,
+        liveBidRequestSender,
         bidLifecycleListener,
         metricSendingQueueConsumer
     );

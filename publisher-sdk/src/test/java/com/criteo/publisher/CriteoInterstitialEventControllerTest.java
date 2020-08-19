@@ -125,7 +125,7 @@ public class CriteoInterstitialEventControllerTest {
 
     verify(controller, never()).fetchCreativeAsync(any());
     verify(controller).notifyForFailure();
-    verify(criteo, never()).getBidForAdUnit(any());
+    verify(criteo, never()).getBidForAdUnit(any(), any());
   }
 
   private void givenLoadedWebViewData() {
