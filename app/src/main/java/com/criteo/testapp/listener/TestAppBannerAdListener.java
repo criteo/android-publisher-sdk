@@ -21,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoErrorCode;
+import org.jetbrains.annotations.NotNull;
 
 public class TestAppBannerAdListener implements CriteoBannerAdListener {
 
@@ -55,7 +56,7 @@ public class TestAppBannerAdListener implements CriteoBannerAdListener {
   }
 
   @Override
-  public void onAdFailedToReceive(CriteoErrorCode code) {
+  public void onAdFailedToReceive(@NotNull CriteoErrorCode code) {
     Log.d(tag, prefix + " - Banner onAdFailedToReceive, reason : " + code.toString());
   }
 

@@ -17,6 +17,8 @@
   - Move `CriteoInterstitialAdDisplayListener#onAdReadyToDisplay()` to
    `CriteoInterstitialAdListener#onAdReceived(CriteoInterstitial)`. This callback is fired when an
     interstitial ad is ready to be displayed.
+  - Provide default implementation in interstitial listener. Java 8 is required, see
+  https://developer.android.com/studio/write/java8-support.
 
 # Version 3.9.0
 

@@ -66,6 +66,7 @@ import com.criteo.publisher.view.WebViewLookup;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -528,20 +529,8 @@ public class StandaloneFunctionalTest {
       }
 
       @Override
-      public void onAdFailedToReceive(CriteoErrorCode code) {
+      public void onAdFailedToReceive(@NotNull CriteoErrorCode code) {
         onFailed();
-      }
-
-      @Override
-      public void onAdLeftApplication() {
-      }
-
-      @Override
-      public void onAdClicked() {
-      }
-
-      @Override
-      public void onAdClosed() {
       }
     }
   }

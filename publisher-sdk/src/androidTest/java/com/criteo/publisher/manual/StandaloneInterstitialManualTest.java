@@ -30,6 +30,7 @@ import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.util.CompletableFuture;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -135,25 +136,9 @@ public class StandaloneInterstitialManualTest {
     }
 
     @Override
-    public void onAdFailedToReceive(CriteoErrorCode code) {
+    public void onAdFailedToReceive(@NotNull CriteoErrorCode code) {
       failure.completeExceptionally(
           new IllegalStateException("Error while loading the interstitial: " + code.name()));
-    }
-
-    @Override
-    public void onAdLeftApplication() {
-    }
-
-    @Override
-    public void onAdClicked() {
-    }
-
-    @Override
-    public void onAdOpened() {
-    }
-
-    @Override
-    public void onAdClosed() {
     }
   }
 
