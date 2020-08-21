@@ -16,10 +16,12 @@
 
 package com.criteo.publisher.tasks;
 
+import static com.criteo.publisher.CriteoErrorCode.ERROR_CODE_NETWORK_ERROR;
+import static com.criteo.publisher.CriteoErrorCode.ERROR_CODE_NO_FILL;
+
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.CriteoListenerCode;
 
@@ -59,7 +61,10 @@ public class CriteoInterstitialListenerCallTask implements Runnable {
         criteoInterstitialAdListener.onAdReceived();
         break;
       case INVALID:
-        criteoInterstitialAdListener.onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
+        criteoInterstitialAdListener.onAdFailedToReceive(ERROR_CODE_NO_FILL);
+        break;
+      case INVALID_CREATIVE:
+        criteoInterstitialAdListener.onAdFailedToReceive(ERROR_CODE_NETWORK_ERROR);
         break;
     }
   }

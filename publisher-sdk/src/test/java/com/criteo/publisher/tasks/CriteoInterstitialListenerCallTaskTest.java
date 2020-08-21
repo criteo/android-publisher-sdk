@@ -16,13 +16,15 @@
 
 package com.criteo.publisher.tasks;
 
+import static com.criteo.publisher.CriteoErrorCode.ERROR_CODE_NETWORK_ERROR;
 import static com.criteo.publisher.CriteoErrorCode.ERROR_CODE_NO_FILL;
 import static com.criteo.publisher.CriteoListenerCode.INVALID;
+import static com.criteo.publisher.CriteoListenerCode.INVALID_CREATIVE;
 import static com.criteo.publisher.CriteoListenerCode.VALID;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.CriteoListenerCode;
@@ -60,12 +62,21 @@ public class CriteoInterstitialListenerCallTaskTest {
   }
 
   @Test
+  public void run_GivenInvalidCreativeCode_NotifyForFailure() throws InterruptedException {
+    CriteoInterstitialListenerCallTask task = createTask(INVALID_CREATIVE);
+    task.run();
+
+    verify(listener).onAdFailedToReceive(ERROR_CODE_NETWORK_ERROR);
+    verifyNoMoreInteractions(listener);
+  }
+
+  @Test
   public void run_GivenInvalidCode_NotifyForFailure() throws InterruptedException {
     CriteoInterstitialListenerCallTask task = createTask(INVALID);
     task.run();
 
-    verify(listener, times(0)).onAdReceived();
-    verify(listener, times(1)).onAdFailedToReceive(ERROR_CODE_NO_FILL);
+    verify(listener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
+    verifyNoMoreInteractions(listener);
   }
 
   @Test
@@ -73,8 +84,8 @@ public class CriteoInterstitialListenerCallTaskTest {
     CriteoInterstitialListenerCallTask task = createTask(VALID);
     task.run();
 
-    verify(listener, times(1)).onAdReceived();
-    verify(listener, times(0)).onAdFailedToReceive(ERROR_CODE_NO_FILL);
+    verify(listener).onAdReceived();
+    verifyNoMoreInteractions(listener);
   }
 
   private CriteoInterstitialListenerCallTask createTask(CriteoListenerCode code) {
