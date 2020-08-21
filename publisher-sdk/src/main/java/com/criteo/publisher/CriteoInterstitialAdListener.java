@@ -16,6 +16,9 @@
 
 package com.criteo.publisher;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.UiThread;
+
 public interface CriteoInterstitialAdListener extends CriteoAdListener {
 
   /**
@@ -26,7 +29,8 @@ public interface CriteoInterstitialAdListener extends CriteoAdListener {
    * {@link CriteoInterstitial#show()}. It can be done directly in the implementation of this
    * callback, or later.
    */
-  void onAdReceived();
+  @UiThread
+  void onAdReceived(@NonNull CriteoInterstitial interstitial);
 
 }
 

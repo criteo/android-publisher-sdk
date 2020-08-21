@@ -79,6 +79,9 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   private WebViewData webViewData;
 
   @Mock
+  private CriteoInterstitial interstitial;
+
+  @Mock
   private CriteoInterstitialAdListener listener;
 
   @Mock
@@ -108,7 +111,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
       runOnUiThreadExecutor.expectIsRunningInExecutor();
       return null;
     };
-    doAnswer(checkIsRunningOnUiThread).when(listener).onAdReceived();
+    doAnswer(checkIsRunningOnUiThread).when(listener).onAdReceived(any());
     doAnswer(checkIsRunningOnUiThread).when(listener).onAdFailedToReceive(any());
 
     doAnswer(invocation -> new ByteArrayInputStream(GOOD_CREATIVE.getBytes())).when(api)
@@ -119,6 +122,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
     when(config.getAdTagDataMode()).thenReturn(adTagDataMacro);
 
     InterstitialListenerNotifier listenerNotifier = new InterstitialListenerNotifier(
+        interstitial,
         listener,
         runOnUiThreadExecutor
     );
@@ -163,7 +167,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
 
     assertThat(criteoInterstitialEventController.isAdLoaded()).isTrue();
     assertThat(webViewData.getContent()).isEqualTo(GOOD_CREATIVE);
-    verify(listener).onAdReceived();
+    verify(listener).onAdReceived(interstitial);
     verifyNoMoreInteractions(listener);
     verify(criteoInterstitialEventController).fetchCreativeAsync(GOOD_DISPLAY_URL);
   }
@@ -206,7 +210,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
 
     InOrder inOrder = inOrder(listener, criteoInterstitialEventController);
     inOrder.verify(criteoInterstitialEventController).fetchCreativeAsync(GOOD_DISPLAY_URL);
-    inOrder.verify(listener).onAdReceived();
+    inOrder.verify(listener).onAdReceived(interstitial);
     inOrder.verify(criteoInterstitialEventController).fetchCreativeAsync(BAD_DISPLAY_URL);
     inOrder.verify(listener).onAdFailedToReceive(ERROR_CODE_NETWORK_ERROR);
     inOrder.verifyNoMoreInteractions();
@@ -239,7 +243,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
 
     assertThat(criteoInterstitialEventController.isAdLoaded()).isTrue();
     assertThat(webViewData.getContent()).isEqualTo(GOOD_CREATIVE);
-    verify(listener).onAdReceived();
+    verify(listener).onAdReceived(interstitial);
     verifyNoMoreInteractions(listener);
     verify(criteoInterstitialEventController).fetchCreativeAsync(GOOD_DISPLAY_URL);
   }
@@ -282,7 +286,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
 
     InOrder inOrder = inOrder(listener, criteoInterstitialEventController);
     inOrder.verify(criteoInterstitialEventController).fetchCreativeAsync(GOOD_DISPLAY_URL);
-    inOrder.verify(listener).onAdReceived();
+    inOrder.verify(listener).onAdReceived(interstitial);
     inOrder.verify(criteoInterstitialEventController).fetchCreativeAsync(BAD_DISPLAY_URL);
     inOrder.verify(listener).onAdFailedToReceive(ERROR_CODE_NETWORK_ERROR);
     inOrder.verifyNoMoreInteractions();

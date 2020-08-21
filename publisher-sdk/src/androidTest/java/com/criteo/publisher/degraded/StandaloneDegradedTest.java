@@ -133,7 +133,7 @@ public class StandaloneDegradedTest {
     runOnMainThreadAndWait(interstitial::loadAd);
     waitForIdleState();
 
-    verify(listener, never()).onAdReceived();
+    verify(listener, never()).onAdReceived(interstitial);
     verify(listener, times(2)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
   }
 

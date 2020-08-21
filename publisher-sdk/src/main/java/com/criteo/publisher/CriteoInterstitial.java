@@ -126,6 +126,7 @@ public class CriteoInterstitial {
       Criteo criteo = getCriteo();
 
       InterstitialListenerNotifier listenerNotifier = new InterstitialListenerNotifier(
+          this,
           criteoInterstitialAdListener,
           getRunOnUiThreadExecutor()
       );

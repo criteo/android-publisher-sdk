@@ -15,8 +15,8 @@
    `CriteoInterstitialAdListener#onAdFailedToReceive(CriteoErrorCode)`. This callback is fired
     when an error happens after requesting an interstitial ad.
   - Move `CriteoInterstitialAdDisplayListener#onAdReadyToDisplay()` to
-   `CriteoInterstitialAdListener#onAdReceived()`. This callback is fired when an interstitial ad
-    is ready to be displayed.
+   `CriteoInterstitialAdListener#onAdReceived(CriteoInterstitial)`. This callback is fired when an
+    interstitial ad is ready to be displayed.
 
 # Version 3.9.0
 

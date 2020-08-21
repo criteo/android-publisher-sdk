@@ -40,6 +40,8 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import androidx.annotation.NonNull;
+import androidx.annotation.UiThread;
 import androidx.test.filters.FlakyTest;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.CriteoBannerAdListener;
@@ -391,7 +393,7 @@ public class StandaloneFunctionalTest {
 
     InOrder inOrder = inOrder(listener);
     inOrder.verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
-    inOrder.verify(listener).onAdReceived();
+    inOrder.verify(listener).onAdReceived(interstitial);
     inOrder.verifyNoMoreInteractions();
 
     verify(api, times(2)).loadCdb(
@@ -514,8 +516,9 @@ public class StandaloneFunctionalTest {
         onLoaded();
       }
 
+      @UiThread
       @Override
-      public void onAdReceived() {
+      public void onAdReceived(@NonNull CriteoInterstitial interstitial) {
         onLoaded();
       }
 
