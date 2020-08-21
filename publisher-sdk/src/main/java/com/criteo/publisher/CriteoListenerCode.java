@@ -21,5 +21,6 @@ public enum CriteoListenerCode {
   INVALID,
   INVALID_CREATIVE,
   CLICK,
-  CLOSE
+  CLOSE,
+  OPEN
 }

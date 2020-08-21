@@ -43,6 +43,7 @@ import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.WebViewData;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 import com.criteo.publisher.util.AdUnitType;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -117,11 +118,16 @@ public class CriteoInterstitialEventControllerIntegrationTest {
     String adTagDataMacro = config.getAdTagDataMacro();
     when(config.getAdTagDataMode()).thenReturn(adTagDataMacro);
 
-    criteoInterstitialEventController = spy(new CriteoInterstitialEventController(
+    InterstitialListenerNotifier listenerNotifier = new InterstitialListenerNotifier(
         listener,
+        runOnUiThreadExecutor
+    );
+
+    criteoInterstitialEventController = spy(new CriteoInterstitialEventController(
         webViewData,
         interstitialActivityHelper,
-        criteo
+        criteo,
+        listenerNotifier
     ));
   }
 

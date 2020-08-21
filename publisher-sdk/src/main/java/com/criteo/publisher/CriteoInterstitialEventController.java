@@ -17,25 +17,22 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.CriteoListenerCode.INVALID;
+import static com.criteo.publisher.CriteoListenerCode.OPEN;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
-import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.WebViewData;
-import com.criteo.publisher.tasks.CriteoInterstitialListenerCallTask;
+import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 import com.criteo.publisher.util.AdUnitType;
 
 
 public class CriteoInterstitialEventController {
-
-  @Nullable
-  private final CriteoInterstitialAdListener criteoInterstitialAdListener;
 
   @NonNull
   private final WebViewData webViewData;
@@ -50,20 +47,19 @@ public class CriteoInterstitialEventController {
   private final InterstitialActivityHelper interstitialActivityHelper;
 
   @NonNull
-  private final RunOnUiThreadExecutor executor;
+  private final InterstitialListenerNotifier listenerNotifier;
 
   public CriteoInterstitialEventController(
-      @Nullable CriteoInterstitialAdListener listener,
       @NonNull WebViewData webViewData,
       @NonNull InterstitialActivityHelper interstitialActivityHelper,
-      @NonNull Criteo criteo
+      @NonNull Criteo criteo,
+      @NonNull InterstitialListenerNotifier listenerNotifier
   ) {
-    this.criteoInterstitialAdListener = listener;
     this.webViewData = webViewData;
     this.interstitialActivityHelper = interstitialActivityHelper;
     this.criteo = criteo;
     this.deviceInfo = criteo.getDeviceInfo();
-    this.executor = DependencyProvider.getInstance().provideRunOnUiThreadExecutor();
+    this.listenerNotifier = listenerNotifier;
   }
 
   public boolean isAdLoaded() {
@@ -104,8 +100,7 @@ public class CriteoInterstitialEventController {
 
   @VisibleForTesting
   void notifyForFailure() {
-    Runnable task = new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener, INVALID);
-    executor.executeAsync(task);
+    listenerNotifier.notifyFor(INVALID);
   }
 
   @VisibleForTesting
@@ -113,7 +108,7 @@ public class CriteoInterstitialEventController {
     webViewData.fillWebViewHtmlContent(
         displayUrl,
         deviceInfo,
-        criteoInterstitialAdListener
+        listenerNotifier
     );
   }
 
@@ -123,11 +118,8 @@ public class CriteoInterstitialEventController {
     }
 
     String webViewContent = webViewData.getContent();
-    interstitialActivityHelper.openActivity(webViewContent, criteoInterstitialAdListener);
-
-    if (criteoInterstitialAdListener != null) {
-      criteoInterstitialAdListener.onAdOpened();
-    }
+    interstitialActivityHelper.openActivity(webViewContent, listenerNotifier);
+    listenerNotifier.notifyFor(OPEN);
 
     webViewData.refresh();
   }

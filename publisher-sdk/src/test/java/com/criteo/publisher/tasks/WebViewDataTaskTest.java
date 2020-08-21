@@ -18,17 +18,11 @@ package com.criteo.publisher.tasks;
 
 import static com.criteo.publisher.util.CompletableFuture.completedFuture;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import androidx.annotation.NonNull;
-import com.criteo.publisher.CriteoErrorCode;
-import com.criteo.publisher.CriteoInterstitialAdListener;
-import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor;
+import com.criteo.publisher.CriteoListenerCode;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.DeviceInfo;
@@ -62,15 +56,13 @@ public class WebViewDataTaskTest {
   private DeviceInfo deviceInfo;
 
   @Mock
-  private CriteoInterstitialAdListener listener;
+  private InterstitialListenerNotifier listenerNotifier;
 
   @SpyBean
   private BuildConfigWrapper buildConfigWrapper;
 
   @Inject
   private PubSdkApi api;
-
-  private final DirectMockRunOnUiThreadExecutor runOnUiThreadExecutor = new DirectMockRunOnUiThreadExecutor();
 
   private WebViewDataTask task;
 
@@ -80,16 +72,6 @@ public class WebViewDataTaskTest {
 
     displayUrl = "http://localhost:" + mockWebServer.getPort() + "/path";
     when(deviceInfo.getUserAgent()).thenReturn(completedFuture(""));
-
-    doAnswer(invocation -> {
-      runOnUiThreadExecutor.expectIsRunningInExecutor();
-      return null;
-    }).when(listener).onAdFailedToReceive(any());
-
-    doAnswer(invocation -> {
-      runOnUiThreadExecutor.expectIsRunningInExecutor();
-      return null;
-    }).when(listener).onAdReceived();
 
     task = createTask();
   }
@@ -174,58 +156,6 @@ public class WebViewDataTaskTest {
     assertNotifyForSuccess();
   }
 
-  @Test
-  public void notifyForFailure_GivenNoListener_DoesNotThrow() throws Exception {
-    givenNoListener();
-
-    assertThatCode(() -> {
-      task.notifyForFailure();
-    }).doesNotThrowAnyException();
-  }
-
-  @Test
-  public void notifyForSuccess_GivenNoListener_DoesNotThrow() throws Exception {
-    givenNoListener();
-
-    assertThatCode(() -> {
-      task.notifyForSuccess("dummy");
-    }).doesNotThrowAnyException();
-  }
-
-  @Test
-  public void run_GivenThrowingListenerAndInvalidCreative_DoesNotThrow()
-      throws Exception {
-    when(buildConfigWrapper.preconditionThrowsOnException()).thenReturn(false);
-    givenDownloadedCreative("");
-    givenThrowingListener();
-
-    assertThatCode(() -> {
-      task.run();
-    }).doesNotThrowAnyException();
-  }
-
-  @Test
-  public void run_GivenThrowingListenerAndValidCreative_DoesNotThrow()
-      throws Exception {
-    when(buildConfigWrapper.preconditionThrowsOnException()).thenReturn(false);
-    givenDownloadedCreative("creative");
-    givenThrowingListener();
-
-    assertThatCode(() -> {
-      task.run();
-    }).doesNotThrowAnyException();
-  }
-
-  private void givenNoListener() {
-    listener = null;
-    task = createTask();
-  }
-
-  private void givenThrowingListener() {
-    doThrow(RuntimeException.class).when(listener).onAdReceived();
-    doThrow(RuntimeException.class).when(listener).onAdFailedToReceive(any());
-  }
-
   private void givenDisplayUrl(@NonNull String displayUrl) {
     this.displayUrl = displayUrl;
     task = createTask();
@@ -239,15 +169,13 @@ public class WebViewDataTaskTest {
 
   private void assertNotifyForFailure() {
     verify(webViewData).downloadFailed();
-    verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
-    runOnUiThreadExecutor.verifyExpectations();
+    verify(listenerNotifier).notifyFor(CriteoListenerCode.INVALID_CREATIVE);
   }
 
   private void assertNotifyForSuccess() {
     verify(webViewData).downloadSucceeded();
     verify(webViewData).setContent("content");
-    verify(listener).onAdReceived();
-    runOnUiThreadExecutor.verifyExpectations();
+    verify(listenerNotifier).notifyFor(CriteoListenerCode.VALID);
   }
 
   private WebViewDataTask createTask() {
@@ -255,9 +183,8 @@ public class WebViewDataTaskTest {
         displayUrl,
         webViewData,
         deviceInfo,
-        listener,
-        api,
-        runOnUiThreadExecutor
+        listenerNotifier,
+        api
     );
   }
 

@@ -28,8 +28,8 @@ import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.content.pm.ResolveInfo;
-import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.activity.TopActivityFinder;
+import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
@@ -45,7 +45,7 @@ public class InterstitialActivityHelperUnitTest {
   private TopActivityFinder topActivityFinder;
 
   @Mock
-  private CriteoInterstitialAdListener listener;
+  private InterstitialListenerNotifier listenerNotifier;
 
   private InterstitialActivityHelper helper;
 
@@ -60,7 +60,7 @@ public class InterstitialActivityHelperUnitTest {
   public void openActivity_GivenNotAvailableActivity_DoesNothing() throws Exception {
     doReturn(false).when(helper).isAvailable();
 
-    helper.openActivity("myContent", listener);
+    helper.openActivity("myContent", listenerNotifier);
 
     verifyZeroInteractions(context);
   }
@@ -69,7 +69,7 @@ public class InterstitialActivityHelperUnitTest {
   public void openActivity_GivenAvailableActivity_StartActivity() throws Exception {
     doReturn(true).when(helper).isAvailable();
 
-    helper.openActivity("myContent", listener);
+    helper.openActivity("myContent", listenerNotifier);
 
     verify(context).startActivity(any());
   }
