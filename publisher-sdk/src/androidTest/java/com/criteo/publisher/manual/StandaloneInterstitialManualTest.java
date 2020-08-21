@@ -128,7 +128,7 @@ public class StandaloneInterstitialManualTest {
     }
 
     @Override
-    public void onAdReadyToDisplay() {
+    public void onAdReceived() {
       interstitial.show();
       failure.complete(null);
     }
@@ -137,10 +137,6 @@ public class StandaloneInterstitialManualTest {
     public void onAdFailedToReceive(CriteoErrorCode code) {
       failure.completeExceptionally(
           new IllegalStateException("Error while loading the interstitial: " + code.name()));
-    }
-
-    @Override
-    public void onAdReceived() {
     }
 
     @Override

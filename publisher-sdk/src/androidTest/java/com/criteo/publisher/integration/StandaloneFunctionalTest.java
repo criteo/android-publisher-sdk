@@ -392,7 +392,6 @@ public class StandaloneFunctionalTest {
     InOrder inOrder = inOrder(listener);
     inOrder.verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
     inOrder.verify(listener).onAdReceived();
-    inOrder.verify(listener).onAdReadyToDisplay();
     inOrder.verifyNoMoreInteractions();
 
     verify(api, times(2)).loadCdb(
@@ -512,11 +511,6 @@ public class StandaloneFunctionalTest {
 
       @Override
       public void onAdReceived(View view) {
-        onLoaded();
-      }
-
-      @Override
-      public void onAdReadyToDisplay() {
         onLoaded();
       }
 

@@ -103,7 +103,7 @@ public class WebViewDataTask extends SafeRunnable {
       runOnUiThreadExecutor.executeAsync(new SafeRunnable() {
         @Override
         public void runSafely() {
-          listener.onAdReadyToDisplay();
+          listener.onAdReceived();
         }
       });
     }
