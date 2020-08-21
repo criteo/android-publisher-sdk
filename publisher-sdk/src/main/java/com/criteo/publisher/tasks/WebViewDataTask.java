@@ -20,11 +20,8 @@ import static com.criteo.publisher.CriteoListenerCode.INVALID_CREATIVE;
 import static com.criteo.publisher.CriteoListenerCode.VALID;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
-import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.SafeRunnable;
-import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.WebViewData;
 import com.criteo.publisher.network.PubSdkApi;
@@ -45,29 +42,24 @@ public class WebViewDataTask extends SafeRunnable {
   @NonNull
   private final DeviceInfo deviceInfo;
 
-  @Nullable
-  private final CriteoInterstitialAdListener listener;
+  @NonNull
+  private final InterstitialListenerNotifier listenerNotifier;
 
   @NonNull
   private final PubSdkApi api;
-
-  @NonNull
-  private final RunOnUiThreadExecutor runOnUiThreadExecutor;
 
   public WebViewDataTask(
       @NonNull String displayUrl,
       @NonNull WebViewData webviewData,
       @NonNull DeviceInfo deviceInfo,
-      @Nullable CriteoInterstitialAdListener listener,
-      @NonNull PubSdkApi api,
-      @NonNull RunOnUiThreadExecutor runOnUiThreadExecutor
+      @NonNull InterstitialListenerNotifier listenerNotifier,
+      @NonNull PubSdkApi api
   ) {
     this.displayUrl = displayUrl;
     this.webviewData = webviewData;
     this.deviceInfo = deviceInfo;
-    this.listener = listener;
+    this.listenerNotifier = listenerNotifier;
     this.api = api;
-    this.runOnUiThreadExecutor = runOnUiThreadExecutor;
   }
 
   @Override
@@ -100,21 +92,13 @@ public class WebViewDataTask extends SafeRunnable {
   void notifyForSuccess(@NotNull String creative) {
     webviewData.setContent(creative);
     webviewData.downloadSucceeded();
-
-    if (listener != null) {
-      Runnable task = new CriteoInterstitialListenerCallTask(listener, VALID);
-      runOnUiThreadExecutor.executeAsync(task);
-    }
+    listenerNotifier.notifyFor(VALID);
   }
 
   @VisibleForTesting
   void notifyForFailure() {
     webviewData.downloadFailed();
-
-    if (listener != null) {
-      Runnable task = new CriteoInterstitialListenerCallTask(listener, INVALID_CREATIVE);
-      runOnUiThreadExecutor.executeAsync(task);
-    }
+    listenerNotifier.notifyFor(INVALID_CREATIVE);
   }
 
 }

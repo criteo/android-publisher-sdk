@@ -17,7 +17,6 @@
 package com.criteo.publisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -31,6 +30,7 @@ import androidx.annotation.NonNull;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.WebViewData;
+import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -39,7 +39,7 @@ import org.mockito.MockitoAnnotations;
 public class CriteoInterstitialEventControllerTest {
 
   @Mock
-  private CriteoInterstitialAdListener listener;
+  private InterstitialListenerNotifier listenerNotifier;
 
   @Mock
   private WebViewData webViewData;
@@ -87,7 +87,7 @@ public class CriteoInterstitialEventControllerTest {
     controller.show();
 
     verifyNoInteractions(context);
-    verifyNoInteractions(listener);
+    verifyNoInteractions(listenerNotifier);
   }
 
   @Test
@@ -96,16 +96,7 @@ public class CriteoInterstitialEventControllerTest {
 
     controller.show();
 
-    verify(listener).onAdOpened();
-  }
-
-  @Test
-  public void show_GivenLoadedWebViewDataAndNullListener_DoesNotCrash() throws Exception {
-    givenLoadedWebViewData();
-    listener = null;
-    controller = createController();
-
-    assertThatCode(() -> controller.show()).doesNotThrowAnyException();
+    verify(listenerNotifier).notifyFor(CriteoListenerCode.OPEN);
   }
 
   @Test
@@ -114,7 +105,7 @@ public class CriteoInterstitialEventControllerTest {
 
     controller.show();
 
-    verify(interstitialActivityHelper).openActivity("myContent", listener);
+    verify(interstitialActivityHelper).openActivity("myContent", listenerNotifier);
   }
 
   @Test
@@ -149,10 +140,10 @@ public class CriteoInterstitialEventControllerTest {
   @NonNull
   private CriteoInterstitialEventController createController() {
     return new CriteoInterstitialEventController(
-        listener,
         webViewData,
         interstitialActivityHelper,
-        criteo
+        criteo,
+        listenerNotifier
     );
   }
 

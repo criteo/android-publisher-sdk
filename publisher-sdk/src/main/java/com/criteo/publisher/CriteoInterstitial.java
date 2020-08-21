@@ -20,12 +20,15 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.WebViewData;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 import com.criteo.publisher.util.ObjectUtils;
+import org.jetbrains.annotations.NotNull;
 
 public class CriteoInterstitial {
 
@@ -122,11 +125,16 @@ public class CriteoInterstitial {
     if (criteoInterstitialEventController == null) {
       Criteo criteo = getCriteo();
 
-      criteoInterstitialEventController = new CriteoInterstitialEventController(
+      InterstitialListenerNotifier listenerNotifier = new InterstitialListenerNotifier(
           criteoInterstitialAdListener,
+          getRunOnUiThreadExecutor()
+      );
+
+      criteoInterstitialEventController = new CriteoInterstitialEventController(
           new WebViewData(criteo.getConfig(), getPubSdkApi()),
           criteo.getInterstitialActivityHelper(),
-          criteo
+          criteo,
+          listenerNotifier
       );
     }
     return criteoInterstitialEventController;
@@ -145,6 +153,11 @@ public class CriteoInterstitial {
   @NonNull
   private PubSdkApi getPubSdkApi() {
     return DependencyProvider.getInstance().providePubSdkApi();
+  }
+
+  @NotNull
+  private RunOnUiThreadExecutor getRunOnUiThreadExecutor() {
+    return DependencyProvider.getInstance().provideRunOnUiThreadExecutor();
   }
 
 }
