@@ -223,8 +223,9 @@ public class BearcatPrivacyFunctionalTest {
 
     if (callBearcat) {
       verify(pubSdkApi)
-          .postAppEvent(any(Integer.class), any(String.class), any(String.class), any(String.class),
-              any(Integer.class), any(), any());
+          .postAppEvent(any(Integer.class), any(String.class), any(), any(String.class),
+              any(Integer.class), any(), any()
+          );
     } else {
       verify(pubSdkApi, never())
           .postAppEvent(any(Integer.class), any(String.class), any(String.class), any(String.class),
