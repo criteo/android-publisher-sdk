@@ -16,10 +16,12 @@
 
 package com.criteo.publisher.tasks;
 
+import static com.criteo.publisher.CriteoListenerCode.INVALID_CREATIVE;
+import static com.criteo.publisher.CriteoListenerCode.VALID;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
-import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
@@ -100,12 +102,8 @@ public class WebViewDataTask extends SafeRunnable {
     webviewData.downloadSucceeded();
 
     if (listener != null) {
-      runOnUiThreadExecutor.executeAsync(new SafeRunnable() {
-        @Override
-        public void runSafely() {
-          listener.onAdReceived();
-        }
-      });
+      Runnable task = new CriteoInterstitialListenerCallTask(listener, VALID);
+      runOnUiThreadExecutor.executeAsync(task);
     }
   }
 
@@ -114,13 +112,8 @@ public class WebViewDataTask extends SafeRunnable {
     webviewData.downloadFailed();
 
     if (listener != null) {
-      runOnUiThreadExecutor.executeAsync(new SafeRunnable() {
-        @Override
-        public void runSafely() {
-          listener
-              .onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
-        }
-      });
+      Runnable task = new CriteoInterstitialListenerCallTask(listener, INVALID_CREATIVE);
+      runOnUiThreadExecutor.executeAsync(task);
     }
   }
 
