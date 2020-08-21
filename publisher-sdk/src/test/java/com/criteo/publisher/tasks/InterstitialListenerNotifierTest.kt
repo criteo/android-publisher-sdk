@@ -17,6 +17,7 @@
 package com.criteo.publisher.tasks
 
 import com.criteo.publisher.CriteoErrorCode
+import com.criteo.publisher.CriteoInterstitial
 import com.criteo.publisher.CriteoInterstitialAdListener
 import com.criteo.publisher.CriteoListenerCode
 import com.criteo.publisher.CriteoListenerCode.CLICK
@@ -43,6 +44,9 @@ import java.lang.ref.Reference
 class InterstitialListenerNotifierTest {
 
   @Mock
+  private lateinit var interstitial: CriteoInterstitial
+
+  @Mock
   private lateinit var listenerRef: Reference<CriteoInterstitialAdListener>
 
   @Mock
@@ -58,7 +62,11 @@ class InterstitialListenerNotifierTest {
 
     setUpExpectingListenerToBeInvokedInExecutor()
 
-    listenerNotifier = InterstitialListenerNotifier(listenerRef, runOnUiThreadExecutor)
+    listenerNotifier = InterstitialListenerNotifier(
+        interstitial,
+        listenerRef,
+        runOnUiThreadExecutor
+    )
   }
 
   @After
@@ -72,7 +80,7 @@ class InterstitialListenerNotifierTest {
 
     listenerNotifier.notifyFor(VALID)
 
-    verify(listener).onAdReceived()
+    verify(listener).onAdReceived(interstitial)
   }
 
   @Test
@@ -152,7 +160,7 @@ class InterstitialListenerNotifierTest {
   }
 
   private fun givenThrowingListener() {
-    doThrow(RuntimeException::class).whenever(listener).onAdReceived()
+    doThrow(RuntimeException::class).whenever(listener).onAdReceived(any())
     doThrow(RuntimeException::class).whenever(listener).onAdFailedToReceive(any())
     doThrow(RuntimeException::class).whenever(listener).onAdClicked()
     doThrow(RuntimeException::class).whenever(listener).onAdLeftApplication()
@@ -163,7 +171,7 @@ class InterstitialListenerNotifierTest {
   private fun setUpExpectingListenerToBeInvokedInExecutor() {
     doAnswer {
       runOnUiThreadExecutor.expectIsRunningInExecutor()
-    }.whenever(listener).onAdReceived()
+    }.whenever(listener).onAdReceived(any())
 
     doAnswer {
       runOnUiThreadExecutor.expectIsRunningInExecutor()

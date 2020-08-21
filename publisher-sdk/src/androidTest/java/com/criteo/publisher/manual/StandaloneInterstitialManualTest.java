@@ -19,6 +19,8 @@ package com.criteo.publisher.manual;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.UiThread;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
@@ -95,7 +97,7 @@ public class StandaloneInterstitialManualTest {
     runOnMainThreadAndWait(() -> {
       interstitial = new CriteoInterstitial(adUnit);
 
-      listener = new ShowingInterstitialListener(interstitial);
+      listener = new ShowingInterstitialListener();
       interstitial.setCriteoInterstitialAdListener(listener);
 
       interstitial.loadAd();
@@ -115,11 +117,9 @@ public class StandaloneInterstitialManualTest {
 
   private static class ShowingInterstitialListener implements CriteoInterstitialAdListener {
 
-    private final CriteoInterstitial interstitial;
     private final CompletableFuture<Void> failure;
 
-    private ShowingInterstitialListener(CriteoInterstitial interstitial) {
-      this.interstitial = interstitial;
+    private ShowingInterstitialListener() {
       this.failure = new CompletableFuture<>();
     }
 
@@ -127,8 +127,9 @@ public class StandaloneInterstitialManualTest {
       failure.get();
     }
 
+    @UiThread
     @Override
-    public void onAdReceived() {
+    public void onAdReceived(@NonNull CriteoInterstitial interstitial) {
       interstitial.show();
       failure.complete(null);
     }

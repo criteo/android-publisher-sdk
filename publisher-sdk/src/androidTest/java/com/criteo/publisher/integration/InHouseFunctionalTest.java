@@ -132,7 +132,7 @@ public class InHouseFunctionalTest {
     interstitial.loadAd(bidResponse.getBidToken());
     waitForIdleState();
 
-    verify(listener).onAdReceived();
+    verify(listener).onAdReceived(interstitial);
 
     verify(api, atLeastOnce()).loadCdb(
         argThat(request -> request.getProfileId() == Integration.IN_HOUSE.getProfileId()),
@@ -173,7 +173,7 @@ public class InHouseFunctionalTest {
     waitForIdleState();
 
     InOrder inOrder = inOrder(listener);
-    inOrder.verify(listener).onAdReceived();
+    inOrder.verify(listener).onAdReceived(interstitial);
     inOrder.verify(listener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
     inOrder.verifyNoMoreInteractions();
   }

@@ -20,6 +20,7 @@ import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
 import com.criteo.publisher.CriteoErrorCode.ERROR_CODE_NETWORK_ERROR
 import com.criteo.publisher.CriteoErrorCode.ERROR_CODE_NO_FILL
+import com.criteo.publisher.CriteoInterstitial
 import com.criteo.publisher.CriteoInterstitialAdListener
 import com.criteo.publisher.CriteoListenerCode
 import com.criteo.publisher.CriteoListenerCode.CLICK
@@ -36,14 +37,20 @@ import java.lang.ref.WeakReference
 
 @OpenForTesting
 class InterstitialListenerNotifier @VisibleForTesting internal constructor(
+    private val interstitial: CriteoInterstitial,
     private val listenerRef: Reference<CriteoInterstitialAdListener>,
     private val runOnUiThreadExecutor: RunOnUiThreadExecutor
 ) {
 
   constructor(
+      interstitial: CriteoInterstitial,
       listener: CriteoInterstitialAdListener?,
       runOnUiThreadExecutor: RunOnUiThreadExecutor
-  ) : this(WeakReference<CriteoInterstitialAdListener>(listener), runOnUiThreadExecutor)
+  ) : this(
+      interstitial,
+      WeakReference<CriteoInterstitialAdListener>(listener),
+      runOnUiThreadExecutor
+  )
 
   fun notifyFor(code: CriteoListenerCode) {
     runOnUiThreadExecutor.executeAsync(object : SafeRunnable() {
@@ -56,7 +63,7 @@ class InterstitialListenerNotifier @VisibleForTesting internal constructor(
   @UiThread
   private fun CriteoInterstitialAdListener.notifyFor(code: CriteoListenerCode) {
     when (code) {
-      VALID -> onAdReceived()
+      VALID -> onAdReceived(interstitial)
       INVALID -> onAdFailedToReceive(ERROR_CODE_NO_FILL)
       INVALID_CREATIVE -> onAdFailedToReceive(ERROR_CODE_NETWORK_ERROR)
       OPEN -> onAdOpened()
