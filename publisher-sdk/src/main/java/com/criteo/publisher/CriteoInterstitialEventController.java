@@ -17,7 +17,6 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.CriteoListenerCode.INVALID;
-import static com.criteo.publisher.CriteoListenerCode.VALID;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -73,7 +72,7 @@ public class CriteoInterstitialEventController {
 
   public void fetchAdAsync(@Nullable AdUnit adUnit) {
     if (!interstitialActivityHelper.isAvailable()) {
-      notifyFor(INVALID);
+      notifyForFailure();
       return;
     }
 
@@ -86,10 +85,9 @@ public class CriteoInterstitialEventController {
     CdbResponseSlot slot = criteo.getBidForAdUnit(adUnit);
 
     if (slot == null) {
-      notifyFor(INVALID);
+      notifyForFailure();
       webViewData.downloadFailed();
     } else {
-      notifyFor(VALID);
       fetchCreativeAsync(slot.getDisplayUrl());
     }
   }
@@ -98,17 +96,16 @@ public class CriteoInterstitialEventController {
     DisplayUrlTokenValue tokenValue = criteo.getTokenValue(bidToken, AdUnitType.CRITEO_INTERSTITIAL);
 
     if (tokenValue == null) {
-      notifyFor(INVALID);
+      notifyForFailure();
     } else {
-      notifyFor(VALID);
       fetchCreativeAsync(tokenValue.getDisplayUrl());
     }
   }
 
   @VisibleForTesting
-  void notifyFor(@NonNull CriteoListenerCode code) {
-    executor
-        .executeAsync(new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener, code));
+  void notifyForFailure() {
+    Runnable task = new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener, INVALID);
+    executor.executeAsync(task);
   }
 
   @VisibleForTesting

@@ -89,7 +89,7 @@ public class WebViewDataTaskTest {
     doAnswer(invocation -> {
       runOnUiThreadExecutor.expectIsRunningInExecutor();
       return null;
-    }).when(listener).onAdReadyToDisplay();
+    }).when(listener).onAdReceived();
 
     task = createTask();
   }
@@ -222,7 +222,7 @@ public class WebViewDataTaskTest {
   }
 
   private void givenThrowingListener() {
-    doThrow(RuntimeException.class).when(listener).onAdReadyToDisplay();
+    doThrow(RuntimeException.class).when(listener).onAdReceived();
     doThrow(RuntimeException.class).when(listener).onAdFailedToReceive(any());
   }
 
@@ -246,7 +246,7 @@ public class WebViewDataTaskTest {
   private void assertNotifyForSuccess() {
     verify(webViewData).downloadSucceeded();
     verify(webViewData).setContent("content");
-    verify(listener).onAdReadyToDisplay();
+    verify(listener).onAdReceived();
     runOnUiThreadExecutor.verifyExpectations();
   }
 

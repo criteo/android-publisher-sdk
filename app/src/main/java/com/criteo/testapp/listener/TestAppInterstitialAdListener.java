@@ -37,15 +37,9 @@ public class TestAppInterstitialAdListener implements CriteoInterstitialAdListen
   }
 
   @Override
-  public void onAdReadyToDisplay() {
-    Log.d(tag, prefix + "Interstitial ad called onAdReadyToDisplay");
-  }
-
-
-  @Override
   public void onAdReceived() {
     btnShowInterstitial.setEnabled(true);
-    Log.d(tag, prefix + " - Interstitial onAdReceived");
+    Log.d(tag, prefix + "Interstitial ad called onAdReceived");
   }
 
   @Override

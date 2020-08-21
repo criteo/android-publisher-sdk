@@ -174,7 +174,6 @@ public class InHouseFunctionalTest {
 
     InOrder inOrder = inOrder(listener);
     inOrder.verify(listener).onAdReceived();
-    inOrder.verify(listener).onAdReadyToDisplay();
     inOrder.verify(listener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
     inOrder.verifyNoMoreInteractions();
   }

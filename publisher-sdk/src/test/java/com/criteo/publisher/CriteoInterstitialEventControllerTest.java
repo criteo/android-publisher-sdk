@@ -133,7 +133,7 @@ public class CriteoInterstitialEventControllerTest {
     controller.fetchAdAsync(mock(AdUnit.class));
 
     verify(controller, never()).fetchCreativeAsync(any());
-    verify(controller).notifyFor(CriteoListenerCode.INVALID);
+    verify(controller).notifyForFailure();
     verify(criteo, never()).getBidForAdUnit(any());
   }
 

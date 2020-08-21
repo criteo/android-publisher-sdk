@@ -19,14 +19,14 @@ package com.criteo.publisher;
 public interface CriteoInterstitialAdListener extends CriteoAdListener {
 
   /**
-   * Called when an ad is successfully fetched.
+   * Callback invoked when an interstitial ad is requested and valid bid is answered and creative is
+   * successfully received.
+   * <p>
+   * From this notification, publisher are able to display the interstitial ad call by calling
+   * {@link CriteoInterstitial#show()}. It can be done directly in the implementation of this
+   * callback, or later.
    */
   void onAdReceived();
-
-  default void onAdReadyToDisplay() {
-    // FIXME This is only temporary, onAdReadyToDisplay will disappear and onAdReceived will be
-    //  fired instead of the current onAdReadyToDisplay.
-  }
 
 }
 

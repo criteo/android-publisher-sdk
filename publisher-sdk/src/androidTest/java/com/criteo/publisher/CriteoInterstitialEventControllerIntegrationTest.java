@@ -109,7 +109,6 @@ public class CriteoInterstitialEventControllerIntegrationTest {
     };
     doAnswer(checkIsRunningOnUiThread).when(listener).onAdReceived();
     doAnswer(checkIsRunningOnUiThread).when(listener).onAdFailedToReceive(any());
-    doAnswer(checkIsRunningOnUiThread).when(listener).onAdReadyToDisplay();
 
     doAnswer(invocation -> new ByteArrayInputStream(GOOD_CREATIVE.getBytes())).when(api)
         .executeRawGet(eq(new URL(GOOD_DISPLAY_URL)), any());
@@ -145,7 +144,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   }
 
   @Test
-  public void fetchAdAsyncStandalone_GivenBidAndGoodDisplayUrl_NotifyAdListenerForSuccessAndFetchCreative()
+  public void fetchAdAsyncStandalone_GivenBidAndGoodDisplayUrl_FetchCreativeAndNotifyListenerForSuccess()
       throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
@@ -159,13 +158,12 @@ public class CriteoInterstitialEventControllerIntegrationTest {
     assertThat(criteoInterstitialEventController.isAdLoaded()).isTrue();
     assertThat(webViewData.getContent()).isEqualTo(GOOD_CREATIVE);
     verify(listener).onAdReceived();
-    verify(listener).onAdReadyToDisplay();
     verifyNoMoreInteractions(listener);
     verify(criteoInterstitialEventController).fetchCreativeAsync(GOOD_DISPLAY_URL);
   }
 
   @Test
-  public void fetchAdAsyncStandalone_GivenBidAndBadDisplayUrl_NotifyAdListenerForBidButForFailureToDisplay()
+  public void fetchAdAsyncStandalone_GivenBidAndBadDisplayUrl_NotifyListenerForFailureToDisplay()
       throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
@@ -178,14 +176,13 @@ public class CriteoInterstitialEventControllerIntegrationTest {
 
     assertThat(criteoInterstitialEventController.isAdLoaded()).isFalse();
     assertThat(webViewData.getContent()).isEmpty();
-    verify(listener).onAdReceived();
     verify(listener).onAdFailedToReceive(ERROR_CODE_NETWORK_ERROR);
     verifyNoMoreInteractions(listener);
     verify(criteoInterstitialEventController).fetchCreativeAsync(BAD_DISPLAY_URL);
   }
 
   @Test
-  public void fetchAdAsyncStandalone_GivenBidTwice_NotifyAdListenerForSuccessAndFetchCreativeTwice()
+  public void fetchAdAsyncStandalone_GivenBidTwice_FetchCreativeTwiceAndNotifyListenerIfSuccess()
       throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
@@ -202,9 +199,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
     waitForIdleState();
 
     InOrder inOrder = inOrder(listener, criteoInterstitialEventController);
-    inOrder.verify(listener).onAdReceived();
     inOrder.verify(criteoInterstitialEventController).fetchCreativeAsync(GOOD_DISPLAY_URL);
-    inOrder.verify(listener).onAdReadyToDisplay();
     inOrder.verify(listener).onAdReceived();
     inOrder.verify(criteoInterstitialEventController).fetchCreativeAsync(BAD_DISPLAY_URL);
     inOrder.verify(listener).onAdFailedToReceive(ERROR_CODE_NETWORK_ERROR);
@@ -225,7 +220,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   }
 
   @Test
-  public void fetchAdAsyncInHouse_GivenBidAndGoodDisplayUrl_NotifyAdListenerForSuccessAndFetchCreative()
+  public void fetchAdAsyncInHouse_GivenBidAndGoodDisplayUrl_FetchCreativeAndNotifyListenerForSuccess()
       throws Exception {
     BidToken bidToken = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
     DisplayUrlTokenValue tokenValue = mock(DisplayUrlTokenValue.class);
@@ -239,13 +234,12 @@ public class CriteoInterstitialEventControllerIntegrationTest {
     assertThat(criteoInterstitialEventController.isAdLoaded()).isTrue();
     assertThat(webViewData.getContent()).isEqualTo(GOOD_CREATIVE);
     verify(listener).onAdReceived();
-    verify(listener).onAdReadyToDisplay();
     verifyNoMoreInteractions(listener);
     verify(criteoInterstitialEventController).fetchCreativeAsync(GOOD_DISPLAY_URL);
   }
 
   @Test
-  public void fetchAdAsyncInHouse_GivenBidAndBadDisplayUrl_NotifyAdListenerForBidButForFailureToDisplay()
+  public void fetchAdAsyncInHouse_GivenBidAndBadDisplayUrl_NotifyListenerForFailureToDisplay()
       throws Exception {
     BidToken bidToken = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
     DisplayUrlTokenValue tokenValue = mock(DisplayUrlTokenValue.class);
@@ -258,14 +252,13 @@ public class CriteoInterstitialEventControllerIntegrationTest {
 
     assertThat(criteoInterstitialEventController.isAdLoaded()).isFalse();
     assertThat(webViewData.getContent()).isEmpty();
-    verify(listener).onAdReceived();
     verify(listener).onAdFailedToReceive(ERROR_CODE_NETWORK_ERROR);
     verifyNoMoreInteractions(listener);
     verify(criteoInterstitialEventController).fetchCreativeAsync(BAD_DISPLAY_URL);
   }
 
   @Test
-  public void fetchAdAsyncInHouse_GivenBidTwice_NotifyAdListenerForSuccessAndFetchCreativeTwice()
+  public void fetchAdAsyncInHouse_GivenBidTwice_FetchCreativeTwiceAndNotifyListenerIfSuccess()
       throws Exception {
     BidToken bidToken = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
     DisplayUrlTokenValue tokenValue = mock(DisplayUrlTokenValue.class);
@@ -282,9 +275,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
     waitForIdleState();
 
     InOrder inOrder = inOrder(listener, criteoInterstitialEventController);
-    inOrder.verify(listener).onAdReceived();
     inOrder.verify(criteoInterstitialEventController).fetchCreativeAsync(GOOD_DISPLAY_URL);
-    inOrder.verify(listener).onAdReadyToDisplay();
     inOrder.verify(listener).onAdReceived();
     inOrder.verify(criteoInterstitialEventController).fetchCreativeAsync(BAD_DISPLAY_URL);
     inOrder.verify(listener).onAdFailedToReceive(ERROR_CODE_NETWORK_ERROR);
