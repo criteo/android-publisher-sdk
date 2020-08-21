@@ -16,9 +16,16 @@
 
 package com.criteo.publisher;
 
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.UiThread;
+import org.jetbrains.annotations.NotNull;
 
+/**
+ * All callbacks are invoked on the UI thread, so it is safe to execute any UI operations in the
+ * implementation.
+ */
+@Keep
 public interface CriteoInterstitialAdListener extends CriteoAdListener {
 
   /**
@@ -32,5 +39,53 @@ public interface CriteoInterstitialAdListener extends CriteoAdListener {
   @UiThread
   void onAdReceived(@NonNull CriteoInterstitial interstitial);
 
+  /**
+   * Callback invoked when an interstitial ad is requested but none may be provided by the SDK.
+   *
+   * @param code error code indicating the reason of the failure
+   */
+  @UiThread
+  @Override
+  default void onAdFailedToReceive(@NotNull CriteoErrorCode code) {
+    // no-op by default
+  }
+
+  /**
+   * Callback invoked when an user clicks anywhere on the interstitial ad.
+   */
+  @UiThread
+  @Override
+  default void onAdClicked() {
+    // no-op by default
+  }
+
+  /**
+   * Callback invoked when an ad is opened and the user is redirected outside the application, to
+   * the product web page for instance.
+   */
+  @UiThread
+  @Override
+  default void onAdLeftApplication() {
+    // no-op by default
+  }
+
+  /**
+   * Callback invoked when an interstitial ad is opened via {@link CriteoInterstitial#show()}.
+   */
+  @UiThread
+  @Override
+  default void onAdOpened() {
+    // no-op by default
+  }
+
+  /**
+   * Callback invoked when the user is back from the Ad. This happens generally when the user
+   * presses the back button after being redirected to an ad.
+   */
+  @UiThread
+  @Override
+  default void onAdClosed() {
+    // no-op by default
+  }
 }
 
