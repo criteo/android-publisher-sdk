@@ -23,7 +23,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
@@ -89,8 +89,8 @@ public class CriteoInterstitialEventControllerTest {
 
     controller.show();
 
-    verifyZeroInteractions(context);
-    verifyZeroInteractions(listener);
+    verifyNoInteractions(context);
+    verifyNoInteractions(listener);
   }
 
   @Test
