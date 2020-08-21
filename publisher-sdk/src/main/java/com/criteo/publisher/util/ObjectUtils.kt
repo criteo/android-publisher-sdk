@@ -16,6 +16,8 @@
 
 package com.criteo.publisher.util
 
+import org.jetbrains.annotations.Contract
+
 object ObjectUtils {
   @JvmStatic
   fun equals(
@@ -24,6 +26,7 @@ object ObjectUtils {
   ): Boolean = a == b
 
   @JvmStatic
+  @Contract("!null, _ -> !null; _, !null -> !null")
   fun <T> getOrElse(
       value: T?,
       defaultValue: T?
