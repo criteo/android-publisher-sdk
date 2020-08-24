@@ -155,6 +155,7 @@ public class StandaloneFunctionalTest {
     CriteoInterstitial interstitial = createInterstitial(validInterstitialAdUnit);
     CriteoSync sync = new CriteoSync(interstitial);
     View interstitialView = whenLoadingAndDisplayingAnInterstitial(interstitial, sync);
+    waitUntilInterstitialWebViewIsLoaded(interstitialView);
     String html = webViewLookup.lookForHtmlContent(interstitialView).get();
 
     assertThat(html).contains(STUB_CREATIVE_IMAGE);
