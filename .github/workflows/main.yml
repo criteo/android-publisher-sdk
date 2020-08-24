@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - v*.*.* # Version branches such as v4.2.1
   pull_request:
 
 jobs:
@@ -168,7 +169,7 @@ jobs:
 
   deploy-development-artifacts:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name != 'pull_request' # Only deploy on merge
 
     needs:
       - java-tests

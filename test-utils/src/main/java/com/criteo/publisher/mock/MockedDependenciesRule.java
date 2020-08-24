@@ -19,6 +19,7 @@ package com.criteo.publisher.mock;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -33,6 +34,8 @@ import com.criteo.publisher.MockableDependencyProvider;
 import com.criteo.publisher.concurrent.ThreadingUtil;
 import com.criteo.publisher.concurrent.TrackingCommandsExecutor;
 import com.criteo.publisher.csm.MetricHelper;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.RemoteConfigResponse;
 import com.criteo.publisher.network.PubSdkApi;
@@ -45,7 +48,6 @@ import org.junit.internal.runners.statements.FailOnTimeout;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
-import org.mockito.Mockito;
 
 /**
  * Use this Rule when writing tests that require mocking global dependencies.
@@ -79,12 +81,31 @@ public class MockedDependenciesRule implements MethodRule {
   @SuppressWarnings("FieldCanBeLocal")
   private final boolean injectCdbMockServer = true;
 
+  @Nullable
+  private Logger mockedLogger = null;
+  private boolean injectMockedLogger = false;
+
   protected DependencyProvider dependencyProvider;
   private TrackingCommandsExecutor trackingCommandsExecutor = null;
   private Object target;
 
   @Nullable
   private CdbMock cdbMock;
+
+  /**
+   * Activate mocking of {@link Logger}.
+   * <p>
+   * All loggers created through the {@link LoggerFactory} are mocked and represented by a single
+   * instance given by {@link #getMockedLogger()}.
+   * <p>
+   * Note that this option should be used when creating the {@link org.junit.Rule}.
+   *
+   * @return this for chaining calls
+   */
+  public MockedDependenciesRule withMockedLogger() {
+    injectMockedLogger = true;
+    return this;
+  }
 
   @Override
   public Statement apply(Statement base, FrameworkMethod method, Object target) {
@@ -112,6 +133,8 @@ public class MockedDependenciesRule implements MethodRule {
           if (cdbMock != null) {
             cdbMock.shutdown();
           }
+
+          mockedLogger = null;
         }
       }
     };
@@ -146,6 +169,23 @@ public class MockedDependenciesRule implements MethodRule {
     when(buildConfigWrapper.getCdbUrl()).thenReturn(cdbMock.getUrl());
     when(buildConfigWrapper.getEventUrl()).thenReturn(cdbMock.getUrl());
     when(dependencyProvider.provideBuildConfigWrapper()).thenReturn(buildConfigWrapper);
+  }
+
+  @Nullable
+  public Logger getMockedLogger() {
+    return mockedLogger;
+  }
+
+  private void setUpMockedLogger() {
+    if (!injectMockedLogger) {
+      return;
+    }
+
+    mockedLogger = mock(Logger.class);
+
+    LoggerFactory loggerFactory = spy(dependencyProvider.provideLoggerFactory());
+    doReturn(mockedLogger).when(loggerFactory).createLogger(any());
+    when(dependencyProvider.provideLoggerFactory()).thenReturn(loggerFactory);
   }
 
   @RequiresApi(api = VERSION_CODES.O)
@@ -188,7 +228,7 @@ public class MockedDependenciesRule implements MethodRule {
   // a mock response for the RemoteConfig backend without having to play PubSdkApi at all.
   public void givenMockedRemoteConfigResponse(PubSdkApi pubSdkApi)
       throws IOException {
-    RemoteConfigResponse remoteConfigResponse = Mockito.mock(RemoteConfigResponse.class);
+    RemoteConfigResponse remoteConfigResponse = mock(RemoteConfigResponse.class);
     doReturn(false).when(remoteConfigResponse).getKillSwitch();
     doReturn(true).when(remoteConfigResponse).getCsmEnabled();
     doReturn(remoteConfigResponse).when(pubSdkApi).loadConfig(any());
@@ -224,6 +264,7 @@ public class MockedDependenciesRule implements MethodRule {
 
     setUpDependencyProvider();
     setUpCdbMock();
+    setUpMockedLogger();
     injectDependencies();
   }
 

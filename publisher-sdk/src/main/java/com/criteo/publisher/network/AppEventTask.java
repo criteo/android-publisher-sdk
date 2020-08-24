@@ -76,7 +76,7 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
     try {
       jsonObject = doAppEventTask(objects);
     } catch (Throwable tr) {
-      logger.error("Internal AET exec error.", tr);
+      logger.debug("Internal AET exec error.", tr);
     }
 
     return jsonObject;

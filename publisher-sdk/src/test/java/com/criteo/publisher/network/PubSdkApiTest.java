@@ -195,6 +195,22 @@ public class PubSdkApiTest {
   }
 
   @Test
+  public void postAppEvent_GivenConnectionError_SetItInHttpHeader() throws Exception {
+    givenConnectionError();
+
+    assertThatCode(() -> api.postAppEvent(42, "", null, "", 0, "myUserAgent", gdprData))
+        .isInstanceOf(IOException.class);
+  }
+
+  @Test
+  public void postAppEvent_GivenHttpError_ThrowException() throws Exception {
+    mockWebServer.enqueue(new MockResponse().setResponseCode(400));
+
+    assertThatCode(() -> api.postAppEvent(42, "", null, "", 0, "myUserAgent", gdprData))
+        .isInstanceOf(IOException.class);
+  }
+
+  @Test
   public void loadCdb_GivenCdbRequest_SendPostRequestWithJsonPayload() throws Exception {
     String json = "{\"payload\":\"my awesome payload\"}";
     CdbRequest cdbRequest = mock(CdbRequest.class);
