@@ -45,8 +45,10 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
     const val TCF2_CONSENT_NOT_GIVEN = "COwJDpQOwJDpQIAAAAENAPCgAAAAAAAAAAAAAxQAgAsABiAAAAAA"
     const val TCF1_CONSENT_NOT_GIVEN = "BOnz82JOnz82JABABBFRCPgAAAAFuABABAA"
 
-    // Use any ZoneId as CDB preprod returns an auto-incremented ID coming from DB
-    private const val DUMMY_ZONE_ID = 1337
+    private const val PREPROD_ZONE_ID = 0
+    private const val PREPROD_TTL = 3600
+    private const val PREPROD_CPM = "1.12"
+    private const val PREPROD_CURRENCY = "EUR"
 
     private const val CONTENT_TYPE = "content-type"
   }
@@ -158,12 +160,12 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
           "impId": "$impressionId",
           "placementId": "$placementId",
           "arbitrageId": "arbitrage_id",
-          "zoneId": $DUMMY_ZONE_ID,
-          "cpm": "1.12",
-          "currency": "EUR",
+          "zoneId": $PREPROD_ZONE_ID,
+          "cpm": "$PREPROD_CPM",
+          "currency": "$PREPROD_CURRENCY",
           "width": $width,
           "height": $height,
-          "ttl": 3600,
+          "ttl": $PREPROD_TTL,
           "displayUrl": "$url/delivery/ajs.php?width=$width&height=$height"
         }
       """.trimIndent()
@@ -174,12 +176,12 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
           "impId": "$impressionId",
           "placementId": "$placementId",
           "arbitrageId": "",
-          "zoneId": $DUMMY_ZONE_ID,
-          "cpm": "1.12",
-          "currency": "EUR",
+          "zoneId": $PREPROD_ZONE_ID,
+          "cpm": "$PREPROD_CPM",
+          "currency": "$PREPROD_CURRENCY",
           "width": $width,
           "height": $height,
-          "ttl": 0,
+          "ttl": $PREPROD_TTL,
           "native": $STUB_NATIVE_JSON
         }
       """.trimIndent()
