@@ -178,6 +178,7 @@ public class PubSdkApiIntegrationTest {
     assertThat(response.getTimeToNextCall()).isZero();
     assertThat(response.getSlots()).hasSize(1).allSatisfy(slot -> {
       assertThat(slot.getImpressionId()).isNotNull();
+      assertThat(slot.getZoneId()).isNotNull();
       assertThat(slot.isNative()).isFalse();
       assertThat(slot.getPlacementId()).isEqualTo(BANNER_320_50.getAdUnitId());
       assertThat(slot.getCpm()).isNotEmpty();
@@ -203,6 +204,7 @@ public class PubSdkApiIntegrationTest {
     assertThat(response.getTimeToNextCall()).isZero();
     assertThat(response.getSlots()).hasSize(1).allSatisfy(slot -> {
       assertThat(slot.getImpressionId()).isNotNull();
+      assertThat(slot.getZoneId()).isNotNull();
       assertThat(slot.isNative()).isFalse();
       assertThat(slot.getPlacementId()).isEqualTo(INTERSTITIAL.getAdUnitId());
       assertThat(slot.getCpm()).isNotEmpty();
@@ -226,13 +228,14 @@ public class PubSdkApiIntegrationTest {
     assertThat(response.getTimeToNextCall()).isZero();
     assertThat(response.getSlots()).hasSize(1).allSatisfy(slot -> {
       assertThat(slot.getImpressionId()).isNotNull();
+      assertThat(slot.getZoneId()).isNotNull();
       assertThat(slot.isNative()).isTrue();
       assertThat(slot.getPlacementId()).isEqualTo(NATIVE.getAdUnitId());
       assertThat(slot.getCpm()).isNotEmpty();
       assertThat(slot.getWidth()).isEqualTo(2);
       assertThat(slot.getHeight()).isEqualTo(2);
       assertThat(slot.getCurrency()).isNotEmpty();
-      assertThat(slot.getTtlInSeconds()).isEqualTo(0);
+      assertThat(slot.getTtlInSeconds()).isEqualTo(3600);
       assertThat(slot.getDisplayUrl()).isNull();
       assertThat(slot.getNativeAssets()).isEqualTo(StubConstants.STUB_NATIVE_ASSETS);
       assertThat(slot.isValid()).isTrue();
