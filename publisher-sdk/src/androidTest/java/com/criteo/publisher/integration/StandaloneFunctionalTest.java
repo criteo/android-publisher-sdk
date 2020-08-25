@@ -465,7 +465,7 @@ public class StandaloneFunctionalTest {
     CriteoSync(CriteoInterstitial interstitial) {
       this.handler = new Handler(Looper.getMainLooper());
       this.init = () -> {
-        this.isLoaded = new CountDownLatch(2);
+        this.isLoaded = new CountDownLatch(1);
         this.isDisplayed = new CountDownLatch(1);
       };
 
