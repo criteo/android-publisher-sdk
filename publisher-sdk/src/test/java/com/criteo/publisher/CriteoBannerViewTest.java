@@ -225,6 +225,12 @@ public class CriteoBannerViewTest {
     assertThatCode(() -> new CriteoBannerView(context, bannerAdUnit)).doesNotThrowAnyException();
   }
 
+  @Test
+  public void displayAd_GivenController_DelegateToIt() throws Exception {
+    bannerView.displayAd("fake_display_data");
+    verify(controller).displayAd("fake_display_data");
+  }
+
   private CriteoBannerView givenBannerUsingNonInitializedSdk() {
     Criteo.setInstance(null);
     return new CriteoBannerView(context, bannerAdUnit);

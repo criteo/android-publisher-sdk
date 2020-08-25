@@ -73,6 +73,12 @@ public class MainActivity extends AppCompatActivity {
       startActivity(intent);
     });
 
+
+    findViewById(R.id.buttonAdvancedBidding).setOnClickListener((View v) -> {
+      Intent intent = new Intent(getApplicationContext(), ServerBiddingActivity.class);
+      startActivity(intent);
+    });
+
     findViewById(R.id.buttonConsentSelector).setOnClickListener((View v) -> {
       Intent intent = new Intent(getApplicationContext(), PrivacyConsentSelectorActivity.class);
       startActivity(intent);

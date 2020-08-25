@@ -302,3 +302,6 @@ fabric.properties
 .idea/*
 !.idea/codeStyles
 !.idea/copyright
+
+# Jacoco
+*.exec

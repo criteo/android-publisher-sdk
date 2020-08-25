@@ -141,6 +141,11 @@
       android:configChanges="orientation|screenSize"
       android:theme="@style/AppTheme"/>
 
+    <activity
+      android:label="@string/title_activity_server_bidding"
+      android:name=".ServerBiddingActivity"
+      android:configChanges="orientation|screenSize"
+      android:theme="@style/AppTheme"/>
   </application>
 
 </manifest>
