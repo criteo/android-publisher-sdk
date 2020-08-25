@@ -57,9 +57,10 @@ sonarqube {
         )
     )
 
-    val junitReports = allSubProjectsReports("**/TEST-*.xml") + // Normal tests
+    val junitReportFiles = allSubProjectsReports("**/TEST-*.xml") + // Normal tests
         allSubProjectsReports("test-results/gordon/*.xml") // Retried tests (Gordon runner)
-    property("sonar.junit.reportPaths", junitReports)
+    val junitReportDirs = junitReportFiles.mapNotNull { it.parentFile }.toSet()
+    property("sonar.junit.reportPaths", junitReportDirs)
 
     val lintReports = allSubProjectsReports("reports/lint-results.xml")
     property("sonar.androidLint.reportPaths", lintReports)

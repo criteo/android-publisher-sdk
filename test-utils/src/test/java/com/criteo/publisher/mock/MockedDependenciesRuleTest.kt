@@ -17,6 +17,7 @@
 package com.criteo.publisher.mock
 
 import com.criteo.publisher.concurrent.AsyncResources
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Rule
 import org.junit.Test
@@ -58,4 +59,31 @@ class MockedDependenciesRuleTest {
     mockedDependenciesRule.waitForIdleState()
   }
 
+  @Test
+  fun withMockedLogger_GivenAnyCreatedLogger_IsAMockContainsByTheMockedDependencyProvider() {
+    mockedDependenciesRule.withMockedLogger()
+
+    // Resetting the rule because withMockedLogger should normally be called at the rule creation.
+    mockedDependenciesRule.resetAllDependencies()
+
+    val loggerFactory = mockedDependenciesRule.dependencyProvider.provideLoggerFactory()
+    val logger1 = loggerFactory.createLogger(javaClass)
+    val logger2 = loggerFactory.createLogger(loggerFactory.javaClass)
+
+    assertThat(logger1).isSameAs(mockedDependenciesRule.mockedLogger)
+    assertThat(logger2).isSameAs(mockedDependenciesRule.mockedLogger)
+  }
+
+  @Test
+  fun withMockedLogger_WithoutTheOption_LoggerFactoryWorkNormallyAndMockedDependencyProviderContainsNoLogger() {
+    // Given no withMockedLogger
+
+    val loggerFactory = mockedDependenciesRule.dependencyProvider.provideLoggerFactory()
+    val logger1 = loggerFactory.createLogger(javaClass)
+    val logger2 = loggerFactory.createLogger(loggerFactory.javaClass)
+
+    assertThat(logger1).isNotNull.isNotEqualTo(logger2)
+    assertThat(logger2).isNotNull
+    assertThat(mockedDependenciesRule.mockedLogger).isNull()
+  }
 }

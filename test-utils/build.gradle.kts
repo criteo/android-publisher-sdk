@@ -49,6 +49,7 @@ dependencies {
   testImplementation(Deps.AssertJ.AssertJ)
 
   androidTestImplementation(Deps.AndroidX.Test.Runner)
+  androidTestImplementation(Deps.AssertJ.AssertJ)
 
   detektPlugins(Deps.Detekt.DetektFormatting)
 }

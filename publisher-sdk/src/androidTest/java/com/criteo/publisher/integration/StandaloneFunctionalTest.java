@@ -20,6 +20,7 @@ import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE;
 import static com.criteo.publisher.StubConstants.STUB_DISPLAY_URL;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
+import static com.criteo.publisher.view.WebViewClicker.waitUntilWebViewIsLoaded;
 import static com.criteo.publisher.view.WebViewLookup.getRootView;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,6 +41,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.webkit.WebView;
 import androidx.annotation.NonNull;
 import androidx.annotation.UiThread;
 import androidx.test.filters.FlakyTest;
@@ -154,6 +156,7 @@ public class StandaloneFunctionalTest {
     CriteoInterstitial interstitial = createInterstitial(validInterstitialAdUnit);
     CriteoSync sync = new CriteoSync(interstitial);
     View interstitialView = whenLoadingAndDisplayingAnInterstitial(interstitial, sync);
+    waitUntilInterstitialWebViewIsLoaded(interstitialView);
     String html = webViewLookup.lookForHtmlContent(interstitialView).get();
 
     assertThat(html).contains(STUB_CREATIVE_IMAGE);
@@ -169,15 +172,24 @@ public class StandaloneFunctionalTest {
     CriteoSync sync = new CriteoSync(interstitial);
 
     View interstitialView1 = whenLoadingAndDisplayingAnInterstitial(interstitial, sync);
+    waitUntilInterstitialWebViewIsLoaded(interstitialView1);
     String html1 = webViewLookup.lookForHtmlContent(interstitialView1).get();
 
     sync.reset();
 
     View interstitialView2 = whenLoadingAndDisplayingAnInterstitial(interstitial, sync);
+    waitUntilInterstitialWebViewIsLoaded(interstitialView2);
     String html2 = webViewLookup.lookForHtmlContent(interstitialView2).get();
 
     assertThat(html1).contains(STUB_CREATIVE_IMAGE);
     assertThat(html2).contains(STUB_CREATIVE_IMAGE);
+  }
+
+  private void waitUntilInterstitialWebViewIsLoaded(@NonNull View interstitialView)
+      throws Exception {
+    for (WebView webView : webViewLookup.lookForWebViews(interstitialView)) {
+      waitUntilWebViewIsLoaded(webView);
+    }
   }
 
   @Test

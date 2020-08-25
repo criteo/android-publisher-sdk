@@ -21,10 +21,12 @@ import static com.criteo.publisher.util.CompletableFuture.completedFuture;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.privacy.gdpr.GdprData;
@@ -33,12 +35,16 @@ import com.criteo.publisher.util.AppEventResponseListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 public class AppEventTaskTest {
+
+  @Rule
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule()
+      .withMockedLogger();
 
   private AppEventTask appEventTask;
 
@@ -84,20 +90,20 @@ public class AppEventTaskTest {
   public void testWithThrottleOnPostExecute() throws JSONException {
     json.put(THROTTLE, 5);
     appEventTask.onPostExecute(json);
-    Mockito.verify(responseListener, Mockito.times(1)).setThrottle(json.optInt(THROTTLE, 0));
+    verify(responseListener, times(1)).setThrottle(json.optInt(THROTTLE, 0));
   }
 
   @Test
   public void testWithNullThrottleOnPostExecute() {
     appEventTask.onPostExecute(json);
-    Mockito.verify(responseListener, Mockito.times(1)).setThrottle(0);
+    verify(responseListener, times(1)).setThrottle(0);
   }
 
   @Test
   public void testWithNullJsonOnPostExecute() {
     json = null;
     appEventTask.onPostExecute(json);
-    Mockito.verify(responseListener, Mockito.times(1)).setThrottle(0);
+    verify(responseListener, times(1)).setThrottle(0);
   }
 
   @Test
@@ -107,7 +113,28 @@ public class AppEventTaskTest {
 
     appEventTask.doInBackground("eventType");
 
-    verify(api).postAppEvent(anyInt(), any(), any(), any(), anyInt(), eq("myUserAgent"), eq(gdprData));
+    verify(api).postAppEvent(
+        anyInt(),
+        any(),
+        any(),
+        any(),
+        anyInt(),
+        eq("myUserAgent"),
+        eq(gdprData)
+    );
+  }
+
+  @Test
+  public void backgroundTask_GivenNetworkError_LogError() throws Exception {
+    Exception exception = new Exception();
+
+    when(deviceInfo.getUserAgent()).thenReturn(completedFuture("myUserAgent"));
+    when(api.postAppEvent(anyInt(), any(), any(), any(), anyInt(), any(), any())).thenThrow(
+        exception);
+
+    appEventTask.doInBackground("eventType");
+
+    verify(mockedDependenciesRule.getMockedLogger()).debug(any(), eq(exception));
   }
 
 }

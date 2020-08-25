@@ -127,7 +127,7 @@ public class PubSdkApiIntegrationTest {
   }
 
   @Test
-  public void postAppEvent_GivenNonNullGaid_ReturnInSuccess() {
+  public void postAppEvent_GivenNonNullGaid_ReturnInSuccess() throws Exception {
     gaid = null;
 
     api.postAppEvent(
@@ -144,7 +144,7 @@ public class PubSdkApiIntegrationTest {
   }
 
   @Test
-  public void postAppEvent_GivenNullGaid_ReturnInSuccess() {
+  public void postAppEvent_GivenNullGaid_ReturnInSuccess() throws Exception {
     api.postAppEvent(
         senderId,
         appId,
@@ -296,7 +296,7 @@ public class PubSdkApiIntegrationTest {
   }
 
   @Test
-  public void testPostAppEvent_WhenUsingEmptyGdprData() {
+  public void testPostAppEvent_WhenUsingEmptyGdprData() throws Exception {
     // Given
     setupGdprDataWithTcf2(
         "-1",

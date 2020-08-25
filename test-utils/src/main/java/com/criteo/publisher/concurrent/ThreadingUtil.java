@@ -28,6 +28,7 @@ import com.criteo.publisher.util.CompletableFuture;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class ThreadingUtil {
 
@@ -50,12 +51,51 @@ public class ThreadingUtil {
     });
 
     try {
-      return future.get();
-    } catch (InterruptedException | ExecutionException e) {
+      return getUninterruptibly(future);
+    } catch (ExecutionException e) {
       throw new RuntimeException(e);
     }
   }
 
+  /**
+   * Invokes {@link Future#get()} and ignore interruption of thread.
+   * <p>
+   * Once finished, if the thread was interrupted, the interruption flag is set back for further
+   * interruption control.
+   *
+   * @param future future to get the value from
+   * @return value of the future
+   * @throws ExecutionException if the future throw an exception during its execution
+   */
+  public static <T> T getUninterruptibly(Future<T> future) throws ExecutionException {
+    boolean wasInterrupted = false;
+    try {
+      while (true) {
+        try {
+          return future.get();
+        } catch (InterruptedException e) {
+          wasInterrupted = true;
+        }
+      }
+    } finally {
+      if (wasInterrupted) {
+        Thread.currentThread().interrupt();
+      }
+    }
+  }
+
+  /**
+   * Wait for all threads in the given executor and for all task on the UI thread too.
+   * <p>
+   * This method is also working when called on a Java VM (outside Android then), and as there is no
+   * concept of UI thread, only commands in given executor are waited for.
+   * <p>
+   * If the current thread get interrupted while waiting, then this method ends earlier by throwing
+   * a runtime exception instead of an {@link InterruptedException} just to be convenient for
+   * callers. Although, the interruption flag on this thread is set on.
+   *
+   * @param trackingCommandsExecutor executor to wait commands from
+   */
   @RequiresApi(api = VERSION_CODES.M)
   public static void waitForAllThreads(@NonNull TrackingCommandsExecutor trackingCommandsExecutor) {
     // FIXME EE-764 This is a wait with two different steps (main and async). Because of those steps, it
@@ -75,6 +115,7 @@ public class ThreadingUtil {
     try {
       trackingCommandsExecutor.waitCommands();
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
 
@@ -86,6 +127,10 @@ public class ThreadingUtil {
   /**
    * Blocks the current threads until the {@link MessageQueue} associated to the provided {@link
    * Looper} is idle.
+   * <p>
+   * If the current thread get interrupted while waiting, then this method ends earlier by throwing
+   * a runtime exception instead of an {@link InterruptedException} just to be convenient for
+   * callers. Although, the interruption flag on this thread is set on.
    */
   @RequiresApi(api = VERSION_CODES.M)
   public static void waitForMessageQueueToBeIdle() {
@@ -108,6 +153,7 @@ public class ThreadingUtil {
     try {
       latch.await();
     } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
       throw new RuntimeException(e);
     }
   }
