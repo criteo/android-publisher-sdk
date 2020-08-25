@@ -143,6 +143,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          # Fetch the whole history to activate the auto-assignment of Sonar issues.
+          # Also, Sonar needs the base branch to be fetched in order to provide a good report.
+          fetch-depth: 0
 
       # Sonar drops support of Java 8 in favor of the new LTS: Java 11.
       # See https://sonarcloud.io/documentation/user-guide/move-analysis-java-11/
