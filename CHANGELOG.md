@@ -1,4 +1,4 @@
-# 3.10.0
+# Version 3.10.0
 
 - Features
   - MoPub Header-Bidding: Handle subclasses of `MoPubView` and `MoPubInterstitial`
