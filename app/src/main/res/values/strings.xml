@@ -1,10 +1,7 @@
 <resources>
   <string name="app_name">Criteo Pub SDK Demo</string>
   <string name="demo_app_title">Publisher SDK \nDemo App</string>
-  <string name="sdk_version">3.5.0</string>
-  <string name="sdk_version_label">Publisher SDK:</string>
-  <string name="demo_app_version">3.5.0</string>
-  <string name="demo_app_version_label">Demo App version:</string>
+  <string name="sdk_version_label">Version: %s</string>
   <string name="criteo_logo_content_description">Criteo Logo</string>
   <string name="title_activity_standalone">Standalone</string>
   <string name="title_activity_splash">PubSDK</string>

@@ -21,7 +21,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import com.criteo.publisher.util.BuildConfigWrapper;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -37,6 +39,8 @@ public class SplashActivity extends AppCompatActivity {
     );
     setContentView(R.layout.activity_splash);
 
+    TextView labelSdkVersion = findViewById(R.id.labelSdkVersion);
+    labelSdkVersion.setText(String.format(getString(R.string.sdk_version_label), BuildConfig.VERSION_NAME));
     new Handler().postDelayed(() -> {
       Intent intent = new Intent(SplashActivity.this, MainActivity.class);
       startActivity(intent);
