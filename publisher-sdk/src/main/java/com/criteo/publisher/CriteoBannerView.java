@@ -92,7 +92,7 @@ public class CriteoBannerView extends WebView {
   }
 
   @Keep
-  public void displayAd(@NonNull String displayData) {
+  public void loadAdWithDisplayData(@NonNull String displayData) {
     getOrCreateController().displayAd(displayData);
   }
 

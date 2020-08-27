@@ -227,7 +227,7 @@ public class CriteoBannerViewTest {
 
   @Test
   public void displayAd_GivenController_DelegateToIt() throws Exception {
-    bannerView.displayAd("fake_display_data");
+    bannerView.loadAdWithDisplayData("fake_display_data");
     verify(controller).displayAd("fake_display_data");
   }
 

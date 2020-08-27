@@ -110,7 +110,7 @@ public class CriteoInterstitial {
   }
 
   @Keep
-  public void displayAd(@NonNull String displayData) {
+  public void loadAdWithDisplayData(@NonNull String displayData) {
     getOrCreateController().fetchCreativeAsync(displayData);
   }
 

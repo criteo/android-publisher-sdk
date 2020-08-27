@@ -38,7 +38,7 @@ class ServerBiddingActivity : AppCompatActivity() {
     buttonBanner.setOnClickListener {
       val bannerViewContainer: LinearLayout = findViewById(R.id.bannerViewContainer)
       criteoBannerView = CriteoBannerView(this.baseContext)
-      criteoBannerView.displayAd("https://rdi.eu.criteo.com/delivery/rtb/demo/ajs?" +
+      criteoBannerView.loadAdWithDisplayData("https://rdi.eu.criteo.com/delivery/rtb/demo/ajs?" +
           "zoneid=1417086&width=300&height=250&ibva=0")
       bannerViewContainer.addView(criteoBannerView)
     }
@@ -56,7 +56,7 @@ class ServerBiddingActivity : AppCompatActivity() {
           criteoInterstitial.show()
         }
       })
-      criteoInterstitial.displayAd("https://rdi.eu.criteo.com/delivery/rtb/demo/ajs?" +
+      criteoInterstitial.loadAdWithDisplayData("https://rdi.eu.criteo.com/delivery/rtb/demo/ajs?" +
           "zoneid=1417086&width=393&height=759&ibva=1&uaCap=5")
     }
   }
