@@ -2,7 +2,7 @@
 
 - Features
   - MoPub Header-Bidding: Handle subclasses of `MoPubView` and `MoPubInterstitial`
-  - Server Side bidding:  `displayAd` added to `CriteoBannerView` & `CriteoInterstitial`
+  - Server Side bidding:  `loadAdWithDisplayData` added to `CriteoBannerView` & `CriteoInterstitial`
 - Bug fixes
   - Fix wrong interstitial orientation when user starts the application in landscape
 

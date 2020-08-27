@@ -18,6 +18,7 @@ package com.criteo.publisher;
 
 import android.content.Context;
 import android.util.Log;
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -108,7 +109,8 @@ public class CriteoInterstitial {
     }
   }
 
-  public void displayAd(@NonNull String displayData) {
+  @Keep
+  public void loadAdWithDisplayData(@NonNull String displayData) {
     getOrCreateController().fetchCreativeAsync(displayData);
   }
 

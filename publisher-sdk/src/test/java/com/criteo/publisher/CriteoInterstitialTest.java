@@ -156,7 +156,7 @@ public class CriteoInterstitialTest {
   @Test
   public void displayAd_GivenController_DelegateToIt() throws Exception {
     CriteoInterstitialEventController controller = givenMockedController();
-    interstitial.displayAd("fake_display_data");
+    interstitial.loadAdWithDisplayData("fake_display_data");
     verify(controller).fetchCreativeAsync("fake_display_data");
   }
 
