@@ -19,6 +19,7 @@ package com.criteo.publisher;
 import android.content.Context;
 import android.util.Log;
 import android.webkit.WebView;
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -90,6 +91,7 @@ public class CriteoBannerView extends WebView {
     }
   }
 
+  @Keep
   public void displayAd(@NonNull String displayData) {
     getOrCreateController().displayAd(displayData);
   }
