@@ -109,7 +109,6 @@ public class CriteoInterstitialEventController {
     }
   }
 
-  @VisibleForTesting
   void notifyFor(@NonNull CriteoListenerCode code) {
     executor
         .executeAsync(new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener, code));
