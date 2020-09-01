@@ -90,7 +90,7 @@ public class CriteoBannerEventController {
     }
   }
 
-  private void notifyFor(@NonNull CriteoListenerCode code) {
+  void notifyFor(@NonNull CriteoListenerCode code) {
     executor.executeAsync(new CriteoBannerListenerCallTask(adListener, view, code));
   }
 

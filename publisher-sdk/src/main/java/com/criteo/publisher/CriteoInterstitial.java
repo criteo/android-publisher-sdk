@@ -111,6 +111,7 @@ public class CriteoInterstitial {
 
   @Keep
   public void loadAdWithDisplayData(@NonNull String displayData) {
+    getOrCreateController().notifyFor(CriteoListenerCode.VALID);
     getOrCreateController().fetchCreativeAsync(displayData);
   }
 
