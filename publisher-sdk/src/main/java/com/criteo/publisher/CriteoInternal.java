@@ -94,7 +94,7 @@ final class CriteoInternal extends Criteo {
       userPrivacyUtil.storeUsPrivacyOptout(usPrivacyOptout);
     }
 
-    // this nulll check ensures that instantiating Criteo object with null mopub consent value,
+    // this null check ensures that instantiating Criteo object with null mopub consent value,
     // doesn't erase the previously stored consent value
     if (mopubConsent != null) {
       userPrivacyUtil.storeMopubConsent(mopubConsent);

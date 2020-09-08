@@ -16,12 +16,20 @@
 
 package com.criteo.publisher;
 
-public class CriteoNotInitializedException extends IllegalStateException {
+import static junit.framework.TestCase.assertEquals;
 
-  public CriteoNotInitializedException(String message) {
-    super(message + "\n"
-        + "Did you properly initialize the Criteo SDK ?\n"
-        + "Please follow this step: https://publisherdocs.criteotilt.com/app/android/standalone/#sdk-initialization\n");
+import org.junit.Test;
+
+public class CriteoTest {
+
+  @Test
+  public void criteoInit_GivenNullApplication_DoesNotCrash() {
+    try {
+      new Criteo.Builder(null, "").init();
+    } catch (CriteoInitException e) {
+    }
+
+    assertEquals(DummyCriteo.class, Criteo.getInstance().getClass());
   }
 
 }
