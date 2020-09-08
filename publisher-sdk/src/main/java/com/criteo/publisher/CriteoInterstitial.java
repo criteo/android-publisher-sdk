@@ -79,16 +79,23 @@ public class CriteoInterstitial {
   }
 
   public void setCriteoInterstitialAdListener(
-      @Nullable CriteoInterstitialAdListener criteoInterstitialAdListener) {
+      @Nullable CriteoInterstitialAdListener criteoInterstitialAdListener
+  ) {
     this.criteoInterstitialAdListener = criteoInterstitialAdListener;
   }
 
   public void setCriteoInterstitialAdDisplayListener(
-      @Nullable CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener) {
+      @Nullable CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener
+  ) {
     this.criteoInterstitialAdDisplayListener = criteoInterstitialAdDisplayListener;
   }
 
   public void loadAd() {
+    if (!DependencyProvider.getInstance().isApplicationSet()) {
+      Log.w(TAG, "Calling CriteoInterstitial#loadAd with a null application");
+      return;
+    }
+
     try {
       doLoadAd();
     } catch (Throwable tr) {
@@ -102,6 +109,11 @@ public class CriteoInterstitial {
   }
 
   public void loadAd(@Nullable BidToken bidToken) {
+    if (!DependencyProvider.getInstance().isApplicationSet()) {
+      Log.w(TAG, "Calling CriteoInterstitial#loadAd(bidToken) with a null application");
+      return;
+    }
+
     try {
       doLoadAd(bidToken);
     } catch (Throwable tr) {
@@ -111,6 +123,11 @@ public class CriteoInterstitial {
 
   @Keep
   public void loadAdWithDisplayData(@NonNull String displayData) {
+    if (!DependencyProvider.getInstance().isApplicationSet()) {
+      Log.w(TAG, "Calling CriteoInterstitial#loadAdWithDisplayData with a null application");
+      return;
+    }
+
     getOrCreateController().notifyFor(CriteoListenerCode.VALID);
     getOrCreateController().fetchCreativeAsync(displayData);
   }
@@ -133,6 +150,11 @@ public class CriteoInterstitial {
   }
 
   public void show() {
+    if (!DependencyProvider.getInstance().isApplicationSet()) {
+      Log.w(TAG, "Calling CriteoInterstitial#show with a null application");
+      return;
+    }
+
     try {
       doShow();
     } catch (Throwable tr) {
