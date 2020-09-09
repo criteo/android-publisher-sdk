@@ -112,43 +112,43 @@ public class CriteoNativeLoader {
    * be notified by the {@link CriteoNativeAdListener#onAdFailedToReceive(CriteoErrorCode)}
    * callback.
    */
-  public void loadAd() {
+  public void loadAd(@NonNull Context context) {
     try {
-      doLoad();
+      doLoad(context);
     } catch (Throwable t) {
       PreconditionsUtil.throwOrLog(t);
     }
   }
 
-  private void doLoad() {
+  private void doLoad(@NonNull Context context) {
     getIntegrationRegistry().declare(Integration.STANDALONE);
 
     BidManager bidManager = getBidManager();
     CdbResponseSlot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
     NativeAssets assets = bid == null ? null : bid.getNativeAssets();
-    handleNativeAssets(assets);
+    handleNativeAssets(context, assets);
   }
 
-  public void loadAd(@Nullable BidToken bidToken) {
+  public void loadAd(@NonNull Context context, @Nullable BidToken bidToken) {
     try {
-      doLoad(bidToken);
+      doLoad(context, bidToken);
     } catch (Throwable t) {
       PreconditionsUtil.throwOrLog(t);
     }
   }
 
-  private void doLoad(@Nullable BidToken bidToken) {
+  private void doLoad(@NonNull Context context, @Nullable BidToken bidToken) {
     InHouse inHouse = getInHouse();
     NativeTokenValue tokenValue = inHouse.getNativeTokenValue(bidToken);
     NativeAssets assets = tokenValue == null ? null : tokenValue.getNativeAssets();
-    handleNativeAssets(assets);
+    handleNativeAssets(context, assets);
   }
 
-  private void handleNativeAssets(@Nullable NativeAssets assets) {
+  private void handleNativeAssets(@NonNull Context context, @Nullable NativeAssets assets) {
     if (assets == null) {
       notifyForFailureAsync();
     } else {
-      NativeAdMapper nativeAdMapper = getNativeAdMapper();
+      NativeAdMapper nativeAdMapper = getNativeAdMapper(context);
       CriteoNativeAd nativeAd = nativeAdMapper.map(
           assets,
           new WeakReference<>(listener),
@@ -185,8 +185,8 @@ public class CriteoNativeLoader {
   }
 
   @NonNull
-  private NativeAdMapper getNativeAdMapper() {
-    return DependencyProvider.getInstance().provideNativeAdMapper();
+  private NativeAdMapper getNativeAdMapper(@NonNull Context context) {
+    return DependencyProvider.getInstance().provideNativeAdMapper(context);
   }
 
   @NonNull

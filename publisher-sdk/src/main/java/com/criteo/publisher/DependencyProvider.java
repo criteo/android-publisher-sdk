@@ -429,26 +429,37 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public NativeAdMapper provideNativeAdMapper() {
+  public NativeAdMapper provideNativeAdMapper(@NonNull Context context) {
     return getOrCreate(NativeAdMapper.class, new Factory<NativeAdMapper>() {
       @NonNull
       @Override
       public NativeAdMapper create() {
         return new NativeAdMapper(
             provideVisibilityTracker(),
-            new ImpressionHelper(
-                providePubSdkApi(),
-                provideThreadPoolExecutor(),
-                provideRunOnUiThreadExecutor()
-            ),
+            provideImpressionHelper(),
             provideClickDetection(),
             new ClickHelper(
-                provideRedirection(),
+                provideRedirection(context),
                 provideTopActivityFinder(),
                 provideRunOnUiThreadExecutor()
             ),
             provideAdChoiceOverlay(),
             provideRendererHelper()
+        );
+      }
+    });
+  }
+
+  @NonNull
+  public ImpressionHelper provideImpressionHelper() {
+    return getOrCreate(ImpressionHelper.class, new Factory<ImpressionHelper>() {
+      @NonNull
+      @Override
+      public ImpressionHelper create() {
+        return new ImpressionHelper(
+            providePubSdkApi(),
+            provideThreadPoolExecutor(),
+            provideRunOnUiThreadExecutor()
         );
       }
     });
@@ -477,12 +488,12 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public Redirection provideRedirection() {
+  public Redirection provideRedirection(@NonNull Context context) {
     return getOrCreate(Redirection.class, new Factory<Redirection>() {
       @NonNull
       @Override
       public Redirection create() {
-        return new Redirection(provideContext());
+        return new Redirection(context);
       }
     });
   }

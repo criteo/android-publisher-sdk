@@ -111,7 +111,7 @@ public class StandaloneActivity extends AppCompatActivity {
   }
 
   private void loadNative() {
-    nativeLoader.loadAd();
+    nativeLoader.loadAd(this);
   }
 
   private void loadInterstitial(InterstitialAdUnit adUnit, Button btnShow) {

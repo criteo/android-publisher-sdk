@@ -213,7 +213,7 @@ class ProfileIdFunctionalTest {
     givenPreviousInHouseIntegration()
 
     givenInitializedCriteo()
-    CriteoNativeLoader(NATIVE, mock(), mock()).loadAd()
+    CriteoNativeLoader(NATIVE, mock(), mock()).loadAd(context)
     mockedDependenciesRule.waitForIdleState()
 
     verifyCdbIsCalledWith(Integration.STANDALONE)

@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.advancednative
 
+import android.content.Context
 import com.criteo.publisher.BidManager
 import com.criteo.publisher.CriteoErrorCode
 import com.criteo.publisher.InHouse
@@ -63,6 +64,9 @@ class CriteoNativeLoaderTest {
   @Inject
   private lateinit var imageLoaderHolder: ImageLoaderHolder
 
+  @Inject
+  private lateinit var context: Context
+
   @SpyBean
   private lateinit var buildConfigWrapper: BuildConfigWrapper
 
@@ -106,7 +110,7 @@ class CriteoNativeLoaderTest {
   fun loadAdInHouse_GivenNoBid_NotifyListenerOnUiThreadForFailure() {
     expectListenerToBeCalledOnUiThread()
 
-    nativeLoader.loadAd(null)
+    nativeLoader.loadAd(context, null)
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
     verifyNoMoreInteractions(listener)
@@ -120,7 +124,7 @@ class CriteoNativeLoaderTest {
     givenNotANativeBidAvailable()
 
     val bidResponse = inHouse.getBidResponse(adUnit)
-    nativeLoader.loadAd(bidResponse.bidToken)
+    nativeLoader.loadAd(context, bidResponse.bidToken)
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
     verifyNoMoreInteractions(listener)
@@ -134,7 +138,7 @@ class CriteoNativeLoaderTest {
     val nativeAd = givenNativeBidAvailable()
 
     val bidResponse = inHouse.getBidResponse(adUnit)
-    nativeLoader.loadAd(bidResponse.bidToken)
+    nativeLoader.loadAd(context, bidResponse.bidToken)
 
     verify(listener).onAdReceived(nativeAd)
     verifyNoMoreInteractions(listener)
@@ -147,7 +151,7 @@ class CriteoNativeLoaderTest {
     expectListenerToBeCalledOnUiThread()
     givenNoBidAvailable()
 
-    nativeLoader.loadAd()
+    nativeLoader.loadAd(context)
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
     verifyNoMoreInteractions(listener)
@@ -160,7 +164,7 @@ class CriteoNativeLoaderTest {
     expectListenerToBeCalledOnUiThread()
     val nativeAd = givenNativeBidAvailable()
 
-    nativeLoader.loadAd()
+    nativeLoader.loadAd(context)
 
     verify(listener).onAdReceived(nativeAd)
     verifyNoMoreInteractions(listener)
@@ -173,7 +177,7 @@ class CriteoNativeLoaderTest {
     expectListenerToBeCalledOnUiThread()
     givenNotANativeBidAvailable()
 
-    nativeLoader.loadAd()
+    nativeLoader.loadAd(context)
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
     verifyNoMoreInteractions(listener)
@@ -191,7 +195,7 @@ class CriteoNativeLoaderTest {
 
     // then
     assertThatCode {
-      nativeLoader.loadAd()
+      nativeLoader.loadAd(context)
     }.doesNotThrowAnyException()
   }
 

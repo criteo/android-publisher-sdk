@@ -17,6 +17,7 @@
 package com.criteo.publisher.adview;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
@@ -35,12 +36,13 @@ public class AdWebViewClient extends WebViewClient {
   private final Redirection redirection;
 
   public AdWebViewClient(
+      @NonNull Context context,
       @NonNull RedirectionListener listener,
       @Nullable ComponentName hostActivityName
   ) {
     this.listener = listener;
     this.hostActivityName = hostActivityName;
-    this.redirection = DependencyProvider.getInstance().provideRedirection();
+    this.redirection = DependencyProvider.getInstance().provideRedirection(context);
   }
 
   @Override

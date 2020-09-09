@@ -117,6 +117,7 @@ public class CriteoInterstitialActivity extends Activity {
     );
 
     AdWebViewClient adWebViewClient = new AdWebViewClient(
+        this,
         weakRedirectionListener,
         callingActivityName
     );

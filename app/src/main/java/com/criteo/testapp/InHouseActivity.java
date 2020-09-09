@@ -118,7 +118,7 @@ public class InHouseActivity extends AppCompatActivity {
 
   private void loadNative() {
     BidResponse bidResponse = Criteo.getInstance().getBidResponse(NATIVE);
-    nativeLoader.loadAd(bidResponse.getBidToken());
+    nativeLoader.loadAd(this, bidResponse.getBidToken());
   }
 
   private void loadInterstitialAd(InterstitialAdUnit adUnit, Button btnShow) {

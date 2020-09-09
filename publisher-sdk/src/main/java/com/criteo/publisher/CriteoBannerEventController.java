@@ -22,6 +22,7 @@ import static com.criteo.publisher.CriteoListenerCode.INVALID;
 import static com.criteo.publisher.CriteoListenerCode.VALID;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,6 +31,7 @@ import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.adview.AdWebViewClient;
 import com.criteo.publisher.adview.RedirectionListener;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
@@ -40,6 +42,7 @@ import java.lang.ref.WeakReference;
 
 
 public class CriteoBannerEventController {
+
   @NonNull
   private final WeakReference<CriteoBannerView> view;
 
@@ -95,20 +98,26 @@ public class CriteoBannerEventController {
   }
 
   void displayAd(@NonNull String displayUrl) {
+    CriteoBannerView bannerView = view.get();
+    if (bannerView == null) {
+      LoggerFactory.getLogger(CriteoBannerEventController.class).debug(
+          "Not displaying ads on CriteoBannerView because the reference is no longer reachable");
+      return;
+    }
     executor.executeAsync(new CriteoBannerLoadTask(
-        view, createWebViewClient(), criteo.getConfig(), displayUrl));
+        view, createWebViewClient(bannerView.getContext()), criteo.getConfig(), displayUrl));
   }
 
   // WebViewClient is created here to prevent passing the AdListener everywhere.
   // Setting this webViewClient to the WebView is done in the CriteoBannerLoadTask as all
   // WebView methods need to run in the same UI thread
   @VisibleForTesting
-  WebViewClient createWebViewClient() {
+  WebViewClient createWebViewClient(@NonNull Context context) {
     // Even if we have access to the view here, we're not sure that publisher gave an activity
     // context to the view. So we're getting the activity by this way.
     ComponentName bannerActivityName = topActivityFinder.getTopActivityName();
 
-    return new AdWebViewClient(new RedirectionListener() {
+    return new AdWebViewClient(context, new RedirectionListener() {
       @Override
       public void onUserRedirectedToAd() {
         notifyFor(CLICK);

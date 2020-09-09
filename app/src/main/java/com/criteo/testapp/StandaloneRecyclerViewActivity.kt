@@ -71,7 +71,7 @@ class StandaloneRecyclerViewActivity : AppCompatActivity() {
     }
 
     findViewById<View>(R.id.buttonStandaloneNative).setOnClickListener {
-      nativeLoader.loadAd()
+      nativeLoader.loadAd(this)
     }
   }
 

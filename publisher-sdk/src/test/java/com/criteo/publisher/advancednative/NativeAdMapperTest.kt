@@ -21,6 +21,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import com.criteo.publisher.DependencyProvider
 import com.criteo.publisher.activity.TopActivityFinder
 import com.criteo.publisher.adview.Redirection
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
@@ -30,14 +31,27 @@ import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.model.nativeads.NativeAssets
 import com.criteo.publisher.model.nativeads.NativeProduct
 import com.criteo.publisher.network.PubSdkApi
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.argumentCaptor
+import com.nhaarman.mockitokotlin2.check
+import com.nhaarman.mockitokotlin2.doAnswer
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.inOrder
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.spy
+import com.nhaarman.mockitokotlin2.stub
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Answers
 import java.lang.ref.WeakReference
 import java.net.URI
-import javax.inject.Inject
 
 class NativeAdMapperTest {
 
@@ -69,8 +83,19 @@ class NativeAdMapperTest {
   @MockBean
   private lateinit var api: PubSdkApi
 
-  @Inject
+  @MockBean
+  private lateinit var impressionHelper: ImpressionHelper
+
   private lateinit var mapper: NativeAdMapper
+
+  @Before
+  fun setUp() {
+    mapper = NativeAdMapper(visibilityTracker, impressionHelper, clickDetection, ClickHelper(
+        redirection,
+        topActivityFinder,
+        runOnUiThreadExecutor
+    ), adChoiceOverlay, rendererHelper)
+  }
 
   @Test
   fun map_GivenAssets_ReturnsNativeAdWithSameDataAndPreloadImages() {
