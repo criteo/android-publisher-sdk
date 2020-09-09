@@ -116,9 +116,8 @@ public abstract class Criteo {
           } else {
             criteo = new DummyCriteo();
           }
-        } catch (IllegalArgumentException iae) {
-          throw iae;
-        } catch (Throwable tr) {
+        } catch(Throwable tr) {
+          criteo = new DummyCriteo();
           Log.e(TAG, "Internal error initializing Criteo instance.", tr);
           throw new CriteoInitException("Internal error initializing Criteo instance.", tr);
         }

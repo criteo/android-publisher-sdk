@@ -129,6 +129,15 @@ public class DependencyProvider {
     this.criteoPublisherId = criteoPublisherId;
     checkCriteoPublisherIdIsSet();
   }
+  
+  boolean isApplicationSet() {
+    try {
+      DependencyProvider.getInstance().checkApplicationIsSet();
+    } catch (Exception e) {
+      return false;
+    }
+    return true;
+  }
 
   private void checkApplicationIsSet() {
     if (application == null) {
@@ -285,7 +294,8 @@ public class DependencyProvider {
       public DeviceInfo create() {
         return new DeviceInfo(
             provideContext(),
-            provideRunOnUiThreadExecutor());
+            provideRunOnUiThreadExecutor()
+        );
       }
     });
   }
@@ -298,7 +308,8 @@ public class DependencyProvider {
       public AdUnitMapper create() {
         return new AdUnitMapper(
             DependencyProvider.this.provideAndroidUtil(),
-            DependencyProvider.this.provideDeviceUtil());
+            DependencyProvider.this.provideDeviceUtil()
+        );
       }
     });
   }
@@ -771,6 +782,7 @@ public class DependencyProvider {
   }
 
   public interface Factory<T> {
+
     @NonNull
     T create();
   }

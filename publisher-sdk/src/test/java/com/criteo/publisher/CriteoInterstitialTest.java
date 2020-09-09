@@ -28,6 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
+import android.app.Application;
 import android.content.Context;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
@@ -159,6 +160,61 @@ public class CriteoInterstitialTest {
     interstitial.loadAdWithDisplayData("fake_display_data");
     verify(controller).notifyFor(CriteoListenerCode.VALID);
     verify(controller).fetchCreativeAsync("fake_display_data");
+  }
+
+  @Test
+  public void loadAd_GivenNullApplication_ReturnImmediately() throws Exception {
+    CriteoInterstitialEventController controller = givenMockedController();
+    Application application = givenNullApplication();
+
+    interstitial.loadAd();
+
+    verifyNoMoreInteractions(controller);
+    DependencyProvider.getInstance().setApplication(application);
+  }
+
+  @Test
+  public void loadAdWithBidToken_GivenNullApplication_ReturnImmediately() throws Exception {
+    CriteoInterstitialEventController controller = givenMockedController();
+    Application application = givenNullApplication();
+    BidToken token = new BidToken(UUID.randomUUID(), adUnit);
+
+    interstitial.loadAd(token);
+
+    verifyNoMoreInteractions(controller);
+    DependencyProvider.getInstance().setApplication(application);
+  }
+
+  @Test
+  public void loadAdWithDisplayData_GivenNullApplication_ReturnImmediately() throws Exception {
+    CriteoInterstitialEventController controller = givenMockedController();
+    Application application = givenNullApplication();
+
+    interstitial.loadAdWithDisplayData("");
+
+    verifyNoMoreInteractions(controller);
+    DependencyProvider.getInstance().setApplication(application);
+  }
+
+
+  @Test
+  public void show_GivenNullApplication_ReturnImmediately() throws Exception {
+    CriteoInterstitialEventController controller = givenMockedController();
+    Application application = givenNullApplication();
+
+    interstitial.show();
+
+    verifyNoMoreInteractions(controller);
+    DependencyProvider.getInstance().setApplication(application);
+  }
+
+  private Application givenNullApplication() {
+    Application application = DependencyProvider.getInstance().provideApplication();
+    try {
+      DependencyProvider.getInstance().setApplication(null);
+    } catch (Exception e) {
+    }
+    return application;
   }
 
   private CriteoInterstitialEventController givenMockedController() {
