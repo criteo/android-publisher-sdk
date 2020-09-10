@@ -1,3 +1,7 @@
+# Version 3.10.1
+- Bug fix
+ - Ensure `CriteoInterstitialActivity` does not crash when the `application` object is null.
+  
 # Version 3.10.0
 
 - Features
