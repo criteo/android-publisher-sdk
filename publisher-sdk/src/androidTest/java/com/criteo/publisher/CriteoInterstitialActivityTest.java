@@ -20,26 +20,36 @@ import static androidx.test.runner.lifecycle.Stage.RESUMED;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import android.app.Activity;
+import android.app.Application;
+import android.app.Application.ActivityLifecycleCallbacks;
 import android.content.Context;
+import android.content.Intent;
 import android.webkit.WebView;
 import androidx.annotation.NonNull;
 import androidx.test.filters.FlakyTest;
 import androidx.test.rule.ActivityTestRule;
+import androidx.test.runner.lifecycle.ActivityLifecycleCallback;
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitor;
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import androidx.test.runner.lifecycle.Stage;
+import com.criteo.publisher.activity.TopActivityFinder;
+import com.criteo.publisher.concurrent.ThreadingUtil;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
+import com.criteo.publisher.mock.ApplicationMock;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.test.activity.DummyActivity;
@@ -87,8 +97,40 @@ public class CriteoInterstitialActivityTest {
   }
 
   @Test
+  @FlakyTest(detail = "Device takes time for creating and destroying the activity")
+  public void openActivity_GivenActivityStartedBySystemWithoutSdkBeingInitialized_CloseImmediatelyWithoutCrashing()
+      throws Exception {
+    CriteoUtil.clearCriteo();
+    MockableDependencyProvider.setInstance(null);
+    activityRule.finishActivity();
+
+    assertThat(DependencyProvider.getInstance().isApplicationSet())
+        .describedAs("Verify that all dependencies are empty like on a fresh start")
+        .isFalse();
+
+    ActivityLifecycleCallbacks lifecycle = mock(ActivityLifecycleCallbacks.class);
+    Application application = (Application) context.getApplicationContext();
+    application.registerActivityLifecycleCallbacks(lifecycle);
+
+    InterstitialActivityHelper helper = new InterstitialActivityHelper(
+        context,
+        mock(TopActivityFinder.class)
+    );
+
+    helper.openActivity("content", mock(CriteoInterstitialAdListener.class));
+
+    InOrder inOrder = inOrder(lifecycle);
+    inOrder.verify(lifecycle, timeout(2000))
+        .onActivityCreated(any(CriteoInterstitialActivity.class), any());
+    inOrder.verify(lifecycle, never()).onActivityStarted(any(CriteoInterstitialActivity.class));
+    inOrder.verify(lifecycle, timeout(2000))
+        .onActivityDestroyed(any(CriteoInterstitialActivity.class));
+  }
+
+  @Test
   @Ignore("FIXME EE-1191")
-  public void whenUserClickOnAd_GivenHtmlWithHttpUrl_RedirectUserAndNotifyListener() throws Exception {
+  public void whenUserClickOnAd_GivenHtmlWithHttpUrl_RedirectUserAndNotifyListener()
+      throws Exception {
     Activity activity = whenUserClickOnAd("https://criteo.com");
 
     assertFalse(getActivitiesInStage(RESUMED).contains(activity));
