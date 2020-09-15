@@ -20,6 +20,7 @@ import android.os.Build.VERSION_CODES;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import com.criteo.publisher.util.MapUtilKt;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,7 +28,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.Function;
+import kotlin.jvm.functions.Function0;
 
 @RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)
 class FileMetricRepository extends MetricRepository {
@@ -104,22 +105,19 @@ class FileMetricRepository extends MetricRepository {
   /**
    * Atomically get or create a synchronized metric file on the given file.
    * <p>
-   * At most, one {@link SyncMetricFile} should exist for an underlying file. This method ensure
-   * this with a logic similar to {@link ConcurrentMap#computeIfAbsent(Object, Function)}. Note that
-   * this method is not directly used because it requires Android API level >= 24.
+   * At most, one {@link SyncMetricFile} should exist for an underlying file.
    *
    * @param metricFile underlying file to synchronized
    * @return unique instance of synchronized and atomic file over given one
    */
   @NonNull
   private SyncMetricFile getOrCreateMetricFile(@NonNull File metricFile) {
-    SyncMetricFile oldMetric = metricFileById.get(metricFile);
-    if (oldMetric == null) {
-      SyncMetricFile newMetric = directory.createSyncMetricFile(metricFile);
-      oldMetric = (oldMetric = metricFileById.putIfAbsent(metricFile, newMetric)) == null
-          ? newMetric : oldMetric;
-    }
-    return oldMetric;
+    return MapUtilKt.getOrCompute(metricFileById, metricFile, new Function0<SyncMetricFile>() {
+      @Override
+      public SyncMetricFile invoke() {
+        return directory.createSyncMetricFile(metricFile);
+      }
+    });
   }
 
 }
