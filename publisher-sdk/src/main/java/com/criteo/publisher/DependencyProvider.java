@@ -80,14 +80,16 @@ import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.CustomAdapterFactory;
 import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.util.JsonSerializer;
+import com.criteo.publisher.util.MapUtilKt;
 import com.criteo.publisher.util.TextUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
+import kotlin.jvm.functions.Function0;
 
 /**
  * Provides global dependencies to the rest of the codebase
@@ -96,7 +98,7 @@ public class DependencyProvider {
 
   protected static DependencyProvider instance;
 
-  private final Map<Class<?>, Object> services = new HashMap<>();
+  private final ConcurrentMap<Class<?>, Object> services = new ConcurrentHashMap<>();
 
   private Application application;
   private String criteoPublisherId;
@@ -129,7 +131,7 @@ public class DependencyProvider {
     this.criteoPublisherId = criteoPublisherId;
     checkCriteoPublisherIdIsSet();
   }
-  
+
   boolean isApplicationSet() {
     try {
       DependencyProvider.getInstance().checkApplicationIsSet();
@@ -611,15 +613,15 @@ public class DependencyProvider {
 
   @SuppressWarnings("unchecked")
   private <T> T getOrCreate(Class<T> klass, Factory<T> factory) {
-    Object service = services.get(klass);
-    if (service != null) {
-      // safe because the services map is only filled there by typed factory
-      return (T) service;
-    }
+    Object service = MapUtilKt.getOrCompute(services, klass, new Function0<T>() {
+      @Override
+      public T invoke() {
+        return factory.create();
+      }
+    });
 
-    T newService = factory.create();
-    services.put(klass, newService);
-    return newService;
+    // safe because the services map is only filled there by typed factory
+    return (T) service;
   }
 
   @NonNull

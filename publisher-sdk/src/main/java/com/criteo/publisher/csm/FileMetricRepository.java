@@ -104,9 +104,9 @@ class FileMetricRepository extends MetricRepository {
   /**
    * Atomically get or create a synchronized metric file on the given file.
    * <p>
-   * At most, one {@link SyncMetricFile} should exist for an underlying file. This method
-   * ensure this with a logic similar to {@link ConcurrentMap#computeIfAbsent(Object, Function)}.
-   * Note that this method is not directly used because it requires Android API level >= 24.
+   * At most, one {@link SyncMetricFile} should exist for an underlying file. This method ensure
+   * this with a logic similar to {@link ConcurrentMap#computeIfAbsent(Object, Function)}. Note that
+   * this method is not directly used because it requires Android API level >= 24.
    *
    * @param metricFile underlying file to synchronized
    * @return unique instance of synchronized and atomic file over given one
