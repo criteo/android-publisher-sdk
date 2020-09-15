@@ -36,9 +36,13 @@ import android.widget.ImageButton;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.adview.AdWebViewClient;
 import com.criteo.publisher.adview.RedirectionListener;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import java.lang.ref.WeakReference;
 
 public class CriteoInterstitialActivity extends Activity {
+
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private WebView webView;
   private ResultReceiver resultReceiver;
@@ -47,15 +51,24 @@ public class CriteoInterstitialActivity extends Activity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+    try {
+      super.onCreate(savedInstanceState);
+      doOnCreate();
+    } catch (Throwable t) {
+      logger.error("Error while creating interstitial activity.", t);
+      finish();
+    }
+  }
+
+  private void doOnCreate() {
     setContentView(R.layout.activity_criteo_interstitial);
     adLayout = findViewById(R.id.AdLayout);
 
-    /**
-     * {@link WebView}s leak the Activity context:
-     * {@link https://issuetracker.google.com/issues/36918787}. This happens when the {@link WebView}
-     * is created via the XML file. In order to avoid leaking the Activity context, a workaround
-     * consists in creating the WebView by hand by passing the Application context instead.
+    /*
+      {@link WebView}s leak the Activity context:
+      {@link https://issuetracker.google.com/issues/36918787}. This happens when the {@link WebView}
+      is created via the XML file. In order to avoid leaking the Activity context, a workaround
+      consists in creating the WebView by hand by passing the Application context instead.
      */
     webView = new WebView(getApplicationContext());
     adLayout.addView(webView, 0);
@@ -78,7 +91,6 @@ public class CriteoInterstitialActivity extends Activity {
         close();
       }
     });
-
   }
 
   private void close() {
