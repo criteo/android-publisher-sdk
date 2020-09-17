@@ -61,11 +61,6 @@
    public *;
 }
 
--keep public class com.criteo.publisher.model.AdSize
--keepclassmembers class com.criteo.publisher.model.AdSize {
-   public *;
-}
-
 -keep public class com.criteo.publisher.model.AdUnit
 -keepclassmembers class com.criteo.publisher.model.AdUnit {
    public *;
@@ -103,10 +98,6 @@
 -keep public interface com.criteo.publisher.CriteoAdListener {*;}
 
 -keep public interface com.criteo.publisher.CriteoBannerAdListener {*;}
-
--keep public interface com.criteo.publisher.CriteoInterstitialAdListener {*;}
-
--keep public interface com.criteo.publisher.CriteoInterstitialAdDisplayListener {*;}
 
 -keep class com.google.android.gms.ads.** { *; }
 

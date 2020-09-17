@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.util;
 
+import androidx.annotation.NonNull;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +28,7 @@ public final class StreamUtil {
 
   }
 
+  @NonNull
   public static String readStream(InputStream in) throws IOException {
     StringBuilder response = new StringBuilder();
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {

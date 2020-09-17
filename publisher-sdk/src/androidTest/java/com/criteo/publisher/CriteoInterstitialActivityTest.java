@@ -48,10 +48,12 @@ import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import androidx.test.runner.lifecycle.Stage;
 import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.concurrent.ThreadingUtil;
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.mock.ApplicationMock;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
+import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.view.WebViewClicker;
 import com.criteo.publisher.view.WebViewLookup;
@@ -88,6 +90,9 @@ public class CriteoInterstitialActivityTest {
   @Inject
   private InterstitialActivityHelper interstitialActivityHelper;
 
+  @Inject
+  private RunOnUiThreadExecutor runOnUiThreadExecutor;
+
   @Mock
   private CriteoInterstitialAdListener listener;
 
@@ -117,7 +122,7 @@ public class CriteoInterstitialActivityTest {
         mock(TopActivityFinder.class)
     );
 
-    helper.openActivity("content", mock(CriteoInterstitialAdListener.class));
+    helper.openActivity("content", mock(InterstitialListenerNotifier.class));
 
     InOrder inOrder = inOrder(lifecycle);
     inOrder.verify(lifecycle, timeout(2000))
@@ -212,7 +217,13 @@ public class CriteoInterstitialActivityTest {
   @NonNull
   private CriteoInterstitialActivity givenOpenedInterstitialActivity(@NonNull String html) throws Exception {
     Activity activity = lookup.lookForResumedActivity(() -> {
-      interstitialActivityHelper.openActivity(html, listener);
+      InterstitialListenerNotifier listenerNotifier = new InterstitialListenerNotifier(
+          mock(CriteoInterstitial.class),
+          listener,
+          runOnUiThreadExecutor
+      );
+
+      interstitialActivityHelper.openActivity(html, listenerNotifier);
     }).get();
 
     clearInvocations(context);

@@ -43,13 +43,13 @@ import android.os.Looper;
 import android.view.View;
 import android.webkit.WebView;
 import androidx.annotation.NonNull;
+import androidx.annotation.UiThread;
 import androidx.test.filters.FlakyTest;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
-import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.TestAdUnits;
@@ -68,6 +68,7 @@ import com.criteo.publisher.view.WebViewLookup;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -273,7 +274,7 @@ public class StandaloneFunctionalTest {
     AtomicReference<CriteoInterstitial> interstitialRef = new AtomicReference<>();
 
     runOnMainThreadAndWait(() -> {
-      CriteoInterstitial interstitial = new CriteoInterstitial(context, adUnit);
+      CriteoInterstitial interstitial = new CriteoInterstitial(adUnit);
       interstitialRef.set(interstitial);
     });
 
@@ -346,7 +347,7 @@ public class StandaloneFunctionalTest {
     AtomicReference<CriteoInterstitial> interstitial = new AtomicReference<>();
 
     runOnMainThreadAndWait(() -> {
-      interstitial.set(new CriteoInterstitial(context, interstitialAdUnit));
+      interstitial.set(new CriteoInterstitial(interstitialAdUnit));
       interstitial.get().setCriteoInterstitialAdListener(listener);
     });
 
@@ -360,7 +361,7 @@ public class StandaloneFunctionalTest {
     Mockito.clearInvocations(api);
 
     runOnMainThreadAndWait(() -> {
-      CriteoInterstitial interstitial = new CriteoInterstitial(context, validInterstitialAdUnit);
+      CriteoInterstitial interstitial = new CriteoInterstitial(validInterstitialAdUnit);
       interstitial.loadAd();
     });
     waitForBids();
@@ -405,7 +406,7 @@ public class StandaloneFunctionalTest {
 
     InOrder inOrder = inOrder(listener);
     inOrder.verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
-    inOrder.verify(listener).onAdReceived();
+    inOrder.verify(listener).onAdReceived(interstitial);
     inOrder.verifyNoMoreInteractions();
 
     verify(api, times(2)).loadCdb(
@@ -464,14 +465,13 @@ public class StandaloneFunctionalTest {
     CriteoSync(CriteoInterstitial interstitial) {
       this.handler = new Handler(Looper.getMainLooper());
       this.init = () -> {
-        this.isLoaded = new CountDownLatch(2);
+        this.isLoaded = new CountDownLatch(1);
         this.isDisplayed = new CountDownLatch(1);
       };
 
       reset();
 
       SyncAdListener listener = new SyncAdListener();
-      interstitial.setCriteoInterstitialAdDisplayListener(listener);
       interstitial.setCriteoInterstitialAdListener(listener);
     }
 
@@ -522,21 +522,16 @@ public class StandaloneFunctionalTest {
     }
 
     private class SyncAdListener implements CriteoBannerAdListener,
-        CriteoInterstitialAdListener,
-        CriteoInterstitialAdDisplayListener {
+        CriteoInterstitialAdListener {
 
       @Override
       public void onAdReceived(View view) {
         onLoaded();
       }
 
+      @UiThread
       @Override
-      public void onAdReadyToDisplay() {
-        onLoaded();
-      }
-
-      @Override
-      public void onAdReceived() {
+      public void onAdReceived(@NonNull CriteoInterstitial interstitial) {
         onLoaded();
       }
 
@@ -546,25 +541,8 @@ public class StandaloneFunctionalTest {
       }
 
       @Override
-      public void onAdFailedToReceive(CriteoErrorCode code) {
+      public void onAdFailedToReceive(@NotNull CriteoErrorCode code) {
         onFailed();
-      }
-
-      @Override
-      public void onAdFailedToDisplay(CriteoErrorCode error) {
-        onFailed();
-      }
-
-      @Override
-      public void onAdLeftApplication() {
-      }
-
-      @Override
-      public void onAdClicked() {
-      }
-
-      @Override
-      public void onAdClosed() {
       }
     }
   }

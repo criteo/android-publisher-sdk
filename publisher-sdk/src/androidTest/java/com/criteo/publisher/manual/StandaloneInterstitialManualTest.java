@@ -19,23 +19,23 @@ package com.criteo.publisher.manual;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 
-import android.content.Context;
+import androidx.annotation.NonNull;
+import androidx.annotation.UiThread;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
-import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.util.CompletableFuture;
-import org.junit.Before;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Ignore // Those are test that should only be run manually
+@Ignore("Those are test that should only be run manually")
 public class StandaloneInterstitialManualTest {
 
   private static final int INVESTIGATION_TIME_MS = 15_000;
@@ -49,15 +49,8 @@ public class StandaloneInterstitialManualTest {
   private final InterstitialAdUnit interstitialDemo = TestAdUnits.INTERSTITIAL_DEMO;
   private final InterstitialAdUnit interstitialIbvDemo = TestAdUnits.INTERSTITIAL_IBV_DEMO;
 
-  private Context context;
-
   private CriteoInterstitial interstitial;
   private ShowingInterstitialListener listener;
-
-  @Before
-  public void setUp() throws Exception {
-    context = activityRule.getActivity().getApplicationContext();
-  }
 
   /**
    * Here is the list of test scenarios that could be verified through this test case.
@@ -103,11 +96,10 @@ public class StandaloneInterstitialManualTest {
     waitForBids();
 
     runOnMainThreadAndWait(() -> {
-      interstitial = new CriteoInterstitial(context, adUnit);
+      interstitial = new CriteoInterstitial(adUnit);
 
-      listener = new ShowingInterstitialListener(interstitial);
+      listener = new ShowingInterstitialListener();
       interstitial.setCriteoInterstitialAdListener(listener);
-      interstitial.setCriteoInterstitialAdDisplayListener(listener);
 
       interstitial.loadAd();
     });
@@ -124,14 +116,11 @@ public class StandaloneInterstitialManualTest {
     mockedDependenciesRule.waitForIdleState();
   }
 
-  private static class ShowingInterstitialListener implements CriteoInterstitialAdListener,
-      CriteoInterstitialAdDisplayListener {
+  private static class ShowingInterstitialListener implements CriteoInterstitialAdListener {
 
-    private final CriteoInterstitial interstitial;
     private final CompletableFuture<Void> failure;
 
-    private ShowingInterstitialListener(CriteoInterstitial interstitial) {
-      this.interstitial = interstitial;
+    private ShowingInterstitialListener() {
       this.failure = new CompletableFuture<>();
     }
 
@@ -139,42 +128,17 @@ public class StandaloneInterstitialManualTest {
       failure.get();
     }
 
+    @UiThread
     @Override
-    public void onAdReadyToDisplay() {
+    public void onAdReceived(@NonNull CriteoInterstitial interstitial) {
       interstitial.show();
       failure.complete(null);
     }
 
     @Override
-    public void onAdFailedToDisplay(CriteoErrorCode error) {
-      failure.completeExceptionally(
-          new IllegalStateException("Error while displaying the interstitial: " + error.name()));
-    }
-
-    @Override
-    public void onAdFailedToReceive(CriteoErrorCode code) {
+    public void onAdFailedToReceive(@NotNull CriteoErrorCode code) {
       failure.completeExceptionally(
           new IllegalStateException("Error while loading the interstitial: " + code.name()));
-    }
-
-    @Override
-    public void onAdReceived() {
-    }
-
-    @Override
-    public void onAdLeftApplication() {
-    }
-
-    @Override
-    public void onAdClicked() {
-    }
-
-    @Override
-    public void onAdOpened() {
-    }
-
-    @Override
-    public void onAdClosed() {
     }
   }
 

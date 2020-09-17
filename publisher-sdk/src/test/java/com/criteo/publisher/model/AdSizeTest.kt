@@ -13,29 +13,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.criteo.publisher.model
 
-import org.gradle.api.Project
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.Test
 
-private const val sdkBaseVersion = "4.0.0"
+class AdSizeTest {
 
-private val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd.HHmm"))
+  @Test
+  fun testFormattedSize() {
+    val adSize = AdSize(42, 1337)
 
-fun sdkVersion(): String {
-  return sdkBaseVersion
-}
+    val formattedSize = adSize.formattedSize
 
-fun Project.isSnapshot(): Boolean {
-  return properties["isRelease"] != "true"
-}
-
-fun Project.sdkPublicationVersion(): String {
-  val sdkVersion = sdkVersion()
-  return if (isSnapshot()) {
-    "$sdkVersion-$timestamp"
-  } else {
-    sdkVersion
+    assertThat(formattedSize).isEqualTo("42x1337")
   }
-
 }

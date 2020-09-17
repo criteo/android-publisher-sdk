@@ -16,6 +16,8 @@
 
 package com.criteo.publisher;
 
+import androidx.annotation.NonNull;
+
 public interface CriteoAdListener {
 
   /**
@@ -23,7 +25,7 @@ public interface CriteoAdListener {
    *
    * @param code The reason the fetch failed.
    */
-  void onAdFailedToReceive(CriteoErrorCode code);
+  void onAdFailedToReceive(@NonNull CriteoErrorCode code);
 
   /**
    * Called when an ad is clicked.

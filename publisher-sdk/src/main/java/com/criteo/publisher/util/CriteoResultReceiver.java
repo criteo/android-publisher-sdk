@@ -16,12 +16,14 @@
 
 package com.criteo.publisher.util;
 
+import static com.criteo.publisher.CriteoListenerCode.CLICK;
+import static com.criteo.publisher.CriteoListenerCode.CLOSE;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import androidx.annotation.NonNull;
-import com.criteo.publisher.CriteoInterstitialAdListener;
-import java.lang.ref.Reference;
+import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 
 public class CriteoResultReceiver extends ResultReceiver {
 
@@ -31,7 +33,7 @@ public class CriteoResultReceiver extends ResultReceiver {
   public static final int ACTION_LEFT_CLICKED = 202;
 
   @NonNull
-  private final Reference<CriteoInterstitialAdListener> criteoInterstitialAdListenerRef;
+  private final InterstitialListenerNotifier listenerNotifier;
 
   /**
    * Create a new ResultReceive to receive results.  Your {@link #onReceiveResult} method will be
@@ -40,31 +42,24 @@ public class CriteoResultReceiver extends ResultReceiver {
    */
   public CriteoResultReceiver(
       @NonNull Handler handler,
-      @NonNull Reference<CriteoInterstitialAdListener> listenerRef
+      @NonNull InterstitialListenerNotifier listenerNotifier
   ) {
     super(handler);
-    this.criteoInterstitialAdListenerRef = listenerRef;
+    this.listenerNotifier = listenerNotifier;
   }
 
   @Override
   protected void onReceiveResult(int resultCode, Bundle resultData) {
     if (resultCode == RESULT_CODE_SUCCESSFUL) {
       int action = resultData.getInt(INTERSTITIAL_ACTION);
-      CriteoInterstitialAdListener listener = criteoInterstitialAdListenerRef.get();
 
-      if (listener != null) {
-        switch (action) {
-          case ACTION_CLOSED:
-            listener.onAdClosed();
-            break;
-          case ACTION_LEFT_CLICKED:
-            listener.onAdClicked();
-            listener.onAdLeftApplication();
-            break;
-
-          default:
-            break;
-        }
+      switch (action) {
+        case ACTION_CLOSED:
+          listenerNotifier.notifyFor(CLOSE);
+          break;
+        case ACTION_LEFT_CLICKED:
+          listenerNotifier.notifyFor(CLICK);
+          break;
       }
     }
   }
