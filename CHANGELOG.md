@@ -1,3 +1,8 @@
+# Version 3.10.2
+-Bug fix
+ - Ensure `CriteoInterstitialActivity` does not crash when it is open by system and SDK is not
+  initialized yet.
+
 # Version 3.10.1
 - Bug fix
  - Ensure `CriteoInterstitialActivity` does not crash when the `application` object is null.
