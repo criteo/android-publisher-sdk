@@ -77,9 +77,17 @@ public class LiveCdbCallListener extends CdbCallListener {
           "During a live request, only one bid will be fetched at a time."));
     }
     if (isListenerTriggered.compareAndSet(false, true)) {
-      if ((cdbResponse.getSlots().size() == 1) && !bidManager.isBidSilent(cdbResponse.getSlots()
-          .get(0))) {
-        bidListener.onBidResponse(cdbResponse.getSlots().get(0));
+      if (cdbResponse.getSlots().size() == 1) {
+        CdbResponseSlot cdbResponseSlot = cdbResponse.getSlots().get(0);
+        if (bidManager.isBidSilent(cdbResponseSlot)) {
+          bidManager.setCacheAdUnits(
+              cdbResponse.getSlots()
+          );
+          bidListener.onNoBid();
+        } else {
+          bidListener.onBidResponse(cdbResponseSlot);
+          bidLifecycleListener.onBidConsumed(cacheAdUnit, cdbResponseSlot);
+        }
       } else {
         bidListener.onNoBid();
       }

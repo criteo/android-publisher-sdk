@@ -177,7 +177,7 @@ public class BidManager implements ApplicationStoppedListener {
    * load data for next time
    */
   private void fetchForCache(CacheAdUnit cacheAdUnit) {
-    if (cdbTimeToNextCall.get() <= clock.getCurrentTimeInMillis()) {
+    if (!isGlobalSilenceEnabled()) {
       sendBidRequest(Collections.singletonList(cacheAdUnit));
     }
   }
@@ -190,9 +190,6 @@ public class BidManager implements ApplicationStoppedListener {
       @NonNull AdUnit adUnit,
       @NonNull BidListener bidListener
   ) {
-    // TODO: check if global silence is managed correctly
-    //    (cdbTimeToNextCall.get() <= clock.getCurrentTimeInMillis())
-
     if (killSwitchEngaged()) {
       bidListener.onNoBid();
       return;
@@ -204,15 +201,33 @@ public class BidManager implements ApplicationStoppedListener {
       return;
     }
 
+    synchronized (cacheLock) {
+      CdbResponseSlot cachedCdbResponseSlot = cache.peekAdUnit(cacheAdUnit);
+      boolean isCachedBidExpired = cachedCdbResponseSlot != null && hasBidExpired(cachedCdbResponseSlot);
+      boolean isCachedBidUsable = cachedCdbResponseSlot != null && !hasBidExpired(cachedCdbResponseSlot);
+      boolean isGlobalSilenceEnabled = isGlobalSilenceEnabled();
+      boolean isCachedBidSilent = isCachedBidUsable && isBidSilent(cachedCdbResponseSlot);
 
-    liveBidRequestSender.sendLiveBidRequest(cacheAdUnit, new LiveCdbCallListener(
+      if (isCachedBidExpired) {
+        cache.remove(cacheAdUnit);
+      }
+
+      // not allowed to request CDB, but cache has something usable
+      if (isGlobalSilenceEnabled && isCachedBidUsable && !isCachedBidSilent) {
+        cache.remove(cacheAdUnit);
+        bidListener.onBidResponse(cachedCdbResponseSlot);
+      } else if (isGlobalSilenceEnabled || isCachedBidSilent) { // silenced and nothing cached
+        bidListener.onNoBid();
+      } else { // not silenced
+        liveBidRequestSender.sendLiveBidRequest(cacheAdUnit, new LiveCdbCallListener(
             bidListener,
             bidLifecycleListener,
             this,
             cacheAdUnit
-        )
-    );
-    metricSendingQueueConsumer.sendMetricBatch();
+        ));
+      }
+      metricSendingQueueConsumer.sendMetricBatch();
+    }
   }
 
   private void sendBidRequest(List<CacheAdUnit> prefetchCacheAdUnits) {
@@ -267,6 +282,11 @@ public class BidManager implements ApplicationStoppedListener {
     return cdbResponseSlot.isExpired(clock);
   }
 
+  @VisibleForTesting
+  boolean isGlobalSilenceEnabled() {
+    return cdbTimeToNextCall.get() > clock.getCurrentTimeInMillis();
+  }
+
   @Override
   public void onApplicationStopped() {
     bidRequestSender.cancelAllPendingTasks();
@@ -295,27 +315,27 @@ public class BidManager implements ApplicationStoppedListener {
     return cdbResponseSlot.getCpmAsNumber() == null ? 0.0 : cdbResponseSlot.getCpmAsNumber();
   }
 
-  /**
-   * Implementation specific to listening Cdb calls for updating the cache only
-   */
-  private class CacheOnlyCdbCallListener extends CdbCallListener {
+/**
+ * Implementation specific to listening Cdb calls for updating the cache only
+ */
+private class CacheOnlyCdbCallListener extends CdbCallListener {
 
-    public CacheOnlyCdbCallListener() {
-      super(bidLifecycleListener, BidManager.this);
-    }
-
-    @Override
-    public void onCdbResponse(
-        @NonNull CdbRequest cdbRequest,
-        @NonNull CdbResponse cdbResponse
-    ) {
-      setCacheAdUnits(cdbResponse.getSlots());
-      super.onCdbResponse(cdbRequest, cdbResponse);
-    }
-
-    @Override
-    public void onTimeBudgetExceeded() {
-      // no-op
-    }
+  public CacheOnlyCdbCallListener() {
+    super(bidLifecycleListener, BidManager.this);
   }
+
+  @Override
+  public void onCdbResponse(
+      @NonNull CdbRequest cdbRequest,
+      @NonNull CdbResponse cdbResponse
+  ) {
+    setCacheAdUnits(cdbResponse.getSlots());
+    super.onCdbResponse(cdbRequest, cdbResponse);
+  }
+
+  @Override
+  public void onTimeBudgetExceeded() {
+    // no-op
+  }
+}
 }

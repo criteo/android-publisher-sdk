@@ -83,7 +83,7 @@ class LiveCdbCallListenerTests {
   }
 
   @Test
-  fun onBidResponse_givenEmptyResponseServedWithinTimeBudget_ThenDontCache_AndDontPassTheResponseThrough() {
+  fun onBidResponse_givenEmptyResponseServedWithinTimeBudget_ThenDontCache_AndTriggerNoBid() {
     whenever(cdbResponse.slots).thenReturn(listOf())
     whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
     whenever(bidManager.isBidSilent(freshCdbResponseSlot)).thenReturn(false);
@@ -97,10 +97,8 @@ class LiveCdbCallListenerTests {
     verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
   }
 
-  // TODO: silenced bid should be put in cache.
-  // EE-1276
   @Test
-  fun onBidResponse_givenSilentBidServedWithinTimeBudget_ThenDontCache_AndDontPassTheResponseThrough() {
+  fun onBidResponse_givenSilentBidServedWithinTimeBudget_ThenCache_AndTriggerNoBid() {
     whenever(cdbResponse.slots).thenReturn(listOf(freshCdbResponseSlot))
     whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
     whenever(bidManager.isBidSilent(freshCdbResponseSlot)).thenReturn(true);
@@ -110,7 +108,7 @@ class LiveCdbCallListenerTests {
     verify(bidManager).setTimeToNextCall(1_000)
     verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
     verify(bidListener, never()).onBidResponse(any())
-    verify(bidManager, never()).setCacheAdUnits(listOf(freshCdbResponseSlot))
+    verify(bidManager).setCacheAdUnits(listOf(freshCdbResponseSlot))
     verify(bidListener).onNoBid()
   }
 
@@ -133,52 +131,9 @@ class LiveCdbCallListenerTests {
     verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, cachedCdbResponseSlot)
   }
 
-  // TODO: EE-1276 if cache entry is silenced, a CDB call must not be made in the first place
-  @Test
-  fun onBidResponse_givenTimeBudgetExceeded_AndCacheEntryIsSilentBid_ThenDontReturnCachedEntry_AndCacheNewResponse() {
-    whenever(cdbResponse.slots).thenReturn(listOf(freshCdbResponseSlot))
-    whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
-    whenever(bidManager.isBidSilent(cachedCdbResponseSlot)).thenReturn(true)
-    whenever(bidManager.hasBidExpired(cachedCdbResponseSlot)).thenReturn(false)
-    whenever(bidManager.consumeCachedBid(cacheAdUnit)).thenReturn(cachedCdbResponseSlot)
-
-    liveCdbCallListener.onTimeBudgetExceeded()
-    liveCdbCallListener.onCdbResponse(cdbRequest, cdbResponse)
-
-    verify(bidManager).consumeCachedBid(cacheAdUnit)
-    verify(bidManager).setTimeToNextCall(1_000)
-    verify(bidManager).setCacheAdUnits(cdbResponse.slots)
-    verify(bidListener, never()).onBidResponse(cachedCdbResponseSlot)
-    verify(bidListener, never()).onBidResponse(freshCdbResponseSlot)
-    verify(bidListener).onNoBid()
-    verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
-    verify(bidLifecycleListener).onBidConsumed(any(), any())
-  }
 
   @Test
   fun onBidResponse_givenTimeBudgetExceeded_AndCacheEntryExpired_ThenCacheNewResponse_AndTriggerNoBid() {
-    whenever(cdbResponse.slots).thenReturn(listOf(freshCdbResponseSlot))
-    whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
-    whenever(bidManager.consumeCachedBid(cacheAdUnit)).thenReturn(null)
-    whenever(bidManager.hasBidExpired(cachedCdbResponseSlot)).thenReturn(true);
-    whenever(bidManager.isBidSilent(cachedCdbResponseSlot)).thenReturn(false)
-    whenever(bidManager.consumeCachedBid(cacheAdUnit)).thenReturn(cachedCdbResponseSlot)
-
-    liveCdbCallListener.onTimeBudgetExceeded()
-    liveCdbCallListener.onCdbResponse(cdbRequest, cdbResponse)
-
-    verify(bidManager).consumeCachedBid(cacheAdUnit)
-    verify(bidManager).setTimeToNextCall(1_000)
-    verify(bidManager).setCacheAdUnits(cdbResponse.slots)
-    verify(bidListener, never()).onBidResponse(cachedCdbResponseSlot)
-    verify(bidListener, never()).onBidResponse(freshCdbResponseSlot)
-    verify(bidListener).onNoBid()
-    verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
-    verify(bidLifecycleListener).onBidConsumed(any(), any())
-  }
-
-  @Test
-  fun onBidResponse_givenTimeBudgetExceeded_CacheEntryExpired_AndSilent_ThenCacheNewResponse_AndTriggerNoBid() {
     whenever(cdbResponse.slots).thenReturn(listOf(freshCdbResponseSlot))
     whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
     whenever(bidManager.consumeCachedBid(cacheAdUnit)).thenReturn(null)

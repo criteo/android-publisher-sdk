@@ -338,7 +338,7 @@ public class StandaloneFunctionalTest {
   }
 
   @Test
-  public void whenLoadingAnInterstitial_GivenTimeBudgetExceededAndNoBidInCache_OnAdFailedToReceivedIsCalledWithNoFill()
+  public void whenLoadingAnInterstitial_GivenLiveBiddingEnabled_TimeBudgetExceeded_AndNoBidInCache_OnAdFailedToReceivedIsCalledWithNoFill()
       throws Exception {
     givenLiveBidding(true);
     givenTimeBudgetExceededWhenFetchingLiveBids();
@@ -356,7 +356,7 @@ public class StandaloneFunctionalTest {
   }
 
   @Test
-  public void whenLoadingAnInterstitial_GivenTimeBudgetNotExceeded_OnAdReceivedIsCalled()
+  public void whenLoadingAnInterstitial_GivenLiveBiddingEnabled_TimeBudgetNotExceeded_OnAdReceivedIsCalled()
       throws Exception {
     givenLiveBidding(true);
     givenInitializedSdk();
@@ -372,7 +372,7 @@ public class StandaloneFunctionalTest {
   }
 
   @Test
-  public void whenLoadingABanner_GivenTimeBudgetExceeded_NoBidInCache_OnAdFailedToReceivedIsCalledWithNoFill()
+  public void whenLoadingABanner_GivenLiveBiddingEnabled_TimeBudgetExceeded_AndNoBidInCache_OnAdFailedToReceivedIsCalledWithNoFill()
       throws Exception {
     givenLiveBidding(true);
     givenTimeBudgetExceededWhenFetchingLiveBids();
@@ -390,7 +390,7 @@ public class StandaloneFunctionalTest {
   }
 
   @Test
-  public void whenLoadingABanner_GivenTimeBudgetNotExceeded_NoBidInCache_OnAdRereceivedIsCalled()
+  public void whenLoadingABanner_GivenLiveBiddingEnabled_TimeBudgetNotExceeded_AndNoBidInCache_OnAdRereceivedIsCalled()
       throws Exception {
     givenLiveBidding(true);
     givenInitializedSdk();
