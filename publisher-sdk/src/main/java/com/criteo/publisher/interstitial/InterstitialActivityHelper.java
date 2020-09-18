@@ -24,13 +24,11 @@ import android.content.pm.ResolveInfo;
 import android.os.Handler;
 import android.os.Looper;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.CriteoInterstitialActivity;
-import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.activity.TopActivityFinder;
+import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 import com.criteo.publisher.util.CriteoResultReceiver;
-import java.lang.ref.WeakReference;
 
 public class InterstitialActivityHelper {
 
@@ -70,12 +68,13 @@ public class InterstitialActivityHelper {
 
   public void openActivity(
       @NonNull String webViewContent,
-      @Nullable CriteoInterstitialAdListener listener) {
+      @NonNull InterstitialListenerNotifier listenerNotifier
+  ) {
     if (!isAvailable()) {
       return;
     }
 
-    CriteoResultReceiver criteoResultReceiver = createReceiver(listener);
+    CriteoResultReceiver criteoResultReceiver = createReceiver(listenerNotifier);
     ComponentName hostActivityName = topActivityFinder.getTopActivityName();
 
     Intent intent = createIntent();
@@ -93,7 +92,7 @@ public class InterstitialActivityHelper {
   }
 
   @VisibleForTesting
-  CriteoResultReceiver createReceiver(@Nullable CriteoInterstitialAdListener listener) {
-    return new CriteoResultReceiver(new Handler(Looper.getMainLooper()), new WeakReference<>(listener));
+  CriteoResultReceiver createReceiver(@NonNull InterstitialListenerNotifier listenerNotifier) {
+    return new CriteoResultReceiver(new Handler(Looper.getMainLooper()), listenerNotifier);
   }
 }

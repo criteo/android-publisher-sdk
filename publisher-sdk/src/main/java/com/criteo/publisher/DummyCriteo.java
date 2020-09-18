@@ -27,6 +27,7 @@ import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
+import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 import com.criteo.publisher.util.AdUnitType;
 import java.util.concurrent.Future;
 
@@ -122,8 +123,10 @@ public class DummyCriteo extends Criteo {
     }
 
     @Override
-    public void openActivity(@NonNull String webViewContent,
-        @Nullable CriteoInterstitialAdListener listener) {
+    public void openActivity(
+        @NonNull String webViewContent,
+        @NonNull InterstitialListenerNotifier listenerNotifier
+    ) {
     }
   }
 }

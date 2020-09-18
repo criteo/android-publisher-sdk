@@ -37,9 +37,9 @@ import android.webkit.WebView;
 import androidx.annotation.NonNull;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.CriteoInterstitialActivity;
-import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.util.CriteoResultReceiver;
 import com.criteo.publisher.view.WebViewLookup;
@@ -64,7 +64,7 @@ public class InterstitialActivityHelperTest {
   private TopActivityFinder topActivityFinder;
 
   @Mock
-  private CriteoInterstitialAdListener listener;
+  private InterstitialListenerNotifier listenerNotifier;
 
   private InterstitialActivityHelper helper;
 
@@ -102,10 +102,10 @@ public class InterstitialActivityHelperTest {
     ComponentName expectedCallingActivity = activityRule.getActivity().getComponentName();
 
     CriteoResultReceiver expectedReceiver = mock(CriteoResultReceiver.class);
-    doReturn(expectedReceiver).when(helper).createReceiver(listener);
+    doReturn(expectedReceiver).when(helper).createReceiver(listenerNotifier);
     doReturn(true).when(helper).isAvailable();
 
-    helper.openActivity("myContent", listener);
+    helper.openActivity("myContent", listenerNotifier);
 
     verify(context).startActivity(argThat(intent -> {
       assertEquals(expectedComponent, intent.getComponent());
@@ -127,7 +127,7 @@ public class InterstitialActivityHelperTest {
 
   private String openInterstitialAndGetHtml(String content) throws Exception {
     Activity activity = webViewLookup.lookForResumedActivity(() -> {
-      helper.openActivity(content, listener);
+      helper.openActivity(content, listenerNotifier);
     }).get();
 
     View root = activity.getWindow().getDecorView();

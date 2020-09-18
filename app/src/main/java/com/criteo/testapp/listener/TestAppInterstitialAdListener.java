@@ -18,8 +18,12 @@ package com.criteo.testapp.listener;
 
 import android.util.Log;
 import android.widget.Button;
+import androidx.annotation.NonNull;
+import androidx.annotation.UiThread;
 import com.criteo.publisher.CriteoErrorCode;
+import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdListener;
+import org.jetbrains.annotations.NotNull;
 
 public class TestAppInterstitialAdListener implements CriteoInterstitialAdListener {
 
@@ -27,21 +31,24 @@ public class TestAppInterstitialAdListener implements CriteoInterstitialAdListen
   private final String prefix;
   private final Button btnShowInterstitial;
 
-  public TestAppInterstitialAdListener(String tag, String prefix,
-      Button btnShowInterstitial) {
+  public TestAppInterstitialAdListener(
+      String tag, String prefix,
+      Button btnShowInterstitial
+  ) {
     this.tag = tag;
     this.prefix = prefix;
     this.btnShowInterstitial = btnShowInterstitial;
   }
 
+  @UiThread
   @Override
-  public void onAdReceived() {
+  public void onAdReceived(@NonNull CriteoInterstitial interstitial) {
     btnShowInterstitial.setEnabled(true);
-    Log.d(tag, prefix + " - Interstitial onAdReceived");
+    Log.d(tag, prefix + "Interstitial ad called onAdReceived");
   }
 
   @Override
-  public void onAdFailedToReceive(CriteoErrorCode code) {
+  public void onAdFailedToReceive(@NotNull CriteoErrorCode code) {
     Log.d(tag, prefix + " - Interstitial onAdFailedToReceive");
   }
 

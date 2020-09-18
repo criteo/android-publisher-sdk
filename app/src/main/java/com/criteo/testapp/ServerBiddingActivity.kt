@@ -21,9 +21,7 @@ import android.widget.Button
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import com.criteo.publisher.CriteoBannerView
-import com.criteo.publisher.CriteoErrorCode
 import com.criteo.publisher.CriteoInterstitial
-import com.criteo.publisher.CriteoInterstitialAdDisplayListener
 
 class ServerBiddingActivity : AppCompatActivity() {
 
@@ -45,19 +43,14 @@ class ServerBiddingActivity : AppCompatActivity() {
 
     val buttonInterstitial: Button = findViewById(R.id.buttonInterstitial)
     buttonInterstitial.setOnClickListener {
-      criteoInterstitial = CriteoInterstitial(this.baseContext)
-      criteoInterstitial.setCriteoInterstitialAdDisplayListener(object :
-          CriteoInterstitialAdDisplayListener {
-        override fun onAdFailedToDisplay(error: CriteoErrorCode?) {
-          // no-op
-        }
-
-        override fun onAdReadyToDisplay() {
-          criteoInterstitial.show()
-        }
-      })
-      criteoInterstitial.loadAdWithDisplayData("https://rdi.eu.criteo.com/delivery/rtb/demo/ajs?" +
-          "zoneid=1417086&width=393&height=759&ibva=1&uaCap=5")
+      criteoInterstitial = CriteoInterstitial()
+      criteoInterstitial.setCriteoInterstitialAdListener {
+        it.show()
+      }
+      criteoInterstitial.loadAdWithDisplayData(
+          "https://rdi.eu.criteo.com/delivery/rtb/demo/ajs?" +
+              "zoneid=1417086&width=393&height=759&ibva=1&uaCap=5"
+      )
     }
   }
 

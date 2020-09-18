@@ -13,12 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.criteo.publisher.model
 
-package com.criteo.publisher;
+import androidx.annotation.Keep
 
-public interface CriteoInterstitialAdDisplayListener {
+@Keep
+data class AdSize(val width: Int, val height: Int) {
 
-  void onAdReadyToDisplay();
-
-  void onAdFailedToDisplay(CriteoErrorCode error);
+  val formattedSize: String
+    get() = width.toString() + "x" + height
 }

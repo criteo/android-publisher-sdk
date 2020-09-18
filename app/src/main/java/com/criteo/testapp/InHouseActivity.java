@@ -36,7 +36,6 @@ import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.testapp.integration.MockedIntegrationRegistry;
 import com.criteo.testapp.listener.TestAppBannerAdListener;
-import com.criteo.testapp.listener.TestAppInterstitialAdDisplayListener;
 import com.criteo.testapp.listener.TestAppInterstitialAdListener;
 import com.criteo.testapp.listener.TestAppNativeAdListener;
 
@@ -124,11 +123,9 @@ public class InHouseActivity extends AppCompatActivity {
   private void loadInterstitialAd(InterstitialAdUnit adUnit, Button btnShow) {
     String prefix = "In-House " + adUnit.getAdUnitId();
 
-    CriteoInterstitial interstitial = new CriteoInterstitial(context, adUnit);
+    CriteoInterstitial interstitial = new CriteoInterstitial(adUnit);
     interstitial.setCriteoInterstitialAdListener(
         new TestAppInterstitialAdListener(TAG, prefix, btnShow));
-    interstitial.setCriteoInterstitialAdDisplayListener(
-        new TestAppInterstitialAdDisplayListener(TAG, prefix));
 
     btnShow.setOnClickListener(v -> showInterstitial(interstitial));
 

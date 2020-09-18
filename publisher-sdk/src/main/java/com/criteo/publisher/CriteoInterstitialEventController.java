@@ -17,29 +17,22 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.CriteoListenerCode.INVALID;
-import static com.criteo.publisher.CriteoListenerCode.VALID;
+import static com.criteo.publisher.CriteoListenerCode.OPEN;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
-import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.WebViewData;
-import com.criteo.publisher.tasks.CriteoInterstitialListenerCallTask;
+import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 import com.criteo.publisher.util.AdUnitType;
 
 
 public class CriteoInterstitialEventController {
-
-  @Nullable
-  private final CriteoInterstitialAdListener criteoInterstitialAdListener;
-
-  @Nullable
-  private final CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
 
   @NonNull
   private final WebViewData webViewData;
@@ -54,21 +47,19 @@ public class CriteoInterstitialEventController {
   private final InterstitialActivityHelper interstitialActivityHelper;
 
   @NonNull
-  private final RunOnUiThreadExecutor executor;
+  private final InterstitialListenerNotifier listenerNotifier;
 
   public CriteoInterstitialEventController(
-      @Nullable CriteoInterstitialAdListener listener,
-      @Nullable CriteoInterstitialAdDisplayListener adDisplayListener,
       @NonNull WebViewData webViewData,
       @NonNull InterstitialActivityHelper interstitialActivityHelper,
-      @NonNull Criteo criteo) {
-    this.criteoInterstitialAdListener = listener;
-    this.criteoInterstitialAdDisplayListener = adDisplayListener;
+      @NonNull Criteo criteo,
+      @NonNull InterstitialListenerNotifier listenerNotifier
+  ) {
     this.webViewData = webViewData;
     this.interstitialActivityHelper = interstitialActivityHelper;
     this.criteo = criteo;
     this.deviceInfo = criteo.getDeviceInfo();
-    this.executor = DependencyProvider.getInstance().provideRunOnUiThreadExecutor();
+    this.listenerNotifier = listenerNotifier;
   }
 
   public boolean isAdLoaded() {
@@ -77,7 +68,7 @@ public class CriteoInterstitialEventController {
 
   public void fetchAdAsync(@Nullable AdUnit adUnit) {
     if (!interstitialActivityHelper.isAvailable()) {
-      notifyFor(INVALID);
+      notifyForFailure();
       return;
     }
 
@@ -90,10 +81,9 @@ public class CriteoInterstitialEventController {
     CdbResponseSlot slot = criteo.getBidForAdUnit(adUnit);
 
     if (slot == null) {
-      notifyFor(INVALID);
+      notifyForFailure();
       webViewData.downloadFailed();
     } else {
-      notifyFor(VALID);
       fetchCreativeAsync(slot.getDisplayUrl());
     }
   }
@@ -102,23 +92,22 @@ public class CriteoInterstitialEventController {
     DisplayUrlTokenValue tokenValue = criteo.getTokenValue(bidToken, AdUnitType.CRITEO_INTERSTITIAL);
 
     if (tokenValue == null) {
-      notifyFor(INVALID);
+      notifyForFailure();
     } else {
-      notifyFor(VALID);
       fetchCreativeAsync(tokenValue.getDisplayUrl());
     }
   }
 
-  void notifyFor(@NonNull CriteoListenerCode code) {
-    executor
-        .executeAsync(new CriteoInterstitialListenerCallTask(criteoInterstitialAdListener, code));
+  void notifyForFailure() {
+    listenerNotifier.notifyFor(INVALID);
   }
 
   void fetchCreativeAsync(@NonNull String displayUrl) {
     webViewData.fillWebViewHtmlContent(
         displayUrl,
         deviceInfo,
-        criteoInterstitialAdDisplayListener);
+        listenerNotifier
+    );
   }
 
   public void show() {
@@ -127,11 +116,8 @@ public class CriteoInterstitialEventController {
     }
 
     String webViewContent = webViewData.getContent();
-    interstitialActivityHelper.openActivity(webViewContent, criteoInterstitialAdListener);
-
-    if (criteoInterstitialAdListener != null) {
-      criteoInterstitialAdListener.onAdOpened();
-    }
+    interstitialActivityHelper.openActivity(webViewContent, listenerNotifier);
+    listenerNotifier.notifyFor(OPEN);
 
     webViewData.refresh();
   }

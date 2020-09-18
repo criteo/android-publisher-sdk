@@ -17,13 +17,12 @@
 package com.criteo.publisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
@@ -31,6 +30,7 @@ import androidx.annotation.NonNull;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.WebViewData;
+import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -39,10 +39,7 @@ import org.mockito.MockitoAnnotations;
 public class CriteoInterstitialEventControllerTest {
 
   @Mock
-  private CriteoInterstitialAdListener listener;
-
-  @Mock
-  private CriteoInterstitialAdDisplayListener displayListener;
+  private InterstitialListenerNotifier listenerNotifier;
 
   @Mock
   private WebViewData webViewData;
@@ -89,8 +86,8 @@ public class CriteoInterstitialEventControllerTest {
 
     controller.show();
 
-    verifyZeroInteractions(context);
-    verifyZeroInteractions(listener);
+    verifyNoInteractions(context);
+    verifyNoInteractions(listenerNotifier);
   }
 
   @Test
@@ -99,16 +96,7 @@ public class CriteoInterstitialEventControllerTest {
 
     controller.show();
 
-    verify(listener).onAdOpened();
-  }
-
-  @Test
-  public void show_GivenLoadedWebViewDataAndNullListener_DoesNotCrash() throws Exception {
-    givenLoadedWebViewData();
-    listener = null;
-    controller = createController();
-
-    assertThatCode(() -> controller.show()).doesNotThrowAnyException();
+    verify(listenerNotifier).notifyFor(CriteoListenerCode.OPEN);
   }
 
   @Test
@@ -117,7 +105,7 @@ public class CriteoInterstitialEventControllerTest {
 
     controller.show();
 
-    verify(interstitialActivityHelper).openActivity("myContent", listener);
+    verify(interstitialActivityHelper).openActivity("myContent", listenerNotifier);
   }
 
   @Test
@@ -136,7 +124,7 @@ public class CriteoInterstitialEventControllerTest {
     controller.fetchAdAsync(mock(AdUnit.class));
 
     verify(controller, never()).fetchCreativeAsync(any());
-    verify(controller).notifyFor(CriteoListenerCode.INVALID);
+    verify(controller).notifyForFailure();
     verify(criteo, never()).getBidForAdUnit(any());
   }
 
@@ -152,11 +140,10 @@ public class CriteoInterstitialEventControllerTest {
   @NonNull
   private CriteoInterstitialEventController createController() {
     return new CriteoInterstitialEventController(
-        listener,
-        displayListener,
         webViewData,
         interstitialActivityHelper,
-        criteo
+        criteo,
+        listenerNotifier
     );
   }
 

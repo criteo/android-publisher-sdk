@@ -1,3 +1,19 @@
+# Next version
+
+# Version 4.0.0
+
+- Breaking changes
+  - Remove `Context` parameter from `CriteoInterstitial` constructor
+  - Remove `Parcelable` implementation from `AdSize` class
+  - Move `CriteoInterstitialAdDisplayListener#onAdFailedToDisplay(CriteoErrorCode)` to
+   `CriteoInterstitialAdListener#onAdFailedToReceive(CriteoErrorCode)`. This callback is fired
+    when an error happens after requesting an interstitial ad.
+  - Move `CriteoInterstitialAdDisplayListener#onAdReadyToDisplay()` to
+   `CriteoInterstitialAdListener#onAdReceived(CriteoInterstitial)`. This callback is fired when an
+    interstitial ad is ready to be displayed.
+  - Provide default implementation in interstitial listener. Java 8 is required, see
+  https://developer.android.com/studio/write/java8-support.
+
 # Version 3.10.1
 - Bug fix
  - Ensure `CriteoInterstitialActivity` does not crash when the `application` object is null.

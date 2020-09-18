@@ -16,22 +16,26 @@
 
 package com.criteo.publisher;
 
-import android.content.Context;
 import android.util.Log;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.WebViewData;
+import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 import com.criteo.publisher.util.ObjectUtils;
+import org.jetbrains.annotations.NotNull;
 
 public class CriteoInterstitial {
 
   private static final String TAG = CriteoInterstitial.class.getSimpleName();
 
+  @Nullable
   private final InterstitialAdUnit interstitialAdUnit;
 
   /**
@@ -49,23 +53,17 @@ public class CriteoInterstitial {
   @Nullable
   private CriteoInterstitialAdListener criteoInterstitialAdListener;
 
-  @Nullable
-  private CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
-
   /**
    * Used by server side bidding and in-house auction
    */
-  public CriteoInterstitial(@SuppressWarnings("unused") @NonNull Context context) {
-    this(context, null);
+  public CriteoInterstitial() {
+    this(null);
   }
 
   /**
    * Used by Standalone
    */
-  public CriteoInterstitial(
-      @SuppressWarnings("unused") @NonNull Context context,
-      InterstitialAdUnit interstitialAdUnit
-  ) {
+  public CriteoInterstitial(InterstitialAdUnit interstitialAdUnit) {
     this(interstitialAdUnit, null);
   }
 
@@ -82,12 +80,6 @@ public class CriteoInterstitial {
       @Nullable CriteoInterstitialAdListener criteoInterstitialAdListener
   ) {
     this.criteoInterstitialAdListener = criteoInterstitialAdListener;
-  }
-
-  public void setCriteoInterstitialAdDisplayListener(
-      @Nullable CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener
-  ) {
-    this.criteoInterstitialAdDisplayListener = criteoInterstitialAdDisplayListener;
   }
 
   public void loadAd() {
@@ -128,7 +120,6 @@ public class CriteoInterstitial {
       return;
     }
 
-    getOrCreateController().notifyFor(CriteoListenerCode.VALID);
     getOrCreateController().fetchCreativeAsync(displayData);
   }
 
@@ -172,12 +163,17 @@ public class CriteoInterstitial {
     if (criteoInterstitialEventController == null) {
       Criteo criteo = getCriteo();
 
-      criteoInterstitialEventController = new CriteoInterstitialEventController(
+      InterstitialListenerNotifier listenerNotifier = new InterstitialListenerNotifier(
+          this,
           criteoInterstitialAdListener,
-          criteoInterstitialAdDisplayListener,
-          new WebViewData(criteo.getConfig()),
+          getRunOnUiThreadExecutor()
+      );
+
+      criteoInterstitialEventController = new CriteoInterstitialEventController(
+          new WebViewData(criteo.getConfig(), getPubSdkApi()),
           criteo.getInterstitialActivityHelper(),
-          criteo
+          criteo,
+          listenerNotifier
       );
     }
     return criteoInterstitialEventController;
@@ -191,6 +187,16 @@ public class CriteoInterstitial {
   @NonNull
   private IntegrationRegistry getIntegrationRegistry() {
     return DependencyProvider.getInstance().provideIntegrationRegistry();
+  }
+
+  @NonNull
+  private PubSdkApi getPubSdkApi() {
+    return DependencyProvider.getInstance().providePubSdkApi();
+  }
+
+  @NotNull
+  private RunOnUiThreadExecutor getRunOnUiThreadExecutor() {
+    return DependencyProvider.getInstance().provideRunOnUiThreadExecutor();
   }
 
 }

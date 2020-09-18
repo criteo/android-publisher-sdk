@@ -107,7 +107,7 @@ public class StandaloneDegradedTest {
   @Test
   public void whenLoadingAnInterstitial_ShouldNotDoAnyCallToCdb() throws Exception {
     runOnMainThreadAndWait(() -> {
-      CriteoInterstitial interstitial = new CriteoInterstitial(context, interstitialAdUnit);
+      CriteoInterstitial interstitial = new CriteoInterstitial(interstitialAdUnit);
 
       interstitial.loadAd();
     });
@@ -122,7 +122,7 @@ public class StandaloneDegradedTest {
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
 
     CriteoInterstitial interstitial = callOnMainThreadAndWait(() ->
-        new CriteoInterstitial(context, interstitialAdUnit));
+        new CriteoInterstitial(interstitialAdUnit));
 
     interstitial.setCriteoInterstitialAdListener(listener);
 
@@ -133,7 +133,7 @@ public class StandaloneDegradedTest {
     runOnMainThreadAndWait(interstitial::loadAd);
     waitForIdleState();
 
-    verify(listener, never()).onAdReceived();
+    verify(listener, never()).onAdReceived(interstitial);
     verify(listener, times(2)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
   }
 

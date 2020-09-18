@@ -16,22 +16,25 @@
 
 package com.criteo.publisher.tasks;
 
-import android.os.AsyncTask;
-import android.util.Log;
+import static com.criteo.publisher.CriteoListenerCode.INVALID_CREATIVE;
+import static com.criteo.publisher.CriteoListenerCode.VALID;
+
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.criteo.publisher.CriteoErrorCode;
-import com.criteo.publisher.CriteoInterstitialAdDisplayListener;
+import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.WebViewData;
+import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.util.StreamUtil;
 import com.criteo.publisher.util.TextUtils;
-import java.net.HttpURLConnection;
+import java.io.InputStream;
 import java.net.URL;
+import org.jetbrains.annotations.NotNull;
 
-public class WebViewDataTask extends AsyncTask<String, Void, String> {
+public class WebViewDataTask extends SafeRunnable {
 
-  private static final String TAG = "Criteo.WVDT";
+  @NonNull
+  private final String displayUrl;
 
   @NonNull
   private final WebViewData webviewData;
@@ -39,71 +42,63 @@ public class WebViewDataTask extends AsyncTask<String, Void, String> {
   @NonNull
   private final DeviceInfo deviceInfo;
 
-  @Nullable
-  private final CriteoInterstitialAdDisplayListener criteoInterstitialAdDisplayListener;
+  @NonNull
+  private final InterstitialListenerNotifier listenerNotifier;
 
-  public WebViewDataTask(@NonNull WebViewData webviewData,
+  @NonNull
+  private final PubSdkApi api;
+
+  public WebViewDataTask(
+      @NonNull String displayUrl,
+      @NonNull WebViewData webviewData,
       @NonNull DeviceInfo deviceInfo,
-      @Nullable CriteoInterstitialAdDisplayListener adDisplayListener) {
+      @NonNull InterstitialListenerNotifier listenerNotifier,
+      @NonNull PubSdkApi api
+  ) {
+    this.displayUrl = displayUrl;
     this.webviewData = webviewData;
     this.deviceInfo = deviceInfo;
-    this.criteoInterstitialAdDisplayListener = adDisplayListener;
+    this.listenerNotifier = listenerNotifier;
+    this.api = api;
   }
 
   @Override
-  protected String doInBackground(String... args) {
-    try {
-      return doWebViewDataTask(args);
-    } catch (Throwable tr) {
-      Log.e(TAG, "Internal WVDT exec error.", tr);
-    }
+  public void runSafely() throws Exception {
+    String creative = null;
 
-    return null;
+    try {
+      creative = downloadCreative();
+    } finally {
+      if (TextUtils.isEmpty(creative)) {
+        notifyForFailure();
+      } else {
+        notifyForSuccess(creative);
+      }
+    }
   }
 
-  private String doWebViewDataTask(String[] args) throws Exception {
-    String displayUrl = args[0];
+  @NonNull
+  @VisibleForTesting
+  String downloadCreative() throws Exception {
+    URL url = new URL(displayUrl);
     String userAgent = deviceInfo.getUserAgent().get();
 
-    URL url = new URL(displayUrl);
-
-    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-    urlConnection.setRequestMethod("GET");
-    urlConnection.setRequestProperty("Content-Type", "text/plain");
-    if (!TextUtils.isEmpty(userAgent)) {
-      urlConnection.setRequestProperty("User-Agent", userAgent);
-    }
-
-    if (urlConnection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-      return StreamUtil.readStream(urlConnection.getInputStream());
-    }
-
-    return null;
-  }
-
-  @Override
-  protected void onPostExecute(@Nullable String data) {
-    try {
-      doOnPostExecute(data);
-    } catch (Throwable tr) {
-      Log.e(TAG, "Internal WVDT PostExec error.", tr);
+    try (InputStream stream = api.executeRawGet(url, userAgent)) {
+      return StreamUtil.readStream(stream);
     }
   }
 
-  private void doOnPostExecute(@Nullable String data) {
-    if (TextUtils.isEmpty(data)) {
-      webviewData.downloadFailed();
-      if (criteoInterstitialAdDisplayListener != null) {
-        criteoInterstitialAdDisplayListener
-            .onAdFailedToDisplay(CriteoErrorCode.ERROR_CODE_NETWORK_ERROR);
-      }
-    } else {
-      webviewData.setContent(data);
-      webviewData.downloadSucceeded();
-      if (criteoInterstitialAdDisplayListener != null) {
-        criteoInterstitialAdDisplayListener.onAdReadyToDisplay();
-      }
-    }
+  @VisibleForTesting
+  void notifyForSuccess(@NotNull String creative) {
+    webviewData.setContent(creative);
+    webviewData.downloadSucceeded();
+    listenerNotifier.notifyFor(VALID);
+  }
+
+  @VisibleForTesting
+  void notifyForFailure() {
+    webviewData.downloadFailed();
+    listenerNotifier.notifyFor(INVALID_CREATIVE);
   }
 
 }

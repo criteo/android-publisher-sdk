@@ -19,6 +19,8 @@ package com.criteo.publisher;
 public enum CriteoListenerCode {
   VALID,
   INVALID,
+  INVALID_CREATIVE,
   CLICK,
-  CLOSE
+  CLOSE,
+  OPEN
 }
