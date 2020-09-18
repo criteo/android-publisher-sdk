@@ -105,7 +105,7 @@ public class CriteoInterstitialEventControllerTest {
 
     controller.show();
 
-    verify(interstitialActivityHelper).openActivity("myContent", listenerNotifier);
+    verify(interstitialActivityHelper).openActivity("myContent", listenerNotifier, -1);
   }
 
   @Test

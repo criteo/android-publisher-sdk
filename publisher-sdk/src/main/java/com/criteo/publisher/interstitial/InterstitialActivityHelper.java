@@ -32,6 +32,7 @@ import com.criteo.publisher.util.CriteoResultReceiver;
 
 public class InterstitialActivityHelper {
 
+  public static final String WEB_VIEW_ID = "webviewid";
   public static final String WEB_VIEW_DATA = "webviewdata";
   public static final String RESULT_RECEIVER = "resultreceiver";
   public static final String CALLING_ACTIVITY = "callingactivity";
@@ -68,7 +69,8 @@ public class InterstitialActivityHelper {
 
   public void openActivity(
       @NonNull String webViewContent,
-      @NonNull InterstitialListenerNotifier listenerNotifier
+      @NonNull InterstitialListenerNotifier listenerNotifier,
+      int webViewId
   ) {
     if (!isAvailable()) {
       return;
@@ -82,6 +84,7 @@ public class InterstitialActivityHelper {
     intent.putExtra(WEB_VIEW_DATA, webViewContent);
     intent.putExtra(RESULT_RECEIVER, criteoResultReceiver);
     intent.putExtra(CALLING_ACTIVITY, hostActivityName);
+    intent.putExtra(WEB_VIEW_ID, webViewId);
 
     context.startActivity(intent);
   }

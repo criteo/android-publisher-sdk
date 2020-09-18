@@ -60,7 +60,7 @@ public class InterstitialActivityHelperUnitTest {
   public void openActivity_GivenNotAvailableActivity_DoesNothing() throws Exception {
     doReturn(false).when(helper).isAvailable();
 
-    helper.openActivity("myContent", listenerNotifier);
+    helper.openActivity("myContent", listenerNotifier, -1);
 
     verifyZeroInteractions(context);
   }
@@ -69,7 +69,7 @@ public class InterstitialActivityHelperUnitTest {
   public void openActivity_GivenAvailableActivity_StartActivity() throws Exception {
     doReturn(true).when(helper).isAvailable();
 
-    helper.openActivity("myContent", listenerNotifier);
+    helper.openActivity("myContent", listenerNotifier, -1);
 
     verify(context).startActivity(any());
   }

@@ -19,6 +19,7 @@ package com.criteo.publisher;
 import static com.criteo.publisher.interstitial.InterstitialActivityHelper.CALLING_ACTIVITY;
 import static com.criteo.publisher.interstitial.InterstitialActivityHelper.RESULT_RECEIVER;
 import static com.criteo.publisher.interstitial.InterstitialActivityHelper.WEB_VIEW_DATA;
+import static com.criteo.publisher.interstitial.InterstitialActivityHelper.WEB_VIEW_ID;
 import static com.criteo.publisher.util.CriteoResultReceiver.ACTION_CLOSED;
 import static com.criteo.publisher.util.CriteoResultReceiver.ACTION_LEFT_CLICKED;
 import static com.criteo.publisher.util.CriteoResultReceiver.INTERSTITIAL_ACTION;
@@ -28,19 +29,27 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.os.Bundle;
 import android.os.ResultReceiver;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.adview.AdWebViewClient;
 import com.criteo.publisher.adview.RedirectionListener;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import java.lang.ref.WeakReference;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class CriteoInterstitialActivity extends Activity {
+
+  public static Map<Integer, WebView> webViewsById = new ConcurrentHashMap<>();
+  public static Map<Integer, WeakReference<CriteoInterstitialActivity>> activitiesById = new ConcurrentHashMap<>();
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -71,7 +80,6 @@ public class CriteoInterstitialActivity extends Activity {
       consists in creating the WebView by hand by passing the Application context instead.
      */
     webView = new WebView(getApplicationContext());
-    adLayout.addView(webView, 0);
 
     ImageButton closeButton = findViewById(R.id.closeButton);
 
@@ -81,9 +89,21 @@ public class CriteoInterstitialActivity extends Activity {
       resultReceiver = bundle.getParcelable(RESULT_RECEIVER);
       callingActivityName = bundle.getParcelable(CALLING_ACTIVITY);
 
-      prepareWebView();
-      displayWebView(webViewData);
+      int webViewId = bundle.getInt(WEB_VIEW_ID, -1);
+      activitiesById.put(webViewId, new WeakReference<>(this));
+
+      WebView preloadedWebView = webViewsById.remove(webViewId);
+      if (preloadedWebView != null) {
+        webView = preloadedWebView;
+      } else {
+        if (true) {
+          // throw new IllegalStateException();
+        }
+        prepareWebView(webViewId, webView, webViewData, callingActivityName);
+      }
     }
+
+    adLayout.addView(webView, 0);
 
     closeButton.setOnClickListener(new OnClickListener() {
       @Override
@@ -116,24 +136,41 @@ public class CriteoInterstitialActivity extends Activity {
     webView = null;
   }
 
-  private void displayWebView(String webViewData) {
-    webView.loadDataWithBaseURL("https://criteo.com", webViewData, "text/html", "UTF-8",
-        "about:blank");
-  }
+  public static void prepareWebView(
+      int webViewId,
+      @NonNull WebView webView,
+      @NonNull String webViewData,
+      @Nullable ComponentName callingActivityName
+  ) {
+    webViewsById.put(webViewId, webView);
 
-  private void prepareWebView() {
     webView.getSettings().setJavaScriptEnabled(true);
 
-    WeakRedirectionListener weakRedirectionListener = new WeakRedirectionListener(
-        new WeakReference<>(this)
-    );
+    WeakRedirectionListener weakRedirectionListener = new WeakRedirectionListener(webViewId);
 
     AdWebViewClient adWebViewClient = new AdWebViewClient(
         weakRedirectionListener,
         callingActivityName
-    );
+    ) {
+      @Override
+      public void onPageFinished(WebView view, String url) {
+        super.onPageFinished(view, url);
+        Log.d("Standalone", "Finish loading: " + url);
+        Log.d("Standalone", "Progress of webview: " + view.getProgress());
+      }
+
+      @Override
+      public void onLoadResource(WebView view, String url) {
+        super.onLoadResource(view, url);
+        Log.d("Standalone", "Loaded resource: " + url);
+      }
+    };
 
     webView.setWebViewClient(adWebViewClient);
+
+    webView.loadDataWithBaseURL("https://criteo.com", webViewData, "text/html", "UTF-8",
+        "about:blank"
+    );
   }
 
   @Override
@@ -148,15 +185,15 @@ public class CriteoInterstitialActivity extends Activity {
 
   private static class WeakRedirectionListener implements RedirectionListener {
 
-    private final WeakReference<CriteoInterstitialActivity> activityRef;
+    private final int id;
 
-    private WeakRedirectionListener(WeakReference<CriteoInterstitialActivity> activityRef) {
-      this.activityRef = activityRef;
+    private WeakRedirectionListener(int id) {
+      this.id = id;
     }
 
     @Override
     public void onUserRedirectedToAd() {
-      CriteoInterstitialActivity criteoInterstitialActivity = activityRef.get();
+      CriteoInterstitialActivity criteoInterstitialActivity = getActivity();
       if (criteoInterstitialActivity != null) {
         criteoInterstitialActivity.click();
       }
@@ -164,10 +201,19 @@ public class CriteoInterstitialActivity extends Activity {
 
     @Override
     public void onUserBackFromAd() {
-      CriteoInterstitialActivity criteoInterstitialActivity = activityRef.get();
+      CriteoInterstitialActivity criteoInterstitialActivity = getActivity();
       if (criteoInterstitialActivity != null) {
         criteoInterstitialActivity.close();
       }
+    }
+
+    @Nullable
+    private CriteoInterstitialActivity getActivity() {
+      WeakReference<CriteoInterstitialActivity> ref = activitiesById.get(id);
+      if (ref == null) {
+        return null;
+      }
+      return ref.get();
     }
   }
 }

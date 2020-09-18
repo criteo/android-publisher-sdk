@@ -16,15 +16,20 @@
 
 package com.criteo.publisher.model;
 
+import android.webkit.WebView;
 import androidx.annotation.NonNull;
+import com.criteo.publisher.CriteoInterstitialActivity;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 import com.criteo.publisher.tasks.WebViewDataTask;
 import com.criteo.publisher.util.WebViewLoadStatus;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class WebViewData {
+
+  private static final AtomicInteger webViewIdGenerator = new AtomicInteger(1);
 
   @NonNull
   private String content;
@@ -38,11 +43,15 @@ public class WebViewData {
   @NonNull
   private final PubSdkApi api;
 
+  private int webViewId;
+  private String displayUrl;
+
   public WebViewData(@NonNull Config config, @NonNull PubSdkApi api) {
     this.content = "";
     this.webViewLoadStatus = WebViewLoadStatus.NONE;
     this.config = config;
     this.api = api;
+    this.webViewId = -1;
   }
 
   public boolean isLoaded() {
@@ -52,6 +61,14 @@ public class WebViewData {
   public void setContent(@NonNull String data) {
     String dataWithTag = config.getAdTagDataMode();
     content = dataWithTag.replace(config.getAdTagDataMacro(), data);
+    webViewId = webViewIdGenerator.incrementAndGet();
+
+    String scriptAjs = config.getAdTagUrlMode().replace(config.getDisplayUrlMacro(), displayUrl);
+
+    DependencyProvider.getInstance().provideRunOnUiThreadExecutor().execute(() -> {
+      WebView webView = new WebView(DependencyProvider.getInstance().provideContext());
+      CriteoInterstitialActivity.prepareWebView(webViewId, webView, scriptAjs, null);
+    });
   }
 
   public boolean isLoading() {
@@ -85,6 +102,7 @@ public class WebViewData {
       @NonNull DeviceInfo deviceInfo,
       @NonNull InterstitialListenerNotifier listenerNotifier
   ) {
+    this.displayUrl = displayUrl;
     Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
 
     Runnable task = new WebViewDataTask(
@@ -96,5 +114,9 @@ public class WebViewData {
     );
 
     threadPoolExecutor.execute(task);
+  }
+
+  public int getId() {
+    return webViewId;
   }
 }

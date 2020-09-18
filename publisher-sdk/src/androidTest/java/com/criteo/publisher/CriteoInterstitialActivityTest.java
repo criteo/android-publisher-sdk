@@ -37,20 +37,16 @@ import android.app.Activity;
 import android.app.Application;
 import android.app.Application.ActivityLifecycleCallbacks;
 import android.content.Context;
-import android.content.Intent;
 import android.webkit.WebView;
 import androidx.annotation.NonNull;
 import androidx.test.filters.FlakyTest;
 import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.lifecycle.ActivityLifecycleCallback;
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitor;
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 import androidx.test.runner.lifecycle.Stage;
 import com.criteo.publisher.activity.TopActivityFinder;
-import com.criteo.publisher.concurrent.ThreadingUtil;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
-import com.criteo.publisher.mock.ApplicationMock;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.tasks.InterstitialListenerNotifier;
@@ -122,7 +118,7 @@ public class CriteoInterstitialActivityTest {
         mock(TopActivityFinder.class)
     );
 
-    helper.openActivity("content", mock(InterstitialListenerNotifier.class));
+    helper.openActivity("content", mock(InterstitialListenerNotifier.class), -1);
 
     InOrder inOrder = inOrder(lifecycle);
     inOrder.verify(lifecycle, timeout(2000))
@@ -223,7 +219,7 @@ public class CriteoInterstitialActivityTest {
           runOnUiThreadExecutor
       );
 
-      interstitialActivityHelper.openActivity(html, listenerNotifier);
+      interstitialActivityHelper.openActivity(html, listenerNotifier, -1);
     }).get();
 
     clearInvocations(context);

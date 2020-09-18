@@ -125,7 +125,8 @@ public class DummyCriteo extends Criteo {
     @Override
     public void openActivity(
         @NonNull String webViewContent,
-        @NonNull InterstitialListenerNotifier listenerNotifier
+        @NonNull InterstitialListenerNotifier listenerNotifier,
+        int webViewId
     ) {
     }
   }

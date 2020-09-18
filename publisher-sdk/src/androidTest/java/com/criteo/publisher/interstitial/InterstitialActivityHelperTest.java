@@ -105,7 +105,7 @@ public class InterstitialActivityHelperTest {
     doReturn(expectedReceiver).when(helper).createReceiver(listenerNotifier);
     doReturn(true).when(helper).isAvailable();
 
-    helper.openActivity("myContent", listenerNotifier);
+    helper.openActivity("myContent", listenerNotifier, -1);
 
     verify(context).startActivity(argThat(intent -> {
       assertEquals(expectedComponent, intent.getComponent());
@@ -127,7 +127,7 @@ public class InterstitialActivityHelperTest {
 
   private String openInterstitialAndGetHtml(String content) throws Exception {
     Activity activity = webViewLookup.lookForResumedActivity(() -> {
-      helper.openActivity(content, listenerNotifier);
+      helper.openActivity(content, listenerNotifier, -1);
     }).get();
 
     View root = activity.getWindow().getDecorView();

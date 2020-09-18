@@ -21,7 +21,6 @@ import static com.criteo.publisher.CriteoListenerCode.OPEN;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
@@ -116,7 +115,8 @@ public class CriteoInterstitialEventController {
     }
 
     String webViewContent = webViewData.getContent();
-    interstitialActivityHelper.openActivity(webViewContent, listenerNotifier);
+    int webViewId = webViewData.getId();
+    interstitialActivityHelper.openActivity(webViewContent, listenerNotifier, webViewId);
     listenerNotifier.notifyFor(OPEN);
 
     webViewData.refresh();
