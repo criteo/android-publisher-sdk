@@ -47,6 +47,9 @@ class RemoteConfigResponseTest {
     assertThat(response.androidAdTagUrlMode).isNull()
     assertThat(response.androidAdTagDataMacro).isNull()
     assertThat(response.androidAdTagDataMode).isNull()
+    assertThat(response.csmEnabled).isNull()
+    assertThat(response.liveBiddingEnabled).isNull()
+    assertThat(response.liveBiddingTimeBudgetInMillis).isNull()
   }
 
   @Test
@@ -62,6 +65,9 @@ class RemoteConfigResponseTest {
     assertThat(response.androidAdTagUrlMode).isNull()
     assertThat(response.androidAdTagDataMacro).isNull()
     assertThat(response.androidAdTagDataMode).isNull()
+    assertThat(response.csmEnabled).isNull()
+    assertThat(response.liveBiddingEnabled).isNull()
+    assertThat(response.liveBiddingTimeBudgetInMillis).isNull()
   }
 
   @Test
@@ -72,7 +78,9 @@ class RemoteConfigResponseTest {
       "AndroidAdTagUrlMode": "<html />",
       "AndroidAdTagDataMacro": "%%macroData%%",
       "AndroidAdTagDataMode": "<body />",
-      "csmEnabled": true
+      "csmEnabled": true,
+      "liveBiddingEnabled": true,
+      "liveBiddingTimeBudgetInMillis": 42
     }""".trimIndent()
 
     val response = readFromString(json)
@@ -83,6 +91,8 @@ class RemoteConfigResponseTest {
     assertThat(response.androidAdTagDataMacro).isEqualTo("%%macroData%%")
     assertThat(response.androidAdTagDataMode).isEqualTo("<body />")
     assertThat(response.csmEnabled).isTrue()
+    assertThat(response.liveBiddingEnabled).isTrue()
+    assertThat(response.liveBiddingTimeBudgetInMillis).isEqualTo(42)
   }
 
   @Test

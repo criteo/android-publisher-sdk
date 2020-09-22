@@ -58,6 +58,7 @@ public class Config {
     private static final String AD_TAG_DATA_MODE = "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>";
     private static final boolean CSM_ENABLED = true;
     private static final boolean LIVE_BIDDING_ENABLED = false;
+    private static final int LIVE_BIDDING_TIME_BUDGET_IN_MILLIS = 5_000;
 
   }
 
@@ -158,6 +159,10 @@ public class Config {
         getOrElse(
             overrideRemoteConfig.getLiveBiddingEnabled(),
             baseRemoteConfig.getLiveBiddingEnabled()
+        ),
+        getOrElse(
+            overrideRemoteConfig.getLiveBiddingTimeBudgetInMillis(),
+            baseRemoteConfig.getLiveBiddingTimeBudgetInMillis()
         )
     );
   }
@@ -210,13 +215,24 @@ public class Config {
   }
 
   /**
-   * Return <code>true</code> to indicate if the live-bidding is enabled, <code>false</code>
-   * otherwise.
+   * Return <code>true</code> to indicate if the live-bidding is enabled, <code>false</code> otherwise.
    */
   public boolean isLiveBiddingEnabled() {
     return getOrElse(
         cachedRemoteConfig.getLiveBiddingEnabled(),
         DefaultConfig.LIVE_BIDDING_ENABLED
+    );
+  }
+
+  /**
+   * Return the time budget allocated to the SDK to answer bids to the publisher.
+   * <p>
+   * This is only used if {@linkplain #isLiveBiddingEnabled() live bidding is enabled}.
+   */
+  public int getLiveBiddingTimeBudgetInMillis() {
+    return getOrElse(
+        cachedRemoteConfig.getLiveBiddingTimeBudgetInMillis(),
+        DefaultConfig.LIVE_BIDDING_TIME_BUDGET_IN_MILLIS
     );
   }
 

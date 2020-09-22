@@ -85,7 +85,7 @@ environments {
 
         // Uncomment to use another CDB, you'll also need to deactivate the CDB stub in
         // MockedDependenciesRule
-        // cdbUrl = 'https://directbidder-test-app.par.preprod.crto.in' // preprod
+        cdbUrl = 'https://directbidder-test-app.par.preprod.crto.in' // preprod
         // cdbUrl = 'http://10.0.2.2:9991' // local
 
         minLogLevel = 2 // All
