@@ -30,7 +30,6 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -55,6 +54,7 @@ import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.concurrent.TrackingCommandsExecutorWithDelay;
+import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdSize;
@@ -63,7 +63,6 @@ import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.InterstitialAdUnit;
-import com.criteo.publisher.network.LiveBidRequestSender;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.util.AndroidUtil;
@@ -73,6 +72,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.inject.Inject;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Rule;
@@ -80,7 +80,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InOrder;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
@@ -98,9 +97,10 @@ public class StandaloneFunctionalTest {
   private final InterstitialAdUnit validInterstitialAdUnit = TestAdUnits.INTERSTITIAL;
   private final InterstitialAdUnit invalidInterstitialAdUnit = TestAdUnits.INTERSTITIAL_UNKNOWN;
 
+  @SpyBean
   private PubSdkApi api;
 
-  @Mock
+  @MockBean
   private AndroidUtil androidUtil;
 
   @SpyBean
@@ -109,6 +109,7 @@ public class StandaloneFunctionalTest {
   @SpyBean
   private Config config;
 
+  @Inject
   private Context context;
 
   @Captor
@@ -119,15 +120,10 @@ public class StandaloneFunctionalTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    context = activityRule.getActivity().getApplicationContext();
-
-    DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-
-    api = spy(dependencyProvider.providePubSdkApi());
-    when(dependencyProvider.providePubSdkApi()).thenReturn(api);
-    when(dependencyProvider.provideAndroidUtil()).thenReturn(androidUtil);
 
     webViewLookup = new WebViewLookup();
+
+    givenTimeBudgetRespectedWhenFetchingLiveBids();
   }
 
   @Test
@@ -345,7 +341,7 @@ public class StandaloneFunctionalTest {
   public void whenLoadingAnInterstitial_GivenTimeBudgetExceededAndNoBidInCache_OnAdFailedToReceivedIsCalledWithNoFill()
       throws Exception {
     givenLiveBidding(true);
-    givenDelayWhenFetchingBids(LiveBidRequestSender.DEFAULT_TIME_BUDGET_IN_MILLIS);
+    givenTimeBudgetExceededWhenFetchingLiveBids();
 
     givenInitializedSdk();
 
@@ -379,7 +375,7 @@ public class StandaloneFunctionalTest {
   public void whenLoadingABanner_GivenTimeBudgetExceeded_NoBidInCache_OnAdFailedToReceivedIsCalledWithNoFill()
       throws Exception {
     givenLiveBidding(true);
-    givenDelayWhenFetchingBids(LiveBidRequestSender.DEFAULT_TIME_BUDGET_IN_MILLIS);
+    givenTimeBudgetExceededWhenFetchingLiveBids();
 
     givenInitializedSdk();
 
@@ -528,6 +524,11 @@ public class StandaloneFunctionalTest {
     mockedDependenciesRule.waitForIdleState();
   }
 
+  private void givenTimeBudgetExceededWhenFetchingLiveBids() {
+    when(config.getLiveBiddingTimeBudgetInMillis()).thenReturn(1);
+    givenDelayWhenFetchingBids(1000);
+  }
+
   private void givenDelayWhenFetchingBids(long delay) {
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
     Executor oldExecutor = dependencyProvider.provideThreadPoolExecutor();
@@ -536,6 +537,10 @@ public class StandaloneFunctionalTest {
         delay
     );
     doReturn(trackingCommandsExecutorWithDelay).when(dependencyProvider).provideThreadPoolExecutor();
+  }
+
+  private void givenTimeBudgetRespectedWhenFetchingLiveBids() {
+    when(config.getLiveBiddingTimeBudgetInMillis()).thenReturn(Integer.MAX_VALUE);
   }
 
   private static final class CriteoSync {

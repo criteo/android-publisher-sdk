@@ -61,7 +61,6 @@ import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.RemoteConfigResponse;
 import com.criteo.publisher.model.User;
-import com.criteo.publisher.network.LiveBidRequestSender;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.privacy.gdpr.GdprData;
@@ -147,6 +146,7 @@ public class BidManagerFunctionalTest {
     givenExpiredSilentModeBidCached(sampleAdUnit());
     givenNoBidCached(sampleAdUnit());
     givenNoLastBid(sampleAdUnit());
+    givenTimeBudgetRespectedWhenFetchingLiveBids();
   }
 
   @Test
@@ -293,7 +293,7 @@ public class BidManagerFunctionalTest {
   @Test
   public void prefetch_GivenRemoteConfigWithKillSwitchEnabled_WhenGettingBidShouldNotCallCdbAndNotPopulateCacheAndReturnNull()
       throws Exception {
-    Config config = givenKillSwitchIs(false);
+    givenKillSwitchIs(false);
     doAnswer(answerVoid((RemoteConfigResponse response) -> {
       Boolean killSwitch = response.getKillSwitch();
       when(config.isKillSwitchEnabled()).thenReturn(killSwitch);
@@ -871,7 +871,7 @@ public class BidManagerFunctionalTest {
   @Test
   public void fetchForLiveBidRequest_GivenResponseOutsideTimeBudget_ShouldReturnNoBid()
       throws Exception {
-    givenDelayWhenFetchingBids(LiveBidRequestSender.DEFAULT_TIME_BUDGET_IN_MILLIS + 1_000);
+    givenTimeBudgetExceededWhenFetchingLiveBids();
     givenKillSwitchIs(false);
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
@@ -889,7 +889,7 @@ public class BidManagerFunctionalTest {
   @Test
   public void fetchForLiveBidRequest_GivenResponseOutsideTimeBudgetWithExistingCacheEntry_ShouldReturnBidResponse()
       throws Exception {
-    givenDelayWhenFetchingBids(LiveBidRequestSender.DEFAULT_TIME_BUDGET_IN_MILLIS + 1_000);
+    givenTimeBudgetExceededWhenFetchingLiveBids();
     givenKillSwitchIs(false);
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
@@ -1005,11 +1005,8 @@ public class BidManagerFunctionalTest {
     return new CacheAdUnit(new AdSize(1, 1), "adUnit" + adUnitId++, CRITEO_BANNER);
   }
 
-  private Config givenKillSwitchIs(boolean isEnabled) {
-    Config config = mock(Config.class);
+  private void givenKillSwitchIs(boolean isEnabled) {
     when(config.isKillSwitchEnabled()).thenReturn(isEnabled);
-    doReturn(config).when(dependencyProvider).provideConfig();
-    return config;
   }
 
   private void givenRemoteConfigWithKillSwitchEnabled() throws IOException {
@@ -1109,6 +1106,15 @@ public class BidManagerFunctionalTest {
         dependencyProvider.provideBidLifecycleListener(),
         dependencyProvider.provideMetricSendingQueueConsumer()
     );
+  }
+
+  private void givenTimeBudgetRespectedWhenFetchingLiveBids() {
+    when(config.getLiveBiddingTimeBudgetInMillis()).thenReturn(Integer.MAX_VALUE);
+  }
+
+  private void givenTimeBudgetExceededWhenFetchingLiveBids() {
+    when(config.getLiveBiddingTimeBudgetInMillis()).thenReturn(1);
+    givenDelayWhenFetchingBids(1000);
   }
 
   private void givenDelayWhenFetchingBids(long delay) {
