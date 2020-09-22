@@ -23,7 +23,6 @@ import androidx.annotation.Nullable;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
@@ -40,8 +39,8 @@ public class DummyCriteo extends Criteo {
 
   @Nullable
   @Override
-  CdbResponseSlot getBidForAdUnit(@Nullable AdUnit adUnit) {
-    return null;
+  void getBidForAdUnit(@Nullable AdUnit adUnit, @NonNull BidListener bidListener) {
+    bidListener.onNoBid();
   }
 
   @Override

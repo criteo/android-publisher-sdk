@@ -36,9 +36,8 @@ public class Config {
   private static final String TAG = Config.class.getSimpleName();
 
   /**
-   * Key in local storage where kill switch was persisted before.
-   * We keep compatibility with such persisted data, but it is overridden by new persistence
-   * strategies.
+   * Key in local storage where kill switch was persisted before. We keep compatibility with such
+   * persisted data, but it is overridden by new persistence strategies.
    *
    * @see #CONFIG_STORAGE_KEY
    */
@@ -58,6 +57,7 @@ public class Config {
     private static final String AD_TAG_DATA_MACRO = "%%adTagData%%";
     private static final String AD_TAG_DATA_MODE = "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>";
     private static final boolean CSM_ENABLED = true;
+    private static final boolean LIVE_BIDDING_ENABLED = false;
 
   }
 
@@ -154,6 +154,10 @@ public class Config {
         getOrElse(
             overrideRemoteConfig.getCsmEnabled(),
             baseRemoteConfig.getCsmEnabled()
+        ),
+        getOrElse(
+            overrideRemoteConfig.getLiveBiddingEnabled(),
+            baseRemoteConfig.getLiveBiddingEnabled()
         )
     );
   }
@@ -202,6 +206,17 @@ public class Config {
     return getOrElse(
         cachedRemoteConfig.getCsmEnabled(),
         DefaultConfig.CSM_ENABLED
+    );
+  }
+
+  /**
+   * Return <code>true</code> to indicate if the live-bidding is enabled, <code>false</code>
+   * otherwise.
+   */
+  public boolean isLiveBiddingEnabled() {
+    return getOrElse(
+        cachedRemoteConfig.getLiveBiddingEnabled(),
+        DefaultConfig.LIVE_BIDDING_ENABLED
     );
   }
 

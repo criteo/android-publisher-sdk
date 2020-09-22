@@ -72,6 +72,7 @@ import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.network.BidRequestSender;
+import com.criteo.publisher.network.LiveBidRequestSender;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AdvertisingInfo;
@@ -88,6 +89,9 @@ import com.squareup.picasso.Picasso;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import kotlin.jvm.functions.Function0;
 
@@ -223,6 +227,17 @@ public class DependencyProvider {
   }
 
   @NonNull
+  public ScheduledExecutorService provideScheduledExecutorService() {
+    return getOrCreate(ScheduledExecutorService.class, new Factory<ScheduledExecutorService>() {
+      @NonNull
+      @Override
+      public ScheduledExecutorService create() {
+        return Executors.newSingleThreadScheduledExecutor();
+      }
+    });
+  }
+
+  @NonNull
   public RunOnUiThreadExecutor provideRunOnUiThreadExecutor() {
     return getOrCreate(RunOnUiThreadExecutor.class, new Factory<RunOnUiThreadExecutor>() {
       @NonNull
@@ -281,6 +296,7 @@ public class DependencyProvider {
             provideClock(),
             provideAdUnitMapper(),
             provideBidRequestSender(),
+            provideLiveBidRequestSender(),
             provideBidLifecycleListener(),
             provideMetricSendingQueueConsumer()
         );
@@ -412,6 +428,22 @@ public class DependencyProvider {
             provideRemoteConfigRequestFactory(),
             providePubSdkApi(),
             provideThreadPoolExecutor()
+        );
+      }
+    });
+  }
+
+  @NonNull
+  public LiveBidRequestSender provideLiveBidRequestSender() {
+    return getOrCreate(LiveBidRequestSender.class, new Factory<LiveBidRequestSender>() {
+      @NonNull
+      @Override
+      public LiveBidRequestSender create() {
+        return new LiveBidRequestSender(
+            providePubSdkApi(),
+            provideCdbRequestFactory(),
+            provideThreadPoolExecutor(),
+            provideScheduledExecutorService()
         );
       }
     });

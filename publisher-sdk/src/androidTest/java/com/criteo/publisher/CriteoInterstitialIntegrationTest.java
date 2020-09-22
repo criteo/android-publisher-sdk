@@ -20,6 +20,10 @@ import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 import static com.criteo.publisher.util.CompletableFuture.completedFuture;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.AdditionalAnswers.answerVoid;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -27,6 +31,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import java.util.UUID;
 import org.junit.Before;
@@ -82,7 +87,8 @@ public class CriteoInterstitialIntegrationTest {
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
 
     criteo = mock(Criteo.class, Answers.RETURNS_DEEP_STUBS);
-    when(criteo.getBidForAdUnit(interstitialAdUnit)).thenReturn(null);
+    givenMockedNoBidResponse(interstitialAdUnit);
+
     when(criteo.getDeviceInfo().getUserAgent()).thenReturn(completedFuture(""));
 
     CriteoInterstitial interstitial = createInterstitial();
@@ -114,4 +120,11 @@ public class CriteoInterstitialIntegrationTest {
     return new CriteoInterstitial(interstitialAdUnit, criteo);
   }
 
+
+  private void givenMockedNoBidResponse(AdUnit adUnit) {
+    doAnswer(answerVoid((AdUnit ignored, BidListener bidListener) -> bidListener
+        .onNoBid()))
+        .when(criteo)
+        .getBidForAdUnit(eq(adUnit), any(BidListener.class));
+  }
 }

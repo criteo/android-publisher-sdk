@@ -69,14 +69,18 @@ public class CriteoBannerEventController {
   }
 
   public void fetchAdAsync(@Nullable AdUnit adUnit) {
-    CdbResponseSlot slot = criteo.getBidForAdUnit(adUnit);
+   criteo.getBidForAdUnit(adUnit, new BidListener() {
+      @Override
+      public void onBidResponse(@NonNull CdbResponseSlot cdbResponseSlot) {
+        notifyFor(VALID);
+        displayAd(cdbResponseSlot.getDisplayUrl());
+      }
 
-    if (slot == null) {
-      notifyFor(INVALID);
-    } else {
-      notifyFor(VALID);
-      displayAd(slot.getDisplayUrl());
-    }
+      @Override
+      public void onNoBid() {
+        notifyFor(INVALID);
+      }
+    });
   }
 
   public void fetchAdAsync(@Nullable BidToken bidToken) {

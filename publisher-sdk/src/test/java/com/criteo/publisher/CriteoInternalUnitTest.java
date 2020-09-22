@@ -19,12 +19,15 @@ package com.criteo.publisher;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.AdditionalAnswers.answerVoid;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -35,6 +38,7 @@ import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor;
 import com.criteo.publisher.headerbidding.HeaderBidding;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
+import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
@@ -67,12 +71,17 @@ public class CriteoInternalUnitTest {
   @Mock
   private UserPrivacyUtil userPrivacyUtil;
 
+  @Mock
+  private Config config;
+
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
     when(dependencyProvider.provideRunOnUiThreadExecutor())
         .thenReturn(new DirectMockRunOnUiThreadExecutor());
+
+    when(dependencyProvider.provideConfig()).thenReturn(config);
 
     adUnits = new ArrayList<>();
   }
@@ -297,17 +306,77 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void getBidForAdUnit_GivenBidManager_DelegateToIt() throws Exception {
+  public void getBidForAdUnit_GivenLiveBiddingEnabledWithAResponse_ThenTriggerBidResponse() throws Exception {
+    when(config.isLiveBiddingEnabled()).thenReturn(true);
     AdUnit adUnit = mock(AdUnit.class);
     CdbResponseSlot expected = mock(CdbResponseSlot.class);
 
     BidManager bidManager = givenMockedBidManager();
-    when(bidManager.getBidForAdUnitAndPrefetch(adUnit)).thenReturn(expected);
+    BidListener bidListener = mock(BidListener.class);
+
+    doAnswer(answerVoid((AdUnit adUnit1, BidListener bidListener1) -> bidListener
+        .onBidResponse(expected)))
+        .when(bidManager)
+        .getLiveBidForAdUnit(adUnit, bidListener);
 
     CriteoInternal criteo = createCriteo();
-    CdbResponseSlot bid = criteo.getBidForAdUnit(adUnit);
 
-    assertThat(bid).isSameAs(expected);
+    criteo.getBidForAdUnit(adUnit, bidListener);
+
+    verify(bidListener).onBidResponse(expected);
+  }
+
+  @Test
+  public void getBidForAdUnit_GivenLiveBiddingEnabledAndNoResponseReturned_ThenTriggerNoBid() throws Exception {
+    when(config.isLiveBiddingEnabled()).thenReturn(true);
+    AdUnit adUnit = mock(AdUnit.class);
+
+    BidManager bidManager = givenMockedBidManager();
+    BidListener bidListener = mock(BidListener.class);
+
+    doAnswer(answerVoid((AdUnit adUnit1, BidListener bidListener1) -> bidListener
+        .onNoBid()))
+        .when(bidManager)
+        .getLiveBidForAdUnit(adUnit, bidListener);
+
+    CriteoInternal criteo = createCriteo();
+
+    criteo.getBidForAdUnit(adUnit, bidListener);
+    verify(bidListener).onNoBid();
+  }
+
+  @Test
+  public void getBidForAdUnit_GivenLiveBiddingDisabledAndCacheHit_ThenTriggerBidResponse() throws Exception {
+    when(config.isLiveBiddingEnabled()).thenReturn(false);
+    AdUnit adUnit = mock(AdUnit.class);
+    CdbResponseSlot expected = mock(CdbResponseSlot.class);
+
+    BidManager bidManager = givenMockedBidManager();
+    doReturn(expected).when(bidManager).getBidForAdUnitAndPrefetch(adUnit);
+    BidListener bidListener = mock(BidListener.class);
+
+    CriteoInternal criteo = createCriteo();
+    criteo.getBidForAdUnit(adUnit, bidListener);
+
+    verify(bidListener).onBidResponse(expected);
+    verify(bidListener, never()).onNoBid();
+  }
+
+  @Test
+  public void getBidForAdUnit_GivenLiveBiddingDisabledAndCacheMiss_ThenTriggerNoBid() throws Exception {
+    when(config.isLiveBiddingEnabled()).thenReturn(false);
+    AdUnit adUnit = mock(AdUnit.class);
+    CdbResponseSlot expected = mock(CdbResponseSlot.class);
+
+    BidManager bidManager = givenMockedBidManager();
+    doReturn(expected).when(bidManager).getBidForAdUnitAndPrefetch(adUnit);
+    BidListener bidListener = mock(BidListener.class);
+
+    CriteoInternal criteo = createCriteo();
+    criteo.getBidForAdUnit(adUnit, bidListener);
+
+    verify(bidListener).onBidResponse(expected);
+    verify(bidListener, never()).onNoBid();
   }
 
   @Test
@@ -362,7 +431,7 @@ public class CriteoInternalUnitTest {
 
   private CriteoInternal createCriteo() {
     return new CriteoInternal(application, adUnits, usPrivacyOptout,
-        mopubConsentValue, dependencyProvider);
+        mopubConsentValue, dependencyProvider
+    );
   }
-
 }

@@ -136,11 +136,21 @@ final class CriteoInternal extends Criteo {
 
   /**
    * Method to start new CdbDownload Asynctask
+   * [Standalone only]
    */
   @Nullable
   @Override
-  CdbResponseSlot getBidForAdUnit(AdUnit adUnit) {
-    return bidManager.getBidForAdUnitAndPrefetch(adUnit);
+  void getBidForAdUnit(AdUnit adUnit, @NonNull BidListener bidListener) {
+    if (config.isLiveBiddingEnabled()) {
+      bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    } else {
+      CdbResponseSlot cdbResponseSlot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
+      if (cdbResponseSlot != null) {
+        bidListener.onBidResponse(cdbResponseSlot);
+      } else {
+        bidListener.onNoBid();
+      }
+    }
   }
 
   @Override

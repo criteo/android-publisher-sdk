@@ -23,6 +23,7 @@ import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -44,6 +45,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class UserPrivacyFunctionalTest {
+
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
@@ -152,7 +154,7 @@ public class UserPrivacyFunctionalTest {
     waitForIdleState();
 
     criteo.setUsPrivacyOptOut(false);
-    criteo.getBidForAdUnit(TestAdUnits.BANNER_320_480);
+    criteo.getBidForAdUnit(TestAdUnits.BANNER_320_480, mock(BidListener.class));
 
     waitForIdleState();
 
@@ -186,7 +188,7 @@ public class UserPrivacyFunctionalTest {
     waitForIdleState();
 
     criteo.setMopubConsent("fake_mopub_consent");
-    criteo.getBidForAdUnit(TestAdUnits.BANNER_320_480);
+    criteo.getBidForAdUnit(TestAdUnits.BANNER_320_480, mock(BidListener.class));
 
     waitForIdleState();
 
@@ -214,7 +216,7 @@ public class UserPrivacyFunctionalTest {
     // then
     Criteo.Builder builder2 = getCriteoBuilder(TestAdUnits.BANNER_320_50);
     Criteo criteo2 = builder2.init();
-    criteo2.getBidForAdUnit(TestAdUnits.BANNER_320_480);
+    criteo2.getBidForAdUnit(TestAdUnits.BANNER_320_480, mock(BidListener.class));
     waitForIdleState();
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi, times(3)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));

@@ -19,7 +19,7 @@ package com.criteo.publisher.network
 import com.criteo.publisher.concurrent.DirectMockExecutor
 import com.criteo.publisher.model.*
 import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
-import com.criteo.publisher.util.CdbCallListener
+import com.criteo.publisher.CdbCallListener
 import com.criteo.publisher.util.CompletableFuture.completedFuture
 import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat

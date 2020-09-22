@@ -22,6 +22,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.AdditionalAnswers.answerVoid;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -105,7 +106,7 @@ public class CriteoBannerEventControllerTest {
     })).when(criteoBannerAdListener).onAdFailedToReceive(any());
 
     AdUnit adUnit = mock(AdUnit.class);
-    when(criteo.getBidForAdUnit(adUnit)).thenReturn(null);
+    givenMockedNoBidResponse(adUnit);
 
     runOnMainThreadAndWait(() -> {
       criteoBannerEventController.fetchAdAsync(adUnit);
@@ -139,8 +140,7 @@ public class CriteoBannerEventControllerTest {
   public void fetchAdAsyncAdUnit_GivenNoBid_NotifyListenerForFailureAndDoNotDisplayAd()
       throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
-
-    when(criteo.getBidForAdUnit(adUnit)).thenReturn(null);
+    givenMockedNoBidResponse(adUnit);
 
     criteoBannerEventController.fetchAdAsync(adUnit);
     waitForIdleState();
@@ -153,8 +153,8 @@ public class CriteoBannerEventControllerTest {
   public void fetchAdAsyncAdUnit_GivenBid_NotifyListenerForSuccessAndDisplayAd() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
+    givenMockedBidResponse(adUnit, slot);
 
-    when(criteo.getBidForAdUnit(adUnit)).thenReturn(slot);
     when(slot.getDisplayUrl()).thenReturn("http://my.display.url");
 
     criteoBannerEventController.fetchAdAsync(adUnit);
@@ -165,11 +165,12 @@ public class CriteoBannerEventControllerTest {
   }
 
   @Test
-  public void fetchAdAsyncAdUnit_GivenBidTwice_NotifyListenerForSuccessAndDisplayAdTwice() throws Exception {
+  public void fetchAdAsyncAdUnit_GivenBidTwice_NotifyListenerForSuccessAndDisplayAdTwice()
+      throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
+    givenMockedBidResponse(adUnit, slot);
 
-    when(criteo.getBidForAdUnit(adUnit)).thenReturn(slot);
     when(slot.getDisplayUrl())
         .thenReturn("http://my.display.url1")
         .thenReturn("http://my.display.url2");
@@ -218,7 +219,8 @@ public class CriteoBannerEventControllerTest {
   }
 
   @Test
-  public void fetchAdAsyncToken_GivenBidTwice_NotifyListenerForSuccessAndDisplayAdTwice() throws Exception {
+  public void fetchAdAsyncToken_GivenBidTwice_NotifyListenerForSuccessAndDisplayAdTwice()
+      throws Exception {
     BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
     DisplayUrlTokenValue tokenValue = mock(DisplayUrlTokenValue.class);
 
@@ -264,12 +266,31 @@ public class CriteoBannerEventControllerTest {
   public void whenDeeplinkIsLoaded_GivenTargetAppIsNotInstalled_DontThrowActivityNotFound() {
     runOnMainThreadAndWait(() -> {
       WebViewClient webViewClient = criteoBannerEventController.createWebViewClient();
-      webViewClient.shouldOverrideUrlLoading(new WebView(context),
-          "fake_deeplink://fakeappdispatch");
+      webViewClient.shouldOverrideUrlLoading(
+          new WebView(context),
+          "fake_deeplink://fakeappdispatch"
+      );
     });
   }
 
   private void waitForIdleState() {
     mockedDependenciesRule.waitForIdleState();
+  }
+
+  private void givenMockedBidResponse(
+      AdUnit adUnit,
+      CdbResponseSlot cdbResponseSlot
+  ) {
+    doAnswer(answerVoid((AdUnit ignored, BidListener bidListener) -> bidListener
+        .onBidResponse(cdbResponseSlot)))
+        .when(criteo)
+        .getBidForAdUnit(eq(adUnit), any(BidListener.class));
+  }
+
+  private void givenMockedNoBidResponse(AdUnit adUnit) {
+    doAnswer(answerVoid((AdUnit ignored, BidListener bidListener) -> bidListener
+        .onNoBid()))
+        .when(criteo)
+        .getBidForAdUnit(eq(adUnit), any(BidListener.class));
   }
 }

@@ -84,9 +84,9 @@ public class MockedDependenciesRule implements MethodRule {
   @Nullable
   private Logger mockedLogger = null;
   private boolean injectMockedLogger = false;
+  private TrackingCommandsExecutor trackingCommandsExecutor;
 
   protected DependencyProvider dependencyProvider;
-  private TrackingCommandsExecutor trackingCommandsExecutor = null;
   private Object target;
 
   @Nullable

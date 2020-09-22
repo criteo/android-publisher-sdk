@@ -188,6 +188,16 @@ public class ConfigTest {
     refreshConfig_assertItIsUnchanged(newConfig, Config::isCsmEnabled);
   }
 
+  @Test
+  public void refreshConfig_GivenMissingLiveBiddingEnabled_ItIsUnchanged() throws Exception {
+    givenNewConfig();
+
+    RemoteConfigResponse newConfig = givenFullNewPayload(config);
+    when(newConfig.getLiveBiddingEnabled()).thenReturn(null);
+
+    refreshConfig_assertItIsUnchanged(newConfig, Config::isLiveBiddingEnabled);
+  }
+
   private <T> void refreshConfig_assertItIsUnchanged(RemoteConfigResponse newConfig,
       Function<Config, T> projection) {
     T previousValue = projection.apply(config);
@@ -210,6 +220,7 @@ public class ConfigTest {
         null,
         "dataMacro",
         "dataMode",
+        false,
         false
     );
 
@@ -250,6 +261,7 @@ public class ConfigTest {
     String adTagDataMacro = config.getAdTagDataMacro();
     String adTagDataMode = config.getAdTagDataMode();
     boolean csmEnabled = config.isCsmEnabled();
+    boolean liveBiddingEnabled = config.isLiveBiddingEnabled();
 
     RemoteConfigResponse newConfig = givenFullNewPayload(config);
 
@@ -261,6 +273,8 @@ public class ConfigTest {
     assertEquals("new_" + adTagDataMacro, config.getAdTagDataMacro());
     assertEquals("new_" + adTagDataMode, config.getAdTagDataMode());
     assertEquals(!config.isCsmEnabled(), csmEnabled);
+    assertEquals(!config.isLiveBiddingEnabled(), liveBiddingEnabled);
+
   }
 
   private void givenNewConfig() {
@@ -275,6 +289,7 @@ public class ConfigTest {
     when(response.getAndroidAdTagDataMacro()).thenReturn("new_" + config.getAdTagDataMacro());
     when(response.getAndroidAdTagDataMode()).thenReturn("new_" + config.getAdTagDataMode());
     when(response.getCsmEnabled()).thenReturn(!config.isCsmEnabled());
+    when(response.getLiveBiddingEnabled()).thenReturn(!config.isLiveBiddingEnabled());
     return response;
   }
 
@@ -295,6 +310,7 @@ public class ConfigTest {
         "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>",
         config.getAdTagDataMode());
     assertTrue(config.isCsmEnabled());
+    assertFalse(config.isLiveBiddingEnabled());
   }
 
 }
