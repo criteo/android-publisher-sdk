@@ -20,6 +20,7 @@ import com.criteo.publisher.LiveCdbCallListener
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.model.CacheAdUnit
 import com.criteo.publisher.model.CdbRequestFactory
+import com.criteo.publisher.model.Config
 import java.util.concurrent.Executor
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
@@ -29,11 +30,9 @@ class LiveBidRequestSender(
     private val pubSdkApi: PubSdkApi,
     private val cdbRequestFactory: CdbRequestFactory,
     private val executor: Executor,
-    private val scheduledExecutorService: ScheduledExecutorService
+    private val scheduledExecutorService: ScheduledExecutorService,
+    private val config: Config
 ) {
-  companion object {
-    const val DEFAULT_TIME_BUDGET_IN_MILLIS = 5_000L
-  }
 
   fun sendLiveBidRequest(
       cacheAdUnit: CacheAdUnit,
@@ -41,7 +40,7 @@ class LiveBidRequestSender(
   ) {
     scheduledExecutorService.schedule({
       liveCdbCallListener.onTimeBudgetExceeded()
-    }, DEFAULT_TIME_BUDGET_IN_MILLIS, TimeUnit.MILLISECONDS)
+    }, config.liveBiddingTimeBudgetInMillis.toLong(), TimeUnit.MILLISECONDS)
 
     executor.execute(
         CdbCall(

@@ -21,12 +21,13 @@ import com.criteo.publisher.model.CacheAdUnit
 import com.criteo.publisher.model.CdbRequest
 import com.criteo.publisher.model.CdbRequestFactory
 import com.criteo.publisher.model.CdbResponse
-import com.criteo.publisher.network.LiveBidRequestSender.Companion.DEFAULT_TIME_BUDGET_IN_MILLIS
+import com.criteo.publisher.model.Config
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.*
+import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import java.util.concurrent.Executor
@@ -40,6 +41,9 @@ class LiveBidRequestSenderTest {
 
   @Mock
   private lateinit var cdbRequestFactory: CdbRequestFactory
+
+  @Mock
+  private lateinit var config: Config
 
   @Mock
   private lateinit var cacheAdUnit: CacheAdUnit
@@ -66,15 +70,15 @@ class LiveBidRequestSenderTest {
     whenever(cdbRequestFactory.userAgent).thenReturn(userAgentFuture)
     whenever(userAgentFuture.get()).thenReturn("fake_user_agent")
     whenever(cdbRequestFactory.createRequest(any())).thenReturn(cdbRequest)
-    whenever(pubSdkApi.loadCdb(eq(cdbRequest), any())).thenReturn(
-        cdbResponse
-    )
+    whenever(pubSdkApi.loadCdb(eq(cdbRequest), any())).thenReturn(cdbResponse)
+    whenever(config.liveBiddingTimeBudgetInMillis).thenReturn(1)
 
     val liveBidRequestSender = LiveBidRequestSender(
         pubSdkApi,
         cdbRequestFactory,
-        getDelayedExecutor(DEFAULT_TIME_BUDGET_IN_MILLIS  + 100),
-        getScheduledExecutorService()
+        getDelayedExecutor(config.liveBiddingTimeBudgetInMillis.toLong() + 100),
+        getScheduledExecutorService(),
+        config
     )
 
     liveBidRequestSender.sendLiveBidRequest(
@@ -90,8 +94,6 @@ class LiveBidRequestSenderTest {
         Thread.sleep(delayInMillis)
         it.run()
       }
-
-  private fun getExecutor() = Executor(Runnable::run)
 
   private fun getScheduledExecutorService() = Executors.newSingleThreadScheduledExecutor()
 
