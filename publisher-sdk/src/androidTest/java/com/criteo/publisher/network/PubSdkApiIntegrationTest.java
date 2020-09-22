@@ -389,7 +389,8 @@ public class PubSdkApiIntegrationTest {
         "%%adTagData%%",
         "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>",
         true,
-        null // JIRA: EE-1274
+        false,
+        1000
     );
   }
 }

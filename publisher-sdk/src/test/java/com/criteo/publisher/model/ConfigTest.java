@@ -198,8 +198,20 @@ public class ConfigTest {
     refreshConfig_assertItIsUnchanged(newConfig, Config::isLiveBiddingEnabled);
   }
 
-  private <T> void refreshConfig_assertItIsUnchanged(RemoteConfigResponse newConfig,
-      Function<Config, T> projection) {
+  @Test
+  public void refreshConfig_GivenMissingLiveBiddingTimeBudget_ItIsUnchanged() throws Exception {
+    givenNewConfig();
+
+    RemoteConfigResponse newConfig = givenFullNewPayload(config);
+    when(newConfig.getLiveBiddingTimeBudgetInMillis()).thenReturn(null);
+
+    refreshConfig_assertItIsUnchanged(newConfig, Config::getLiveBiddingTimeBudgetInMillis);
+  }
+
+  private <T> void refreshConfig_assertItIsUnchanged(
+      RemoteConfigResponse newConfig,
+      Function<Config, T> projection
+  ) {
     T previousValue = projection.apply(config);
     config.refreshConfig(newConfig);
     T newValue = projection.apply(config);
@@ -221,7 +233,8 @@ public class ConfigTest {
         "dataMacro",
         "dataMode",
         false,
-        false
+        false,
+        42
     );
 
     doAnswer(answerVoid((RemoteConfigResponse ignored, OutputStream outputStream) -> {
@@ -262,18 +275,20 @@ public class ConfigTest {
     String adTagDataMode = config.getAdTagDataMode();
     boolean csmEnabled = config.isCsmEnabled();
     boolean liveBiddingEnabled = config.isLiveBiddingEnabled();
+    int liveBiddingTimeBudgetInMillis = config.getLiveBiddingTimeBudgetInMillis();
 
     RemoteConfigResponse newConfig = givenFullNewPayload(config);
 
     config.refreshConfig(newConfig);
 
-    assertEquals(!config.isKillSwitchEnabled(), killSwitchEnabled);
+    assertEquals(killSwitchEnabled, !config.isKillSwitchEnabled());
     assertEquals("new_" + displayUrlMacro, config.getDisplayUrlMacro());
     assertEquals("new_" + adTagUrlMode, config.getAdTagUrlMode());
     assertEquals("new_" + adTagDataMacro, config.getAdTagDataMacro());
     assertEquals("new_" + adTagDataMode, config.getAdTagDataMode());
-    assertEquals(!config.isCsmEnabled(), csmEnabled);
-    assertEquals(!config.isLiveBiddingEnabled(), liveBiddingEnabled);
+    assertEquals(csmEnabled, !config.isCsmEnabled());
+    assertEquals(liveBiddingEnabled, !config.isLiveBiddingEnabled());
+    assertEquals(1 + liveBiddingTimeBudgetInMillis, config.getLiveBiddingTimeBudgetInMillis());
 
   }
 
@@ -290,6 +305,7 @@ public class ConfigTest {
     when(response.getAndroidAdTagDataMode()).thenReturn("new_" + config.getAdTagDataMode());
     when(response.getCsmEnabled()).thenReturn(!config.isCsmEnabled());
     when(response.getLiveBiddingEnabled()).thenReturn(!config.isLiveBiddingEnabled());
+    when(response.getLiveBiddingTimeBudgetInMillis()).thenReturn(1 + config.getLiveBiddingTimeBudgetInMillis());
     return response;
   }
 
@@ -311,6 +327,7 @@ public class ConfigTest {
         config.getAdTagDataMode());
     assertTrue(config.isCsmEnabled());
     assertFalse(config.isLiveBiddingEnabled());
+    assertEquals(5000, config.getLiveBiddingTimeBudgetInMillis());
   }
 
 }
