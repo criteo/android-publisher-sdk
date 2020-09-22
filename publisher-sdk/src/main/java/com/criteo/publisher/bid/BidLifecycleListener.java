@@ -80,4 +80,10 @@ public interface BidLifecycleListener {
    */
   void onBidConsumed(@NonNull CacheAdUnit adUnit, @NonNull CdbResponseSlot consumedBid);
 
+  /**
+   * Callback invoked when a bid is cached.
+   *
+   * @param cachedBid bid that was cached
+   */
+  void onBidCached(@NonNull CdbResponseSlot cachedBid);
 }

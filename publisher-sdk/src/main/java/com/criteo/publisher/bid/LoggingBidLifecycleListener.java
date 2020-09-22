@@ -56,4 +56,9 @@ public class LoggingBidLifecycleListener implements BidLifecycleListener {
     logger.debug("onBidConsumed: %s", consumedBid);
   }
 
+  @Override
+  public void onBidCached(@NonNull CdbResponseSlot cachedBid) {
+    logger.debug("onBidCached: %s", cachedBid);
+  }
+
 }

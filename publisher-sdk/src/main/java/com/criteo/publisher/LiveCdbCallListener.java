@@ -80,9 +80,7 @@ public class LiveCdbCallListener extends CdbCallListener {
       if (cdbResponse.getSlots().size() == 1) {
         CdbResponseSlot cdbResponseSlot = cdbResponse.getSlots().get(0);
         if (bidManager.isBidSilent(cdbResponseSlot)) {
-          bidManager.setCacheAdUnits(
-              cdbResponse.getSlots()
-          );
+          bidManager.setCacheAdUnits(cdbResponse.getSlots());
           bidListener.onNoBid();
         } else {
           bidListener.onBidResponse(cdbResponseSlot);

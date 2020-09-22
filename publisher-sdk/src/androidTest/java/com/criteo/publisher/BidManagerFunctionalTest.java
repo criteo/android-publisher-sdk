@@ -980,8 +980,7 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void fetchForLiveBidRequest_GivenGlobalSilentModeOff_AndSilencedCacheEntry_ShouldReturnNoBid()
-      throws Exception {
+  public void fetchForLiveBidRequest_GivenGlobalSilentModeOff_AndSilencedCacheEntry_ShouldReturnNoBid() {
     givenKillSwitchIs(false);
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
@@ -995,6 +994,47 @@ public class BidManagerFunctionalTest {
     verify(bidListener).onNoBid();
     verify(liveBidRequestSender, never()).sendLiveBidRequest(any(), any());
     verify(metricSendingQueueConsumer).sendMetricBatch();
+  }
+
+  @Test
+  public void setCacheAdUnits_GivenValidCdbResponseSlot_ShouldTriggerBidCached() {
+    CdbResponseSlot cdbResponseSlot = givenValidCdbResponseSlot();
+
+    BidManager bidManager = createBidManager();
+    bidManager.setCacheAdUnits(singletonList(cdbResponseSlot));
+
+    verify(bidLifecycleListener).onBidCached(cdbResponseSlot);
+  }
+
+  @Test
+  public void setCacheAdUnits_GivenOneValid_AndOneInvalidCdbResponseSlot_ShouldOnlyTriggerBidCachedForValid() {
+    CdbResponseSlot validCdbResponseSlot = givenValidCdbResponseSlot();
+    CdbResponseSlot invalidCdbResponseSlot = givenInvalidCdbResponseSlot();
+
+    List<CdbResponseSlot> cdbResponseSlots = Arrays.asList(
+        validCdbResponseSlot,
+        invalidCdbResponseSlot
+    );
+
+    BidManager bidManager = createBidManager();
+    bidManager.setCacheAdUnits(cdbResponseSlots);
+
+    verify(bidLifecycleListener).onBidCached(validCdbResponseSlot);
+  }
+
+  @Test
+  public void setCacheAdUnits_GivenInvalidCdbResponseSlot_ShouldNotTriggerBidCached()
+      throws Exception {
+    CdbResponseSlot invalidCdbResponseSlot = givenInvalidCdbResponseSlot();
+
+    List<CdbResponseSlot> cdbResponseSlots = singletonList(
+        invalidCdbResponseSlot
+    );
+
+    BidManager bidManager = createBidManager();
+    bidManager.setCacheAdUnits(cdbResponseSlots);
+
+    verify(bidLifecycleListener, never()).onBidCached(any());
   }
 
   private BidManager givenGlobalSilenceMode(boolean enabled) {
@@ -1167,6 +1207,18 @@ public class BidManagerFunctionalTest {
 
   private void givenMockedClockSetTo(long instant) {
     when(clock.getCurrentTimeInMillis()).thenReturn(instant);
+  }
+
+  private CdbResponseSlot givenValidCdbResponseSlot() {
+    CdbResponseSlot cdbResponseSlot = mock(CdbResponseSlot.class);
+    when(cdbResponseSlot.isValid()).thenReturn(true);
+    return cdbResponseSlot;
+  }
+
+  private CdbResponseSlot givenInvalidCdbResponseSlot() {
+    CdbResponseSlot cdbResponseSlot = mock(CdbResponseSlot.class);
+    when(cdbResponseSlot.isValid()).thenReturn(false);
+    return cdbResponseSlot;
   }
 
   @NonNull

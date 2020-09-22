@@ -36,6 +36,7 @@ import com.criteo.publisher.model.Config;
 import com.criteo.publisher.network.BidRequestSender;
 import com.criteo.publisher.network.LiveBidRequestSender;
 import com.criteo.publisher.util.ApplicationStoppedListener;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -245,13 +246,15 @@ public class BidManager implements ApplicationStoppedListener {
     synchronized (cacheLock) {
       for (CdbResponseSlot slot : slots) {
         if (slot.isValid()) {
-          boolean isImmediateBid = slot.getCpmAsNumber() > 0 && slot.getTtlInSeconds() == 0;
+          boolean isImmediateBid = slot.getCpmAsNumber() != null && slot.getCpmAsNumber() > 0
+              && slot.getTtlInSeconds() == 0;
           if (isImmediateBid) {
             slot.setTtlInSeconds(DEFAULT_TTL_IN_SECONDS);
           }
 
           slot.setTimeOfDownload(instant);
           cache.add(slot);
+          bidLifecycleListener.onBidCached(slot);
         }
       }
     }
@@ -315,27 +318,27 @@ public class BidManager implements ApplicationStoppedListener {
     return cdbResponseSlot.getCpmAsNumber() == null ? 0.0 : cdbResponseSlot.getCpmAsNumber();
   }
 
-/**
- * Implementation specific to listening Cdb calls for updating the cache only
- */
-private class CacheOnlyCdbCallListener extends CdbCallListener {
+  /**
+   * Implementation specific to listening Cdb calls for updating the cache only
+   */
+  private class CacheOnlyCdbCallListener extends CdbCallListener {
 
-  public CacheOnlyCdbCallListener() {
-    super(bidLifecycleListener, BidManager.this);
-  }
+    public CacheOnlyCdbCallListener() {
+      super(bidLifecycleListener, BidManager.this);
+    }
 
-  @Override
-  public void onCdbResponse(
-      @NonNull CdbRequest cdbRequest,
-      @NonNull CdbResponse cdbResponse
-  ) {
-    setCacheAdUnits(cdbResponse.getSlots());
-    super.onCdbResponse(cdbRequest, cdbResponse);
-  }
+    @Override
+    public void onCdbResponse(
+        @NonNull CdbRequest cdbRequest,
+        @NonNull CdbResponse cdbResponse
+    ) {
+      setCacheAdUnits(cdbResponse.getSlots());
+      super.onCdbResponse(cdbRequest, cdbResponse);
+    }
 
-  @Override
-  public void onTimeBudgetExceeded() {
-    // no-op
+    @Override
+    public void onTimeBudgetExceeded() {
+      // no-op
+    }
   }
-}
 }

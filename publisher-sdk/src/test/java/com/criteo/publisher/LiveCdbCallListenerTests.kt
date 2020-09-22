@@ -23,7 +23,6 @@ import com.criteo.publisher.model.CdbResponse
 import com.criteo.publisher.model.CdbResponseSlot
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.only
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -71,7 +70,7 @@ class LiveCdbCallListenerTests {
   fun onBidResponse_givenRequestServedWithinTimeBudget_ThenDontCache_AndPassTheResponseThrough() {
     whenever(cdbResponse.slots).thenReturn(listOf(freshCdbResponseSlot))
     whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
-    whenever(bidManager.isBidSilent(freshCdbResponseSlot)).thenReturn(false);
+    whenever(bidManager.isBidSilent(freshCdbResponseSlot)).thenReturn(false)
 
     liveCdbCallListener.onCdbResponse(cdbRequest, cdbResponse)
 
@@ -79,7 +78,8 @@ class LiveCdbCallListenerTests {
     verify(bidManager, never()).setCacheAdUnits(any())
     verify(bidListener, never()).onNoBid()
     verify(bidListener, times(1)).onBidResponse(freshCdbResponseSlot)
-    verify(bidLifecycleListener, only()).onCdbCallFinished(cdbRequest, cdbResponse)
+    verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
+    verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, freshCdbResponseSlot);
   }
 
   @Test
@@ -130,7 +130,6 @@ class LiveCdbCallListenerTests {
     verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
     verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, cachedCdbResponseSlot)
   }
-
 
   @Test
   fun onBidResponse_givenTimeBudgetExceeded_AndCacheEntryExpired_ThenCacheNewResponse_AndTriggerNoBid() {
@@ -207,7 +206,6 @@ class LiveCdbCallListenerTests {
     verify(bidManager, never()).consumeCachedBid(cacheAdUnit)
     verify(bidManager, never()).setTimeToNextCall(1_000)
     verify(bidManager, never()).setCacheAdUnits(any())
-
     verify(bidListener, never()).onBidResponse(any())
     verify(bidListener, times(1)).onNoBid()
 
