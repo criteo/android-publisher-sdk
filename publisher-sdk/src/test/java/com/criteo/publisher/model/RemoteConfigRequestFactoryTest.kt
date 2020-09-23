@@ -17,6 +17,7 @@
 package com.criteo.publisher.model
 
 import com.criteo.publisher.integration.IntegrationRegistry
+import com.criteo.publisher.util.AdvertisingInfo
 import com.criteo.publisher.util.BuildConfigWrapper
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.stub
@@ -37,12 +38,15 @@ class RemoteConfigRequestFactoryTest {
     @Mock
     private lateinit var integrationRegistry: IntegrationRegistry
 
+    @Mock
+    private lateinit var advertisingInfo: AdvertisingInfo
+
     private lateinit var factory: RemoteConfigRequestFactory
 
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        factory = RemoteConfigRequestFactory(publisher, buildConfigWrapper, integrationRegistry)
+        factory = RemoteConfigRequestFactory(publisher, buildConfigWrapper, integrationRegistry, advertisingInfo)
     }
 
     @Test
@@ -60,11 +64,16 @@ class RemoteConfigRequestFactoryTest {
             on { criteoPublisherId } doReturn "myCpId"
         }
 
+        advertisingInfo.stub {
+            on { advertisingId } doReturn "myAdvertisingId"
+        }
+
         val request = factory.createRequest()
 
         assertThat(request.bundleId).isEqualTo("my.bundle")
         assertThat(request.criteoPublisherId).isEqualTo("myCpId")
         assertThat(request.sdkVersion).isEqualTo("1.2.3")
         assertThat(request.profileId).isEqualTo(456)
+        assertThat(request.deviceId).isEqualTo("myAdvertisingId")
     }
 }

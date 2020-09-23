@@ -410,7 +410,8 @@ public class DependencyProvider {
         return new RemoteConfigRequestFactory(
             providePublisher(),
             provideBuildConfigWrapper(),
-            provideIntegrationRegistry()
+            provideIntegrationRegistry(),
+            provideAdvertisingInfo()
         );
       }
     });

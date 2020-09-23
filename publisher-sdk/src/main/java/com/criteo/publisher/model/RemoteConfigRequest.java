@@ -17,6 +17,7 @@
 package com.criteo.publisher.model;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
@@ -30,9 +31,10 @@ public abstract class RemoteConfigRequest {
       @NonNull String criteoPublisherId,
       @NonNull String bundleId,
       @NonNull String sdkVersion,
-      int profileId
+      int profileId,
+      @Nullable String deviceId
   ) {
-    return new AutoValue_RemoteConfigRequest(criteoPublisherId, bundleId, sdkVersion, profileId);
+    return new AutoValue_RemoteConfigRequest(criteoPublisherId, bundleId, sdkVersion, profileId, deviceId);
   }
 
   public static TypeAdapter<RemoteConfigRequest> typeAdapter(Gson gson) {
@@ -51,5 +53,11 @@ public abstract class RemoteConfigRequest {
 
   @SerializedName("rtbProfileId")
   public abstract int getProfileId();
+
+  /**
+   * Field used by the remote config to A/B test some configurations.
+   */
+  @Nullable
+  public abstract String getDeviceId();
 
 }
