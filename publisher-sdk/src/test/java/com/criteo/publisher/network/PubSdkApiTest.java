@@ -348,7 +348,8 @@ public class PubSdkApiTest {
         "myCpId",
         "myAppId",
         "myVersion",
-        456
+        456,
+        "myDeviceId"
     );
 
     String expectedJson = ""
@@ -356,7 +357,8 @@ public class PubSdkApiTest {
         + "  \"cpId\" : \"myCpId\",\n"
         + "  \"bundleId\" : \"myAppId\",\n"
         + "  \"sdkVersion\" : \"myVersion\",\n"
-        + "  \"rtbProfileId\": 456\n"
+        + "  \"rtbProfileId\": 456,\n"
+        + "  \"deviceId\": \"myDeviceId\""
         + "}";
 
     mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody("{}"));

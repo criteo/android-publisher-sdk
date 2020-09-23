@@ -39,19 +39,21 @@ class RemoteConfigRequestTest {
         "myCpId",
         "my.bundle.id",
         "1.2.3",
-        456
+        456,
+        "myDeviceId"
     )
 
     val json = serializer.writeIntoString(request)
 
-    assertThat(json).isEqualToIgnoringWhitespace("""
+    assertThat(json).isEqualToIgnoringWhitespace(
+        """
       {
         "cpId" : "myCpId",
         "bundleId" : "my.bundle.id",
         "sdkVersion" : "1.2.3",
-        "rtbProfileId": 456
+        "rtbProfileId": 456,
+        "deviceId": "myDeviceId"
       }
     """.trimIndent())
   }
-
 }
