@@ -67,7 +67,8 @@ class LiveCdbCallListenerTests {
   }
 
   @Test
-  fun onBidResponse_givenRequestServedWithinTimeBudget_ThenDontCache_AndPassTheResponseThrough() {
+  fun onBidResponse_givenValidResponseServedWithinTimeBudget_ThenDontCache_AndPassTheResponseThrough() {
+    whenever(freshCdbResponseSlot.isValid()).thenReturn(true)
     whenever(cdbResponse.slots).thenReturn(listOf(freshCdbResponseSlot))
     whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
     whenever(bidManager.isBidSilent(freshCdbResponseSlot)).thenReturn(false)
@@ -80,6 +81,23 @@ class LiveCdbCallListenerTests {
     verify(bidListener, times(1)).onBidResponse(freshCdbResponseSlot)
     verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
     verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, freshCdbResponseSlot);
+  }
+
+  @Test
+  fun onBidResponse_givenInvalidResponseServedWithinTimeBudget_ThenDontCache_AndCallNoBid() {
+    whenever(freshCdbResponseSlot.isValid()).thenReturn(false)
+    whenever(cdbResponse.slots).thenReturn(listOf(freshCdbResponseSlot))
+    whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
+    whenever(bidManager.isBidSilent(freshCdbResponseSlot)).thenReturn(false)
+
+    liveCdbCallListener.onCdbResponse(cdbRequest, cdbResponse)
+
+    verify(bidManager).setTimeToNextCall(1_000)
+    verify(bidManager, never()).setCacheAdUnits(any())
+    verify(bidListener).onNoBid()
+    verify(bidListener, never()).onBidResponse(freshCdbResponseSlot)
+    verify(bidLifecycleListener, never()).onBidConsumed(cacheAdUnit, freshCdbResponseSlot)
+    verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
   }
 
   @Test

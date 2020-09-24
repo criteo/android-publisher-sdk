@@ -78,19 +78,28 @@ public class LiveCdbCallListener extends CdbCallListener {
     }
     if (isListenerTriggered.compareAndSet(false, true)) {
       if (cdbResponse.getSlots().size() == 1) {
-        CdbResponseSlot cdbResponseSlot = cdbResponse.getSlots().get(0);
-        if (bidManager.isBidSilent(cdbResponseSlot)) {
-          bidManager.setCacheAdUnits(cdbResponse.getSlots());
-          bidListener.onNoBid();
-        } else {
-          bidListener.onBidResponse(cdbResponseSlot);
-          bidLifecycleListener.onBidConsumed(cacheAdUnit, cdbResponseSlot);
-        }
+        serveBidResponseIfPossible(cdbResponse);
       } else {
         bidListener.onNoBid();
       }
     } else {
       bidManager.setCacheAdUnits(cdbResponse.getSlots());
+    }
+  }
+
+  private void serveBidResponseIfPossible(@NonNull CdbResponse cdbResponse) {
+    CdbResponseSlot cdbResponseSlot = cdbResponse.getSlots().get(0);
+    boolean bidSilent = bidManager.isBidSilent(cdbResponseSlot);
+    boolean bidValid = cdbResponseSlot.isValid();
+    boolean bidUsable = !bidSilent && bidValid;
+    if (bidUsable) {
+      bidListener.onBidResponse(cdbResponseSlot);
+      bidLifecycleListener.onBidConsumed(cacheAdUnit, cdbResponseSlot);
+    } else {
+      if (bidSilent) {
+        bidManager.setCacheAdUnits(cdbResponse.getSlots());
+      }
+      bidListener.onNoBid();
     }
   }
 
