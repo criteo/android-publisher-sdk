@@ -62,6 +62,7 @@ public class ApplicationMock {
     when(application.getApplicationContext().getSharedPreferences(any(), anyInt()))
         .thenReturn(sharedPreferences);
     when(application.getApplicationContext().getFilesDir()).thenReturn(filesDir);
+    when(application.getApplicationContext().getPackageName()).thenReturn("com.criteo.dummy.bundle");
     return application;
   }
 

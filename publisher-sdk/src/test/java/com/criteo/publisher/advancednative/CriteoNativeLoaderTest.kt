@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.advancednative
 
+import com.criteo.publisher.BidListener
 import com.criteo.publisher.BidManager
 import com.criteo.publisher.CriteoErrorCode
 import com.criteo.publisher.InHouse
@@ -26,29 +27,55 @@ import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.model.CdbResponseSlot
+import com.criteo.publisher.model.Config
 import com.criteo.publisher.model.NativeAdUnit
 import com.criteo.publisher.model.nativeads.NativeAssets
 import com.criteo.publisher.util.BuildConfigWrapper
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.argThat
+import com.nhaarman.mockitokotlin2.doAnswer
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.doThrow
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.stub
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
+import com.nhaarman.mockitokotlin2.verifyZeroInteractions
+import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import javax.inject.Inject
 
-class CriteoNativeLoaderTest {
+@RunWith(Parameterized::class)
+class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
+
+  companion object {
+    @JvmStatic
+    @Parameterized.Parameters(name = "liveBiddingEnabled_{0}")
+    fun data(): Collection<Array<out Any>> {
+      return listOf(arrayOf(true), arrayOf(false))
+    }
+  }
 
   @Rule
   @JvmField
   val mockedDependenciesRule = MockedDependenciesRule()
 
   @SpyBean
+  private lateinit var config: Config
+
+  @SpyBean
   private lateinit var inHouse: InHouse
 
-  @MockBean
+  @SpyBean
   private lateinit var bidManager: BidManager
 
   @MockBean
@@ -81,6 +108,8 @@ class CriteoNativeLoaderTest {
   @Before
   fun setUp() {
     MockitoAnnotations.initMocks(this)
+
+    doReturn(liveBiddingEnabled).whenever(config).isLiveBiddingEnabled
 
     runOnUiThreadExecutor = DirectMockRunOnUiThreadExecutor()
     mockedDependenciesRule.dependencyProvider.stub {
@@ -203,7 +232,11 @@ class CriteoNativeLoaderTest {
 
   private fun givenNoBidAvailable() {
     bidManager.stub {
-      on { getBidForAdUnitAndPrefetch(adUnit) } doReturn null
+      doReturn(null).whenever(mock).getBidForAdUnitAndPrefetch(adUnit)
+
+      doAnswer {
+        it.getArgument<BidListener>(1).onNoBid()
+      }.whenever(mock).getLiveBidForAdUnit(eq(adUnit), any())
     }
   }
 
@@ -215,7 +248,11 @@ class CriteoNativeLoaderTest {
     }
 
     bidManager.stub {
-      on { getBidForAdUnitAndPrefetch(adUnit) } doReturn slot
+      doReturn(slot).whenever(mock).getBidForAdUnitAndPrefetch(adUnit)
+
+      doAnswer {
+        it.getArgument<BidListener>(1).onBidResponse(slot)
+      }.whenever(mock).getLiveBidForAdUnit(eq(adUnit), any())
     }
 
     nativeAdMapper.stub {
@@ -230,7 +267,11 @@ class CriteoNativeLoaderTest {
     }
 
     bidManager.stub {
-      on { getBidForAdUnitAndPrefetch(adUnit) } doReturn slot
+      doReturn(slot).whenever(mock).getBidForAdUnitAndPrefetch(adUnit)
+
+      doAnswer {
+        it.getArgument<BidListener>(1).onBidResponse(slot)
+      }.whenever(mock).getLiveBidForAdUnit(eq(adUnit), any())
     }
   }
 
@@ -247,5 +288,4 @@ class CriteoNativeLoaderTest {
       }
     }
   }
-
 }
