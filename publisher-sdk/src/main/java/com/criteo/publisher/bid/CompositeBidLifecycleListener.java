@@ -67,4 +67,11 @@ public class CompositeBidLifecycleListener implements BidLifecycleListener {
       delegate.onBidConsumed(adUnit, consumedBid);
     }
   }
+
+  @Override
+  public void onBidCached(@NonNull CdbResponseSlot cachedBid) {
+    for (BidLifecycleListener delegate : delegates) {
+      delegate.onBidCached(cachedBid);
+    }
+  }
 }

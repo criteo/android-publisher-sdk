@@ -33,8 +33,8 @@ import java.util.concurrent.Executor;
 /**
  * Update metrics files accordingly to received events.
  * <p>
- * This follows specifications given by <a href="https://go.crto.in/publisher-sdk-csm">Client
- * Side Metrics</a>.
+ * This follows specifications given by <a href="https://go.crto.in/publisher-sdk-csm">Client Side
+ * Metrics</a>.
  */
 public class CsmBidLifecycleListener implements BidLifecycleListener {
 
@@ -160,7 +160,6 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
                 builder.setReadyToSend(true);
               } else /* if isValidBid */ {
                 builder.setCdbCallEndTimestamp(currentTimeInMillis);
-                builder.setCachedBidUsed(true);
                 builder.setZoneId(responseSlot.getZoneId());
               }
             }
@@ -271,6 +270,34 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
         });
 
         sendingQueueProducer.pushInQueue(repository, impressionId);
+      }
+    });
+  }
+
+  @Override
+  public void onBidCached(@NonNull CdbResponseSlot bidCached) {
+    if (isCsmDisabled()) {
+      return;
+    }
+
+    executor.execute(new SafeRunnable() {
+      @Override
+      public void runSafely() {
+        String impressionId = bidCached.getImpressionId();
+        if (impressionId == null) {
+          return;
+        }
+
+        if (!bidCached.isValid()) {
+          return;
+        }
+
+        repository.addOrUpdateById(impressionId, new MetricUpdater() {
+          @Override
+          public void update(@NonNull Metric.Builder builder) {
+            builder.setReadyToSend(true);
+          }
+        });
       }
     });
   }

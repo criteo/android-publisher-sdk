@@ -319,6 +319,34 @@ class CsmBidLifecycleListenerTest {
     verifyZeroInteractions(repository)
   }
 
+  @Test
+  fun onBidsCached_GivenValidSlots_SetReadyToSend() {
+    val validSlot = mock<CdbResponseSlot>() {
+      on { isValid() } doReturn true
+      on { zoneId } doReturn 42
+      on { impressionId } doReturn "id"
+    }
+
+    listener.onBidCached(validSlot)
+
+    assertRepositoryIsUpdatedById("id") {
+      verify(it).setReadyToSend(true)
+      verifyNoMoreInteractions(it)
+    }  }
+
+  @Test
+  fun onBidsCached_GivenInValidSlots_DontSetReadyToSend() {
+    val invalidSlot = mock<CdbResponseSlot>() {
+      on { isValid() } doReturn false
+      on { zoneId } doReturn 42
+      on { impressionId } doReturn "id"
+    }
+
+    listener.onBidCached(invalidSlot)
+
+    verify(repository, never()).addOrUpdateById(any(), any())
+  }
+
   private fun givenCdbRequestWithSlots(vararg impressionIds: String): CdbRequest {
     val slots = impressionIds.map { impressionId ->
       mock<CdbRequestSlot> {
@@ -352,7 +380,6 @@ class CsmBidLifecycleListenerTest {
   private fun assertValidBidSlotIsReceived(impressionId: String, zoneId: Int) {
     assertRepositoryIsUpdatedById(impressionId) {
       verify(it).setCdbCallEndTimestamp(clock.currentTimeInMillis)
-      verify(it).setCachedBidUsed(true)
       verify(it).setZoneId(zoneId)
       verifyNoMoreInteractions(it)
     }

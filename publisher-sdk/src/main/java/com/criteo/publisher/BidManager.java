@@ -36,6 +36,7 @@ import com.criteo.publisher.model.Config;
 import com.criteo.publisher.network.BidRequestSender;
 import com.criteo.publisher.network.LiveBidRequestSender;
 import com.criteo.publisher.util.ApplicationStoppedListener;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -177,7 +178,7 @@ public class BidManager implements ApplicationStoppedListener {
    * load data for next time
    */
   private void fetchForCache(CacheAdUnit cacheAdUnit) {
-    if (cdbTimeToNextCall.get() <= clock.getCurrentTimeInMillis()) {
+    if (!isGlobalSilenceEnabled()) {
       sendBidRequest(Collections.singletonList(cacheAdUnit));
     }
   }
@@ -190,9 +191,6 @@ public class BidManager implements ApplicationStoppedListener {
       @NonNull AdUnit adUnit,
       @NonNull BidListener bidListener
   ) {
-    // TODO: check if global silence is managed correctly
-    //    (cdbTimeToNextCall.get() <= clock.getCurrentTimeInMillis())
-
     if (killSwitchEngaged()) {
       bidListener.onNoBid();
       return;
@@ -204,15 +202,33 @@ public class BidManager implements ApplicationStoppedListener {
       return;
     }
 
+    synchronized (cacheLock) {
+      CdbResponseSlot cachedCdbResponseSlot = cache.peekAdUnit(cacheAdUnit);
+      boolean isCachedBidExpired = cachedCdbResponseSlot != null && hasBidExpired(cachedCdbResponseSlot);
+      boolean isCachedBidUsable = cachedCdbResponseSlot != null && !hasBidExpired(cachedCdbResponseSlot);
+      boolean isGlobalSilenceEnabled = isGlobalSilenceEnabled();
+      boolean isCachedBidSilent = isCachedBidUsable && isBidSilent(cachedCdbResponseSlot);
 
-    liveBidRequestSender.sendLiveBidRequest(cacheAdUnit, new LiveCdbCallListener(
+      if (isCachedBidExpired) {
+        cache.remove(cacheAdUnit);
+      }
+
+      // not allowed to request CDB, but cache has something usable
+      if (isGlobalSilenceEnabled && isCachedBidUsable && !isCachedBidSilent) {
+        cache.remove(cacheAdUnit);
+        bidListener.onBidResponse(cachedCdbResponseSlot);
+      } else if (isGlobalSilenceEnabled || isCachedBidSilent) { // silenced and nothing cached
+        bidListener.onNoBid();
+      } else { // not silenced
+        liveBidRequestSender.sendLiveBidRequest(cacheAdUnit, new LiveCdbCallListener(
             bidListener,
             bidLifecycleListener,
             this,
             cacheAdUnit
-        )
-    );
-    metricSendingQueueConsumer.sendMetricBatch();
+        ));
+      }
+      metricSendingQueueConsumer.sendMetricBatch();
+    }
   }
 
   private void sendBidRequest(List<CacheAdUnit> prefetchCacheAdUnits) {
@@ -230,13 +246,15 @@ public class BidManager implements ApplicationStoppedListener {
     synchronized (cacheLock) {
       for (CdbResponseSlot slot : slots) {
         if (slot.isValid()) {
-          boolean isImmediateBid = slot.getCpmAsNumber() > 0 && slot.getTtlInSeconds() == 0;
+          boolean isImmediateBid = slot.getCpmAsNumber() != null && slot.getCpmAsNumber() > 0
+              && slot.getTtlInSeconds() == 0;
           if (isImmediateBid) {
             slot.setTtlInSeconds(DEFAULT_TTL_IN_SECONDS);
           }
 
           slot.setTimeOfDownload(instant);
           cache.add(slot);
+          bidLifecycleListener.onBidCached(slot);
         }
       }
     }
@@ -265,6 +283,11 @@ public class BidManager implements ApplicationStoppedListener {
 
   boolean hasBidExpired(@NonNull CdbResponseSlot cdbResponseSlot) {
     return cdbResponseSlot.isExpired(clock);
+  }
+
+  @VisibleForTesting
+  boolean isGlobalSilenceEnabled() {
+    return cdbTimeToNextCall.get() > clock.getCurrentTimeInMillis();
   }
 
   @Override
