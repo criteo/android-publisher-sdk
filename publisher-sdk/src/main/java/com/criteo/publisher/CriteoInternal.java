@@ -25,7 +25,6 @@ import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.headerbidding.HeaderBidding;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
@@ -138,19 +137,9 @@ final class CriteoInternal extends Criteo {
    * Method to start new CdbDownload Asynctask
    * [Standalone only]
    */
-  @Nullable
   @Override
   void getBidForAdUnit(AdUnit adUnit, @NonNull BidListener bidListener) {
-    if (config.isLiveBiddingEnabled()) {
-      bidManager.getLiveBidForAdUnit(adUnit, bidListener);
-    } else {
-      CdbResponseSlot cdbResponseSlot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
-      if (cdbResponseSlot != null) {
-        bidListener.onBidResponse(cdbResponseSlot);
-      } else {
-        bidListener.onNoBid();
-      }
-    }
+    bidManager.getBidForAdUnit(adUnit, bidListener);
   }
 
   @Override

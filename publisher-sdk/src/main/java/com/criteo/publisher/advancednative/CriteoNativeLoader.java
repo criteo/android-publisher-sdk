@@ -22,6 +22,7 @@ import android.view.ViewGroup;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.criteo.publisher.BidListener;
 import com.criteo.publisher.BidManager;
 import com.criteo.publisher.BidToken;
 import com.criteo.publisher.CriteoErrorCode;
@@ -123,10 +124,17 @@ public class CriteoNativeLoader {
   private void doLoad() {
     getIntegrationRegistry().declare(Integration.STANDALONE);
 
-    BidManager bidManager = getBidManager();
-    CdbResponseSlot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit);
-    NativeAssets assets = bid == null ? null : bid.getNativeAssets();
-    handleNativeAssets(assets);
+    getBidManager().getBidForAdUnit(adUnit, new BidListener() {
+      @Override
+      public void onBidResponse(@NonNull CdbResponseSlot cdbResponseSlot) {
+        handleNativeAssets(cdbResponseSlot.getNativeAssets());
+      }
+
+      @Override
+      public void onNoBid() {
+        handleNativeAssets(null);
+      }
+    });
   }
 
   public void loadAd(@Nullable BidToken bidToken) {

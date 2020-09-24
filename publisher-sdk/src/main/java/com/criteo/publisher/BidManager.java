@@ -97,6 +97,32 @@ public class BidManager implements ApplicationStoppedListener {
   }
 
   /**
+   * Notify the given listener for bid or no bid for the given ad unit.
+   * <p>
+   * {@link BidListener#onBidResponse(CdbResponseSlot)} is invoked only if a bid is available and valide.
+   *
+   * @param adUnit ad unit to get a bid from (nullable only to accommodate callers)
+   * @param bidListener listener to notify
+   */
+  public void getBidForAdUnit(@Nullable AdUnit adUnit, @NonNull BidListener bidListener) {
+    if (adUnit == null) {
+      bidListener.onNoBid();
+      return;
+    }
+
+    if (config.isLiveBiddingEnabled()) {
+      getLiveBidForAdUnit(adUnit, bidListener);
+    } else {
+      CdbResponseSlot cdbResponseSlot = getBidForAdUnitAndPrefetch(adUnit);
+      if (cdbResponseSlot != null) {
+        bidListener.onBidResponse(cdbResponseSlot);
+      } else {
+        bidListener.onNoBid();
+      }
+    }
+  }
+
+  /**
    * Returns the last fetched bid a fetch a new one for the next invocation.
    * <p>
    * A <code>null</code> value could be returned. This means that there is no valid bid for the
@@ -126,6 +152,9 @@ public class BidManager implements ApplicationStoppedListener {
    * @return a valid bid that may be displayed or <code>null</code> that should be ignored
    */
   @Nullable
+  // TODO EE-1224, EE-1225 Callers should use #getBidForAdUnit, so live bidding or cached bidding is an implementation
+  //  details for the integration. Once last integration is migrated, this method should be only visible for testing.
+  // @VisibleForTesting
   public CdbResponseSlot getBidForAdUnitAndPrefetch(@Nullable AdUnit adUnit) {
     if (killSwitchEngaged()) {
       return null;
@@ -183,6 +212,7 @@ public class BidManager implements ApplicationStoppedListener {
     }
   }
 
+  @VisibleForTesting
   public void getLiveBidForAdUnit(@NonNull AdUnit adUnit, @NonNull BidListener bidListener) {
     fetchForLiveBidRequest(adUnit, bidListener);
   }
