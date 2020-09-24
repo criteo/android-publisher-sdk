@@ -104,13 +104,10 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
       public void runSafely() {
         long currentTimeInMillis = clock.getCurrentTimeInMillis();
 
-        updateByCdbRequestIds(request, new MetricUpdater() {
-          @Override
-          public void update(@NonNull Metric.Builder builder) {
-            builder.setRequestGroupId(request.getId());
-            builder.setCdbCallStartTimestamp(currentTimeInMillis);
-            builder.setProfileId(request.getProfileId());
-          }
+        updateByCdbRequestIds(request, builder -> {
+          builder.setRequestGroupId(request.getId());
+          builder.setCdbCallStartTimestamp(currentTimeInMillis);
+          builder.setProfileId(request.getProfileId());
         });
       }
     });
@@ -150,18 +147,15 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
           boolean isNoBid = responseSlot == null;
           boolean isInvalidBid = responseSlot != null && !responseSlot.isValid();
 
-          repository.addOrUpdateById(impressionId, new MetricUpdater() {
-            @Override
-            public void update(@NonNull Metric.Builder builder) {
-              if (isNoBid) {
-                builder.setCdbCallEndTimestamp(currentTimeInMillis);
-                builder.setReadyToSend(true);
-              } else if (isInvalidBid) {
-                builder.setReadyToSend(true);
-              } else /* if isValidBid */ {
-                builder.setCdbCallEndTimestamp(currentTimeInMillis);
-                builder.setZoneId(responseSlot.getZoneId());
-              }
+          repository.addOrUpdateById(impressionId, builder -> {
+            if (isNoBid) {
+              builder.setCdbCallEndTimestamp(currentTimeInMillis);
+              builder.setReadyToSend(true);
+            } else if (isInvalidBid) {
+              builder.setReadyToSend(true);
+            } else /* if isValidBid */ {
+              builder.setCdbCallEndTimestamp(currentTimeInMillis);
+              builder.setZoneId(responseSlot.getZoneId());
             }
           });
 
@@ -211,21 +205,13 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
   }
 
   private void onCdbCallNetworkError(CdbRequest request) {
-    updateByCdbRequestIds(request, new MetricUpdater() {
-      @Override
-      public void update(@NonNull Metric.Builder builder) {
-        builder.setReadyToSend(true);
-      }
-    });
+    updateByCdbRequestIds(request, builder -> builder.setReadyToSend(true));
   }
 
   private void onCdbCallTimeout(@NonNull CdbRequest request) {
-    updateByCdbRequestIds(request, new MetricUpdater() {
-      @Override
-      public void update(@NonNull Metric.Builder builder) {
-        builder.setCdbCallTimeout(true);
-        builder.setReadyToSend(true);
-      }
+    updateByCdbRequestIds(request, builder -> {
+      builder.setCdbCallTimeout(true);
+      builder.setReadyToSend(true);
     });
   }
 
@@ -258,15 +244,12 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
         boolean isNotExpired = !consumedBid.isExpired(clock);
         long currentTimeInMillis = clock.getCurrentTimeInMillis();
 
-        repository.addOrUpdateById(impressionId, new MetricUpdater() {
-          @Override
-          public void update(@NonNull Metric.Builder builder) {
-            if (isNotExpired) {
-              builder.setElapsedTimestamp(currentTimeInMillis);
-            }
-
-            builder.setReadyToSend(true);
+        repository.addOrUpdateById(impressionId, builder -> {
+          if (isNotExpired) {
+            builder.setElapsedTimestamp(currentTimeInMillis);
           }
+
+          builder.setReadyToSend(true);
         });
 
         sendingQueueProducer.pushInQueue(repository, impressionId);
@@ -292,12 +275,7 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
           return;
         }
 
-        repository.addOrUpdateById(impressionId, new MetricUpdater() {
-          @Override
-          public void update(@NonNull Metric.Builder builder) {
-            builder.setReadyToSend(true);
-          }
-        });
+        repository.addOrUpdateById(impressionId, builder -> builder.setCachedBidUsed(true));
       }
     });
   }
