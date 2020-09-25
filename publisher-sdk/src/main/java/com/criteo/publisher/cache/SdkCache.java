@@ -42,9 +42,13 @@ public class SdkCache {
   }
 
   public void add(@NonNull CdbResponseSlot slot) {
+    String placementId = slot.getPlacementId();
+    if (placementId == null) {
+      return;
+    }
+
     AdUnitType adUnitType = findAdUnitType(slot);
-    CacheAdUnit key = new CacheAdUnit(new AdSize(slot.getWidth(), slot.getHeight())
-        , slot.getPlacementId(), adUnitType);
+    CacheAdUnit key = new CacheAdUnit(new AdSize(slot.getWidth(), slot.getHeight()), placementId, adUnitType);
     slotMap.put(key, slot);
   }
 
