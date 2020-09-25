@@ -80,10 +80,11 @@ public class DfpActivity extends AppCompatActivity {
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-    Criteo.getInstance().setBidsForAdUnit(builder, NATIVE);
-    PublisherAdRequest request = builder.build();
-    publisherAdView.loadAd(request);
-    linearLayout.addView(publisherAdView);
+    Criteo.getInstance().setBidsForAdUnit(builder, NATIVE, () -> {
+      PublisherAdRequest request = builder.build();
+      publisherAdView.loadAd(request);
+      linearLayout.addView(publisherAdView);
+    });
   }
 
 
@@ -95,10 +96,11 @@ public class DfpActivity extends AppCompatActivity {
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-    Criteo.getInstance().setBidsForAdUnit(builder, BANNER);
-    PublisherAdRequest request = builder.build();
-    publisherAdView.loadAd(request);
-    linearLayout.addView(publisherAdView);
+    Criteo.getInstance().setBidsForAdUnit(builder, BANNER, () -> {
+      PublisherAdRequest request = builder.build();
+      publisherAdView.loadAd(request);
+      linearLayout.addView(publisherAdView);
+    });
   }
 
   private void onInterstitialClick() {
@@ -119,9 +121,9 @@ public class DfpActivity extends AppCompatActivity {
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-    Criteo.getInstance().setBidsForAdUnit(builder, INTERSTITIAL);
-    PublisherAdRequest request = builder.build();
-    mPublisherInterstitialAd.loadAd(request);
+    Criteo.getInstance().setBidsForAdUnit(builder, INTERSTITIAL, () -> {
+      PublisherAdRequest request = builder.build();
+      mPublisherInterstitialAd.loadAd(request);
+    });
   }
-
 }

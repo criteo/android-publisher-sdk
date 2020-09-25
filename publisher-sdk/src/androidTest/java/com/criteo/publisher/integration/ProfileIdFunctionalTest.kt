@@ -161,7 +161,7 @@ class ProfileIdFunctionalTest {
     Criteo.getInstance().getBidResponse(BANNER_320_480)
     mockedDependenciesRule.waitForIdleState()
 
-    Criteo.getInstance().setBidsForAdUnit(mutableMapOf<Any, Any>(), BANNER_320_480)
+    Criteo.getInstance().setBidsForAdUnit(mutableMapOf<Any, Any>(), BANNER_320_480, mock())
     mockedDependenciesRule.waitForIdleState()
 
     doCallRealMethod().whenever(metricSendingQueueConsumer).sendMetricBatch()
@@ -222,7 +222,7 @@ class ProfileIdFunctionalTest {
   @Test
   fun bidInHouse_GivenAnyPreviousIntegration_UseInHouseProfileId() {
     givenInitializedCriteo()
-    Criteo.getInstance().setBidsForAdUnit(mutableMapOf<Any, Any>(), BANNER_320_480)
+    Criteo.getInstance().setBidsForAdUnit(mutableMapOf<Any, Any>(), BANNER_320_480, mock())
     mockedDependenciesRule.waitForIdleState()
     mockedDependenciesRule.resetAllDependencies()
 
@@ -238,7 +238,7 @@ class ProfileIdFunctionalTest {
     givenPreviousInHouseIntegration()
 
     givenInitializedCriteo()
-    Criteo.getInstance().setBidsForAdUnit(mutableMapOf<Any, Any>(), BANNER_320_480)
+    Criteo.getInstance().setBidsForAdUnit(mutableMapOf<Any, Any>(), BANNER_320_480, mock())
     mockedDependenciesRule.waitForIdleState()
 
     verifyCdbIsCalledWith(Integration.CUSTOM_APP_BIDDING)
@@ -249,7 +249,7 @@ class ProfileIdFunctionalTest {
     givenPreviousInHouseIntegration()
 
     givenInitializedCriteo()
-    Criteo.getInstance().setBidsForAdUnit(PublisherAdRequest.Builder(), BANNER_320_480)
+    Criteo.getInstance().setBidsForAdUnit(PublisherAdRequest.Builder(), BANNER_320_480, mock())
     mockedDependenciesRule.waitForIdleState()
 
     verifyCdbIsCalledWith(Integration.GAM_APP_BIDDING)
@@ -261,7 +261,7 @@ class ProfileIdFunctionalTest {
 
     givenInitializedCriteo()
     runOnMainThreadAndWait {
-      Criteo.getInstance().setBidsForAdUnit(MoPubView(context), BANNER_320_480)
+      Criteo.getInstance().setBidsForAdUnit(MoPubView(context), BANNER_320_480, mock())
     }
     mockedDependenciesRule.waitForIdleState()
 
@@ -275,7 +275,7 @@ class ProfileIdFunctionalTest {
     givenInitializedCriteo()
     runOnMainThreadAndWait {
       val moPubInterstitial = MoPubInterstitial(mock(), "adUnit")
-      Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, BANNER_320_480)
+      Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, BANNER_320_480, mock())
     }
     mockedDependenciesRule.waitForIdleState()
 

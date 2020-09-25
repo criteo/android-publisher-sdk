@@ -279,12 +279,12 @@ public class CriteoInternalUnitTest {
   @Test
   public void setBidsForAdUnit_GivenHeaderBiddingThrowing_DoNotThrow() throws Exception {
     HeaderBidding headerBidding = givenMockedHeaderBidding();
-    doThrow(RuntimeException.class).when(headerBidding).enrichBid(any(), any());
+    doThrow(RuntimeException.class).when(headerBidding).enrichBid(any(), any(), any());
 
     CriteoInternal criteo = createCriteo();
 
     assertThatCode(() -> {
-      criteo.setBidsForAdUnit(mock(Object.class), mock(AdUnit.class));
+      criteo.setBidsForAdUnit(mock(Object.class), mock(AdUnit.class), mock(BidListener.class));
     }).doesNotThrowAnyException();
   }
 
@@ -294,11 +294,12 @@ public class CriteoInternalUnitTest {
 
     Object object = mock(Object.class);
     AdUnit adUnit = mock(AdUnit.class);
+    BidListener bidListener = mock(BidListener.class);
 
     CriteoInternal criteo = createCriteo();
-    criteo.setBidsForAdUnit(object, adUnit);
+    criteo.setBidsForAdUnit(object, adUnit, bidListener);
 
-    verify(headerBidding).enrichBid(object, adUnit);
+    verify(headerBidding).enrichBid(object, adUnit, bidListener);
   }
 
   @Test

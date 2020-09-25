@@ -32,6 +32,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -39,6 +40,7 @@ import android.os.Bundle;
 import android.view.View;
 import androidx.test.filters.FlakyTest;
 import androidx.test.rule.ActivityTestRule;
+import com.criteo.publisher.BidListener;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.logging.LoggerFactory;
@@ -159,11 +161,13 @@ public class DfpHeaderBiddingFunctionalTest {
     waitForBids();
 
     Builder builder = new Builder();
+    BidListener bidListener = mock(BidListener.class);
 
-    Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
+    Criteo.getInstance().setBidsForAdUnit(builder, adUnit, bidListener);
     waitForBids();
 
     assertCriteoMacroAreInjectedInDfpBuilder(builder);
+    verify(bidListener).onBiddingComplete();
 
     verify(api, atLeastOnce()).loadCdb(
         argThat(request -> request.getProfileId() == Integration.GAM_APP_BIDDING.getProfileId()),
@@ -178,8 +182,9 @@ public class DfpHeaderBiddingFunctionalTest {
     waitForBids();
 
     Builder builder = new Builder();
+    BidListener bidListener = mock(BidListener.class);
 
-    Criteo.getInstance().setBidsForAdUnit(builder, validNativeAdUnit);
+    Criteo.getInstance().setBidsForAdUnit(builder, validNativeAdUnit, bidListener);
     waitForBids();
 
     Bundle customTargeting = builder.build().getCustomTargeting();
@@ -239,8 +244,9 @@ public class DfpHeaderBiddingFunctionalTest {
     waitForBids();
 
     Builder builder = new Builder();
+    BidListener bidListener = mock(BidListener.class);
 
-    Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
+    Criteo.getInstance().setBidsForAdUnit(builder, adUnit, bidListener);
 
     Bundle customTargeting = builder.build().getCustomTargeting();
 
@@ -287,11 +293,13 @@ public class DfpHeaderBiddingFunctionalTest {
     givenInitializedCriteo(adUnit);
     waitForBids();
 
+    BidListener bidListener = mock(BidListener.class);
     Builder builder = new Builder();
 
-    Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
+    Criteo.getInstance().setBidsForAdUnit(builder, adUnit, bidListener);
 
     assertCriteoMacroAreInjectedInDfpBuilder(builder);
+    verify(bidListener).onBiddingComplete();
 
     // The amount is not that important, but the format is
     String cpm = builder.build().getCustomTargeting().getString(MACRO_CPM);
@@ -319,13 +327,15 @@ public class DfpHeaderBiddingFunctionalTest {
     waitForBids();
 
     Builder builder = new Builder();
+    BidListener bidListener = mock(BidListener.class);
 
-    Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
+    Criteo.getInstance().setBidsForAdUnit(builder, adUnit, bidListener);
 
     String encodedDisplayUrl = builder.build().getCustomTargeting().getString(MACRO_DISPLAY_URL);
     String decodedDisplayUrl = decodeDfpPayloadComponent(encodedDisplayUrl);
 
     assertTrue(STUB_DISPLAY_URL.matcher(decodedDisplayUrl).matches());
+    verify(bidListener).onBiddingComplete();
   }
 
   @Test
@@ -338,8 +348,9 @@ public class DfpHeaderBiddingFunctionalTest {
     waitForBids();
 
     Builder builder = new Builder();
+    BidListener bidListener = mock(BidListener.class);
 
-    Criteo.getInstance().setBidsForAdUnit(builder, validNativeAdUnit);
+    Criteo.getInstance().setBidsForAdUnit(builder, validNativeAdUnit, bidListener);
 
     Bundle bundle = builder.build().getCustomTargeting();
 
@@ -373,6 +384,7 @@ public class DfpHeaderBiddingFunctionalTest {
         decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PIXEL_2)));
     assertEquals(String.valueOf(expectedAssets.getImpressionPixels().size()),
         bundle.getString(MACRO_NATIVE_PIXEL_COUNT));
+    verify(bidListener).onBiddingComplete();
   }
 
   private String decodeDfpPayloadComponent(String component) throws Exception {
@@ -516,8 +528,9 @@ public class DfpHeaderBiddingFunctionalTest {
     waitForBids();
 
     Builder builder = new Builder();
+    BidListener bidListener = mock(BidListener.class);
 
-    Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
+    Criteo.getInstance().setBidsForAdUnit(builder, adUnit, bidListener);
 
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
     PublisherAdRequest request = builder.build();
@@ -535,8 +548,9 @@ public class DfpHeaderBiddingFunctionalTest {
     waitForBids();
 
     Builder builder = new Builder();
+    BidListener bidListener = mock(BidListener.class);
 
-    Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
+    Criteo.getInstance().setBidsForAdUnit(builder, adUnit, bidListener);
 
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
     PublisherAdRequest request = builder.build();

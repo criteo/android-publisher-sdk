@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.headerbidding
 
+import com.criteo.publisher.BidListener
 import com.criteo.publisher.BidManager
 import com.criteo.publisher.integration.Integration
 import com.criteo.publisher.integration.IntegrationRegistry
@@ -44,12 +45,13 @@ class HeaderBiddingTest {
   fun enrichBid_GivenNullObject_DoNothing() {
     val handler = mock<HeaderBiddingHandler>()
     val headerBidding = HeaderBidding(bidManager, listOf(handler), integrationRegistry)
-
-    headerBidding.enrichBid(null, mock())
+    val bidListener = mock<BidListener>()
+    headerBidding.enrichBid(null, mock(), bidListener)
 
     verifyZeroInteractions(bidManager)
     verifyZeroInteractions(handler)
     verifyZeroInteractions(integrationRegistry)
+    verifyZeroInteractions(bidListener)
   }
 
   @Test
@@ -64,7 +66,7 @@ class HeaderBiddingTest {
 
     val headerBidding = HeaderBidding(bidManager, listOf(handler), integrationRegistry)
 
-    headerBidding.enrichBid(obj, adUnit)
+    headerBidding.enrichBid(obj, adUnit, mock())
 
     verify(handler).cleanPreviousBid(obj)
     verify(handler, never()).enrichBid(any(), anyOrNull(), any())
@@ -84,13 +86,15 @@ class HeaderBiddingTest {
       on { getBidForAdUnitAndPrefetch(adUnit) } doReturn slot
     }
 
+    val bidListener = mock<BidListener>()
+
     val headerBidding = HeaderBidding(
         bidManager,
         listOf(handler1, handler2, handler3),
         integrationRegistry
     )
 
-    headerBidding.enrichBid(obj, adUnit)
+    headerBidding.enrichBid(obj, adUnit, bidListener)
 
     verify(handler1, never()).cleanPreviousBid(any())
     verify(handler1, never()).enrichBid(any(), anyOrNull(), any())
@@ -99,6 +103,7 @@ class HeaderBiddingTest {
     verify(handler3, never()).cleanPreviousBid(any())
     verify(handler3, never()).enrichBid(any(), anyOrNull(), any())
     verify(integrationRegistry).declare(Integration.IN_HOUSE)
+    verify(bidListener).onBiddingComplete()
     verifyNoMoreInteractions(integrationRegistry)
   }
 

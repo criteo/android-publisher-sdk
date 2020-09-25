@@ -18,6 +18,8 @@ package com.criteo.publisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
 import com.criteo.publisher.model.AdSize;
@@ -48,19 +50,19 @@ public class DummyCriteoTest {
   @Test
   public void setBidsForAdUnit_GivenAnyAdUnit_DoNothingAndDoNotThrow() throws Exception {
     assertThatCode(() -> {
-      criteo.setBidsForAdUnit(null, null);
+      criteo.setBidsForAdUnit(null, null, mock(BidListener.class));
     }).doesNotThrowAnyException();
 
     assertThatCode(() -> {
-      criteo.setBidsForAdUnit(new HashMap<>(), banner);
+      criteo.setBidsForAdUnit(new HashMap<>(), banner, mock(BidListener.class));
     }).doesNotThrowAnyException();
 
     assertThatCode(() -> {
-      criteo.setBidsForAdUnit(new HashMap<>(), interstitial);
+      criteo.setBidsForAdUnit(new HashMap<>(), interstitial, mock(BidListener.class));
     }).doesNotThrowAnyException();
 
     assertThatCode(() -> {
-      criteo.setBidsForAdUnit(new HashMap<>(), aNative);
+      criteo.setBidsForAdUnit(new HashMap<>(), aNative, mock(BidListener.class));
     }).doesNotThrowAnyException();
   }
 

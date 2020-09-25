@@ -128,7 +128,7 @@ public abstract class Criteo {
     criteo = instance;
   }
 
-  public abstract void setBidsForAdUnit(Object object, @NonNull AdUnit adUnit);
+  public abstract void setBidsForAdUnit(Object object, @NonNull AdUnit adUnit, @NonNull BidListener bidListener);
 
   @Nullable
   abstract void getBidForAdUnit(@Nullable AdUnit adUnit, @NonNull CdbResponseSlotListener cdbResponseSlotListener);

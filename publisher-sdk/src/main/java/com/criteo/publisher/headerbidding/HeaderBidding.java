@@ -18,6 +18,7 @@ package com.criteo.publisher.headerbidding;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.criteo.publisher.BidListener;
 import com.criteo.publisher.BidManager;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.model.AdUnit;
@@ -45,7 +46,11 @@ public class HeaderBidding {
     this.integrationRegistry = integrationRegistry;
   }
 
-  public void enrichBid(@Nullable Object object, @Nullable AdUnit adUnit) {
+  public void enrichBid(
+      @Nullable Object object,
+      @Nullable AdUnit adUnit,
+      @NonNull BidListener bidListener
+  ) {
     if (object == null) {
       return;
     }
@@ -62,6 +67,7 @@ public class HeaderBidding {
         }
 
         handler.enrichBid(object, adUnit, slot);
+        bidListener.onBiddingComplete();
         return;
       }
     }

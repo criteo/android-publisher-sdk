@@ -121,16 +121,16 @@ final class CriteoInternal extends Criteo {
   }
 
   @Override
-  public void setBidsForAdUnit(Object object, @NonNull AdUnit adUnit) {
+  public void setBidsForAdUnit(Object object, @NonNull AdUnit adUnit, @NonNull BidListener bidListener) {
     try {
-      doSetBidsForAdUnit(object, adUnit);
+      doSetBidsForAdUnit(object, adUnit, bidListener);
     } catch (Throwable e) {
       Log.e(TAG, "Internal error while setting bids for adUnit.", e);
     }
   }
 
-  private void doSetBidsForAdUnit(Object object, AdUnit adUnit) {
-    headerBidding.enrichBid(object, adUnit);
+  private void doSetBidsForAdUnit(Object object, AdUnit adUnit, @NonNull BidListener bidListener) {
+    headerBidding.enrichBid(object, adUnit, bidListener);
   }
 
   /**

@@ -26,6 +26,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
+import com.criteo.publisher.BidListener;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdSize;
@@ -92,19 +93,23 @@ public class MopubActivity extends AppCompatActivity {
     linearLayout.setVisibility(View.VISIBLE);
 
     publisherAdView = new MoPubView(this);
-    criteo.setBidsForAdUnit(publisherAdView, BANNER);
-    publisherAdView.setAdUnitId(MOPUB_BANNER_ADUNIT_ID_HB);
-    publisherAdView.loadAd();
+    criteo.setBidsForAdUnit(publisherAdView, BANNER, () -> {
+      publisherAdView.setAdUnitId(MOPUB_BANNER_ADUNIT_ID_HB);
+      publisherAdView.loadAd();
+    });
+
 
     linearLayout.addView(publisherAdView);
   }
 
   private void onInterstitialClick() {
     MoPubInterstitial mInterstitial = new MoPubInterstitial(this, MOPUB_INTERSTITIAL_ADUNIT_ID_HB);
-    criteo.setBidsForAdUnit(mInterstitial, INTERSTITIAL);
-    mInterstitial.setInterstitialAdListener(
-        new TestAppMoPubInterstitialAdListener(TAG, mInterstitial));
-    mInterstitial.load();
+
+    criteo.setBidsForAdUnit(mInterstitial, INTERSTITIAL, () ->{
+      mInterstitial.setInterstitialAdListener(
+          new TestAppMoPubInterstitialAdListener(TAG, mInterstitial));
+      mInterstitial.load();
+    });
   }
 
   @Override
