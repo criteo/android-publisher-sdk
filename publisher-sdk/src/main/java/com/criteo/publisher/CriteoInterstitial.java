@@ -56,19 +56,19 @@ public class CriteoInterstitial {
    * Used by server side bidding and in-house auction
    */
   public CriteoInterstitial() {
-    this(null);
+    this(null, null);
   }
 
   /**
    * Used by Standalone
    */
-  public CriteoInterstitial(InterstitialAdUnit interstitialAdUnit) {
+  public CriteoInterstitial(@NonNull InterstitialAdUnit interstitialAdUnit) {
     this(interstitialAdUnit, null);
   }
 
   @VisibleForTesting
   CriteoInterstitial(
-      InterstitialAdUnit interstitialAdUnit,
+      @Nullable InterstitialAdUnit interstitialAdUnit,
       @Nullable Criteo criteo
   ) {
     this.interstitialAdUnit = interstitialAdUnit;
