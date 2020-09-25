@@ -213,7 +213,7 @@ public class ConfigIntegrationTests {
   public void sdkInit_GivenContext_ProvidedConfigIsUsed() throws CriteoInitException {
     clearCriteo();
 
-    Criteo.init(application, CriteoUtil.TEST_CP_ID, null);
+    new Criteo.Builder(application, CriteoUtil.TEST_CP_ID).init();
 
     verify(mockedDependenciesRule.getDependencyProvider(), atLeastOnce()).provideConfig();
   }

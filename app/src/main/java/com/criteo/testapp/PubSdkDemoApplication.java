@@ -80,7 +80,9 @@ public class PubSdkDemoApplication extends MultiDexApplication {
     adUnits.add(NATIVE);
 
     try {
-      Criteo.init(this, "B-056946", adUnits);
+      new Criteo.Builder(this, "B-056946")
+          .adUnits(adUnits)
+          .init();
     } catch (Throwable tr) {
       Log.e(TAG, "FAILED TO INIT SDK!!!!", tr);
       throw new IllegalStateException("Criteo SDK is not initialized. You may not proceed.", tr);

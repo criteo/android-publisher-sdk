@@ -35,7 +35,9 @@ public class CriteoUtil {
 
     clearCriteo();
 
-    return Criteo.init(app, TEST_CP_ID, Arrays.asList(preloadedAdUnits));
+    return new Criteo.Builder(app, TEST_CP_ID)
+        .adUnits(Arrays.asList(preloadedAdUnits))
+        .init();
   }
 
   /**
