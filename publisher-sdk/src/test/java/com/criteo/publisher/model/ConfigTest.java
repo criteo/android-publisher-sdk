@@ -111,24 +111,6 @@ public class ConfigTest {
   }
 
   @Test
-  public void isKillSwitchEnabled_GivenKillSwitchEnabledInOldLocalStorage_ReturnsEnabled() {
-    givenKillSwitchInOldLocalStorage(true);
-
-    givenNewConfig();
-
-    assertTrue(config.isKillSwitchEnabled());
-  }
-
-  @Test
-  public void isKillSwitchEnabled_GivenKillSwitchDisabledInOldLocalStorage_ReturnsDisabled() {
-    givenKillSwitchInOldLocalStorage(false);
-
-    givenNewConfig();
-
-    assertFalse(config.isKillSwitchEnabled());
-  }
-
-  @Test
   public void refreshConfig_GivenMissingKillSwitch_ItIsUnchanged() throws Exception {
     givenNewConfig();
 
@@ -307,12 +289,6 @@ public class ConfigTest {
     when(response.getLiveBiddingEnabled()).thenReturn(!config.isLiveBiddingEnabled());
     when(response.getLiveBiddingTimeBudgetInMillis()).thenReturn(1 + config.getLiveBiddingTimeBudgetInMillis());
     return response;
-  }
-
-  private void givenKillSwitchInOldLocalStorage(boolean isEnabled) {
-    when(sharedPreferences.contains("CriteoCachedKillSwitch")).thenReturn(true);
-    when(sharedPreferences.getBoolean(eq("CriteoCachedKillSwitch"), anyBoolean()))
-        .thenReturn(isEnabled);
   }
 
   private void assertConfigContainsDefaultValues() {
