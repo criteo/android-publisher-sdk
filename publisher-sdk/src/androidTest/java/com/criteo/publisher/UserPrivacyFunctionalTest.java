@@ -154,7 +154,7 @@ public class UserPrivacyFunctionalTest {
     waitForIdleState();
 
     criteo.setUsPrivacyOptOut(false);
-    criteo.getBidForAdUnit(TestAdUnits.BANNER_320_480, mock(BidListener.class));
+    criteo.getBidForAdUnit(TestAdUnits.BANNER_320_480, mock(CdbResponseSlotListener.class));
 
     waitForIdleState();
 
@@ -188,7 +188,7 @@ public class UserPrivacyFunctionalTest {
     waitForIdleState();
 
     criteo.setMopubConsent("fake_mopub_consent");
-    criteo.getBidForAdUnit(TestAdUnits.BANNER_320_480, mock(BidListener.class));
+    criteo.getBidForAdUnit(TestAdUnits.BANNER_320_480, mock(CdbResponseSlotListener.class));
 
     waitForIdleState();
 
@@ -216,7 +216,7 @@ public class UserPrivacyFunctionalTest {
     // then
     Criteo.Builder builder2 = getCriteoBuilder(TestAdUnits.BANNER_320_50);
     Criteo criteo2 = builder2.init();
-    criteo2.getBidForAdUnit(TestAdUnits.BANNER_320_480, mock(BidListener.class));
+    criteo2.getBidForAdUnit(TestAdUnits.BANNER_320_480, mock(CdbResponseSlotListener.class));
     waitForIdleState();
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi, times(3)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));

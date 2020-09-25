@@ -36,7 +36,6 @@ import com.criteo.publisher.model.Config;
 import com.criteo.publisher.network.BidRequestSender;
 import com.criteo.publisher.network.LiveBidRequestSender;
 import com.criteo.publisher.util.ApplicationStoppedListener;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -99,25 +98,25 @@ public class BidManager implements ApplicationStoppedListener {
   /**
    * Notify the given listener for bid or no bid for the given ad unit.
    * <p>
-   * {@link BidListener#onBidResponse(CdbResponseSlot)} is invoked only if a bid is available and valide.
+   * {@link CdbResponseSlotListener#onBidResponse(CdbResponseSlot)} is invoked only if a bid is available and valide.
    *
    * @param adUnit ad unit to get a bid from (nullable only to accommodate callers)
-   * @param bidListener listener to notify
+   * @param cdbResponseSlotListener listener to notify
    */
-  public void getBidForAdUnit(@Nullable AdUnit adUnit, @NonNull BidListener bidListener) {
+  public void getBidForAdUnit(@Nullable AdUnit adUnit, @NonNull CdbResponseSlotListener cdbResponseSlotListener) {
     if (adUnit == null) {
-      bidListener.onNoBid();
+      cdbResponseSlotListener.onNoBid();
       return;
     }
 
     if (config.isLiveBiddingEnabled()) {
-      getLiveBidForAdUnit(adUnit, bidListener);
+      getLiveBidForAdUnit(adUnit, cdbResponseSlotListener);
     } else {
       CdbResponseSlot cdbResponseSlot = getBidForAdUnitAndPrefetch(adUnit);
       if (cdbResponseSlot != null) {
-        bidListener.onBidResponse(cdbResponseSlot);
+        cdbResponseSlotListener.onBidResponse(cdbResponseSlot);
       } else {
-        bidListener.onNoBid();
+        cdbResponseSlotListener.onNoBid();
       }
     }
   }
@@ -213,22 +212,22 @@ public class BidManager implements ApplicationStoppedListener {
   }
 
   @VisibleForTesting
-  public void getLiveBidForAdUnit(@NonNull AdUnit adUnit, @NonNull BidListener bidListener) {
-    fetchForLiveBidRequest(adUnit, bidListener);
+  public void getLiveBidForAdUnit(@NonNull AdUnit adUnit, @NonNull CdbResponseSlotListener cdbResponseSlotListener) {
+    fetchForLiveBidRequest(adUnit, cdbResponseSlotListener);
   }
 
   private void fetchForLiveBidRequest(
       @NonNull AdUnit adUnit,
-      @NonNull BidListener bidListener
+      @NonNull CdbResponseSlotListener cdbResponseSlotListener
   ) {
     if (killSwitchEngaged()) {
-      bidListener.onNoBid();
+      cdbResponseSlotListener.onNoBid();
       return;
     }
 
     CacheAdUnit cacheAdUnit = mapToCacheAdUnit(adUnit);
     if (cacheAdUnit == null) {
-      bidListener.onNoBid();
+      cdbResponseSlotListener.onNoBid();
       return;
     }
 
@@ -246,12 +245,12 @@ public class BidManager implements ApplicationStoppedListener {
       // not allowed to request CDB, but cache has something usable
       if (isGlobalSilenceEnabled && isCachedBidUsable && !isCachedBidSilent) {
         cache.remove(cacheAdUnit);
-        bidListener.onBidResponse(cachedCdbResponseSlot);
+        cdbResponseSlotListener.onBidResponse(cachedCdbResponseSlot);
       } else if (isGlobalSilenceEnabled || isCachedBidSilent) { // silenced and nothing cached
-        bidListener.onNoBid();
+        cdbResponseSlotListener.onNoBid();
       } else { // not silenced
         liveBidRequestSender.sendLiveBidRequest(cacheAdUnit, new LiveCdbCallListener(
-            bidListener,
+            cdbResponseSlotListener,
             bidLifecycleListener,
             this,
             cacheAdUnit

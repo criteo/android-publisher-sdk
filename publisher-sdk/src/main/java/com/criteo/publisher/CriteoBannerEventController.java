@@ -69,7 +69,7 @@ public class CriteoBannerEventController {
   }
 
   public void fetchAdAsync(@Nullable AdUnit adUnit) {
-   criteo.getBidForAdUnit(adUnit, new BidListener() {
+   criteo.getBidForAdUnit(adUnit, new CdbResponseSlotListener() {
       @Override
       public void onBidResponse(@NonNull CdbResponseSlot cdbResponseSlot) {
         notifyFor(VALID);

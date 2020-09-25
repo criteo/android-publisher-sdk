@@ -122,9 +122,9 @@ public class CriteoInterstitialIntegrationTest {
 
 
   private void givenMockedNoBidResponse(AdUnit adUnit) {
-    doAnswer(answerVoid((AdUnit ignored, BidListener bidListener) -> bidListener
+    doAnswer(answerVoid((AdUnit ignored, CdbResponseSlotListener bidListener) -> bidListener
         .onNoBid()))
         .when(criteo)
-        .getBidForAdUnit(eq(adUnit), any(BidListener.class));
+        .getBidForAdUnit(eq(adUnit), any(CdbResponseSlotListener.class));
   }
 }

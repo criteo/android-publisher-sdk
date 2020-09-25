@@ -138,8 +138,8 @@ final class CriteoInternal extends Criteo {
    * [Standalone only]
    */
   @Override
-  void getBidForAdUnit(AdUnit adUnit, @NonNull BidListener bidListener) {
-    bidManager.getBidForAdUnit(adUnit, bidListener);
+  void getBidForAdUnit(AdUnit adUnit, @NonNull CdbResponseSlotListener cdbResponseSlotListener) {
+    bidManager.getBidForAdUnit(adUnit, cdbResponseSlotListener);
   }
 
   @Override

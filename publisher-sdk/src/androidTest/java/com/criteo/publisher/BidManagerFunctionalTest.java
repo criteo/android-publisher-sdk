@@ -825,12 +825,12 @@ public class BidManagerFunctionalTest {
     givenMockedCdbRespondingSlot();
 
     BidManager bidManager = createBidManager();
-    BidListener bidListener = mock(BidListener.class);
+    CdbResponseSlotListener cdbResponseSlotListener = mock(CdbResponseSlotListener.class);
 
-    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    bidManager.getLiveBidForAdUnit(adUnit, cdbResponseSlotListener);
     waitForIdleState();
 
-    verify(bidListener).onNoBid();
+    verify(cdbResponseSlotListener).onNoBid();
     verify(metricSendingQueueConsumer, never()).sendMetricBatch();
   }
 
@@ -846,12 +846,12 @@ public class BidManagerFunctionalTest {
     BidManager bidManagerSpy = Mockito.spy(bidManager);
     doReturn(null).when(bidManagerSpy).mapToCacheAdUnit(adUnit);
 
-    BidListener bidListener = mock(BidListener.class);
+    CdbResponseSlotListener cdbResponseSlotListener = mock(CdbResponseSlotListener.class);
 
-    bidManagerSpy.getLiveBidForAdUnit(adUnit, bidListener);
+    bidManagerSpy.getLiveBidForAdUnit(adUnit, cdbResponseSlotListener);
     waitForIdleState();
 
-    verify(bidListener).onNoBid();
+    verify(cdbResponseSlotListener).onNoBid();
     verify(metricSendingQueueConsumer, never()).sendMetricBatch();
   }
 
@@ -861,13 +861,13 @@ public class BidManagerFunctionalTest {
     givenKillSwitchIs(false);
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    BidListener bidListener = mock(BidListener.class);
+    CdbResponseSlotListener cdbResponseSlotListener = mock(CdbResponseSlotListener.class);
 
     BidManager bidManagerSpy = givenGlobalSilenceMode(true);
-    bidManagerSpy.getLiveBidForAdUnit(adUnit, bidListener);
+    bidManagerSpy.getLiveBidForAdUnit(adUnit, cdbResponseSlotListener);
     waitForIdleState();
 
-    verify(bidListener).onNoBid();
+    verify(cdbResponseSlotListener).onNoBid();
     verify(liveBidRequestSender, never()).sendLiveBidRequest(any(), any());
     verify(metricSendingQueueConsumer).sendMetricBatch();
   }
@@ -879,13 +879,13 @@ public class BidManagerFunctionalTest {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     CdbResponseSlot cdbResponseSlot = givenNotExpiredValidCachedBid(cacheAdUnit);
-    BidListener bidListener = mock(BidListener.class);
+    CdbResponseSlotListener cdbResponseSlotListener = mock(CdbResponseSlotListener.class);
 
     BidManager bidManagerSpy = givenGlobalSilenceMode(true);
-    bidManagerSpy.getLiveBidForAdUnit(adUnit, bidListener);
+    bidManagerSpy.getLiveBidForAdUnit(adUnit, cdbResponseSlotListener);
     waitForIdleState();
 
-    verify(bidListener).onBidResponse(cdbResponseSlot);
+    verify(cdbResponseSlotListener).onBidResponse(cdbResponseSlot);
     verify(liveBidRequestSender, never()).sendLiveBidRequest(any(), any());
     verify(metricSendingQueueConsumer).sendMetricBatch();
   }
@@ -898,13 +898,13 @@ public class BidManagerFunctionalTest {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenExpiredValidCachedBid(cacheAdUnit);
-    BidListener bidListener = mock(BidListener.class);
+    CdbResponseSlotListener cdbResponseSlotListener = mock(CdbResponseSlotListener.class);
 
     BidManager bidManagerSpy = givenGlobalSilenceMode(true);
-    bidManagerSpy.getLiveBidForAdUnit(adUnit, bidListener);
+    bidManagerSpy.getLiveBidForAdUnit(adUnit, cdbResponseSlotListener);
     waitForIdleState();
 
-    verify(bidListener).onNoBid();
+    verify(cdbResponseSlotListener).onNoBid();
     verify(liveBidRequestSender, never()).sendLiveBidRequest(any(), any());
     verify(metricSendingQueueConsumer).sendMetricBatch();
   }
@@ -916,13 +916,13 @@ public class BidManagerFunctionalTest {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenNotExpiredSilentModeBidCached(cacheAdUnit);
-    BidListener bidListener = mock(BidListener.class);
+    CdbResponseSlotListener cdbResponseSlotListener = mock(CdbResponseSlotListener.class);
 
     BidManager bidManagerSpy = givenGlobalSilenceMode(true);
-    bidManagerSpy.getLiveBidForAdUnit(adUnit, bidListener);
+    bidManagerSpy.getLiveBidForAdUnit(adUnit, cdbResponseSlotListener);
     waitForIdleState();
 
-    verify(bidListener).onNoBid();
+    verify(cdbResponseSlotListener).onNoBid();
     verify(liveBidRequestSender, never()).sendLiveBidRequest(any(), any());
     verify(metricSendingQueueConsumer).sendMetricBatch();
   }
@@ -934,10 +934,10 @@ public class BidManagerFunctionalTest {
     givenKillSwitchIs(false);
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    BidListener bidListener = mock(BidListener.class);
+    CdbResponseSlotListener cdbResponseSlotListener = mock(CdbResponseSlotListener.class);
 
     BidManager bidManagerSpy = givenGlobalSilenceMode(false);
-    bidManagerSpy.getLiveBidForAdUnit(adUnit, bidListener);
+    bidManagerSpy.getLiveBidForAdUnit(adUnit, cdbResponseSlotListener);
     waitForIdleState();
 
     verify(liveBidRequestSender).sendLiveBidRequest(eq(cacheAdUnit), any());
@@ -951,10 +951,10 @@ public class BidManagerFunctionalTest {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenNotExpiredValidCachedBid(cacheAdUnit);
-    BidListener bidListener = mock(BidListener.class);
+    CdbResponseSlotListener cdbResponseSlotListener = mock(CdbResponseSlotListener.class);
 
     BidManager bidManagerSpy = givenGlobalSilenceMode(false);
-    bidManagerSpy.getLiveBidForAdUnit(adUnit, bidListener);
+    bidManagerSpy.getLiveBidForAdUnit(adUnit, cdbResponseSlotListener);
     waitForIdleState();
 
     verify(liveBidRequestSender).sendLiveBidRequest(eq(cacheAdUnit), any());
@@ -968,13 +968,13 @@ public class BidManagerFunctionalTest {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenExpiredSilentModeBidCached(cacheAdUnit);
-    BidListener bidListener = mock(BidListener.class);
+    CdbResponseSlotListener cdbResponseSlotListener = mock(CdbResponseSlotListener.class);
 
     BidManager bidManagerSpy = givenGlobalSilenceMode(true);
-    bidManagerSpy.getLiveBidForAdUnit(adUnit, bidListener);
+    bidManagerSpy.getLiveBidForAdUnit(adUnit, cdbResponseSlotListener);
     waitForIdleState();
 
-    verify(bidListener).onNoBid();
+    verify(cdbResponseSlotListener).onNoBid();
     verify(liveBidRequestSender, never()).sendLiveBidRequest(any(), any());
     verify(metricSendingQueueConsumer).sendMetricBatch();
   }
@@ -985,13 +985,13 @@ public class BidManagerFunctionalTest {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenNotExpiredSilentModeBidCached(cacheAdUnit);
-    BidListener bidListener = mock(BidListener.class);
+    CdbResponseSlotListener cdbResponseSlotListener = mock(CdbResponseSlotListener.class);
 
     BidManager bidManagerSpy = givenGlobalSilenceMode(true);
-    bidManagerSpy.getLiveBidForAdUnit(adUnit, bidListener);
+    bidManagerSpy.getLiveBidForAdUnit(adUnit, cdbResponseSlotListener);
     waitForIdleState();
 
-    verify(bidListener).onNoBid();
+    verify(cdbResponseSlotListener).onNoBid();
     verify(liveBidRequestSender, never()).sendLiveBidRequest(any(), any());
     verify(metricSendingQueueConsumer).sendMetricBatch();
   }
