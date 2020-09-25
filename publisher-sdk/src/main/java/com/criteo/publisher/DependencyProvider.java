@@ -465,6 +465,7 @@ public class DependencyProvider {
               new MetricSendingQueueProducer(provideMetricSendingQueue()),
               provideClock(),
               provideConfig(),
+              provideUserPrivacyUtil(),
               provideThreadPoolExecutor()
           ));
         }

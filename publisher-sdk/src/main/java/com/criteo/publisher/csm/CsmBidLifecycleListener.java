@@ -27,6 +27,7 @@ import com.criteo.publisher.model.CdbRequestSlot;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.Config;
+import com.criteo.publisher.privacy.UserPrivacyUtil;
 import java.io.InterruptedIOException;
 import java.util.concurrent.Executor;
 
@@ -51,6 +52,9 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
   private final Config config;
 
   @NonNull
+  private final UserPrivacyUtil userPrivacyUtil;
+
+  @NonNull
   private final Executor executor;
 
   public CsmBidLifecycleListener(
@@ -58,12 +62,14 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
       @NonNull MetricSendingQueueProducer sendingQueueProducer,
       @NonNull Clock clock,
       @NonNull Config config,
+      @NonNull UserPrivacyUtil userPrivacyUtil,
       @NonNull Executor executor
   ) {
     this.repository = repository;
     this.sendingQueueProducer = sendingQueueProducer;
     this.clock = clock;
     this.config = config;
+    this.userPrivacyUtil = userPrivacyUtil;
     this.executor = executor;
   }
 
@@ -287,6 +293,6 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
   }
 
   private boolean isCsmDisabled() {
-    return !config.isCsmEnabled();
+    return !config.isCsmEnabled() || userPrivacyUtil.isCsmDisallowed();
   }
 }
