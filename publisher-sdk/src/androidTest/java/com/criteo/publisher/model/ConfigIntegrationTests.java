@@ -31,7 +31,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.app.Application;
-import android.content.Context;
 import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -54,14 +53,10 @@ import org.junit.Test;
 
 public class ConfigIntegrationTests {
 
-  private final String CACHED_KILL_SWITCH = "CriteoCachedKillSwitch";
   private final String CACHED_CONFIG = "CriteoCachedConfig";
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
-
-  @Inject
-  private Context context;
 
   @Inject
   private JsonSerializer jsonSerializer;
@@ -114,7 +109,7 @@ public class ConfigIntegrationTests {
 
   private void isKillSwitchEnabled_GivenKillSwitchInLocalStorageAndNoRemoteConfig_ReturnsLocalStorageValue(
       boolean isEnabled) throws Exception {
-    givenKillSwitchInOldLocalStorage(isEnabled);
+    givenKillSwitchInLocalStorage(isEnabled);
     givenRemoteConfigInError();
 
     givenInitializedCriteo();
@@ -253,9 +248,10 @@ public class ConfigIntegrationTests {
   }
 
   @Test
-  public void testRefreshConfigCachedKillSwitch() throws Exception {
+  public void refreshConfig_GivenKillSwitchInStorageAndGivenNewKillSwitchInRemoteConfig_PersistNewKillSwitch()
+      throws Exception {
     //set the killSwitch to true in sharedPrefs
-    givenKillSwitchInOldLocalStorage(true);
+    givenKillSwitchInLocalStorage(true);
 
     Config config = createConfig();
 
@@ -269,25 +265,6 @@ public class ConfigIntegrationTests {
     // To prevent confusion of where the 'false' value came from
     // changing the defaultValue of getBoolean to true
     assertFalse(getKillSwitchInLocalStorage());
-  }
-
-  @Test
-  public void refreshConfig_GivenKillSwitchInOldStorageAndGivenNullKillSwitchInRemoteConfig_DoNotPersistNullKillSwitch() throws Exception {
-    //set the killSwitch to true in sharedPrefs
-    givenKillSwitchInOldLocalStorage(true);
-
-    Config config = createConfig();
-
-    RemoteConfigResponse response = createRemoteConfigWithKillSwitch(null);
-
-    // test
-    config.refreshConfig(response);
-
-    assertTrue(config.isKillSwitchEnabled());
-
-    // this should not flip from the explicitly set value
-    // as the json doesn't have a kill switch value to overwrite
-    assertTrue(getKillSwitchInLocalStorage());
   }
 
   @Test
@@ -446,12 +423,6 @@ public class ConfigIntegrationTests {
 
   private void givenEmptyLocalStorage() {
     sharedPreferences.edit().clear().apply();
-  }
-
-  private void givenKillSwitchInOldLocalStorage(boolean isEnabled) {
-    sharedPreferences.edit()
-        .putBoolean(CACHED_KILL_SWITCH, isEnabled)
-        .apply();
   }
 
   private void givenKillSwitchInLocalStorage(boolean isEnabled) throws Exception {

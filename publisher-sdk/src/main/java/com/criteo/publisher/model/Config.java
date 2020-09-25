@@ -36,15 +36,6 @@ public class Config {
   private static final String TAG = Config.class.getSimpleName();
 
   /**
-   * Key in local storage where kill switch was persisted before. We keep compatibility with such
-   * persisted data, but it is overridden by new persistence strategies.
-   *
-   * @see #CONFIG_STORAGE_KEY
-   */
-  @Deprecated
-  private static final String OLD_KILL_SWITCH_STORAGE_KEY = "CriteoCachedKillSwitch";
-
-  /**
    * Key in local storage where all configuration from remote is persisted.
    */
   private static final String CONFIG_STORAGE_KEY = "CriteoCachedConfig";
@@ -101,16 +92,6 @@ public class Config {
     }
 
     SafeSharedPreferences safeSharedPreferences = new SafeSharedPreferences(sharedPreferences);
-
-    // Keep compatibility with old kill switches stored in local storage
-    if (sharedPreferences.contains(OLD_KILL_SWITCH_STORAGE_KEY)) {
-      boolean killSwitch = safeSharedPreferences.getBoolean(
-          OLD_KILL_SWITCH_STORAGE_KEY,
-          DefaultConfig.KILL_SWITCH
-      );
-
-      config = config.withKillSwitch(killSwitch);
-    }
 
     String remoteConfigJson = safeSharedPreferences.getString(CONFIG_STORAGE_KEY, "{}");
     byte[] remoteConfigJsonBytes = remoteConfigJson.getBytes(Charset.forName("UTF-8"));
