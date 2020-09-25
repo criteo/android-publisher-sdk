@@ -16,10 +16,6 @@
 
 package com.criteo.publisher.model;
 
-import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
-import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
-import static com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL;
-
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -51,6 +47,11 @@ public class AdUnitMapper {
    */
   private static final int CHUNK_SIZE = 8;
 
+  /**
+   * Special size representing a native ad.
+   */
+  private static final AdSize NATIVE_SIZE = new AdSize(2, 2);
+
   private final AndroidUtil androidUtil;
   private final DeviceUtil deviceUtil;
 
@@ -76,34 +77,27 @@ public class AdUnitMapper {
       if (adUnit == null) {
         continue;
       }
-      switch (adUnit.getAdUnitType()) {
-        case CRITEO_BANNER:
-          BannerAdUnit bannerAdUnit = (BannerAdUnit) adUnit;
-          cacheAdUnits.add(
-              new CacheAdUnit(bannerAdUnit.getSize(), bannerAdUnit.getAdUnitId(), CRITEO_BANNER));
-          break;
 
-        case CRITEO_INTERSTITIAL:
-          InterstitialAdUnit interstitialAdUnit = (InterstitialAdUnit) adUnit;
-          cacheAdUnits.add(new CacheAdUnit(
-              deviceUtil.getCurrentScreenSize(),
-              interstitialAdUnit.getAdUnitId(),
-              CRITEO_INTERSTITIAL
-          ));
-          break;
-
-        case CRITEO_CUSTOM_NATIVE:
-          NativeAdUnit nativeAdUnit = (NativeAdUnit) adUnit;
-          cacheAdUnits.add(new CacheAdUnit(nativeAdUnit.getAdSize(), nativeAdUnit.getAdUnitId(),
-              CRITEO_CUSTOM_NATIVE
-          ));
-          break;
-
-        default:
-          throw new IllegalArgumentException("Found an invalid AdUnit");
-      }
+      AdSize size = getSize(adUnit);
+      CacheAdUnit cacheAdUnit = new CacheAdUnit(size, adUnit.getAdUnitId(), adUnit.getAdUnitType());
+      cacheAdUnits.add(cacheAdUnit);
     }
     return splitIntoChunks(filterInvalidCacheAdUnits(cacheAdUnits), CHUNK_SIZE);
+  }
+
+  @NonNull
+  private AdSize getSize(@NonNull AdUnit adUnit) {
+    switch (adUnit.getAdUnitType()) {
+      case CRITEO_BANNER:
+        BannerAdUnit bannerAdUnit = (BannerAdUnit) adUnit;
+        return bannerAdUnit.getSize();
+      case CRITEO_INTERSTITIAL:
+        return deviceUtil.getCurrentScreenSize();
+      case CRITEO_CUSTOM_NATIVE:
+        return NATIVE_SIZE;
+      default:
+        throw new IllegalArgumentException("Found an invalid AdUnit");
+    }
   }
 
   /**

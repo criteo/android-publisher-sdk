@@ -13,50 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.criteo.publisher.model
 
-package com.criteo.publisher.model;
+import com.criteo.publisher.util.AdUnitType
 
-import androidx.annotation.NonNull;
-import com.criteo.publisher.util.AdUnitType;
-import com.criteo.publisher.util.ObjectUtils;
-import java.util.Arrays;
-
-public abstract class AdUnit {
-
-  private final String adUnitId;
-
-  @NonNull
-  private final AdUnitType adUnitType;
-
-  protected AdUnit(String adUnitId, @NonNull AdUnitType adUnitType) {
-    this.adUnitId = adUnitId;
-    this.adUnitType = adUnitType;
-  }
-
-  public String getAdUnitId() {
-    return adUnitId;
-  }
-
-  @NonNull
-  public AdUnitType getAdUnitType() {
-    return adUnitType;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    AdUnit adUnit = (AdUnit) o;
-    return ObjectUtils.equals(adUnitId, adUnit.adUnitId) &&
-        adUnitType == adUnit.adUnitType;
-  }
-
-  @Override
-  public int hashCode() {
-    return Arrays.hashCode(new Object[] { adUnitId, adUnitType });
-  }
+internal interface AdUnit {
+  val adUnitId: String
+  val adUnitType: AdUnitType
 }

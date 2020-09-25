@@ -13,44 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.criteo.publisher.model
 
-package com.criteo.publisher.model;
+import androidx.annotation.Keep
+import com.criteo.publisher.util.AdUnitType
 
-import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
-
-import com.criteo.publisher.util.ObjectUtils;
-import java.util.Arrays;
-
-public final class NativeAdUnit extends AdUnit {
-
-  private final AdSize adSize;
-
-  public NativeAdUnit(String adUnitId) {
-    super(adUnitId, CRITEO_CUSTOM_NATIVE);
-    this.adSize = new AdSize(2, 2);
-  }
-
-  public AdSize getAdSize() {
-    return this.adSize;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    if (!super.equals(o)) {
-      return false;
-    }
-    NativeAdUnit that = (NativeAdUnit) o;
-    return ObjectUtils.equals(adSize, that.adSize);
-  }
-
-  @Override
-  public int hashCode() {
-    return Arrays.hashCode(new Object [] { super.hashCode(), adSize });
-  }
+@Keep
+data class NativeAdUnit(override val adUnitId: String) : AdUnit {
+  override val adUnitType: AdUnitType
+    get() = AdUnitType.CRITEO_CUSTOM_NATIVE
 }
