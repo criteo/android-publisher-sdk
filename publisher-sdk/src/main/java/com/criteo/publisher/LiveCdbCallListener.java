@@ -118,7 +118,7 @@ public class LiveCdbCallListener extends CdbCallListener {
   }
 
   /**
-   * If the time-budget is exceeded, a bid is returned only if it's available in the cache.
+   * If the time-budget is exceeded, a bid is returned only if it is available in the cache.
    * Otherwise {@link BidListener#onNoBid()} is triggered
    */
   @Override

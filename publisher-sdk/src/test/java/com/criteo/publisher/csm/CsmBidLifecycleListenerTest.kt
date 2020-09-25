@@ -320,7 +320,7 @@ class CsmBidLifecycleListenerTest {
   }
 
   @Test
-  fun onBidsCached_GivenValidSlots_SetReadyToSend() {
+  fun onBidsCached_GivenValidSlots_SetCachedBidUsed() {
     val validSlot = mock<CdbResponseSlot>() {
       on { isValid() } doReturn true
       on { zoneId } doReturn 42
@@ -330,12 +330,12 @@ class CsmBidLifecycleListenerTest {
     listener.onBidCached(validSlot)
 
     assertRepositoryIsUpdatedById("id") {
-      verify(it).setReadyToSend(true)
+      verify(it).setCachedBidUsed(true)
       verifyNoMoreInteractions(it)
     }  }
 
   @Test
-  fun onBidsCached_GivenInValidSlots_DontSetReadyToSend() {
+  fun onBidsCached_GivenInValidSlots_DontSetBidCached() {
     val invalidSlot = mock<CdbResponseSlot>() {
       on { isValid() } doReturn false
       on { zoneId } doReturn 42
