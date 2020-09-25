@@ -16,7 +16,7 @@
 
 package com.criteo.publisher.advancednative
 
-import com.criteo.publisher.BidListener
+import com.criteo.publisher.CdbResponseSlotListener
 import com.criteo.publisher.BidManager
 import com.criteo.publisher.CriteoErrorCode
 import com.criteo.publisher.InHouse
@@ -235,7 +235,7 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
       doReturn(null).whenever(mock).getBidForAdUnitAndPrefetch(adUnit)
 
       doAnswer {
-        it.getArgument<BidListener>(1).onNoBid()
+        it.getArgument<CdbResponseSlotListener>(1).onNoBid()
       }.whenever(mock).getLiveBidForAdUnit(eq(adUnit), any())
     }
   }
@@ -251,7 +251,7 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
       doReturn(slot).whenever(mock).getBidForAdUnitAndPrefetch(adUnit)
 
       doAnswer {
-        it.getArgument<BidListener>(1).onBidResponse(slot)
+        it.getArgument<CdbResponseSlotListener>(1).onBidResponse(slot)
       }.whenever(mock).getLiveBidForAdUnit(eq(adUnit), any())
     }
 
@@ -270,7 +270,7 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
       doReturn(slot).whenever(mock).getBidForAdUnitAndPrefetch(adUnit)
 
       doAnswer {
-        it.getArgument<BidListener>(1).onBidResponse(slot)
+        it.getArgument<CdbResponseSlotListener>(1).onBidResponse(slot)
       }.whenever(mock).getLiveBidForAdUnit(eq(adUnit), any())
     }
   }

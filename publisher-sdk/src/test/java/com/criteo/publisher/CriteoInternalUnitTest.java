@@ -318,14 +318,14 @@ public class CriteoInternalUnitTest {
   @Test
   public void getBidForAdUnit_GivenBidManager_DelegateToIt() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
-    BidListener bidListener = mock(BidListener.class);
+    CdbResponseSlotListener cdbResponseSlotListener = mock(CdbResponseSlotListener.class);
 
     BidManager bidManager = givenMockedBidManager();
 
     CriteoInternal criteo = createCriteo();
-    criteo.getBidForAdUnit(adUnit, bidListener);
+    criteo.getBidForAdUnit(adUnit, cdbResponseSlotListener);
 
-    verify(bidManager).getBidForAdUnit(adUnit, bidListener);
+    verify(bidManager).getBidForAdUnit(adUnit, cdbResponseSlotListener);
   }
 
   private void givenMockedUserPrivacyUtil() {

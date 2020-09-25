@@ -48,10 +48,10 @@ class BidManagerTest {
 
     val adUnit = mock<AdUnit>()
     val expected = mock<CdbResponseSlot>()
-    val bidListener = mock<BidListener>()
+    val bidListener = mock<CdbResponseSlotListener>()
 
     doAnswer {
-      it.getArgument<BidListener>(1).onBidResponse(expected)
+      it.getArgument<CdbResponseSlotListener>(1).onBidResponse(expected)
     }.whenever(bidManager).getLiveBidForAdUnit(adUnit, bidListener)
 
     bidManager.getBidForAdUnit(adUnit, bidListener)
@@ -65,10 +65,10 @@ class BidManagerTest {
     whenever(config.isLiveBiddingEnabled).thenReturn(true)
 
     val adUnit = mock<AdUnit>()
-    val bidListener = mock<BidListener>()
+    val bidListener = mock<CdbResponseSlotListener>()
 
     doAnswer {
-      it.getArgument<BidListener>(1).onNoBid()
+      it.getArgument<CdbResponseSlotListener>(1).onNoBid()
     }.whenever(bidManager).getLiveBidForAdUnit(adUnit, bidListener)
 
     bidManager.getBidForAdUnit(adUnit, bidListener)
@@ -83,7 +83,7 @@ class BidManagerTest {
 
     val adUnit = mock<AdUnit>()
     val expected = mock<CdbResponseSlot>()
-    val bidListener = mock<BidListener>()
+    val bidListener = mock<CdbResponseSlotListener>()
 
     doReturn(expected).whenever(bidManager).getBidForAdUnitAndPrefetch(adUnit)
 
@@ -98,7 +98,7 @@ class BidManagerTest {
     whenever(config.isLiveBiddingEnabled).thenReturn(false)
 
     val adUnit = mock<AdUnit>()
-    val bidListener = mock<BidListener>()
+    val bidListener = mock<CdbResponseSlotListener>()
 
     doReturn(null).whenever(bidManager).getBidForAdUnitAndPrefetch(adUnit)
 

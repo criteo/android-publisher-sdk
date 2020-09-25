@@ -66,12 +66,12 @@ public class DummyCriteoTest {
 
   @Test
   public void getBidForAdUnit_GivenAnyAdUnit_ReturnNull() throws Exception {
-    BidListener bidListener = Mockito.mock(BidListener.class);
-    criteo.getBidForAdUnit(null, bidListener);
-    criteo.getBidForAdUnit(banner, bidListener);
-    criteo.getBidForAdUnit(interstitial, bidListener);
-    criteo.getBidForAdUnit(aNative, bidListener);
-    Mockito.verify(bidListener, times(4)).onNoBid();
+    CdbResponseSlotListener cdbResponseSlotListener = Mockito.mock(CdbResponseSlotListener.class);
+    criteo.getBidForAdUnit(null, cdbResponseSlotListener);
+    criteo.getBidForAdUnit(banner, cdbResponseSlotListener);
+    criteo.getBidForAdUnit(interstitial, cdbResponseSlotListener);
+    criteo.getBidForAdUnit(aNative, cdbResponseSlotListener);
+    Mockito.verify(cdbResponseSlotListener, times(4)).onNoBid();
   }
 
   @Test

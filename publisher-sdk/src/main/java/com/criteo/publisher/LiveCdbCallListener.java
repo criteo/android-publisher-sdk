@@ -32,20 +32,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Internal
 public class LiveCdbCallListener extends CdbCallListener {
 
-  private final BidListener bidListener;
+  private final CdbResponseSlotListener cdbResponseSlotListener;
   private final BidManager bidManager;
   private final CacheAdUnit cacheAdUnit;
   private final BidLifecycleListener bidLifecycleListener;
   private final AtomicBoolean isListenerTriggered = new AtomicBoolean(false);
 
   public LiveCdbCallListener(
-      @NonNull BidListener bidListener,
+      @NonNull CdbResponseSlotListener cdbResponseSlotListener,
       @NonNull BidLifecycleListener bidLifecycleListener,
       @NonNull BidManager bidManager,
       @NonNull CacheAdUnit cacheAdUnit
   ) {
     super(bidLifecycleListener, bidManager);
-    this.bidListener = bidListener;
+    this.cdbResponseSlotListener = cdbResponseSlotListener;
     this.bidLifecycleListener = bidLifecycleListener;
     this.bidManager = bidManager;
     this.cacheAdUnit = cacheAdUnit;
@@ -57,11 +57,11 @@ public class LiveCdbCallListener extends CdbCallListener {
    * <p>
    * 1. If {@link LiveCdbCallListener#onTimeBudgetExceeded()}  hasn't been triggered yet (on a
    * separate thread), a bid response is returned to the caller via {@link
-   * BidListener#onBidResponse(CdbResponseSlot)} unless the {@link CdbResponseSlot} has been
-   * silenced, in which case {@link BidListener#onNoBid()} is triggered instead.
+   * CdbResponseSlotListener#onBidResponse(CdbResponseSlot)} unless the {@link CdbResponseSlot} has been
+   * silenced, in which case {@link CdbResponseSlotListener#onNoBid()} is triggered instead.
    * <p>
    * 2. If {@link LiveCdbCallListener#onTimeBudgetExceeded()} has been triggered, then either {@link
-   * BidListener#onNoBid()} or {@link BidListener#onBidResponse(CdbResponseSlot)} were already
+   * CdbResponseSlotListener#onNoBid()} or {@link CdbResponseSlotListener#onBidResponse(CdbResponseSlot)} were already
    * triggered. The only action that needs to be taken here is to cache the {@link
    * CdbResponseSlot}.
    */
@@ -80,7 +80,7 @@ public class LiveCdbCallListener extends CdbCallListener {
       if (cdbResponse.getSlots().size() == 1) {
         serveBidResponseIfPossible(cdbResponse);
       } else {
-        bidListener.onNoBid();
+        cdbResponseSlotListener.onNoBid();
       }
     } else {
       bidManager.setCacheAdUnits(cdbResponse.getSlots());
@@ -93,19 +93,19 @@ public class LiveCdbCallListener extends CdbCallListener {
     boolean bidValid = cdbResponseSlot.isValid();
     boolean bidUsable = !bidSilent && bidValid;
     if (bidUsable) {
-      bidListener.onBidResponse(cdbResponseSlot);
+      cdbResponseSlotListener.onBidResponse(cdbResponseSlot);
       bidLifecycleListener.onBidConsumed(cacheAdUnit, cdbResponseSlot);
     } else {
       if (bidSilent) {
         bidManager.setCacheAdUnits(cdbResponse.getSlots());
       }
-      bidListener.onNoBid();
+      cdbResponseSlotListener.onNoBid();
     }
   }
 
   /**
    * Triggered when an error happens while fetching a bid. Following this, {@link
-   * BidListener#onNoBid()} is triggered, unless a no-bid was already returned by {@link
+   * CdbResponseSlotListener#onNoBid()} is triggered, unless a no-bid was already returned by {@link
    * LiveCdbCallListener#onTimeBudgetExceeded()} on a separate thread.
    */
   @Override
@@ -113,13 +113,13 @@ public class LiveCdbCallListener extends CdbCallListener {
     super.onCdbError(cdbRequest, exception);
     // noBid would already been called
     if (isListenerTriggered.compareAndSet(false, true)) {
-      bidListener.onNoBid();
+      cdbResponseSlotListener.onNoBid();
     }
   }
 
   /**
    * If the time-budget is exceeded, a bid is returned only if it is available in the cache.
-   * Otherwise {@link BidListener#onNoBid()} is triggered
+   * Otherwise {@link CdbResponseSlotListener#onNoBid()} is triggered
    */
   @Override
   public void onTimeBudgetExceeded() {
@@ -134,12 +134,12 @@ public class LiveCdbCallListener extends CdbCallListener {
       boolean isBidSilent = bidManager.isBidSilent(cdbResponseSlot);
       boolean hasBidExpired = bidManager.hasBidExpired(cdbResponseSlot);
       if (!isBidSilent && !hasBidExpired) {
-        bidListener.onBidResponse(cdbResponseSlot);
+        cdbResponseSlotListener.onBidResponse(cdbResponseSlot);
       } else {
-        bidListener.onNoBid();
+        cdbResponseSlotListener.onNoBid();
       }
     } else {
-      bidListener.onNoBid();
+      cdbResponseSlotListener.onNoBid();
     }
   }
 }

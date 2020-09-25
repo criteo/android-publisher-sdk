@@ -19,10 +19,10 @@ package com.criteo.publisher
 import com.criteo.publisher.model.CdbResponseSlot
 
 /**
- * Callback through which bid responses will be served asynchronously.
+ * Callback through which [CdbResponseSlot] responses will be served asynchronously.
  * Each of the callback methods will only be called once.
  */
-interface BidListener {
+interface CdbResponseSlotListener {
   fun onBidResponse(cdbResponseSlot: CdbResponseSlot)
 
   fun onNoBid()
