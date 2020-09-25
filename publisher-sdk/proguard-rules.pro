@@ -61,26 +61,6 @@
    public *;
 }
 
--keep public class com.criteo.publisher.model.AdUnit
--keepclassmembers class com.criteo.publisher.model.AdUnit {
-   public *;
-}
-
--keep public class com.criteo.publisher.model.BannerAdUnit
--keepclassmembers class com.criteo.publisher.model.BannerAdUnit {
-   public *;
-}
-
--keep public class com.criteo.publisher.model.InterstitialAdUnit
--keepclassmembers class com.criteo.publisher.model.InterstitialAdUnit {
-   public *;
-}
-
--keep public class com.criteo.publisher.model.NativeAdUnit
--keepclassmembers class com.criteo.publisher.model.NativeAdUnit {
-   public *;
-}
-
 -keep public class com.criteo.publisher.CriteoErrorCode
 -keepclassmembers class com.criteo.publisher.CriteoErrorCode {
    public *;

@@ -64,26 +64,8 @@ public class AdUnitMapperTest {
   }
 
   @Test
-  public void convertValidAdUnits_GivenBannerWithNoPlacementId_SkipIt() throws Exception {
-    AdUnit adUnit = new BannerAdUnit(null, new AdSize(1, 1));
-
-    List<List<CacheAdUnit>> validAdUnits = mapper.mapToChunks(singletonList(adUnit));
-
-    assertThat(validAdUnits).isEmpty();
-  }
-
-  @Test
   public void convertValidAdUnits_GivenBannerWithEmptyPlacementId_SkipIt() throws Exception {
     AdUnit adUnit = new BannerAdUnit("", new AdSize(1, 1));
-
-    List<List<CacheAdUnit>> validAdUnits = mapper.mapToChunks(singletonList(adUnit));
-
-    assertThat(validAdUnits).isEmpty();
-  }
-
-  @Test
-  public void convertValidAdUnits_GivenBannerWithNoSize_SkipIt() throws Exception {
-    AdUnit adUnit = new BannerAdUnit("adUnit", null);
 
     List<List<CacheAdUnit>> validAdUnits = mapper.mapToChunks(singletonList(adUnit));
 
@@ -100,26 +82,10 @@ public class AdUnitMapperTest {
   }
 
   @Test
-  public void convertValidAdUnits_GivenInterstitialWithNoPlacementId_SkipIt() throws Exception {
-    AdUnit adUnit = new InterstitialAdUnit(null);
-
-    List<List<CacheAdUnit>> validAdUnits = mapper.mapToChunks(singletonList(adUnit));
-
-    assertThat(validAdUnits).isEmpty();
-  }
-
-  @Test
   public void convertValidAdUnits_GivenInterstitialWithEmptyPlacementId_SkipIt() throws Exception {
+    when(deviceUtil.getCurrentScreenSize()).thenReturn(new AdSize(1, 2));
+
     AdUnit adUnit = new InterstitialAdUnit("");
-
-    List<List<CacheAdUnit>> validAdUnits = mapper.mapToChunks(singletonList(adUnit));
-
-    assertThat(validAdUnits).isEmpty();
-  }
-
-  @Test
-  public void convertValidAdUnits_GivenNativeWithNoPlacementId_SkipIt() throws Exception {
-    AdUnit adUnit = new NativeAdUnit(null);
 
     List<List<CacheAdUnit>> validAdUnits = mapper.mapToChunks(singletonList(adUnit));
 

@@ -13,16 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.criteo.publisher.model
 
-package com.criteo.publisher.model;
+import androidx.annotation.Keep
+import com.criteo.publisher.util.AdUnitType
 
-
-import com.criteo.publisher.util.AdUnitType;
-
-public final class InterstitialAdUnit extends AdUnit {
-
-  public InterstitialAdUnit(String adUnitId) {
-    super(adUnitId, AdUnitType.CRITEO_INTERSTITIAL);
-  }
-
+@Keep
+data class InterstitialAdUnit(override val adUnitId: String) : AdUnit {
+  override val adUnitType: AdUnitType
+    get() = AdUnitType.CRITEO_INTERSTITIAL
 }
