@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.privacy;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -42,12 +43,15 @@ public class UserPrivacyUtilTest {
   @Mock
   private Editor editor;
 
+  @Mock
+  private Tcf2CsmGuard csmGuard;
+
   private UserPrivacyUtil userPrivacyUtil;
 
   @Before
   public void setUp() {
     MockitoAnnotations.initMocks(this);
-    userPrivacyUtil = new UserPrivacyUtil(sharedPreferences, gdprDataFetcher);
+    userPrivacyUtil = new UserPrivacyUtil(sharedPreferences, gdprDataFetcher, csmGuard);
   }
 
   @Test
@@ -210,8 +214,7 @@ public class UserPrivacyUtilTest {
     assertCCPAConsentGiven("", "true", false);
   }
 
-  private void assertCCPAConsentGiven(String iabUsPrivacyString, String usPrivacyOptout,
-      boolean consentGiven) {
+  private void assertCCPAConsentGiven(String iabUsPrivacyString, String usPrivacyOptout, boolean consentGiven) {
     givenUsPrivacySetup(iabUsPrivacyString, usPrivacyOptout);
     assertEquals(consentGiven, userPrivacyUtil.isCCPAConsentGivenOrNotApplicable());
   }
@@ -219,5 +222,16 @@ public class UserPrivacyUtilTest {
   private void givenUsPrivacySetup(String iabUsPrivacyString, String usPrivacyOptout) {
     when(sharedPreferences.getString("IABUSPrivacy_String", "")).thenReturn(iabUsPrivacyString);
     when(sharedPreferences.getString("USPrivacy_Optout", "")).thenReturn(usPrivacyOptout);
+  }
+
+  @Test
+  public void testIsCsmDisabled_DelegateToCsmGuard() {
+    when(csmGuard.isCsmDisallowed()).thenReturn(true).thenReturn(false);
+
+    boolean csmDisallowed1 = userPrivacyUtil.isCsmDisallowed();
+    boolean csmDisallowed2 = userPrivacyUtil.isCsmDisallowed();
+
+    assertThat(csmDisallowed1).isTrue();
+    assertThat(csmDisallowed2).isFalse();
   }
 }

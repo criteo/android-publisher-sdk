@@ -14,20 +14,14 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.privacy.gdpr;
+package com.criteo.publisher.privacy
 
-import androidx.annotation.NonNull;
+import com.criteo.publisher.annotation.OpenForTesting
 
-interface TcfGdprStrategy {
+@OpenForTesting
+internal class Tcf2CsmGuard {
 
-  @NonNull
-  String getConsentString();
-
-  @NonNull
-  String getSubjectToGdpr();
-
-  @NonNull
-  Integer getVersion();
-
-  boolean isProvided();
+  fun isCsmDisallowed(): Boolean {
+    return false // TODO
+  }
 }
