@@ -69,7 +69,7 @@ public class InHouseFunctionalTest {
     Criteo criteo = givenInitializedSdk(validBannerAdUnit);
 
     CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
-    CriteoBannerView bannerView = createBannerView(validBannerAdUnit);
+    CriteoBannerView bannerView = createBannerView();
     bannerView.setCriteoBannerAdListener(listener);
 
     BidResponse bidResponse = criteo.getBidResponse(validBannerAdUnit);
@@ -90,7 +90,7 @@ public class InHouseFunctionalTest {
     Criteo criteo = givenInitializedSdk(invalidBannerAdUnit);
 
     CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
-    CriteoBannerView bannerView = createBannerView(invalidBannerAdUnit);
+    CriteoBannerView bannerView = createBannerView();
     bannerView.setCriteoBannerAdListener(listener);
 
     BidResponse bidResponse = criteo.getBidResponse(invalidBannerAdUnit);
@@ -106,7 +106,7 @@ public class InHouseFunctionalTest {
     Criteo criteo = givenInitializedSdk(validBannerAdUnit);
 
     CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
-    CriteoBannerView bannerView = createBannerView(validBannerAdUnit);
+    CriteoBannerView bannerView = createBannerView();
     bannerView.setCriteoBannerAdListener(listener);
 
     BidResponse bidResponse = criteo.getBidResponse(validBannerAdUnit);
@@ -125,7 +125,7 @@ public class InHouseFunctionalTest {
     Criteo criteo = givenInitializedSdk(validInterstitialAdUnit);
 
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
-    CriteoInterstitial interstitial = createInterstitial(validInterstitialAdUnit);
+    CriteoInterstitial interstitial = createInterstitial();
     interstitial.setCriteoInterstitialAdListener(listener);
 
     BidResponse bidResponse = criteo.getBidResponse(validInterstitialAdUnit);
@@ -146,7 +146,7 @@ public class InHouseFunctionalTest {
     Criteo criteo = givenInitializedSdk(invalidInterstitialAdUnit);
 
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
-    CriteoInterstitial interstitial = createInterstitial(invalidInterstitialAdUnit);
+    CriteoInterstitial interstitial = createInterstitial();
     interstitial.setCriteoInterstitialAdListener(listener);
 
     BidResponse bidResponse = criteo.getBidResponse(invalidInterstitialAdUnit);
@@ -162,7 +162,7 @@ public class InHouseFunctionalTest {
     Criteo criteo = givenInitializedSdk(validInterstitialAdUnit);
 
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
-    CriteoInterstitial interstitial = createInterstitial(validInterstitialAdUnit);
+    CriteoInterstitial interstitial = createInterstitial();
     interstitial.setCriteoInterstitialAdListener(listener);
 
     BidResponse bidResponse = criteo.getBidResponse(validInterstitialAdUnit);
@@ -179,17 +179,13 @@ public class InHouseFunctionalTest {
   }
 
   @NonNull
-  private CriteoBannerView createBannerView(BannerAdUnit bannerAdUnit) {
-    return callOnMainThreadAndWait(() ->
-        new CriteoBannerView(context, bannerAdUnit)
-    );
+  private CriteoBannerView createBannerView() {
+    return callOnMainThreadAndWait(() -> new CriteoBannerView(context));
   }
 
   @NonNull
-  private CriteoInterstitial createInterstitial(InterstitialAdUnit interstitialAdUnit) {
-    return callOnMainThreadAndWait(() ->
-        new CriteoInterstitial(interstitialAdUnit)
-    );
+  private CriteoInterstitial createInterstitial() {
+    return callOnMainThreadAndWait(CriteoInterstitial::new);
   }
 
   private void waitForIdleState() {

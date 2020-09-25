@@ -106,7 +106,7 @@ public class InHouseActivity extends AppCompatActivity {
       criteoBannerView.destroy();
     }
 
-    criteoBannerView = new CriteoBannerView(context, BANNER);
+    criteoBannerView = new CriteoBannerView(context);
     criteoBannerView.setCriteoBannerAdListener(new TestAppBannerAdListener(
         TAG, "In-House", adLayout));
 
@@ -123,7 +123,7 @@ public class InHouseActivity extends AppCompatActivity {
   private void loadInterstitialAd(InterstitialAdUnit adUnit, Button btnShow) {
     String prefix = "In-House " + adUnit.getAdUnitId();
 
-    CriteoInterstitial interstitial = new CriteoInterstitial(adUnit);
+    CriteoInterstitial interstitial = new CriteoInterstitial();
     interstitial.setCriteoInterstitialAdListener(
         new TestAppInterstitialAdListener(TAG, prefix, btnShow));
 
