@@ -39,8 +39,8 @@ public class DummyCriteo extends Criteo {
 
   @Nullable
   @Override
-  void getBidForAdUnit(@Nullable AdUnit adUnit, @NonNull BidListener bidListener) {
-    bidListener.onNoBid();
+  void getBidForAdUnit(@Nullable AdUnit adUnit, @NonNull CdbResponseSlotListener cdbResponseSlotListener) {
+    cdbResponseSlotListener.onNoBid();
   }
 
   @Override

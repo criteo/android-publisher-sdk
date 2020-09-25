@@ -35,7 +35,7 @@ import java.lang.Exception
 
 class LiveCdbCallListenerTests {
   @Mock
-  private lateinit var bidListener: BidListener
+  private lateinit var cdbResponseSlotListener: CdbResponseSlotListener
 
   @Mock
   private lateinit var bidManager: BidManager
@@ -77,8 +77,8 @@ class LiveCdbCallListenerTests {
 
     verify(bidManager).setTimeToNextCall(1_000)
     verify(bidManager, never()).setCacheAdUnits(any())
-    verify(bidListener, never()).onNoBid()
-    verify(bidListener, times(1)).onBidResponse(freshCdbResponseSlot)
+    verify(cdbResponseSlotListener, never()).onNoBid()
+    verify(cdbResponseSlotListener, times(1)).onBidResponse(freshCdbResponseSlot)
     verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
     verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, freshCdbResponseSlot);
   }
@@ -94,8 +94,8 @@ class LiveCdbCallListenerTests {
 
     verify(bidManager).setTimeToNextCall(1_000)
     verify(bidManager, never()).setCacheAdUnits(any())
-    verify(bidListener).onNoBid()
-    verify(bidListener, never()).onBidResponse(freshCdbResponseSlot)
+    verify(cdbResponseSlotListener).onNoBid()
+    verify(cdbResponseSlotListener, never()).onBidResponse(freshCdbResponseSlot)
     verify(bidLifecycleListener, never()).onBidConsumed(cacheAdUnit, freshCdbResponseSlot)
     verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
   }
@@ -110,8 +110,8 @@ class LiveCdbCallListenerTests {
 
     verify(bidManager).setTimeToNextCall(1_000)
     verify(bidManager, never()).setCacheAdUnits(any())
-    verify(bidListener, never()).onBidResponse(any())
-    verify(bidListener).onNoBid()
+    verify(cdbResponseSlotListener, never()).onBidResponse(any())
+    verify(cdbResponseSlotListener).onNoBid()
     verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
   }
 
@@ -125,9 +125,9 @@ class LiveCdbCallListenerTests {
 
     verify(bidManager).setTimeToNextCall(1_000)
     verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
-    verify(bidListener, never()).onBidResponse(any())
+    verify(cdbResponseSlotListener, never()).onBidResponse(any())
     verify(bidManager).setCacheAdUnits(listOf(freshCdbResponseSlot))
-    verify(bidListener).onNoBid()
+    verify(cdbResponseSlotListener).onNoBid()
   }
 
   @Test
@@ -142,9 +142,9 @@ class LiveCdbCallListenerTests {
     verify(bidManager).setTimeToNextCall(1_000)
     verify(bidManager).consumeCachedBid(cacheAdUnit)
     verify(bidManager).setCacheAdUnits(cdbResponse.slots)
-    verify(bidListener).onBidResponse(cachedCdbResponseSlot)
-    verify(bidListener, never()).onBidResponse(freshCdbResponseSlot)
-    verify(bidListener, never()).onNoBid()
+    verify(cdbResponseSlotListener).onBidResponse(cachedCdbResponseSlot)
+    verify(cdbResponseSlotListener, never()).onBidResponse(freshCdbResponseSlot)
+    verify(cdbResponseSlotListener, never()).onNoBid()
     verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
     verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, cachedCdbResponseSlot)
   }
@@ -164,9 +164,9 @@ class LiveCdbCallListenerTests {
     verify(bidManager).consumeCachedBid(cacheAdUnit)
     verify(bidManager).setTimeToNextCall(1_000)
     verify(bidManager).setCacheAdUnits(cdbResponse.slots)
-    verify(bidListener, never()).onBidResponse(cachedCdbResponseSlot)
-    verify(bidListener, never()).onBidResponse(freshCdbResponseSlot)
-    verify(bidListener).onNoBid()
+    verify(cdbResponseSlotListener, never()).onBidResponse(cachedCdbResponseSlot)
+    verify(cdbResponseSlotListener, never()).onBidResponse(freshCdbResponseSlot)
+    verify(cdbResponseSlotListener).onNoBid()
     verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
     verify(bidLifecycleListener).onBidConsumed(any(), any())
   }
@@ -183,9 +183,9 @@ class LiveCdbCallListenerTests {
     verify(bidManager).consumeCachedBid(cacheAdUnit)
     verify(bidManager).setTimeToNextCall(1_000)
     verify(bidManager).setCacheAdUnits(cdbResponse.slots)
-    verify(bidListener, never()).onBidResponse(cachedCdbResponseSlot)
-    verify(bidListener, never()).onBidResponse(freshCdbResponseSlot)
-    verify(bidListener).onNoBid()
+    verify(cdbResponseSlotListener, never()).onBidResponse(cachedCdbResponseSlot)
+    verify(cdbResponseSlotListener, never()).onBidResponse(freshCdbResponseSlot)
+    verify(cdbResponseSlotListener).onNoBid()
     verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
     verify(bidLifecycleListener, never()).onBidConsumed(any(), any())
   }
@@ -203,8 +203,8 @@ class LiveCdbCallListenerTests {
     verify(bidManager).consumeCachedBid(cacheAdUnit)
     verify(bidManager, never()).setTimeToNextCall(1_000)
     verify(bidManager, never()).setCacheAdUnits(any())
-    verify(bidListener, never()).onBidResponse(any())
-    verify(bidListener, times(1)).onNoBid()
+    verify(cdbResponseSlotListener, never()).onBidResponse(any())
+    verify(cdbResponseSlotListener, times(1)).onNoBid()
     verify(bidLifecycleListener, never()).onCdbCallFinished(cdbRequest, cdbResponse)
     verify(bidLifecycleListener).onCdbCallFailed(cdbRequest, exception)
     verify(bidLifecycleListener, never()).onBidConsumed(any(), any())
@@ -224,8 +224,8 @@ class LiveCdbCallListenerTests {
     verify(bidManager, never()).consumeCachedBid(cacheAdUnit)
     verify(bidManager, never()).setTimeToNextCall(1_000)
     verify(bidManager, never()).setCacheAdUnits(any())
-    verify(bidListener, never()).onBidResponse(any())
-    verify(bidListener, times(1)).onNoBid()
+    verify(cdbResponseSlotListener, never()).onBidResponse(any())
+    verify(cdbResponseSlotListener, times(1)).onNoBid()
 
     verify(bidLifecycleListener, never()).onCdbCallFinished(cdbRequest, cdbResponse)
     verify(bidLifecycleListener, never()).onBidConsumed(any(), any())

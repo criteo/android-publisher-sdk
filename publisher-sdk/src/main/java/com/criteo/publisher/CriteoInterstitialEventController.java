@@ -76,7 +76,7 @@ public class CriteoInterstitialEventController {
     }
 
     webViewData.downloadLoading();
-    criteo.getBidForAdUnit(adUnit, new BidListener() {
+    criteo.getBidForAdUnit(adUnit, new CdbResponseSlotListener() {
       @Override
       public void onBidResponse(@NonNull CdbResponseSlot cdbResponseSlot) {
         fetchCreativeAsync(cdbResponseSlot.getDisplayUrl());

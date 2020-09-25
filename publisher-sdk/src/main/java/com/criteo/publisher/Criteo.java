@@ -142,7 +142,7 @@ public abstract class Criteo {
   public abstract void setBidsForAdUnit(Object object, AdUnit adUnit);
 
   @Nullable
-  abstract void getBidForAdUnit(@Nullable AdUnit adUnit, @NonNull BidListener bidListener);
+  abstract void getBidForAdUnit(@Nullable AdUnit adUnit, @NonNull CdbResponseSlotListener cdbResponseSlotListener);
 
   public abstract BidResponse getBidResponse(AdUnit adUnit);
 
