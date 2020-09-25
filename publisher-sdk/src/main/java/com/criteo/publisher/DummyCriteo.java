@@ -33,7 +33,7 @@ import java.util.concurrent.Future;
 public class DummyCriteo extends Criteo {
 
   @Override
-  public void setBidsForAdUnit(Object object, AdUnit adUnit) {
+  public void setBidsForAdUnit(Object object, @NonNull AdUnit adUnit) {
     // Nothing
   }
 
@@ -44,7 +44,7 @@ public class DummyCriteo extends Criteo {
   }
 
   @Override
-  public BidResponse getBidResponse(AdUnit adUnit) {
+  public BidResponse getBidResponse(@NonNull AdUnit adUnit) {
     return new BidResponse();
   }
 
@@ -74,8 +74,9 @@ public class DummyCriteo extends Criteo {
 
   @NonNull
   @Override
-  public CriteoBannerEventController createBannerController(CriteoBannerView bannerView) {
-    return new CriteoBannerEventController(bannerView,
+  public CriteoBannerEventController createBannerController(@NonNull CriteoBannerView bannerView) {
+    return new CriteoBannerEventController(
+        bannerView,
         this,
         DependencyProvider.getInstance().provideTopActivityFinder(),
         DependencyProvider.getInstance().provideRunOnUiThreadExecutor()

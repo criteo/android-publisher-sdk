@@ -121,7 +121,7 @@ final class CriteoInternal extends Criteo {
   }
 
   @Override
-  public void setBidsForAdUnit(Object object, AdUnit adUnit) {
+  public void setBidsForAdUnit(Object object, @NonNull AdUnit adUnit) {
     try {
       doSetBidsForAdUnit(object, adUnit);
     } catch (Throwable e) {
@@ -143,7 +143,7 @@ final class CriteoInternal extends Criteo {
   }
 
   @Override
-  public BidResponse getBidResponse(AdUnit adUnit) {
+  public BidResponse getBidResponse(@NonNull AdUnit adUnit) {
     BidResponse response;
 
     try {
@@ -186,7 +186,7 @@ final class CriteoInternal extends Criteo {
 
   @NonNull
   @Override
-  public CriteoBannerEventController createBannerController(CriteoBannerView bannerView) {
+  public CriteoBannerEventController createBannerController(@NonNull CriteoBannerView bannerView) {
     return new CriteoBannerEventController(
         bannerView,
         this,

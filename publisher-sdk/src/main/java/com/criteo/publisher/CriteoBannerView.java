@@ -59,13 +59,14 @@ public class CriteoBannerView extends WebView {
   /**
    * Used by Standalone
    */
-  public CriteoBannerView(@NonNull Context context, @Nullable BannerAdUnit bannerAdUnit) {
+  public CriteoBannerView(@NonNull Context context, @NonNull BannerAdUnit bannerAdUnit) {
     this(context, bannerAdUnit, null);
   }
 
   @VisibleForTesting
   CriteoBannerView(
-      @NonNull Context context, @Nullable BannerAdUnit bannerAdUnit,
+      @NonNull Context context,
+      @Nullable BannerAdUnit bannerAdUnit,
       @Nullable Criteo criteo
   ) {
     super(context);
