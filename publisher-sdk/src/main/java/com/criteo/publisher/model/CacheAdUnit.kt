@@ -20,7 +20,7 @@ import com.criteo.publisher.util.AdUnitType
 
 @OpenForTesting
 data class CacheAdUnit(
-    val size: AdSize?,
-    val placementId: String?,
+    val size: AdSize,
+    val placementId: String,
     val adUnitType: AdUnitType
 )

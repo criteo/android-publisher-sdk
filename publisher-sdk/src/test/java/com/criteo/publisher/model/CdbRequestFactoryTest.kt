@@ -91,7 +91,6 @@ class CdbRequestFactoryTest {
     assertThat(userAgent).isSameAs(expected)
   }
 
-
   @Test
   fun createRequest_GivenInput_BuildRequest() {
     val adUnit = createAdUnit()
@@ -100,9 +99,9 @@ class CdbRequestFactoryTest {
 
     val expectedSlot = CdbRequestSlot.create(
         "impId",
-        adUnit.placementId!!,
+        adUnit.placementId,
         adUnit.adUnitType,
-        adUnit.size!!
+        adUnit.size
     )
 
     buildConfigWrapper.stub {
@@ -134,9 +133,9 @@ class CdbRequestFactoryTest {
 
     val expectedSlot = CdbRequestSlot.create(
         "impId",
-        adUnit.placementId!!,
+        adUnit.placementId,
         adUnit.adUnitType,
-        adUnit.size!!
+        adUnit.size
     )
 
     buildConfigWrapper.stub {
@@ -189,16 +188,16 @@ class CdbRequestFactoryTest {
 
     val expectedSlot1 = CdbRequestSlot.create(
         "impId1",
-        adUnit1.placementId!!,
+        adUnit1.placementId,
         adUnit1.adUnitType,
-        adUnit1.size!!
+        adUnit1.size
     )
 
     val expectedSlot2 = CdbRequestSlot.create(
         "impId2",
-        adUnit2.placementId!!,
+        adUnit2.placementId,
         adUnit2.adUnitType,
-        adUnit2.size!!
+        adUnit2.size
     )
 
     uniqueIdGenerator.stub {
@@ -220,5 +219,4 @@ class CdbRequestFactoryTest {
     val id = "adUnit #" + adUnitId.incrementAndGet()
     return CacheAdUnit(AdSize(1, 2), id, CRITEO_BANNER)
   }
-
 }

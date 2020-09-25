@@ -130,9 +130,7 @@ public class AdUnitMapper {
     List<CacheAdUnit> validatedCacheAdUnits = new ArrayList<>();
 
     for (CacheAdUnit cacheAdUnit : cacheAdUnits) {
-      if (cacheAdUnit.getPlacementId() == null
-          || cacheAdUnit.getPlacementId().isEmpty()
-          || cacheAdUnit.getSize() == null
+      if (cacheAdUnit.getPlacementId().isEmpty()
           || cacheAdUnit.getSize().getWidth() <= 0
           || cacheAdUnit.getSize().getHeight() <= 0) {
         Log.e(TAG, "Found an invalid AdUnit: " + cacheAdUnit);
