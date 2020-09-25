@@ -28,7 +28,6 @@ import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.WebViewData;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.tasks.InterstitialListenerNotifier;
-import com.criteo.publisher.util.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class CriteoInterstitial {
@@ -124,10 +123,6 @@ public class CriteoInterstitial {
   }
 
   private void doLoadAd(@Nullable BidToken bidToken) {
-    if (bidToken != null && !ObjectUtils.equals(interstitialAdUnit, bidToken.getAdUnit())) {
-      return;
-    }
-
     getOrCreateController().fetchAdAsync(bidToken);
   }
 

@@ -26,7 +26,6 @@ import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.model.BannerAdUnit;
-import com.criteo.publisher.util.ObjectUtils;
 
 public class CriteoBannerView extends WebView {
 
@@ -111,10 +110,6 @@ public class CriteoBannerView extends WebView {
   }
 
   private void doLoadAd(@Nullable BidToken bidToken) {
-    if (bidToken != null && !ObjectUtils.equals(bannerAdUnit, bidToken.getAdUnit())) {
-      return;
-    }
-
     getOrCreateController().fetchAdAsync(bidToken);
   }
 

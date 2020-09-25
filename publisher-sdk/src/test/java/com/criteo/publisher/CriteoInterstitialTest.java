@@ -26,10 +26,8 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.verifyZeroInteractions;
 
 import android.app.Application;
-import android.content.Context;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.mock.MockBean;
@@ -42,7 +40,6 @@ import kotlin.jvm.JvmField;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -105,36 +102,28 @@ public class CriteoInterstitialTest {
     verifyNoMoreInteractions(controller);
   }
 
-  /**
-   * FIXME EE-831 this test scenario is not well-defined. This is currently failing silently. Should
-   * the failure be logged and where ? Should the listener be notified for the failure ? This is an
-   * integration error on publisher side, at least when an interstitial (or native) token is
-   * provided for a banner view. But, for banner token, this is also due to an API that is error
-   * prone: The ad unit given to the view is useless for in-house.
-   */
   @Test
-  public void loadAdInHouse_GivenTokenWithDifferentAdUnit_SkipIt() throws Exception {
+  public void loadAdInHouse_GivenTokenWithDifferentAdUnit_IgnoreAdUnitFromConstructorAndDelegateToController()
+      throws Exception {
     CriteoInterstitialEventController controller = givenMockedController();
     InterstitialAdUnit differentAdUnit = new InterstitialAdUnit(adUnit.getAdUnitId() + "_");
     BidToken bidToken = new BidToken(UUID.randomUUID(), differentAdUnit);
 
     interstitial.loadAd(bidToken);
 
-    verifyZeroInteractions(controller);
+    verify(controller).fetchAdAsync(bidToken);
   }
 
-  /**
-   * FIXME See above
-   */
   @Test
-  public void loadAdInHouse_GivenNotABannerToken_SkipIt() throws Exception {
+  public void loadAdInHouse_GivenNotABannerToken_IgnoreAdUnitFromConstructorAndLetControllerHandleThis()
+      throws Exception {
     CriteoInterstitialEventController controller = givenMockedController();
     AdUnit differentAdUnit = new NativeAdUnit(adUnit.getAdUnitId());
     BidToken bidToken = new BidToken(UUID.randomUUID(), differentAdUnit);
 
     interstitial.loadAd(bidToken);
 
-    verifyZeroInteractions(controller);
+    verify(controller).fetchAdAsync(bidToken);
   }
 
   @Test
