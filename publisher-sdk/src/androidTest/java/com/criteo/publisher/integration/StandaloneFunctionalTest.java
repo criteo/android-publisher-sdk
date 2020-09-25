@@ -73,7 +73,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -640,7 +639,7 @@ public class StandaloneFunctionalTest {
       }
 
       @Override
-      public void onAdFailedToReceive(@NotNull CriteoErrorCode code) {
+      public void onAdFailedToReceive(@NonNull CriteoErrorCode code) {
         onFailed();
       }
     }

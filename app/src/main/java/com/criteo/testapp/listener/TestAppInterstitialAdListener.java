@@ -23,7 +23,6 @@ import androidx.annotation.UiThread;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdListener;
-import org.jetbrains.annotations.NotNull;
 
 public class TestAppInterstitialAdListener implements CriteoInterstitialAdListener {
 
@@ -48,7 +47,7 @@ public class TestAppInterstitialAdListener implements CriteoInterstitialAdListen
   }
 
   @Override
-  public void onAdFailedToReceive(@NotNull CriteoErrorCode code) {
+  public void onAdFailedToReceive(@NonNull CriteoErrorCode code) {
     Log.d(tag, prefix + " - Interstitial onAdFailedToReceive");
   }
 

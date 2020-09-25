@@ -19,7 +19,6 @@ package com.criteo.publisher;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.UiThread;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * All callbacks are invoked on the UI thread, so it is safe to execute any UI operations in the
@@ -46,7 +45,7 @@ public interface CriteoInterstitialAdListener extends CriteoAdListener {
    */
   @UiThread
   @Override
-  default void onAdFailedToReceive(@NotNull CriteoErrorCode code) {
+  default void onAdFailedToReceive(@NonNull CriteoErrorCode code) {
     // no-op by default
   }
 

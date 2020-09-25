@@ -29,7 +29,6 @@ import com.criteo.publisher.util.StreamUtil;
 import com.criteo.publisher.util.TextUtils;
 import java.io.InputStream;
 import java.net.URL;
-import org.jetbrains.annotations.NotNull;
 
 public class WebViewDataTask extends SafeRunnable {
 
@@ -89,7 +88,7 @@ public class WebViewDataTask extends SafeRunnable {
   }
 
   @VisibleForTesting
-  void notifyForSuccess(@NotNull String creative) {
+  void notifyForSuccess(@NonNull String creative) {
     webviewData.setContent(creative);
     webviewData.downloadSucceeded();
     listenerNotifier.notifyFor(VALID);
