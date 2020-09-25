@@ -119,7 +119,9 @@ public class CriteoFunctionalTest {
     givenInitializedCriteo(adUnit);
     waitForBids();
 
-    Criteo.init(application, TEST_CP_ID, Collections.singletonList(adUnit));
+    new Criteo.Builder(application, TEST_CP_ID)
+        .adUnits(Collections.singletonList(adUnit))
+        .init();
     waitForBids();
 
     verify(api, times(1)).loadCdb(any(), any());
