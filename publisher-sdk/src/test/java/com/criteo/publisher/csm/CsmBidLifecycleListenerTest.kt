@@ -17,9 +17,28 @@
 package com.criteo.publisher.csm
 
 import com.criteo.publisher.Clock
-import com.criteo.publisher.model.*
+import com.criteo.publisher.model.AdSize
+import com.criteo.publisher.model.CacheAdUnit
+import com.criteo.publisher.model.CdbRequest
+import com.criteo.publisher.model.CdbRequestSlot
+import com.criteo.publisher.model.CdbResponse
+import com.criteo.publisher.model.CdbResponseSlot
+import com.criteo.publisher.model.Config
+import com.criteo.publisher.privacy.UserPrivacyUtil
 import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.argumentCaptor
+import com.nhaarman.mockitokotlin2.check
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.stub
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
+import com.nhaarman.mockitokotlin2.verifyZeroInteractions
+import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -44,6 +63,9 @@ class CsmBidLifecycleListenerTest {
   @Mock
   private lateinit var config: Config
 
+  @Mock
+  private lateinit var userPrivacyUtil: UserPrivacyUtil
+
   private lateinit var executor: Executor
 
   private lateinit var listener: CsmBidLifecycleListener
@@ -63,6 +85,7 @@ class CsmBidLifecycleListenerTest {
         sendingQueueProducer,
         clock,
         config,
+        userPrivacyUtil,
         executor
     )
   }
@@ -70,6 +93,15 @@ class CsmBidLifecycleListenerTest {
   @Test
   fun onSdkInitialized_GivenDeactivatedFeature_DoNothing() {
     givenDeactivatedFeature()
+
+    listener.onSdkInitialized()
+
+    verifyFeatureIsDeactivated()
+  }
+
+  @Test
+  fun onSdkInitialized_GivenCsmDisallowed_DoNothing() {
+    givenCsmDisallowed()
 
     listener.onSdkInitialized()
 
@@ -86,6 +118,15 @@ class CsmBidLifecycleListenerTest {
   @Test
   fun onCdbCallStarted_GivenDeactivatedFeature_DoNothing() {
     givenDeactivatedFeature()
+
+    listener.onCdbCallStarted(mock())
+
+    verifyFeatureIsDeactivated()
+  }
+
+  @Test
+  fun onCdbCallStarted_GivenCsmDisallowed_DoNothing() {
+    givenCsmDisallowed()
 
     listener.onCdbCallStarted(mock())
 
@@ -115,6 +156,15 @@ class CsmBidLifecycleListenerTest {
   @Test
   fun onCdbCallFinished_GivenDeactivatedFeature_DoNothing() {
     givenDeactivatedFeature()
+
+    listener.onCdbCallFinished(mock(), mock())
+
+    verifyFeatureIsDeactivated()
+  }
+
+  @Test
+  fun onCdbCallFinished_GivenCsmDisallowed_DoNothing() {
+    givenCsmDisallowed()
 
     listener.onCdbCallFinished(mock(), mock())
 
@@ -212,6 +262,15 @@ class CsmBidLifecycleListenerTest {
   }
 
   @Test
+  fun onCdbCallFailed_GivenCsmDisallowed_DoNothing() {
+    givenCsmDisallowed()
+
+    listener.onCdbCallFailed(mock(), mock())
+
+    verifyFeatureIsDeactivated()
+  }
+
+  @Test
   fun onCdbCallFailed_GivenNotATimeoutException_UpdateAllForNetworkError() {
     val request = givenCdbRequestWithSlots("id1", "id2")
 
@@ -258,6 +317,16 @@ class CsmBidLifecycleListenerTest {
   @Test
   fun onBidConsumed_GivenDeactivatedFeature_DoNothing() {
     givenDeactivatedFeature()
+    val adUnit = CacheAdUnit(AdSize(1, 2), "myAdUnit", CRITEO_BANNER)
+
+    listener.onBidConsumed(adUnit, mock())
+
+    verifyFeatureIsDeactivated()
+  }
+
+  @Test
+  fun onBidConsumed_GivenCsmDisallowed_DoNothing() {
+    givenCsmDisallowed()
     val adUnit = CacheAdUnit(AdSize(1, 2), "myAdUnit", CRITEO_BANNER)
 
     listener.onBidConsumed(adUnit, mock())
@@ -320,7 +389,7 @@ class CsmBidLifecycleListenerTest {
   }
 
   @Test
-  fun onBidsCached_GivenValidSlots_SetCachedBidUsed() {
+  fun onBidCached_GivenValidSlots_SetCachedBidUsed() {
     val validSlot = mock<CdbResponseSlot>() {
       on { isValid() } doReturn true
       on { zoneId } doReturn 42
@@ -332,10 +401,11 @@ class CsmBidLifecycleListenerTest {
     assertRepositoryIsUpdatedById("id") {
       verify(it).setCachedBidUsed(true)
       verifyNoMoreInteractions(it)
-    }  }
+    }
+  }
 
   @Test
-  fun onBidsCached_GivenInValidSlots_DontSetBidCached() {
+  fun onBidCached_GivenInValidSlots_DontSetBidCached() {
     val invalidSlot = mock<CdbResponseSlot>() {
       on { isValid() } doReturn false
       on { zoneId } doReturn 42
@@ -345,6 +415,24 @@ class CsmBidLifecycleListenerTest {
     listener.onBidCached(invalidSlot)
 
     verify(repository, never()).addOrUpdateById(any(), any())
+  }
+
+  @Test
+  fun onBidCached_GivenDeactivatedFeature_DoNothing() {
+    givenDeactivatedFeature()
+
+    listener.onBidCached(mock())
+
+    verifyFeatureIsDeactivated()
+  }
+
+  @Test
+  fun onBidCached_GivenDisallowedCsm_DoNothing() {
+    givenCsmDisallowed()
+
+    listener.onBidCached(mock())
+
+    verifyFeatureIsDeactivated()
   }
 
   private fun givenCdbRequestWithSlots(vararg impressionIds: String): CdbRequest {
@@ -427,16 +515,13 @@ class CsmBidLifecycleListenerTest {
     }
   }
 
+  private fun givenCsmDisallowed() {
+    whenever(userPrivacyUtil.isCsmDisallowed).doReturn(true)
+  }
+
   private fun verifyFeatureIsDeactivated() {
     verifyZeroInteractions(repository)
     verifyZeroInteractions(clock)
     verifyZeroInteractions(sendingQueueProducer)
-  }
-
-  private fun givenExecutor(executor: Executor) {
-    doAnswer {
-      val command = it.arguments[0] as Runnable
-      executor.execute(command)
-    }.whenever(this.executor).execute(any())
   }
 }

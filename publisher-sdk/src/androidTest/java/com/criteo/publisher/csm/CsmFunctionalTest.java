@@ -29,6 +29,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,6 +37,7 @@ import androidx.core.util.Consumer;
 import androidx.test.filters.FlakyTest;
 import com.criteo.publisher.Clock;
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.csm.MetricRequest.MetricRequestFeedback;
 import com.criteo.publisher.integration.Integration;
@@ -43,6 +45,7 @@ import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -75,11 +78,31 @@ public class CsmFunctionalTest {
   @SpyBean
   private Clock clock;
 
+  @SpyBean
+  private UserPrivacyUtil userPrivacyUtil;
+
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     mockedDependenciesRule.givenMockedRemoteConfigResponse(api);
     integrationRegistry.declare(Integration.IN_HOUSE);
+  }
+
+  @Test
+  public void givenDisallowedCsm_NeverSendCsmRequest() throws Exception {
+    when(userPrivacyUtil.isCsmDisallowed()).thenReturn(true);
+
+    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+    waitForIdleState();
+
+    Criteo.getInstance().getBidResponse(TestAdUnits.BANNER_320_50);
+    waitForIdleState();
+
+    CriteoUtil.clearCriteo();
+    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+    waitForIdleState();
+
+    verify(api, never()).postCsm(any());
   }
 
   @Test

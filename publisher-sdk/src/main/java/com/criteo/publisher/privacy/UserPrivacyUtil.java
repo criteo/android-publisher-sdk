@@ -148,4 +148,11 @@ public class UserPrivacyUtil {
   public String getMopubConsent() {
     return safeSharedPreferences.getString(MOPUB_CONSENT_SHARED_PREFS_KEY, "");
   }
+
+  /**
+   * Indicate if user didn't give its consent for CSM when applicable.
+   */
+  public boolean isCsmDisallowed() {
+    return false; // TODO
+  }
 }
