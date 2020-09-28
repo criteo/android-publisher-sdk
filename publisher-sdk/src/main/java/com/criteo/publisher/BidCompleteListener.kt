@@ -25,7 +25,7 @@ import androidx.annotation.Keep
  * @see: https://publisherdocs.criteotilt.com/app/android/app-bidding/
  */
 @Keep
-interface BidListener {
+interface BidCompleteListener {
   /**
    * Callback to know when Criteo has finished bidding on a given AdUnit.
    */

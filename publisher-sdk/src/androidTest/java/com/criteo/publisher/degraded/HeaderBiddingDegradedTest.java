@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import com.criteo.publisher.BidListener;
+import com.criteo.publisher.BidCompleteListener;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
@@ -63,7 +63,7 @@ public class HeaderBiddingDegradedTest {
   public void whenSettingABids_ShouldNotDoAnyCallToCdb() throws Exception {
     Object builder = mock(Object.class);
 
-    criteo.setBidsForAdUnit(builder, adUnit, mock(BidListener.class));
+    criteo.setBidsForAdUnit(builder, adUnit, mock(BidCompleteListener.class));
     waitForIdleState();
 
     verifyNoInteractions(api);
@@ -73,7 +73,7 @@ public class HeaderBiddingDegradedTest {
   public void whenSettingABids_ShouldNotEnrichGivenBuilder() throws Exception {
     Object builder = mock(Object.class);
 
-    criteo.setBidsForAdUnit(builder, adUnit, mock(BidListener.class));
+    criteo.setBidsForAdUnit(builder, adUnit, mock(BidCompleteListener.class));
     waitForIdleState();
 
     verifyNoInteractions(builder);

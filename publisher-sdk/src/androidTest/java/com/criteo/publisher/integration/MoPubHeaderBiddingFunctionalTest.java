@@ -38,8 +38,7 @@ import android.view.View;
 import android.webkit.WebView;
 import androidx.test.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
-import com.criteo.publisher.BidListener;
-import com.criteo.publisher.CdbCallListener;
+import com.criteo.publisher.BidCompleteListener;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.mock.MockedDependenciesRule;
@@ -61,7 +60,6 @@ import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubInterstitial;
 import com.mopub.mobileads.MoPubInterstitial.InterstitialAdListener;
 import com.mopub.mobileads.MoPubView;
-import java.text.Bidi;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
@@ -70,7 +68,6 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 public class MoPubHeaderBiddingFunctionalTest {
 
@@ -149,7 +146,7 @@ public class MoPubHeaderBiddingFunctionalTest {
     MoPubView moPubView = createMoPubView();
     moPubView.setKeywords("old keywords");
 
-    Criteo.getInstance().setBidsForAdUnit(moPubView, invalidBannerAdUnit, mock(BidListener.class));
+    Criteo.getInstance().setBidsForAdUnit(moPubView, invalidBannerAdUnit, mock(BidCompleteListener.class));
 
     assertEquals("old keywords", moPubView.getKeywords());
   }
@@ -163,7 +160,8 @@ public class MoPubHeaderBiddingFunctionalTest {
     MoPubInterstitial moPubInterstitial = createMoPubInterstitial();
     moPubInterstitial.setKeywords("old keywords");
 
-    Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, invalidInterstitialAdUnit, mock(BidListener.class));
+    Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, invalidInterstitialAdUnit, mock(
+        BidCompleteListener.class));
 
     Assert.assertEquals("old keywords", moPubInterstitial.getKeywords());
   }
@@ -190,7 +188,7 @@ public class MoPubHeaderBiddingFunctionalTest {
 
     MoPubView moPubView = createMoPubView();
 
-    Criteo.getInstance().setBidsForAdUnit(moPubView, adUnit, mock(BidListener.class));
+    Criteo.getInstance().setBidsForAdUnit(moPubView, adUnit, mock(BidCompleteListener.class));
     waitForBids();
 
     assertCriteoKeywordsAreInjectedInMoPubView(moPubView.getKeywords(), adUnit);
@@ -224,7 +222,8 @@ public class MoPubHeaderBiddingFunctionalTest {
 
     MoPubInterstitial moPubInterstitial = createMoPubInterstitial();
 
-    Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, interstitialAdUnit, mock(BidListener.class));
+    Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, interstitialAdUnit, mock(
+        BidCompleteListener.class));
     waitForBids();
 
     assertCriteoKeywordsAreInjectedInMoPubView(moPubInterstitial.getKeywords(), interstitialAdUnit);
@@ -238,11 +237,11 @@ public class MoPubHeaderBiddingFunctionalTest {
   @Test
   @Ignore("JIRA EE-1192")
   public void loadingMoPubBanner_GivenValidBanner_MoPubViewContainsCreative() throws Exception {
-    BidListener bidListener = mock(BidListener.class);
-    String html = loadMoPubHtmlBanner(validBannerAdUnit, bidListener);
+    BidCompleteListener bidCompleteListener = mock(BidCompleteListener.class);
+    String html = loadMoPubHtmlBanner(validBannerAdUnit, bidCompleteListener);
 
     assertTrue(html.contains(STUB_CREATIVE_IMAGE));
-    verify(bidListener).onBiddingComplete();
+    verify(bidCompleteListener).onBiddingComplete();
   }
 
   @Test
@@ -250,12 +249,12 @@ public class MoPubHeaderBiddingFunctionalTest {
   public void loadingMoPubBanner_GivenDemoBanner_MoPubViewUsesDemoDisplayUrl() throws Exception {
     givenUsingCdbProd();
     ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
-    BidListener bidListener = mock(BidListener.class);
-    String html = loadMoPubHtmlBanner(demoBannerAdUnit, bidListener);
+    BidCompleteListener bidCompleteListener = mock(BidCompleteListener.class);
+    String html = loadMoPubHtmlBanner(demoBannerAdUnit, bidCompleteListener);
 
     String displayUrl = cdbResultCaptor.getLastCaptureValue().getSlots().get(0).getDisplayUrl();
     assertTrue(html.contains(displayUrl));
-    verify(bidListener).onBiddingComplete();
+    verify(bidCompleteListener).onBiddingComplete();
   }
 
   @Test
@@ -281,13 +280,13 @@ public class MoPubHeaderBiddingFunctionalTest {
   @Test
   public void loadingMoPubBanner_GivenInvalidBanner_MoPubViewDoesNotContainWebView()
       throws Exception {
-    BidListener bidListener = mock(BidListener.class);
-    MoPubView moPubView = loadMoPubBanner(invalidBannerAdUnit, bidListener);
+    BidCompleteListener bidCompleteListener = mock(BidCompleteListener.class);
+    MoPubView moPubView = loadMoPubBanner(invalidBannerAdUnit, bidCompleteListener);
 
     List<WebView> webViews = webViewLookup.lookForWebViews(moPubView);
 
     assertTrue(webViews.isEmpty());
-    verify(bidListener, never()).onBiddingComplete();
+    verify(bidCompleteListener, never()).onBiddingComplete();
   }
 
   @Test
@@ -298,9 +297,9 @@ public class MoPubHeaderBiddingFunctionalTest {
     assertFalse(moPubInterstitial.isReady());
   }
 
-  private String loadMoPubHtmlBanner(BannerAdUnit adUnit, BidListener bidListener)
+  private String loadMoPubHtmlBanner(BannerAdUnit adUnit, BidCompleteListener bidCompleteListener)
       throws Exception {
-    MoPubView moPubView = loadMoPubBanner(adUnit, bidListener);
+    MoPubView moPubView = loadMoPubBanner(adUnit, bidCompleteListener);
 
     return webViewLookup.lookForHtmlContent(moPubView).get();
   }
@@ -316,7 +315,7 @@ public class MoPubHeaderBiddingFunctionalTest {
     return webViewLookup.lookForHtmlContent(moPubView).get();
   }
 
-  private MoPubView loadMoPubBanner(BannerAdUnit adUnit, BidListener bidListener) throws Exception {
+  private MoPubView loadMoPubBanner(BannerAdUnit adUnit, BidCompleteListener bidCompleteListener) throws Exception {
     givenInitializedCriteo(adUnit);
     waitForBids();
 
@@ -324,7 +323,7 @@ public class MoPubHeaderBiddingFunctionalTest {
 
     MoPubView moPubView = createMoPubView();
 
-    Criteo.getInstance().setBidsForAdUnit(moPubView, adUnit, bidListener);
+    Criteo.getInstance().setBidsForAdUnit(moPubView, adUnit, bidCompleteListener);
 
     MoPubSync moPubSync = new MoPubSync(moPubView);
     runOnMainThreadAndWait(moPubView::loadAd);
@@ -341,7 +340,7 @@ public class MoPubHeaderBiddingFunctionalTest {
 
     MoPubInterstitial moPubInterstitial = createMoPubInterstitial();
 
-    Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, adUnit, mock(BidListener.class));
+    Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, adUnit, mock(BidCompleteListener.class));
 
     MoPubSync moPubSync = new MoPubSync(moPubInterstitial);
     runOnMainThreadAndWait(moPubInterstitial::load);

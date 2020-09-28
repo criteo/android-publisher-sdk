@@ -33,7 +33,7 @@ import java.util.concurrent.Future;
 public class DummyCriteo extends Criteo {
 
   @Override
-  public void setBidsForAdUnit(Object object, @NonNull AdUnit adUnit, @NonNull BidListener bidListener) {
+  public void setBidsForAdUnit(Object object, @NonNull AdUnit adUnit, @NonNull BidCompleteListener bidCompleteListener) {
     // Nothing
   }
 

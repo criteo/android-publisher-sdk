@@ -16,7 +16,7 @@
 
 package com.criteo.publisher.headerbidding
 
-import com.criteo.publisher.BidListener
+import com.criteo.publisher.BidCompleteListener
 import com.criteo.publisher.BidManager
 import com.criteo.publisher.integration.Integration
 import com.criteo.publisher.integration.IntegrationRegistry
@@ -45,7 +45,7 @@ class HeaderBiddingTest {
   fun enrichBid_GivenNullObject_DoNothing() {
     val handler = mock<HeaderBiddingHandler>()
     val headerBidding = HeaderBidding(bidManager, listOf(handler), integrationRegistry)
-    val bidListener = mock<BidListener>()
+    val bidListener = mock<BidCompleteListener>()
     headerBidding.enrichBid(null, mock(), bidListener)
 
     verifyZeroInteractions(bidManager)
@@ -86,7 +86,7 @@ class HeaderBiddingTest {
       on { getBidForAdUnitAndPrefetch(adUnit) } doReturn slot
     }
 
-    val bidListener = mock<BidListener>()
+    val bidListener = mock<BidCompleteListener>()
 
     val headerBidding = HeaderBidding(
         bidManager,

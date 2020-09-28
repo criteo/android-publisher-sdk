@@ -26,7 +26,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
-import com.criteo.publisher.BidListener;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdSize;

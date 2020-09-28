@@ -50,19 +50,19 @@ public class DummyCriteoTest {
   @Test
   public void setBidsForAdUnit_GivenAnyAdUnit_DoNothingAndDoNotThrow() throws Exception {
     assertThatCode(() -> {
-      criteo.setBidsForAdUnit(null, null, mock(BidListener.class));
+      criteo.setBidsForAdUnit(null, null, mock(BidCompleteListener.class));
     }).doesNotThrowAnyException();
 
     assertThatCode(() -> {
-      criteo.setBidsForAdUnit(new HashMap<>(), banner, mock(BidListener.class));
+      criteo.setBidsForAdUnit(new HashMap<>(), banner, mock(BidCompleteListener.class));
     }).doesNotThrowAnyException();
 
     assertThatCode(() -> {
-      criteo.setBidsForAdUnit(new HashMap<>(), interstitial, mock(BidListener.class));
+      criteo.setBidsForAdUnit(new HashMap<>(), interstitial, mock(BidCompleteListener.class));
     }).doesNotThrowAnyException();
 
     assertThatCode(() -> {
-      criteo.setBidsForAdUnit(new HashMap<>(), aNative, mock(BidListener.class));
+      criteo.setBidsForAdUnit(new HashMap<>(), aNative, mock(BidCompleteListener.class));
     }).doesNotThrowAnyException();
   }
 
