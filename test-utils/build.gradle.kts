@@ -26,9 +26,21 @@ plugins {
 
 androidLibModule()
 
+android {
+  defaultConfig {
+    multiDexEnabled = true
+  }
+
+  packagingOptions {
+    // Both AssertJ and ByteBuddy (via Mockito) bring this and the duplication yields an error
+    exclude("META-INF/licenses/ASM")
+  }
+}
+
 dependencies {
   compileOnly(project(":publisher-sdk"))
 
+  implementation(Deps.AndroidX.MultiDex)
   implementation(Deps.JUnit.JUnit)
   implementation(Deps.Square.OkHttp.MockWebServer)
   compileOnly(Deps.AutoValue.GsonRuntime)
@@ -50,6 +62,8 @@ dependencies {
 
   androidTestImplementation(Deps.AndroidX.Test.Runner)
   androidTestImplementation(Deps.AssertJ.AssertJ)
+  androidTestImplementation(Deps.Mockito.Android)
+  androidTestImplementation(Deps.Mockito.Kotlin)
 
   detektPlugins(Deps.Detekt.DetektFormatting)
 }

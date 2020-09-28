@@ -289,6 +289,27 @@ class DependenciesAnnotationInjection {
     Method[] methods = dependencyProvider.getClass().getMethods();
 
     for (Method method : methods) {
+      if (method.isSynthetic()) {
+        /*
+         * When a lambda is capturing only `this`, then a new method is created:
+         * - method is synthetic
+         * - method has no argument
+         * - method returns what the lambda returns
+         *
+         * Such generated method may collide with real candidates and should not be considered. So they are ignored by
+         * using the fact that they are synthetic.
+         *
+         * Note that this is only observable on Android: the Android SDK is generating such method during compilation
+         * while the JDK is only placing an invoke dynamic at call-site which will lazily generate and call a SAM during
+         * runtime (via its LambdaMetaFactory).
+         * The difference is that JDK has no effect on callers while Android has.
+         *
+         * See https://docs.oracle.com/javase/specs/jls/se8/html/jls-13.html §13.1.11 for definition of synthetic.
+         * See java.lang.invoke.LambdaMetafactory for how lambda are handled during runtime
+         */
+        continue;
+      }
+
       if (acceptParameters || getParameterCount(method) == 0) {
         Class<?> returnType = method.getReturnType();
 
