@@ -16,12 +16,38 @@
 
 package com.criteo.publisher.privacy
 
+import androidx.annotation.VisibleForTesting
 import com.criteo.publisher.annotation.OpenForTesting
+import com.criteo.publisher.util.SafeSharedPreferences
+import com.criteo.publisher.util.getNonNullString
 
 @OpenForTesting
-internal class Tcf2CsmGuard {
+internal class Tcf2CsmGuard(private val safeSharedPreferences: SafeSharedPreferences) {
+
+  private companion object {
+    const val IAB_VENDOR_CONSENTS = "IABTCF_VendorConsents"
+
+    /**
+     * The Vendor ID of Criteo is 91 (which is 1-based). So consents for Criteo is at index 90 (which is 0-based).
+     */
+    const val CRITEO_VENDOR_INDEX = 90
+  }
 
   fun isCsmDisallowed(): Boolean {
-    return false // TODO
+    return isVendorConsentGiven() == false
+  }
+
+  @VisibleForTesting
+  fun isVendorConsentGiven(): Boolean? {
+    val vendorConsents = safeSharedPreferences.getNonNullString(IAB_VENDOR_CONSENTS, "")
+    if (vendorConsents.length < CRITEO_VENDOR_INDEX) {
+      return null
+    }
+
+    return when (vendorConsents[CRITEO_VENDOR_INDEX]) {
+      '0' -> false
+      '1' -> true
+      else -> null
+    }
   }
 }
