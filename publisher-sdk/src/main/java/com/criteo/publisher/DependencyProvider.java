@@ -284,7 +284,7 @@ public class DependencyProvider {
         () -> new UserPrivacyUtil(
             getDefaultSharedPreferences(provideContext()),
             new GdprDataFetcher(provideTcfStrategyResolver()),
-            new Tcf2CsmGuard()
+            new Tcf2CsmGuard(new SafeSharedPreferences(getDefaultSharedPreferences(provideContext())))
         )
     );
   }
