@@ -27,6 +27,7 @@ internal class Tcf2CsmGuard(private val safeSharedPreferences: SafeSharedPrefere
   private companion object {
     const val IAB_VENDOR_CONSENTS = "IABTCF_VendorConsents"
     const val IAB_VENDOR_LEGITIMATE_INTERESTS = "IABTCF_VendorLegitimateInterests"
+    const val IAB_PUBLISHER_RESTRICTION_FOR_PURPOSE_1 = "IABTCF_PublisherRestrictions1"
 
     /**
      * The Vendor ID of Criteo is 91 (which is 1-based). So consents for Criteo is at index 90 (which is 0-based).
@@ -35,6 +36,12 @@ internal class Tcf2CsmGuard(private val safeSharedPreferences: SafeSharedPrefere
   }
 
   fun isCsmDisallowed(): Boolean {
+    val publisherRestrictionTypeForPurpose1 = getPublisherRestrictionTypeForPurpose1()
+    if (publisherRestrictionTypeForPurpose1 == PublisherRestrictionType.NOT_ALLOWED ||
+        publisherRestrictionTypeForPurpose1 == PublisherRestrictionType.REQUIRE_LEGITIMATE_INTEREST) {
+      return true
+    }
+
     return isVendorConsentGiven() == false && isVendorLegitimateInterestGiven() == false
   }
 
@@ -48,16 +55,40 @@ internal class Tcf2CsmGuard(private val safeSharedPreferences: SafeSharedPrefere
     return readCriteoConsentInBinaryString(IAB_VENDOR_LEGITIMATE_INTERESTS)
   }
 
-  private fun readCriteoConsentInBinaryString(key: String): Boolean? {
-    val binaryString = safeSharedPreferences.getNonNullString(key, "")
-    if (binaryString.length < CRITEO_VENDOR_INDEX) {
-      return null
-    }
+  @VisibleForTesting
+  fun getPublisherRestrictionTypeForPurpose1(): PublisherRestrictionType? {
+    val criteoChar = readCriteoCharInString(IAB_PUBLISHER_RESTRICTION_FOR_PURPOSE_1) ?: return null
 
-    return when (binaryString[CRITEO_VENDOR_INDEX]) {
+    return when (criteoChar) {
+      '0' -> PublisherRestrictionType.NOT_ALLOWED
+      '1' -> PublisherRestrictionType.REQUIRE_CONSENT
+      '2' -> PublisherRestrictionType.REQUIRE_LEGITIMATE_INTEREST
+      else -> null
+    }
+  }
+
+  private fun readCriteoConsentInBinaryString(key: String): Boolean? {
+    val criteoChar = readCriteoCharInString(key) ?: return null
+
+    return when (criteoChar) {
       '0' -> false
       '1' -> true
       else -> null
     }
+  }
+
+  private fun readCriteoCharInString(key: String): Char? {
+    val string = safeSharedPreferences.getNonNullString(key, "")
+    if (string.length < CRITEO_VENDOR_INDEX) {
+      return null
+    }
+
+    return string[CRITEO_VENDOR_INDEX]
+  }
+
+  enum class PublisherRestrictionType {
+    NOT_ALLOWED,
+    REQUIRE_CONSENT,
+    REQUIRE_LEGITIMATE_INTEREST
   }
 }
