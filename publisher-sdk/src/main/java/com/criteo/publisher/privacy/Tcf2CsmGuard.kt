@@ -26,6 +26,7 @@ internal class Tcf2CsmGuard(private val safeSharedPreferences: SafeSharedPrefere
 
   private companion object {
     const val IAB_VENDOR_CONSENTS = "IABTCF_VendorConsents"
+    const val IAB_VENDOR_LEGITIMATE_INTERESTS = "IABTCF_VendorLegitimateInterests"
 
     /**
      * The Vendor ID of Criteo is 91 (which is 1-based). So consents for Criteo is at index 90 (which is 0-based).
@@ -34,17 +35,26 @@ internal class Tcf2CsmGuard(private val safeSharedPreferences: SafeSharedPrefere
   }
 
   fun isCsmDisallowed(): Boolean {
-    return isVendorConsentGiven() == false
+    return isVendorConsentGiven() == false && isVendorLegitimateInterestGiven() == false
   }
 
   @VisibleForTesting
   fun isVendorConsentGiven(): Boolean? {
-    val vendorConsents = safeSharedPreferences.getNonNullString(IAB_VENDOR_CONSENTS, "")
-    if (vendorConsents.length < CRITEO_VENDOR_INDEX) {
+    return readCriteoConsentInBinaryString(IAB_VENDOR_CONSENTS)
+  }
+
+  @VisibleForTesting
+  fun isVendorLegitimateInterestGiven(): Boolean? {
+    return readCriteoConsentInBinaryString(IAB_VENDOR_LEGITIMATE_INTERESTS)
+  }
+
+  private fun readCriteoConsentInBinaryString(key: String): Boolean? {
+    val binaryString = safeSharedPreferences.getNonNullString(key, "")
+    if (binaryString.length < CRITEO_VENDOR_INDEX) {
       return null
     }
 
-    return when (vendorConsents[CRITEO_VENDOR_INDEX]) {
+    return when (binaryString[CRITEO_VENDOR_INDEX]) {
       '0' -> false
       '1' -> true
       else -> null
