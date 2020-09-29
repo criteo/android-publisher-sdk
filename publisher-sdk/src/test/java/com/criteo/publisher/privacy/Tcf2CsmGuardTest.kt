@@ -16,6 +16,10 @@
 
 package com.criteo.publisher.privacy
 
+import com.criteo.publisher.privacy.Tcf2CsmGuard.PublisherRestrictionType
+import com.criteo.publisher.privacy.Tcf2CsmGuard.PublisherRestrictionType.NOT_ALLOWED
+import com.criteo.publisher.privacy.Tcf2CsmGuard.PublisherRestrictionType.REQUIRE_CONSENT
+import com.criteo.publisher.privacy.Tcf2CsmGuard.PublisherRestrictionType.REQUIRE_LEGITIMATE_INTEREST
 import com.criteo.publisher.util.SafeSharedPreferences
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doAnswer
@@ -57,30 +61,79 @@ class Tcf2CsmGuardTest {
   }
 
   @Test
-  fun isCsmDisallowed_GivenTcf2() {
+  fun isCsmDisallowed_GivenTcf2_PublisherRestrictionNotProvidedOrRequireConsent() {
     // Neither vendor consent nor legitimate interest => No CSM
-    isCsmDisallowed_GivenTcf2(VendorConsents.NOT_GIVEN, VendorLegitimateInterest.NOT_GIVEN, true)
+    isCsmDisallowed_GivenTcf2(
+        VendorConsents.NOT_GIVEN,
+        VendorLegitimateInterest.NOT_GIVEN,
+        PublisherRestrictionTypeForPurpose1.NOT_PROVIDED,
+        true
+    )
+
+    isCsmDisallowed_GivenTcf2(
+        VendorConsents.NOT_GIVEN,
+        VendorLegitimateInterest.NOT_GIVEN,
+        PublisherRestrictionTypeForPurpose1.REQUIRE_CONSENT,
+        true
+    )
 
     // Either vendor consent or legitimate interest => CSM is ok
-    isCsmDisallowed_GivenTcf2(VendorConsents.NOT_PROVIDED, VendorLegitimateInterest.NOT_PROVIDED, false)
-    isCsmDisallowed_GivenTcf2(VendorConsents.NOT_GIVEN, VendorLegitimateInterest.NOT_PROVIDED, false)
-    isCsmDisallowed_GivenTcf2(VendorConsents.GIVEN, VendorLegitimateInterest.NOT_PROVIDED, false)
-    isCsmDisallowed_GivenTcf2(VendorConsents.NOT_PROVIDED, VendorLegitimateInterest.NOT_GIVEN, false)
-    isCsmDisallowed_GivenTcf2(VendorConsents.GIVEN, VendorLegitimateInterest.NOT_GIVEN, false)
-    isCsmDisallowed_GivenTcf2(VendorConsents.NOT_PROVIDED, VendorLegitimateInterest.GIVEN, false)
-    isCsmDisallowed_GivenTcf2(VendorConsents.NOT_GIVEN, VendorLegitimateInterest.GIVEN, false)
-    isCsmDisallowed_GivenTcf2(VendorConsents.GIVEN, VendorLegitimateInterest.GIVEN, false)
+    for (vendorConsent in VendorConsents.ALL) {
+      for (vendorLegitimateInterest in VendorLegitimateInterest.ALL) {
+        if (vendorConsent == VendorConsents.NOT_GIVEN &&
+            vendorLegitimateInterest == VendorLegitimateInterest.NOT_GIVEN) {
+          continue
+        }
+
+        isCsmDisallowed_GivenTcf2(
+            vendorConsent,
+            vendorLegitimateInterest,
+            PublisherRestrictionTypeForPurpose1.NOT_PROVIDED,
+            false
+        )
+
+        isCsmDisallowed_GivenTcf2(
+            vendorConsent,
+            vendorLegitimateInterest,
+            PublisherRestrictionTypeForPurpose1.REQUIRE_CONSENT,
+            false
+        )
+      }
+    }
+  }
+
+  @Test
+  fun isCsmDisallowed_GivenTcf2_PublisherRestrictionForPurpose1NotAllowedOrRequireLegitimateInterest() {
+    for (vendorConsent in VendorConsents.ALL) {
+      for (vendorLegitimateInterest in VendorLegitimateInterest.ALL) {
+        isCsmDisallowed_GivenTcf2(
+            vendorConsent,
+            vendorLegitimateInterest,
+            PublisherRestrictionTypeForPurpose1.NOT_ALLOWED,
+            true
+        )
+
+        isCsmDisallowed_GivenTcf2(
+            vendorConsent,
+            vendorLegitimateInterest,
+            PublisherRestrictionTypeForPurpose1.REQUIRE_LEGITIMATE_INTEREST,
+            true
+        )
+      }
+    }
   }
 
   private fun isCsmDisallowed_GivenTcf2(
       vendorConsent: String,
       vendorLegitimateInterest: String,
+      publisherRestrictionTypeForPurpose1: String,
       expected: Boolean
   ) {
     // Given
     sharedPref.stub {
       on { getString("IABTCF_VendorConsents", "") } doReturn vendorConsent
       on { getString("IABTCF_VendorLegitimateInterests", "") } doReturn vendorLegitimateInterest
+      on { getString("IABTCF_PublisherRestrictions1", "") } doReturn publisherRestrictionTypeForPurpose1
     }
 
     // When
@@ -88,9 +141,10 @@ class Tcf2CsmGuardTest {
 
     // Then
     assertThat(csmDisallowed).describedAs(
-        "vendorConsent=%s vendorLegitimateInterest=%s",
+        "vendorConsent=%s vendorLegitimateInterest=%s publisherRestrictionTypeForPurpose1=%s",
         vendorConsent,
-        vendorLegitimateInterest
+        vendorLegitimateInterest,
+        publisherRestrictionTypeForPurpose1
     ).isEqualTo(expected)
   }
 
@@ -138,15 +192,49 @@ class Tcf2CsmGuardTest {
     assertThat(isVendorLegitimateInterestGiven).isEqualTo(expected)
   }
 
+  @Test
+  fun testPublisherRestrictionTypeForPurpose1() {
+    testPublisherRestrictionTypeForPurpose1("", null)
+    testPublisherRestrictionTypeForPurpose1("malformed", null)
+    testPublisherRestrictionTypeForPurpose1(String.format("%090dX", 0), null)
+    testPublisherRestrictionTypeForPurpose1(String.format("%091d", 0), NOT_ALLOWED)
+    testPublisherRestrictionTypeForPurpose1(String.format("%091d", 1), REQUIRE_CONSENT)
+    testPublisherRestrictionTypeForPurpose1(String.format("%091d", 2), REQUIRE_LEGITIMATE_INTEREST)
+  }
+
+  private fun testPublisherRestrictionTypeForPurpose1(value: String, expected: PublisherRestrictionType?) {
+    // Given
+    sharedPref.stub {
+      on { getString("IABTCF_PublisherRestrictions1", "") } doReturn value
+    }
+
+    // When
+    val publisherRestrictionTypeForPurpose1 = csmGuard.getPublisherRestrictionTypeForPurpose1()
+
+    // Then
+    assertThat(publisherRestrictionTypeForPurpose1).isEqualTo(expected)
+  }
+
   private object VendorConsents {
     const val NOT_PROVIDED = ""
     val NOT_GIVEN = String.format("%091d", 0)
     val GIVEN = String.format("%091d", 1)
+
+    val ALL = listOf(NOT_PROVIDED, NOT_GIVEN, GIVEN)
   }
 
   private object VendorLegitimateInterest {
     const val NOT_PROVIDED = ""
     val NOT_GIVEN = String.format("%091d", 0)
     val GIVEN = String.format("%091d", 1)
+
+    val ALL = listOf(NOT_PROVIDED, NOT_GIVEN, GIVEN)
+  }
+
+  private object PublisherRestrictionTypeForPurpose1 {
+    const val NOT_PROVIDED = ""
+    val NOT_ALLOWED = String.format("%091d", 0)
+    val REQUIRE_CONSENT = String.format("%091d", 1)
+    val REQUIRE_LEGITIMATE_INTEREST = String.format("%091d", 2)
   }
 }
