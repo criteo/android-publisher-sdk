@@ -35,6 +35,19 @@ internal class Tcf2CsmGuard(private val safeSharedPreferences: SafeSharedPrefere
     const val CRITEO_VENDOR_INDEX = 90
   }
 
+  /**
+   * Indicate if user didn't give its consent for CSM when applicable.
+   *
+   * - IABTCF_PublisherRestrictions{ID}: publisher restrictions on purpose {ID} (only ID=1 is required for storing
+   * technical data)
+   *     - if RestrictionType = 0: Purpose Flatly Not Allowed by Publisher => **No CSM**
+   *     - if RestrictionType = 1: Consent is required > Ignore restriction > fallback on other consent checks
+   *     - if RestrictionType = 2: Legitimate interest is required > **No CSM**
+   * - IABTCF_VendorConsents AND IABTCF_VendorLegitimateInterests:
+   *     - VendorConsent: Check Bitfield OR Range whether Criteo (91) == 1
+   *     - VendorLegitimateInterest: Check Bitfield OR Range whether Criteo (91) == 1
+   *     - If Criteo (91) is not set to 1 in either VendorConsent or VendorLegitimateInterest: **No CSM**
+   */
   fun isCsmDisallowed(): Boolean {
     val publisherRestrictionTypeForPurpose1 = getPublisherRestrictionTypeForPurpose1()
     if (publisherRestrictionTypeForPurpose1 == PublisherRestrictionType.NOT_ALLOWED ||
