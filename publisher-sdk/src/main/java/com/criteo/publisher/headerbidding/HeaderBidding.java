@@ -52,6 +52,7 @@ public class HeaderBidding {
       @NonNull BidCompleteListener bidCompleteListener
   ) {
     if (object == null) {
+      bidCompleteListener.onBiddingComplete();
       return;
     }
 
@@ -63,6 +64,7 @@ public class HeaderBidding {
         handler.cleanPreviousBid(object);
 
         if (slot == null) {
+          bidCompleteListener.onBiddingComplete();
           return;
         }
 

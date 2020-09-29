@@ -51,7 +51,7 @@ class HeaderBiddingTest {
     verifyZeroInteractions(bidManager)
     verifyZeroInteractions(handler)
     verifyZeroInteractions(integrationRegistry)
-    verifyZeroInteractions(bidListener)
+    verify(bidListener).onBiddingComplete()
   }
 
   @Test
@@ -59,6 +59,7 @@ class HeaderBiddingTest {
     val obj = mock<Any>()
     val adUnit = mock<AdUnit>()
     val handler = givenHandler(obj, true, Integration.STANDALONE)
+    val bidListener = mock<BidCompleteListener>()
 
     bidManager.stub {
       on { getBidForAdUnitAndPrefetch(adUnit) } doReturn null
@@ -66,11 +67,12 @@ class HeaderBiddingTest {
 
     val headerBidding = HeaderBidding(bidManager, listOf(handler), integrationRegistry)
 
-    headerBidding.enrichBid(obj, adUnit, mock())
+    headerBidding.enrichBid(obj, adUnit, bidListener)
 
     verify(handler).cleanPreviousBid(obj)
     verify(handler, never()).enrichBid(any(), anyOrNull(), any())
     verify(integrationRegistry).declare(Integration.STANDALONE)
+    verify(bidListener).onBiddingComplete()
   }
 
   @Test
