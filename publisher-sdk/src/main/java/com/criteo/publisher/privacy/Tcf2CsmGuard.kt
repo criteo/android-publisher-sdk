@@ -28,6 +28,7 @@ internal class Tcf2CsmGuard(private val safeSharedPreferences: SafeSharedPrefere
     const val IAB_VENDOR_CONSENTS = "IABTCF_VendorConsents"
     const val IAB_VENDOR_LEGITIMATE_INTERESTS = "IABTCF_VendorLegitimateInterests"
     const val IAB_PUBLISHER_RESTRICTION_FOR_PURPOSE_1 = "IABTCF_PublisherRestrictions1"
+    const val IAB_PURPOSE_CONSENTS = "IABTCF_PurposeConsents"
 
     /**
      * The Vendor ID of Criteo is 91 (which is 1-based). So consents for Criteo is at index 90 (which is 0-based).
@@ -38,6 +39,7 @@ internal class Tcf2CsmGuard(private val safeSharedPreferences: SafeSharedPrefere
   /**
    * Indicate if user didn't give its consent for CSM when applicable.
    *
+   * - IABTCF_PurposeConsents : User consent to purpose
    * - IABTCF_PublisherRestrictions{ID}: publisher restrictions on purpose {ID} (only ID=1 is required for storing
    * technical data)
    *     - if RestrictionType = 0: Purpose Flatly Not Allowed by Publisher => **No CSM**
@@ -49,9 +51,15 @@ internal class Tcf2CsmGuard(private val safeSharedPreferences: SafeSharedPrefere
    *     - If Criteo (91) is not set to 1 in either VendorConsent or VendorLegitimateInterest: **No CSM**
    */
   fun isCsmDisallowed(): Boolean {
-    val publisherRestrictionTypeForPurpose1 = getPublisherRestrictionTypeForPurpose1()
-    if (publisherRestrictionTypeForPurpose1 == PublisherRestrictionType.NOT_ALLOWED ||
-        publisherRestrictionTypeForPurpose1 == PublisherRestrictionType.REQUIRE_LEGITIMATE_INTEREST) {
+    val purposeConsentNotGiven = isPurpose1ConsentGiven() == false
+
+    val publisherRestriction = getPublisherRestrictionTypeForPurpose1()
+    val hasPublisherRestriction = publisherRestriction in setOf(
+        PublisherRestrictionType.NOT_ALLOWED,
+        PublisherRestrictionType.REQUIRE_LEGITIMATE_INTEREST
+    )
+
+    if (purposeConsentNotGiven || hasPublisherRestriction) {
       return true
     }
 
@@ -80,23 +88,27 @@ internal class Tcf2CsmGuard(private val safeSharedPreferences: SafeSharedPrefere
     }
   }
 
-  private fun readCriteoConsentInBinaryString(key: String): Boolean? {
-    val criteoChar = readCriteoCharInString(key) ?: return null
+  @VisibleForTesting
+  fun isPurpose1ConsentGiven(): Boolean? {
+    // Purpose 1 (1-based) is at index 0 (0-based)
+    return readCharInString(IAB_PURPOSE_CONSENTS, 0).toBoolean()
+  }
 
-    return when (criteoChar) {
+  private fun readCriteoConsentInBinaryString(key: String): Boolean? = readCriteoCharInString(key).toBoolean()
+
+  private fun readCriteoCharInString(key: String): Char? = readCharInString(key, CRITEO_VENDOR_INDEX)
+
+  private fun readCharInString(key: String, index: Int): Char? {
+    val string = safeSharedPreferences.getNonNullString(key, "")
+    return string.elementAtOrNull(index)
+  }
+
+  private fun Char?.toBoolean(): Boolean? {
+    return when (this) {
       '0' -> false
       '1' -> true
       else -> null
     }
-  }
-
-  private fun readCriteoCharInString(key: String): Char? {
-    val string = safeSharedPreferences.getNonNullString(key, "")
-    if (string.length < CRITEO_VENDOR_INDEX) {
-      return null
-    }
-
-    return string[CRITEO_VENDOR_INDEX]
   }
 
   enum class PublisherRestrictionType {

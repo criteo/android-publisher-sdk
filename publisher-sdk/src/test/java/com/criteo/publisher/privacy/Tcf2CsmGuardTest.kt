@@ -61,19 +61,11 @@ class Tcf2CsmGuardTest {
   }
 
   @Test
-  fun isCsmDisallowed_GivenTcf2_PublisherRestrictionNotProvidedOrRequireConsent() {
+  fun isCsmDisallowed_GivenTcf2_PublisherRestrictionNotProvidedOrRequireConsent_PurposeContentGivenOrNotProvided() {
     // Neither vendor consent nor legitimate interest => No CSM
-    isCsmDisallowed_GivenTcf2(
+    isCsmDisallowed_PublisherRestrictionNotProvidedOrRequireConsent_PurposeContentGivenOrNotProvided(
         VendorConsents.NOT_GIVEN,
         VendorLegitimateInterest.NOT_GIVEN,
-        PublisherRestrictionTypeForPurpose1.NOT_PROVIDED,
-        true
-    )
-
-    isCsmDisallowed_GivenTcf2(
-        VendorConsents.NOT_GIVEN,
-        VendorLegitimateInterest.NOT_GIVEN,
-        PublisherRestrictionTypeForPurpose1.REQUIRE_CONSENT,
         true
     )
 
@@ -85,18 +77,31 @@ class Tcf2CsmGuardTest {
           continue
         }
 
-        isCsmDisallowed_GivenTcf2(
+        isCsmDisallowed_PublisherRestrictionNotProvidedOrRequireConsent_PurposeContentGivenOrNotProvided(
             vendorConsent,
             vendorLegitimateInterest,
-            PublisherRestrictionTypeForPurpose1.NOT_PROVIDED,
             false
         )
+      }
+    }
+  }
 
+  private fun isCsmDisallowed_PublisherRestrictionNotProvidedOrRequireConsent_PurposeContentGivenOrNotProvided(
+      vendorConsent: String,
+      vendorLegitimateInterest: String,
+      expected: Boolean
+  ) {
+    for (publisherRestriction in listOf(
+        PublisherRestrictionTypeForPurpose1.NOT_PROVIDED,
+        PublisherRestrictionTypeForPurpose1.REQUIRE_CONSENT
+    )) {
+      for (purposeConsent in listOf(PurposeContent.NOT_PROVIDED, PurposeContent.GIVEN)) {
         isCsmDisallowed_GivenTcf2(
             vendorConsent,
             vendorLegitimateInterest,
-            PublisherRestrictionTypeForPurpose1.REQUIRE_CONSENT,
-            false
+            publisherRestriction,
+            purposeConsent,
+            expected
         )
       }
     }
@@ -110,6 +115,7 @@ class Tcf2CsmGuardTest {
             vendorConsent,
             vendorLegitimateInterest,
             PublisherRestrictionTypeForPurpose1.NOT_ALLOWED,
+            PurposeContent.GIVEN,
             true
         )
 
@@ -117,8 +123,26 @@ class Tcf2CsmGuardTest {
             vendorConsent,
             vendorLegitimateInterest,
             PublisherRestrictionTypeForPurpose1.REQUIRE_LEGITIMATE_INTEREST,
+            PurposeContent.GIVEN,
             true
         )
+      }
+    }
+  }
+
+  @Test
+  fun isCsmDisallowed_GivenTcf2_PurposeConsentNotGiven() {
+    for (vendorConsent in VendorConsents.ALL) {
+      for (vendorLegitimateInterest in VendorLegitimateInterest.ALL) {
+        for (publisherRestriction in PublisherRestrictionTypeForPurpose1.ALL) {
+          isCsmDisallowed_GivenTcf2(
+              vendorConsent,
+              vendorLegitimateInterest,
+              publisherRestriction,
+              PurposeContent.NOT_GIVEN,
+              true
+          )
+        }
       }
     }
   }
@@ -127,6 +151,7 @@ class Tcf2CsmGuardTest {
       vendorConsent: String,
       vendorLegitimateInterest: String,
       publisherRestrictionTypeForPurpose1: String,
+      purposeConsent: String,
       expected: Boolean
   ) {
     // Given
@@ -134,6 +159,7 @@ class Tcf2CsmGuardTest {
       on { getString("IABTCF_VendorConsents", "") } doReturn vendorConsent
       on { getString("IABTCF_VendorLegitimateInterests", "") } doReturn vendorLegitimateInterest
       on { getString("IABTCF_PublisherRestrictions1", "") } doReturn publisherRestrictionTypeForPurpose1
+      on { getString("IABTCF_PurposeConsents", "") } doReturn purposeConsent
     }
 
     // When
@@ -141,10 +167,16 @@ class Tcf2CsmGuardTest {
 
     // Then
     assertThat(csmDisallowed).describedAs(
-        "vendorConsent=%s vendorLegitimateInterest=%s publisherRestrictionTypeForPurpose1=%s",
+        """
+          vendorConsent=%s
+          vendorLegitimateInterest=%s
+          publisherRestrictionTypeForPurpose1=%s
+          purposeConsent=%s
+        """.trimIndent(),
         vendorConsent,
         vendorLegitimateInterest,
-        publisherRestrictionTypeForPurpose1
+        publisherRestrictionTypeForPurpose1,
+        purposeConsent
     ).isEqualTo(expected)
   }
 
@@ -215,6 +247,28 @@ class Tcf2CsmGuardTest {
     assertThat(publisherRestrictionTypeForPurpose1).isEqualTo(expected)
   }
 
+  @Test
+  fun testPurpose1Consent() {
+    testPurpose1Consent("", null)
+    testPurpose1Consent("malformed", null)
+    testPurpose1Consent(String.format("X%09d", 0), null)
+    testPurpose1Consent(String.format("0%09d", 0), false)
+    testPurpose1Consent(String.format("1%09d", 0), true)
+  }
+
+  private fun testPurpose1Consent(value: String, expected: Boolean?) {
+    // Given
+    sharedPref.stub {
+      on { getString("IABTCF_PurposeConsents", "") } doReturn value
+    }
+
+    // When
+    val isPurpose1ConsentGiven = csmGuard.isPurpose1ConsentGiven()
+
+    // Then
+    assertThat(isPurpose1ConsentGiven).isEqualTo(expected)
+  }
+
   private object VendorConsents {
     const val NOT_PROVIDED = ""
     val NOT_GIVEN = String.format("%091d", 0)
@@ -236,5 +290,13 @@ class Tcf2CsmGuardTest {
     val NOT_ALLOWED = String.format("%091d", 0)
     val REQUIRE_CONSENT = String.format("%091d", 1)
     val REQUIRE_LEGITIMATE_INTEREST = String.format("%091d", 2)
+
+    val ALL = listOf(NOT_PROVIDED, NOT_ALLOWED, REQUIRE_CONSENT, REQUIRE_LEGITIMATE_INTEREST)
+  }
+
+  private object PurposeContent {
+    const val NOT_PROVIDED = ""
+    val NOT_GIVEN = String.format("0%09d", 0)
+    val GIVEN = String.format("1%09d", 0)
   }
 }
