@@ -41,7 +41,6 @@ import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
-import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.util.AdUnitType;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;

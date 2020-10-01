@@ -19,15 +19,15 @@ package com.criteo.publisher;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.criteo.publisher.model.AbstractTokenValue;
-import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.CdbResponseSlot;
+import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.util.AdUnitType;
-import com.criteo.publisher.util.ObjectUtils;
+import kotlin.jvm.functions.Function1;
 
 public class BidResponse {
 
   @SuppressWarnings("ConstantConditions")
-  public static final BidResponse NO_BID = new BidResponse(0, false, null);
+  public static final BidResponse NO_BID = new BidResponse(0, false, null, null, null);
 
   private final double price;
 
@@ -35,14 +35,23 @@ public class BidResponse {
 
   private final AdUnitType adUnitType;
 
-  protected BidResponse(
+  private final Clock clock;
+
+  @Nullable
+  private CdbResponseSlot slot;
+
+  BidResponse(
       double price,
       boolean valid,
-      @NonNull AdUnitType adUnitType
+      @NonNull AdUnitType adUnitType,
+      @NonNull Clock clock,
+      @NonNull CdbResponseSlot slot
   ) {
     this.price = price;
     this.valid = valid;
     this.adUnitType = adUnitType;
+    this.slot = slot;
+    this.clock = clock;
   }
 
   @Keep
@@ -55,8 +64,33 @@ public class BidResponse {
     return valid;
   }
 
-  public AdUnitType getAdUnitType() {
-    return adUnitType;
+  @Nullable
+  public String consumeDisplayUrlFor(@NonNull AdUnitType adUnitType) {
+    if (!adUnitType.equals(this.adUnitType)) {
+      return null;
+    }
+
+    return consume(CdbResponseSlot::getDisplayUrl);
+  }
+
+  @Nullable
+  public NativeAssets consumeNativeAssets() {
+    return consume(CdbResponseSlot::getNativeAssets);
+  }
+
+  @Nullable
+  private synchronized <T> T consume(Function1<CdbResponseSlot, T> action) {
+    if (slot == null || slot.isExpired(clock)) {
+      return null;
+    }
+
+    T element = action.invoke(slot);
+
+    // This object represents a bid usable only once by a publisher. The slot is nullified after consumption to
+    // invalidate it.
+    slot = null;
+
+    return element;
   }
 
 }

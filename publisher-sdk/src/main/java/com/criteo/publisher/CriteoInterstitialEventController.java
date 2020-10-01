@@ -25,7 +25,6 @@ import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.DeviceInfo;
-import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.WebViewData;
 import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 import com.criteo.publisher.util.AdUnitType;
