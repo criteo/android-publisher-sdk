@@ -16,10 +16,12 @@
 
 package com.criteo.publisher;
 
+import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.util.AdUnitType;
 import java.util.UUID;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Assert;
@@ -32,31 +34,19 @@ public class BidResponseTest {
 
   @Test
   public void testBidResponse() {
-    UUID uuid = UUID.nameUUIDFromBytes("TEST_STRING1".getBytes());
-    AdSize size = new AdSize(320, 50);
-    BannerAdUnit adUnitId = new BannerAdUnit("AdUnitId1", size);
+    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_BANNER);
 
-    BidToken token = new BidToken(uuid, adUnitId);
-
-    BidResponse bidResponse = new BidResponse(PRICE, token, VALID);
-    Assert.assertEquals(PRICE, bidResponse.getPrice(), 0);
-    Assert.assertEquals(VALID, bidResponse.isBidSuccess());
+    assertThat(bidResponse.getPrice()).isEqualTo(PRICE);
+    assertThat(bidResponse.isBidSuccess()).isTrue();
+    assertThat(bidResponse.getAdUnitType()).isEqualTo(CRITEO_BANNER);
   }
 
   @Test
   public void equalsContract() throws Exception {
-    EqualsVerifier.forClass(BidResponse.class)
-        .usingGetClass()
-        .verify();
-  }
+    BidResponse bidResponse1 = new BidResponse(PRICE, VALID, CRITEO_BANNER);
+    BidResponse bidResponse2 = new BidResponse(PRICE, VALID, CRITEO_BANNER);
 
-  @Test
-  public void create_GivenNoArgument_CreateANoBidResponse() throws Exception {
-    BidResponse bidResponse = new BidResponse();
-
-    assertThat(bidResponse.isBidSuccess()).isFalse();
-    assertThat(bidResponse.getPrice()).isEqualTo(0.0);
-    assertThat(bidResponse.getBidToken()).isNull();
+    assertThat(bidResponse1).isEqualTo(bidResponse1).isNotEqualTo(bidResponse2);
   }
 
 }

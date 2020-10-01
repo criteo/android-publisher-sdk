@@ -18,6 +18,7 @@ package com.criteo.publisher.degraded;
 
 
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -83,9 +84,7 @@ public class InHouseDegradedTest {
   }
 
   private void assertIsNoBid(BidResponse bidResponse) {
-    assertFalse(bidResponse.isBidSuccess());
-    assertEquals(0.0, bidResponse.getPrice(), 0.0);
-    assertNull(bidResponse.getBidToken());
+    assertThat(bidResponse).isEqualTo(BidResponse.NO_BID);
   }
 
   private void waitForIdleState() {

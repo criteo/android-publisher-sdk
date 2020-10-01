@@ -17,28 +17,32 @@
 package com.criteo.publisher;
 
 import androidx.annotation.Keep;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.criteo.publisher.model.AbstractTokenValue;
+import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.ObjectUtils;
 
 public class BidResponse {
 
-  private final double price;
+  @SuppressWarnings("ConstantConditions")
+  public static final BidResponse NO_BID = new BidResponse(0, false, null);
 
-  @Nullable
-  private final BidToken token;
+  private final double price;
 
   private final boolean valid;
 
-  protected BidResponse(double price, @Nullable BidToken token, boolean valid) {
-    this.price = price;
-    this.token = token;
-    this.valid = valid;
-  }
+  private final AdUnitType adUnitType;
 
-  protected BidResponse() {
-    this.price = 0;
-    this.token = null;
-    this.valid = false;
+  protected BidResponse(
+      double price,
+      boolean valid,
+      @NonNull AdUnitType adUnitType
+  ) {
+    this.price = price;
+    this.valid = valid;
+    this.adUnitType = adUnitType;
   }
 
   @Keep
@@ -46,44 +50,13 @@ public class BidResponse {
     return price;
   }
 
-  @Nullable
-  public BidToken getBidToken() {
-    return token;
-  }
-
   @Keep
   public boolean isBidSuccess() {
     return valid;
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    BidResponse that = (BidResponse) o;
-
-    if (Double.compare(that.price, price) != 0) {
-      return false;
-    }
-    if (valid != that.valid) {
-      return false;
-    }
-    return ObjectUtils.equals(token, that.token);
+  public AdUnitType getAdUnitType() {
+    return adUnitType;
   }
 
-  @Override
-  public int hashCode() {
-    int result;
-    long temp;
-    temp = Double.doubleToLongBits(price);
-    result = (int) (temp ^ (temp >>> 32));
-    result = 31 * result + (token != null ? token.hashCode() : 0);
-    result = 31 * result + (valid ? 1 : 0);
-    return result;
-  }
 }

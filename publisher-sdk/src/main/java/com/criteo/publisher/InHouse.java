@@ -67,12 +67,12 @@ public class InHouse {
     integrationRegistry.declare(Integration.IN_HOUSE);
 
     if (adUnit instanceof InterstitialAdUnit && !interstitialActivityHelper.isAvailable()) {
-      return new BidResponse();
+      return BidResponse.NO_BID;
     }
 
     CdbResponseSlot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
     if (slot == null || adUnit == null) {
-      return new BidResponse();
+      return BidResponse.NO_BID;
     }
 
     AbstractTokenValue tokenValue;
@@ -92,12 +92,14 @@ public class InHouse {
     }
 
     double price = slot.getCpmAsNumber();
-    return new BidResponse(price, tokenCache.add(tokenValue, adUnit), true);
+    BidResponse bidResponse = new BidResponse(price, true, adUnit.getAdUnitType());
+    tokenCache.add(bidResponse, tokenValue);
+    return bidResponse;
   }
 
   @Nullable
   public DisplayUrlTokenValue getTokenValue(@NonNull BidResponse bidResponse, @NonNull AdUnitType adUnitType) {
-    AbstractTokenValue tokenValue = tokenCache.getTokenValue(bidResponse.getBidToken(), adUnitType);
+    AbstractTokenValue tokenValue = tokenCache.getTokenValue(bidResponse, adUnitType);
     if (!(tokenValue instanceof DisplayUrlTokenValue)) {
       // This should not happen. Tokens are forged with the expected type
       return null;
@@ -108,7 +110,7 @@ public class InHouse {
 
   @Nullable
   public NativeTokenValue getNativeTokenValue(@NonNull BidResponse bidResponse) {
-    AbstractTokenValue tokenValue = tokenCache.getTokenValue(bidResponse.getBidToken(), CRITEO_CUSTOM_NATIVE);
+    AbstractTokenValue tokenValue = tokenCache.getTokenValue(bidResponse, CRITEO_CUSTOM_NATIVE);
     if (!(tokenValue instanceof NativeTokenValue)) {
       // This should not happen. Tokens are forged with the expected type
       return null;
