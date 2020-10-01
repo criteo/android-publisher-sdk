@@ -74,10 +74,12 @@ public class InHouseTest {
   public void getTokenValue_GivenToken_DelegateToCache() throws Exception {
     DisplayUrlTokenValue expectedTokenValue = mock(DisplayUrlTokenValue.class);
     BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
+    BidResponse bidResponse = mock(BidResponse.class);
+    when(bidResponse.getBidToken()).thenReturn(token);
 
     when(tokenCache.getTokenValue(token, CRITEO_BANNER)).thenReturn(expectedTokenValue);
 
-    DisplayUrlTokenValue tokenValue = inHouse.getTokenValue(token, CRITEO_BANNER);
+    DisplayUrlTokenValue tokenValue = inHouse.getTokenValue(bidResponse, CRITEO_BANNER);
 
     assertThat(tokenValue).isEqualTo(expectedTokenValue);
   }
@@ -86,10 +88,12 @@ public class InHouseTest {
   public void getNativeTokenValue_GivenToken_DelegateToCache() throws Exception {
     NativeTokenValue expectedTokenValue = mock(NativeTokenValue.class);
     BidToken token = new BidToken(UUID.randomUUID(), mock(AdUnit.class));
+    BidResponse bidResponse = mock(BidResponse.class);
+    when(bidResponse.getBidToken()).thenReturn(token);
 
     when(tokenCache.getTokenValue(token, CRITEO_CUSTOM_NATIVE)).thenReturn(expectedTokenValue);
 
-    NativeTokenValue tokenValue = inHouse.getNativeTokenValue(token);
+    NativeTokenValue tokenValue = inHouse.getNativeTokenValue(bidResponse);
 
     assertThat(tokenValue).isEqualTo(expectedTokenValue);
   }

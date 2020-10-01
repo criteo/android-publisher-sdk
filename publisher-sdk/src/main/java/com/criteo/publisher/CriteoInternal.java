@@ -162,8 +162,8 @@ final class CriteoInternal extends Criteo {
 
   @Nullable
   @Override
-  DisplayUrlTokenValue getTokenValue(@Nullable BidToken bidToken, @NonNull AdUnitType adUnitType) {
-    return inHouse.getTokenValue(bidToken, adUnitType);
+  DisplayUrlTokenValue getTokenValue(@NonNull BidResponse bidResponse, @NonNull AdUnitType adUnitType) {
+    return inHouse.getTokenValue(bidResponse, adUnitType);
   }
 
   @NonNull

@@ -46,6 +46,7 @@ public class BidResponseTest {
   @Test
   public void equalsContract() throws Exception {
     EqualsVerifier.forClass(BidResponse.class)
+        .usingGetClass()
         .verify();
   }
 

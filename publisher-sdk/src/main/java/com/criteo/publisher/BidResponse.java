@@ -16,10 +16,11 @@
 
 package com.criteo.publisher;
 
+import androidx.annotation.Keep;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.util.ObjectUtils;
 
-public final class BidResponse {
+public class BidResponse {
 
   private final double price;
 
@@ -40,6 +41,7 @@ public final class BidResponse {
     this.valid = false;
   }
 
+  @Keep
   public double getPrice() {
     return price;
   }
@@ -49,6 +51,7 @@ public final class BidResponse {
     return token;
   }
 
+  @Keep
   public boolean isBidSuccess() {
     return valid;
   }

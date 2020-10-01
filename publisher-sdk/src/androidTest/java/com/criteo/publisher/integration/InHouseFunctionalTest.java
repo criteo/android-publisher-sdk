@@ -73,7 +73,7 @@ public class InHouseFunctionalTest {
     bannerView.setCriteoBannerAdListener(listener);
 
     BidResponse bidResponse = criteo.getBidResponse(validBannerAdUnit);
-    bannerView.loadAd(bidResponse.getBidToken());
+    bannerView.loadAd(bidResponse);
     waitForIdleState();
 
     verify(listener).onAdReceived(bannerView);
@@ -94,7 +94,7 @@ public class InHouseFunctionalTest {
     bannerView.setCriteoBannerAdListener(listener);
 
     BidResponse bidResponse = criteo.getBidResponse(invalidBannerAdUnit);
-    bannerView.loadAd(bidResponse.getBidToken());
+    bannerView.loadAd(bidResponse);
     waitForIdleState();
 
     verify(listener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
@@ -110,8 +110,8 @@ public class InHouseFunctionalTest {
     bannerView.setCriteoBannerAdListener(listener);
 
     BidResponse bidResponse = criteo.getBidResponse(validBannerAdUnit);
-    bannerView.loadAd(bidResponse.getBidToken());
-    bannerView.loadAd(bidResponse.getBidToken());
+    bannerView.loadAd(bidResponse);
+    bannerView.loadAd(bidResponse);
     waitForIdleState();
 
     InOrder inOrder = inOrder(listener);
@@ -129,7 +129,7 @@ public class InHouseFunctionalTest {
     interstitial.setCriteoInterstitialAdListener(listener);
 
     BidResponse bidResponse = criteo.getBidResponse(validInterstitialAdUnit);
-    interstitial.loadAd(bidResponse.getBidToken());
+    interstitial.loadAd(bidResponse);
     waitForIdleState();
 
     verify(listener).onAdReceived(interstitial);
@@ -150,7 +150,7 @@ public class InHouseFunctionalTest {
     interstitial.setCriteoInterstitialAdListener(listener);
 
     BidResponse bidResponse = criteo.getBidResponse(invalidInterstitialAdUnit);
-    interstitial.loadAd(bidResponse.getBidToken());
+    interstitial.loadAd(bidResponse);
     waitForIdleState();
 
     verify(listener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
@@ -166,10 +166,10 @@ public class InHouseFunctionalTest {
     interstitial.setCriteoInterstitialAdListener(listener);
 
     BidResponse bidResponse = criteo.getBidResponse(validInterstitialAdUnit);
-    interstitial.loadAd(bidResponse.getBidToken());
+    interstitial.loadAd(bidResponse);
     waitForIdleState();
 
-    interstitial.loadAd(bidResponse.getBidToken());
+    interstitial.loadAd(bidResponse);
     waitForIdleState();
 
     InOrder inOrder = inOrder(listener);

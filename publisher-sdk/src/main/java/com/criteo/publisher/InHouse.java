@@ -96,8 +96,8 @@ public class InHouse {
   }
 
   @Nullable
-  public DisplayUrlTokenValue getTokenValue(@Nullable BidToken bidToken, @NonNull AdUnitType adUnitType) {
-    AbstractTokenValue tokenValue = tokenCache.getTokenValue(bidToken, adUnitType);
+  public DisplayUrlTokenValue getTokenValue(@NonNull BidResponse bidResponse, @NonNull AdUnitType adUnitType) {
+    AbstractTokenValue tokenValue = tokenCache.getTokenValue(bidResponse.getBidToken(), adUnitType);
     if (!(tokenValue instanceof DisplayUrlTokenValue)) {
       // This should not happen. Tokens are forged with the expected type
       return null;
@@ -107,8 +107,8 @@ public class InHouse {
   }
 
   @Nullable
-  public NativeTokenValue getNativeTokenValue(@Nullable BidToken bidToken) {
-    AbstractTokenValue tokenValue = tokenCache.getTokenValue(bidToken, CRITEO_CUSTOM_NATIVE);
+  public NativeTokenValue getNativeTokenValue(@NonNull BidResponse bidResponse) {
+    AbstractTokenValue tokenValue = tokenCache.getTokenValue(bidResponse.getBidToken(), CRITEO_CUSTOM_NATIVE);
     if (!(tokenValue instanceof NativeTokenValue)) {
       // This should not happen. Tokens are forged with the expected type
       return null;
