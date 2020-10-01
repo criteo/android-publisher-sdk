@@ -28,7 +28,6 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
-import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.AppLifecycleUtil;
 import java.util.ArrayList;
 import java.util.List;
@@ -157,12 +156,6 @@ final class CriteoInternal extends Criteo {
 
   private BidResponse doGetBidResponse(@Nullable AdUnit adUnit) {
     return inHouse.getBidResponse(adUnit);
-  }
-
-  @Nullable
-  @Override
-  String getDisplayUrl(@NonNull BidResponse bidResponse, @NonNull AdUnitType adUnitType) {
-    return inHouse.getDisplayUrl(bidResponse, adUnitType);
   }
 
   @NonNull

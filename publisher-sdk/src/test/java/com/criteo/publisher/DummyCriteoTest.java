@@ -18,7 +18,6 @@ package com.criteo.publisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
 import com.criteo.publisher.model.AdSize;
@@ -26,7 +25,6 @@ import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.NativeAdUnit;
-import com.criteo.publisher.util.AdUnitType;
 import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
@@ -79,15 +77,6 @@ public class DummyCriteoTest {
     assertThat(criteo.getBidResponse(banner)).isEqualTo(BidResponse.NO_BID);
     assertThat(criteo.getBidResponse(interstitial)).isEqualTo(BidResponse.NO_BID);
     assertThat(criteo.getBidResponse(aNative)).isEqualTo(BidResponse.NO_BID);
-  }
-
-  @Test
-  public void getTokenValue_GivenAnyAdUnit_ReturnNull() throws Exception {
-    BidResponse bidResponse = mock(BidResponse.class);
-
-    assertThat(criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_BANNER)).isNull();
-    assertThat(criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_INTERSTITIAL)).isNull();
-    assertThat(criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_CUSTOM_NATIVE)).isNull();
   }
 
   @Test

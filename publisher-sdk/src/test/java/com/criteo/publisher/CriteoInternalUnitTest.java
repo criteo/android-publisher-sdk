@@ -16,7 +16,6 @@
 
 package com.criteo.publisher;
 
-import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
@@ -295,20 +294,6 @@ public class CriteoInternalUnitTest {
     criteo.setBidsForAdUnit(object, adUnit);
 
     verify(headerBidding).enrichBid(object, adUnit);
-  }
-
-  @Test
-  public void getDisplayUrl_GivenInHouse_DelegateToIt() throws Exception {
-    BidResponse bidResponse = mock(BidResponse.class);
-    String expected = "display.url";
-
-    InHouse inHouse = givenMockedInHouse();
-    when(inHouse.getDisplayUrl(bidResponse, CRITEO_BANNER)).thenReturn(expected);
-
-    CriteoInternal criteo = createCriteo();
-    String displayUrl = criteo.getDisplayUrl(bidResponse, CRITEO_BANNER);
-
-    assertThat(displayUrl).isSameAs(expected);
   }
 
   @Test

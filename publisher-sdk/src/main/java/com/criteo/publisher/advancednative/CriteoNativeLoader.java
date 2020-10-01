@@ -27,7 +27,6 @@ import com.criteo.publisher.BidManager;
 import com.criteo.publisher.BidResponse;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.DependencyProvider;
-import com.criteo.publisher.InHouse;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
@@ -145,8 +144,7 @@ public class CriteoNativeLoader {
   }
 
   private void doLoad(@NonNull BidResponse bidResponse) {
-    InHouse inHouse = getInHouse();
-    NativeAssets assets = inHouse.getNativeAssets(bidResponse);
+    NativeAssets assets = bidResponse.consumeNativeAssets();
     handleNativeAssets(assets);
   }
 
@@ -203,11 +201,6 @@ public class CriteoNativeLoader {
   @NonNull
   private BidManager getBidManager() {
     return DependencyProvider.getInstance().provideBidManager();
-  }
-
-  @NonNull
-  private InHouse getInHouse() {
-    return DependencyProvider.getInstance().provideInHouse();
   }
 
   @NonNull
