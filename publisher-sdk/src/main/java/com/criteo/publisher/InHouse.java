@@ -64,9 +64,7 @@ public class InHouse {
       return null;
     }
 
-    double price = slot.getCpmAsNumber();
-
-    return new BidResponse(price, adUnit.getAdUnitType(), clock, slot);
+    return new BidResponse(adUnit.getAdUnitType(), clock, slot);
   }
 
 }
