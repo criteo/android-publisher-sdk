@@ -25,7 +25,6 @@ import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
-import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 import com.criteo.publisher.util.AdUnitType;
 import java.util.concurrent.Future;
@@ -50,7 +49,7 @@ public class DummyCriteo extends Criteo {
 
   @Nullable
   @Override
-  DisplayUrlTokenValue getTokenValue(@NonNull BidResponse bidResponse, @NonNull AdUnitType adUnitType) {
+  String getDisplayUrl(@NonNull BidResponse bidResponse, @NonNull AdUnitType adUnitType) {
     return null;
   }
 

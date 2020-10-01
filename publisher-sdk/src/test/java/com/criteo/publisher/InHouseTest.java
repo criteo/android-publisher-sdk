@@ -31,8 +31,8 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeTokenValue;
-import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -73,25 +73,29 @@ public class InHouseTest {
   @Test
   public void getTokenValue_GivenToken_DelegateToCache() throws Exception {
     DisplayUrlTokenValue expectedTokenValue = mock(DisplayUrlTokenValue.class);
+    when(expectedTokenValue.getDisplayUrl()).thenReturn("display.url");
+
     BidResponse bidResponse = mock(BidResponse.class);
 
     when(tokenCache.getTokenValue(bidResponse, CRITEO_BANNER)).thenReturn(expectedTokenValue);
 
-    DisplayUrlTokenValue tokenValue = inHouse.getTokenValue(bidResponse, CRITEO_BANNER);
+    String displayUrl = inHouse.getDisplayUrl(bidResponse, CRITEO_BANNER);
 
-    assertThat(tokenValue).isEqualTo(expectedTokenValue);
+    assertThat(displayUrl).isEqualTo(displayUrl);
   }
 
   @Test
   public void getNativeTokenValue_GivenToken_DelegateToCache() throws Exception {
+    NativeAssets expected = mock(NativeAssets.class);
     NativeTokenValue expectedTokenValue = mock(NativeTokenValue.class);
+    when(expectedTokenValue.getNativeAssets()).thenReturn(expected);
     BidResponse bidResponse = mock(BidResponse.class);
 
     when(tokenCache.getTokenValue(bidResponse, CRITEO_CUSTOM_NATIVE)).thenReturn(expectedTokenValue);
 
-    NativeTokenValue tokenValue = inHouse.getNativeTokenValue(bidResponse);
+    NativeAssets nativeAssets = inHouse.getNativeAssets(bidResponse);
 
-    assertThat(tokenValue).isEqualTo(expectedTokenValue);
+    assertThat(nativeAssets).isEqualTo(expected);
   }
 
   @Test

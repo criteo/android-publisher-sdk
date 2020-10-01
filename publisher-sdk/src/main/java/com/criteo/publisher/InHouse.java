@@ -28,6 +28,7 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeTokenValue;
 import com.criteo.publisher.util.AdUnitType;
 
@@ -98,25 +99,25 @@ public class InHouse {
   }
 
   @Nullable
-  public DisplayUrlTokenValue getTokenValue(@NonNull BidResponse bidResponse, @NonNull AdUnitType adUnitType) {
+  public String getDisplayUrl(@NonNull BidResponse bidResponse, @NonNull AdUnitType adUnitType) {
     AbstractTokenValue tokenValue = tokenCache.getTokenValue(bidResponse, adUnitType);
     if (!(tokenValue instanceof DisplayUrlTokenValue)) {
       // This should not happen. Tokens are forged with the expected type
       return null;
     }
 
-    return (DisplayUrlTokenValue) tokenValue;
+    return ((DisplayUrlTokenValue) tokenValue).getDisplayUrl();
   }
 
   @Nullable
-  public NativeTokenValue getNativeTokenValue(@NonNull BidResponse bidResponse) {
+  public NativeAssets getNativeAssets(@NonNull BidResponse bidResponse) {
     AbstractTokenValue tokenValue = tokenCache.getTokenValue(bidResponse, CRITEO_CUSTOM_NATIVE);
     if (!(tokenValue instanceof NativeTokenValue)) {
       // This should not happen. Tokens are forged with the expected type
       return null;
     }
 
-    return (NativeTokenValue) tokenValue;
+    return ((NativeTokenValue) tokenValue).getNativeAssets();
   }
 
 }

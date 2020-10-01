@@ -49,7 +49,6 @@ import com.criteo.publisher.util.AdUnitType;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.util.UUID;
 import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Before;
@@ -218,7 +217,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   @Test
   public void fetchAdAsyncInHouse_GivenNoBid_NotifyAdListenerForFailure() throws Exception {
     BidResponse bidResponse = mock(BidResponse.class);
-    when(criteo.getTokenValue(bidResponse, AdUnitType.CRITEO_INTERSTITIAL)).thenReturn(null);
+    when(criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_INTERSTITIAL)).thenReturn(null);
 
     criteoInterstitialEventController.fetchAdAsync(bidResponse);
     waitForIdleState();
@@ -232,10 +231,8 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   public void fetchAdAsyncInHouse_GivenBidAndGoodDisplayUrl_FetchCreativeAndNotifyListenerForSuccess()
       throws Exception {
     BidResponse bidResponse = mock(BidResponse.class);
-    DisplayUrlTokenValue tokenValue = mock(DisplayUrlTokenValue.class);
 
-    when(tokenValue.getDisplayUrl()).thenReturn(GOOD_DISPLAY_URL);
-    when(criteo.getTokenValue(bidResponse, AdUnitType.CRITEO_INTERSTITIAL)).thenReturn(tokenValue);
+    when(criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_INTERSTITIAL)).thenReturn(GOOD_DISPLAY_URL);
 
     criteoInterstitialEventController.fetchAdAsync(bidResponse);
     waitForIdleState();
@@ -251,10 +248,8 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   public void fetchAdAsyncInHouse_GivenBidAndBadDisplayUrl_NotifyListenerForFailureToDisplay()
       throws Exception {
     BidResponse bidResponse = mock(BidResponse.class);
-    DisplayUrlTokenValue tokenValue = mock(DisplayUrlTokenValue.class);
 
-    when(tokenValue.getDisplayUrl()).thenReturn(BAD_DISPLAY_URL);
-    when(criteo.getTokenValue(bidResponse, AdUnitType.CRITEO_INTERSTITIAL)).thenReturn(tokenValue);
+    when(criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_INTERSTITIAL)).thenReturn(BAD_DISPLAY_URL);
 
     criteoInterstitialEventController.fetchAdAsync(bidResponse);
     waitForIdleState();
@@ -270,10 +265,8 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   public void fetchAdAsyncInHouse_GivenBidTwice_FetchCreativeTwiceAndNotifyListenerIfSuccess()
       throws Exception {
     BidResponse bidResponse = mock(BidResponse.class);
-    DisplayUrlTokenValue tokenValue = mock(DisplayUrlTokenValue.class);
 
-    when(criteo.getTokenValue(bidResponse, AdUnitType.CRITEO_INTERSTITIAL)).thenReturn(tokenValue);
-    when(tokenValue.getDisplayUrl())
+    when(criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_INTERSTITIAL))
         .thenReturn(GOOD_DISPLAY_URL)
         .thenReturn(BAD_DISPLAY_URL);
 

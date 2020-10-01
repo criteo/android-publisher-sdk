@@ -28,7 +28,6 @@ import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.util.AdUnitType;
 import java.util.HashMap;
-import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -86,9 +85,9 @@ public class DummyCriteoTest {
   public void getTokenValue_GivenAnyAdUnit_ReturnNull() throws Exception {
     BidResponse bidResponse = mock(BidResponse.class);
 
-    assertThat(criteo.getTokenValue(bidResponse, AdUnitType.CRITEO_BANNER)).isNull();
-    assertThat(criteo.getTokenValue(bidResponse, AdUnitType.CRITEO_INTERSTITIAL)).isNull();
-    assertThat(criteo.getTokenValue(bidResponse, AdUnitType.CRITEO_CUSTOM_NATIVE)).isNull();
+    assertThat(criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_BANNER)).isNull();
+    assertThat(criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_INTERSTITIAL)).isNull();
+    assertThat(criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_CUSTOM_NATIVE)).isNull();
   }
 
   @Test
