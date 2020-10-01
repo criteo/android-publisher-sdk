@@ -135,7 +135,7 @@ public class CriteoNativeLoader {
     });
   }
 
-  public void loadAd(@NonNull BidResponse bidResponse) {
+  public void loadAd(@Nullable BidResponse bidResponse) {
     try {
       doLoad(bidResponse);
     } catch (Throwable t) {
@@ -143,8 +143,8 @@ public class CriteoNativeLoader {
     }
   }
 
-  private void doLoad(@NonNull BidResponse bidResponse) {
-    NativeAssets assets = bidResponse.consumeNativeAssets();
+  private void doLoad(@Nullable BidResponse bidResponse) {
+    NativeAssets assets = bidResponse == null ? null : bidResponse.consumeNativeAssets();
     handleNativeAssets(assets);
   }
 

@@ -108,7 +108,7 @@ public class InHouseTest {
   }
 
   private void assertIsNoBid(BidResponse bidResponse) {
-    assertThat(bidResponse).isEqualTo(BidResponse.NO_BID);
+    assertThat(bidResponse).isNull();
   }
 
 }

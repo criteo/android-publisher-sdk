@@ -98,7 +98,7 @@ public class CriteoInterstitial {
     getOrCreateController().fetchAdAsync(interstitialAdUnit);
   }
 
-  public void loadAd(@NonNull BidResponse bidResponse) {
+  public void loadAd(@Nullable BidResponse bidResponse) {
     if (!DependencyProvider.getInstance().isApplicationSet()) {
       Log.w(TAG, "Calling CriteoInterstitial#loadAd(bidToken) with a null application");
       return;
@@ -121,7 +121,7 @@ public class CriteoInterstitial {
     getOrCreateController().fetchCreativeAsync(displayData);
   }
 
-  private void doLoadAd(@NonNull BidResponse bidResponse) {
+  private void doLoadAd(@Nullable BidResponse bidResponse) {
     getOrCreateController().fetchAdAsync(bidResponse);
   }
 

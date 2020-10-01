@@ -26,15 +26,12 @@ import kotlin.jvm.functions.Function1;
 
 public class BidResponse {
 
-  @SuppressWarnings("ConstantConditions")
-  public static final BidResponse NO_BID = new BidResponse(0, false, null, null, null);
-
   private final double price;
 
-  private final boolean valid;
-
+  @NonNull
   private final AdUnitType adUnitType;
 
+  @NonNull
   private final Clock clock;
 
   @Nullable
@@ -42,13 +39,11 @@ public class BidResponse {
 
   BidResponse(
       double price,
-      boolean valid,
       @NonNull AdUnitType adUnitType,
       @NonNull Clock clock,
       @NonNull CdbResponseSlot slot
   ) {
     this.price = price;
-    this.valid = valid;
     this.adUnitType = adUnitType;
     this.slot = slot;
     this.clock = clock;
@@ -57,11 +52,6 @@ public class BidResponse {
   @Keep
   public double getPrice() {
     return price;
-  }
-
-  @Keep
-  public boolean isBidSuccess() {
-    return valid;
   }
 
   @Nullable

@@ -201,6 +201,15 @@ public class CriteoBannerEventControllerTest {
   }
 
   @Test
+  public void fetchAdAsyncToken_GivenNullBid_NotifyListenerForFailureAndDoNotDisplayAd() throws Exception {
+    criteoBannerEventController.fetchAdAsync((BidResponse) null);
+    waitForIdleState();
+
+    verify(criteoBannerAdListener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
+    verify(criteoBannerEventController, never()).displayAd(any());
+  }
+
+  @Test
   public void fetchAdAsyncToken_GivenBid_NotifyListenerForSuccessAndDisplayAd() throws Exception {
     BidResponse bidResponse = mock(BidResponse.class);
     when(bidResponse.consumeDisplayUrlFor(CRITEO_BANNER)).thenReturn("http://my.display.url");

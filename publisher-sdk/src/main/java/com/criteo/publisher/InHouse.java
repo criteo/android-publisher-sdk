@@ -51,22 +51,22 @@ public class InHouse {
     this.integrationRegistry = integrationRegistry;
   }
 
-  @NonNull
+  @Nullable
   public BidResponse getBidResponse(@Nullable AdUnit adUnit) {
     integrationRegistry.declare(Integration.IN_HOUSE);
 
     if (adUnit instanceof InterstitialAdUnit && !interstitialActivityHelper.isAvailable()) {
-      return BidResponse.NO_BID;
+      return null;
     }
 
     CdbResponseSlot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
     if (slot == null || adUnit == null) {
-      return BidResponse.NO_BID;
+      return null;
     }
 
     double price = slot.getCpmAsNumber();
 
-    return new BidResponse(price, true, adUnit.getAdUnitType(), clock, slot);
+    return new BidResponse(price, adUnit.getAdUnitType(), clock, slot);
   }
 
 }
