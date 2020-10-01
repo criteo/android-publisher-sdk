@@ -79,51 +79,14 @@ public class CriteoInterstitialTest {
 
   @Test
   public void loadAdInHouse_GivenControllerAndLoadTwice_DelegateToItTwice() throws Exception {
-    BidToken token = new BidToken(UUID.randomUUID(), adUnit);
+    BidResponse bidResponse = mock(BidResponse.class);
     CriteoInterstitialEventController controller = givenMockedController();
 
-    interstitial.loadAd(token);
-    interstitial.loadAd(token);
+    interstitial.loadAd(bidResponse);
+    interstitial.loadAd(bidResponse);
 
-    verify(controller, times(2)).fetchAdAsync(token);
+    verify(controller, times(2)).fetchAdAsync(bidResponse);
     verify(integrationRegistry, never()).declare(any());
-  }
-
-  @Test
-  public void loadAdInHouse_GivenTokenWithDifferentButEqualAdUnit_DelegateToController()
-      throws Exception {
-    CriteoInterstitialEventController controller = givenMockedController();
-    InterstitialAdUnit equalAdUnit = new InterstitialAdUnit(adUnit.getAdUnitId());
-    BidToken bidToken = new BidToken(UUID.randomUUID(), equalAdUnit);
-
-    interstitial.loadAd(bidToken);
-
-    verify(controller).fetchAdAsync(bidToken);
-    verifyNoMoreInteractions(controller);
-  }
-
-  @Test
-  public void loadAdInHouse_GivenTokenWithDifferentAdUnit_IgnoreAdUnitFromConstructorAndDelegateToController()
-      throws Exception {
-    CriteoInterstitialEventController controller = givenMockedController();
-    InterstitialAdUnit differentAdUnit = new InterstitialAdUnit(adUnit.getAdUnitId() + "_");
-    BidToken bidToken = new BidToken(UUID.randomUUID(), differentAdUnit);
-
-    interstitial.loadAd(bidToken);
-
-    verify(controller).fetchAdAsync(bidToken);
-  }
-
-  @Test
-  public void loadAdInHouse_GivenNotABannerToken_IgnoreAdUnitFromConstructorAndLetControllerHandleThis()
-      throws Exception {
-    CriteoInterstitialEventController controller = givenMockedController();
-    AdUnit differentAdUnit = new NativeAdUnit(adUnit.getAdUnitId());
-    BidToken bidToken = new BidToken(UUID.randomUUID(), differentAdUnit);
-
-    interstitial.loadAd(bidToken);
-
-    verify(controller).fetchAdAsync(bidToken);
   }
 
   @Test
@@ -165,9 +128,9 @@ public class CriteoInterstitialTest {
   public void loadAdWithBidToken_GivenNullApplication_ReturnImmediately() throws Exception {
     CriteoInterstitialEventController controller = givenMockedController();
     Application application = givenNullApplication();
-    BidToken token = new BidToken(UUID.randomUUID(), adUnit);
+    BidResponse bidResponse = mock(BidResponse.class);
 
-    interstitial.loadAd(token);
+    interstitial.loadAd(bidResponse);
 
     verifyNoMoreInteractions(controller);
     DependencyProvider.getInstance().setApplication(application);

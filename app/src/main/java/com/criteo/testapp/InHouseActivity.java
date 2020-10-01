@@ -112,12 +112,12 @@ public class InHouseActivity extends AppCompatActivity {
 
     Log.d(TAG, "Banner Requested");
     BidResponse bidResponse = Criteo.getInstance().getBidResponse(BANNER);
-    criteoBannerView.loadAd(bidResponse.getBidToken());
+    criteoBannerView.loadAd(bidResponse);
   }
 
   private void loadNative() {
     BidResponse bidResponse = Criteo.getInstance().getBidResponse(NATIVE);
-    nativeLoader.loadAd(bidResponse.getBidToken());
+    nativeLoader.loadAd(bidResponse);
   }
 
   private void loadInterstitialAd(InterstitialAdUnit adUnit, Button btnShow) {
@@ -131,7 +131,7 @@ public class InHouseActivity extends AppCompatActivity {
 
     Log.d(TAG, prefix + " - Interstitial Requested");
     BidResponse bidResponse = Criteo.getInstance().getBidResponse(adUnit);
-    interstitial.loadAd(bidResponse.getBidToken());
+    interstitial.loadAd(bidResponse);
   }
 
 }

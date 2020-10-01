@@ -19,6 +19,7 @@ package com.criteo.publisher;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -75,11 +76,11 @@ public class CriteoBannerViewIntegrationTest {
     givenInitializedCriteo(bannerAdUnit);
     waitForIdleState();
 
-    // This should not be possible since BidToken is not part of the public API.
+    // This should not be possible since BidResponse constructor is not part of the public API.
     // But just in case, we may check that no publisher can attempt this.
-    BidToken token = new BidToken(UUID.randomUUID(), bannerAdUnit);
+    BidResponse bidResponse = mock(BidResponse.class);
 
-    criteoBannerView.loadAd(token);
+    criteoBannerView.loadAd(bidResponse);
     waitForIdleState();
 
     verify(criteoBannerAdListener, never()).onAdReceived(criteoBannerView);

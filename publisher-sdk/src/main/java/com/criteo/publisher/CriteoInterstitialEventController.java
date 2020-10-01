@@ -90,8 +90,8 @@ public class CriteoInterstitialEventController {
     });
   }
 
-  public void fetchAdAsync(@Nullable BidToken bidToken) {
-    DisplayUrlTokenValue tokenValue = criteo.getTokenValue(bidToken, AdUnitType.CRITEO_INTERSTITIAL);
+  public void fetchAdAsync(@NonNull BidResponse bidResponse) {
+    DisplayUrlTokenValue tokenValue = criteo.getTokenValue(bidResponse, AdUnitType.CRITEO_INTERSTITIAL);
 
     if (tokenValue == null) {
       notifyForFailure();

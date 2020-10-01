@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -66,14 +67,14 @@ public class CriteoBannerViewTest {
 
   private BannerAdUnit bannerAdUnit;
 
-  private BidToken bidToken;
+  @Mock
+  private BidResponse bidResponse;
 
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
     bannerAdUnit = new BannerAdUnit("mock", new AdSize(320, 50));
-    bidToken = new BidToken(UUID.randomUUID(), bannerAdUnit);
 
     bannerView = spy(new CriteoBannerView(context, bannerAdUnit, criteo));
     doReturn(controller).when(criteo).createBannerController(bannerView);
@@ -126,81 +127,35 @@ public class CriteoBannerViewTest {
 
   @Test
   public void loadAdInHouse_GivenController_DelegateToIt() throws Exception {
-    bannerView.loadAd(bidToken);
+    bannerView.loadAd(bidResponse);
 
-    verify(controller).fetchAdAsync(bidToken);
+    verify(controller).fetchAdAsync(bidResponse);
     verifyNoMoreInteractions(controller);
     verify(integrationRegistry, never()).declare(any());
   }
 
   @Test
   public void loadAdInHouse_GivenControllerAndLoadTwice_DelegateToItTwice() throws Exception {
-    bannerView.loadAd(bidToken);
-    bannerView.loadAd(bidToken);
+    bannerView.loadAd(bidResponse);
+    bannerView.loadAd(bidResponse);
 
-    verify(controller, times(2)).fetchAdAsync(bidToken);
-    verifyNoMoreInteractions(controller);
-    verify(integrationRegistry, never()).declare(any());
-  }
-
-  @Test
-  public void loadAdInHouse_GivenNullTokenAndController_DelegateToIt() throws Exception {
-    bannerView.loadAd(null);
-
-    verify(controller).fetchAdAsync((BidToken) null);
+    verify(controller, times(2)).fetchAdAsync(bidResponse);
     verifyNoMoreInteractions(controller);
     verify(integrationRegistry, never()).declare(any());
   }
 
   @Test
   public void loadAdInHouse_GivenControllerThrowing_DoNotThrow() throws Exception {
-    doThrow(RuntimeException.class).when(controller).fetchAdAsync(any(BidToken.class));
+    doThrow(RuntimeException.class).when(controller).fetchAdAsync(any(BidResponse.class));
 
-    assertThatCode(() -> bannerView.loadAd(bidToken)).doesNotThrowAnyException();
+    assertThatCode(() -> bannerView.loadAd(bidResponse)).doesNotThrowAnyException();
   }
 
   @Test
   public void loadAdInHouse_GivenNonInitializedSdk_DoesNotThrow() throws Exception {
     bannerView = givenBannerUsingNonInitializedSdk();
 
-    assertThatCode(() -> bannerView.loadAd(bidToken)).doesNotThrowAnyException();
-  }
-
-  @Test
-  public void loadAdInHouse_GivenTokenWithDifferentButEqualAdUnit_DelegateToController()
-      throws Exception {
-    BannerAdUnit equalAdUnit = new BannerAdUnit(bannerAdUnit.getAdUnitId(), bannerAdUnit.getSize());
-    bidToken = new BidToken(UUID.randomUUID(), equalAdUnit);
-
-    bannerView.loadAd(bidToken);
-
-    verify(controller).fetchAdAsync(bidToken);
-    verifyNoMoreInteractions(controller);
-  }
-
-  @Test
-  public void loadAdInHouse_GivenTokenWithDifferentAdUnit_IgnoreAdUnitFromConstructorAndDelegateToController()
-      throws Exception {
-    BannerAdUnit differentAdUnit = new BannerAdUnit(
-        bannerAdUnit.getAdUnitId() + "_",
-        bannerAdUnit.getSize()
-    );
-    bidToken = new BidToken(UUID.randomUUID(), differentAdUnit);
-
-    bannerView.loadAd(bidToken);
-
-    verify(controller).fetchAdAsync(bidToken);
-  }
-
-  @Test
-  public void loadAdInHouse_GivenNotABannerToken_IgnoreAdUnitFromConstructorAndLetControllerHandleThis()
-      throws Exception {
-    AdUnit differentAdUnit = new InterstitialAdUnit(bannerAdUnit.getAdUnitId());
-    bidToken = new BidToken(UUID.randomUUID(), differentAdUnit);
-
-    bannerView.loadAd(bidToken);
-
-    verify(controller).fetchAdAsync(bidToken);
+    assertThatCode(() -> bannerView.loadAd(bidResponse)).doesNotThrowAnyException();
   }
 
   @Test

@@ -76,15 +76,15 @@ public class CriteoBannerEventController {
         displayAd(cdbResponseSlot.getDisplayUrl());
       }
 
-      @Override
-      public void onNoBid() {
-        notifyFor(INVALID);
-      }
-    });
+     @Override
+     public void onNoBid() {
+       notifyFor(INVALID);
+     }
+   });
   }
 
-  public void fetchAdAsync(@Nullable BidToken bidToken) {
-    DisplayUrlTokenValue tokenValue = criteo.getTokenValue(bidToken, AdUnitType.CRITEO_BANNER);
+  public void fetchAdAsync(@NonNull BidResponse bidResponse) {
+    DisplayUrlTokenValue tokenValue = criteo.getTokenValue(bidResponse, AdUnitType.CRITEO_BANNER);
 
     if (tokenValue == null) {
       notifyFor(INVALID);

@@ -18,6 +18,7 @@ package com.criteo.publisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
 import com.criteo.publisher.model.AdSize;
@@ -86,15 +87,11 @@ public class DummyCriteoTest {
 
   @Test
   public void getTokenValue_GivenAnyAdUnit_ReturnNull() throws Exception {
-    BidToken bannerToken = new BidToken(UUID.randomUUID(), banner);
-    BidToken interstitialToken = new BidToken(UUID.randomUUID(), interstitial);
-    BidToken nativeToken = new BidToken(UUID.randomUUID(), aNative);
+    BidResponse bidResponse = mock(BidResponse.class);
 
-    assertThat(criteo.getTokenValue(null, null)).isNull();
-    assertThat(criteo.getTokenValue(bannerToken, AdUnitType.CRITEO_BANNER)).isNull();
-    assertThat(criteo.getTokenValue(interstitialToken, AdUnitType.CRITEO_INTERSTITIAL)).isNull();
-    assertThat(criteo.getTokenValue(nativeToken, AdUnitType.CRITEO_CUSTOM_NATIVE)).isNull();
-    assertThat(criteo.getTokenValue(bannerToken, AdUnitType.CRITEO_INTERSTITIAL)).isNull();
+    assertThat(criteo.getTokenValue(bidResponse, AdUnitType.CRITEO_BANNER)).isNull();
+    assertThat(criteo.getTokenValue(bidResponse, AdUnitType.CRITEO_INTERSTITIAL)).isNull();
+    assertThat(criteo.getTokenValue(bidResponse, AdUnitType.CRITEO_CUSTOM_NATIVE)).isNull();
   }
 
   @Test

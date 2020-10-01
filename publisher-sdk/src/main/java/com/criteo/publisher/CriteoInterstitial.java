@@ -98,14 +98,14 @@ public class CriteoInterstitial {
     getOrCreateController().fetchAdAsync(interstitialAdUnit);
   }
 
-  public void loadAd(@Nullable BidToken bidToken) {
+  public void loadAd(@NonNull BidResponse bidResponse) {
     if (!DependencyProvider.getInstance().isApplicationSet()) {
       Log.w(TAG, "Calling CriteoInterstitial#loadAd(bidToken) with a null application");
       return;
     }
 
     try {
-      doLoadAd(bidToken);
+      doLoadAd(bidResponse);
     } catch (Throwable tr) {
       Log.e(TAG, "Internal error while loading interstitial from bid token.", tr);
     }
@@ -121,8 +121,8 @@ public class CriteoInterstitial {
     getOrCreateController().fetchCreativeAsync(displayData);
   }
 
-  private void doLoadAd(@Nullable BidToken bidToken) {
-    getOrCreateController().fetchAdAsync(bidToken);
+  private void doLoadAd(@NonNull BidResponse bidResponse) {
+    getOrCreateController().fetchAdAsync(bidResponse);
   }
 
   public boolean isAdLoaded() {

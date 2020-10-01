@@ -70,11 +70,11 @@ public class CriteoInterstitialIntegrationTest {
     givenInitializedCriteo(interstitialAdUnit);
     waitForIdleState();
 
-    // This should not be possible since BidToken is not part of the public API.
+    // This should not be possible since BidResponse constructor is not part of the public API.
     // But just in case, we may check that no publisher can attempt this.
-    BidToken token = new BidToken(UUID.randomUUID(), interstitialAdUnit);
+    BidResponse bidResponse = mock(BidResponse.class);
 
-    interstitial.loadAd(token);
+    interstitial.loadAd(bidResponse);
     waitForIdleState();
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
