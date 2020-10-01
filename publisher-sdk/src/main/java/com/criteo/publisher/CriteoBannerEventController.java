@@ -84,13 +84,13 @@ public class CriteoBannerEventController {
   }
 
   public void fetchAdAsync(@NonNull BidResponse bidResponse) {
-    DisplayUrlTokenValue tokenValue = criteo.getTokenValue(bidResponse, AdUnitType.CRITEO_BANNER);
+    String displayUrl = criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_BANNER);
 
-    if (tokenValue == null) {
+    if (displayUrl == null) {
       notifyFor(INVALID);
     } else {
       notifyFor(VALID);
-      displayAd(tokenValue.getDisplayUrl());
+      displayAd(displayUrl);
     }
   }
 

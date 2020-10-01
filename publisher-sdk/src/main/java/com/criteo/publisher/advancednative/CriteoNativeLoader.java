@@ -147,8 +147,7 @@ public class CriteoNativeLoader {
 
   private void doLoad(@NonNull BidResponse bidResponse) {
     InHouse inHouse = getInHouse();
-    NativeTokenValue tokenValue = inHouse.getNativeTokenValue(bidResponse);
-    NativeAssets assets = tokenValue == null ? null : tokenValue.getNativeAssets();
+    NativeAssets assets = inHouse.getNativeAssets(bidResponse);
     handleNativeAssets(assets);
   }
 

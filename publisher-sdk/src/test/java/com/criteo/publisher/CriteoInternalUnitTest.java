@@ -42,7 +42,6 @@ import com.criteo.publisher.util.AppLifecycleUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
@@ -300,17 +299,17 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void getTokenValue_GivenInHouse_DelegateToIt() throws Exception {
+  public void getDisplayUrl_GivenInHouse_DelegateToIt() throws Exception {
     BidResponse bidResponse = mock(BidResponse.class);
-    DisplayUrlTokenValue expected = mock(DisplayUrlTokenValue.class);
+    String expected = "display.url";
 
     InHouse inHouse = givenMockedInHouse();
-    when(inHouse.getTokenValue(bidResponse, CRITEO_BANNER)).thenReturn(expected);
+    when(inHouse.getDisplayUrl(bidResponse, CRITEO_BANNER)).thenReturn(expected);
 
     CriteoInternal criteo = createCriteo();
-    DisplayUrlTokenValue tokenValue = criteo.getTokenValue(bidResponse, CRITEO_BANNER);
+    String displayUrl = criteo.getDisplayUrl(bidResponse, CRITEO_BANNER);
 
-    assertThat(tokenValue).isSameAs(expected);
+    assertThat(displayUrl).isSameAs(expected);
   }
 
   @Test

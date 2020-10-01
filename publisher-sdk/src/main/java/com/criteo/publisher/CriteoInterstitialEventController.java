@@ -91,12 +91,12 @@ public class CriteoInterstitialEventController {
   }
 
   public void fetchAdAsync(@NonNull BidResponse bidResponse) {
-    DisplayUrlTokenValue tokenValue = criteo.getTokenValue(bidResponse, AdUnitType.CRITEO_INTERSTITIAL);
+    String displayUrl = criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_INTERSTITIAL);
 
-    if (tokenValue == null) {
+    if (displayUrl == null) {
       notifyForFailure();
     } else {
-      fetchCreativeAsync(tokenValue.getDisplayUrl());
+      fetchCreativeAsync(displayUrl);
     }
   }
 

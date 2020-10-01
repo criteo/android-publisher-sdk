@@ -27,7 +27,6 @@ import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
-import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.AppLifecycleUtil;
@@ -162,8 +161,8 @@ final class CriteoInternal extends Criteo {
 
   @Nullable
   @Override
-  DisplayUrlTokenValue getTokenValue(@NonNull BidResponse bidResponse, @NonNull AdUnitType adUnitType) {
-    return inHouse.getTokenValue(bidResponse, adUnitType);
+  String getDisplayUrl(@NonNull BidResponse bidResponse, @NonNull AdUnitType adUnitType) {
+    return inHouse.getDisplayUrl(bidResponse, adUnitType);
   }
 
   @NonNull

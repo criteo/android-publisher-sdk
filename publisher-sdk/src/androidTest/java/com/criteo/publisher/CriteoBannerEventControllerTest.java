@@ -43,7 +43,6 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.util.AdUnitType;
-import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
@@ -126,7 +125,7 @@ public class CriteoBannerEventControllerTest {
     })).when(criteoBannerAdListener).onAdFailedToReceive(any());
 
     BidResponse bidResponse = mock(BidResponse.class);
-    when(criteo.getTokenValue(bidResponse, AdUnitType.CRITEO_BANNER)).thenReturn(null);
+    when(criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_BANNER)).thenReturn(null);
 
     runOnMainThreadAndWait(() -> {
       criteoBannerEventController.fetchAdAsync(bidResponse);
@@ -194,7 +193,7 @@ public class CriteoBannerEventControllerTest {
       throws Exception {
     BidResponse bidResponse = mock(BidResponse.class);
 
-    when(criteo.getTokenValue(bidResponse, AdUnitType.CRITEO_BANNER)).thenReturn(null);
+    when(criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_BANNER)).thenReturn(null);
 
     criteoBannerEventController.fetchAdAsync(bidResponse);
     waitForIdleState();
@@ -206,10 +205,8 @@ public class CriteoBannerEventControllerTest {
   @Test
   public void fetchAdAsyncToken_GivenBid_NotifyListenerForSuccessAndDisplayAd() throws Exception {
     BidResponse bidResponse = mock(BidResponse.class);
-    DisplayUrlTokenValue tokenValue = mock(DisplayUrlTokenValue.class);
 
-    when(criteo.getTokenValue(bidResponse, AdUnitType.CRITEO_BANNER)).thenReturn(tokenValue);
-    when(tokenValue.getDisplayUrl()).thenReturn("http://my.display.url");
+    when(criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_BANNER)).thenReturn("http://my.display.url");
 
     criteoBannerEventController.fetchAdAsync(bidResponse);
     waitForIdleState();
@@ -222,10 +219,8 @@ public class CriteoBannerEventControllerTest {
   public void fetchAdAsyncToken_GivenBidTwice_NotifyListenerForSuccessAndDisplayAdTwice()
       throws Exception {
     BidResponse bidResponse = mock(BidResponse.class);
-    DisplayUrlTokenValue tokenValue = mock(DisplayUrlTokenValue.class);
 
-    when(criteo.getTokenValue(any(), any())).thenReturn(tokenValue);
-    when(tokenValue.getDisplayUrl())
+    when(criteo.getDisplayUrl(any(), any()))
         .thenReturn("http://my.display.url1")
         .thenReturn("http://my.display.url2");
 
