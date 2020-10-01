@@ -33,7 +33,6 @@ import org.mockito.MockitoAnnotations;
 public class BidResponseTest {
 
   private static final double PRICE = 1.0d;
-  private static final boolean VALID = true;
 
   @Mock
   private CdbResponseSlot slot;
@@ -48,10 +47,9 @@ public class BidResponseTest {
 
   @Test
   public void testBidResponse() {
-    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_BANNER, clock, slot);
+    BidResponse bidResponse = new BidResponse(PRICE, CRITEO_BANNER, clock, slot);
 
     assertThat(bidResponse.getPrice()).isEqualTo(PRICE);
-    assertThat(bidResponse.isBidSuccess()).isTrue();
   }
 
   @Test
@@ -59,7 +57,7 @@ public class BidResponseTest {
     when(slot.getDisplayUrl()).thenReturn("display.url");
     when(slot.isExpired(clock)).thenReturn(false);
 
-    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_BANNER, clock, slot);
+    BidResponse bidResponse = new BidResponse(PRICE, CRITEO_BANNER, clock, slot);
     String displayUrl = bidResponse.consumeDisplayUrlFor(CRITEO_BANNER);
 
     assertThat(displayUrl).isEqualTo("display.url");
@@ -70,7 +68,7 @@ public class BidResponseTest {
     when(slot.getDisplayUrl()).thenReturn("display.url");
     when(slot.isExpired(clock)).thenReturn(false);
 
-    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_INTERSTITIAL, clock, slot);
+    BidResponse bidResponse = new BidResponse(PRICE, CRITEO_INTERSTITIAL, clock, slot);
     String displayUrl = bidResponse.consumeDisplayUrlFor(CRITEO_INTERSTITIAL);
 
     assertThat(displayUrl).isEqualTo("display.url");
@@ -81,7 +79,7 @@ public class BidResponseTest {
     when(slot.getDisplayUrl()).thenReturn("display.url");
     when(slot.isExpired(clock)).thenReturn(false);
 
-    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_INTERSTITIAL, clock, slot);
+    BidResponse bidResponse = new BidResponse(PRICE, CRITEO_INTERSTITIAL, clock, slot);
     bidResponse.consumeDisplayUrlFor(CRITEO_INTERSTITIAL);
     String displayUrl = bidResponse.consumeDisplayUrlFor(CRITEO_INTERSTITIAL);
 
@@ -93,7 +91,7 @@ public class BidResponseTest {
     when(slot.getDisplayUrl()).thenReturn("display.url");
     when(slot.isExpired(clock)).thenReturn(false);
 
-    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_INTERSTITIAL, clock, slot);
+    BidResponse bidResponse = new BidResponse(PRICE, CRITEO_INTERSTITIAL, clock, slot);
     String displayUrl = bidResponse.consumeDisplayUrlFor(CRITEO_BANNER);
 
     assertThat(displayUrl).isNull();
@@ -104,15 +102,8 @@ public class BidResponseTest {
     when(slot.getDisplayUrl()).thenReturn("display.url");
     when(slot.isExpired(clock)).thenReturn(true);
 
-    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_BANNER, clock, slot);
+    BidResponse bidResponse = new BidResponse(PRICE, CRITEO_BANNER, clock, slot);
     String displayUrl = bidResponse.consumeDisplayUrlFor(CRITEO_BANNER);
-
-    assertThat(displayUrl).isNull();
-  }
-
-  @Test
-  public void consumeDisplayUrlFor_GivenNoBid_ReturnNull() {
-    String displayUrl = BidResponse.NO_BID.consumeDisplayUrlFor(CRITEO_BANNER);
 
     assertThat(displayUrl).isNull();
   }
@@ -123,7 +114,7 @@ public class BidResponseTest {
     when(slot.getNativeAssets()).thenReturn(expected);
     when(slot.isExpired(clock)).thenReturn(false);
 
-    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_CUSTOM_NATIVE, clock, slot);
+    BidResponse bidResponse = new BidResponse(PRICE, CRITEO_CUSTOM_NATIVE, clock, slot);
     NativeAssets nativeAssets = bidResponse.consumeNativeAssets();
 
     assertThat(nativeAssets).isEqualTo(expected);
@@ -134,7 +125,7 @@ public class BidResponseTest {
     when(slot.getNativeAssets()).thenReturn(mock(NativeAssets.class));
     when(slot.isExpired(clock)).thenReturn(false);
 
-    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_CUSTOM_NATIVE, clock, slot);
+    BidResponse bidResponse = new BidResponse(PRICE, CRITEO_CUSTOM_NATIVE, clock, slot);
     bidResponse.consumeNativeAssets();
     NativeAssets nativeAssets = bidResponse.consumeNativeAssets();
 
@@ -146,15 +137,8 @@ public class BidResponseTest {
     when(slot.getNativeAssets()).thenReturn(mock(NativeAssets.class));
     when(slot.isExpired(clock)).thenReturn(true);
 
-    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_CUSTOM_NATIVE, clock, slot);
+    BidResponse bidResponse = new BidResponse(PRICE, CRITEO_CUSTOM_NATIVE, clock, slot);
     NativeAssets nativeAssets = bidResponse.consumeNativeAssets();
-
-    assertThat(nativeAssets).isNull();
-  }
-
-  @Test
-  public void consumeNativeAssets_GivenNoBid_ReturnNull() {
-    NativeAssets nativeAssets = BidResponse.NO_BID.consumeNativeAssets();
 
     assertThat(nativeAssets).isNull();
   }

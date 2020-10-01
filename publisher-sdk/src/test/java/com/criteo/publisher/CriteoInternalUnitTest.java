@@ -232,7 +232,7 @@ public class CriteoInternalUnitTest {
     Criteo criteo = createCriteo();
     BidResponse bidResponse = criteo.getBidResponse(adUnit);
 
-    assertThat(bidResponse).isEqualTo(BidResponse.NO_BID);
+    assertThat(bidResponse).isNull();
   }
 
   @Test

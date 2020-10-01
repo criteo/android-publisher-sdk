@@ -109,7 +109,7 @@ public class TestNativeActivity extends Activity {
     nativeLoaderInAdLayout.loadAd();
   }
 
-  public void loadInHouseAdInAdLayout(@NonNull BidResponse bidResponse) {
+  public void loadInHouseAdInAdLayout(@Nullable BidResponse bidResponse) {
     nativeLoaderInAdLayout.loadAd(bidResponse);
   }
 
@@ -117,7 +117,7 @@ public class TestNativeActivity extends Activity {
     nativeLoaderInRecyclerView.loadAd();
   }
 
-  public void loadInHouseAdInRecyclerView(@NonNull BidResponse bidResponse) {
+  public void loadInHouseAdInRecyclerView(@Nullable BidResponse bidResponse) {
     nativeLoaderInRecyclerView.loadAd(bidResponse);
   }
 

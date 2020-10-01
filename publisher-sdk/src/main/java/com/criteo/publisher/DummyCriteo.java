@@ -35,15 +35,15 @@ public class DummyCriteo extends Criteo {
     // Nothing
   }
 
-  @Nullable
   @Override
   void getBidForAdUnit(@Nullable AdUnit adUnit, @NonNull BidListener bidListener) {
     bidListener.onNoBid();
   }
 
+  @Nullable
   @Override
   public BidResponse getBidResponse(@NonNull AdUnit adUnit) {
-    return BidResponse.NO_BID;
+    return null;
   }
 
   @NonNull

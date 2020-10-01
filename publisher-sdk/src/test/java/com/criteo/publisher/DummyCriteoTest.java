@@ -74,9 +74,9 @@ public class DummyCriteoTest {
 
   @Test
   public void getBidResponse_GivenAnyAdUnit_ReturnNoBid() throws Exception {
-    assertThat(criteo.getBidResponse(banner)).isEqualTo(BidResponse.NO_BID);
-    assertThat(criteo.getBidResponse(interstitial)).isEqualTo(BidResponse.NO_BID);
-    assertThat(criteo.getBidResponse(aNative)).isEqualTo(BidResponse.NO_BID);
+    assertThat(criteo.getBidResponse(banner)).isNull();
+    assertThat(criteo.getBidResponse(interstitial)).isNull();
+    assertThat(criteo.getBidResponse(aNative)).isNull();
   }
 
   @Test

@@ -102,7 +102,7 @@ public class CriteoBannerView extends WebView {
     getOrCreateController().fetchAdAsync(bannerAdUnit);
   }
 
-  public void loadAd(@NonNull BidResponse bidResponse) {
+  public void loadAd(@Nullable BidResponse bidResponse) {
     try {
       doLoadAd(bidResponse);
     } catch (Throwable tr) {
@@ -110,7 +110,7 @@ public class CriteoBannerView extends WebView {
     }
   }
 
-  private void doLoadAd(@NonNull BidResponse bidResponse) {
+  private void doLoadAd(@Nullable BidResponse bidResponse) {
     getOrCreateController().fetchAdAsync(bidResponse);
   }
 

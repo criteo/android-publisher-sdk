@@ -227,6 +227,16 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   }
 
   @Test
+  public void fetchAdAsyncInHouse_GivenNillBid_NotifyAdListenerForFailure() throws Exception {
+    criteoInterstitialEventController.fetchAdAsync((BidResponse) null);
+    waitForIdleState();
+
+    verify(listener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
+    verifyNoMoreInteractions(listener);
+    verify(criteoInterstitialEventController, never()).fetchCreativeAsync(any());
+  }
+
+  @Test
   public void fetchAdAsyncInHouse_GivenBidAndGoodDisplayUrl_FetchCreativeAndNotifyListenerForSuccess()
       throws Exception {
     BidResponse bidResponse = mock(BidResponse.class);
