@@ -38,12 +38,11 @@ public class BidResponse {
   private CdbResponseSlot slot;
 
   BidResponse(
-      double price,
       @NonNull AdUnitType adUnitType,
       @NonNull Clock clock,
       @NonNull CdbResponseSlot slot
   ) {
-    this.price = price;
+    this.price = slot.getCpmAsNumber();
     this.adUnitType = adUnitType;
     this.slot = slot;
     this.clock = clock;
