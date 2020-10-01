@@ -32,7 +32,6 @@ import com.criteo.publisher.adview.RedirectionListener;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
-import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.tasks.CriteoBannerListenerCallTask;
 import com.criteo.publisher.tasks.CriteoBannerLoadTask;
 import com.criteo.publisher.util.AdUnitType;

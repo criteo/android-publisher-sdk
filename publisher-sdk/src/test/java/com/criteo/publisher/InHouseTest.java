@@ -17,7 +17,6 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
-import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -29,10 +28,8 @@ import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
-import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.nativeads.NativeAssets;
-import com.criteo.publisher.model.nativeads.NativeTokenValue;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -42,9 +39,6 @@ public class InHouseTest {
 
   @Mock
   private BidManager bidManager;
-
-  @Mock
-  private TokenCache tokenCache;
 
   @Mock
   private Clock clock;
@@ -63,7 +57,6 @@ public class InHouseTest {
 
     inHouse = new InHouse(
         bidManager,
-        tokenCache,
         clock,
         interstitialActivityHelper,
         integrationRegistry
@@ -72,12 +65,8 @@ public class InHouseTest {
 
   @Test
   public void getTokenValue_GivenToken_DelegateToCache() throws Exception {
-    DisplayUrlTokenValue expectedTokenValue = mock(DisplayUrlTokenValue.class);
-    when(expectedTokenValue.getDisplayUrl()).thenReturn("display.url");
-
     BidResponse bidResponse = mock(BidResponse.class);
-
-    when(tokenCache.getTokenValue(bidResponse, CRITEO_BANNER)).thenReturn(expectedTokenValue);
+    when(bidResponse.consumeDisplayUrlFor(CRITEO_BANNER)).thenReturn("display.url");
 
     String displayUrl = inHouse.getDisplayUrl(bidResponse, CRITEO_BANNER);
 
@@ -87,11 +76,8 @@ public class InHouseTest {
   @Test
   public void getNativeTokenValue_GivenToken_DelegateToCache() throws Exception {
     NativeAssets expected = mock(NativeAssets.class);
-    NativeTokenValue expectedTokenValue = mock(NativeTokenValue.class);
-    when(expectedTokenValue.getNativeAssets()).thenReturn(expected);
     BidResponse bidResponse = mock(BidResponse.class);
-
-    when(tokenCache.getTokenValue(bidResponse, CRITEO_CUSTOM_NATIVE)).thenReturn(expectedTokenValue);
+    when(bidResponse.consumeNativeAssets()).thenReturn(expected);
 
     NativeAssets nativeAssets = inHouse.getNativeAssets(bidResponse);
 

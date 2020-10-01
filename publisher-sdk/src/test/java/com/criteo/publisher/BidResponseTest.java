@@ -17,36 +17,146 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import com.criteo.publisher.model.AdSize;
-import com.criteo.publisher.model.BannerAdUnit;
-import com.criteo.publisher.util.AdUnitType;
-import java.util.UUID;
-import nl.jqno.equalsverifier.EqualsVerifier;
-import org.junit.Assert;
+import com.criteo.publisher.model.CdbResponseSlot;
+import com.criteo.publisher.model.nativeads.NativeAssets;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 public class BidResponseTest {
 
   private static final double PRICE = 1.0d;
   private static final boolean VALID = true;
 
-  @Test
-  public void testBidResponse() {
-    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_BANNER);
+  @Mock
+  private CdbResponseSlot slot;
 
-    assertThat(bidResponse.getPrice()).isEqualTo(PRICE);
-    assertThat(bidResponse.isBidSuccess()).isTrue();
-    assertThat(bidResponse.getAdUnitType()).isEqualTo(CRITEO_BANNER);
+  @Mock
+  private Clock clock;
+
+  @Before
+  public void setUp() {
+    MockitoAnnotations.initMocks(this);
   }
 
   @Test
-  public void equalsContract() throws Exception {
-    BidResponse bidResponse1 = new BidResponse(PRICE, VALID, CRITEO_BANNER);
-    BidResponse bidResponse2 = new BidResponse(PRICE, VALID, CRITEO_BANNER);
+  public void testBidResponse() {
+    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_BANNER, clock, slot);
 
-    assertThat(bidResponse1).isEqualTo(bidResponse1).isNotEqualTo(bidResponse2);
+    assertThat(bidResponse.getPrice()).isEqualTo(PRICE);
+    assertThat(bidResponse.isBidSuccess()).isTrue();
+  }
+
+  @Test
+  public void consumeDisplayUrlFor_GivenValidBannerSlot_ReturnDisplayUrl() {
+    when(slot.getDisplayUrl()).thenReturn("display.url");
+    when(slot.isExpired(clock)).thenReturn(false);
+
+    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_BANNER, clock, slot);
+    String displayUrl = bidResponse.consumeDisplayUrlFor(CRITEO_BANNER);
+
+    assertThat(displayUrl).isEqualTo("display.url");
+  }
+
+  @Test
+  public void consumeDisplayUrlFor_GivenValidInterstitialSlot_ReturnDisplayUrl() {
+    when(slot.getDisplayUrl()).thenReturn("display.url");
+    when(slot.isExpired(clock)).thenReturn(false);
+
+    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_INTERSTITIAL, clock, slot);
+    String displayUrl = bidResponse.consumeDisplayUrlFor(CRITEO_INTERSTITIAL);
+
+    assertThat(displayUrl).isEqualTo("display.url");
+  }
+
+  @Test
+  public void consumeDisplayUrlFor_GivenAfterConsumingOnce_ReturnNull() {
+    when(slot.getDisplayUrl()).thenReturn("display.url");
+    when(slot.isExpired(clock)).thenReturn(false);
+
+    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_INTERSTITIAL, clock, slot);
+    bidResponse.consumeDisplayUrlFor(CRITEO_INTERSTITIAL);
+    String displayUrl = bidResponse.consumeDisplayUrlFor(CRITEO_INTERSTITIAL);
+
+    assertThat(displayUrl).isNull();
+  }
+
+  @Test
+  public void consumeDisplayUrlFor_GivenValidBannerSlotButBidIsForAnotherType_ReturnNull() {
+    when(slot.getDisplayUrl()).thenReturn("display.url");
+    when(slot.isExpired(clock)).thenReturn(false);
+
+    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_INTERSTITIAL, clock, slot);
+    String displayUrl = bidResponse.consumeDisplayUrlFor(CRITEO_BANNER);
+
+    assertThat(displayUrl).isNull();
+  }
+
+  @Test
+  public void consumeDisplayUrlFor_GivenExpiredSlot_ReturnNull() {
+    when(slot.getDisplayUrl()).thenReturn("display.url");
+    when(slot.isExpired(clock)).thenReturn(true);
+
+    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_BANNER, clock, slot);
+    String displayUrl = bidResponse.consumeDisplayUrlFor(CRITEO_BANNER);
+
+    assertThat(displayUrl).isNull();
+  }
+
+  @Test
+  public void consumeDisplayUrlFor_GivenNoBid_ReturnNull() {
+    String displayUrl = BidResponse.NO_BID.consumeDisplayUrlFor(CRITEO_BANNER);
+
+    assertThat(displayUrl).isNull();
+  }
+
+  @Test
+  public void consumeNativeAssets_GivenValidNativeSlot_ReturnAssets() {
+    NativeAssets expected = mock(NativeAssets.class);
+    when(slot.getNativeAssets()).thenReturn(expected);
+    when(slot.isExpired(clock)).thenReturn(false);
+
+    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_CUSTOM_NATIVE, clock, slot);
+    NativeAssets nativeAssets = bidResponse.consumeNativeAssets();
+
+    assertThat(nativeAssets).isEqualTo(expected);
+  }
+
+  @Test
+  public void consumeNativeAssets_GivenAfterConsumingOnce_ReturnNull() {
+    when(slot.getNativeAssets()).thenReturn(mock(NativeAssets.class));
+    when(slot.isExpired(clock)).thenReturn(false);
+
+    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_CUSTOM_NATIVE, clock, slot);
+    bidResponse.consumeNativeAssets();
+    NativeAssets nativeAssets = bidResponse.consumeNativeAssets();
+
+    assertThat(nativeAssets).isNull();
+  }
+
+  @Test
+  public void consumeNativeAssets_GivenExpiredSlot_ReturnNull() {
+    when(slot.getNativeAssets()).thenReturn(mock(NativeAssets.class));
+    when(slot.isExpired(clock)).thenReturn(true);
+
+    BidResponse bidResponse = new BidResponse(PRICE, VALID, CRITEO_CUSTOM_NATIVE, clock, slot);
+    NativeAssets nativeAssets = bidResponse.consumeNativeAssets();
+
+    assertThat(nativeAssets).isNull();
+  }
+
+  @Test
+  public void consumeNativeAssets_GivenNoBid_ReturnNull() {
+    NativeAssets nativeAssets = BidResponse.NO_BID.consumeNativeAssets();
+
+    assertThat(nativeAssets).isNull();
   }
 
 }

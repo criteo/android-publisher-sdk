@@ -36,7 +36,6 @@ import com.criteo.publisher.headerbidding.HeaderBidding;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
-import com.criteo.publisher.model.DisplayUrlTokenValue;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AppLifecycleUtil;
 import java.util.ArrayList;

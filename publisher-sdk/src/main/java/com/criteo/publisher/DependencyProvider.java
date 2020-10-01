@@ -665,7 +665,6 @@ public class DependencyProvider {
       public InHouse create() {
         return new InHouse(
             provideBidManager(),
-            new TokenCache(),
             provideClock(),
             provideInterstitialActivityHelper(),
             provideIntegrationRegistry()

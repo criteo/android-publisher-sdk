@@ -34,7 +34,6 @@ import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.nativeads.NativeAssets;
-import com.criteo.publisher.model.nativeads.NativeTokenValue;
 import com.criteo.publisher.util.PreconditionsUtil;
 import java.lang.ref.WeakReference;
 
