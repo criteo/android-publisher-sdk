@@ -19,6 +19,7 @@ package com.criteo.publisher;
 import static com.criteo.publisher.CriteoErrorCode.ERROR_CODE_NETWORK_ERROR;
 import static com.criteo.publisher.CriteoErrorCode.ERROR_CODE_NO_FILL;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalAnswers.answerVoid;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,7 +45,6 @@ import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.WebViewData;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.tasks.InterstitialListenerNotifier;
-import com.criteo.publisher.util.AdUnitType;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -216,7 +216,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   @Test
   public void fetchAdAsyncInHouse_GivenNoBid_NotifyAdListenerForFailure() throws Exception {
     BidResponse bidResponse = mock(BidResponse.class);
-    when(criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_INTERSTITIAL)).thenReturn(null);
+    when(bidResponse.consumeDisplayUrlFor(any())).thenReturn(null);
 
     criteoInterstitialEventController.fetchAdAsync(bidResponse);
     waitForIdleState();
@@ -230,8 +230,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   public void fetchAdAsyncInHouse_GivenBidAndGoodDisplayUrl_FetchCreativeAndNotifyListenerForSuccess()
       throws Exception {
     BidResponse bidResponse = mock(BidResponse.class);
-
-    when(criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_INTERSTITIAL)).thenReturn(GOOD_DISPLAY_URL);
+    when(bidResponse.consumeDisplayUrlFor(CRITEO_INTERSTITIAL)).thenReturn(GOOD_DISPLAY_URL);
 
     criteoInterstitialEventController.fetchAdAsync(bidResponse);
     waitForIdleState();
@@ -247,8 +246,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   public void fetchAdAsyncInHouse_GivenBidAndBadDisplayUrl_NotifyListenerForFailureToDisplay()
       throws Exception {
     BidResponse bidResponse = mock(BidResponse.class);
-
-    when(criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_INTERSTITIAL)).thenReturn(BAD_DISPLAY_URL);
+    when(bidResponse.consumeDisplayUrlFor(CRITEO_INTERSTITIAL)).thenReturn(BAD_DISPLAY_URL);
 
     criteoInterstitialEventController.fetchAdAsync(bidResponse);
     waitForIdleState();
@@ -264,8 +262,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   public void fetchAdAsyncInHouse_GivenBidTwice_FetchCreativeTwiceAndNotifyListenerIfSuccess()
       throws Exception {
     BidResponse bidResponse = mock(BidResponse.class);
-
-    when(criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_INTERSTITIAL))
+    when(bidResponse.consumeDisplayUrlFor(CRITEO_INTERSTITIAL))
         .thenReturn(GOOD_DISPLAY_URL)
         .thenReturn(BAD_DISPLAY_URL);
 

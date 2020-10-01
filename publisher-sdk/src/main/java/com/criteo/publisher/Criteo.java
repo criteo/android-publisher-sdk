@@ -25,7 +25,6 @@ import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
-import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.DeviceUtil;
 import java.util.List;
 
@@ -132,9 +131,6 @@ public abstract class Criteo {
   abstract void getBidForAdUnit(@Nullable AdUnit adUnit, @NonNull BidListener bidListener);
 
   public abstract BidResponse getBidResponse(@NonNull AdUnit adUnit);
-
-  @Nullable
-  abstract String getDisplayUrl(@NonNull BidResponse bidResponse, @NonNull AdUnitType adUnitType);
 
   @NonNull
   abstract DeviceInfo getDeviceInfo();

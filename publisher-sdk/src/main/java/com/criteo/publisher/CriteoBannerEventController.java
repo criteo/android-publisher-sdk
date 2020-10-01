@@ -20,6 +20,7 @@ import static com.criteo.publisher.CriteoListenerCode.CLICK;
 import static com.criteo.publisher.CriteoListenerCode.CLOSE;
 import static com.criteo.publisher.CriteoListenerCode.INVALID;
 import static com.criteo.publisher.CriteoListenerCode.VALID;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 
 import android.content.ComponentName;
 import android.webkit.WebViewClient;
@@ -34,7 +35,6 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.tasks.CriteoBannerListenerCallTask;
 import com.criteo.publisher.tasks.CriteoBannerLoadTask;
-import com.criteo.publisher.util.AdUnitType;
 import java.lang.ref.WeakReference;
 
 
@@ -83,7 +83,7 @@ public class CriteoBannerEventController {
   }
 
   public void fetchAdAsync(@NonNull BidResponse bidResponse) {
-    String displayUrl = criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_BANNER);
+    String displayUrl = bidResponse.consumeDisplayUrlFor(CRITEO_BANNER);
 
     if (displayUrl == null) {
       notifyFor(INVALID);

@@ -24,8 +24,6 @@ import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.InterstitialAdUnit;
-import com.criteo.publisher.model.nativeads.NativeAssets;
-import com.criteo.publisher.util.AdUnitType;
 
 public class InHouse {
 
@@ -69,16 +67,6 @@ public class InHouse {
     double price = slot.getCpmAsNumber();
 
     return new BidResponse(price, true, adUnit.getAdUnitType(), clock, slot);
-  }
-
-  @Nullable
-  public String getDisplayUrl(@NonNull BidResponse bidResponse, @NonNull AdUnitType adUnitType) {
-    return bidResponse.consumeDisplayUrlFor(adUnitType);
-  }
-
-  @Nullable
-  public NativeAssets getNativeAssets(@NonNull BidResponse bidResponse) {
-    return bidResponse.consumeNativeAssets();
   }
 
 }

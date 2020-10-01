@@ -18,6 +18,7 @@ package com.criteo.publisher;
 
 import static com.criteo.publisher.CriteoListenerCode.INVALID;
 import static com.criteo.publisher.CriteoListenerCode.OPEN;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,7 +28,6 @@ import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.WebViewData;
 import com.criteo.publisher.tasks.InterstitialListenerNotifier;
-import com.criteo.publisher.util.AdUnitType;
 
 
 public class CriteoInterstitialEventController {
@@ -90,7 +90,7 @@ public class CriteoInterstitialEventController {
   }
 
   public void fetchAdAsync(@NonNull BidResponse bidResponse) {
-    String displayUrl = criteo.getDisplayUrl(bidResponse, AdUnitType.CRITEO_INTERSTITIAL);
+    String displayUrl = bidResponse.consumeDisplayUrlFor(CRITEO_INTERSTITIAL);
 
     if (displayUrl == null) {
       notifyForFailure();

@@ -26,7 +26,6 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.tasks.InterstitialListenerNotifier;
-import com.criteo.publisher.util.AdUnitType;
 import java.util.concurrent.Future;
 
 public class DummyCriteo extends Criteo {
@@ -45,12 +44,6 @@ public class DummyCriteo extends Criteo {
   @Override
   public BidResponse getBidResponse(@NonNull AdUnit adUnit) {
     return BidResponse.NO_BID;
-  }
-
-  @Nullable
-  @Override
-  String getDisplayUrl(@NonNull BidResponse bidResponse, @NonNull AdUnitType adUnitType) {
-    return null;
   }
 
   @NonNull

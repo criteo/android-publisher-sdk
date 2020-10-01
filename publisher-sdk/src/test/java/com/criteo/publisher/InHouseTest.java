@@ -16,7 +16,6 @@
 
 package com.criteo.publisher;
 
-import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -29,7 +28,6 @@ import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.InterstitialAdUnit;
-import com.criteo.publisher.model.nativeads.NativeAssets;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -61,27 +59,6 @@ public class InHouseTest {
         interstitialActivityHelper,
         integrationRegistry
     );
-  }
-
-  @Test
-  public void getTokenValue_GivenToken_DelegateToCache() throws Exception {
-    BidResponse bidResponse = mock(BidResponse.class);
-    when(bidResponse.consumeDisplayUrlFor(CRITEO_BANNER)).thenReturn("display.url");
-
-    String displayUrl = inHouse.getDisplayUrl(bidResponse, CRITEO_BANNER);
-
-    assertThat(displayUrl).isEqualTo(displayUrl);
-  }
-
-  @Test
-  public void getNativeTokenValue_GivenToken_DelegateToCache() throws Exception {
-    NativeAssets expected = mock(NativeAssets.class);
-    BidResponse bidResponse = mock(BidResponse.class);
-    when(bidResponse.consumeNativeAssets()).thenReturn(expected);
-
-    NativeAssets nativeAssets = inHouse.getNativeAssets(bidResponse);
-
-    assertThat(nativeAssets).isEqualTo(expected);
   }
 
   @Test
