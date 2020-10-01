@@ -45,7 +45,7 @@ public class DummyCriteo extends Criteo {
 
   @Override
   public BidResponse getBidResponse(@NonNull AdUnit adUnit) {
-    return new BidResponse();
+    return BidResponse.NO_BID;
   }
 
   @Nullable

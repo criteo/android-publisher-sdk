@@ -232,18 +232,16 @@ public class CriteoInternalUnitTest {
     InHouse inHouse = givenMockedInHouse();
     when(inHouse.getBidResponse(adUnit)).thenThrow(RuntimeException.class);
 
-    BidResponse noBid = new BidResponse(0., null, false);
-
     Criteo criteo = createCriteo();
     BidResponse bidResponse = criteo.getBidResponse(adUnit);
 
-    assertThat(bidResponse).isEqualTo(noBid);
+    assertThat(bidResponse).isEqualTo(BidResponse.NO_BID);
   }
 
   @Test
   public void getBidResponse_GivenBidManagerYieldingOne_ReturnIt() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
-    BidResponse expectedBid = new BidResponse(42., new BidToken(UUID.randomUUID(), adUnit), true);
+    BidResponse expectedBid = mock(BidResponse.class);
 
     InHouse inHouse = givenMockedInHouse();
     when(inHouse.getBidResponse(adUnit)).thenReturn(expectedBid);

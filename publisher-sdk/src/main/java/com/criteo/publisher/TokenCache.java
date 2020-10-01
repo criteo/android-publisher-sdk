@@ -27,25 +27,23 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class TokenCache {
 
-  private final Map<BidToken, AbstractTokenValue> tokenMap;
+  private final Map<BidResponse, AbstractTokenValue> tokenMap;
 
   public TokenCache() {
     tokenMap = new ConcurrentHashMap<>();
   }
 
-  public BidToken add(@NonNull AbstractTokenValue tokenValue, @NonNull AdUnit adUnit) {
-    BidToken bidToken = new BidToken(UUID.randomUUID(), adUnit);
-    tokenMap.put(bidToken, tokenValue);
-    return bidToken;
+  public void add(@NonNull BidResponse bidResponse, @NonNull AbstractTokenValue tokenValue) {
+    tokenMap.put(bidResponse, tokenValue);
   }
 
   @Nullable
-  public AbstractTokenValue getTokenValue(@Nullable BidToken bidToken, @NonNull AdUnitType expectedType) {
-    if (bidToken == null || bidToken.getAdUnit().getAdUnitType() != expectedType) {
+  public AbstractTokenValue getTokenValue(@NonNull BidResponse bidResponse, @NonNull AdUnitType expectedType) {
+    if (bidResponse.getAdUnitType() != expectedType) {
       return null;
     }
 
-    AbstractTokenValue tokenValue = tokenMap.remove(bidToken);
+    AbstractTokenValue tokenValue = tokenMap.remove(bidResponse);
     if (tokenValue == null || tokenValue.isExpired()) {
       return null;
     }

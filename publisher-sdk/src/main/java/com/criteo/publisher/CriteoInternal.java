@@ -149,7 +149,7 @@ final class CriteoInternal extends Criteo {
     try {
       response = doGetBidResponse(adUnit);
     } catch (Throwable e) {
-      response = new BidResponse();
+      response = BidResponse.NO_BID;
       Log.e(TAG, "Internal error while getting Bid Response.", e);
     }
 
