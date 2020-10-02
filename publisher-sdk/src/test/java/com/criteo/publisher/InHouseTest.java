@@ -25,8 +25,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.criteo.publisher.integration.Integration;
-import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
 import org.junit.Before;
@@ -43,9 +41,6 @@ public class InHouseTest {
   private Clock clock;
 
   @Mock
-  private IntegrationRegistry integrationRegistry;
-
-  @Mock
   private BidResponseListener listener;
 
   private InHouse inHouse;
@@ -56,8 +51,7 @@ public class InHouseTest {
 
     inHouse = new InHouse(
         bidManager,
-        clock,
-        integrationRegistry
+        clock
     );
   }
 
@@ -73,7 +67,6 @@ public class InHouseTest {
     inHouse.loadBidResponse(adUnit, listener);
 
     verify(listener).onResponse(null);
-    verify(integrationRegistry).declare(Integration.IN_HOUSE);
   }
 
   @Test
@@ -94,7 +87,6 @@ public class InHouseTest {
       assertThat(bidResponse.getPrice()).isEqualTo(42.1337);
       return true;
     }));
-    verify(integrationRegistry).declare(Integration.IN_HOUSE);
   }
 
 }

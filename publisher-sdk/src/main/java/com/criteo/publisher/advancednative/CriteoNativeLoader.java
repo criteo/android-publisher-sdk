@@ -144,6 +144,8 @@ public class CriteoNativeLoader {
   }
 
   private void doLoad(@Nullable Bid bid) {
+    getIntegrationRegistry().declare(Integration.IN_HOUSE);
+
     NativeAssets assets = bid == null ? null : bid.consumeNativeAssets();
     handleNativeAssets(assets);
   }
