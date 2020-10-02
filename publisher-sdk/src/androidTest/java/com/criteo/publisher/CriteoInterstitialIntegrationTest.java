@@ -33,7 +33,6 @@ import static org.mockito.Mockito.when;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
-import java.util.UUID;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -72,9 +71,9 @@ public class CriteoInterstitialIntegrationTest {
 
     // This should not be possible since BidResponse constructor is not part of the public API.
     // But just in case, we may check that no publisher can attempt this.
-    BidResponse bidResponse = mock(BidResponse.class);
+    Bid bid = mock(Bid.class);
 
-    interstitial.loadAd(bidResponse);
+    interstitial.loadAd(bid);
     waitForIdleState();
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);

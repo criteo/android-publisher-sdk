@@ -34,7 +34,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
-import com.criteo.publisher.BidResponse;
+import com.criteo.publisher.Bid;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.advancednative.CriteoMediaView;
 import com.criteo.publisher.advancednative.CriteoNativeAd;
@@ -109,16 +109,16 @@ public class TestNativeActivity extends Activity {
     nativeLoaderInAdLayout.loadAd();
   }
 
-  public void loadInHouseAdInAdLayout(@Nullable BidResponse bidResponse) {
-    nativeLoaderInAdLayout.loadAd(bidResponse);
+  public void loadInHouseAdInAdLayout(@Nullable Bid bid) {
+    nativeLoaderInAdLayout.loadAd(bid);
   }
 
   public void loadStandaloneAdInRecyclerView() {
     nativeLoaderInRecyclerView.loadAd();
   }
 
-  public void loadInHouseAdInRecyclerView(@Nullable BidResponse bidResponse) {
-    nativeLoaderInRecyclerView.loadAd(bidResponse);
+  public void loadInHouseAdInRecyclerView(@Nullable Bid bid) {
+    nativeLoaderInRecyclerView.loadAd(bid);
   }
 
   public Drawable getDefaultDrawable() {

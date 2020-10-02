@@ -102,16 +102,16 @@ public class CriteoBannerView extends WebView {
     getOrCreateController().fetchAdAsync(bannerAdUnit);
   }
 
-  public void loadAd(@Nullable BidResponse bidResponse) {
+  public void loadAd(@Nullable Bid bid) {
     try {
-      doLoadAd(bidResponse);
+      doLoadAd(bid);
     } catch (Throwable tr) {
       Log.e(TAG, "Internal error while loading banner from bid token.", tr);
     }
   }
 
-  private void doLoadAd(@Nullable BidResponse bidResponse) {
-    getOrCreateController().fetchAdAsync(bidResponse);
+  private void doLoadAd(@Nullable Bid bid) {
+    getOrCreateController().fetchAdAsync(bid);
   }
 
   @NonNull

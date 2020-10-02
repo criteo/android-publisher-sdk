@@ -27,7 +27,6 @@ import android.content.Context;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.util.InstrumentationUtil;
-import java.util.UUID;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Rule;
@@ -78,9 +77,9 @@ public class CriteoBannerViewIntegrationTest {
 
     // This should not be possible since BidResponse constructor is not part of the public API.
     // But just in case, we may check that no publisher can attempt this.
-    BidResponse bidResponse = mock(BidResponse.class);
+    Bid bid = mock(Bid.class);
 
-    criteoBannerView.loadAd(bidResponse);
+    criteoBannerView.loadAd(bid);
     waitForIdleState();
 
     verify(criteoBannerAdListener, never()).onAdReceived(criteoBannerView);

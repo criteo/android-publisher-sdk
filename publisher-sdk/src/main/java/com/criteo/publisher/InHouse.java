@@ -65,8 +65,8 @@ public class InHouse {
     bidManager.getBidForAdUnit(adUnit, new BidListener() {
       @Override
       public void onBidResponse(@NotNull CdbResponseSlot cdbResponseSlot) {
-        BidResponse bidResponse = new BidResponse(adUnit.getAdUnitType(), clock, cdbResponseSlot);
-        bidResponseListener.onResponse(bidResponse);
+        Bid bid = new Bid(adUnit.getAdUnitType(), clock, cdbResponseSlot);
+        bidResponseListener.onResponse(bid);
       }
 
       @Override

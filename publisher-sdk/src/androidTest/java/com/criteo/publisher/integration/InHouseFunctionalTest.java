@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 
 import android.content.Context;
 import androidx.annotation.NonNull;
-import com.criteo.publisher.BidResponse;
+import com.criteo.publisher.Bid;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
@@ -163,7 +163,7 @@ public class InHouseFunctionalTest {
     CriteoInterstitial interstitial = createInterstitial();
     interstitial.setCriteoInterstitialAdListener(listener);
 
-    AtomicReference<BidResponse> bidResponseRef = new AtomicReference<>();
+    AtomicReference<Bid> bidResponseRef = new AtomicReference<>();
 
     criteo.loadBidResponse(validInterstitialAdUnit, bidResponseRef::set);
     interstitial.loadAd(bidResponseRef.get());
