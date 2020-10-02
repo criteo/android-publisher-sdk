@@ -51,20 +51,25 @@ public class InHouse {
     this.integrationRegistry = integrationRegistry;
   }
 
-  @Nullable
-  public BidResponse getBidResponse(@Nullable AdUnit adUnit) {
+  public void loadBidResponse(
+      @Nullable AdUnit adUnit,
+      @NonNull BidResponseListener bidResponseListener
+  ) {
     integrationRegistry.declare(Integration.IN_HOUSE);
 
     if (adUnit instanceof InterstitialAdUnit && !interstitialActivityHelper.isAvailable()) {
-      return null;
+      bidResponseListener.onResponse(null);
+      return;
     }
 
     CdbResponseSlot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
     if (slot == null || adUnit == null) {
-      return null;
+      bidResponseListener.onResponse(null);
+      return;
     }
 
-    return new BidResponse(adUnit.getAdUnitType(), clock, slot);
+    BidResponse bidResponse = new BidResponse(adUnit.getAdUnitType(), clock, slot);
+    bidResponseListener.onResponse(bidResponse);
   }
 
 }

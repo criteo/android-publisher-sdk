@@ -18,6 +18,7 @@ package com.criteo.publisher;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
@@ -227,7 +228,9 @@ public class CriteoInternalUnitTest {
     BidResponseListener listener = mock(BidResponseListener.class);
 
     InHouse inHouse = givenMockedInHouse();
-    when(inHouse.getBidResponse(adUnit)).thenThrow(RuntimeException.class);
+    doAnswer(invocation -> {
+      throw new RuntimeException();
+    }).when(inHouse).loadBidResponse(adUnit, listener);
 
     Criteo criteo = createCriteo();
     criteo.loadBidResponse(adUnit, listener);
@@ -242,7 +245,10 @@ public class CriteoInternalUnitTest {
     BidResponse expectedBid = mock(BidResponse.class);
 
     InHouse inHouse = givenMockedInHouse();
-    when(inHouse.getBidResponse(adUnit)).thenReturn(expectedBid);
+    doAnswer(invocation -> {
+      invocation.<BidResponseListener>getArgument(1).onResponse(expectedBid);
+      return null;
+    }).when(inHouse).loadBidResponse(adUnit, listener);
 
     Criteo criteo = createCriteo();
     criteo.loadBidResponse(adUnit, listener);

@@ -17,9 +17,10 @@
 package com.criteo.publisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.criteo.publisher.integration.Integration;
@@ -47,6 +48,9 @@ public class InHouseTest {
   @Mock
   private IntegrationRegistry integrationRegistry;
 
+  @Mock
+  private BidResponseListener listener;
+
   private InHouse inHouse;
 
   @Before
@@ -63,9 +67,9 @@ public class InHouseTest {
 
   @Test
   public void getBidResponse_GivenNullAdUnit_ReturnNoBid() throws Exception {
-    BidResponse bidResponse = inHouse.getBidResponse(null);
+    inHouse.loadBidResponse(null, listener);
 
-    assertIsNoBid(bidResponse);
+    verify(listener).onResponse(null);
     verify(integrationRegistry).declare(Integration.IN_HOUSE);
   }
 
@@ -75,9 +79,9 @@ public class InHouseTest {
 
     when(bidManager.getBidForAdUnitAndPrefetch(adUnit)).thenReturn(null);
 
-    BidResponse bidResponse = inHouse.getBidResponse(adUnit);
+    inHouse.loadBidResponse(adUnit, listener);
 
-    assertIsNoBid(bidResponse);
+    verify(listener).onResponse(null);
     verify(integrationRegistry).declare(Integration.IN_HOUSE);
   }
 
@@ -89,9 +93,12 @@ public class InHouseTest {
     when(slot.getCpmAsNumber()).thenReturn(42.1337);
     when(bidManager.getBidForAdUnitAndPrefetch(adUnit)).thenReturn(slot);
 
-    BidResponse bidResponse = inHouse.getBidResponse(adUnit);
+    inHouse.loadBidResponse(adUnit, listener);
 
-    assertThat(bidResponse.getPrice()).isEqualTo(42.1337);
+    verify(listener).onResponse(argThat(bidResponse -> {
+      assertThat(bidResponse.getPrice()).isEqualTo(42.1337);
+      return true;
+    }));
     verify(integrationRegistry).declare(Integration.IN_HOUSE);
   }
 
@@ -100,10 +107,10 @@ public class InHouseTest {
     InterstitialAdUnit adUnit = new InterstitialAdUnit("myAdUnit");
     when(interstitialActivityHelper.isAvailable()).thenReturn(false);
 
-    BidResponse bidResponse = inHouse.getBidResponse(adUnit);
+    inHouse.loadBidResponse(adUnit, listener);
 
-    assertIsNoBid(bidResponse);
-    verifyZeroInteractions(bidManager);
+    verify(listener).onResponse(null);
+    verifyNoInteractions(bidManager);
     verify(integrationRegistry).declare(Integration.IN_HOUSE);
   }
 
