@@ -17,7 +17,10 @@
 package com.criteo.publisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -69,7 +72,10 @@ public class InHouseTest {
   public void getBidResponse_GivenBidManagerYieldingNoBid_ReturnNoBid() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
 
-    when(bidManager.getBidForAdUnitAndPrefetch(adUnit)).thenReturn(null);
+    doAnswer(invocation -> {
+      invocation.<BidListener>getArgument(1).onNoBid();
+      return null;
+    }).when(bidManager).getBidForAdUnit(eq(adUnit), any());
 
     inHouse.loadBidResponse(adUnit, listener);
 
@@ -83,7 +89,11 @@ public class InHouseTest {
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
 
     when(slot.getCpmAsNumber()).thenReturn(42.1337);
-    when(bidManager.getBidForAdUnitAndPrefetch(adUnit)).thenReturn(slot);
+
+    doAnswer(invocation -> {
+      invocation.<BidListener>getArgument(1).onBidResponse(slot);
+      return null;
+    }).when(bidManager).getBidForAdUnit(eq(adUnit), any());
 
     inHouse.loadBidResponse(adUnit, listener);
 
