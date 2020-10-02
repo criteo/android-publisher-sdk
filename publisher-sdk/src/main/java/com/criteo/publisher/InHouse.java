@@ -17,7 +17,6 @@
 package com.criteo.publisher;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
@@ -52,7 +51,7 @@ public class InHouse {
   }
 
   public void loadBidResponse(
-      @Nullable AdUnit adUnit,
+      @NonNull AdUnit adUnit,
       @NonNull BidResponseListener bidResponseListener
   ) {
     integrationRegistry.declare(Integration.IN_HOUSE);
@@ -63,7 +62,7 @@ public class InHouse {
     }
 
     CdbResponseSlot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
-    if (slot == null || adUnit == null) {
+    if (slot == null) {
       bidResponseListener.onResponse(null);
       return;
     }
