@@ -42,6 +42,7 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 import org.junit.Rule;
 import org.junit.Test;
@@ -72,8 +73,7 @@ public class InHouseFunctionalTest {
     CriteoBannerView bannerView = createBannerView();
     bannerView.setCriteoBannerAdListener(listener);
 
-    BidResponse bidResponse = criteo.getBidResponse(validBannerAdUnit);
-    bannerView.loadAd(bidResponse);
+    criteo.loadBidResponse(validBannerAdUnit, bannerView::loadAd);
     waitForIdleState();
 
     verify(listener).onAdReceived(bannerView);
@@ -93,8 +93,7 @@ public class InHouseFunctionalTest {
     CriteoBannerView bannerView = createBannerView();
     bannerView.setCriteoBannerAdListener(listener);
 
-    BidResponse bidResponse = criteo.getBidResponse(invalidBannerAdUnit);
-    bannerView.loadAd(bidResponse);
+    criteo.loadBidResponse(invalidBannerAdUnit, bannerView::loadAd);
     waitForIdleState();
 
     verify(listener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
@@ -109,9 +108,10 @@ public class InHouseFunctionalTest {
     CriteoBannerView bannerView = createBannerView();
     bannerView.setCriteoBannerAdListener(listener);
 
-    BidResponse bidResponse = criteo.getBidResponse(validBannerAdUnit);
-    bannerView.loadAd(bidResponse);
-    bannerView.loadAd(bidResponse);
+    criteo.loadBidResponse(validBannerAdUnit, bidResponse -> {
+      bannerView.loadAd(bidResponse);
+      bannerView.loadAd(bidResponse);
+    });
     waitForIdleState();
 
     InOrder inOrder = inOrder(listener);
@@ -128,8 +128,7 @@ public class InHouseFunctionalTest {
     CriteoInterstitial interstitial = createInterstitial();
     interstitial.setCriteoInterstitialAdListener(listener);
 
-    BidResponse bidResponse = criteo.getBidResponse(validInterstitialAdUnit);
-    interstitial.loadAd(bidResponse);
+    criteo.loadBidResponse(validInterstitialAdUnit, interstitial::loadAd);
     waitForIdleState();
 
     verify(listener).onAdReceived(interstitial);
@@ -149,8 +148,7 @@ public class InHouseFunctionalTest {
     CriteoInterstitial interstitial = createInterstitial();
     interstitial.setCriteoInterstitialAdListener(listener);
 
-    BidResponse bidResponse = criteo.getBidResponse(invalidInterstitialAdUnit);
-    interstitial.loadAd(bidResponse);
+    criteo.loadBidResponse(invalidInterstitialAdUnit, interstitial::loadAd);
     waitForIdleState();
 
     verify(listener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
@@ -165,11 +163,13 @@ public class InHouseFunctionalTest {
     CriteoInterstitial interstitial = createInterstitial();
     interstitial.setCriteoInterstitialAdListener(listener);
 
-    BidResponse bidResponse = criteo.getBidResponse(validInterstitialAdUnit);
-    interstitial.loadAd(bidResponse);
+    AtomicReference<BidResponse> bidResponseRef = new AtomicReference<>();
+
+    criteo.loadBidResponse(validInterstitialAdUnit, bidResponseRef::set);
+    interstitial.loadAd(bidResponseRef.get());
     waitForIdleState();
 
-    interstitial.loadAd(bidResponse);
+    interstitial.loadAd(bidResponseRef.get());
     waitForIdleState();
 
     InOrder inOrder = inOrder(listener);

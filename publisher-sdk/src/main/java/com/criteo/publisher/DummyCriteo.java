@@ -40,10 +40,12 @@ public class DummyCriteo extends Criteo {
     bidListener.onNoBid();
   }
 
-  @Nullable
   @Override
-  public BidResponse getBidResponse(@NonNull AdUnit adUnit) {
-    return null;
+  public void loadBidResponse(
+      @NonNull AdUnit adUnit,
+      @NonNull BidResponseListener bidResponseListener
+  ) {
+    bidResponseListener.onResponse(null);
   }
 
   @NonNull

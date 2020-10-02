@@ -130,8 +130,10 @@ public abstract class Criteo {
 
   abstract void getBidForAdUnit(@Nullable AdUnit adUnit, @NonNull BidListener bidListener);
 
-  @Nullable
-  public abstract BidResponse getBidResponse(@NonNull AdUnit adUnit);
+  public abstract void loadBidResponse(
+      @NonNull AdUnit adUnit,
+      @NonNull BidResponseListener bidResponseListener
+  );
 
   @NonNull
   abstract DeviceInfo getDeviceInfo();
