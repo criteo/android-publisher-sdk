@@ -90,6 +90,11 @@ public class CriteoInterstitialEventController {
   }
 
   public void fetchAdAsync(@Nullable Bid bid) {
+    if (!interstitialActivityHelper.isAvailable()) {
+      notifyForFailure();
+      return;
+    }
+
     String displayUrl = bid == null ? null : bid.consumeDisplayUrlFor(CRITEO_INTERSTITIAL);
 
     if (displayUrl == null) {

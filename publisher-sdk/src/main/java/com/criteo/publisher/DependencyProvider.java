@@ -666,7 +666,6 @@ public class DependencyProvider {
         return new InHouse(
             provideBidManager(),
             provideClock(),
-            provideInterstitialActivityHelper(),
             provideIntegrationRegistry()
         );
       }

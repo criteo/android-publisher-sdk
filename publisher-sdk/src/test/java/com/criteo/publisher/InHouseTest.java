@@ -23,15 +23,12 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
-import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
-import com.criteo.publisher.model.InterstitialAdUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -44,9 +41,6 @@ public class InHouseTest {
 
   @Mock
   private Clock clock;
-
-  @Mock
-  private InterstitialActivityHelper interstitialActivityHelper;
 
   @Mock
   private IntegrationRegistry integrationRegistry;
@@ -63,7 +57,6 @@ public class InHouseTest {
     inHouse = new InHouse(
         bidManager,
         clock,
-        interstitialActivityHelper,
         integrationRegistry
     );
   }
@@ -102,22 +95,6 @@ public class InHouseTest {
       return true;
     }));
     verify(integrationRegistry).declare(Integration.IN_HOUSE);
-  }
-
-  @Test
-  public void getBidResponse_GivenInterstitialAdUnitAndInterstitialNotAvailable_ReturnNoBidWithoutRequestingBidManager() throws Exception {
-    InterstitialAdUnit adUnit = new InterstitialAdUnit("myAdUnit");
-    when(interstitialActivityHelper.isAvailable()).thenReturn(false);
-
-    inHouse.loadBidResponse(adUnit, listener);
-
-    verify(listener).onResponse(null);
-    verifyNoInteractions(bidManager);
-    verify(integrationRegistry).declare(Integration.IN_HOUSE);
-  }
-
-  private void assertIsNoBid(Bid bid) {
-    assertThat(bid).isNull();
   }
 
 }

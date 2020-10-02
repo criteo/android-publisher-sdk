@@ -25,6 +25,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import androidx.annotation.NonNull;
@@ -36,6 +37,7 @@ import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.TestAdUnits;
+import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdUnit;
@@ -64,6 +66,9 @@ public class InHouseFunctionalTest {
 
   @SpyBean
   private PubSdkApi api;
+
+  @SpyBean
+  private InterstitialActivityHelper interstitialActivityHelper;
 
   @Test
   public void loadBannerAd_GivenValidAdUnit_ThenListenerIsNotifiedOfTheSuccess() throws Exception {
@@ -149,6 +154,23 @@ public class InHouseFunctionalTest {
     interstitial.setCriteoInterstitialAdListener(listener);
 
     criteo.loadBid(invalidInterstitialAdUnit, interstitial::loadAd);
+    waitForIdleState();
+
+    verify(listener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
+  }
+
+  @Test
+  public void loadInterstitialAd_GivenValidAdUnitButInterstitialActivityNotAvailable_ThenListenerIsNotifiedOfTheFailure()
+      throws Exception {
+    when(interstitialActivityHelper.isAvailable()).thenReturn(false);
+
+    Criteo criteo = givenInitializedSdk(validInterstitialAdUnit);
+
+    CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
+    CriteoInterstitial interstitial = createInterstitial();
+    interstitial.setCriteoInterstitialAdListener(listener);
+
+    criteo.loadBid(validInterstitialAdUnit, interstitial::loadAd);
     waitForIdleState();
 
     verify(listener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
