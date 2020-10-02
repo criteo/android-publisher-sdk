@@ -23,6 +23,7 @@ import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import org.jetbrains.annotations.NotNull;
 
 public class InHouse {
 
@@ -61,14 +62,18 @@ public class InHouse {
       return;
     }
 
-    CdbResponseSlot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit);
-    if (slot == null) {
-      bidResponseListener.onResponse(null);
-      return;
-    }
+    bidManager.getBidForAdUnit(adUnit, new BidListener() {
+      @Override
+      public void onBidResponse(@NotNull CdbResponseSlot cdbResponseSlot) {
+        BidResponse bidResponse = new BidResponse(adUnit.getAdUnitType(), clock, cdbResponseSlot);
+        bidResponseListener.onResponse(bidResponse);
+      }
 
-    BidResponse bidResponse = new BidResponse(adUnit.getAdUnitType(), clock, slot);
-    bidResponseListener.onResponse(bidResponse);
+      @Override
+      public void onNoBid() {
+        bidResponseListener.onResponse(null);
+      }
+    });
   }
 
 }
