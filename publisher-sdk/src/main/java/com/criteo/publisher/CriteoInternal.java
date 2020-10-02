@@ -140,23 +140,17 @@ final class CriteoInternal extends Criteo {
     bidManager.getBidForAdUnit(adUnit, bidListener);
   }
 
-  @Nullable
   @Override
-  public BidResponse getBidResponse(@NonNull AdUnit adUnit) {
-    BidResponse response = null;
-
+  public void loadBidResponse(
+      @NonNull AdUnit adUnit,
+      @NonNull BidResponseListener bidResponseListener
+  ) {
     try {
-      response = doGetBidResponse(adUnit);
+      bidResponseListener.onResponse(inHouse.getBidResponse(adUnit));
     } catch (Throwable e) {
-      Log.e(TAG, "Internal error while getting Bid Response.", e);
+      Log.e(TAG, "Internal error while loading bid response.", e);
+      bidResponseListener.onResponse(null);
     }
-
-    return response;
-  }
-
-  @Nullable
-  private BidResponse doGetBidResponse(@Nullable AdUnit adUnit) {
-    return inHouse.getBidResponse(adUnit);
   }
 
   @NonNull

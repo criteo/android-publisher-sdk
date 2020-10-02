@@ -32,6 +32,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import androidx.annotation.NonNull;
 import androidx.core.util.Consumer;
 import androidx.test.filters.FlakyTest;
 import com.criteo.publisher.Clock;
@@ -42,6 +43,7 @@ import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
+import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import java.io.IOException;
@@ -87,7 +89,7 @@ public class CsmFunctionalTest {
     givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
     waitForIdleState();
 
-    Criteo.getInstance().getBidResponse(TestAdUnits.BANNER_320_50);
+    loadBid(TestAdUnits.BANNER_320_50);
     waitForIdleState();
 
     AtomicReference<String> firstImpressionId = new AtomicReference<>();
@@ -98,7 +100,7 @@ public class CsmFunctionalTest {
     // An INTERSTITIAL AdUnit is set here on purpose to verify that the metric that is sent
     // to CSM relates to BANNER_320_50, which is the one that was consumed and whose metric
     // was pushed to the sending queue.
-    Criteo.getInstance().getBidResponse(TestAdUnits.INTERSTITIAL);
+    loadBid(TestAdUnits.INTERSTITIAL);
     waitForIdleState();
 
     verify(api).postCsm(argThat(request -> {
@@ -115,7 +117,7 @@ public class CsmFunctionalTest {
     }));
 
     clearInvocations(api);
-    Criteo.getInstance().getBidResponse(TestAdUnits.BANNER_320_50);
+    loadBid(TestAdUnits.BANNER_320_50);
     waitForIdleState();
 
     verify(api).postCsm(argThat(request -> {
@@ -140,7 +142,7 @@ public class CsmFunctionalTest {
     waitForIdleState();
 
     when(clock.getCurrentTimeInMillis()).thenReturn(Long.MAX_VALUE);
-    Criteo.getInstance().getBidResponse(TestAdUnits.INTERSTITIAL);
+    loadBid(TestAdUnits.INTERSTITIAL);
     waitForIdleState();
 
     // A third call is needed to trigger the sending of metrics to CSM. This is because,
@@ -148,7 +150,7 @@ public class CsmFunctionalTest {
     // An BANNER_320_50 AdUnit is set here on purpose to verify that the metric that is sent
     // to CSM relates to INTERSTITIAL, which is the one that was consumed and whose metric
     // was pushed to the sending queue.
-    Criteo.getInstance().getBidResponse(TestAdUnits.BANNER_320_50);
+    loadBid(TestAdUnits.BANNER_320_50);
     waitForIdleState();
 
     verify(api).postCsm(argThat(request -> {
@@ -167,7 +169,7 @@ public class CsmFunctionalTest {
     givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL_UNKNOWN);
     waitForIdleState();
 
-    Criteo.getInstance().getBidResponse(TestAdUnits.INTERSTITIAL_UNKNOWN);
+    loadBid(TestAdUnits.INTERSTITIAL_UNKNOWN);
     waitForIdleState();
 
     verify(api).postCsm(argThat(request -> {
@@ -188,7 +190,7 @@ public class CsmFunctionalTest {
     givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
     waitForIdleState();
 
-    Criteo.getInstance().getBidResponse(TestAdUnits.INTERSTITIAL_UNKNOWN);
+    loadBid(TestAdUnits.INTERSTITIAL_UNKNOWN);
     waitForIdleState();
 
     verify(api).postCsm(argThat(request -> {
@@ -220,7 +222,7 @@ public class CsmFunctionalTest {
 
     when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenCallRealMethod();
 
-    Criteo.getInstance().getBidResponse(TestAdUnits.INTERSTITIAL_UNKNOWN);
+    loadBid(TestAdUnits.INTERSTITIAL_UNKNOWN);
     waitForIdleState();
 
     verify(api).postCsm(argThat(request -> {
@@ -249,40 +251,40 @@ public class CsmFunctionalTest {
     doThrow(IOException.class).when(api).postCsm(any());
 
     when(clock.getCurrentTimeInMillis()).thenReturn(0L);
-    Criteo criteo = givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
     waitForIdleState();
 
     // Consumed and not expired
-    criteo.getBidResponse(TestAdUnits.INTERSTITIAL);
+    loadBid(TestAdUnits.INTERSTITIAL);
     waitForIdleState();
 
     // Consumed but expired
     // There is also a bid request here and consumed at timeout step
     when(clock.getCurrentTimeInMillis()).thenCallRealMethod();
-    criteo.getBidResponse(TestAdUnits.INTERSTITIAL);
+    loadBid(TestAdUnits.INTERSTITIAL);
     waitForIdleState();
 
     // No bid
-    criteo.getBidResponse(TestAdUnits.INTERSTITIAL_UNKNOWN);
+    loadBid(TestAdUnits.INTERSTITIAL_UNKNOWN);
     waitForIdleState();
 
     // Timeout
     mockedDependenciesRule.getCdbMock().simulatorSlowNetworkOnNextRequest();
     when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenReturn(1);
-    criteo.getBidResponse(TestAdUnits.INTERSTITIAL);
+    loadBid(TestAdUnits.INTERSTITIAL);
     waitForIdleState();
     when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenCallRealMethod();
 
     // Network error
     doThrow(IOException.class).when(api).loadCdb(any(), any());
-    criteo.getBidResponse(TestAdUnits.INTERSTITIAL);
+    loadBid(TestAdUnits.INTERSTITIAL);
     waitForIdleState();
     doCallRealMethod().when(api).loadCdb(any(), any());
 
     // CSM endpoint works again: on next bid request, there should metrics for all previous bids.
     clearInvocations(api);
     doCallRealMethod().when(api).postCsm(any());
-    criteo.getBidResponse(TestAdUnits.BANNER_UNKNOWN);
+    loadBid(TestAdUnits.BANNER_UNKNOWN);
     waitForIdleState();
 
     verify(api).postCsm(argThat(request -> {
@@ -393,5 +395,9 @@ public class CsmFunctionalTest {
 
   private void waitForIdleState() {
     mockedDependenciesRule.waitForIdleState();
+  }
+
+  private void loadBid(@NonNull AdUnit adUnit) {
+    Criteo.getInstance().loadBidResponse(adUnit, ignored -> { /* no op */ });
   }
 }

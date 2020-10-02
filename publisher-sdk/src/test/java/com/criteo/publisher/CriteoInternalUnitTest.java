@@ -16,7 +16,6 @@
 
 package com.criteo.publisher;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -225,28 +224,30 @@ public class CriteoInternalUnitTest {
   public void getBidResponse_GivenInHouseThrowing_DoNotThrowAndReturnNoBidResponse()
       throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
+    BidResponseListener listener = mock(BidResponseListener.class);
 
     InHouse inHouse = givenMockedInHouse();
     when(inHouse.getBidResponse(adUnit)).thenThrow(RuntimeException.class);
 
     Criteo criteo = createCriteo();
-    BidResponse bidResponse = criteo.getBidResponse(adUnit);
+    criteo.loadBidResponse(adUnit, listener);
 
-    assertThat(bidResponse).isNull();
+    verify(listener).onResponse(null);
   }
 
   @Test
   public void getBidResponse_GivenBidManagerYieldingOne_ReturnIt() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
+    BidResponseListener listener = mock(BidResponseListener.class);
     BidResponse expectedBid = mock(BidResponse.class);
 
     InHouse inHouse = givenMockedInHouse();
     when(inHouse.getBidResponse(adUnit)).thenReturn(expectedBid);
 
     Criteo criteo = createCriteo();
-    BidResponse bidResponse = criteo.getBidResponse(adUnit);
+    criteo.loadBidResponse(adUnit, listener);
 
-    assertThat(bidResponse).isEqualTo(expectedBid);
+    verify(listener).onResponse(expectedBid);
   }
 
   @Test

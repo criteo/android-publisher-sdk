@@ -25,7 +25,6 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
-import com.criteo.publisher.BidResponse;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoInterstitial;
@@ -111,13 +110,11 @@ public class InHouseActivity extends AppCompatActivity {
         TAG, "In-House", adLayout));
 
     Log.d(TAG, "Banner Requested");
-    BidResponse bidResponse = Criteo.getInstance().getBidResponse(BANNER);
-    criteoBannerView.loadAd(bidResponse);
+    Criteo.getInstance().loadBidResponse(BANNER, criteoBannerView::loadAd);
   }
 
   private void loadNative() {
-    BidResponse bidResponse = Criteo.getInstance().getBidResponse(NATIVE);
-    nativeLoader.loadAd(bidResponse);
+    Criteo.getInstance().loadBidResponse(NATIVE, nativeLoader::loadAd);
   }
 
   private void loadInterstitialAd(InterstitialAdUnit adUnit, Button btnShow) {
@@ -130,8 +127,7 @@ public class InHouseActivity extends AppCompatActivity {
     btnShow.setOnClickListener(v -> showInterstitial(interstitial));
 
     Log.d(TAG, prefix + " - Interstitial Requested");
-    BidResponse bidResponse = Criteo.getInstance().getBidResponse(adUnit);
-    interstitial.loadAd(bidResponse);
+    Criteo.getInstance().loadBidResponse(adUnit, interstitial::loadAd);
   }
 
 }

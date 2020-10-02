@@ -18,11 +18,12 @@ package com.criteo.publisher.degraded;
 
 
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import com.criteo.publisher.BidResponse;
+import com.criteo.publisher.BidResponseListener;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
@@ -46,6 +47,9 @@ public class InHouseDegradedTest {
   @Mock
   private PubSdkApi api;
 
+  @Mock
+  private BidResponseListener listener;
+
   @SpyBean
   private DeviceUtil deviceUtil;
 
@@ -62,26 +66,22 @@ public class InHouseDegradedTest {
 
   @Test
   public void whenGettingABidResponse_ShouldNotDoAnyCallToCdb() throws Exception {
-    criteo.getBidResponse(adUnit);
+    criteo.loadBidResponse(adUnit, listener);
     waitForIdleState();
 
     verifyNoInteractions(api);
+    verify(listener).onResponse(null);
   }
 
   @Test
   public void whenGettingABidResponseTwice_ShouldReturnANoBid() throws Exception {
-    BidResponse bidResponse1 = criteo.getBidResponse(adUnit);
+    criteo.loadBidResponse(adUnit, listener);
     waitForIdleState();
 
-    BidResponse bidResponse2 = criteo.getBidResponse(adUnit);
+    criteo.loadBidResponse(adUnit, listener);
     waitForIdleState();
 
-    assertIsNoBid(bidResponse1);
-    assertIsNoBid(bidResponse2);
-  }
-
-  private void assertIsNoBid(BidResponse bidResponse) {
-    assertThat(bidResponse).isNull();
+    verify(listener, times(2)).onResponse(null);
   }
 
   private void waitForIdleState() {

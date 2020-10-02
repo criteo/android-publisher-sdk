@@ -18,7 +18,9 @@ package com.criteo.publisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
@@ -28,7 +30,6 @@ import com.criteo.publisher.model.NativeAdUnit;
 import java.util.HashMap;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 public class DummyCriteoTest {
 
@@ -64,19 +65,23 @@ public class DummyCriteoTest {
 
   @Test
   public void getBidForAdUnit_GivenAnyAdUnit_ReturnNull() throws Exception {
-    BidListener bidListener = Mockito.mock(BidListener.class);
+    BidListener bidListener = mock(BidListener.class);
     criteo.getBidForAdUnit(null, bidListener);
     criteo.getBidForAdUnit(banner, bidListener);
     criteo.getBidForAdUnit(interstitial, bidListener);
     criteo.getBidForAdUnit(aNative, bidListener);
-    Mockito.verify(bidListener, times(4)).onNoBid();
+    verify(bidListener, times(4)).onNoBid();
   }
 
   @Test
   public void getBidResponse_GivenAnyAdUnit_ReturnNoBid() throws Exception {
-    assertThat(criteo.getBidResponse(banner)).isNull();
-    assertThat(criteo.getBidResponse(interstitial)).isNull();
-    assertThat(criteo.getBidResponse(aNative)).isNull();
+    BidResponseListener listener = mock(BidResponseListener.class);
+
+    criteo.loadBidResponse(banner, listener);
+    criteo.loadBidResponse(interstitial, listener);
+    criteo.loadBidResponse(aNative, listener);
+
+    verify(listener, times(3)).onResponse(null);
   }
 
   @Test

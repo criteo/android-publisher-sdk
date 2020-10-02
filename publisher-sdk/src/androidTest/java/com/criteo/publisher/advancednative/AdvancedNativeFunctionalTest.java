@@ -18,6 +18,7 @@ package com.criteo.publisher.advancednative;
 
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.StubConstants.STUB_NATIVE_ASSETS;
+import static com.criteo.publisher.TestAdUnits.NATIVE;
 import static com.criteo.publisher.activity.TestNativeActivity.ADVERTISER_DESCRIPTION_TAG;
 import static com.criteo.publisher.activity.TestNativeActivity.ADVERTISER_DOMAIN_TAG;
 import static com.criteo.publisher.activity.TestNativeActivity.ADVERTISER_LOGO_TAG;
@@ -47,9 +48,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.test.rule.ActivityTestRule;
-import com.criteo.publisher.BidResponse;
 import com.criteo.publisher.Criteo;
-import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.activity.TestNativeActivity;
 import com.criteo.publisher.adview.Redirection;
 import com.criteo.publisher.integration.Integration;
@@ -84,7 +83,7 @@ public class AdvancedNativeFunctionalTest {
   @Test
   public void loadStandaloneAdInAdLayout_GivenValidBid_DisplayAllInformationInViews()
       throws Exception {
-    givenInitializedCriteo(TestAdUnits.NATIVE);
+    givenInitializedCriteo(NATIVE);
     mockedDependenciesRule.waitForIdleState();
 
     TestNativeActivity activity = activityRule.getActivity();
@@ -105,12 +104,11 @@ public class AdvancedNativeFunctionalTest {
 
   @Test
   public void loadInHouseAdInAdLayout_GivenValidBid_DisplayAllInformationInViews() throws Exception {
-    givenInitializedCriteo(TestAdUnits.NATIVE);
+    givenInitializedCriteo(NATIVE);
     mockedDependenciesRule.waitForIdleState();
 
     TestNativeActivity activity = activityRule.getActivity();
-    BidResponse bidResponse = Criteo.getInstance().getBidResponse(TestAdUnits.NATIVE);
-    activity.loadInHouseAdInAdLayout(bidResponse);
+    Criteo.getInstance().loadBidResponse(NATIVE, activity::loadInHouseAdInAdLayout);
     mockedDependenciesRule.waitForIdleState();
 
     // Check there is one ad
@@ -127,7 +125,7 @@ public class AdvancedNativeFunctionalTest {
 
   @Test
   public void loadStandaloneAdInRecyclerView_GivenValidBid_DisplayAllInformationInViews() throws Exception {
-    givenInitializedCriteo(TestAdUnits.NATIVE);
+    givenInitializedCriteo(NATIVE);
     mockedDependenciesRule.waitForIdleState();
 
     TestNativeActivity activity = activityRule.getActivity();
@@ -147,16 +145,14 @@ public class AdvancedNativeFunctionalTest {
 
   @Test
   public void loadInHouseAdInRecyclerView_GivenValidBid_DisplayAllInformationInViews() throws Exception {
-    givenInitializedCriteo(TestAdUnits.NATIVE);
+    givenInitializedCriteo(NATIVE);
     mockedDependenciesRule.waitForIdleState();
 
     TestNativeActivity activity = activityRule.getActivity();
-    BidResponse bidResponse1 = Criteo.getInstance().getBidResponse(TestAdUnits.NATIVE);
-    activity.loadInHouseAdInRecyclerView(bidResponse1);
+    Criteo.getInstance().loadBidResponse(NATIVE, activity::loadInHouseAdInRecyclerView);
     mockedDependenciesRule.waitForIdleState();
 
-    BidResponse bidResponse2 = Criteo.getInstance().getBidResponse(TestAdUnits.NATIVE);
-    activity.loadInHouseAdInRecyclerView(bidResponse2);
+    Criteo.getInstance().loadBidResponse(NATIVE, activity::loadInHouseAdInRecyclerView);
     mockedDependenciesRule.waitForIdleState();
 
     // Check there is two ads
