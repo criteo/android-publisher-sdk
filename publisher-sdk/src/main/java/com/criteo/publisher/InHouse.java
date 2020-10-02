@@ -17,8 +17,6 @@
 package com.criteo.publisher;
 
 import androidx.annotation.NonNull;
-import com.criteo.publisher.integration.Integration;
-import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
 import org.jetbrains.annotations.NotNull;
@@ -31,24 +29,18 @@ public class InHouse {
   @NonNull
   private final Clock clock;
 
-  @NonNull
-  private final IntegrationRegistry integrationRegistry;
-
   public InHouse(
       @NonNull BidManager bidManager,
-      @NonNull Clock clock,
-      @NonNull IntegrationRegistry integrationRegistry
+      @NonNull Clock clock
   ) {
     this.bidManager = bidManager;
     this.clock = clock;
-    this.integrationRegistry = integrationRegistry;
   }
 
   public void loadBidResponse(
       @NonNull AdUnit adUnit,
       @NonNull BidResponseListener bidResponseListener
   ) {
-    integrationRegistry.declare(Integration.IN_HOUSE);
     bidManager.getBidForAdUnit(adUnit, new BidListener() {
       @Override
       public void onBidResponse(@NotNull CdbResponseSlot cdbResponseSlot) {

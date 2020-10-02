@@ -111,6 +111,7 @@ public class CriteoBannerView extends WebView {
   }
 
   private void doLoadAd(@Nullable Bid bid) {
+    getIntegrationRegistry().declare(Integration.IN_HOUSE);
     getOrCreateController().fetchAdAsync(bid);
   }
 

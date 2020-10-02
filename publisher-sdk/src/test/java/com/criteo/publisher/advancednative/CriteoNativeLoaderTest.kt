@@ -41,7 +41,6 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
@@ -153,7 +152,7 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
     verifyNoMoreInteractions(listener)
-    verifyZeroInteractions(integrationRegistry)
+    verify(integrationRegistry).declare(Integration.IN_HOUSE)
     runOnUiThreadExecutor.verifyExpectations()
   }
 
