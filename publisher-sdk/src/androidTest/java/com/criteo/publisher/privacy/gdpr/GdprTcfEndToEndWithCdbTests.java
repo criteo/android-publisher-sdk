@@ -274,7 +274,7 @@ public class GdprTcfEndToEndWithCdbTests {
   }
 
   private void whenBidding() {
-    Criteo.getInstance().loadBidResponse(validInterstitialAdUnit, ignore -> { /* no op */ });
+    Criteo.getInstance().loadBid(validInterstitialAdUnit, ignore -> { /* no op */ });
     waitForBids();
   }
 }

@@ -398,6 +398,6 @@ public class CsmFunctionalTest {
   }
 
   private void loadBid(@NonNull AdUnit adUnit) {
-    Criteo.getInstance().loadBidResponse(adUnit, ignored -> { /* no op */ });
+    Criteo.getInstance().loadBid(adUnit, ignored -> { /* no op */ });
   }
 }

@@ -41,7 +41,7 @@ public class DummyCriteo extends Criteo {
   }
 
   @Override
-  public void loadBidResponse(
+  public void loadBid(
       @NonNull AdUnit adUnit,
       @NonNull BidResponseListener bidResponseListener
   ) {

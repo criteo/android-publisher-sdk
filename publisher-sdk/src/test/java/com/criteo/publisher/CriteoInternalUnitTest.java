@@ -222,7 +222,7 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void getBidResponse_GivenInHouseThrowing_DoNotThrowAndReturnNoBidResponse()
+  public void loadBid_GivenInHouseThrowing_DoNotThrowAndReturnNoBidResponse()
       throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
     BidResponseListener listener = mock(BidResponseListener.class);
@@ -233,7 +233,7 @@ public class CriteoInternalUnitTest {
     }).when(inHouse).loadBidResponse(adUnit, listener);
 
     Criteo criteo = createCriteo();
-    criteo.loadBidResponse(adUnit, listener);
+    criteo.loadBid(adUnit, listener);
 
     verify(listener).onResponse(null);
   }
@@ -251,7 +251,7 @@ public class CriteoInternalUnitTest {
     }).when(inHouse).loadBidResponse(adUnit, listener);
 
     Criteo criteo = createCriteo();
-    criteo.loadBidResponse(adUnit, listener);
+    criteo.loadBid(adUnit, listener);
 
     verify(listener).onResponse(expectedBid);
   }
