@@ -66,14 +66,6 @@ public class InHouseTest {
   }
 
   @Test
-  public void getBidResponse_GivenNullAdUnit_ReturnNoBid() throws Exception {
-    inHouse.loadBidResponse(null, listener);
-
-    verify(listener).onResponse(null);
-    verify(integrationRegistry).declare(Integration.IN_HOUSE);
-  }
-
-  @Test
   public void getBidResponse_GivenBidManagerYieldingNoBid_ReturnNoBid() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
 
