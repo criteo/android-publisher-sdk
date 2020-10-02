@@ -116,8 +116,8 @@ public class InHouseTest {
     verify(integrationRegistry).declare(Integration.IN_HOUSE);
   }
 
-  private void assertIsNoBid(BidResponse bidResponse) {
-    assertThat(bidResponse).isNull();
+  private void assertIsNoBid(Bid bid) {
+    assertThat(bid).isNull();
   }
 
 }

@@ -82,8 +82,8 @@ public class CriteoBannerEventController {
    });
   }
 
-  public void fetchAdAsync(@Nullable BidResponse bidResponse) {
-    String displayUrl = bidResponse == null ? null : bidResponse.consumeDisplayUrlFor(CRITEO_BANNER);
+  public void fetchAdAsync(@Nullable Bid bid) {
+    String displayUrl = bid == null ? null : bid.consumeDisplayUrlFor(CRITEO_BANNER);
 
     if (displayUrl == null) {
       notifyFor(INVALID);

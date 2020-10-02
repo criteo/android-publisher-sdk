@@ -242,7 +242,7 @@ public class CriteoInternalUnitTest {
   public void getBidResponse_GivenBidManagerYieldingOne_ReturnIt() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
     BidResponseListener listener = mock(BidResponseListener.class);
-    BidResponse expectedBid = mock(BidResponse.class);
+    Bid expectedBid = mock(Bid.class);
 
     InHouse inHouse = givenMockedInHouse();
     doAnswer(invocation -> {

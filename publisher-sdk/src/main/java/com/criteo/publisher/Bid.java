@@ -27,7 +27,7 @@ import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.util.AdUnitType;
 import kotlin.jvm.functions.Function1;
 
-public class BidResponse {
+public class Bid {
 
   private final double price;
 
@@ -40,7 +40,7 @@ public class BidResponse {
   @Nullable
   private CdbResponseSlot slot;
 
-  BidResponse(
+  Bid(
       @NonNull AdUnitType adUnitType,
       @NonNull Clock clock,
       @NonNull CdbResponseSlot slot

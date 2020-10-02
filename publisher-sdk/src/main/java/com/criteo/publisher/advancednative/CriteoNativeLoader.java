@@ -22,9 +22,9 @@ import android.view.ViewGroup;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.criteo.publisher.Bid;
 import com.criteo.publisher.BidListener;
 import com.criteo.publisher.BidManager;
-import com.criteo.publisher.BidResponse;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
@@ -84,7 +84,7 @@ public class CriteoNativeLoader {
    * <p>
    * You can add it to your view hierarchy, but it is empty and not rendered yet. To render it, you
    * need to get a {@link CriteoNativeAd} by requesting an ad (see {@link #loadAd()} or {@link
-   * #loadAd(BidResponse)}), then you can call {@link CriteoNativeAd#renderNativeView(View)}.
+   * #loadAd(Bid)}), then you can call {@link CriteoNativeAd#renderNativeView(View)}.
    * <p>
    * Note that you are expected to use this method if you're using a recycler view. So you can
    * create your views in <code>onCreateViewHolder</code>, and render them separately in
@@ -135,16 +135,16 @@ public class CriteoNativeLoader {
     });
   }
 
-  public void loadAd(@Nullable BidResponse bidResponse) {
+  public void loadAd(@Nullable Bid bid) {
     try {
-      doLoad(bidResponse);
+      doLoad(bid);
     } catch (Throwable t) {
       PreconditionsUtil.throwOrLog(t);
     }
   }
 
-  private void doLoad(@Nullable BidResponse bidResponse) {
-    NativeAssets assets = bidResponse == null ? null : bidResponse.consumeNativeAssets();
+  private void doLoad(@Nullable Bid bid) {
+    NativeAssets assets = bid == null ? null : bid.consumeNativeAssets();
     handleNativeAssets(assets);
   }
 

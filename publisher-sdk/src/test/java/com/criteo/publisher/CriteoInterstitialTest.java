@@ -32,10 +32,7 @@ import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
-import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
-import com.criteo.publisher.model.NativeAdUnit;
-import java.util.UUID;
 import kotlin.jvm.JvmField;
 import org.junit.Before;
 import org.junit.Rule;
@@ -79,13 +76,13 @@ public class CriteoInterstitialTest {
 
   @Test
   public void loadAdInHouse_GivenControllerAndLoadTwice_DelegateToItTwice() throws Exception {
-    BidResponse bidResponse = mock(BidResponse.class);
+    Bid bid = mock(Bid.class);
     CriteoInterstitialEventController controller = givenMockedController();
 
-    interstitial.loadAd(bidResponse);
-    interstitial.loadAd(bidResponse);
+    interstitial.loadAd(bid);
+    interstitial.loadAd(bid);
 
-    verify(controller, times(2)).fetchAdAsync(bidResponse);
+    verify(controller, times(2)).fetchAdAsync(bid);
     verify(integrationRegistry, never()).declare(any());
   }
 
@@ -128,9 +125,9 @@ public class CriteoInterstitialTest {
   public void loadAdWithBidToken_GivenNullApplication_ReturnImmediately() throws Exception {
     CriteoInterstitialEventController controller = givenMockedController();
     Application application = givenNullApplication();
-    BidResponse bidResponse = mock(BidResponse.class);
+    Bid bid = mock(Bid.class);
 
-    interstitial.loadAd(bidResponse);
+    interstitial.loadAd(bid);
 
     verifyNoMoreInteractions(controller);
     DependencyProvider.getInstance().setApplication(application);

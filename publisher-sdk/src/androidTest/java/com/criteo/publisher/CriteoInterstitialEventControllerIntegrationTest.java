@@ -215,10 +215,10 @@ public class CriteoInterstitialEventControllerIntegrationTest {
 
   @Test
   public void fetchAdAsyncInHouse_GivenNoBid_NotifyAdListenerForFailure() throws Exception {
-    BidResponse bidResponse = mock(BidResponse.class);
-    when(bidResponse.consumeDisplayUrlFor(any())).thenReturn(null);
+    Bid bid = mock(Bid.class);
+    when(bid.consumeDisplayUrlFor(any())).thenReturn(null);
 
-    criteoInterstitialEventController.fetchAdAsync(bidResponse);
+    criteoInterstitialEventController.fetchAdAsync(bid);
     waitForIdleState();
 
     verify(listener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
@@ -228,7 +228,7 @@ public class CriteoInterstitialEventControllerIntegrationTest {
 
   @Test
   public void fetchAdAsyncInHouse_GivenNillBid_NotifyAdListenerForFailure() throws Exception {
-    criteoInterstitialEventController.fetchAdAsync((BidResponse) null);
+    criteoInterstitialEventController.fetchAdAsync((Bid) null);
     waitForIdleState();
 
     verify(listener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
@@ -239,10 +239,10 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   @Test
   public void fetchAdAsyncInHouse_GivenBidAndGoodDisplayUrl_FetchCreativeAndNotifyListenerForSuccess()
       throws Exception {
-    BidResponse bidResponse = mock(BidResponse.class);
-    when(bidResponse.consumeDisplayUrlFor(CRITEO_INTERSTITIAL)).thenReturn(GOOD_DISPLAY_URL);
+    Bid bid = mock(Bid.class);
+    when(bid.consumeDisplayUrlFor(CRITEO_INTERSTITIAL)).thenReturn(GOOD_DISPLAY_URL);
 
-    criteoInterstitialEventController.fetchAdAsync(bidResponse);
+    criteoInterstitialEventController.fetchAdAsync(bid);
     waitForIdleState();
 
     assertThat(criteoInterstitialEventController.isAdLoaded()).isTrue();
@@ -255,10 +255,10 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   @Test
   public void fetchAdAsyncInHouse_GivenBidAndBadDisplayUrl_NotifyListenerForFailureToDisplay()
       throws Exception {
-    BidResponse bidResponse = mock(BidResponse.class);
-    when(bidResponse.consumeDisplayUrlFor(CRITEO_INTERSTITIAL)).thenReturn(BAD_DISPLAY_URL);
+    Bid bid = mock(Bid.class);
+    when(bid.consumeDisplayUrlFor(CRITEO_INTERSTITIAL)).thenReturn(BAD_DISPLAY_URL);
 
-    criteoInterstitialEventController.fetchAdAsync(bidResponse);
+    criteoInterstitialEventController.fetchAdAsync(bid);
     waitForIdleState();
 
     assertThat(criteoInterstitialEventController.isAdLoaded()).isFalse();
@@ -271,15 +271,15 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   @Test
   public void fetchAdAsyncInHouse_GivenBidTwice_FetchCreativeTwiceAndNotifyListenerIfSuccess()
       throws Exception {
-    BidResponse bidResponse = mock(BidResponse.class);
-    when(bidResponse.consumeDisplayUrlFor(CRITEO_INTERSTITIAL))
+    Bid bid = mock(Bid.class);
+    when(bid.consumeDisplayUrlFor(CRITEO_INTERSTITIAL))
         .thenReturn(GOOD_DISPLAY_URL)
         .thenReturn(BAD_DISPLAY_URL);
 
-    runOnMainThreadAndWait(() -> criteoInterstitialEventController.fetchAdAsync(bidResponse));
+    runOnMainThreadAndWait(() -> criteoInterstitialEventController.fetchAdAsync(bid));
     waitForIdleState();
 
-    runOnMainThreadAndWait(() -> criteoInterstitialEventController.fetchAdAsync(bidResponse));
+    runOnMainThreadAndWait(() -> criteoInterstitialEventController.fetchAdAsync(bid));
     waitForIdleState();
 
     InOrder inOrder = inOrder(listener, criteoInterstitialEventController);

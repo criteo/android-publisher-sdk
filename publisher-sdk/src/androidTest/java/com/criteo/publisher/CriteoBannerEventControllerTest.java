@@ -123,11 +123,11 @@ public class CriteoBannerEventControllerTest {
       assertTrue(latch.await(1, TimeUnit.SECONDS));
     })).when(criteoBannerAdListener).onAdFailedToReceive(any());
 
-    BidResponse bidResponse = mock(BidResponse.class);
-    when(bidResponse.consumeDisplayUrlFor(CRITEO_BANNER)).thenReturn(null);
+    Bid bid = mock(Bid.class);
+    when(bid.consumeDisplayUrlFor(CRITEO_BANNER)).thenReturn(null);
 
     runOnMainThreadAndWait(() -> {
-      criteoBannerEventController.fetchAdAsync(bidResponse);
+      criteoBannerEventController.fetchAdAsync(bid);
       latch.countDown();
     });
 
@@ -190,10 +190,10 @@ public class CriteoBannerEventControllerTest {
   @Test
   public void fetchAdAsyncToken_GivenNoBid_NotifyListenerForFailureAndDoNotDisplayAd()
       throws Exception {
-    BidResponse bidResponse = mock(BidResponse.class);
-    when(bidResponse.consumeDisplayUrlFor(any())).thenReturn(null);
+    Bid bid = mock(Bid.class);
+    when(bid.consumeDisplayUrlFor(any())).thenReturn(null);
 
-    criteoBannerEventController.fetchAdAsync(bidResponse);
+    criteoBannerEventController.fetchAdAsync(bid);
     waitForIdleState();
 
     verify(criteoBannerAdListener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
@@ -202,7 +202,7 @@ public class CriteoBannerEventControllerTest {
 
   @Test
   public void fetchAdAsyncToken_GivenNullBid_NotifyListenerForFailureAndDoNotDisplayAd() throws Exception {
-    criteoBannerEventController.fetchAdAsync((BidResponse) null);
+    criteoBannerEventController.fetchAdAsync((Bid) null);
     waitForIdleState();
 
     verify(criteoBannerAdListener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
@@ -211,10 +211,10 @@ public class CriteoBannerEventControllerTest {
 
   @Test
   public void fetchAdAsyncToken_GivenBid_NotifyListenerForSuccessAndDisplayAd() throws Exception {
-    BidResponse bidResponse = mock(BidResponse.class);
-    when(bidResponse.consumeDisplayUrlFor(CRITEO_BANNER)).thenReturn("http://my.display.url");
+    Bid bid = mock(Bid.class);
+    when(bid.consumeDisplayUrlFor(CRITEO_BANNER)).thenReturn("http://my.display.url");
 
-    criteoBannerEventController.fetchAdAsync(bidResponse);
+    criteoBannerEventController.fetchAdAsync(bid);
     waitForIdleState();
 
     verify(criteoBannerAdListener).onAdReceived(criteoBannerView);
@@ -224,15 +224,15 @@ public class CriteoBannerEventControllerTest {
   @Test
   public void fetchAdAsyncToken_GivenBidTwice_NotifyListenerForSuccessAndDisplayAdTwice()
       throws Exception {
-    BidResponse bidResponse = mock(BidResponse.class);
-    when(bidResponse.consumeDisplayUrlFor(CRITEO_BANNER))
+    Bid bid = mock(Bid.class);
+    when(bid.consumeDisplayUrlFor(CRITEO_BANNER))
         .thenReturn("http://my.display.url1")
         .thenReturn("http://my.display.url2");
 
-    runOnMainThreadAndWait(() -> criteoBannerEventController.fetchAdAsync(bidResponse));
+    runOnMainThreadAndWait(() -> criteoBannerEventController.fetchAdAsync(bid));
     waitForIdleState();
 
-    runOnMainThreadAndWait(() -> criteoBannerEventController.fetchAdAsync(bidResponse));
+    runOnMainThreadAndWait(() -> criteoBannerEventController.fetchAdAsync(bid));
     waitForIdleState();
 
     InOrder inOrder = inOrder(criteoBannerAdListener, criteoBannerEventController);

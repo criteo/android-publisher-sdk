@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -36,8 +35,6 @@ import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
-import com.criteo.publisher.model.InterstitialAdUnit;
-import java.util.UUID;
 import kotlin.jvm.JvmField;
 import org.junit.Before;
 import org.junit.Rule;
@@ -68,7 +65,7 @@ public class CriteoBannerViewTest {
   private BannerAdUnit bannerAdUnit;
 
   @Mock
-  private BidResponse bidResponse;
+  private Bid bid;
 
   @Before
   public void setUp() throws Exception {
@@ -127,35 +124,35 @@ public class CriteoBannerViewTest {
 
   @Test
   public void loadAdInHouse_GivenController_DelegateToIt() throws Exception {
-    bannerView.loadAd(bidResponse);
+    bannerView.loadAd(bid);
 
-    verify(controller).fetchAdAsync(bidResponse);
+    verify(controller).fetchAdAsync(bid);
     verifyNoMoreInteractions(controller);
     verify(integrationRegistry, never()).declare(any());
   }
 
   @Test
   public void loadAdInHouse_GivenControllerAndLoadTwice_DelegateToItTwice() throws Exception {
-    bannerView.loadAd(bidResponse);
-    bannerView.loadAd(bidResponse);
+    bannerView.loadAd(bid);
+    bannerView.loadAd(bid);
 
-    verify(controller, times(2)).fetchAdAsync(bidResponse);
+    verify(controller, times(2)).fetchAdAsync(bid);
     verifyNoMoreInteractions(controller);
     verify(integrationRegistry, never()).declare(any());
   }
 
   @Test
   public void loadAdInHouse_GivenControllerThrowing_DoNotThrow() throws Exception {
-    doThrow(RuntimeException.class).when(controller).fetchAdAsync(any(BidResponse.class));
+    doThrow(RuntimeException.class).when(controller).fetchAdAsync(any(Bid.class));
 
-    assertThatCode(() -> bannerView.loadAd(bidResponse)).doesNotThrowAnyException();
+    assertThatCode(() -> bannerView.loadAd(bid)).doesNotThrowAnyException();
   }
 
   @Test
   public void loadAdInHouse_GivenNonInitializedSdk_DoesNotThrow() throws Exception {
     bannerView = givenBannerUsingNonInitializedSdk();
 
-    assertThatCode(() -> bannerView.loadAd(bidResponse)).doesNotThrowAnyException();
+    assertThatCode(() -> bannerView.loadAd(bid)).doesNotThrowAnyException();
   }
 
   @Test
