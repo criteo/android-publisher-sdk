@@ -140,7 +140,7 @@ class ProfileIdFunctionalTest {
   @Test
   fun csm_GivenIntegrationSpecificBidConsumedWithSdkUsedForTheFirstTime_UseIntegrationProfileId() {
     givenInitializedCriteo()
-    Criteo.getInstance().loadBidResponse(BANNER_320_480) { /* no op */ }
+    Criteo.getInstance().loadBid(BANNER_320_480) { /* no op */ }
     mockedDependenciesRule.waitForIdleState()
 
     triggerMetricRequest()
@@ -158,7 +158,7 @@ class ProfileIdFunctionalTest {
     doNothing().whenever(metricSendingQueueConsumer).sendMetricBatch()
 
     givenInitializedCriteo()
-    Criteo.getInstance().loadBidResponse(BANNER_320_480) { /* no op */ }
+    Criteo.getInstance().loadBid(BANNER_320_480) { /* no op */ }
     mockedDependenciesRule.waitForIdleState()
 
     Criteo.getInstance().setBidsForAdUnit(mutableMapOf<Any, Any>(), BANNER_320_480)
@@ -227,7 +227,7 @@ class ProfileIdFunctionalTest {
     mockedDependenciesRule.resetAllDependencies()
 
     givenInitializedCriteo()
-    Criteo.getInstance().loadBidResponse(BANNER_320_480) { /* no op */ }
+    Criteo.getInstance().loadBid(BANNER_320_480) { /* no op */ }
     mockedDependenciesRule.waitForIdleState()
 
     verifyCdbIsCalledWith(Integration.IN_HOUSE)
@@ -284,7 +284,7 @@ class ProfileIdFunctionalTest {
 
   private fun givenPreviousInHouseIntegration() {
     givenInitializedCriteo()
-    Criteo.getInstance().loadBidResponse(BANNER_320_480) { /* no op */ }
+    Criteo.getInstance().loadBid(BANNER_320_480) { /* no op */ }
     mockedDependenciesRule.waitForIdleState()
     mockedDependenciesRule.resetAllDependencies()
   }

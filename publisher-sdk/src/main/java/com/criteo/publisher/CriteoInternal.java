@@ -141,7 +141,7 @@ final class CriteoInternal extends Criteo {
   }
 
   @Override
-  public void loadBidResponse(
+  public void loadBid(
       @NonNull AdUnit adUnit,
       @NonNull BidResponseListener bidResponseListener
   ) {

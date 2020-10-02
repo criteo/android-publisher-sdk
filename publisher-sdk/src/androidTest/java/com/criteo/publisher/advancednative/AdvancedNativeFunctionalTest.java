@@ -108,7 +108,7 @@ public class AdvancedNativeFunctionalTest {
     mockedDependenciesRule.waitForIdleState();
 
     TestNativeActivity activity = activityRule.getActivity();
-    Criteo.getInstance().loadBidResponse(NATIVE, activity::loadInHouseAdInAdLayout);
+    Criteo.getInstance().loadBid(NATIVE, activity::loadInHouseAdInAdLayout);
     mockedDependenciesRule.waitForIdleState();
 
     // Check there is one ad
@@ -149,10 +149,10 @@ public class AdvancedNativeFunctionalTest {
     mockedDependenciesRule.waitForIdleState();
 
     TestNativeActivity activity = activityRule.getActivity();
-    Criteo.getInstance().loadBidResponse(NATIVE, activity::loadInHouseAdInRecyclerView);
+    Criteo.getInstance().loadBid(NATIVE, activity::loadInHouseAdInRecyclerView);
     mockedDependenciesRule.waitForIdleState();
 
-    Criteo.getInstance().loadBidResponse(NATIVE, activity::loadInHouseAdInRecyclerView);
+    Criteo.getInstance().loadBid(NATIVE, activity::loadInHouseAdInRecyclerView);
     mockedDependenciesRule.waitForIdleState();
 
     // Check there is two ads

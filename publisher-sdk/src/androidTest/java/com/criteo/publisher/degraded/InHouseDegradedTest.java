@@ -66,7 +66,7 @@ public class InHouseDegradedTest {
 
   @Test
   public void whenGettingABidResponse_ShouldNotDoAnyCallToCdb() throws Exception {
-    criteo.loadBidResponse(adUnit, listener);
+    criteo.loadBid(adUnit, listener);
     waitForIdleState();
 
     verifyNoInteractions(api);
@@ -75,10 +75,10 @@ public class InHouseDegradedTest {
 
   @Test
   public void whenGettingABidResponseTwice_ShouldReturnANoBid() throws Exception {
-    criteo.loadBidResponse(adUnit, listener);
+    criteo.loadBid(adUnit, listener);
     waitForIdleState();
 
-    criteo.loadBidResponse(adUnit, listener);
+    criteo.loadBid(adUnit, listener);
     waitForIdleState();
 
     verify(listener, times(2)).onResponse(null);

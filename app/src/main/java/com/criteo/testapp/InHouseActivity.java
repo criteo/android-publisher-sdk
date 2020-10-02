@@ -110,11 +110,11 @@ public class InHouseActivity extends AppCompatActivity {
         TAG, "In-House", adLayout));
 
     Log.d(TAG, "Banner Requested");
-    Criteo.getInstance().loadBidResponse(BANNER, criteoBannerView::loadAd);
+    Criteo.getInstance().loadBid(BANNER, criteoBannerView::loadAd);
   }
 
   private void loadNative() {
-    Criteo.getInstance().loadBidResponse(NATIVE, nativeLoader::loadAd);
+    Criteo.getInstance().loadBid(NATIVE, nativeLoader::loadAd);
   }
 
   private void loadInterstitialAd(InterstitialAdUnit adUnit, Button btnShow) {
@@ -127,7 +127,7 @@ public class InHouseActivity extends AppCompatActivity {
     btnShow.setOnClickListener(v -> showInterstitial(interstitial));
 
     Log.d(TAG, prefix + " - Interstitial Requested");
-    Criteo.getInstance().loadBidResponse(adUnit, interstitial::loadAd);
+    Criteo.getInstance().loadBid(adUnit, interstitial::loadAd);
   }
 
 }

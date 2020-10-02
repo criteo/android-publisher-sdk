@@ -74,12 +74,12 @@ public class DummyCriteoTest {
   }
 
   @Test
-  public void getBidResponse_GivenAnyAdUnit_ReturnNoBid() throws Exception {
+  public void loadBid_GivenAnyAdUnit_ReturnNoBid() throws Exception {
     BidResponseListener listener = mock(BidResponseListener.class);
 
-    criteo.loadBidResponse(banner, listener);
-    criteo.loadBidResponse(interstitial, listener);
-    criteo.loadBidResponse(aNative, listener);
+    criteo.loadBid(banner, listener);
+    criteo.loadBid(interstitial, listener);
+    criteo.loadBid(aNative, listener);
 
     verify(listener, times(3)).onResponse(null);
   }
