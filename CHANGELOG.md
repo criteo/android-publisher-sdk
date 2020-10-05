@@ -13,7 +13,6 @@
     interstitial ad is ready to be displayed.
   - Provide default implementation in interstitial listener. Java 8 is required, see
   https://developer.android.com/studio/write/java8-support.
-  - Do not store technical metrics unless TCFv2 consent is given.
   - Remove the deprecated `Criteo#init` method. [`Criteo.Builder#init`](https://github.com/criteo/android-publisher-sdk/blob/main/publisher-sdk/src/main/java/com/criteo/publisher/Criteo.java#L54)
   should be used instead.
 

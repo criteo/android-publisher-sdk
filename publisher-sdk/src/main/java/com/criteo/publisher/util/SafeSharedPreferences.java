@@ -19,7 +19,6 @@ package com.criteo.publisher.util;
 import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import org.jetbrains.annotations.Contract;
 
 /**
  * Wrapper around {@link SharedPreferences} that provides type safety when accessing data saved under
@@ -35,7 +34,6 @@ public class SafeSharedPreferences {
   }
 
   @Nullable
-  @Contract("_, !null - > !null")
   public String getString(@NonNull String key, @Nullable String defaultValue) {
     String value = defaultValue;
 
