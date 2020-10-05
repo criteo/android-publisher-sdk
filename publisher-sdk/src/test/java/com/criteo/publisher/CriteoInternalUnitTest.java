@@ -227,10 +227,10 @@ public class CriteoInternalUnitTest {
     AdUnit adUnit = mock(AdUnit.class);
     BidResponseListener listener = mock(BidResponseListener.class);
 
-    InHouse inHouse = givenMockedInHouse();
+    ConsumableBidLoader consumableBidLoader = givenMockedInHouse();
     doAnswer(invocation -> {
       throw new RuntimeException();
-    }).when(inHouse).loadBid(adUnit, listener);
+    }).when(consumableBidLoader).loadBid(adUnit, listener);
 
     Criteo criteo = createCriteo();
     criteo.loadBid(adUnit, listener);
@@ -244,11 +244,11 @@ public class CriteoInternalUnitTest {
     BidResponseListener listener = mock(BidResponseListener.class);
     Bid expectedBid = mock(Bid.class);
 
-    InHouse inHouse = givenMockedInHouse();
+    ConsumableBidLoader consumableBidLoader = givenMockedInHouse();
     doAnswer(invocation -> {
       invocation.<BidResponseListener>getArgument(1).onResponse(expectedBid);
       return null;
-    }).when(inHouse).loadBid(adUnit, listener);
+    }).when(consumableBidLoader).loadBid(adUnit, listener);
 
     Criteo criteo = createCriteo();
     criteo.loadBid(adUnit, listener);
@@ -344,12 +344,12 @@ public class CriteoInternalUnitTest {
     return headerBidding;
   }
 
-  private InHouse givenMockedInHouse() {
-    InHouse inHouse = mock(InHouse.class);
+  private ConsumableBidLoader givenMockedInHouse() {
+    ConsumableBidLoader consumableBidLoader = mock(ConsumableBidLoader.class);
 
-    when(dependencyProvider.provideInHouse()).thenReturn(inHouse);
+    when(dependencyProvider.provideConsumableBidLoader()).thenReturn(consumableBidLoader);
 
-    return inHouse;
+    return consumableBidLoader;
   }
 
   private CriteoInternal createCriteo() {
