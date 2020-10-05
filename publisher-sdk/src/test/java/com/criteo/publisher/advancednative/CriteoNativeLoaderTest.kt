@@ -135,7 +135,7 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
     expectListenerToBeCalledOnUiThread()
     givenNotANativeBidAvailable()
 
-    inHouse.loadBidResponse(adUnit, nativeLoader::loadAd)
+    inHouse.loadBid(adUnit, nativeLoader::loadAd)
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
     verifyNoMoreInteractions(listener)
@@ -161,7 +161,7 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
     expectListenerToBeCalledOnUiThread()
     val nativeAd = givenNativeBidAvailable()
 
-    inHouse.loadBidResponse(adUnit, nativeLoader::loadAd)
+    inHouse.loadBid(adUnit, nativeLoader::loadAd)
 
     verify(listener).onAdReceived(nativeAd)
     verifyNoMoreInteractions(listener)

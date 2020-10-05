@@ -64,7 +64,7 @@ public class InHouseTest {
       return null;
     }).when(bidManager).getBidForAdUnit(eq(adUnit), any());
 
-    inHouse.loadBidResponse(adUnit, listener);
+    inHouse.loadBid(adUnit, listener);
 
     verify(listener).onResponse(null);
   }
@@ -81,7 +81,7 @@ public class InHouseTest {
       return null;
     }).when(bidManager).getBidForAdUnit(eq(adUnit), any());
 
-    inHouse.loadBidResponse(adUnit, listener);
+    inHouse.loadBid(adUnit, listener);
 
     verify(listener).onResponse(argThat(bidResponse -> {
       assertThat(bidResponse.getPrice()).isEqualTo(42.1337);
