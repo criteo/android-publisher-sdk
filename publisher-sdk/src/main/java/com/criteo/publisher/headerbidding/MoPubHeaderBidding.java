@@ -19,11 +19,9 @@ package com.criteo.publisher.headerbidding;
 import static com.criteo.publisher.util.ReflectionUtil.isInstanceOf;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import com.criteo.publisher.integration.Integration;
-import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
+import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.ReflectionUtil;
 import java.util.Arrays;
 import java.util.List;
@@ -93,7 +91,7 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler {
   @Override
   public void enrichBid(
       @NonNull Object object,
-      @Nullable AdUnit adUnit,
+      @NonNull AdUnitType adUnitType,
       @NonNull CdbResponseSlot slot
   ) {
     if (!canHandle(object)) {
@@ -114,7 +112,7 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler {
     keywords.append(":");
     keywords.append(slot.getDisplayUrl());
 
-    if (adUnit instanceof BannerAdUnit) {
+    if (adUnitType == AdUnitType.CRITEO_BANNER) {
       keywords.append(",");
       keywords.append(CRT_SIZE);
       keywords.append(":");

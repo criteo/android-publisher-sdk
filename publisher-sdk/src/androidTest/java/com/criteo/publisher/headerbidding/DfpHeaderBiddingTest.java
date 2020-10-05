@@ -16,6 +16,9 @@
 
 package com.criteo.publisher.headerbidding;
 
+import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -35,11 +38,7 @@ import android.os.Bundle;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
-import com.criteo.publisher.model.AdSize;
-import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
-import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeProduct;
 import com.criteo.publisher.util.AndroidUtil;
@@ -124,15 +123,13 @@ public class DfpHeaderBiddingTest {
   public void enrichBid_GivenNotHandledObject_DoNothing() throws Exception {
     Object builder = mock(Object.class);
 
-    headerBidding.enrichBid(builder, mock(AdUnit.class), mock(CdbResponseSlot.class));
+    headerBidding.enrichBid(builder, CRITEO_BANNER, mock(CdbResponseSlot.class));
 
     verifyNoMoreInteractions(builder);
   }
 
   @Test
   public void enrichBid_GivenDfpBuilderAndBannerBidAvailable_EnrichBuilder() throws Exception {
-    BannerAdUnit adUnit = new BannerAdUnit("adUnit", new AdSize(42, 1337));
-
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
     when(slot.isNative()).thenReturn(false);
     when(slot.getCpm()).thenReturn("0.10");
@@ -141,7 +138,7 @@ public class DfpHeaderBiddingTest {
     when(slot.getHeight()).thenReturn(1337);
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-    headerBidding.enrichBid(builder, adUnit, slot);
+    headerBidding.enrichBid(builder, CRITEO_BANNER, slot);
     PublisherAdRequest request = builder.build();
     Bundle customTargeting = request.getCustomTargeting();
 
@@ -200,8 +197,6 @@ public class DfpHeaderBiddingTest {
   }
 
   private void enrichBid_GivenInterstitialBidAvailable_EnrichBuilder(int slotWidth, int slotHeight, String expectedInjectedSize) {
-    InterstitialAdUnit adUnit = new InterstitialAdUnit("adUnit");
-
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
     when(slot.isNative()).thenReturn(false);
     when(slot.getCpm()).thenReturn("0.10");
@@ -210,7 +205,7 @@ public class DfpHeaderBiddingTest {
     when(slot.getHeight()).thenReturn(slotHeight);
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-    headerBidding.enrichBid(builder, adUnit, slot);
+    headerBidding.enrichBid(builder, CRITEO_INTERSTITIAL, slot);
     PublisherAdRequest request = builder.build();
     Bundle customTargeting = request.getCustomTargeting();
 
@@ -222,8 +217,6 @@ public class DfpHeaderBiddingTest {
 
   @Test
   public void enrichBid_GivenDfpBuilderAndNativeBidAvailable_EnrichBuilder() throws Exception {
-    BannerAdUnit adUnit = new BannerAdUnit("adUnit", new AdSize(1, 2));
-
     NativeProduct product = mock(NativeProduct.class);
     when(product.getTitle()).thenReturn("title");
     when(product.getDescription()).thenReturn("description");
@@ -251,7 +244,7 @@ public class DfpHeaderBiddingTest {
     when(slot.getNativeAssets()).thenReturn(nativeAssets);
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-    headerBidding.enrichBid(builder, adUnit, slot);
+    headerBidding.enrichBid(builder, CRITEO_CUSTOM_NATIVE, slot);
     PublisherAdRequest request = builder.build();
     Bundle customTargeting = request.getCustomTargeting();
 

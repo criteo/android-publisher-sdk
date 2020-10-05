@@ -46,7 +46,7 @@ public class HeaderBidding {
   }
 
   public void enrichBid(@Nullable Object object, @Nullable AdUnit adUnit) {
-    if (object == null) {
+    if (object == null || adUnit == null) {
       return;
     }
 
@@ -61,7 +61,7 @@ public class HeaderBidding {
           return;
         }
 
-        handler.enrichBid(object, adUnit, slot);
+        handler.enrichBid(object, adUnit.getAdUnitType(), slot);
         return;
       }
     }

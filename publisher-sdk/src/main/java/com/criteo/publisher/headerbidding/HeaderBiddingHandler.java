@@ -17,10 +17,9 @@
 package com.criteo.publisher.headerbidding;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import com.criteo.publisher.integration.Integration;
-import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
+import com.criteo.publisher.util.AdUnitType;
 
 public interface HeaderBiddingHandler {
 
@@ -44,12 +43,10 @@ public interface HeaderBiddingHandler {
   /**
    * Remove previous state that may have been stored in the object.
    * <p>
-   * This cancels any modification done by a {@link #enrichBid(Object, AdUnit, CdbResponseSlot)}
-   * call.
+   * This cancels any modification done by a {@link #enrichBid(Object, AdUnitType, CdbResponseSlot)} call.
    * <p>
-   * This method is only called on {@linkplain #canHandle(Object) handled objects}. If there is a
-   * bid, but also if there is no bid to avoid having a third-party considering that Criteo bids
-   * again.
+   * This method is only called on {@linkplain #canHandle(Object) handled objects}. If there is a bid, but also if there
+   * is no bid to avoid having a third-party considering that Criteo bids again.
    *
    * @param object bid object to clean
    */
@@ -59,10 +56,9 @@ public interface HeaderBiddingHandler {
    * Enrich the given bid object with a bid for the given ad unit.
    * <p>
    * This method is only called on {@linkplain #canHandle(Object) handled objects}.
-   *
-   * @param object bid object to fill
-   * @param adUnit ad unit representing the requested bid
+   *  @param object bid object to fill
+   * @param adUnitType ad unit representing the requested bid
    * @param slot bid to use
    */
-  void enrichBid(@NonNull Object object, @Nullable AdUnit adUnit, @NonNull CdbResponseSlot slot);
+  void enrichBid(@NonNull Object object, @NonNull AdUnitType adUnitType, @NonNull CdbResponseSlot slot);
 }

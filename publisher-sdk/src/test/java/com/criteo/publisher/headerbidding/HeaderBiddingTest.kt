@@ -21,7 +21,16 @@ import com.criteo.publisher.integration.Integration
 import com.criteo.publisher.integration.IntegrationRegistry
 import com.criteo.publisher.model.AdUnit
 import com.criteo.publisher.model.CdbResponseSlot
-import com.nhaarman.mockitokotlin2.*
+import com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.anyOrNull
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.stub
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
+import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -74,7 +83,9 @@ class HeaderBiddingTest {
   @Test
   fun enrichBid_GivenManyHandlerAndBid_EnrichWithFirstAcceptingHandler() {
     val obj = mock<Any>()
-    val adUnit = mock<AdUnit>()
+    val adUnit = mock<AdUnit>() {
+      on { adUnitType } doReturn CRITEO_CUSTOM_NATIVE
+    }
     val slot = mock<CdbResponseSlot>()
     val handler1 = givenHandler(obj, false)
     val handler2 = givenHandler(obj, true, Integration.IN_HOUSE)
@@ -95,7 +106,7 @@ class HeaderBiddingTest {
     verify(handler1, never()).cleanPreviousBid(any())
     verify(handler1, never()).enrichBid(any(), anyOrNull(), any())
     verify(handler2).cleanPreviousBid(obj)
-    verify(handler2).enrichBid(obj, adUnit, slot)
+    verify(handler2).enrichBid(obj, CRITEO_CUSTOM_NATIVE, slot)
     verify(handler3, never()).cleanPreviousBid(any())
     verify(handler3, never()).enrichBid(any(), anyOrNull(), any())
     verify(integrationRegistry).declare(Integration.IN_HOUSE)
@@ -112,5 +123,4 @@ class HeaderBiddingTest {
       on { this.integration } doReturn integration
     }
   }
-
 }

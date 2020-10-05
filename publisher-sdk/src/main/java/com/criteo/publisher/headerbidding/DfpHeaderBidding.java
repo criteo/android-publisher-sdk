@@ -24,12 +24,10 @@ import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
-import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
-import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeProduct;
+import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.Base64;
 import com.criteo.publisher.util.DeviceUtil;
@@ -101,7 +99,7 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
   @Override
   public void enrichBid(
       @NonNull Object object,
-      @Nullable AdUnit adUnit,
+      @NonNull AdUnitType adUnitType,
       @NonNull CdbResponseSlot slot
   ) {
     if (!canHandle(object)) {
@@ -111,14 +109,18 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
     SafeDfpBuilder builder = new SafeDfpBuilder((Builder) object);
     builder.addCustomTargeting(CRT_CPM, slot.getCpm());
 
-    if (slot.isNative()) {
-      enrichNativeRequest(builder, slot);
-    } else if (adUnit instanceof BannerAdUnit) {
-      checkAndReflect(builder, slot.getDisplayUrl(), CRT_DISPLAY_URL);
-      builder.addCustomTargeting(CRT_SIZE, slot.getWidth() + "x" + slot.getHeight());
-    } else if (adUnit instanceof InterstitialAdUnit) {
-      checkAndReflect(builder, slot.getDisplayUrl(), CRT_DISPLAY_URL);
-      builder.addCustomTargeting(CRT_SIZE, getDfpSizeForInterstitial(slot));
+    switch (adUnitType) {
+      case CRITEO_BANNER:
+        checkAndReflect(builder, slot.getDisplayUrl(), CRT_DISPLAY_URL);
+        builder.addCustomTargeting(CRT_SIZE, slot.getWidth() + "x" + slot.getHeight());
+        break;
+      case CRITEO_INTERSTITIAL:
+        checkAndReflect(builder, slot.getDisplayUrl(), CRT_DISPLAY_URL);
+        builder.addCustomTargeting(CRT_SIZE, getDfpSizeForInterstitial(slot));
+        break;
+      case CRITEO_CUSTOM_NATIVE:
+        enrichNativeRequest(builder, slot);
+        break;
     }
   }
 
