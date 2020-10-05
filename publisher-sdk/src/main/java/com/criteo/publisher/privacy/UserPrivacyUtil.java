@@ -16,8 +16,10 @@
 
 package com.criteo.publisher.privacy;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -53,27 +55,27 @@ public class UserPrivacyUtil {
   @VisibleForTesting
   static final String MOPUB_CONSENT_SHARED_PREFS_KEY = "MoPubConsent_String";
 
-  @NonNull
   private final SafeSharedPreferences safeSharedPreferences;
 
-  @NonNull
   private final SharedPreferences sharedPreferences;
 
-  @NonNull
   private final GdprDataFetcher gdprDataFetcher;
 
-  @NonNull
-  private final Tcf2CsmGuard csmGuard;
+  public UserPrivacyUtil(@NonNull Context context) {
+    this(
+        PreferenceManager.getDefaultSharedPreferences(context),
+        new GdprDataFetcher(context)
+    );
+  }
 
-  public UserPrivacyUtil(
+  @VisibleForTesting
+  UserPrivacyUtil(
       @NonNull SharedPreferences sharedPreferences,
-      @NonNull GdprDataFetcher gdprDataFetcher,
-      @NonNull Tcf2CsmGuard csmGuard
+      @NonNull GdprDataFetcher gdprDataFetcher
   ) {
     this.sharedPreferences = sharedPreferences;
     this.safeSharedPreferences = new SafeSharedPreferences(sharedPreferences);
     this.gdprDataFetcher = gdprDataFetcher;
-    this.csmGuard = csmGuard;
   }
 
   @Nullable
@@ -145,12 +147,5 @@ public class UserPrivacyUtil {
   @NonNull
   public String getMopubConsent() {
     return safeSharedPreferences.getString(MOPUB_CONSENT_SHARED_PREFS_KEY, "");
-  }
-
-  /**
-   * Indicate if user didn't give its consent for CSM when applicable.
-   */
-  public boolean isCsmDisallowed() {
-    return csmGuard.isCsmDisallowed();
   }
 }

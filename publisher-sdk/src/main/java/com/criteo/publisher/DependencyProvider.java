@@ -22,7 +22,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build.VERSION_CODES;
-import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -75,10 +74,7 @@ import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.network.BidRequestSender;
 import com.criteo.publisher.network.LiveBidRequestSender;
 import com.criteo.publisher.network.PubSdkApi;
-import com.criteo.publisher.privacy.Tcf2CsmGuard;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
-import com.criteo.publisher.privacy.gdpr.GdprDataFetcher;
-import com.criteo.publisher.privacy.gdpr.TcfStrategyResolver;
 import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.BuildConfigWrapper;
@@ -86,7 +82,6 @@ import com.criteo.publisher.util.CustomAdapterFactory;
 import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.util.JsonSerializer;
 import com.criteo.publisher.util.MapUtilKt;
-import com.criteo.publisher.util.SafeSharedPreferences;
 import com.criteo.publisher.util.TextUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -279,28 +274,13 @@ public class DependencyProvider {
 
   @NonNull
   public UserPrivacyUtil provideUserPrivacyUtil() {
-    return getOrCreate(
-        UserPrivacyUtil.class,
-        () -> new UserPrivacyUtil(
-            getDefaultSharedPreferences(provideContext()),
-            new GdprDataFetcher(provideTcfStrategyResolver()),
-            new Tcf2CsmGuard(new SafeSharedPreferences(getDefaultSharedPreferences(provideContext())))
-        )
-    );
-  }
-
-  @NonNull
-  public TcfStrategyResolver provideTcfStrategyResolver() {
-    return getOrCreate(
-        TcfStrategyResolver.class,
-        () -> new TcfStrategyResolver(
-            new SafeSharedPreferences(getDefaultSharedPreferences(provideContext()))
-        )
-    );
-  }
-
-  private SharedPreferences getDefaultSharedPreferences(@NonNull Context context) {
-    return PreferenceManager.getDefaultSharedPreferences(context);
+    return getOrCreate(UserPrivacyUtil.class, new Factory<UserPrivacyUtil>() {
+      @NonNull
+      @Override
+      public UserPrivacyUtil create() {
+        return new UserPrivacyUtil(provideContext());
+      }
+    });
   }
 
   @NonNull
@@ -485,7 +465,6 @@ public class DependencyProvider {
               new MetricSendingQueueProducer(provideMetricSendingQueue()),
               provideClock(),
               provideConfig(),
-              provideUserPrivacyUtil(),
               provideThreadPoolExecutor()
           ));
         }
