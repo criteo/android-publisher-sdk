@@ -16,10 +16,9 @@
 
 package com.criteo.publisher.headerbidding
 
-import com.criteo.publisher.BidManager
+import com.criteo.publisher.Bid
 import com.criteo.publisher.integration.Integration
 import com.criteo.publisher.integration.IntegrationRegistry
-import com.criteo.publisher.model.AdUnit
 import com.criteo.publisher.model.CdbResponseSlot
 import com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE
 import com.nhaarman.mockitokotlin2.any
@@ -27,7 +26,6 @@ import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.stub
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
@@ -39,9 +37,6 @@ import org.mockito.MockitoAnnotations
 class HeaderBiddingTest {
 
   @Mock
-  private lateinit var bidManager: BidManager
-
-  @Mock
   private lateinit var integrationRegistry: IntegrationRegistry
 
   @Before
@@ -50,30 +45,44 @@ class HeaderBiddingTest {
   }
 
   @Test
-  fun enrichBid_GivenNullObject_DoNothing() {
+  fun enrichBid_GivenNullAdObject_DoNothing() {
     val handler = mock<HeaderBiddingHandler>()
-    val headerBidding = HeaderBidding(bidManager, listOf(handler), integrationRegistry)
+    val headerBidding = HeaderBidding(listOf(handler), integrationRegistry)
+    val bid = mock<Bid>()
 
-    headerBidding.enrichBid(null, mock())
+    headerBidding.enrichBid(null, bid)
 
-    verifyZeroInteractions(bidManager)
+    verifyZeroInteractions(bid)
     verifyZeroInteractions(handler)
     verifyZeroInteractions(integrationRegistry)
   }
 
   @Test
+  fun enrichBid_GivenHandlerAcceptingObjectNullBid_CleanAdObjectAndReturn() {
+    val adObject = mock<Any>()
+
+    val handler = givenHandler(adObject, true, Integration.STANDALONE)
+    val headerBidding = HeaderBidding(listOf(handler), integrationRegistry)
+
+    headerBidding.enrichBid(adObject, null)
+
+    verify(handler).cleanPreviousBid(adObject)
+    verify(handler, never()).enrichBid(any(), anyOrNull(), any())
+    verify(integrationRegistry).declare(Integration.STANDALONE)
+  }
+
+  @Test
   fun enrichBid_GivenHandlerAcceptingObjectButNoBid_CleanBidAndReturn() {
     val obj = mock<Any>()
-    val adUnit = mock<AdUnit>()
-    val handler = givenHandler(obj, true, Integration.STANDALONE)
-
-    bidManager.stub {
-      on { getBidForAdUnitAndPrefetch(adUnit) } doReturn null
+    val bid = mock<Bid>() {
+      on { consumeSlot() } doReturn null
     }
 
-    val headerBidding = HeaderBidding(bidManager, listOf(handler), integrationRegistry)
+    val handler = givenHandler(obj, true, Integration.STANDALONE)
 
-    headerBidding.enrichBid(obj, adUnit)
+    val headerBidding = HeaderBidding(listOf(handler), integrationRegistry)
+
+    headerBidding.enrichBid(obj, bid)
 
     verify(handler).cleanPreviousBid(obj)
     verify(handler, never()).enrichBid(any(), anyOrNull(), any())
@@ -83,25 +92,21 @@ class HeaderBiddingTest {
   @Test
   fun enrichBid_GivenManyHandlerAndBid_EnrichWithFirstAcceptingHandler() {
     val obj = mock<Any>()
-    val adUnit = mock<AdUnit>() {
-      on { adUnitType } doReturn CRITEO_CUSTOM_NATIVE
-    }
     val slot = mock<CdbResponseSlot>()
+    val bid = mock<Bid>() {
+      on { adUnitType } doReturn CRITEO_CUSTOM_NATIVE
+      on { consumeSlot() } doReturn slot
+    }
     val handler1 = givenHandler(obj, false)
     val handler2 = givenHandler(obj, true, Integration.IN_HOUSE)
     val handler3 = givenHandler(obj, true, Integration.STANDALONE)
 
-    bidManager.stub {
-      on { getBidForAdUnitAndPrefetch(adUnit) } doReturn slot
-    }
-
     val headerBidding = HeaderBidding(
-        bidManager,
         listOf(handler1, handler2, handler3),
         integrationRegistry
     )
 
-    headerBidding.enrichBid(obj, adUnit)
+    headerBidding.enrichBid(obj, bid)
 
     verify(handler1, never()).cleanPreviousBid(any())
     verify(handler1, never()).enrichBid(any(), anyOrNull(), any())

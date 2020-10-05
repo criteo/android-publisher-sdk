@@ -678,7 +678,6 @@ public class DependencyProvider {
       @Override
       public HeaderBidding create() {
         return new HeaderBidding(
-            provideBidManager(),
             asList(
                 new MoPubHeaderBidding(),
                 new DfpHeaderBidding(provideAndroidUtil(), provideDeviceUtil()),

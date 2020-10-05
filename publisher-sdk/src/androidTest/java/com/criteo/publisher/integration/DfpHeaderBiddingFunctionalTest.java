@@ -160,7 +160,10 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
+    Criteo.getInstance().loadBid(
+        adUnit,
+        bid -> Criteo.getInstance().setBidsForAdUnit(builder, bid)
+    );
     waitForBids();
 
     assertCriteoMacroAreInjectedInDfpBuilder(builder);
@@ -179,7 +182,10 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().setBidsForAdUnit(builder, validNativeAdUnit);
+    Criteo.getInstance().loadBid(
+        validNativeAdUnit,
+        bid -> Criteo.getInstance().setBidsForAdUnit(builder, bid)
+    );
     waitForBids();
 
     Bundle customTargeting = builder.build().getCustomTargeting();
@@ -240,7 +246,10 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
+    Criteo.getInstance().loadBid(
+        adUnit,
+        bid -> Criteo.getInstance().setBidsForAdUnit(builder, bid)
+    );
 
     Bundle customTargeting = builder.build().getCustomTargeting();
 
@@ -289,7 +298,10 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
+    Criteo.getInstance().loadBid(
+        adUnit,
+        bid -> Criteo.getInstance().setBidsForAdUnit(builder, bid)
+    );
 
     assertCriteoMacroAreInjectedInDfpBuilder(builder);
 
@@ -320,7 +332,10 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
+    Criteo.getInstance().loadBid(
+        adUnit,
+        bid -> Criteo.getInstance().setBidsForAdUnit(builder, bid)
+    );
 
     String encodedDisplayUrl = builder.build().getCustomTargeting().getString(MACRO_DISPLAY_URL);
     String decodedDisplayUrl = decodeDfpPayloadComponent(encodedDisplayUrl);
@@ -339,17 +354,27 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().setBidsForAdUnit(builder, validNativeAdUnit);
+    Criteo.getInstance().loadBid(
+        validNativeAdUnit,
+        bid -> Criteo.getInstance().setBidsForAdUnit(builder, bid)
+    );
 
     Bundle bundle = builder.build().getCustomTargeting();
 
-    assertEquals(expectedProduct.getTitle(),
-        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_TITLE)));
-    assertEquals(expectedProduct.getDescription(),
-        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_DESCRIPTION)));
-    assertEquals(expectedProduct.getImageUrl().toString(),
-        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_IMAGE)));
-    assertEquals(expectedProduct.getPrice(),
+    assertEquals(
+        expectedProduct.getTitle(),
+        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_TITLE))
+    );
+    assertEquals(
+        expectedProduct.getDescription(),
+        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_DESCRIPTION))
+    );
+    assertEquals(
+        expectedProduct.getImageUrl().toString(),
+        decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_IMAGE))
+    );
+    assertEquals(
+        expectedProduct.getPrice(),
         decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_PRICE)));
     assertEquals(expectedProduct.getClickUrl().toString(),
         decodeDfpPayloadComponent(bundle.getString(MACRO_NATIVE_CLICK)));
@@ -517,7 +542,10 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
+    Criteo.getInstance().loadBid(
+        adUnit,
+        bid -> Criteo.getInstance().setBidsForAdUnit(builder, bid)
+    );
 
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
     PublisherAdRequest request = builder.build();
@@ -536,7 +564,10 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().setBidsForAdUnit(builder, adUnit);
+    Criteo.getInstance().loadBid(
+        adUnit,
+        bid -> Criteo.getInstance().setBidsForAdUnit(builder, bid)
+    );
 
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
     PublisherAdRequest request = builder.build();

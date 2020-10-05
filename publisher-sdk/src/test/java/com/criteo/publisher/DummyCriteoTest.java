@@ -51,15 +51,7 @@ public class DummyCriteoTest {
     }).doesNotThrowAnyException();
 
     assertThatCode(() -> {
-      criteo.setBidsForAdUnit(new HashMap<>(), banner);
-    }).doesNotThrowAnyException();
-
-    assertThatCode(() -> {
-      criteo.setBidsForAdUnit(new HashMap<>(), interstitial);
-    }).doesNotThrowAnyException();
-
-    assertThatCode(() -> {
-      criteo.setBidsForAdUnit(new HashMap<>(), aNative);
+      criteo.setBidsForAdUnit(new HashMap<>(), mock(Bid.class));
     }).doesNotThrowAnyException();
   }
 

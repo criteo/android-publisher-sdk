@@ -21,10 +21,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.criteo.publisher.Bid;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
-import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.util.DeviceUtil;
 import org.junit.Before;
@@ -39,7 +39,7 @@ public class HeaderBiddingDegradedTest {
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
   @Mock
-  private AdUnit adUnit;
+  private Bid bid;
 
   @Mock
   private PubSdkApi api;
@@ -62,17 +62,18 @@ public class HeaderBiddingDegradedTest {
   public void whenSettingABids_ShouldNotDoAnyCallToCdb() throws Exception {
     Object builder = mock(Object.class);
 
-    criteo.setBidsForAdUnit(builder, adUnit);
+    criteo.setBidsForAdUnit(builder, bid);
     waitForIdleState();
 
     verifyNoInteractions(api);
+    verifyNoInteractions(bid);
   }
 
   @Test
   public void whenSettingABids_ShouldNotEnrichGivenBuilder() throws Exception {
     Object builder = mock(Object.class);
 
-    criteo.setBidsForAdUnit(builder, adUnit);
+    criteo.setBidsForAdUnit(builder, bid);
     waitForIdleState();
 
     verifyNoInteractions(builder);
