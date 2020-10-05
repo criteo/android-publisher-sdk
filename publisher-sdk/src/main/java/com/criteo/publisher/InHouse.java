@@ -37,7 +37,7 @@ public class InHouse {
     this.clock = clock;
   }
 
-  public void loadBidResponse(
+  public void loadBid(
       @NonNull AdUnit adUnit,
       @NonNull BidResponseListener bidResponseListener
   ) {

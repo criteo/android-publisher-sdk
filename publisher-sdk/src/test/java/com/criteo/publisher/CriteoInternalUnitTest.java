@@ -230,7 +230,7 @@ public class CriteoInternalUnitTest {
     InHouse inHouse = givenMockedInHouse();
     doAnswer(invocation -> {
       throw new RuntimeException();
-    }).when(inHouse).loadBidResponse(adUnit, listener);
+    }).when(inHouse).loadBid(adUnit, listener);
 
     Criteo criteo = createCriteo();
     criteo.loadBid(adUnit, listener);
@@ -248,7 +248,7 @@ public class CriteoInternalUnitTest {
     doAnswer(invocation -> {
       invocation.<BidResponseListener>getArgument(1).onResponse(expectedBid);
       return null;
-    }).when(inHouse).loadBidResponse(adUnit, listener);
+    }).when(inHouse).loadBid(adUnit, listener);
 
     Criteo criteo = createCriteo();
     criteo.loadBid(adUnit, listener);

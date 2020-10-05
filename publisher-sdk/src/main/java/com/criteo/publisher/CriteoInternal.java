@@ -146,7 +146,7 @@ final class CriteoInternal extends Criteo {
       @NonNull BidResponseListener bidResponseListener
   ) {
     try {
-      inHouse.loadBidResponse(adUnit, bidResponseListener);
+      inHouse.loadBid(adUnit, bidResponseListener);
     } catch (Throwable e) {
       Log.e(TAG, "Internal error while loading bid response.", e);
       bidResponseListener.onResponse(null);
