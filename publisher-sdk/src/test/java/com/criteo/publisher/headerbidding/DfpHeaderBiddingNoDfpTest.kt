@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.headerbidding
 
+import com.criteo.publisher.util.AdUnitType
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import org.assertj.core.api.Assertions.assertThat
@@ -57,9 +58,8 @@ via IntelliJ delegating test run to Gradle.
   fun enrichBid_GivenNoDfpDependency_DoNothing() {
     val builder = mock<Any>()
 
-    headerBidding.enrichBid(builder, mock(), mock())
+    headerBidding.enrichBid(builder, AdUnitType.CRITEO_BANNER, mock())
 
     verifyZeroInteractions(builder)
   }
-
 }

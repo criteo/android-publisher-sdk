@@ -17,11 +17,9 @@
 package com.criteo.publisher.headerbidding;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import com.criteo.publisher.integration.Integration;
-import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
+import com.criteo.publisher.util.AdUnitType;
 import java.util.Map;
 
 public class OtherAdServersHeaderBidding implements HeaderBiddingHandler {
@@ -58,7 +56,7 @@ public class OtherAdServersHeaderBidding implements HeaderBiddingHandler {
   @SuppressWarnings({"unchecked", "rawtypes"})
   public void enrichBid(
       @NonNull Object object,
-      @Nullable AdUnit adUnit,
+      @NonNull AdUnitType adUnitType,
       @NonNull CdbResponseSlot slot
   ) {
     if (!canHandle(object)) {
@@ -69,7 +67,7 @@ public class OtherAdServersHeaderBidding implements HeaderBiddingHandler {
     map.put(CRT_DISPLAY_URL, slot.getDisplayUrl());
     map.put(CRT_CPM, slot.getCpm());
 
-    if (adUnit instanceof BannerAdUnit) {
+    if (adUnitType == AdUnitType.CRITEO_BANNER) {
       map.put(CRT_SIZE, slot.getWidth() + "x" + slot.getHeight());
     }
   }

@@ -17,10 +17,9 @@
 package com.criteo.publisher.headerbidding
 
 import com.criteo.publisher.integration.Integration
-import com.criteo.publisher.model.AdSize
-import com.criteo.publisher.model.BannerAdUnit
 import com.criteo.publisher.model.CdbResponseSlot
-import com.criteo.publisher.model.InterstitialAdUnit
+import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
+import com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
@@ -95,15 +94,13 @@ class OtherAdServersHeaderBiddingTest {
   fun enrichBid_GivenNotHandledObject_DoNothing() {
     val builder = mock<Any>()
 
-    headerBidding.enrichBid(builder, mock(), mock())
+    headerBidding.enrichBid(builder, CRITEO_BANNER, mock())
 
     verifyZeroInteractions(builder)
   }
 
   @Test
   fun enrichBid_GivenMapAndBannerBidAvailable_EnrichMap() {
-    val adUnit = BannerAdUnit("adUnit", AdSize(42, 1337))
-
     val slot = mock<CdbResponseSlot>() {
       on { isNative } doReturn false
       on { cpm } doReturn "0.10"
@@ -115,7 +112,7 @@ class OtherAdServersHeaderBiddingTest {
     val map = mutableMapOf<Any, Any>()
     map["garbage"] = "should stay"
 
-    headerBidding.enrichBid(map, adUnit, slot)
+    headerBidding.enrichBid(map, CRITEO_BANNER, slot)
 
     assertThat(map).isEqualTo(mapOf<Any, Any>(
         "garbage" to "should stay",
@@ -127,8 +124,6 @@ class OtherAdServersHeaderBiddingTest {
 
   @Test
   fun enrichBid_GivenMapAndInterstitialBidAvailable_EnrichMap() {
-    val adUnit = InterstitialAdUnit("adUnit")
-
     val slot = mock<CdbResponseSlot>() {
       on { isNative } doReturn false
       on { cpm } doReturn "0.10"
@@ -138,7 +133,7 @@ class OtherAdServersHeaderBiddingTest {
     val map = mutableMapOf<Any, Any>()
     map["garbage"] = "should stay"
 
-    headerBidding.enrichBid(map, adUnit, slot)
+    headerBidding.enrichBid(map, CRITEO_INTERSTITIAL, slot)
 
     assertThat(map).isEqualTo(mapOf<Any, Any>(
         "garbage" to "should stay",
@@ -146,5 +141,4 @@ class OtherAdServersHeaderBiddingTest {
         CRT_DISPLAY_URL to "http://display.url"
     ))
   }
-
 }

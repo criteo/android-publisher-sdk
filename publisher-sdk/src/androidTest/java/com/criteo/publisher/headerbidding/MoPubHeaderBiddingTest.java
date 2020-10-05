@@ -17,6 +17,8 @@
 package com.criteo.publisher.headerbidding;
 
 import static com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -27,11 +29,7 @@ import static org.mockito.Mockito.when;
 
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.integration.Integration;
-import com.criteo.publisher.model.AdSize;
-import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
-import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.mopub.mobileads.MoPubInterstitial;
 import com.mopub.mobileads.MoPubView;
@@ -208,15 +206,13 @@ public class MoPubHeaderBiddingTest {
   public void enrichBid_GivenNotHandledObject_DoNothing() throws Exception {
     Object builder = mock(Object.class);
 
-    headerBidding.enrichBid(builder, mock(AdUnit.class), mock(CdbResponseSlot.class));
+    headerBidding.enrichBid(builder, CRITEO_BANNER, mock(CdbResponseSlot.class));
 
     verifyNoMoreInteractions(builder);
   }
 
   @Test
   public void enrichBid_GivenMoPubViewAndBannerBidAvailable_EnrichBuilder() throws Exception {
-    AdUnit adUnit = new BannerAdUnit("adUnit", new AdSize(42, 1337));
-
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
     when(slot.getCpm()).thenReturn("0.10");
     when(slot.getDisplayUrl()).thenReturn("http://display.url");
@@ -225,7 +221,7 @@ public class MoPubHeaderBiddingTest {
 
     MoPubView moPub = givenMoPubView();
     moPub.setKeywords("previousData");
-    headerBidding.enrichBid(moPub, adUnit, slot);
+    headerBidding.enrichBid(moPub, CRITEO_BANNER, slot);
     String keywords = moPub.getKeywords();
 
     assertEquals("previousData,crt_cpm:0.10,crt_displayUrl:http://display.url,crt_size:42x1337", keywords);
@@ -233,15 +229,13 @@ public class MoPubHeaderBiddingTest {
 
   @Test
   public void enrichBid_GivenMoPubInterstitialAndInterstitialBidAvailable_EnrichBuilder() throws Exception {
-    AdUnit adUnit = new InterstitialAdUnit("adUnit");
-
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
     when(slot.getCpm()).thenReturn("0.10");
     when(slot.getDisplayUrl()).thenReturn("http://display.url");
 
     MoPubInterstitial moPub = givenMoPubInterstitial();
     moPub.setKeywords("previousData");
-    headerBidding.enrichBid(moPub, adUnit, slot);
+    headerBidding.enrichBid(moPub, CRITEO_INTERSTITIAL, slot);
     String keywords = moPub.getKeywords();
 
     assertEquals("previousData,crt_cpm:0.10,crt_displayUrl:http://display.url", keywords);
