@@ -53,7 +53,7 @@ final class CriteoInternal extends Criteo {
   private final UserPrivacyUtil userPrivacyUtil;
 
   @NonNull
-  private final InHouse inHouse;
+  private final ConsumableBidLoader consumableBidLoader;
 
   @NonNull
   private final HeaderBidding headerBidding;
@@ -81,7 +81,7 @@ final class CriteoInternal extends Criteo {
     config = dependencyProvider.provideConfig();
 
     bidManager = dependencyProvider.provideBidManager();
-    inHouse = dependencyProvider.provideInHouse();
+    consumableBidLoader = dependencyProvider.provideConsumableBidLoader();
     headerBidding = dependencyProvider.provideHeaderBidding();
 
     interstitialActivityHelper = dependencyProvider.provideInterstitialActivityHelper();
@@ -146,7 +146,7 @@ final class CriteoInternal extends Criteo {
       @NonNull BidResponseListener bidResponseListener
   ) {
     try {
-      inHouse.loadBid(adUnit, bidResponseListener);
+      consumableBidLoader.loadBid(adUnit, bidResponseListener);
     } catch (Throwable e) {
       Log.e(TAG, "Internal error while loading bid response.", e);
       bidResponseListener.onResponse(null);

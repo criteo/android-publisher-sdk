@@ -32,7 +32,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class InHouseTest {
+public class ConsumableBidLoaderTest {
 
   @Mock
   private BidManager bidManager;
@@ -43,13 +43,13 @@ public class InHouseTest {
   @Mock
   private BidResponseListener listener;
 
-  private InHouse inHouse;
+  private ConsumableBidLoader consumableBidLoader;
 
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    inHouse = new InHouse(
+    consumableBidLoader = new ConsumableBidLoader(
         bidManager,
         clock
     );
@@ -64,7 +64,7 @@ public class InHouseTest {
       return null;
     }).when(bidManager).getBidForAdUnit(eq(adUnit), any());
 
-    inHouse.loadBid(adUnit, listener);
+    consumableBidLoader.loadBid(adUnit, listener);
 
     verify(listener).onResponse(null);
   }
@@ -81,7 +81,7 @@ public class InHouseTest {
       return null;
     }).when(bidManager).getBidForAdUnit(eq(adUnit), any());
 
-    inHouse.loadBid(adUnit, listener);
+    consumableBidLoader.loadBid(adUnit, listener);
 
     verify(listener).onResponse(argThat(bidResponse -> {
       assertThat(bidResponse.getPrice()).isEqualTo(42.1337);

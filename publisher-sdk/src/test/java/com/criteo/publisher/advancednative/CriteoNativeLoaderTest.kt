@@ -18,8 +18,8 @@ package com.criteo.publisher.advancednative
 
 import com.criteo.publisher.BidListener
 import com.criteo.publisher.BidManager
+import com.criteo.publisher.ConsumableBidLoader
 import com.criteo.publisher.CriteoErrorCode
-import com.criteo.publisher.InHouse
 import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor
 import com.criteo.publisher.integration.Integration
 import com.criteo.publisher.integration.IntegrationRegistry
@@ -72,7 +72,7 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
   private lateinit var config: Config
 
   @SpyBean
-  private lateinit var inHouse: InHouse
+  private lateinit var consumableBidLoader: ConsumableBidLoader
 
   @SpyBean
   private lateinit var bidManager: BidManager
@@ -135,7 +135,7 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
     expectListenerToBeCalledOnUiThread()
     givenNotANativeBidAvailable()
 
-    inHouse.loadBid(adUnit, nativeLoader::loadAd)
+    consumableBidLoader.loadBid(adUnit, nativeLoader::loadAd)
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
     verifyNoMoreInteractions(listener)
@@ -161,7 +161,7 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
     expectListenerToBeCalledOnUiThread()
     val nativeAd = givenNativeBidAvailable()
 
-    inHouse.loadBid(adUnit, nativeLoader::loadAd)
+    consumableBidLoader.loadBid(adUnit, nativeLoader::loadAd)
 
     verify(listener).onAdReceived(nativeAd)
     verifyNoMoreInteractions(listener)

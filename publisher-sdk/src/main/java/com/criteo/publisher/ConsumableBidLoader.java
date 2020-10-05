@@ -21,7 +21,13 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
 import org.jetbrains.annotations.NotNull;
 
-public class InHouse {
+/**
+ * Component delivering consumable {@linkplain Bid bids} for publishers.
+ *
+ * The bids are "consumable" because they can be used only once to display an Ad. Note that {@link Bid} is not called
+ * <code>ConsumableBid</code> because it is part of the public API.
+ */
+public class ConsumableBidLoader {
 
   @NonNull
   private final BidManager bidManager;
@@ -29,7 +35,7 @@ public class InHouse {
   @NonNull
   private final Clock clock;
 
-  public InHouse(
+  public ConsumableBidLoader(
       @NonNull BidManager bidManager,
       @NonNull Clock clock
   ) {

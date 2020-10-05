@@ -658,12 +658,12 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public InHouse provideInHouse() {
-    return getOrCreate(InHouse.class, new Factory<InHouse>() {
+  public ConsumableBidLoader provideConsumableBidLoader() {
+    return getOrCreate(ConsumableBidLoader.class, new Factory<ConsumableBidLoader>() {
       @NonNull
       @Override
-      public InHouse create() {
-        return new InHouse(
+      public ConsumableBidLoader create() {
+        return new ConsumableBidLoader(
             provideBidManager(),
             provideClock()
         );
