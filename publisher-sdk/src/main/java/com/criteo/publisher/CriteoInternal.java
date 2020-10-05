@@ -119,21 +119,20 @@ final class CriteoInternal extends Criteo {
   }
 
   @Override
-  public void setBidsForAdUnit(Object object, @NonNull AdUnit adUnit) {
+  public void setBidsForAdUnit(Object object, @Nullable Bid bid) {
     try {
-      doSetBidsForAdUnit(object, adUnit);
+      doSetBidsForAdUnit(object, bid);
     } catch (Throwable e) {
       Log.e(TAG, "Internal error while setting bids for adUnit.", e);
     }
   }
 
-  private void doSetBidsForAdUnit(Object object, AdUnit adUnit) {
-    headerBidding.enrichBid(object, adUnit);
+  private void doSetBidsForAdUnit(Object object, @Nullable Bid bid) {
+    headerBidding.enrichBid(object, bid);
   }
 
   /**
-   * Method to start new CdbDownload Asynctask
-   * [Standalone only]
+   * Method to start new CdbDownload Asynctask [Standalone only]
    */
   @Override
   void getBidForAdUnit(AdUnit adUnit, @NonNull BidListener bidListener) {

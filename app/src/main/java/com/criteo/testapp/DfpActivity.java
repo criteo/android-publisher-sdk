@@ -52,12 +52,15 @@ public class DfpActivity extends AppCompatActivity {
   public static final NativeAdUnit NATIVE = new NativeAdUnit(NATIVE_AD_UNIT_ID);
 
   private LinearLayout linearLayout;
+  private Criteo criteo;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_dfp);
     MockedIntegrationRegistry.force(Integration.GAM_APP_BIDDING);
+
+    criteo = Criteo.getInstance();
 
     linearLayout = findViewById(R.id.adViewHolder);
     findViewById(R.id.buttonBanner).setOnClickListener((View v) -> {
@@ -80,7 +83,7 @@ public class DfpActivity extends AppCompatActivity {
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-    Criteo.getInstance().setBidsForAdUnit(builder, NATIVE);
+    criteo.loadBid(NATIVE, bid -> criteo.setBidsForAdUnit(builder, bid));
     PublisherAdRequest request = builder.build();
     publisherAdView.loadAd(request);
     linearLayout.addView(publisherAdView);
@@ -95,7 +98,7 @@ public class DfpActivity extends AppCompatActivity {
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-    Criteo.getInstance().setBidsForAdUnit(builder, BANNER);
+    criteo.loadBid(BANNER, bid -> criteo.setBidsForAdUnit(builder, bid));
     PublisherAdRequest request = builder.build();
     publisherAdView.loadAd(request);
     linearLayout.addView(publisherAdView);
@@ -119,7 +122,7 @@ public class DfpActivity extends AppCompatActivity {
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-    Criteo.getInstance().setBidsForAdUnit(builder, INTERSTITIAL);
+    criteo.loadBid(INTERSTITIAL, bid -> criteo.setBidsForAdUnit(builder, bid));
     PublisherAdRequest request = builder.build();
     mPublisherInterstitialAd.loadAd(request);
   }

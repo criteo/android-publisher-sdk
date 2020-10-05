@@ -56,6 +56,16 @@ public class Bid {
     return price;
   }
 
+  @NonNull
+  public AdUnitType getAdUnitType() {
+    return adUnitType;
+  }
+
+  @Nullable
+  public CdbResponseSlot consumeSlot() {
+    return consume(slot -> slot);
+  }
+
   @Nullable
   @Internal(IN_HOUSE)
   public String consumeDisplayUrlFor(@NonNull AdUnitType adUnitType) {

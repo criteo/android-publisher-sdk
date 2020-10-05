@@ -143,7 +143,10 @@ public class MoPubHeaderBiddingFunctionalTest {
     MoPubView moPubView = createMoPubView();
     moPubView.setKeywords("old keywords");
 
-    Criteo.getInstance().setBidsForAdUnit(moPubView, invalidBannerAdUnit);
+    Criteo.getInstance().loadBid(
+        invalidBannerAdUnit,
+        bid -> Criteo.getInstance().setBidsForAdUnit(moPubView, bid)
+    );
 
     assertEquals("old keywords", moPubView.getKeywords());
   }
@@ -157,7 +160,10 @@ public class MoPubHeaderBiddingFunctionalTest {
     MoPubInterstitial moPubInterstitial = createMoPubInterstitial();
     moPubInterstitial.setKeywords("old keywords");
 
-    Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, invalidInterstitialAdUnit);
+    Criteo.getInstance().loadBid(
+        invalidBannerAdUnit,
+        bid -> Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, bid)
+    );
 
     Assert.assertEquals("old keywords", moPubInterstitial.getKeywords());
   }
@@ -184,7 +190,10 @@ public class MoPubHeaderBiddingFunctionalTest {
 
     MoPubView moPubView = createMoPubView();
 
-    Criteo.getInstance().setBidsForAdUnit(moPubView, adUnit);
+    Criteo.getInstance().loadBid(
+        adUnit,
+        bid -> Criteo.getInstance().setBidsForAdUnit(moPubView, bid)
+    );
     waitForBids();
 
     assertCriteoKeywordsAreInjectedInMoPubView(moPubView.getKeywords(), adUnit);
@@ -218,7 +227,10 @@ public class MoPubHeaderBiddingFunctionalTest {
 
     MoPubInterstitial moPubInterstitial = createMoPubInterstitial();
 
-    Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, interstitialAdUnit);
+    Criteo.getInstance().loadBid(
+        interstitialAdUnit,
+        bid -> Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, bid)
+    );
     waitForBids();
 
     assertCriteoKeywordsAreInjectedInMoPubView(moPubInterstitial.getKeywords(), interstitialAdUnit);
@@ -313,7 +325,10 @@ public class MoPubHeaderBiddingFunctionalTest {
 
     MoPubView moPubView = createMoPubView();
 
-    Criteo.getInstance().setBidsForAdUnit(moPubView, adUnit);
+    Criteo.getInstance().loadBid(
+        adUnit,
+        bid -> Criteo.getInstance().setBidsForAdUnit(moPubView, bid)
+    );
 
     MoPubSync moPubSync = new MoPubSync(moPubView);
     runOnMainThreadAndWait(moPubView::loadAd);
@@ -330,7 +345,10 @@ public class MoPubHeaderBiddingFunctionalTest {
 
     MoPubInterstitial moPubInterstitial = createMoPubInterstitial();
 
-    Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, adUnit);
+    Criteo.getInstance().loadBid(
+        adUnit,
+        bid -> Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, bid)
+    );
 
     MoPubSync moPubSync = new MoPubSync(moPubInterstitial);
     runOnMainThreadAndWait(moPubInterstitial::load);
