@@ -49,7 +49,7 @@ public class Config {
     private static final String AD_TAG_DATA_MODE = "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>";
     private static final boolean CSM_ENABLED = true;
     private static final boolean LIVE_BIDDING_ENABLED = false;
-    private static final int LIVE_BIDDING_TIME_BUDGET_IN_MILLIS = 5_000;
+    private static final int LIVE_BIDDING_TIME_BUDGET_IN_MILLIS = 8_000;
 
   }
 
