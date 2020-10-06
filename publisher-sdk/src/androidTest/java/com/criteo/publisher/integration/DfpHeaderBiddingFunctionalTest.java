@@ -162,7 +162,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Criteo.getInstance().loadBid(
         adUnit,
-        bid -> Criteo.getInstance().setBidsForAdUnit(builder, bid)
+        bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
     );
     waitForBids();
 
@@ -184,7 +184,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Criteo.getInstance().loadBid(
         validNativeAdUnit,
-        bid -> Criteo.getInstance().setBidsForAdUnit(builder, bid)
+        bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
     );
     waitForBids();
 
@@ -248,7 +248,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Criteo.getInstance().loadBid(
         adUnit,
-        bid -> Criteo.getInstance().setBidsForAdUnit(builder, bid)
+        bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
     );
 
     Bundle customTargeting = builder.build().getCustomTargeting();
@@ -300,7 +300,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Criteo.getInstance().loadBid(
         adUnit,
-        bid -> Criteo.getInstance().setBidsForAdUnit(builder, bid)
+        bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
     );
 
     assertCriteoMacroAreInjectedInDfpBuilder(builder);
@@ -334,7 +334,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Criteo.getInstance().loadBid(
         adUnit,
-        bid -> Criteo.getInstance().setBidsForAdUnit(builder, bid)
+        bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
     );
 
     String encodedDisplayUrl = builder.build().getCustomTargeting().getString(MACRO_DISPLAY_URL);
@@ -356,7 +356,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Criteo.getInstance().loadBid(
         validNativeAdUnit,
-        bid -> Criteo.getInstance().setBidsForAdUnit(builder, bid)
+        bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
     );
 
     Bundle bundle = builder.build().getCustomTargeting();
@@ -544,7 +544,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Criteo.getInstance().loadBid(
         adUnit,
-        bid -> Criteo.getInstance().setBidsForAdUnit(builder, bid)
+        bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
     );
 
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
@@ -566,7 +566,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Criteo.getInstance().loadBid(
         adUnit,
-        bid -> Criteo.getInstance().setBidsForAdUnit(builder, bid)
+        bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
     );
 
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);

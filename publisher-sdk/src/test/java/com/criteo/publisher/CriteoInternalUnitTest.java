@@ -286,7 +286,7 @@ public class CriteoInternalUnitTest {
     CriteoInternal criteo = createCriteo();
 
     assertThatCode(() -> {
-      criteo.setBidsForAdUnit(mock(Object.class), mock(Bid.class));
+      criteo.enrichAdObjectWithBid(mock(Object.class), mock(Bid.class));
     }).doesNotThrowAnyException();
   }
 
@@ -298,7 +298,7 @@ public class CriteoInternalUnitTest {
     Bid bid = mock(Bid.class);
 
     CriteoInternal criteo = createCriteo();
-    criteo.setBidsForAdUnit(object, bid);
+    criteo.enrichAdObjectWithBid(object, bid);
 
     verify(headerBidding).enrichBid(object, bid);
   }

@@ -83,7 +83,7 @@ public class DfpActivity extends AppCompatActivity {
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-    criteo.loadBid(NATIVE, bid -> criteo.setBidsForAdUnit(builder, bid));
+    criteo.loadBid(NATIVE, bid -> criteo.enrichAdObjectWithBid(builder, bid));
     PublisherAdRequest request = builder.build();
     publisherAdView.loadAd(request);
     linearLayout.addView(publisherAdView);
@@ -98,7 +98,7 @@ public class DfpActivity extends AppCompatActivity {
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-    criteo.loadBid(BANNER, bid -> criteo.setBidsForAdUnit(builder, bid));
+    criteo.loadBid(BANNER, bid -> criteo.enrichAdObjectWithBid(builder, bid));
     PublisherAdRequest request = builder.build();
     publisherAdView.loadAd(request);
     linearLayout.addView(publisherAdView);
@@ -122,7 +122,7 @@ public class DfpActivity extends AppCompatActivity {
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-    criteo.loadBid(INTERSTITIAL, bid -> criteo.setBidsForAdUnit(builder, bid));
+    criteo.loadBid(INTERSTITIAL, bid -> criteo.enrichAdObjectWithBid(builder, bid));
     PublisherAdRequest request = builder.build();
     mPublisherInterstitialAd.loadAd(request);
   }

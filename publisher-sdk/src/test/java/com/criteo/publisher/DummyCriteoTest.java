@@ -47,11 +47,11 @@ public class DummyCriteoTest {
   @Test
   public void setBidsForAdUnit_GivenAnyAdUnit_DoNothingAndDoNotThrow() throws Exception {
     assertThatCode(() -> {
-      criteo.setBidsForAdUnit(null, null);
+      criteo.enrichAdObjectWithBid(null, null);
     }).doesNotThrowAnyException();
 
     assertThatCode(() -> {
-      criteo.setBidsForAdUnit(new HashMap<>(), mock(Bid.class));
+      criteo.enrichAdObjectWithBid(new HashMap<>(), mock(Bid.class));
     }).doesNotThrowAnyException();
   }
 

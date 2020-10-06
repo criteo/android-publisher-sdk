@@ -162,7 +162,7 @@ class ProfileIdFunctionalTest {
     bidStandaloneInterstitial()
 
     Criteo.getInstance().loadBid(BANNER_320_480) {
-      Criteo.getInstance().setBidsForAdUnit(mutableMapOf<Any, Any>(), it)
+      Criteo.getInstance().enrichAdObjectWithBid(mutableMapOf<Any, Any>(), it)
     }
     mockedDependenciesRule.waitForIdleState()
 
@@ -283,13 +283,13 @@ class ProfileIdFunctionalTest {
 
     givenInitializedCriteo()
     Criteo.getInstance().loadBid(BANNER_320_480) {
-      Criteo.getInstance().setBidsForAdUnit(mutableMapOf<Any, Any>(), it)
+      Criteo.getInstance().enrichAdObjectWithBid(mutableMapOf<Any, Any>(), it)
     }
     mockedDependenciesRule.waitForIdleState()
 
     // Need 2 bids: AppBidding integration is detected after bid request when enrich method is invoked.
     Criteo.getInstance().loadBid(BANNER_320_480) {
-      Criteo.getInstance().setBidsForAdUnit(mutableMapOf<Any, Any>(), it)
+      Criteo.getInstance().enrichAdObjectWithBid(mutableMapOf<Any, Any>(), it)
     }
     mockedDependenciesRule.waitForIdleState()
 
@@ -302,13 +302,13 @@ class ProfileIdFunctionalTest {
 
     givenInitializedCriteo()
     Criteo.getInstance().loadBid(BANNER_320_480) {
-      Criteo.getInstance().setBidsForAdUnit(PublisherAdRequest.Builder(), it)
+      Criteo.getInstance().enrichAdObjectWithBid(PublisherAdRequest.Builder(), it)
     }
     mockedDependenciesRule.waitForIdleState()
 
     // Need 2 bids: AppBidding integration is detected after bid request when enrich method is invoked.
     Criteo.getInstance().loadBid(BANNER_320_480) {
-      Criteo.getInstance().setBidsForAdUnit(PublisherAdRequest.Builder(), it)
+      Criteo.getInstance().enrichAdObjectWithBid(PublisherAdRequest.Builder(), it)
     }
     mockedDependenciesRule.waitForIdleState()
 
@@ -323,13 +323,13 @@ class ProfileIdFunctionalTest {
     val mopubView = callOnMainThreadAndWait { MoPubView(context) }
 
     Criteo.getInstance().loadBid(BANNER_320_480) {
-      Criteo.getInstance().setBidsForAdUnit(mopubView, it)
+      Criteo.getInstance().enrichAdObjectWithBid(mopubView, it)
     }
     mockedDependenciesRule.waitForIdleState()
 
     // Need 2 bids: AppBidding integration is detected after bid request when enrich method is invoked.
     Criteo.getInstance().loadBid(BANNER_320_480) {
-      Criteo.getInstance().setBidsForAdUnit(mopubView, it)
+      Criteo.getInstance().enrichAdObjectWithBid(mopubView, it)
     }
     mockedDependenciesRule.waitForIdleState()
 
@@ -346,13 +346,13 @@ class ProfileIdFunctionalTest {
     }
 
     Criteo.getInstance().loadBid(BANNER_320_480) {
-      Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, it)
+      Criteo.getInstance().enrichAdObjectWithBid(moPubInterstitial, it)
     }
     mockedDependenciesRule.waitForIdleState()
 
     // Need 2 bids: AppBidding integration is detected after bid request when enrich method is invoked.
     Criteo.getInstance().loadBid(BANNER_320_480) {
-      Criteo.getInstance().setBidsForAdUnit(moPubInterstitial, it)
+      Criteo.getInstance().enrichAdObjectWithBid(moPubInterstitial, it)
     }
     mockedDependenciesRule.waitForIdleState()
 
