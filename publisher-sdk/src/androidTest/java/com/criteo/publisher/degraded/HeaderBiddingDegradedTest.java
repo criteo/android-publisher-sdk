@@ -62,7 +62,7 @@ public class HeaderBiddingDegradedTest {
   public void whenSettingABids_ShouldNotDoAnyCallToCdb() throws Exception {
     Object builder = mock(Object.class);
 
-    criteo.setBidsForAdUnit(builder, bid);
+    criteo.enrichAdObjectWithBid(builder, bid);
     waitForIdleState();
 
     verifyNoInteractions(api);
@@ -73,7 +73,7 @@ public class HeaderBiddingDegradedTest {
   public void whenSettingABids_ShouldNotEnrichGivenBuilder() throws Exception {
     Object builder = mock(Object.class);
 
-    criteo.setBidsForAdUnit(builder, bid);
+    criteo.enrichAdObjectWithBid(builder, bid);
     waitForIdleState();
 
     verifyNoInteractions(builder);

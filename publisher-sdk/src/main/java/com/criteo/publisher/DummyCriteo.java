@@ -31,7 +31,7 @@ import java.util.concurrent.Future;
 public class DummyCriteo extends Criteo {
 
   @Override
-  public void setBidsForAdUnit(Object object, @Nullable Bid bid) {
+  public void enrichAdObjectWithBid(Object object, @Nullable Bid bid) {
     // Nothing
   }
 

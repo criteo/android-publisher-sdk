@@ -126,7 +126,7 @@ public abstract class Criteo {
     criteo = instance;
   }
 
-  public abstract void setBidsForAdUnit(Object object, @Nullable Bid bid);
+  public abstract void enrichAdObjectWithBid(Object object, @Nullable Bid bid);
 
   abstract void getBidForAdUnit(@Nullable AdUnit adUnit, @NonNull BidListener bidListener);
 
