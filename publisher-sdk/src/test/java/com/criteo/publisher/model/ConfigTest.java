@@ -303,7 +303,7 @@ public class ConfigTest {
         config.getAdTagDataMode());
     assertTrue(config.isCsmEnabled());
     assertFalse(config.isLiveBiddingEnabled());
-    assertEquals(5000, config.getLiveBiddingTimeBudgetInMillis());
+    assertEquals(8000, config.getLiveBiddingTimeBudgetInMillis());
   }
 
 }
