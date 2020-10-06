@@ -37,6 +37,7 @@ public @interface Internal {
 
   String MOPUB_ADAPTER = "MoPub Adapter";
   String ADMOB_ADAPTER = "AdMob Adapter";
+  String IN_HOUSE = "InHouse";
 
   /**
    * Marker to indicate which part of the project the annotated element is used by.

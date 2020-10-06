@@ -16,9 +16,12 @@
 
 package com.criteo.publisher;
 
+import static com.criteo.publisher.annotation.Internal.IN_HOUSE;
+
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.criteo.publisher.annotation.Internal;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.util.AdUnitType;
@@ -54,6 +57,7 @@ public class BidResponse {
   }
 
   @Nullable
+  @Internal(IN_HOUSE)
   public String consumeDisplayUrlFor(@NonNull AdUnitType adUnitType) {
     if (!adUnitType.equals(this.adUnitType)) {
       return null;
@@ -63,6 +67,7 @@ public class BidResponse {
   }
 
   @Nullable
+  @Internal(IN_HOUSE)
   public NativeAssets consumeNativeAssets() {
     return consume(CdbResponseSlot::getNativeAssets);
   }
