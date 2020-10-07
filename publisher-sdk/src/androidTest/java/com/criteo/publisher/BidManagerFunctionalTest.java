@@ -21,6 +21,7 @@ import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static com.criteo.publisher.util.CompletableFuture.completedFuture;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.AdditionalAnswers.answerVoid;
@@ -111,7 +112,7 @@ public class BidManagerFunctionalTest {
   @MockBean
   private Clock clock;
 
-  @MockBean
+  @SpyBean
   private LiveBidRequestSender liveBidRequestSender;
 
   @MockBean
@@ -125,6 +126,12 @@ public class BidManagerFunctionalTest {
 
   @MockBean
   private MetricSendingQueueConsumer metricSendingQueueConsumer;
+
+  @SpyBean
+  private UserPrivacyUtil userPrivacyUtil;
+
+  @SpyBean
+  private DeviceInfo deviceInfo;
 
   @Inject
   private AdvertisingInfo advertisingInfo;
@@ -342,17 +349,13 @@ public class BidManagerFunctionalTest {
   private void callingCdb_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo(
       Consumer<AdUnit> callingCdb
   ) throws Exception {
-    DeviceInfo deviceInfo = mock(DeviceInfo.class);
-    when(deviceInfo.getUserAgent()).thenReturn(completedFuture("expectedUserAgent"));
-    doReturn(deviceInfo).when(dependencyProvider).provideDeviceInfo();
+    doReturn(completedFuture("expectedUserAgent")).when(deviceInfo).getUserAgent();
 
     GdprData expectedGdpr = mock(GdprData.class);
-    UserPrivacyUtil userPrivacyUtil = mock(UserPrivacyUtil.class);
     when(userPrivacyUtil.getGdprData()).thenReturn(expectedGdpr);
     when(userPrivacyUtil.getUsPrivacyOptout()).thenReturn("");
     when(userPrivacyUtil.getIabUsPrivacyString()).thenReturn("");
     when(userPrivacyUtil.getMopubConsent()).thenReturn("");
-    doReturn(userPrivacyUtil).when(dependencyProvider).provideUserPrivacyUtil();
 
     when(buildConfigWrapper.getSdkVersion()).thenReturn("1.2.3");
     when(integrationRegistry.getProfileId()).thenReturn(42);
@@ -371,12 +374,12 @@ public class BidManagerFunctionalTest {
     );
 
     verify(api).loadCdb(argThat(cdb -> {
-      assertEquals(publisher, cdb.getPublisher());
-      assertEquals(expectedUser, cdb.getUser());
-      assertEquals(singletonList(cacheAdUnit), getRequestedAdUnits(cdb));
-      assertEquals("1.2.3", cdb.getSdkVersion());
-      assertEquals(42, cdb.getProfileId());
-      assertEquals(expectedGdpr, cdb.getGdprData());
+      assertThat(cdb.getPublisher()).isEqualTo(publisher);
+      assertThat(cdb.getUser()).isEqualTo(expectedUser);
+      assertThat(getRequestedAdUnits(cdb)).containsExactly(cacheAdUnit);
+      assertThat(cdb.getSdkVersion()).isEqualTo("1.2.3");
+      assertThat(cdb.getProfileId()).isEqualTo(42);
+      assertThat(cdb.getGdprData()).isEqualTo(expectedGdpr);
 
       return true;
     }), eq("expectedUserAgent"));
@@ -994,6 +997,48 @@ public class BidManagerFunctionalTest {
     verify(bidListener).onNoBid();
     verify(liveBidRequestSender, never()).sendLiveBidRequest(any(), any());
     verify(metricSendingQueueConsumer).sendMetricBatch();
+  }
+
+  @Test
+  public void fetchForLiveBidRequest_ValidBidFetched_TimeBudgetRespected_ShouldDeliverATimestampedBid()
+      throws Exception {
+    givenMockedClockSetTo(42);
+    givenTimeBudgetRespectedWhenFetchingLiveBids();
+
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    CdbResponseSlot slot = givenMockedCdbRespondingSlot();
+    BidListener bidListener = mock(BidListener.class);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    InOrder inOrder = inOrder(bidListener, slot);
+    inOrder.verify(slot).setTimeOfDownload(42);
+    inOrder.verify(bidListener).onBidResponse(slot);
+    verify(cache, never()).add(any());
+    verify(cache, never()).remove(any());
+  }
+
+  @Test
+  public void fetchForLiveBidRequest_ValidBidFetched_TimeBudgetExceeded_ShouldCacheATimestampedBid()
+      throws Exception {
+    givenMockedClockSetTo(42);
+    givenTimeBudgetExceededWhenFetchingLiveBids();
+
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    CdbResponseSlot slot = givenMockedCdbRespondingSlot();
+    BidListener bidListener = mock(BidListener.class);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    InOrder inOrder = inOrder(cache, slot);
+    inOrder.verify(slot).setTimeOfDownload(42);
+    inOrder.verify(cache).add(slot);
   }
 
   @Test

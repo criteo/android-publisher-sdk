@@ -18,11 +18,13 @@ package com.criteo.publisher.network;
 
 import androidx.annotation.NonNull;
 import com.criteo.publisher.CdbCallListener;
+import com.criteo.publisher.Clock;
 import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.model.CdbResponseSlot;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -35,6 +37,9 @@ class CdbCall extends SafeRunnable {
   private final CdbRequestFactory cdbRequestFactory;
 
   @NonNull
+  private final Clock clock;
+
+  @NonNull
   private final List<CacheAdUnit> requestedAdUnits;
 
   @NonNull
@@ -43,11 +48,13 @@ class CdbCall extends SafeRunnable {
   CdbCall(
       @NonNull PubSdkApi pubSdkApi,
       @NonNull CdbRequestFactory cdbRequestFactory,
+      @NonNull Clock clock,
       @NonNull List<CacheAdUnit> requestedAdUnits,
       @NonNull CdbCallListener listener
   ) {
     this.pubSdkApi = pubSdkApi;
     this.cdbRequestFactory = cdbRequestFactory;
+    this.clock = clock;
     this.requestedAdUnits = requestedAdUnits;
     this.listener = listener;
   }
@@ -61,9 +68,17 @@ class CdbCall extends SafeRunnable {
 
     try {
       CdbResponse cdbResponse = pubSdkApi.loadCdb(cdbRequest, userAgent);
+      setTimeOfDownload(cdbResponse);
       listener.onCdbResponse(cdbRequest, cdbResponse);
     } catch (Exception e) {
       listener.onCdbError(cdbRequest, e);
+    }
+  }
+
+  private void setTimeOfDownload(@NonNull CdbResponse cdbResponse) {
+    long instant = clock.getCurrentTimeInMillis();
+    for (CdbResponseSlot slot : cdbResponse.getSlots()) {
+      slot.setTimeOfDownload(instant);
     }
   }
 }

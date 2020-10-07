@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.network
 
+import com.criteo.publisher.Clock
 import com.criteo.publisher.LiveCdbCallListener
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.model.CacheAdUnit
@@ -29,6 +30,7 @@ import java.util.concurrent.TimeUnit
 class LiveBidRequestSender(
     private val pubSdkApi: PubSdkApi,
     private val cdbRequestFactory: CdbRequestFactory,
+    private val clock: Clock,
     private val executor: Executor,
     private val scheduledExecutorService: ScheduledExecutorService,
     private val config: Config
@@ -46,6 +48,7 @@ class LiveBidRequestSender(
         CdbCall(
             pubSdkApi,
             cdbRequestFactory,
+            clock,
             listOf(cacheAdUnit),
             liveCdbCallListener
         )

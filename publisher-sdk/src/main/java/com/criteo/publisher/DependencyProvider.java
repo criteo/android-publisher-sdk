@@ -426,6 +426,7 @@ public class DependencyProvider {
         return new BidRequestSender(
             provideCdbRequestFactory(),
             provideRemoteConfigRequestFactory(),
+            provideClock(),
             providePubSdkApi(),
             provideThreadPoolExecutor()
         );
@@ -442,6 +443,7 @@ public class DependencyProvider {
         return new LiveBidRequestSender(
             providePubSdkApi(),
             provideCdbRequestFactory(),
+            provideClock(),
             provideThreadPoolExecutor(),
             provideScheduledExecutorService(),
             provideConfig()

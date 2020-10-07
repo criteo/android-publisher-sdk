@@ -36,7 +36,6 @@ import com.criteo.publisher.model.Config;
 import com.criteo.publisher.network.BidRequestSender;
 import com.criteo.publisher.network.LiveBidRequestSender;
 import com.criteo.publisher.util.ApplicationStoppedListener;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -271,8 +270,6 @@ public class BidManager implements ApplicationStoppedListener {
   }
 
   void setCacheAdUnits(@NonNull List<CdbResponseSlot> slots) {
-    long instant = clock.getCurrentTimeInMillis();
-
     synchronized (cacheLock) {
       for (CdbResponseSlot slot : slots) {
         if (slot.isValid()) {
@@ -282,7 +279,6 @@ public class BidManager implements ApplicationStoppedListener {
             slot.setTtlInSeconds(DEFAULT_TTL_IN_SECONDS);
           }
 
-          slot.setTimeOfDownload(instant);
           cache.add(slot);
           bidLifecycleListener.onBidCached(slot);
         }
