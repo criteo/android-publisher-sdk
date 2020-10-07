@@ -15,6 +15,7 @@
   https://developer.android.com/studio/write/java8-support.
   - Remove the deprecated `Criteo#init` method. [`Criteo.Builder#init`](https://github.com/criteo/android-publisher-sdk/blob/main/publisher-sdk/src/main/java/com/criteo/publisher/Criteo.java#L54)
   should be used instead.
+- CriteoBannerView is now a custom view that can included directly in a layout file.
 
 # Version 3.10.1
 - Bug fix

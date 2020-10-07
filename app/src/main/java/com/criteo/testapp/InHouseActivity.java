@@ -19,11 +19,10 @@ package com.criteo.testapp;
 import static com.criteo.testapp.PubSdkDemoApplication.INTERSTITIAL_IBV_DEMO;
 import static com.criteo.testapp.PubSdkDemoApplication.NATIVE;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
-import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoBannerView;
@@ -47,11 +46,11 @@ public class InHouseActivity extends AppCompatActivity {
 
   public static final BannerAdUnit BANNER = new BannerAdUnit(
       "/140800857/Endeavour_320x50",
-      new AdSize(320, 50));
+      new AdSize(320, 50)
+  );
 
-  private Context context;
-  private LinearLayout adLayout;
   private CriteoBannerView criteoBannerView;
+  private FrameLayout nativeAdContainer;
   private CriteoNativeLoader nativeLoader;
   private Button btnShowInterstitial;
   private Button btnShowInterstitialIbv;
@@ -62,14 +61,17 @@ public class InHouseActivity extends AppCompatActivity {
     setContentView(R.layout.activity_in_house);
     MockedIntegrationRegistry.force(Integration.IN_HOUSE);
 
-    adLayout = findViewById(R.id.AdLayout);
+    criteoBannerView = findViewById(R.id.criteoBannerView);
+    nativeAdContainer = findViewById(R.id.nativeAdContainer);
+    criteoBannerView.setCriteoBannerAdListener(new TestAppBannerAdListener(
+        TAG, "In-House"));
+
     btnShowInterstitial = findViewById(R.id.buttonInhouseInterstitial);
     btnShowInterstitialIbv = findViewById(R.id.buttonInhouseInterstitialIbv);
-    context = getApplicationContext();
 
     nativeLoader = new CriteoNativeLoader(
         NATIVE,
-        new TestAppNativeAdListener(TAG, NATIVE.getAdUnitId(), adLayout),
+        new TestAppNativeAdListener(TAG, NATIVE.getAdUnitId(), nativeAdContainer),
         new TestAppNativeRenderer()
     );
 
@@ -101,14 +103,6 @@ public class InHouseActivity extends AppCompatActivity {
   }
 
   private void loadBannerAd() {
-    if (criteoBannerView != null) {
-      criteoBannerView.destroy();
-    }
-
-    criteoBannerView = new CriteoBannerView(context);
-    criteoBannerView.setCriteoBannerAdListener(new TestAppBannerAdListener(
-        TAG, "In-House", adLayout));
-
     Log.d(TAG, "Banner Requested");
     Criteo.getInstance().loadBid(BANNER, criteoBannerView::loadAd);
   }

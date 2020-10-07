@@ -17,6 +17,8 @@
 package com.criteo.publisher;
 
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.webkit.WebView;
 import androidx.annotation.Keep;
@@ -25,14 +27,21 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
+import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.util.PreconditionsUtil;
 
 public class CriteoBannerView extends WebView {
-
   private static final String TAG = CriteoBannerView.class.getSimpleName();
+  private final Logger logger = LoggerFactory.getLogger(getClass());
+
+  private static final int UNSET_DIMENSION_VALUE = -1;
 
   @Nullable
-  private final BannerAdUnit bannerAdUnit;
+  @VisibleForTesting
+  final BannerAdUnit bannerAdUnit;
 
   /**
    * Null means that the singleton Criteo should be used.
@@ -48,6 +57,51 @@ public class CriteoBannerView extends WebView {
 
   @Nullable
   private CriteoBannerEventController criteoBannerEventController;
+
+  /**
+   * Used when setting {@link CriteoBannerView} in XML
+   */
+  public CriteoBannerView(@NonNull Context context, AttributeSet attrs) {
+    super(context, attrs);
+    criteo = null;
+
+    TypedArray a = context.getTheme().obtainStyledAttributes(
+        attrs,
+        R.styleable.CriteoBannerView,
+        0,
+        0
+    );
+
+    try {
+      int width = a.getInteger(
+          R.styleable.CriteoBannerView_criteoAdUnitWidth,
+          UNSET_DIMENSION_VALUE
+      );
+      int height = a.getInteger(
+          R.styleable.CriteoBannerView_criteoAdUnitHeight,
+          UNSET_DIMENSION_VALUE
+      );
+      String adUnitId = a.getString(R.styleable.CriteoBannerView_criteoAdUnitId);
+
+      if (adUnitId != null && width != UNSET_DIMENSION_VALUE && height != UNSET_DIMENSION_VALUE) {
+        logger.info("CriteoBannerView inflated for Standalone integration.");
+        bannerAdUnit = new BannerAdUnit(adUnitId, new AdSize(width, height));
+      } else if (adUnitId == null && width == UNSET_DIMENSION_VALUE
+          && height == UNSET_DIMENSION_VALUE) {
+        logger.info("CriteoBannerView inflated for InHouse integration.");
+        bannerAdUnit = null;
+      } else {
+        bannerAdUnit = null;
+        PreconditionsUtil.throwOrLog(new IllegalStateException(
+            "CriteoBannerView was not properly inflated. For InHouse integration, no attribute must "
+                + "be set. For Standalone integration, all of: criteoAdUnitId, criteoAdUnitWidth and "
+                + "criteoAdUnitHeight must be set.")
+        );
+      }
+    } finally {
+      a.recycle();
+    }
+  }
 
   /**
    * Used by server side bidding and in-house auction
@@ -133,5 +187,4 @@ public class CriteoBannerView extends WebView {
   private IntegrationRegistry getIntegrationRegistry() {
     return DependencyProvider.getInstance().provideIntegrationRegistry();
   }
-
 }

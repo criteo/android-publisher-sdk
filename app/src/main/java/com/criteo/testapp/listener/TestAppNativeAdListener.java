@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.advancednative.CriteoNativeAd;
 import com.criteo.publisher.advancednative.CriteoNativeAdListener;
@@ -30,7 +31,7 @@ public class TestAppNativeAdListener extends CriteoNativeAdListener {
   private final String prefix;
   private final ViewGroup adLayout;
 
-  public TestAppNativeAdListener(String tag, String prefix, ViewGroup adLayout) {
+  public TestAppNativeAdListener(String tag, String prefix, @Nullable ViewGroup adLayout) {
     this.tag = tag;
     this.prefix = prefix;
     this.adLayout = adLayout;
@@ -39,7 +40,6 @@ public class TestAppNativeAdListener extends CriteoNativeAdListener {
   @Override
   public void onAdReceived(@NonNull CriteoNativeAd nativeAd) {
     Log.d(tag, prefix + " - Native onAdReceived");
-
     View view = nativeAd.createNativeRenderedView(adLayout.getContext(), adLayout);
     adLayout.removeAllViews();
     adLayout.addView(view);

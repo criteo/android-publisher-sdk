@@ -69,6 +69,41 @@ class LoggerTest {
   }
 
   @Test
+  fun info_GivenMessageAndThrowable_PrintMessageThenStacktrace() {
+    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.INFO)
+    val logger = spy(Logger(javaClass, buildConfigWrapper))
+
+    logger.info("Hello", Exception())
+
+    inOrder(logger) {
+      verify(logger).println(Log.INFO, "Hello")
+      verify(logger).println(eq(Log.INFO), anyOrNull())
+      verifyNoMoreInteractions()
+    }
+  }
+
+  @Test
+  fun info_GivenMessageAndArgs_PrintFormattedMessage() {
+    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.INFO)
+    val logger = spy(Logger(javaClass, buildConfigWrapper))
+
+    logger.info("Hello %s", "World")
+
+    verify(logger).println(Log.INFO, "Hello World")
+  }
+
+
+  @Test
+  fun info_GivenMinLogLevelHigherThanInfo_IgnoreLog() {
+    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.WARN)
+    val logger = spy(Logger(javaClass, buildConfigWrapper))
+
+    logger.info("Hello")
+
+    verify(logger, never()).println(any(), any())
+  }
+
+  @Test
   fun error_GivenJustThrowable_PrintStacktrace() {
     whenever(buildConfigWrapper.minLogLevel).doReturn(Log.ERROR)
     val logger = spy(Logger(javaClass, buildConfigWrapper))

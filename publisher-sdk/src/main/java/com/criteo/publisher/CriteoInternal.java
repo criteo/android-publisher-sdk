@@ -135,7 +135,7 @@ final class CriteoInternal extends Criteo {
    * Method to start new CdbDownload Asynctask [Standalone only]
    */
   @Override
-  void getBidForAdUnit(AdUnit adUnit, @NonNull BidListener bidListener) {
+  void getBidForAdUnit(@Nullable AdUnit adUnit, @NonNull BidListener bidListener) {
     bidManager.getBidForAdUnit(adUnit, bidListener);
   }
 
