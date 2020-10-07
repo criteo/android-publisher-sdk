@@ -1072,6 +1072,44 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
+  public void fetchForLiveBidRequest_NothingCached_TimeBudgetExceeded_ShouldNotifyForNoBid()
+      throws Exception {
+    givenTimeBudgetExceededWhenFetchingLiveBids();
+
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    BidListener bidListener = mock(BidListener.class);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    verify(bidListener).onNoBid();
+    verify(bidLifecycleListener, never()).onBidConsumed(any(), any());
+    verify(bidLifecycleListener, never()).onBidCached(any());
+  }
+
+  @Test
+  public void fetchForLiveBidRequest_ValidBidFetched_NothingCached_TimeBudgetExceeded_ShouldNotifyForNoBid()
+      throws Exception {
+    givenTimeBudgetExceededWhenFetchingLiveBids();
+
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    CdbResponseSlot newSlot = givenMockedCdbRespondingSlot();
+    BidListener bidListener = mock(BidListener.class);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    verify(bidListener).onNoBid();
+    verify(cache).add(newSlot);
+    verify(bidLifecycleListener, never()).onBidConsumed(any(), any());
+    verify(bidLifecycleListener).onBidCached(newSlot);
+  }
+
+  @Test
   public void setCacheAdUnits_GivenValidCdbResponseSlot_ShouldTriggerBidCached() {
     CdbResponseSlot cdbResponseSlot = givenValidCdbResponseSlot();
 
