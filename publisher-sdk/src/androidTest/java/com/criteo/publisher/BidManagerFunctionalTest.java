@@ -1000,14 +1000,19 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void fetchForLiveBidRequest_ValidBidFetched_TimeBudgetRespected_ShouldDeliverATimestampedBid()
+  public void fetchForLiveBidRequest_ValidBidFetched_TimeBudgetRespected_ShouldNotifyForBidAndNotPopulateCache()
       throws Exception {
     givenMockedClockSetTo(42);
     givenTimeBudgetRespectedWhenFetchingLiveBids();
 
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+
+    // Use immediate bid (ttl = 0, cpm > 0) to prove that live bidding support it
     CdbResponseSlot slot = givenMockedCdbRespondingSlot();
+    when(slot.getCpmAsNumber()).thenReturn(1.);
+    when(slot.getTtlInSeconds()).thenReturn(0);
+
     BidListener bidListener = mock(BidListener.class);
 
     BidManager bidManager = createBidManager();
@@ -1017,28 +1022,53 @@ public class BidManagerFunctionalTest {
     InOrder inOrder = inOrder(bidListener, slot);
     inOrder.verify(slot).setTimeOfDownload(42);
     inOrder.verify(bidListener).onBidResponse(slot);
-    verify(cache, never()).add(any());
-    verify(cache, never()).remove(any());
+    assertCacheIsNotUpdated();
   }
 
   @Test
-  public void fetchForLiveBidRequest_ValidBidFetched_TimeBudgetExceeded_ShouldCacheATimestampedBid()
+  public void fetchForLiveBidRequest_ValidBidCached_TimeBudgetExceeded_ShouldNotifyForConsumedBid()
       throws Exception {
-    givenMockedClockSetTo(42);
     givenTimeBudgetExceededWhenFetchingLiveBids();
 
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    CdbResponseSlot slot = givenMockedCdbRespondingSlot();
+    CdbResponseSlot slot = givenNotExpiredValidCachedBid(cacheAdUnit);
     BidListener bidListener = mock(BidListener.class);
 
     BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, bidListener);
     waitForIdleState();
 
-    InOrder inOrder = inOrder(cache, slot);
-    inOrder.verify(slot).setTimeOfDownload(42);
-    inOrder.verify(cache).add(slot);
+    verify(bidListener).onBidResponse(slot);
+    verify(cache).remove(cacheAdUnit);
+    verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, slot);
+  }
+
+  @Test
+  public void fetchForLiveBidRequest_ValidBidFetched_ValidBidCached_TimeBudgetExceeded_ShouldNotifyForConsumedBidAndPopulateCache()
+      throws Exception {
+    givenMockedClockSetTo(42);
+    givenTimeBudgetExceededWhenFetchingLiveBids();
+
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    CdbResponseSlot cachedSlot = givenNotExpiredValidCachedBid(cacheAdUnit);
+    CdbResponseSlot newSlot = givenMockedCdbRespondingSlot();
+    BidListener bidListener = mock(BidListener.class);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    verify(bidListener).onBidResponse(cachedSlot);
+    verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, cachedSlot);
+    verify(bidLifecycleListener).onBidCached(newSlot);
+
+    InOrder inOrder = inOrder(cache, newSlot);
+    inOrder.verify(cache).remove(cacheAdUnit);
+    inOrder.verify(newSlot).setTimeOfDownload(42);
+    inOrder.verify(cache).add(newSlot);
+    inOrder.verifyNoMoreInteractions();
   }
 
   @Test
@@ -1116,6 +1146,11 @@ public class BidManagerFunctionalTest {
 
   private void assertListenerIsNotNotifyForBidConsumed() {
     verify(bidLifecycleListener, never()).onBidConsumed(any(), any());
+  }
+
+  private void assertCacheIsNotUpdated() {
+    verify(cache, never()).add(any());
+    verify(cache, never()).remove(any());
   }
 
   private void waitForIdleState() {
