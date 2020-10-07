@@ -18,7 +18,6 @@ package com.criteo.publisher.integration;
 
 import static com.criteo.publisher.CriteoUtil.PROD_CDB_URL;
 import static com.criteo.publisher.CriteoUtil.PROD_CP_ID;
-import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE;
 import static com.criteo.publisher.StubConstants.STUB_DISPLAY_URL;
 import static com.criteo.publisher.StubConstants.STUB_NATIVE_ASSETS;
@@ -32,14 +31,18 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.os.Bundle;
 import android.view.View;
+import androidx.annotation.NonNull;
 import androidx.test.filters.FlakyTest;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.CriteoInitException;
+import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.mock.MockedDependenciesRule;
@@ -48,6 +51,7 @@ import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.nativeads.NativeAssets;
@@ -68,13 +72,20 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
+@RunWith(Parameterized.class)
 @FlakyTest(detail = "DFP network is flaky")
 public class DfpHeaderBiddingFunctionalTest {
 
@@ -113,6 +124,14 @@ public class DfpHeaderBiddingFunctionalTest {
    */
   private static final Charset CHARSET = StandardCharsets.UTF_8;
 
+  @Parameters(name = "{0}")
+  public static Iterable<?> data() {
+    return Arrays.asList(false, true);
+  }
+
+  @Parameter
+  public boolean isLiveBiddingEnabled;
+
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
@@ -138,25 +157,28 @@ public class DfpHeaderBiddingFunctionalTest {
   @SpyBean
   private PubSdkApi api;
 
+  @SpyBean
+  private Config config;
+
+  @Before
+  public void setUp() {
+    doReturn(isLiveBiddingEnabled).when(config).isLiveBiddingEnabled();
+  }
+
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchValidBannerId_CriteoMacroAreInjectedInDfpBuilder()
       throws Exception {
-    whenGettingBid_GivenValidCpIdAndPrefetchValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(
-        validBannerAdUnit);
+    whenGettingBid_GivenValidCpIdAndValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(validBannerAdUnit);
   }
 
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchValidInterstitialId_CriteoMacroAreInjectedInDfpBuilder()
       throws Exception {
-    whenGettingBid_GivenValidCpIdAndPrefetchValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(
-        validInterstitialAdUnit);
+    whenGettingBid_GivenValidCpIdAndValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(validInterstitialAdUnit);
   }
 
-  private void whenGettingBid_GivenValidCpIdAndPrefetchValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(
-      AdUnit adUnit)
-      throws Exception {
+  private void whenGettingBid_GivenValidCpIdAndValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(AdUnit adUnit) throws Exception {
     givenInitializedCriteo(adUnit);
-    waitForBids();
 
     Builder builder = new Builder();
 
@@ -167,18 +189,13 @@ public class DfpHeaderBiddingFunctionalTest {
     waitForBids();
 
     assertCriteoMacroAreInjectedInDfpBuilder(builder);
-
-    verify(api, atLeastOnce()).loadCdb(
-        argThat(request -> request.getProfileId() == Integration.GAM_APP_BIDDING.getProfileId()),
-        any()
-    );
+    assertBidRequestHasGoodProfileId();
   }
 
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchValidNativeId_CriteoNativeMacroAreInjectedInDfpBuilder()
       throws Exception {
     givenInitializedCriteo(validNativeAdUnit);
-    waitForBids();
 
     Builder builder = new Builder();
 
@@ -211,10 +228,7 @@ public class DfpHeaderBiddingFunctionalTest {
     assertEquals("2", customTargeting.getString(MACRO_NATIVE_PIXEL_COUNT));
     assertEquals(16, customTargeting.size());
 
-    verify(api, atLeastOnce()).loadCdb(
-        argThat(request -> request.getProfileId() == Integration.GAM_APP_BIDDING.getProfileId()),
-        any()
-    );
+    assertBidRequestHasGoodProfileId();
   }
 
   @Test
@@ -242,7 +256,6 @@ public class DfpHeaderBiddingFunctionalTest {
       AdUnit adUnit)
       throws Exception {
     givenInitializedCriteo(adUnit);
-    waitForBids();
 
     Builder builder = new Builder();
 
@@ -250,6 +263,7 @@ public class DfpHeaderBiddingFunctionalTest {
         adUnit,
         bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
     );
+    waitForBids();
 
     Bundle customTargeting = builder.build().getCustomTargeting();
 
@@ -294,7 +308,6 @@ public class DfpHeaderBiddingFunctionalTest {
       AdUnit adUnit)
       throws Exception {
     givenInitializedCriteo(adUnit);
-    waitForBids();
 
     Builder builder = new Builder();
 
@@ -302,6 +315,7 @@ public class DfpHeaderBiddingFunctionalTest {
         adUnit,
         bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
     );
+    waitForBids();
 
     assertCriteoMacroAreInjectedInDfpBuilder(builder);
 
@@ -328,7 +342,6 @@ public class DfpHeaderBiddingFunctionalTest {
       AdUnit adUnit)
       throws Exception {
     givenInitializedCriteo(adUnit);
-    waitForBids();
 
     Builder builder = new Builder();
 
@@ -336,6 +349,7 @@ public class DfpHeaderBiddingFunctionalTest {
         adUnit,
         bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
     );
+    waitForBids();
 
     String encodedDisplayUrl = builder.build().getCustomTargeting().getString(MACRO_DISPLAY_URL);
     String decodedDisplayUrl = decodeDfpPayloadComponent(encodedDisplayUrl);
@@ -350,7 +364,6 @@ public class DfpHeaderBiddingFunctionalTest {
     NativeProduct expectedProduct = expectedAssets.getProduct();
 
     givenInitializedCriteo(validNativeAdUnit);
-    waitForBids();
 
     Builder builder = new Builder();
 
@@ -358,6 +371,7 @@ public class DfpHeaderBiddingFunctionalTest {
         validNativeAdUnit,
         bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
     );
+    waitForBids();
 
     Bundle bundle = builder.build().getCustomTargeting();
 
@@ -540,7 +554,6 @@ public class DfpHeaderBiddingFunctionalTest {
   private String loadDfpHtmlBannerOrNative(AdUnit adUnit, PublisherAdView publisherAdView)
       throws Exception {
     givenInitializedCriteo(adUnit);
-    waitForBids();
 
     Builder builder = new Builder();
 
@@ -548,6 +561,7 @@ public class DfpHeaderBiddingFunctionalTest {
         adUnit,
         bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
     );
+    waitForBids();
 
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
     PublisherAdRequest request = builder.build();
@@ -562,7 +576,6 @@ public class DfpHeaderBiddingFunctionalTest {
 
   private String loadDfpHtmlInterstitial(InterstitialAdUnit adUnit) throws Exception {
     givenInitializedCriteo(adUnit);
-    waitForBids();
 
     Builder builder = new Builder();
 
@@ -570,6 +583,7 @@ public class DfpHeaderBiddingFunctionalTest {
         adUnit,
         bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
     );
+    waitForBids();
 
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
     PublisherAdRequest request = builder.build();
@@ -619,6 +633,20 @@ public class DfpHeaderBiddingFunctionalTest {
     assertEquals(3, customTargeting.size());
   }
 
+  private void assertBidRequestHasGoodProfileId() throws Exception {
+    if (config.isLiveBiddingEnabled()) {
+      // With live bidding, AppBidding declaration is delayed when bid is consumed. So the declaration is only visible
+      // from the next bid.
+      Criteo.getInstance().loadBid(invalidBannerAdUnit, ignored -> { /* no op */ });
+      waitForBids();
+    }
+
+    verify(api, atLeastOnce()).loadCdb(
+        argThat(request -> request.getProfileId() == Integration.GAM_APP_BIDDING.getProfileId()),
+        any()
+    );
+  }
+
   private void waitForBids() {
     mockedDependenciesRule.waitForIdleState();
   }
@@ -627,6 +655,20 @@ public class DfpHeaderBiddingFunctionalTest {
     when(buildConfigWrapper.getCdbUrl()).thenReturn(PROD_CDB_URL);
     when(mockedDependenciesRule.getDependencyProvider().provideCriteoPublisherId()).thenReturn(
         PROD_CP_ID);
+  }
+
+  private void givenInitializedCriteo(@NonNull AdUnit... adUnits) throws CriteoInitException {
+    if (config.isLiveBiddingEnabled()) {
+      // Empty it to show that prefetch has no influence
+      adUnits = new AdUnit[]{};
+    }
+
+    CriteoUtil.givenInitializedCriteo(adUnits);
+    waitForBids();
+  }
+
+  private void givenLiveBiddingEnabled() {
+    when(config.isLiveBiddingEnabled()).thenReturn(true);
   }
 
   private static final class DfpSync {
