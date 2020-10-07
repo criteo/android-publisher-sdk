@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.criteo.publisher.CriteoBannerView xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_height="match_parent"
+  android:layout_width="match_parent"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  app:criteoAdUnitId="criteoAdUnitId"
+  app:criteoAdUnitWidth="100"
+  app:criteoAdUnitHeight="50"
+  />

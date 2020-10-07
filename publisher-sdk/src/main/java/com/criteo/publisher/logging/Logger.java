@@ -48,6 +48,14 @@ public class Logger {
     log(Log.DEBUG, message, args, null);
   }
 
+  public void info(String message, Throwable thrown) {
+    log(Log.INFO, message, EMPTY, thrown);
+  }
+
+  public void info(String message, Object... args) {
+    log(Log.INFO, message, args, null);
+  }
+
   public void error(Throwable thrown) {
     log(Log.ERROR, null, EMPTY, thrown);
   }

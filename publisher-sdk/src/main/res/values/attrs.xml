@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <declare-styleable name="CriteoBannerView">
+    <attr name="criteoAdUnitId" format="string"/>
+    <attr name="criteoAdUnitHeight" format="integer"/>
+    <attr name="criteoAdUnitWidth" format="integer"/>
+  </declare-styleable>
+</resources>

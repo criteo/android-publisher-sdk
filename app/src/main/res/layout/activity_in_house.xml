@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
-  xmlns:ndroid="http://schemas.android.com/tools">
+  xmlns:ndroid="http://schemas.android.com/tools"
+  xmlns:app="http://schemas.android.com/apk/res-auto">
 
   <LinearLayout
     android:layout_width="match_parent"
@@ -60,12 +61,27 @@
           android:text="@string/btn_advanced_native"/>
       </LinearLayout>
     </HorizontalScrollView>
-    <LinearLayout
-      android:id="@+id/AdLayout"
+    <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:layout_marginTop="10dp"
-      android:orientation="vertical">
-    </LinearLayout>
+      >
+      <com.criteo.publisher.CriteoBannerView
+        android:id="@+id/criteoBannerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:criteoAdUnitHeight="50"
+        app:criteoAdUnitWidth="320"
+        app:criteoAdUnitId="/140800857/Endeavour_320x50"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+      <FrameLayout
+        android:id="@+id/nativeAdContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/criteoBannerView"
+        android:layout_marginTop="64dp"
+        />
+    </androidx.constraintlayout.widget.ConstraintLayout>
   </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
