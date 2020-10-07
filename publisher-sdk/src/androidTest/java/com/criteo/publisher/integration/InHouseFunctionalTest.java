@@ -50,7 +50,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
 
-public class ConsumableBidLoaderFunctionalTest {
+public class InHouseFunctionalTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
