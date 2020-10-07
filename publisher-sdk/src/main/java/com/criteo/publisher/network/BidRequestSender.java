@@ -19,6 +19,8 @@ package com.criteo.publisher.network;
 import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.CdbCallListener;
+import com.criteo.publisher.Clock;
 import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequestFactory;
@@ -26,7 +28,6 @@ import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.RemoteConfigRequest;
 import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.model.RemoteConfigResponse;
-import com.criteo.publisher.CdbCallListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,11 +35,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class BidRequestSender {
 
@@ -47,6 +45,9 @@ public class BidRequestSender {
 
   @NonNull
   private final RemoteConfigRequestFactory remoteConfigRequestFactory;
+
+  @NonNull
+  private final Clock clock;
 
   @NonNull
   private final PubSdkApi api;
@@ -62,11 +63,13 @@ public class BidRequestSender {
   public BidRequestSender(
       @NonNull CdbRequestFactory cdbRequestFactory,
       @NonNull RemoteConfigRequestFactory remoteConfigRequestFactory,
+      @NonNull Clock clock,
       @NonNull PubSdkApi api,
       @NonNull Executor executor
   ) {
     this.cdbRequestFactory = cdbRequestFactory;
     this.remoteConfigRequestFactory = remoteConfigRequestFactory;
+    this.clock = clock;
     this.api = api;
     this.executor = executor;
     this.pendingTasks = new ConcurrentHashMap<>();
@@ -139,7 +142,7 @@ public class BidRequestSender {
       @NonNull List<CacheAdUnit> requestedAdUnits,
       @NonNull CdbCallListener listener
   ) {
-    CdbCall task = new CdbCall(api, cdbRequestFactory, requestedAdUnits, listener);
+    CdbCall task = new CdbCall(api, cdbRequestFactory, clock, requestedAdUnits, listener);
 
     Runnable withRemovedPendingTasksAfterExecution = new Runnable() {
       @Override

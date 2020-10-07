@@ -16,12 +16,34 @@
 
 package com.criteo.publisher.network
 
-import com.criteo.publisher.concurrent.DirectMockExecutor
-import com.criteo.publisher.model.*
-import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
 import com.criteo.publisher.CdbCallListener
+import com.criteo.publisher.Clock
+import com.criteo.publisher.concurrent.DirectMockExecutor
+import com.criteo.publisher.model.AdSize
+import com.criteo.publisher.model.CacheAdUnit
+import com.criteo.publisher.model.CdbRequest
+import com.criteo.publisher.model.CdbRequestFactory
+import com.criteo.publisher.model.CdbResponse
+import com.criteo.publisher.model.Config
+import com.criteo.publisher.model.RemoteConfigRequest
+import com.criteo.publisher.model.RemoteConfigRequestFactory
+import com.criteo.publisher.model.RemoteConfigResponse
+import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
 import com.criteo.publisher.util.CompletableFuture.completedFuture
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.anyOrNull
+import com.nhaarman.mockitokotlin2.argumentCaptor
+import com.nhaarman.mockitokotlin2.doAnswer
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.doThrow
+import com.nhaarman.mockitokotlin2.inOrder
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.spy
+import com.nhaarman.mockitokotlin2.stub
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyZeroInteractions
+import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
@@ -29,7 +51,12 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import java.io.IOException
-import java.util.concurrent.*
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
+import java.util.concurrent.RejectedExecutionException
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
 class BidRequestSenderTest {
@@ -39,6 +66,9 @@ class BidRequestSenderTest {
 
     @Mock
     private lateinit var remoteConfigRequestFactory: RemoteConfigRequestFactory
+
+    @Mock
+    private lateinit var clock: Clock
 
     @Mock
     private lateinit var api: PubSdkApi
@@ -60,10 +90,11 @@ class BidRequestSenderTest {
 
     private fun givenNewSender(executor: Executor = this.executor) {
         sender = BidRequestSender(
-                cdbRequestFactory,
-                remoteConfigRequestFactory,
-                api,
-                executor
+            cdbRequestFactory,
+            remoteConfigRequestFactory,
+            clock,
+            api,
+            executor
         )
     }
 

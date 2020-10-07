@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.network
 
+import com.criteo.publisher.Clock
 import com.criteo.publisher.LiveCdbCallListener
 import com.criteo.publisher.model.CacheAdUnit
 import com.criteo.publisher.model.CdbRequest
@@ -60,6 +61,9 @@ class LiveBidRequestSenderTest {
   @Mock
   private lateinit var userAgentFuture: Future<String>
 
+  @Mock
+  private lateinit var clock: Clock
+
   @Before
   fun setUp() {
     MockitoAnnotations.initMocks(this)
@@ -76,6 +80,7 @@ class LiveBidRequestSenderTest {
     val liveBidRequestSender = LiveBidRequestSender(
         pubSdkApi,
         cdbRequestFactory,
+        clock,
         getDelayedExecutor(config.liveBiddingTimeBudgetInMillis.toLong() + 100),
         getScheduledExecutorService(),
         config
