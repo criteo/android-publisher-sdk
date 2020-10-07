@@ -18,10 +18,12 @@ package com.criteo.publisher.integration;
 
 import static com.criteo.publisher.CriteoErrorCode.ERROR_CODE_NO_FILL;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
+import static com.criteo.publisher.TestAdUnits.INTERSTITIAL_UNKNOWN;
 import static com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -42,14 +44,22 @@ import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 import org.mockito.InOrder;
 
+@RunWith(Parameterized.class)
 public class InHouseFunctionalTest {
 
   @Rule
@@ -59,7 +69,15 @@ public class InHouseFunctionalTest {
   private final BannerAdUnit invalidBannerAdUnit = TestAdUnits.BANNER_UNKNOWN;
 
   private final InterstitialAdUnit validInterstitialAdUnit = TestAdUnits.INTERSTITIAL;
-  private final InterstitialAdUnit invalidInterstitialAdUnit = TestAdUnits.INTERSTITIAL_UNKNOWN;
+  private final InterstitialAdUnit invalidInterstitialAdUnit = INTERSTITIAL_UNKNOWN;
+
+  @Parameters(name = "{0}")
+  public static Iterable<?> data() {
+    return Arrays.asList(false, true);
+  }
+
+  @Parameter
+  public boolean isLiveBiddingEnabled;
 
   @Inject
   private Context context;
@@ -69,6 +87,14 @@ public class InHouseFunctionalTest {
 
   @SpyBean
   private InterstitialActivityHelper interstitialActivityHelper;
+
+  @SpyBean
+  private Config config;
+
+  @Before
+  public void setUp() throws Exception {
+    doReturn(isLiveBiddingEnabled).when(config).isLiveBiddingEnabled();
+  }
 
   @Test
   public void loadBannerAd_GivenValidAdUnit_ThenListenerIsNotifiedOfTheSuccess() throws Exception {
@@ -83,10 +109,7 @@ public class InHouseFunctionalTest {
 
     verify(listener).onAdReceived(bannerView);
 
-    verify(api, atLeastOnce()).loadCdb(
-        argThat(request -> request.getProfileId() == Integration.IN_HOUSE.getProfileId()),
-        any()
-    );
+    assertBidRequestHasGoodProfileId();
   }
 
   @Test
@@ -138,10 +161,7 @@ public class InHouseFunctionalTest {
 
     verify(listener).onAdReceived(interstitial);
 
-    verify(api, atLeastOnce()).loadCdb(
-        argThat(request -> request.getProfileId() == Integration.IN_HOUSE.getProfileId()),
-        any()
-    );
+    assertBidRequestHasGoodProfileId();
   }
 
   @Test
@@ -188,6 +208,8 @@ public class InHouseFunctionalTest {
     AtomicReference<Bid> bidResponseRef = new AtomicReference<>();
 
     criteo.loadBid(validInterstitialAdUnit, bidResponseRef::set);
+    waitForIdleState();
+
     interstitial.loadAd(bidResponseRef.get());
     waitForIdleState();
 
@@ -215,9 +237,29 @@ public class InHouseFunctionalTest {
   }
 
   private Criteo givenInitializedSdk(AdUnit... adUnits) throws CriteoInitException {
+    if (config.isLiveBiddingEnabled()) {
+      // Empty it to show that prefetch has no influence
+      adUnits = new AdUnit[]{};
+    }
+
     Criteo criteo = givenInitializedCriteo(adUnits);
+
     waitForIdleState();
     return criteo;
+  }
+
+  private void assertBidRequestHasGoodProfileId() throws Exception {
+    if (config.isLiveBiddingEnabled()) {
+      // With live bidding, InHouse declaration is delayed when bid is consumed. So the declaration is only visible for
+      // the next bid.
+      Criteo.getInstance().loadBid(INTERSTITIAL_UNKNOWN, ignored -> { /* no op */ });
+      waitForIdleState();
+    }
+
+    verify(api, atLeastOnce()).loadCdb(
+        argThat(request -> request.getProfileId() == Integration.IN_HOUSE.getProfileId()),
+        any()
+    );
   }
 
 }
