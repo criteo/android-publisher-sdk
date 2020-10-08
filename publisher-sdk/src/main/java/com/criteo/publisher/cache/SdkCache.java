@@ -42,14 +42,21 @@ public class SdkCache {
   }
 
   public void add(@NonNull CdbResponseSlot slot) {
+    CacheAdUnit key = detectCacheAdUnit(slot);
+    if (key != null) {
+      slotMap.put(key, slot);
+    }
+  }
+
+  @Nullable
+  public CacheAdUnit detectCacheAdUnit(@NonNull CdbResponseSlot slot) {
     String placementId = slot.getPlacementId();
     if (placementId == null) {
-      return;
+      return null;
     }
 
     AdUnitType adUnitType = findAdUnitType(slot);
-    CacheAdUnit key = new CacheAdUnit(new AdSize(slot.getWidth(), slot.getHeight()), placementId, adUnitType);
-    slotMap.put(key, slot);
+    return new CacheAdUnit(new AdSize(slot.getWidth(), slot.getHeight()), placementId, adUnitType);
   }
 
   // FIXME: EE-608

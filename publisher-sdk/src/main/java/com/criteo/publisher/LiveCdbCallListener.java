@@ -130,7 +130,6 @@ public class LiveCdbCallListener extends CdbCallListener {
     CdbResponseSlot cdbResponseSlot = bidManager.consumeCachedBid(cacheAdUnit);
 
     if (cdbResponseSlot != null) {
-      bidLifecycleListener.onBidConsumed(cacheAdUnit, cdbResponseSlot);
       boolean isBidSilent = bidManager.isBidSilent(cdbResponseSlot);
       boolean hasBidExpired = bidManager.hasBidExpired(cdbResponseSlot);
       if (!isBidSilent && !hasBidExpired) {
