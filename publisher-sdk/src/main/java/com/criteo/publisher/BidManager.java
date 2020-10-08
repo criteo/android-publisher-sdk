@@ -151,10 +151,8 @@ public class BidManager implements ApplicationStoppedListener {
    * @return a valid bid that may be displayed or <code>null</code> that should be ignored
    */
   @Nullable
-  // TODO EE-1224, EE-1225 Callers should use #getBidForAdUnit, so live bidding or cached bidding is an implementation
-  //  details for the integration. Once last integration is migrated, this method should be only visible for testing.
-  // @VisibleForTesting
-  public CdbResponseSlot getBidForAdUnitAndPrefetch(@Nullable AdUnit adUnit) {
+  @VisibleForTesting
+  CdbResponseSlot getBidForAdUnitAndPrefetch(@Nullable AdUnit adUnit) {
     if (killSwitchEngaged()) {
       return null;
     }
