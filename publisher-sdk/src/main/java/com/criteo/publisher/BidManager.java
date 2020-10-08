@@ -162,44 +162,53 @@ public class BidManager implements ApplicationStoppedListener {
     }
 
     synchronized (cacheLock) {
-      CdbResponseSlot peekSlot = cache.peekAdUnit(cacheAdUnit);
-      if (peekSlot == null) {
-        // If no matching bid response is found
+      if (!isSilencedFor(cacheAdUnit)) {
         fetchForCache(cacheAdUnit);
-        return null;
       }
 
-      double cpm = getCpm(peekSlot);
-      long ttl = peekSlot.getTtlInSeconds();
+      return consumeCachedBid(cacheAdUnit);
+    }
+  }
 
-      boolean isNotExpired = !hasBidExpired(peekSlot);
-      boolean isValidBid = (cpm > 0) && (ttl > 0);
-      boolean isSilentBid = (cpm == 0) && (ttl > 0);
+  private boolean isSilencedFor(@NonNull CacheAdUnit cacheAdUnit) {
+    if (isGlobalSilenceEnabled()) {
+      return true;
+    }
 
-      if (isSilentBid && isNotExpired) {
-        return null;
-      }
+    synchronized (cacheLock) {
+      CdbResponseSlot cdbResponseSlot = cache.peekAdUnit(cacheAdUnit);
+      return isBidCurrentlySilent(cdbResponseSlot);
+    }
+  }
 
-      bidLifecycleListener.onBidConsumed(cacheAdUnit, peekSlot);
-      cache.remove(cacheAdUnit);
-      fetchForCache(cacheAdUnit);
+  private CdbResponseSlot consumeCachedBid(@NonNull CacheAdUnit cacheAdUnit) {
+    synchronized (cacheLock) {
+      CdbResponseSlot cdbResponseSlot = cache.peekAdUnit(cacheAdUnit);
 
-      if (isValidBid && isNotExpired) {
-        return peekSlot;
+      if (cdbResponseSlot != null) {
+        boolean isBidSilent = isBidCurrentlySilent(cdbResponseSlot);
+        boolean hasBidExpired = hasBidExpired(cdbResponseSlot);
+
+        if (!isBidSilent) {
+          cache.remove(cacheAdUnit);
+          bidLifecycleListener.onBidConsumed(cacheAdUnit, cdbResponseSlot);
+        }
+
+        if (!isBidSilent && !hasBidExpired) {
+          return cdbResponseSlot;
+        }
       }
 
       return null;
     }
   }
 
-  public CdbResponseSlot consumeCachedBid(@NonNull CacheAdUnit cacheAdUnit) {
-    synchronized (cacheLock) {
-      CdbResponseSlot cdbResponseSlot = cache.peekAdUnit(cacheAdUnit);
-      if (cdbResponseSlot != null && (!isBidSilent(cdbResponseSlot) || hasBidExpired(cdbResponseSlot))) {
-        cache.remove(cacheAdUnit);
-        bidLifecycleListener.onBidConsumed(cacheAdUnit, cdbResponseSlot);
-      }
-      return cdbResponseSlot;
+  void consumeCachedBid(@NonNull CacheAdUnit cacheAdUnit, @NonNull BidListener bidListener) {
+    CdbResponseSlot cdbResponseSlot = consumeCachedBid(cacheAdUnit);
+    if (cdbResponseSlot != null) {
+      bidListener.onBidResponse(cdbResponseSlot);
+    } else {
+      bidListener.onNoBid();
     }
   }
 
@@ -207,9 +216,7 @@ public class BidManager implements ApplicationStoppedListener {
    * load data for next time
    */
   private void fetchForCache(CacheAdUnit cacheAdUnit) {
-    if (!isGlobalSilenceEnabled()) {
-      sendBidRequest(Collections.singletonList(cacheAdUnit));
-    }
+    sendBidRequest(Collections.singletonList(cacheAdUnit));
   }
 
   @VisibleForTesting
@@ -233,25 +240,9 @@ public class BidManager implements ApplicationStoppedListener {
     }
 
     synchronized (cacheLock) {
-      CdbResponseSlot cachedCdbResponseSlot = cache.peekAdUnit(cacheAdUnit);
-      boolean isCachedBidExpired = cachedCdbResponseSlot != null && hasBidExpired(cachedCdbResponseSlot);
-      boolean isCachedBidUsable = cachedCdbResponseSlot != null && !hasBidExpired(cachedCdbResponseSlot);
-      boolean isGlobalSilenceEnabled = isGlobalSilenceEnabled();
-      boolean isCachedBidSilent = isCachedBidUsable && isBidSilent(cachedCdbResponseSlot);
-
-      if (isCachedBidExpired) {
-        cache.remove(cacheAdUnit);
-        bidLifecycleListener.onBidConsumed(cacheAdUnit, cachedCdbResponseSlot);
-      }
-
-      // not allowed to request CDB, but cache has something usable
-      if (isGlobalSilenceEnabled && isCachedBidUsable && !isCachedBidSilent) {
-        cache.remove(cacheAdUnit);
-        bidLifecycleListener.onBidConsumed(cacheAdUnit, cachedCdbResponseSlot);
-        bidListener.onBidResponse(cachedCdbResponseSlot);
-      } else if (isGlobalSilenceEnabled || isCachedBidSilent) { // silenced and nothing cached
-        bidListener.onNoBid();
-      } else { // not silenced
+      if (isSilencedFor(cacheAdUnit)) {
+        consumeCachedBid(cacheAdUnit, bidListener);
+      } else {
         liveBidRequestSender.sendLiveBidRequest(cacheAdUnit, new LiveCdbCallListener(
             bidListener,
             bidLifecycleListener,
@@ -259,6 +250,7 @@ public class BidManager implements ApplicationStoppedListener {
             cacheAdUnit
         ));
       }
+
       metricSendingQueueConsumer.sendMetricBatch();
     }
   }
@@ -276,14 +268,13 @@ public class BidManager implements ApplicationStoppedListener {
     synchronized (cacheLock) {
       for (CdbResponseSlot slot : slots) {
         CdbResponseSlot cachedSlot = cache.peekAdUnit(cache.detectCacheAdUnit(slot));
-        if (cachedSlot != null && isBidSilent(cachedSlot) && !hasBidExpired(cachedSlot)) {
+        if (isBidCurrentlySilent(cachedSlot)) {
           // Do not override silence bid that was concurrently cached.
           continue;
         }
 
         if (slot.isValid()) {
-          boolean isImmediateBid = slot.getCpmAsNumber() != null && slot.getCpmAsNumber() > 0
-              && slot.getTtlInSeconds() == 0;
+          boolean isImmediateBid = getCpm(slot) > 0 && slot.getTtlInSeconds() == 0;
           if (isImmediateBid) {
             slot.setTtlInSeconds(DEFAULT_TTL_IN_SECONDS);
           }
@@ -312,11 +303,16 @@ public class BidManager implements ApplicationStoppedListener {
     }
   }
 
-  boolean isBidSilent(@NonNull CdbResponseSlot cdbResponseSlot) {
-    return cdbResponseSlot.getTtlInSeconds() > 0 && getCpm(cdbResponseSlot) == 0;
+  boolean isBidCurrentlySilent(@Nullable CdbResponseSlot cdbResponseSlot) {
+    if (cdbResponseSlot == null) {
+      return false;
+    }
+
+    boolean isBidSilent = cdbResponseSlot.getTtlInSeconds() > 0 && getCpm(cdbResponseSlot) == 0;
+    return isBidSilent && !hasBidExpired(cdbResponseSlot);
   }
 
-  boolean hasBidExpired(@NonNull CdbResponseSlot cdbResponseSlot) {
+  private boolean hasBidExpired(@NonNull CdbResponseSlot cdbResponseSlot) {
     return cdbResponseSlot.isExpired(clock);
   }
 

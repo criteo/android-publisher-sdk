@@ -16,6 +16,8 @@
 
 package com.criteo.publisher;
 
+import static java.util.Collections.singletonList;
+
 import androidx.annotation.NonNull;
 import com.criteo.publisher.annotation.Internal;
 import com.criteo.publisher.bid.BidLifecycleListener;
@@ -78,7 +80,7 @@ public class LiveCdbCallListener extends CdbCallListener {
     }
     if (isListenerTriggered.compareAndSet(false, true)) {
       if (cdbResponse.getSlots().size() == 1) {
-        serveBidResponseIfPossible(cdbResponse);
+        serveBidResponseIfPossible(cdbResponse.getSlots().get(0));
       } else {
         bidListener.onNoBid();
       }
@@ -87,18 +89,14 @@ public class LiveCdbCallListener extends CdbCallListener {
     }
   }
 
-  private void serveBidResponseIfPossible(@NonNull CdbResponse cdbResponse) {
-    CdbResponseSlot cdbResponseSlot = cdbResponse.getSlots().get(0);
-    boolean bidSilent = bidManager.isBidSilent(cdbResponseSlot);
-    boolean bidValid = cdbResponseSlot.isValid();
-    boolean bidUsable = !bidSilent && bidValid;
-    if (bidUsable) {
+  private void serveBidResponseIfPossible(@NonNull CdbResponseSlot cdbResponseSlot) {
+    if (bidManager.isBidCurrentlySilent(cdbResponseSlot)) {
+      bidManager.setCacheAdUnits(singletonList(cdbResponseSlot));
+      bidListener.onNoBid();
+    } else if (cdbResponseSlot.isValid()) {
       bidListener.onBidResponse(cdbResponseSlot);
       bidLifecycleListener.onBidConsumed(cacheAdUnit, cdbResponseSlot);
     } else {
-      if (bidSilent) {
-        bidManager.setCacheAdUnits(cdbResponse.getSlots());
-      }
       bidListener.onNoBid();
     }
   }
@@ -127,18 +125,6 @@ public class LiveCdbCallListener extends CdbCallListener {
       return;
     }
 
-    CdbResponseSlot cdbResponseSlot = bidManager.consumeCachedBid(cacheAdUnit);
-
-    if (cdbResponseSlot != null) {
-      boolean isBidSilent = bidManager.isBidSilent(cdbResponseSlot);
-      boolean hasBidExpired = bidManager.hasBidExpired(cdbResponseSlot);
-      if (!isBidSilent && !hasBidExpired) {
-        bidListener.onBidResponse(cdbResponseSlot);
-      } else {
-        bidListener.onNoBid();
-      }
-    } else {
-      bidListener.onNoBid();
-    }
+    bidManager.consumeCachedBid(cacheAdUnit, bidListener);
   }
 }
