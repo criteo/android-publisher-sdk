@@ -223,19 +223,13 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
   }
 
   private fun givenExceptionWhileFetchingBid() {
-    bidManager.stub {
-      on { getBidForAdUnitAndPrefetch(any()) } doThrow RuntimeException::class
-    }
+    doThrow(RuntimeException::class).whenever(bidManager).getBidForAdUnit(any(), any())
   }
 
   private fun givenNoBidAvailable() {
-    bidManager.stub {
-      doReturn(null).whenever(mock).getBidForAdUnitAndPrefetch(adUnit)
-
-      doAnswer {
-        it.getArgument<BidListener>(1).onNoBid()
-      }.whenever(mock).getLiveBidForAdUnit(eq(adUnit), any())
-    }
+    doAnswer {
+      it.getArgument<BidListener>(1).onNoBid()
+    }.whenever(bidManager).getBidForAdUnit(eq(adUnit), any())
   }
 
   private fun givenNativeBidAvailable(): CriteoNativeAd {
@@ -245,13 +239,9 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
       on { this.nativeAssets } doReturn nativeAssets
     }
 
-    bidManager.stub {
-      doReturn(slot).whenever(mock).getBidForAdUnitAndPrefetch(adUnit)
-
-      doAnswer {
-        it.getArgument<BidListener>(1).onBidResponse(slot)
-      }.whenever(mock).getLiveBidForAdUnit(eq(adUnit), any())
-    }
+    doAnswer {
+      it.getArgument<BidListener>(1).onBidResponse(slot)
+    }.whenever(bidManager).getBidForAdUnit(eq(adUnit), any())
 
     nativeAdMapper.stub {
       on { map(eq(nativeAssets), argThat { listener == get() }, any()) } doReturn nativeAd
@@ -264,13 +254,9 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
       on { nativeAssets } doReturn null
     }
 
-    bidManager.stub {
-      doReturn(slot).whenever(mock).getBidForAdUnitAndPrefetch(adUnit)
-
-      doAnswer {
-        it.getArgument<BidListener>(1).onBidResponse(slot)
-      }.whenever(mock).getLiveBidForAdUnit(eq(adUnit), any())
-    }
+    doAnswer {
+      it.getArgument<BidListener>(1).onBidResponse(slot)
+    }.whenever(bidManager).getBidForAdUnit(eq(adUnit), any())
   }
 
   private fun expectListenerToBeCalledOnUiThread() {
