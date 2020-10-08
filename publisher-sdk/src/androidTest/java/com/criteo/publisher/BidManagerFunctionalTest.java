@@ -76,6 +76,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import javax.inject.Inject;
 import org.junit.Before;
@@ -1023,7 +1024,7 @@ public class BidManagerFunctionalTest {
     InOrder inOrder = inOrder(bidListener, slot);
     inOrder.verify(slot).setTimeOfDownload(42);
     inOrder.verify(bidListener).onBidResponse(slot);
-    verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, slot);
+    assertLiveBidIsConsumedDirectly(cacheAdUnit, slot);
     assertNoLiveBidIsCached();
   }
 
@@ -1192,6 +1193,131 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
+  public void fetchForLiveBidRequest_SilentBidCached_ShouldNotifyForNoBidAndNotFetch()
+      throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    givenNotExpiredSilentModeBidCached(cacheAdUnit);
+
+    BidListener bidListener = mock(BidListener.class);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    verify(bidListener).onNoBid();
+    assertNoLiveBidIsCached();
+    assertNoLiveBidIsConsumedFromCache();
+    assertShouldNotCallCdbAndNotPopulateCache();
+  }
+
+  @Test
+  public void fetchForLiveBidRequest_ExpiredSilentBidCached_ShouldFetch() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    givenExpiredSilentModeBidCached(cacheAdUnit);
+    CdbResponseSlot newSlot = givenMockedCdbRespondingSlot();
+
+    BidListener bidListener = mock(BidListener.class);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    verify(bidListener).onBidResponse(newSlot);
+    assertNoLiveBidIsCached();
+    assertShouldCallCdb(singletonList(cacheAdUnit));
+  }
+
+  @Test
+  public void fetchForLiveBidRequest_SilentBidFetched_TimeBudgetRespected_NotifyForNoBidAndPopulateCache()
+      throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    CdbResponseSlot newSlot = givenMockedCdbRespondingSlot();
+    when(newSlot.getCpmAsNumber()).thenReturn(0.);
+    when(newSlot.getTtlInSeconds()).thenReturn(1);
+
+    BidListener bidListener = mock(BidListener.class);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    verify(bidListener).onNoBid();
+    assertLiveBidIsCached(newSlot);
+    assertNoLiveBidIsConsumedFromCache();
+  }
+
+  @Test
+  public void fetchForLiveBidRequest_ValidBidFetched_SilentBidCachedDuringFetch_TimeBudgetRespected_NotifyForBid()
+      throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    CdbResponseSlot newSlot = givenMockedCdbRespondingSlot();
+    givenDuringLiveBidCall(() -> givenNotExpiredSilentModeBidCached(cacheAdUnit));
+
+    BidListener bidListener = mock(BidListener.class);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    verify(bidListener).onBidResponse(newSlot);
+    assertNoLiveBidIsCached();
+    assertLiveBidIsConsumedDirectly(cacheAdUnit, newSlot);
+  }
+
+  @Test
+  public void fetchForLiveBidRequest_ValidBidFetched_SilentBidCachedDuringFetch_TimeBudgetExceeded_ShouldNotifyForNoBidAndNotPopulateCache()
+      throws Exception {
+    givenTimeBudgetExceededWhenFetchingLiveBids();
+
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    CdbResponseSlot newSlot = givenMockedCdbRespondingSlot();
+    givenDuringLiveBidCall(() -> {
+      givenNotExpiredSilentModeBidCached(cacheAdUnit);
+      doReturn(cacheAdUnit).when(cache).detectCacheAdUnit(newSlot);
+    });
+
+    BidListener bidListener = mock(BidListener.class);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    verify(bidListener).onNoBid();
+    assertNoLiveBidIsCached();
+    assertNoLiveBidIsConsumedFromCache();
+  }
+
+  @Test
+  public void fetchForLiveBidRequest_ValidBidFetched_ExpiredSilentBidCachedDuringFetch_TimeBudgetExceeded_ShouldNotifyForNoBidAndPopulateCache()
+      throws Exception {
+    givenTimeBudgetExceededWhenFetchingLiveBids();
+
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    CdbResponseSlot newSlot = givenMockedCdbRespondingSlot();
+    AtomicReference<CdbResponseSlot> cachedSlotRef = new AtomicReference<>();
+    givenDuringLiveBidCall(() -> {
+      cachedSlotRef.set(givenExpiredSilentModeBidCached(cacheAdUnit));
+      doReturn(cacheAdUnit).when(cache).detectCacheAdUnit(newSlot);
+    });
+
+    BidListener bidListener = mock(BidListener.class);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    verify(bidListener).onNoBid();
+    assertLiveBidIsCached(newSlot);
+    assertLiveBidIsConsumedFromCache(cacheAdUnit, cachedSlotRef.get());
+  }
+
+  @Test
   public void setCacheAdUnits_GivenValidCdbResponseSlot_ShouldTriggerBidCached() {
     CdbResponseSlot cdbResponseSlot = givenValidCdbResponseSlot();
 
@@ -1243,6 +1369,10 @@ public class BidManagerFunctionalTest {
       CdbResponseSlot slot
   ) throws Exception {
     verify(cache).add(slot);
+    assertShouldCallCdb(requestedAdUnits);
+  }
+
+  private void assertShouldCallCdb(List<CacheAdUnit> requestedAdUnits) throws Exception {
     verify(api).loadCdb(argThat(cdb -> {
       assertEquals(requestedAdUnits, getRequestedAdUnits(cdb));
       return true;
@@ -1287,6 +1417,11 @@ public class BidManagerFunctionalTest {
   private void assertNoLiveBidIsConsumedFromCache() {
     verify(cache, never()).remove(any());
     verify(bidLifecycleListener, never()).onBidConsumed(any(), any());
+  }
+
+  private void assertLiveBidIsConsumedDirectly(@NonNull CacheAdUnit cacheAdUnit, @NonNull CdbResponseSlot directSlot) {
+    verify(cache, never()).remove(any());
+    verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, directSlot);
   }
 
   private void waitForIdleState() {
@@ -1385,6 +1520,13 @@ public class BidManagerFunctionalTest {
         });
 
     return waitingLatch;
+  }
+
+  private void givenDuringLiveBidCall(@NonNull Runnable action) {
+    doAnswer(invocation -> {
+      action.run();
+      return invocation.callRealMethod();
+    }).when(liveBidRequestSender).sendLiveBidRequest(any(), any());
   }
 
   private CdbResponseSlot givenMockedCdbRespondingSlot() throws Exception {

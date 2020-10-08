@@ -31,7 +31,6 @@ import org.junit.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import java.lang.Exception
 
 class LiveCdbCallListenerTests {
   @Mock
@@ -80,7 +79,7 @@ class LiveCdbCallListenerTests {
     verify(bidListener, never()).onNoBid()
     verify(bidListener, times(1)).onBidResponse(freshCdbResponseSlot)
     verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
-    verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, freshCdbResponseSlot);
+    verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, freshCdbResponseSlot)
   }
 
   @Test
@@ -104,7 +103,7 @@ class LiveCdbCallListenerTests {
   fun onBidResponse_givenEmptyResponseServedWithinTimeBudget_ThenDontCache_AndTriggerNoBid() {
     whenever(cdbResponse.slots).thenReturn(listOf())
     whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
-    whenever(bidManager.isBidSilent(freshCdbResponseSlot)).thenReturn(false);
+    whenever(bidManager.isBidSilent(freshCdbResponseSlot)).thenReturn(false)
 
     liveCdbCallListener.onCdbResponse(cdbRequest, cdbResponse)
 
@@ -119,7 +118,7 @@ class LiveCdbCallListenerTests {
   fun onBidResponse_givenSilentBidServedWithinTimeBudget_ThenCache_AndTriggerNoBid() {
     whenever(cdbResponse.slots).thenReturn(listOf(freshCdbResponseSlot))
     whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
-    whenever(bidManager.isBidSilent(freshCdbResponseSlot)).thenReturn(true);
+    whenever(bidManager.isBidSilent(freshCdbResponseSlot)).thenReturn(true)
 
     liveCdbCallListener.onCdbResponse(cdbRequest, cdbResponse)
 
@@ -146,7 +145,6 @@ class LiveCdbCallListenerTests {
     verify(bidListener, never()).onBidResponse(freshCdbResponseSlot)
     verify(bidListener, never()).onNoBid()
     verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
-    verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, cachedCdbResponseSlot)
   }
 
   @Test
@@ -154,7 +152,7 @@ class LiveCdbCallListenerTests {
     whenever(cdbResponse.slots).thenReturn(listOf(freshCdbResponseSlot))
     whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
     whenever(bidManager.consumeCachedBid(cacheAdUnit)).thenReturn(null)
-    whenever(bidManager.hasBidExpired(cachedCdbResponseSlot)).thenReturn(true);
+    whenever(bidManager.hasBidExpired(cachedCdbResponseSlot)).thenReturn(true)
     whenever(bidManager.isBidSilent(cachedCdbResponseSlot)).thenReturn(false)
     whenever(bidManager.consumeCachedBid(cacheAdUnit)).thenReturn(cachedCdbResponseSlot)
 
@@ -168,7 +166,6 @@ class LiveCdbCallListenerTests {
     verify(bidListener, never()).onBidResponse(freshCdbResponseSlot)
     verify(bidListener).onNoBid()
     verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
-    verify(bidLifecycleListener).onBidConsumed(any(), any())
   }
 
   @Test
@@ -209,7 +206,6 @@ class LiveCdbCallListenerTests {
     verify(bidLifecycleListener).onCdbCallFailed(cdbRequest, exception)
     verify(bidLifecycleListener, never()).onBidConsumed(any(), any())
   }
-
 
   @Test
   fun onBidResponse_givenNetworkErrorBeforeTimeBudgetExceeds_ThenTriggerNoBid_CdbFailed_AndDoNothingElse() {

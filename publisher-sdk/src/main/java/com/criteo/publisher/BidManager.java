@@ -197,8 +197,9 @@ public class BidManager implements ApplicationStoppedListener {
   public CdbResponseSlot consumeCachedBid(@NonNull CacheAdUnit cacheAdUnit) {
     synchronized (cacheLock) {
       CdbResponseSlot cdbResponseSlot = cache.peekAdUnit(cacheAdUnit);
-      if (cdbResponseSlot != null) {
+      if (cdbResponseSlot != null && (!isBidSilent(cdbResponseSlot) || hasBidExpired(cdbResponseSlot))) {
         cache.remove(cacheAdUnit);
+        bidLifecycleListener.onBidConsumed(cacheAdUnit, cdbResponseSlot);
       }
       return cdbResponseSlot;
     }
@@ -275,6 +276,12 @@ public class BidManager implements ApplicationStoppedListener {
   void setCacheAdUnits(@NonNull List<CdbResponseSlot> slots) {
     synchronized (cacheLock) {
       for (CdbResponseSlot slot : slots) {
+        CdbResponseSlot cachedSlot = cache.peekAdUnit(cache.detectCacheAdUnit(slot));
+        if (cachedSlot != null && isBidSilent(cachedSlot) && !hasBidExpired(cachedSlot)) {
+          // Do not override silence bid that was concurrently cached.
+          continue;
+        }
+
         if (slot.isValid()) {
           boolean isImmediateBid = slot.getCpmAsNumber() != null && slot.getCpmAsNumber() > 0
               && slot.getTtlInSeconds() == 0;
