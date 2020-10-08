@@ -165,7 +165,7 @@ class LiveCdbCallListenerTests {
   }
 
   @Test
-  fun onBidResponse_givenNetworkErrorBeforeTimeBudgetExceeds_ThenTriggerNoBid_CdbFailed_AndDoNothingElse() {
+  fun onBidResponse_givenNetworkErrorBeforeTimeBudgetExceeds_ThenDontCacheAnythingAndConsumeCache() {
     whenever(cdbResponse.slots).thenReturn(listOf(freshCdbResponseSlot))
     whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
 
@@ -173,13 +173,12 @@ class LiveCdbCallListenerTests {
     liveCdbCallListener.onCdbError(cdbRequest, exception)
     liveCdbCallListener.onTimeBudgetExceeded()
 
-    verify(bidManager, never()).consumeCachedBid(any(), any())
+    verify(bidManager).consumeCachedBid(cacheAdUnit, bidListener)
     verify(bidManager, never()).setTimeToNextCall(1_000)
     verify(bidManager, never()).setCacheAdUnits(any())
-    verify(bidListener, never()).onBidResponse(any())
-    verify(bidListener, times(1)).onNoBid()
-
+    verify(bidListener, never()).onBidResponse(freshCdbResponseSlot)
     verify(bidLifecycleListener, never()).onCdbCallFinished(cdbRequest, cdbResponse)
+    verify(bidLifecycleListener).onCdbCallFailed(cdbRequest, exception)
     verify(bidLifecycleListener, never()).onBidConsumed(any(), any())
     verify(bidLifecycleListener).onCdbCallFailed(cdbRequest, exception)
   }

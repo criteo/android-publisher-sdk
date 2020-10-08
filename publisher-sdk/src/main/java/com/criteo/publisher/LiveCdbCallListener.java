@@ -102,17 +102,13 @@ public class LiveCdbCallListener extends CdbCallListener {
   }
 
   /**
-   * Triggered when an error happens while fetching a bid. Following this, {@link
-   * BidListener#onNoBid()} is triggered, unless a no-bid was already returned by {@link
-   * LiveCdbCallListener#onTimeBudgetExceeded()} on a separate thread.
+   * Triggered when an error happens while fetching a bid. A bid is returned only if it is available in the cache,
+   * unless a no-bid was already returned by {@link LiveCdbCallListener#onTimeBudgetExceeded()} on a separate thread.
    */
   @Override
   public void onCdbError(@NonNull CdbRequest cdbRequest, @NonNull Exception exception) {
     super.onCdbError(cdbRequest, exception);
-    // noBid would already been called
-    if (isListenerTriggered.compareAndSet(false, true)) {
-      bidListener.onNoBid();
-    }
+    onTimeBudgetExceeded();
   }
 
   /**
@@ -121,10 +117,8 @@ public class LiveCdbCallListener extends CdbCallListener {
    */
   @Override
   public void onTimeBudgetExceeded() {
-    if (!isListenerTriggered.compareAndSet(false, true)) {
-      return;
+    if (isListenerTriggered.compareAndSet(false, true)) {
+      bidManager.consumeCachedBid(cacheAdUnit, bidListener);
     }
-
-    bidManager.consumeCachedBid(cacheAdUnit, bidListener);
   }
 }
