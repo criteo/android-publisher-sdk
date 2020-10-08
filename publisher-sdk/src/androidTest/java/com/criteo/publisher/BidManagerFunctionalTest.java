@@ -863,7 +863,6 @@ public class BidManagerFunctionalTest {
   @Test
   public void fetchForLiveBidRequest_GivenGlobalSilentModeOn_AndCacheEmpty_ShouldReturnNoBid()
       throws Exception {
-    givenKillSwitchIs(false);
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     BidListener bidListener = mock(BidListener.class);
@@ -873,14 +872,15 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     verify(bidListener).onNoBid();
-    verify(liveBidRequestSender, never()).sendLiveBidRequest(any(), any());
+    assertNoLiveBidIsConsumedFromCache();
+    assertNoLiveBidIsCached();
+    assertShouldNotCallCdbAndNotPopulateCache();
     verify(metricSendingQueueConsumer).sendMetricBatch();
   }
 
   @Test
   public void fetchForLiveBidRequest_GivenGlobalSilentModeOn_AndValidCacheEntry_ShouldReturnCachedBid()
       throws Exception {
-    givenKillSwitchIs(false);
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     CdbResponseSlot cdbResponseSlot = givenNotExpiredValidCachedBid(cacheAdUnit);
@@ -891,18 +891,18 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     verify(bidListener).onBidResponse(cdbResponseSlot);
-    verify(liveBidRequestSender, never()).sendLiveBidRequest(any(), any());
+    assertLiveBidIsConsumedFromCache(cacheAdUnit, cdbResponseSlot);
+    assertNoLiveBidIsCached();
+    assertShouldNotCallCdbAndNotPopulateCache();
     verify(metricSendingQueueConsumer).sendMetricBatch();
   }
 
   @Test
   public void fetchForLiveBidRequest_GivenGlobalSilentModeOn_AndExpiredCacheEntry_ShouldReturnNoBid()
       throws Exception {
-    givenTimeBudgetExceededWhenFetchingLiveBids();
-    givenKillSwitchIs(false);
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    givenExpiredValidCachedBid(cacheAdUnit);
+    CdbResponseSlot cdbResponseSlot = givenExpiredValidCachedBid(cacheAdUnit);
     BidListener bidListener = mock(BidListener.class);
 
     BidManager bidManagerSpy = givenGlobalSilenceMode(true);
@@ -910,14 +910,15 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     verify(bidListener).onNoBid();
-    verify(liveBidRequestSender, never()).sendLiveBidRequest(any(), any());
+    assertLiveBidIsConsumedFromCache(cacheAdUnit, cdbResponseSlot);
+    assertNoLiveBidIsCached();
+    assertShouldNotCallCdbAndNotPopulateCache();
     verify(metricSendingQueueConsumer).sendMetricBatch();
   }
 
   @Test
   public void fetchForLiveBidRequest_GivenGlobalSilentModeOn_AndSilencedCacheEntry_ShouldReturnNoBid()
       throws Exception {
-    givenKillSwitchIs(false);
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenNotExpiredSilentModeBidCached(cacheAdUnit);
@@ -928,77 +929,103 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     verify(bidListener).onNoBid();
-    verify(liveBidRequestSender, never()).sendLiveBidRequest(any(), any());
+    assertNoLiveBidIsConsumedFromCache();
+    assertNoLiveBidIsCached();
+    assertShouldNotCallCdbAndNotPopulateCache();
     verify(metricSendingQueueConsumer).sendMetricBatch();
   }
 
   @Test
-  public void fetchForLiveBidRequest_GivenGlobalSilentModeOff_AndCacheEmpty_ShouldFetchLiveBid()
+  public void fetchForLiveBidRequest_GivenGlobalSilentModeOff_ShouldFetchLiveBid() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    givenMockedCdbResponse();
+    BidListener bidListener = mock(BidListener.class);
+
+    BidManager bidManagerSpy = givenGlobalSilenceMode(false);
+    bidManagerSpy.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    assertShouldCallCdb(singletonList(cacheAdUnit));
+    verify(metricSendingQueueConsumer).sendMetricBatch();
+  }
+
+  @Test
+  public void fetchForLiveBidRequest_ReceivedTimeToNextCall_TimeBudgetRespected_ShouldUpdateGlobalSilentMode()
+      throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    BidListener bidListener = mock(BidListener.class);
+
+    CdbResponse cdbResponse = givenMockedCdbResponse();
+    when(cdbResponse.getTimeToNextCall()).thenReturn(10);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    assertThat(bidManager.isGlobalSilenceEnabled()).isTrue();
+  }
+
+  @Test
+  public void fetchForLiveBidRequest_ReceivedTimeToNextCall_TimeBudgetExceeded_ShouldUpdateGlobalSilentMode()
       throws Exception {
     givenTimeBudgetExceededWhenFetchingLiveBids();
-    givenKillSwitchIs(false);
+
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManagerSpy = givenGlobalSilenceMode(false);
-    bidManagerSpy.getLiveBidForAdUnit(adUnit, bidListener);
+    CdbResponse cdbResponse = givenMockedCdbResponse();
+    when(cdbResponse.getTimeToNextCall()).thenReturn(10);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
     waitForIdleState();
 
-    verify(liveBidRequestSender).sendLiveBidRequest(eq(cacheAdUnit), any());
-    verify(metricSendingQueueConsumer).sendMetricBatch();
+    assertThat(bidManager.isGlobalSilenceEnabled()).isTrue();
   }
 
   @Test
-  public void fetchForLiveBidRequest_GivenGlobalSilentModeOff_AndValidCacheEntry_ShouldFetchLiveBid()
+  public void fetchForLiveBidRequest_ReceivedNoTimeToNextCall_TimeBudgetRespected_ShouldNotUpdateGlobalSilentMode()
       throws Exception {
-    givenKillSwitchIs(false);
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    givenNotExpiredValidCachedBid(cacheAdUnit);
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManagerSpy = givenGlobalSilenceMode(false);
-    bidManagerSpy.getLiveBidForAdUnit(adUnit, bidListener);
+    CdbResponse cdbResponse = givenMockedCdbResponse();
+    when(cdbResponse.getTimeToNextCall()).thenReturn(0);
+
+    BidManager bidManager = createBidManager();
+
+    givenDuringLiveBidCall(() -> bidManager.setTimeToNextCall(42));
+
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
     waitForIdleState();
 
-    verify(liveBidRequestSender).sendLiveBidRequest(eq(cacheAdUnit), any());
-    verify(metricSendingQueueConsumer).sendMetricBatch();
+    assertThat(bidManager.isGlobalSilenceEnabled()).isTrue();
   }
 
   @Test
-  public void fetchForLiveBidRequest_GivenGlobalSilentModeOff_AndExpiredCacheEntry_ShouldReturnNoBid()
+  public void fetchForLiveBidRequest_ReceivedNoTimeToNextCall_TimeBudgetExpected_ShouldNotUpdateGlobalSilentMode()
       throws Exception {
-    givenKillSwitchIs(false);
+    givenTimeBudgetExceededWhenFetchingLiveBids();
+
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    givenExpiredSilentModeBidCached(cacheAdUnit);
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManagerSpy = givenGlobalSilenceMode(true);
-    bidManagerSpy.getLiveBidForAdUnit(adUnit, bidListener);
+    CdbResponse cdbResponse = givenMockedCdbResponse();
+    when(cdbResponse.getTimeToNextCall()).thenReturn(0);
+
+    BidManager bidManager = createBidManager();
+
+    givenDuringLiveBidCall(() -> bidManager.setTimeToNextCall(42));
+
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
     waitForIdleState();
 
-    verify(bidListener).onNoBid();
-    verify(liveBidRequestSender, never()).sendLiveBidRequest(any(), any());
-    verify(metricSendingQueueConsumer).sendMetricBatch();
-  }
-
-  @Test
-  public void fetchForLiveBidRequest_GivenGlobalSilentModeOff_AndSilencedCacheEntry_ShouldReturnNoBid() {
-    givenKillSwitchIs(false);
-    CacheAdUnit cacheAdUnit = sampleAdUnit();
-    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    givenNotExpiredSilentModeBidCached(cacheAdUnit);
-    BidListener bidListener = mock(BidListener.class);
-
-    BidManager bidManagerSpy = givenGlobalSilenceMode(true);
-    bidManagerSpy.getLiveBidForAdUnit(adUnit, bidListener);
-    waitForIdleState();
-
-    verify(bidListener).onNoBid();
-    verify(liveBidRequestSender, never()).sendLiveBidRequest(any(), any());
-    verify(metricSendingQueueConsumer).sendMetricBatch();
+    assertThat(bidManager.isGlobalSilenceEnabled()).isTrue();
   }
 
   @Test

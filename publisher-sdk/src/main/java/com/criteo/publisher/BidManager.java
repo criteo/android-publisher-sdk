@@ -247,6 +247,7 @@ public class BidManager implements ApplicationStoppedListener {
       // not allowed to request CDB, but cache has something usable
       if (isGlobalSilenceEnabled && isCachedBidUsable && !isCachedBidSilent) {
         cache.remove(cacheAdUnit);
+        bidLifecycleListener.onBidConsumed(cacheAdUnit, cachedCdbResponseSlot);
         bidListener.onBidResponse(cachedCdbResponseSlot);
       } else if (isGlobalSilenceEnabled || isCachedBidSilent) { // silenced and nothing cached
         bidListener.onNoBid();
