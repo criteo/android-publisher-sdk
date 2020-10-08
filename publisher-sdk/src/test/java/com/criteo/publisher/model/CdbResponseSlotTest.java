@@ -132,7 +132,7 @@ public class CdbResponseSlotTest {
   public void testSlotWithNullCmp() throws JSONException {
     response.put(DISPLAY_URL, "https://www.criteo.com/");
     slot = CdbResponseSlot.fromJson(response);
-    assertTrue(slot.isValid());
+    assertFalse(slot.isValid());
   }
 
   @Test

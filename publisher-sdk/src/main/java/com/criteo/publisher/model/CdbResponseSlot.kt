@@ -65,7 +65,8 @@ data class CdbResponseSlot(
 
   fun isValid(): Boolean {
     val hasInvalidCpm = cpmAsNumber ?: -1.0 < 0.0
-    if (hasInvalidCpm) {
+    val isNoBid = cpmAsNumber == 0.0 && ttlInSeconds == 0
+    if (hasInvalidCpm || isNoBid) {
       return false
     }
 
