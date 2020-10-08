@@ -27,6 +27,7 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.AdditionalAnswers.answerVoid;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.clearInvocations;
@@ -1105,7 +1106,49 @@ public class BidManagerFunctionalTest {
 
     verify(bidListener).onNoBid();
     verify(cache).add(newSlot);
+    verify(newSlot).setTimeOfDownload(anyLong());
     verify(bidLifecycleListener, never()).onBidConsumed(any(), any());
+    verify(bidLifecycleListener).onBidCached(newSlot);
+  }
+
+  @Test
+  public void fetchForLiveBidRequest_ExpiredBidCached_TimeBudgetExceeded_ShouldNotifyForNoBid()
+      throws Exception {
+    givenTimeBudgetExceededWhenFetchingLiveBids();
+
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    CdbResponseSlot cachedSlot = givenExpiredValidCachedBid(cacheAdUnit);
+    BidListener bidListener = mock(BidListener.class);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    verify(bidListener).onNoBid();
+    verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, cachedSlot);
+    verify(bidLifecycleListener, never()).onBidCached(any());
+  }
+
+  @Test
+  public void fetchForLiveBidRequest_ValidBidFetched_ExpiredBidCached_TimeBudgetExceeded_ShouldNotifyForNoBidAndPopulateCache()
+      throws Exception {
+    givenTimeBudgetExceededWhenFetchingLiveBids();
+
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    CdbResponseSlot cachedSlot = givenExpiredValidCachedBid(cacheAdUnit);
+    CdbResponseSlot newSlot = givenMockedCdbRespondingSlot();
+    BidListener bidListener = mock(BidListener.class);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    verify(bidListener).onNoBid();
+    verify(cache).add(newSlot);
+    verify(newSlot).setTimeOfDownload(anyLong());
+    verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, cachedSlot);
     verify(bidLifecycleListener).onBidCached(newSlot);
   }
 
