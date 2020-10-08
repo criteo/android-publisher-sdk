@@ -95,4 +95,9 @@ public class SdkCache {
   int getItemCount() {
     return slotMap.size();
   }
+
+  @VisibleForTesting
+  public void put(@NonNull CacheAdUnit cacheAdUnit, @Nullable CdbResponseSlot slot) {
+    slotMap.put(cacheAdUnit, slot);
+  }
 }

@@ -82,7 +82,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
@@ -101,7 +100,6 @@ public class BidManagerFunctionalTest {
   @MockBean
   private Publisher publisher;
 
-  @Mock
   private SdkCache cache;
 
   @MockBean
@@ -144,6 +142,8 @@ public class BidManagerFunctionalTest {
     MockitoAnnotations.initMocks(this);
 
     dependencyProvider = mockedDependenciesRule.getDependencyProvider();
+
+    cache = spy(new SdkCache(dependencyProvider.provideDeviceUtil()));
 
     when(publisher.getCriteoPublisherId()).thenReturn("cpId");
     when(publisher.getBundleId()).thenReturn("bundle.id");
@@ -1023,7 +1023,8 @@ public class BidManagerFunctionalTest {
     InOrder inOrder = inOrder(bidListener, slot);
     inOrder.verify(slot).setTimeOfDownload(42);
     inOrder.verify(bidListener).onBidResponse(slot);
-    assertCacheIsNotUpdated();
+    verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, slot);
+    assertNoLiveBidIsCached();
   }
 
   @Test
@@ -1041,8 +1042,7 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     verify(bidListener).onBidResponse(slot);
-    verify(cache).remove(cacheAdUnit);
-    verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, slot);
+    assertLiveBidIsConsumedFromCache(cacheAdUnit, slot);
   }
 
   @Test
@@ -1062,14 +1062,13 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     verify(bidListener).onBidResponse(cachedSlot);
-    verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, cachedSlot);
-    verify(bidLifecycleListener).onBidCached(newSlot);
+    assertLiveBidIsCached(newSlot);
+    assertLiveBidIsConsumedFromCache(cacheAdUnit, cachedSlot);
 
     InOrder inOrder = inOrder(cache, newSlot);
     inOrder.verify(cache).remove(cacheAdUnit);
     inOrder.verify(newSlot).setTimeOfDownload(42);
     inOrder.verify(cache).add(newSlot);
-    inOrder.verifyNoMoreInteractions();
   }
 
   @Test
@@ -1086,8 +1085,8 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     verify(bidListener).onNoBid();
-    verify(bidLifecycleListener, never()).onBidConsumed(any(), any());
-    verify(bidLifecycleListener, never()).onBidCached(any());
+    assertNoLiveBidIsCached();
+    assertNoLiveBidIsConsumedFromCache();
   }
 
   @Test
@@ -1105,10 +1104,8 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     verify(bidListener).onNoBid();
-    verify(cache).add(newSlot);
-    verify(newSlot).setTimeOfDownload(anyLong());
-    verify(bidLifecycleListener, never()).onBidConsumed(any(), any());
-    verify(bidLifecycleListener).onBidCached(newSlot);
+    assertLiveBidIsCached(newSlot);
+    assertNoLiveBidIsConsumedFromCache();
   }
 
   @Test
@@ -1126,8 +1123,8 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     verify(bidListener).onNoBid();
-    verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, cachedSlot);
-    verify(bidLifecycleListener, never()).onBidCached(any());
+    assertNoLiveBidIsCached();
+    assertLiveBidIsConsumedFromCache(cacheAdUnit, cachedSlot);
   }
 
   @Test
@@ -1146,10 +1143,8 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     verify(bidListener).onNoBid();
-    verify(cache).add(newSlot);
-    verify(newSlot).setTimeOfDownload(anyLong());
-    verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, cachedSlot);
-    verify(bidLifecycleListener).onBidCached(newSlot);
+    assertLiveBidIsCached(newSlot);
+    assertLiveBidIsConsumedFromCache(cacheAdUnit, cachedSlot);
   }
 
   @Test
@@ -1229,9 +1224,25 @@ public class BidManagerFunctionalTest {
     verify(bidLifecycleListener, never()).onBidConsumed(any(), any());
   }
 
-  private void assertCacheIsNotUpdated() {
+  private void assertLiveBidIsCached(@NonNull CdbResponseSlot cachedSlot) {
+    verify(cachedSlot).setTimeOfDownload(anyLong());
+    verify(cache).add(cachedSlot);
+    verify(bidLifecycleListener).onBidCached(cachedSlot);
+  }
+
+  private void assertNoLiveBidIsCached() {
     verify(cache, never()).add(any());
+    verify(bidLifecycleListener, never()).onBidCached(any());
+  }
+
+  private void assertLiveBidIsConsumedFromCache(@NonNull CacheAdUnit cacheAdUnit, @NonNull CdbResponseSlot cachedSlot) {
+    verify(cache).remove(cacheAdUnit);
+    verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, cachedSlot);
+  }
+
+  private void assertNoLiveBidIsConsumedFromCache() {
     verify(cache, never()).remove(any());
+    verify(bidLifecycleListener, never()).onBidConsumed(any(), any());
   }
 
   private void waitForIdleState() {
@@ -1245,7 +1256,7 @@ public class BidManagerFunctionalTest {
     when(slot.isExpired(clock)).thenReturn(false);
     when(slot.getTtlInSeconds()).thenReturn(60);
 
-    when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
+    cache.put(cacheAdUnit, slot);
     return slot;
   }
 
@@ -1256,8 +1267,7 @@ public class BidManagerFunctionalTest {
     when(slot.getTtlInSeconds()).thenReturn(60);
     when(slot.isExpired(clock)).thenReturn(true);
 
-    when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
-
+    cache.put(cacheAdUnit, slot);
     return slot;
   }
 
@@ -1268,13 +1278,12 @@ public class BidManagerFunctionalTest {
     when(slot.getTtlInSeconds()).thenReturn(0);
     when(slot.isExpired(clock)).thenReturn(false);
 
-    when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
-
+    cache.put(cacheAdUnit, slot);
     return slot;
   }
 
   private void givenNoLastBid(CacheAdUnit cacheAdUnit) {
-    when(cache.peekAdUnit(cacheAdUnit)).thenReturn(null);
+    cache.put(cacheAdUnit, null);
   }
 
   private void givenNotExpiredSilentModeBidCached(CacheAdUnit cacheAdUnit) {
@@ -1283,7 +1292,7 @@ public class BidManagerFunctionalTest {
     when(slot.getTtlInSeconds()).thenReturn(60);
     when(slot.isExpired(clock)).thenReturn(false);
 
-    when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
+    cache.put(cacheAdUnit, slot);
   }
 
   @NonNull
@@ -1293,8 +1302,7 @@ public class BidManagerFunctionalTest {
     when(slot.getTtlInSeconds()).thenReturn(60);
     when(slot.isExpired(clock)).thenReturn(true);
 
-    when(cache.peekAdUnit(cacheAdUnit)).thenReturn(slot);
-
+    cache.put(cacheAdUnit, slot);
     return slot;
   }
 

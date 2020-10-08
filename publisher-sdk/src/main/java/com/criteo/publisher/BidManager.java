@@ -197,7 +197,9 @@ public class BidManager implements ApplicationStoppedListener {
   public CdbResponseSlot consumeCachedBid(@NonNull CacheAdUnit cacheAdUnit) {
     synchronized (cacheLock) {
       CdbResponseSlot cdbResponseSlot = cache.peekAdUnit(cacheAdUnit);
-      cache.remove(cacheAdUnit);
+      if (cdbResponseSlot != null) {
+        cache.remove(cacheAdUnit);
+      }
       return cdbResponseSlot;
     }
   }
@@ -240,6 +242,7 @@ public class BidManager implements ApplicationStoppedListener {
 
       if (isCachedBidExpired) {
         cache.remove(cacheAdUnit);
+        bidLifecycleListener.onBidConsumed(cacheAdUnit, cachedCdbResponseSlot);
       }
 
       // not allowed to request CDB, but cache has something usable
