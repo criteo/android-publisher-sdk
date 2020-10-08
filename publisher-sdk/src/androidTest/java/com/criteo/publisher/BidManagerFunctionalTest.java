@@ -1148,6 +1148,50 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
+  public void fetchForLiveBidRequest_NoBidFetched_ValidBidCached_TimeBudgetRespected_ShouldNotifyForNoBid()
+      throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    givenNotExpiredValidCachedBid(cacheAdUnit);
+    CdbResponseSlot newSlot = givenMockedCdbRespondingSlot();
+    when(newSlot.getCpmAsNumber()).thenReturn(0.);
+    when(newSlot.getTtlInSeconds()).thenReturn(0);
+
+    BidListener bidListener = mock(BidListener.class);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    verify(bidListener).onNoBid();
+    assertNoLiveBidIsCached();
+    assertNoLiveBidIsConsumedFromCache();
+  }
+
+  @Test
+  public void fetchForLiveBidRequest_NoBidFetched_ValidBidCached_TimeBudgetExceeded_ShouldNotifyForBid()
+      throws Exception {
+    givenTimeBudgetExceededWhenFetchingLiveBids();
+
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    CdbResponseSlot cachedSlot = givenNotExpiredValidCachedBid(cacheAdUnit);
+    CdbResponseSlot newSlot = givenMockedCdbRespondingSlot();
+    when(newSlot.getCpmAsNumber()).thenReturn(0.);
+    when(newSlot.getTtlInSeconds()).thenReturn(0);
+
+    BidListener bidListener = mock(BidListener.class);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    verify(bidListener).onBidResponse(cachedSlot);
+    assertNoLiveBidIsCached();
+    assertLiveBidIsConsumedFromCache(cacheAdUnit, cachedSlot);
+  }
+
+  @Test
   public void setCacheAdUnits_GivenValidCdbResponseSlot_ShouldTriggerBidCached() {
     CdbResponseSlot cdbResponseSlot = givenValidCdbResponseSlot();
 
@@ -1344,8 +1388,10 @@ public class BidManagerFunctionalTest {
   }
 
   private CdbResponseSlot givenMockedCdbRespondingSlot() throws Exception {
-    CdbResponseSlot slot = mock(CdbResponseSlot.class);
-    when(slot.isValid()).thenReturn(true);
+    CdbResponseSlot slot = spy(CdbResponseSlot.class);
+    when(slot.getCpmAsNumber()).thenReturn(1337.);
+    when(slot.getTtlInSeconds()).thenReturn(42);
+    when(slot.getDisplayUrl()).thenReturn("http://foo.bar");
     CdbResponse response = givenMockedCdbResponse();
     when(response.getSlots()).thenReturn(singletonList(slot));
     return slot;
