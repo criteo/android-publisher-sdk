@@ -70,7 +70,7 @@ class LiveCdbCallListenerTests {
     whenever(freshCdbResponseSlot.isValid()).thenReturn(true)
     whenever(cdbResponse.slots).thenReturn(listOf(freshCdbResponseSlot))
     whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
-    whenever(bidManager.isBidSilent(freshCdbResponseSlot)).thenReturn(false)
+    whenever(bidManager.isBidCurrentlySilent(freshCdbResponseSlot)).thenReturn(false)
 
     liveCdbCallListener.onCdbResponse(cdbRequest, cdbResponse)
 
@@ -87,7 +87,7 @@ class LiveCdbCallListenerTests {
     whenever(freshCdbResponseSlot.isValid()).thenReturn(false)
     whenever(cdbResponse.slots).thenReturn(listOf(freshCdbResponseSlot))
     whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
-    whenever(bidManager.isBidSilent(freshCdbResponseSlot)).thenReturn(false)
+    whenever(bidManager.isBidCurrentlySilent(freshCdbResponseSlot)).thenReturn(false)
 
     liveCdbCallListener.onCdbResponse(cdbRequest, cdbResponse)
 
@@ -103,7 +103,7 @@ class LiveCdbCallListenerTests {
   fun onBidResponse_givenEmptyResponseServedWithinTimeBudget_ThenDontCache_AndTriggerNoBid() {
     whenever(cdbResponse.slots).thenReturn(listOf())
     whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
-    whenever(bidManager.isBidSilent(freshCdbResponseSlot)).thenReturn(false)
+    whenever(bidManager.isBidCurrentlySilent(freshCdbResponseSlot)).thenReturn(false)
 
     liveCdbCallListener.onCdbResponse(cdbRequest, cdbResponse)
 
@@ -118,9 +118,10 @@ class LiveCdbCallListenerTests {
   fun onBidResponse_givenSilentBidServedWithinTimeBudget_ThenCache_AndTriggerNoBid() {
     whenever(cdbResponse.slots).thenReturn(listOf(freshCdbResponseSlot))
     whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
-    whenever(bidManager.isBidSilent(freshCdbResponseSlot)).thenReturn(true)
+    whenever(bidManager.isBidCurrentlySilent(freshCdbResponseSlot)).thenReturn(true)
 
     liveCdbCallListener.onCdbResponse(cdbRequest, cdbResponse)
+    liveCdbCallListener.onTimeBudgetExceeded()
 
     verify(bidManager).setTimeToNextCall(1_000)
     verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
@@ -130,78 +131,34 @@ class LiveCdbCallListenerTests {
   }
 
   @Test
-  fun onBidResponse_givenTimeBudgetExceeded_AndValidCacheEntry_ThenReturnCachedResponse_AndUpdateCache() {
+  fun onBidResponse_givenTimeBudgetExceeded_NoTimeout_ThenConsumeCache_AndCacheNewResponse() {
     whenever(cdbResponse.slots).thenReturn(listOf(freshCdbResponseSlot))
     whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
-    whenever(bidManager.consumeCachedBid(cacheAdUnit)).thenReturn(cachedCdbResponseSlot)
 
     liveCdbCallListener.onTimeBudgetExceeded()
     liveCdbCallListener.onCdbResponse(cdbRequest, cdbResponse)
 
-    verify(bidManager).setTimeToNextCall(1_000)
-    verify(bidManager).consumeCachedBid(cacheAdUnit)
-    verify(bidManager).setCacheAdUnits(cdbResponse.slots)
-    verify(bidListener).onBidResponse(cachedCdbResponseSlot)
-    verify(bidListener, never()).onBidResponse(freshCdbResponseSlot)
-    verify(bidListener, never()).onNoBid()
-    verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
-  }
-
-  @Test
-  fun onBidResponse_givenTimeBudgetExceeded_AndCacheEntryExpired_ThenCacheNewResponse_AndTriggerNoBid() {
-    whenever(cdbResponse.slots).thenReturn(listOf(freshCdbResponseSlot))
-    whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
-    whenever(bidManager.consumeCachedBid(cacheAdUnit)).thenReturn(null)
-    whenever(bidManager.hasBidExpired(cachedCdbResponseSlot)).thenReturn(true)
-    whenever(bidManager.isBidSilent(cachedCdbResponseSlot)).thenReturn(false)
-    whenever(bidManager.consumeCachedBid(cacheAdUnit)).thenReturn(cachedCdbResponseSlot)
-
-    liveCdbCallListener.onTimeBudgetExceeded()
-    liveCdbCallListener.onCdbResponse(cdbRequest, cdbResponse)
-
-    verify(bidManager).consumeCachedBid(cacheAdUnit)
+    verify(bidManager).consumeCachedBid(cacheAdUnit, bidListener)
     verify(bidManager).setTimeToNextCall(1_000)
     verify(bidManager).setCacheAdUnits(cdbResponse.slots)
-    verify(bidListener, never()).onBidResponse(cachedCdbResponseSlot)
     verify(bidListener, never()).onBidResponse(freshCdbResponseSlot)
-    verify(bidListener).onNoBid()
-    verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
-  }
-
-  @Test
-  fun onBidResponse_givenTimeBudgetExceeded_NoTimeout_AndNoValidCacheEntry_ThenCacheNewResponse_AndTriggerNoBid() {
-    whenever(cdbResponse.slots).thenReturn(listOf(freshCdbResponseSlot))
-    whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
-    whenever(bidManager.consumeCachedBid(cacheAdUnit)).thenReturn(null)
-
-    liveCdbCallListener.onTimeBudgetExceeded()
-    liveCdbCallListener.onCdbResponse(cdbRequest, cdbResponse)
-
-    verify(bidManager).consumeCachedBid(cacheAdUnit)
-    verify(bidManager).setTimeToNextCall(1_000)
-    verify(bidManager).setCacheAdUnits(cdbResponse.slots)
-    verify(bidListener, never()).onBidResponse(cachedCdbResponseSlot)
-    verify(bidListener, never()).onBidResponse(freshCdbResponseSlot)
-    verify(bidListener).onNoBid()
     verify(bidLifecycleListener).onCdbCallFinished(cdbRequest, cdbResponse)
     verify(bidLifecycleListener, never()).onBidConsumed(any(), any())
   }
 
   @Test
-  fun onBidResponse_givenTimeout_AndNoValidCacheEntry_ThenDontCacheResponseAndTriggerNoBid() {
+  fun onBidResponse_givenTimeout_ThenDontCacheAnythingAndConsumeCache() {
     whenever(cdbResponse.slots).thenReturn(listOf(freshCdbResponseSlot))
     whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
-    whenever(bidManager.consumeCachedBid(cacheAdUnit)).thenReturn(null)
 
     val exception = Exception()
     liveCdbCallListener.onTimeBudgetExceeded()
     liveCdbCallListener.onCdbError(cdbRequest, exception)
 
-    verify(bidManager).consumeCachedBid(cacheAdUnit)
+    verify(bidManager).consumeCachedBid(cacheAdUnit, bidListener)
     verify(bidManager, never()).setTimeToNextCall(1_000)
     verify(bidManager, never()).setCacheAdUnits(any())
-    verify(bidListener, never()).onBidResponse(any())
-    verify(bidListener, times(1)).onNoBid()
+    verify(bidListener, never()).onBidResponse(freshCdbResponseSlot)
     verify(bidLifecycleListener, never()).onCdbCallFinished(cdbRequest, cdbResponse)
     verify(bidLifecycleListener).onCdbCallFailed(cdbRequest, exception)
     verify(bidLifecycleListener, never()).onBidConsumed(any(), any())
@@ -211,13 +168,12 @@ class LiveCdbCallListenerTests {
   fun onBidResponse_givenNetworkErrorBeforeTimeBudgetExceeds_ThenTriggerNoBid_CdbFailed_AndDoNothingElse() {
     whenever(cdbResponse.slots).thenReturn(listOf(freshCdbResponseSlot))
     whenever(cdbResponse.timeToNextCall).thenReturn(1_000)
-    whenever(bidManager.consumeCachedBid(cacheAdUnit)).thenReturn(null)
 
     val exception = Exception()
     liveCdbCallListener.onCdbError(cdbRequest, exception)
     liveCdbCallListener.onTimeBudgetExceeded()
 
-    verify(bidManager, never()).consumeCachedBid(cacheAdUnit)
+    verify(bidManager, never()).consumeCachedBid(any(), any())
     verify(bidManager, never()).setTimeToNextCall(1_000)
     verify(bidManager, never()).setCacheAdUnits(any())
     verify(bidListener, never()).onBidResponse(any())
