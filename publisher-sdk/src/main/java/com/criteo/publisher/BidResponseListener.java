@@ -19,6 +19,7 @@ package com.criteo.publisher;
 import androidx.annotation.Keep;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.advancednative.CriteoNativeLoader;
+import com.criteo.publisher.model.AdUnit;
 
 @Keep
 public interface BidResponseListener {
@@ -37,7 +38,7 @@ public interface BidResponseListener {
    *   <li>{@link CriteoNativeLoader#loadAd(Bid)}: display a native ad</li>
    * </ul>
    * <p>
-   * Please note that the <code>loadAd</code> method should match the kind of Ad the bid was asked for.
+   * Please note that the <code>loadAd</code> method should match the kind of {@link AdUnit} the bid was asked for.
    *
    * @param bid <code>null</code> in case of no bid, or a bid object that can be used to display an Ad
    * @see <a href="https://publisherdocs.criteotilt.com/app/android/app-bidding/inhouse/">InHouse documentation</a>
