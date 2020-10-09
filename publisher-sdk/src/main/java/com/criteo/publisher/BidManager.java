@@ -220,14 +220,7 @@ public class BidManager implements ApplicationStoppedListener {
   }
 
   @VisibleForTesting
-  public void getLiveBidForAdUnit(@NonNull AdUnit adUnit, @NonNull BidListener bidListener) {
-    fetchForLiveBidRequest(adUnit, bidListener);
-  }
-
-  private void fetchForLiveBidRequest(
-      @NonNull AdUnit adUnit,
-      @NonNull BidListener bidListener
-  ) {
+  void getLiveBidForAdUnit(@NonNull AdUnit adUnit, @NonNull BidListener bidListener) {
     if (killSwitchEngaged()) {
       bidListener.onNoBid();
       return;
