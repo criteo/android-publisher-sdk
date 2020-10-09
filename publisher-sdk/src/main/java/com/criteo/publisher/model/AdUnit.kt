@@ -15,9 +15,11 @@
  */
 package com.criteo.publisher.model
 
+import androidx.annotation.Keep
 import com.criteo.publisher.util.AdUnitType
 
-internal interface AdUnit {
+@Keep
+interface AdUnit {
   val adUnitId: String
   val adUnitType: AdUnitType
 }
