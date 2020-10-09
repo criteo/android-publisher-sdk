@@ -1330,6 +1330,51 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
+  public void fetchForLiveBidRequest_GivenAnOngoingFetch_AndASecondFetchIsMade_BothFetchAreExecuteConcurrently()
+      throws Exception {
+    givenTimeBudgetRespectedWhenFetchingLiveBids();
+
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    CdbResponseSlot newSlot1 = givenMockedCdbRespondingSlot();
+    CdbResponseSlot newSlot2 = givenMockedCdbRespondingSlot();
+
+    CdbResponse response1 = givenMockedCdbResponse();
+    CdbResponse response2 = givenMockedCdbResponse();
+    when(response1.getSlots()).thenReturn(singletonList(newSlot1));
+    when(response2.getSlots()).thenReturn(singletonList(newSlot2));
+
+    CountDownLatch secondSlotIsReceived = new CountDownLatch(1);
+
+    BidListener bidListener = mock(BidListener.class);
+    doAnswer(answerVoid(ignored -> {
+      secondSlotIsReceived.countDown();
+    })).when(bidListener).onBidResponse(newSlot2);
+
+    BidManager bidManager = createBidManager();
+
+    doAnswer(invocation -> {
+      // Fetch a second bid and wait until it is received by listener
+      // Situation is unblocked only if multiple concurrent calls are possible
+      bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+      secondSlotIsReceived.await();
+
+      return response1;
+    }).doReturn(response2).when(api).loadCdb(any(), any());
+
+    bidManager.getLiveBidForAdUnit(adUnit, bidListener);
+    waitForIdleState();
+
+    InOrder inOrder = inOrder(bidListener);
+    inOrder.verify(bidListener).onBidResponse(newSlot2);
+    inOrder.verify(bidListener).onBidResponse(newSlot1);
+    inOrder.verifyNoMoreInteractions();
+    assertNoLiveBidIsCached();
+    assertLiveBidIsConsumedDirectly(cacheAdUnit, newSlot1);
+    assertLiveBidIsConsumedDirectly(cacheAdUnit, newSlot2);
+  }
+
+  @Test
   public void setCacheAdUnits_GivenValidCdbResponseSlot_ShouldTriggerBidCached() {
     CdbResponseSlot cdbResponseSlot = givenValidCdbResponseSlot();
 
@@ -1432,6 +1477,7 @@ public class BidManagerFunctionalTest {
   }
 
   private void assertLiveBidIsConsumedDirectly(@NonNull CacheAdUnit cacheAdUnit, @NonNull CdbResponseSlot directSlot) {
+    verify(directSlot).setTimeOfDownload(anyLong());
     verify(cache, never()).remove(any());
     verify(bidLifecycleListener).onBidConsumed(cacheAdUnit, directSlot);
   }
