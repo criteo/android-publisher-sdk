@@ -51,7 +51,10 @@ public class CriteoBannerListenerCallTask implements Runnable {
 
   @Override
   public void run() {
-    if (listener == null) {
+    CriteoBannerView bannerView = bannerViewRef.get();
+
+    // If banner is null, it means that publisher released it.
+    if (listener == null || bannerView == null) {
       return;
     }
 
@@ -60,7 +63,7 @@ public class CriteoBannerListenerCallTask implements Runnable {
         listener.onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
         break;
       case VALID:
-        listener.onAdReceived(bannerViewRef.get());
+        listener.onAdReceived(bannerView);
         break;
       case CLICK:
         listener.onAdClicked();

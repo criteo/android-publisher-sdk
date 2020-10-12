@@ -25,6 +25,7 @@
     - Replace `Criteo#setBidsForAdUnit(Object, AdUnit)` method by `Criteo#enrichAdObjectWithBid(Object, Bid)`
     - Use `Criteo#loadBid(AdUnit, BidResponseListener)` method to provide `Bid` object
   - Make `CriteoNativeAdListener` an interface instead of an abstract class
+  - Replace `View` parameter by a `CriteoBannerView` in `CriteoBannerAdListener#onAdReceived`
 
 - Features
   - CriteoBannerView is now a custom view that can be included directly in a layout file.

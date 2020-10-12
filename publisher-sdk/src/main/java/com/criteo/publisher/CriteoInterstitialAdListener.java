@@ -28,12 +28,11 @@ import androidx.annotation.UiThread;
 public interface CriteoInterstitialAdListener extends CriteoAdListener {
 
   /**
-   * Callback invoked when an interstitial ad is requested and valid bid is answered and creative is
-   * successfully received.
+   * Callback invoked when an interstitial ad is requested and valid bid is answered and creative is successfully
+   * received.
    * <p>
-   * From this notification, publisher are able to display the interstitial ad call by calling
-   * {@link CriteoInterstitial#show()}. It can be done directly in the implementation of this
-   * callback, or later.
+   * From this notification, publisher are able to display the interstitial ad by calling {@link
+   * CriteoInterstitial#show()}. It can be done directly in the implementation of this callback, or later.
    */
   @UiThread
   void onAdReceived(@NonNull CriteoInterstitial interstitial);

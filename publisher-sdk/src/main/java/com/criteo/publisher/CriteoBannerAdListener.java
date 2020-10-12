@@ -16,12 +16,16 @@
 
 package com.criteo.publisher;
 
-import android.view.View;
+import androidx.annotation.NonNull;
+import androidx.annotation.UiThread;
 
 public interface CriteoBannerAdListener extends CriteoAdListener {
 
   /**
-   * Called when an ad is successfully fetched.
+   * Callback invoked when a banner ad is requested and valid bid is successfully received.
+   * <p>
+   * From this notification, the banner view is displaying the ad and publisher can add it in their view hierarchy.
    */
-  void onAdReceived(View view);
+  @UiThread
+  void onAdReceived(@NonNull CriteoBannerView view);
 }
