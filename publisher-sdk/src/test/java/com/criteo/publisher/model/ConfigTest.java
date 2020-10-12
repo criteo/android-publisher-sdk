@@ -190,6 +190,16 @@ public class ConfigTest {
     refreshConfig_assertItIsUnchanged(newConfig, Config::getLiveBiddingTimeBudgetInMillis);
   }
 
+  @Test
+  public void refreshConfig_GivenMissingPrefetchOnInitEnabled_ItIsUnchanged() throws Exception {
+    givenNewConfig();
+
+    RemoteConfigResponse newConfig = givenFullNewPayload(config);
+    when(newConfig.getPrefetchOnInitEnabled()).thenReturn(null);
+
+    refreshConfig_assertItIsUnchanged(newConfig, Config::isPrefetchOnInitEnabled);
+  }
+
   private <T> void refreshConfig_assertItIsUnchanged(
       RemoteConfigResponse newConfig,
       Function<Config, T> projection
@@ -216,7 +226,8 @@ public class ConfigTest {
         "dataMode",
         false,
         false,
-        42
+        42,
+        false
     );
 
     doAnswer(answerVoid((RemoteConfigResponse ignored, OutputStream outputStream) -> {
@@ -288,6 +299,7 @@ public class ConfigTest {
     when(response.getCsmEnabled()).thenReturn(!config.isCsmEnabled());
     when(response.getLiveBiddingEnabled()).thenReturn(!config.isLiveBiddingEnabled());
     when(response.getLiveBiddingTimeBudgetInMillis()).thenReturn(1 + config.getLiveBiddingTimeBudgetInMillis());
+    when(response.getPrefetchOnInitEnabled()).thenReturn(!config.isPrefetchOnInitEnabled());
     return response;
   }
 

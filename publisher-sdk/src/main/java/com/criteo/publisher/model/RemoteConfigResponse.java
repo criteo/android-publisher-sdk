@@ -35,7 +35,8 @@ public abstract class RemoteConfigResponse {
       @Nullable String androidAdTagDataMode,
       @Nullable Boolean csmEnabled,
       @Nullable Boolean liveBiddingEnabled,
-      @Nullable Integer liveBiddingTimeBudgetInMillis
+      @Nullable Integer liveBiddingTimeBudgetInMillis,
+      @Nullable Boolean prefetchOnInitEnabled
   ) {
     return new AutoValue_RemoteConfigResponse(
         killSwitch,
@@ -45,13 +46,15 @@ public abstract class RemoteConfigResponse {
         androidAdTagDataMode,
         csmEnabled,
         liveBiddingEnabled,
-        liveBiddingTimeBudgetInMillis
+        liveBiddingTimeBudgetInMillis,
+        prefetchOnInitEnabled
     );
   }
 
   @NonNull
   public static RemoteConfigResponse createEmpty() {
     return create(
+        null,
         null,
         null,
         null,
@@ -73,7 +76,8 @@ public abstract class RemoteConfigResponse {
         getAndroidAdTagDataMode(),
         getCsmEnabled(),
         getLiveBiddingEnabled(),
-        getLiveBiddingTimeBudgetInMillis()
+        getLiveBiddingTimeBudgetInMillis(),
+        getPrefetchOnInitEnabled()
     );
   }
 
@@ -163,10 +167,19 @@ public abstract class RemoteConfigResponse {
   public abstract Boolean getLiveBiddingEnabled();
 
   /**
-   * Amount of time (in milliseconds) given to the SDK to serve a bid to the publisher. If the SDK
-   * get a CDB response within this time budget, SDK returns it directly. Else, cached bid is used
-   * (if present) and CDB response is cached for later.
+   * Amount of time (in milliseconds) given to the SDK to serve a bid to the publisher. If the SDK get a CDB response
+   * within this time budget, SDK returns it directly. Else, cached bid is used (if present) and CDB response is cached
+   * for later.
    */
   @Nullable
   public abstract Integer getLiveBiddingTimeBudgetInMillis();
+
+  /**
+   * Feature flag for activating/deactivating the prefetch during initialization. If set to <code>true</code>, then the
+   * feature is activated. If <code>false</code>, then it is deactivated. If the flag is not present (i.e. equals to
+   * <code>null</code>), then the previous persisted value of this flag is taken. If there is no previous value, this
+   * means that this is a fresh start of a new application, then a default value is taken.
+   */
+  @Nullable
+  public abstract Boolean getPrefetchOnInitEnabled();
 }

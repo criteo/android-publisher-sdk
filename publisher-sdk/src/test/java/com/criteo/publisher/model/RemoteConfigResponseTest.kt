@@ -50,6 +50,7 @@ class RemoteConfigResponseTest {
     assertThat(response.csmEnabled).isNull()
     assertThat(response.liveBiddingEnabled).isNull()
     assertThat(response.liveBiddingTimeBudgetInMillis).isNull()
+    assertThat(response.prefetchOnInitEnabled).isNull()
   }
 
   @Test
@@ -68,6 +69,7 @@ class RemoteConfigResponseTest {
     assertThat(response.csmEnabled).isNull()
     assertThat(response.liveBiddingEnabled).isNull()
     assertThat(response.liveBiddingTimeBudgetInMillis).isNull()
+    assertThat(response.prefetchOnInitEnabled).isNull()
   }
 
   @Test
@@ -80,7 +82,8 @@ class RemoteConfigResponseTest {
       "AndroidAdTagDataMode": "<body />",
       "csmEnabled": true,
       "liveBiddingEnabled": true,
-      "liveBiddingTimeBudgetInMillis": 42
+      "liveBiddingTimeBudgetInMillis": 42,
+      "prefetchOnInitEnabled": true
     }""".trimIndent()
 
     val response = readFromString(json)
@@ -93,6 +96,7 @@ class RemoteConfigResponseTest {
     assertThat(response.csmEnabled).isTrue()
     assertThat(response.liveBiddingEnabled).isTrue()
     assertThat(response.liveBiddingTimeBudgetInMillis).isEqualTo(42)
+    assertThat(response.prefetchOnInitEnabled).isTrue()
   }
 
   @Test
