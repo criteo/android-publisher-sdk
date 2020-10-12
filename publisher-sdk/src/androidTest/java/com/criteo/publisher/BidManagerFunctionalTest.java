@@ -39,6 +39,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import androidx.annotation.NonNull;
@@ -148,6 +149,7 @@ public class BidManagerFunctionalTest {
 
     when(publisher.getCriteoPublisherId()).thenReturn("cpId");
     when(publisher.getBundleId()).thenReturn("bundle.id");
+    when(config.isPrefetchOnInitEnabled()).thenReturn(true);
 
     // Should be set to at least 1 because user-level silent mode is set the 0 included
     givenMockedClockSetTo(1);
@@ -159,6 +161,30 @@ public class BidManagerFunctionalTest {
     givenExpiredSilentModeBidCached(sampleAdUnit());
     givenNoLastBid(sampleAdUnit());
     givenTimeBudgetRespectedWhenFetchingLiveBids();
+  }
+
+  @Test
+  public void prefetch_GivenAdUnitsAndPrefetchDisabled_ShouldCallRemoteConfigButNotCdb() throws Exception {
+    when(config.isPrefetchOnInitEnabled()).thenReturn(false);
+
+    RemoteConfigResponse response = mock(RemoteConfigResponse.class);
+    when(api.loadConfig(any())).thenReturn(response);
+
+    List<AdUnit> prefetchAdUnits = Arrays.asList(
+        mock(AdUnit.class),
+        mock(AdUnit.class),
+        mock(AdUnit.class)
+    );
+
+    AdUnitMapper mapper = givenMockedAdUnitMapper();
+
+    BidManager bidManager = createBidManager();
+    bidManager.prefetch(prefetchAdUnits);
+    waitForIdleState();
+
+    verifyNoInteractions(mapper);
+    assertShouldNotCallCdbAndNotPopulateCache();
+    verify(config).refreshConfig(response);
   }
 
   @Test
