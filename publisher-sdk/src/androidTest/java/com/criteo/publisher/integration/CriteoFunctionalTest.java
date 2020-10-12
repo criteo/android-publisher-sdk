@@ -38,7 +38,6 @@ import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.BidManager;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
-import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdUnit;
@@ -74,7 +73,7 @@ public class CriteoFunctionalTest {
   @Inject
   private Application application;
 
-  @MockBean
+  @SpyBean
   private PubSdkApi api;
 
   @SpyBean
@@ -86,7 +85,6 @@ public class CriteoFunctionalTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    mockedDependenciesRule.givenMockedRemoteConfigResponse(api);
   }
 
   @Test

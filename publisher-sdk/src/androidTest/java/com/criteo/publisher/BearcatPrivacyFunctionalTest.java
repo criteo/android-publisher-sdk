@@ -26,8 +26,8 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import com.criteo.publisher.AppEvents.AppEvents;
-import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.network.PubSdkApi;
 import java.util.Arrays;
 import java.util.Collection;
@@ -177,7 +177,7 @@ public class BearcatPrivacyFunctionalTest {
   @Inject
   private AppEvents appEvents;
 
-  @MockBean
+  @SpyBean
   private PubSdkApi pubSdkApi;
 
   private SharedPreferences defaultSharedPreferences;
@@ -187,7 +187,6 @@ public class BearcatPrivacyFunctionalTest {
     MockitoAnnotations.initMocks(this);
 
     defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-    mockedDependenciesRule.givenMockedRemoteConfigResponse(pubSdkApi);
   }
 
   @After

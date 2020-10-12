@@ -80,7 +80,6 @@ public class CsmFunctionalTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    mockedDependenciesRule.givenMockedRemoteConfigResponse(api);
     integrationRegistry.declare(Integration.IN_HOUSE);
   }
 

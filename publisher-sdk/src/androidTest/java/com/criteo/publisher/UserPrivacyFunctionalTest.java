@@ -22,7 +22,6 @@ import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -32,6 +31,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.network.PubSdkApi;
 import javax.inject.Inject;
@@ -41,7 +41,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 public class UserPrivacyFunctionalTest {
@@ -49,7 +48,7 @@ public class UserPrivacyFunctionalTest {
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
-  @Mock
+  @SpyBean
   private PubSdkApi pubSdkApi;
 
   @Inject
@@ -60,12 +59,8 @@ public class UserPrivacyFunctionalTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
-    DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
     defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-
-    doReturn(pubSdkApi).when(dependencyProvider).providePubSdkApi();
-    mockedDependenciesRule.givenMockedRemoteConfigResponse(pubSdkApi);
   }
 
   @After

@@ -19,15 +19,15 @@ package com.criteo.publisher.network;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import com.criteo.publisher.CriteoBannerView;
-import com.criteo.publisher.DependencyProvider;
+import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbRequest;
@@ -37,7 +37,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 /**
@@ -53,10 +52,10 @@ public class AdvertisingInfoFunctionalTest {
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
-  @Mock
+  @MockBean
   private AdvertisingInfo advertisingInfo;
 
-  @Mock
+  @SpyBean
   private PubSdkApi pubSdkApi;
 
   @Inject
@@ -65,10 +64,6 @@ public class AdvertisingInfoFunctionalTest {
   @Before
   public void setUp() throws  Exception {
     MockitoAnnotations.initMocks(this);
-    DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-    when(dependencyProvider.providePubSdkApi()).thenReturn(pubSdkApi);
-    when(dependencyProvider.provideAdvertisingInfo()).thenReturn(advertisingInfo);
-    mockedDependenciesRule.givenMockedRemoteConfigResponse(pubSdkApi);
   }
 
   @Test
@@ -143,10 +138,6 @@ public class AdvertisingInfoFunctionalTest {
 
   private String fetchDeviceIdSentInCdbRequest(CdbRequest cdb) {
     return cdb.getUser().deviceId();
-  }
-
-  private void assertDeviceIdNotInCdbRequest(CdbRequest cdb) {
-    assertNull(cdb.getUser().deviceId());
   }
 
   private void waitForIdleState() {
