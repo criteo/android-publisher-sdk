@@ -25,7 +25,7 @@ import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.advancednative.CriteoNativeAd;
 import com.criteo.publisher.advancednative.CriteoNativeAdListener;
 
-public class TestAppNativeAdListener extends CriteoNativeAdListener {
+public class TestAppNativeAdListener implements CriteoNativeAdListener {
 
   private final String tag;
   private final String prefix;

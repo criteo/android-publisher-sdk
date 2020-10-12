@@ -22,11 +22,10 @@ import androidx.annotation.UiThread;
 import com.criteo.publisher.CriteoErrorCode;
 
 /**
- * All callbacks are invoked on the UI thread, so it is safe to execute any UI operations in the
- * implementation.
+ * All callbacks are invoked on the UI thread, so it is safe to execute any UI operations in the implementation.
  */
 @Keep
-public abstract class CriteoNativeAdListener {
+public interface CriteoNativeAdListener {
 
   /**
    * Callback invoked when a native ad is requested and is successfully received.
@@ -36,7 +35,7 @@ public abstract class CriteoNativeAdListener {
    * @param nativeAd native ad with the native data that may be used to render it
    */
   @UiThread
-  public abstract void onAdReceived(@NonNull CriteoNativeAd nativeAd);
+  void onAdReceived(@NonNull CriteoNativeAd nativeAd);
 
   /**
    * Callback invoked when a native ad is requested but none may be provided by the SDK.
@@ -44,7 +43,8 @@ public abstract class CriteoNativeAdListener {
    * @param errorCode error code indicating the reason of the failure
    */
   @UiThread
-  public void onAdFailedToReceive(@NonNull CriteoErrorCode errorCode) {
+  default void onAdFailedToReceive(@NonNull CriteoErrorCode errorCode) {
+    // no-op by default
   }
 
   /**
@@ -54,14 +54,16 @@ public abstract class CriteoNativeAdListener {
    * Impression can be detected only once per bid. So this method may be invoked at most once.
    */
   @UiThread
-  public void onAdImpression() {
+  default void onAdImpression() {
+    // no-op by default
   }
 
   /**
-   * Callback invoked when an user clicks anywhere on the ad (except on the AdChoice button).
+   * Callback invoked when a user clicks anywhere on the ad (except on the AdChoice button).
    */
   @UiThread
-  public void onAdClicked() {
+  default void onAdClicked() {
+    // no-op by default
   }
 
   /**
@@ -69,7 +71,8 @@ public abstract class CriteoNativeAdListener {
    * the product web page or to the AdChoice page for instance.
    */
   @UiThread
-  public void onAdLeftApplication() {
+  default void onAdLeftApplication() {
+    // no-op by default
   }
 
   /**
@@ -77,6 +80,7 @@ public abstract class CriteoNativeAdListener {
    * presses the back button after being redirected to an ad.
    */
   @UiThread
-  public void onAdClosed() {
+  default void onAdClosed() {
+    // no-op by default
   }
 }

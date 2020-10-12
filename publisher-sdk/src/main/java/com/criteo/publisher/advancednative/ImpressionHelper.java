@@ -67,9 +67,9 @@ public class ImpressionHelper {
    * @param listener listener to notify
    */
   void notifyImpression(@NonNull CriteoNativeAdListener listener) {
-    runOnUiThreadExecutor.executeAsync(new Runnable() {
+    runOnUiThreadExecutor.executeAsync(new SafeRunnable() {
       @Override
-      public void run() {
+      public void runSafely() {
         listener.onAdImpression();
       }
     });
