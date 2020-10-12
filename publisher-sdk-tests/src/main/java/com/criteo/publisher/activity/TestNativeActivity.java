@@ -166,7 +166,8 @@ public class TestNativeActivity extends Activity {
 
   }
 
-  private class AdLayoutNativeAdListener extends CriteoNativeAdListener {
+  private class AdLayoutNativeAdListener implements CriteoNativeAdListener {
+
     @Override
     public void onAdReceived(@NonNull CriteoNativeAd nativeAd) {
       View nativeView = nativeAd.createNativeRenderedView(TestNativeActivity.this, adLayout);
@@ -174,7 +175,8 @@ public class TestNativeActivity extends Activity {
     }
   }
 
-  private class RecyclerViewNativeAdListener extends CriteoNativeAdListener {
+  private class RecyclerViewNativeAdListener implements CriteoNativeAdListener {
+
     @Override
     public void onAdReceived(@NonNull CriteoNativeAd nativeAd) {
       adapter.addNativeAd(nativeAd);

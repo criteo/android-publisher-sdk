@@ -19,6 +19,7 @@ package com.criteo.publisher.advancednative;
 import android.content.ComponentName;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.adview.Redirection;
 import com.criteo.publisher.adview.RedirectionListener;
@@ -51,9 +52,9 @@ public class ClickHelper {
       return;
     }
 
-    runOnUiThreadExecutor.executeAsync(new Runnable() {
+    runOnUiThreadExecutor.executeAsync(new SafeRunnable() {
       @Override
-      public void run() {
+      public void runSafely() {
         listener.onAdClicked();
       }
     });
@@ -64,9 +65,9 @@ public class ClickHelper {
       return;
     }
 
-    runOnUiThreadExecutor.executeAsync(new Runnable() {
+    runOnUiThreadExecutor.executeAsync(new SafeRunnable() {
       @Override
-      public void run() {
+      public void runSafely() {
         listener.onAdLeftApplication();
       }
     });
@@ -77,9 +78,9 @@ public class ClickHelper {
       return;
     }
 
-    runOnUiThreadExecutor.executeAsync(new Runnable() {
+    runOnUiThreadExecutor.executeAsync(new SafeRunnable() {
       @Override
-      public void run() {
+      public void runSafely() {
         listener.onAdClosed();
       }
     });
