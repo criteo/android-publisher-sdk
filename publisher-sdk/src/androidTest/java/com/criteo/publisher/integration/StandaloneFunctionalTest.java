@@ -623,7 +623,7 @@ public class StandaloneFunctionalTest {
         CriteoInterstitialAdListener {
 
       @Override
-      public void onAdReceived(View view) {
+      public void onAdReceived(@NonNull CriteoBannerView view) {
         onLoaded();
       }
 
