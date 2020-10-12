@@ -37,11 +37,9 @@ import com.criteo.publisher.csm.MetricHelper;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.CdbResponse;
-import com.criteo.publisher.model.RemoteConfigResponse;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.InstrumentationUtil;
-import java.io.IOException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import org.junit.internal.runners.statements.FailOnTimeout;
@@ -216,22 +214,6 @@ public class MockedDependenciesRule implements MethodRule {
     }
 
     return captor;
-  }
-
-  // FIXME (ma.chentir) EE-1040
-  // To be removed when we are able to mock backend responses. Ideally, this behavior should be
-  // defined in MockedDependenciesRule#setupNetworkDependencies(). However, this would require
-  // mocking PubSdkApi and overriding its behavior (like what is done below). But... PubSdkApi, would
-  // also be mocked within this test file specifically and hence all the behavior that was defined
-  // earlier would be lost.
-  // Once we will be able to mock backend responses with MockWebServer, we will be able to define
-  // a mock response for the RemoteConfig backend without having to play PubSdkApi at all.
-  public void givenMockedRemoteConfigResponse(PubSdkApi pubSdkApi)
-      throws IOException {
-    RemoteConfigResponse remoteConfigResponse = mock(RemoteConfigResponse.class);
-    doReturn(false).when(remoteConfigResponse).getKillSwitch();
-    doReturn(true).when(remoteConfigResponse).getCsmEnabled();
-    doReturn(remoteConfigResponse).when(pubSdkApi).loadConfig(any());
   }
 
   @NonNull

@@ -63,7 +63,6 @@ public class BearcatFunctionalTest {
     dependencyProvider = mockedDependenciesRule.getDependencyProvider();
     UserPrivacyUtil userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil();
     gdprData = userPrivacyUtil.getGdprData();
-    mockedDependenciesRule.givenMockedRemoteConfigResponse(api);
   }
 
   @Test
