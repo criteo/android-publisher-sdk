@@ -95,19 +95,24 @@ public class MopubActivity extends AppCompatActivity {
     linearLayout.setVisibility(View.VISIBLE);
 
     publisherAdView = new MoPubView(this);
-    criteo.loadBid(BANNER, enrich((mThis, bid) -> mThis.criteo.enrichAdObjectWithBid(mThis.publisherAdView, bid)));
     publisherAdView.setAdUnitId(MOPUB_BANNER_ADUNIT_ID_HB);
-    publisherAdView.loadAd();
 
-    linearLayout.addView(publisherAdView);
+    criteo.loadBid(BANNER, enrich((mThis, bid) -> {
+      mThis.criteo.enrichAdObjectWithBid(mThis.publisherAdView, bid);
+
+      mThis.publisherAdView.loadAd();
+      mThis.linearLayout.addView(mThis.publisherAdView);
+    }));
   }
 
   private void onInterstitialClick() {
     MoPubInterstitial mInterstitial = new MoPubInterstitial(this, MOPUB_INTERSTITIAL_ADUNIT_ID_HB);
-    criteo.loadBid(INTERSTITIAL, enrich((mThis, bid) -> mThis.criteo.enrichAdObjectWithBid(mInterstitial, bid)));
-    mInterstitial.setInterstitialAdListener(
-        new TestAppMoPubInterstitialAdListener(TAG, mInterstitial));
-    mInterstitial.load();
+    mInterstitial.setInterstitialAdListener(new TestAppMoPubInterstitialAdListener(TAG, mInterstitial));
+
+    criteo.loadBid(INTERSTITIAL, enrich((mThis, bid) -> {
+      mThis.criteo.enrichAdObjectWithBid(mInterstitial, bid);
+      mInterstitial.load();
+    }));
   }
 
   @Override

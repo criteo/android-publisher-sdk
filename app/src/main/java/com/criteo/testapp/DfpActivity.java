@@ -28,6 +28,7 @@ import com.criteo.publisher.BidResponseListener;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdSize;
+import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.NativeAdUnit;
@@ -46,7 +47,7 @@ public class DfpActivity extends AppCompatActivity {
   private static final String DFP_BANNER_ID = "/140800857/Endeavour_320x50";
 
   private static final InterstitialAdUnit INTERSTITIAL = new InterstitialAdUnit(
-      "/140800857/Endeavour_320x50");
+      "/140800857/Endeavour_Interstitial_320x480");
 
   public static final BannerAdUnit BANNER = new BannerAdUnit(
       "/140800857/Endeavour_320x50",
@@ -84,12 +85,7 @@ public class DfpActivity extends AppCompatActivity {
     publisherAdView.setAdListener(new TestAppDfpAdListener(TAG, "Custom NativeAd"));
     publisherAdView.setManualImpressionsEnabled(true);
 
-    PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-    builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-    criteo.loadBid(NATIVE, enrich((mThis, bid) -> mThis.criteo.enrichAdObjectWithBid(builder, bid)));
-    PublisherAdRequest request = builder.build();
-    publisherAdView.loadAd(request);
-    linearLayout.addView(publisherAdView);
+    loadAdView(publisherAdView, NATIVE);
   }
 
 
@@ -99,12 +95,19 @@ public class DfpActivity extends AppCompatActivity {
     publisherAdView.setAdUnitId(DFP_BANNER_ID);
     publisherAdView.setAdListener(new TestAppDfpAdListener(TAG, "Banner"));
 
+    loadAdView(publisherAdView, BANNER);
+  }
+
+  private void loadAdView(PublisherAdView publisherAdView, AdUnit adUnit) {
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-    criteo.loadBid(BANNER, enrich((mThis, bid) -> mThis.criteo.enrichAdObjectWithBid(builder, bid)));
-    PublisherAdRequest request = builder.build();
-    publisherAdView.loadAd(request);
-    linearLayout.addView(publisherAdView);
+    criteo.loadBid(adUnit, enrich((mThis, bid) -> {
+      mThis.criteo.enrichAdObjectWithBid(builder, bid);
+
+      PublisherAdRequest request = builder.build();
+      publisherAdView.loadAd(request);
+      mThis.linearLayout.addView(publisherAdView);
+    }));
   }
 
   private void onInterstitialClick() {
@@ -125,9 +128,12 @@ public class DfpActivity extends AppCompatActivity {
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-    criteo.loadBid(INTERSTITIAL, enrich((mThis, bid) -> mThis.criteo.enrichAdObjectWithBid(builder, bid)));
-    PublisherAdRequest request = builder.build();
-    mPublisherInterstitialAd.loadAd(request);
+    criteo.loadBid(INTERSTITIAL, enrich((mThis, bid) -> {
+      mThis.criteo.enrichAdObjectWithBid(builder, bid);
+
+      PublisherAdRequest request = builder.build();
+      mPublisherInterstitialAd.loadAd(request);
+    }));
   }
 
   private BidResponseListener enrich(BiConsumer<DfpActivity, Bid> enrichAction) {
