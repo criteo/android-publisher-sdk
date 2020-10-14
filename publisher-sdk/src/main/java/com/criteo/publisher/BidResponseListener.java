@@ -18,6 +18,7 @@ package com.criteo.publisher;
 
 import androidx.annotation.Keep;
 import androidx.annotation.Nullable;
+import androidx.annotation.UiThread;
 import com.criteo.publisher.advancednative.CriteoNativeLoader;
 import com.criteo.publisher.model.AdUnit;
 import java.lang.ref.WeakReference;
@@ -89,5 +90,6 @@ public interface BidResponseListener {
    * @see <a href="https://publisherdocs.criteotilt.com/app/android/app-bidding/">AppBidding documentation</a>
    * @see Criteo#loadBid(AdUnit, BidResponseListener)
    */
+  @UiThread
   void onResponse(@Nullable Bid bid);
 }

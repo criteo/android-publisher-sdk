@@ -667,7 +667,8 @@ public class DependencyProvider {
       public ConsumableBidLoader create() {
         return new ConsumableBidLoader(
             provideBidManager(),
-            provideClock()
+            provideClock(),
+            provideRunOnUiThreadExecutor()
         );
       }
     });

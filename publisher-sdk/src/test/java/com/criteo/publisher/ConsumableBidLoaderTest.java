@@ -25,8 +25,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -43,16 +45,29 @@ public class ConsumableBidLoaderTest {
   @Mock
   private BidResponseListener listener;
 
+  private final DirectMockRunOnUiThreadExecutor runOnUiThreadExecutor = new DirectMockRunOnUiThreadExecutor();
+
   private ConsumableBidLoader consumableBidLoader;
 
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
+    doAnswer(invocation -> {
+      runOnUiThreadExecutor.expectIsRunningInExecutor();
+      return null;
+    }).when(listener).onResponse(any());
+
     consumableBidLoader = new ConsumableBidLoader(
         bidManager,
-        clock
+        clock,
+        runOnUiThreadExecutor
     );
+  }
+
+  @After
+  public void tearDown() throws Exception {
+    runOnUiThreadExecutor.verifyExpectations();
   }
 
   @Test

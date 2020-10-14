@@ -21,6 +21,7 @@ import com.criteo.publisher.BidManager
 import com.criteo.publisher.ConsumableBidLoader
 import com.criteo.publisher.CriteoErrorCode
 import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
 import com.criteo.publisher.integration.Integration
 import com.criteo.publisher.integration.IntegrationRegistry
 import com.criteo.publisher.mock.MockBean
@@ -49,7 +50,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import org.mockito.AdditionalAnswers.delegatesTo
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.MockitoAnnotations
 import javax.inject.Inject
 
@@ -100,6 +103,8 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
   @Mock
   private lateinit var renderer: CriteoNativeRenderer
 
+  @MockBean
+  private lateinit var injectedRunOnUiThreadExecutor: RunOnUiThreadExecutor
   private lateinit var runOnUiThreadExecutor: DirectMockRunOnUiThreadExecutor
 
   private lateinit var nativeLoader: CriteoNativeLoader
@@ -111,9 +116,9 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
     doReturn(liveBiddingEnabled).whenever(config).isLiveBiddingEnabled
 
     runOnUiThreadExecutor = DirectMockRunOnUiThreadExecutor()
-    mockedDependenciesRule.dependencyProvider.stub {
-      on { provideRunOnUiThreadExecutor() } doReturn runOnUiThreadExecutor
-    }
+    Mockito.doAnswer(delegatesTo<Any>(runOnUiThreadExecutor))
+        .whenever(injectedRunOnUiThreadExecutor)
+        .executeAsync(any())
 
     adUnit = NativeAdUnit("myAdUnit")
     nativeLoader = CriteoNativeLoader(adUnit, listener, renderer)

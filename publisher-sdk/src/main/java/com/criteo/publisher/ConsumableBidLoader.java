@@ -17,6 +17,8 @@
 package com.criteo.publisher;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
 import org.jetbrains.annotations.NotNull;
@@ -35,12 +37,17 @@ public class ConsumableBidLoader {
   @NonNull
   private final Clock clock;
 
+  @NonNull
+  private final RunOnUiThreadExecutor runOnUiThreadExecutor;
+
   public ConsumableBidLoader(
       @NonNull BidManager bidManager,
-      @NonNull Clock clock
+      @NonNull Clock clock,
+      @NonNull RunOnUiThreadExecutor runOnUiThreadExecutor
   ) {
     this.bidManager = bidManager;
     this.clock = clock;
+    this.runOnUiThreadExecutor = runOnUiThreadExecutor;
   }
 
   public void loadBid(
@@ -51,12 +58,19 @@ public class ConsumableBidLoader {
       @Override
       public void onBidResponse(@NotNull CdbResponseSlot cdbResponseSlot) {
         Bid bid = new Bid(adUnit.getAdUnitType(), clock, cdbResponseSlot);
-        bidResponseListener.onResponse(bid);
+        responseBid(bid);
       }
 
       @Override
       public void onNoBid() {
-        bidResponseListener.onResponse(null);
+        responseBid(null);
+      }
+
+      private void responseBid(@Nullable Bid bid) {
+        // The bid object is used for AppBidding and InHouse.
+        // For MoPub AppBidding, it is mandatory to be on the main thread.
+        // For InHouse, it is preferable.
+        runOnUiThreadExecutor.executeAsync(() -> bidResponseListener.onResponse(bid));
       }
     });
   }
