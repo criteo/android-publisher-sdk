@@ -58,7 +58,7 @@ class IntegrationSelectorActivity : AppCompatActivity() {
         val integrationRegistry = MockedIntegrationRegistry(
             sharedPreferences,
             integrationDetector,
-            this@IntegrationSelectorActivity,
+            baseContext,
             allMocked,
             verbose
         )

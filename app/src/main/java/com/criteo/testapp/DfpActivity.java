@@ -23,6 +23,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
+import com.criteo.publisher.Bid;
+import com.criteo.publisher.BidResponseListener;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdSize;
@@ -35,6 +37,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdView;
 import com.google.android.gms.ads.doubleclick.PublisherInterstitialAd;
+import java.lang.ref.WeakReference;
 
 public class DfpActivity extends AppCompatActivity {
 
@@ -83,7 +86,7 @@ public class DfpActivity extends AppCompatActivity {
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-    criteo.loadBid(NATIVE, bid -> criteo.enrichAdObjectWithBid(builder, bid));
+    criteo.loadBid(NATIVE, enrich((mThis, bid) -> mThis.criteo.enrichAdObjectWithBid(builder, bid)));
     PublisherAdRequest request = builder.build();
     publisherAdView.loadAd(request);
     linearLayout.addView(publisherAdView);
@@ -98,7 +101,7 @@ public class DfpActivity extends AppCompatActivity {
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-    criteo.loadBid(BANNER, bid -> criteo.enrichAdObjectWithBid(builder, bid));
+    criteo.loadBid(BANNER, enrich((mThis, bid) -> mThis.criteo.enrichAdObjectWithBid(builder, bid)));
     PublisherAdRequest request = builder.build();
     publisherAdView.loadAd(request);
     linearLayout.addView(publisherAdView);
@@ -122,9 +125,19 @@ public class DfpActivity extends AppCompatActivity {
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-    criteo.loadBid(INTERSTITIAL, bid -> criteo.enrichAdObjectWithBid(builder, bid));
+    criteo.loadBid(INTERSTITIAL, enrich((mThis, bid) -> mThis.criteo.enrichAdObjectWithBid(builder, bid)));
     PublisherAdRequest request = builder.build();
     mPublisherInterstitialAd.loadAd(request);
+  }
+
+  private BidResponseListener enrich(BiConsumer<DfpActivity, Bid> enrichAction) {
+    WeakReference<DfpActivity> weakThis = new WeakReference<>(this);
+    return bid -> {
+      DfpActivity activity = weakThis.get();
+      if (activity != null) {
+        enrichAction.accept(activity, bid);
+      }
+    };
   }
 
 }
