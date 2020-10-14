@@ -16,6 +16,7 @@
 
 package com.criteo.testapp;
 
+import android.os.Handler;
 import android.os.StrictMode;
 import android.util.Log;
 import androidx.multidex.MultiDexApplication;
@@ -27,6 +28,8 @@ import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.NativeAdUnit;
 import java.util.ArrayList;
 import java.util.List;
+import leakcanary.LeakCanary;
+import leakcanary.LeakCanary.Config;
 
 public class PubSdkDemoApplication extends MultiDexApplication {
 
@@ -58,6 +61,18 @@ public class PubSdkDemoApplication extends MultiDexApplication {
     StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll()
         .penaltyLog()
         .build());
+
+    // Enable leak canary
+    // JUnit is in the classpath through the test-utils module. So LeakCanary is deactivated automatically just after
+    // the Application#onCreate.
+    // Then we need to re-enable it explicitly.
+    new Handler().post(() -> {
+      Config newConfig = LeakCanary.getConfig().newBuilder()
+          .dumpHeap(true)
+          .build();
+
+      LeakCanary.setConfig(newConfig);
+    });
 
     List<AdUnit> adUnits = new ArrayList<>();
 
