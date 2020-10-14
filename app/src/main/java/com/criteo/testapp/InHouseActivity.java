@@ -23,7 +23,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import com.criteo.publisher.Bid;
+import com.criteo.publisher.BidResponseListener;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoInterstitial;
@@ -36,6 +39,7 @@ import com.criteo.testapp.integration.MockedIntegrationRegistry;
 import com.criteo.testapp.listener.TestAppBannerAdListener;
 import com.criteo.testapp.listener.TestAppInterstitialAdListener;
 import com.criteo.testapp.listener.TestAppNativeAdListener;
+import java.lang.ref.WeakReference;
 
 public class InHouseActivity extends AppCompatActivity {
 
@@ -104,11 +108,11 @@ public class InHouseActivity extends AppCompatActivity {
 
   private void loadBannerAd() {
     Log.d(TAG, "Banner Requested");
-    Criteo.getInstance().loadBid(BANNER, criteoBannerView::loadAd);
+    Criteo.getInstance().loadBid(BANNER, loadAd(criteoBannerView, CriteoBannerView::loadAd));
   }
 
   private void loadNative() {
-    Criteo.getInstance().loadBid(NATIVE, nativeLoader::loadAd);
+    Criteo.getInstance().loadBid(NATIVE, loadAd(nativeLoader, CriteoNativeLoader::loadAd));
   }
 
   private void loadInterstitialAd(InterstitialAdUnit adUnit, Button btnShow) {
@@ -121,7 +125,17 @@ public class InHouseActivity extends AppCompatActivity {
     btnShow.setOnClickListener(v -> showInterstitial(interstitial));
 
     Log.d(TAG, prefix + " - Interstitial Requested");
-    Criteo.getInstance().loadBid(adUnit, interstitial::loadAd);
+    Criteo.getInstance().loadBid(adUnit, loadAd(interstitial, CriteoInterstitial::loadAd));
+  }
+
+  private <T> BidResponseListener loadAd(@NonNull T adLoader, @NonNull BiConsumer<T, Bid> loadAdAction) {
+    WeakReference<T> weakAdLoader = new WeakReference<>(adLoader);
+    return bid -> {
+      T loader = weakAdLoader.get();
+      if (loader != null) {
+        loadAdAction.accept(loader, bid);
+      }
+    };
   }
 
 }

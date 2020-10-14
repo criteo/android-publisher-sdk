@@ -26,6 +26,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import androidx.appcompat.app.AppCompatActivity;
+import com.criteo.publisher.Bid;
+import com.criteo.publisher.BidResponseListener;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdSize;
@@ -38,6 +40,7 @@ import com.mopub.common.SdkConfiguration;
 import com.mopub.common.SdkInitializationListener;
 import com.mopub.mobileads.MoPubInterstitial;
 import com.mopub.mobileads.MoPubView;
+import java.lang.ref.WeakReference;
 
 public class MopubActivity extends AppCompatActivity {
 
@@ -92,7 +95,7 @@ public class MopubActivity extends AppCompatActivity {
     linearLayout.setVisibility(View.VISIBLE);
 
     publisherAdView = new MoPubView(this);
-    criteo.loadBid(BANNER, bid -> criteo.enrichAdObjectWithBid(publisherAdView, bid));
+    criteo.loadBid(BANNER, enrich((mThis, bid) -> mThis.criteo.enrichAdObjectWithBid(mThis.publisherAdView, bid)));
     publisherAdView.setAdUnitId(MOPUB_BANNER_ADUNIT_ID_HB);
     publisherAdView.loadAd();
 
@@ -101,7 +104,7 @@ public class MopubActivity extends AppCompatActivity {
 
   private void onInterstitialClick() {
     MoPubInterstitial mInterstitial = new MoPubInterstitial(this, MOPUB_INTERSTITIAL_ADUNIT_ID_HB);
-    criteo.loadBid(INTERSTITIAL, bid -> criteo.enrichAdObjectWithBid(mInterstitial, bid));
+    criteo.loadBid(INTERSTITIAL, enrich((mThis, bid) -> mThis.criteo.enrichAdObjectWithBid(mInterstitial, bid)));
     mInterstitial.setInterstitialAdListener(
         new TestAppMoPubInterstitialAdListener(TAG, mInterstitial));
     mInterstitial.load();
@@ -113,6 +116,16 @@ public class MopubActivity extends AppCompatActivity {
     if (publisherAdView != null) {
       publisherAdView.destroy();
     }
+  }
+
+  private BidResponseListener enrich(BiConsumer<MopubActivity, Bid> enrichAction) {
+    WeakReference<MopubActivity> weakThis = new WeakReference<>(this);
+    return bid -> {
+      MopubActivity activity = weakThis.get();
+      if (activity != null) {
+        enrichAction.accept(activity, bid);
+      }
+    };
   }
 
 }
