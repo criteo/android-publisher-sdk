@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 
 import android.app.Application;
 import android.os.Build.VERSION_CODES;
+import android.os.Debug;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -55,19 +56,18 @@ public class MockedDependenciesRule implements MethodRule {
   /**
    * Apply a timeout on all tests using this rule.
    * <p>
-   * Lot of tests are waiting for end of AsyncTasks or for third-parties' events. Those tests may be
-   * stuck and block the overall execution. In order to avoid any infinite blocking, long tests will
-   * be killed by this timeout rule.
+   * Lot of tests are waiting for the end of AsyncTasks or for third-parties' events. Those tests may be stuck and block
+   * the overall execution. In order to avoid any infinite blocking, long tests will be killed by this timeout rule.
    * <p>
    * This timeout duration is roughly set and may have to be updated in the future.
    * <p>
-   * Warning: When debugging, this timeout may interrupt your work and be annoying. To deactivate
-   * it, you may set the {@link #iAmDebuggingDoNotTimeoutMe} variable to <code>true</code>.
+   * Warning: When debugging, this timeout is deactivated to not interrupt your work. To activate it, you may set the
+   * {@link #iAmDebuggingDoNotTimeoutMe} variable to <code>false</code>.
    */
   private final FailOnTimeout.Builder timeout = FailOnTimeout.builder()
       .withTimeout(60, TimeUnit.SECONDS);
 
-  private final boolean iAmDebuggingDoNotTimeoutMe = false; // Do not commit this set to true
+  private final boolean iAmDebuggingDoNotTimeoutMe = Debug.isDebuggerConnected();
 
   /**
    * If set to <code>true</code>, then a CDB mock server is instantiated and started before each
