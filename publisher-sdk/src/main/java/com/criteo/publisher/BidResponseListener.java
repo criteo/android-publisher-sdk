@@ -20,6 +20,7 @@ import androidx.annotation.Keep;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.advancednative.CriteoNativeLoader;
 import com.criteo.publisher.model.AdUnit;
+import java.lang.ref.WeakReference;
 
 @Keep
 public interface BidResponseListener {
@@ -40,8 +41,53 @@ public interface BidResponseListener {
    * <p>
    * Please note that the <code>loadAd</code> method should match the kind of {@link AdUnit} the bid was asked for.
    *
+   * <h1>AppBidding integration</h1>
+   * When using the AppBidding integration, the response can be given to the
+   * {@link Criteo#enrichAdObjectWithBid(Object, Bid)} method, to enrich your ad server object.
+   *
+   * <h1>Memory management</h1>
+   * This listener can be retained few seconds until it is notified. As an effect, if this listener holds a reference
+   * to an activity, when the activity is closed, then it can still be retained briefly in memory.
+   *
+   * If drastic memory management is required, few actions can be applied:
+   * <ul>
+   *   <li>Prefer lambda expression or static inner class over anonymous class: anonymous classes implicitly hold the
+   *   outer class</li>
+   *   <li>Use {@link WeakReference} to capture {@link android.app.Activity} or {@link android.view.View} (or any big
+   *   object)</li>
+   * </ul>
+   *
+   * Here is a sample code showing this:
+   * <pre><code>
+   *   class MyActivity extends Activity {
+   *     private CriteoBannerView bannerView;
+   *
+   *     void sample() {
+   *       // This is an anonymous class, "this" is implicitly hold and is retained until listener is notified
+   *       Criteo.getInstance().loadBid(adUnit, new BidResponseListener() {
+   *       });
+   *
+   *       // "this" is explicitly held and is retained until listener is notified
+   *       Criteo.getInstance().loadBid(adUnit, bid -> {
+   *         this.bannerView.loadAd(bid);
+   *       });
+   *
+   *       // "this" is weakly held and is not retained
+   *       WeakReference&lg;MyActivity&gt; weakThis = new WeakReference(this);
+   *       Criteo.getInstance().loadBid(adUnit, bid -> {
+   *         MyActivity activity = weakThis.get();
+   *         if (activity != null) {
+   *           activity.bannerView.loadAd(bid);
+   *         }
+   *       });
+   *     }
+   *   }
+   * </code></pre>
+   *
    * @param bid <code>null</code> in case of no bid, or a bid object that can be used to display an Ad
    * @see <a href="https://publisherdocs.criteotilt.com/app/android/app-bidding/inhouse/">InHouse documentation</a>
+   * @see <a href="https://publisherdocs.criteotilt.com/app/android/app-bidding/">AppBidding documentation</a>
+   * @see Criteo#loadBid(AdUnit, BidResponseListener)
    */
   void onResponse(@Nullable Bid bid);
 }

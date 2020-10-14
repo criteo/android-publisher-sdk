@@ -19,6 +19,7 @@ package com.criteo.publisher;
 import static java.util.Collections.singletonList;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.criteo.publisher.annotation.Internal;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.model.CacheAdUnit;
@@ -34,10 +35,26 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Internal
 public class LiveCdbCallListener extends CdbCallListener {
 
-  private final BidListener bidListener;
+  /**
+   * Listener to notify when response is received (valid or not) or when time budget is exceeded.
+   * <p>
+   * Synchronization may depend on the notification. So it is triggered only <b>once</b> as soon as outcome is known.
+   * <p>
+   * Once consumed, it is nullified to release memory.
+   */
+  @Nullable
+  private BidListener bidListener;
+
+  @NonNull
   private final BidManager bidManager;
+
+  @NonNull
   private final CacheAdUnit cacheAdUnit;
+
+  @NonNull
   private final BidLifecycleListener bidLifecycleListener;
+
+  @NonNull
   private final AtomicBoolean isListenerTriggered = new AtomicBoolean(false);
 
   public LiveCdbCallListener(
@@ -84,6 +101,7 @@ public class LiveCdbCallListener extends CdbCallListener {
       } else {
         bidListener.onNoBid();
       }
+      bidListener = null;
     } else {
       bidManager.setCacheAdUnits(cdbResponse.getSlots());
     }
@@ -119,6 +137,7 @@ public class LiveCdbCallListener extends CdbCallListener {
   public void onTimeBudgetExceeded() {
     if (isListenerTriggered.compareAndSet(false, true)) {
       bidManager.consumeCachedBid(cacheAdUnit, bidListener);
+      bidListener = null;
     }
   }
 }
