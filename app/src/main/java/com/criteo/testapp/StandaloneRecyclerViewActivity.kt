@@ -29,8 +29,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.criteo.publisher.CriteoBannerView
 import com.criteo.publisher.advancednative.CriteoNativeAd
 import com.criteo.publisher.advancednative.CriteoNativeLoader
+import com.criteo.testapp.PubSdkDemoApplication.BANNER
 import com.criteo.testapp.PubSdkDemoApplication.NATIVE
-import com.criteo.testapp.PubSdkDemoApplication.STANDALONE_BANNER
 import com.criteo.testapp.listener.TestAppBannerAdListener
 import com.criteo.testapp.listener.TestAppNativeAdListener
 import com.squareup.picasso.Picasso
@@ -76,7 +76,7 @@ class StandaloneRecyclerViewActivity : AppCompatActivity() {
   }
 
   private fun loadBanner(adapter: Adapter) {
-    val bannerView = CriteoBannerView(baseContext, STANDALONE_BANNER)
+    val bannerView = CriteoBannerView(baseContext, BANNER)
     bannerView.setCriteoBannerAdListener(object : TestAppBannerAdListener(javaClass.simpleName, "Banner") {
       override fun onAdReceived(view: View?) {
         adapter.addBannerAd(bannerView)

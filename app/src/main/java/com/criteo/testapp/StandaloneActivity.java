@@ -16,6 +16,7 @@
 
 package com.criteo.testapp;
 
+import static com.criteo.testapp.PubSdkDemoApplication.INTERSTITIAL;
 import static com.criteo.testapp.PubSdkDemoApplication.INTERSTITIAL_IBV_DEMO;
 import static com.criteo.testapp.PubSdkDemoApplication.NATIVE;
 
@@ -38,9 +39,6 @@ import com.criteo.testapp.listener.TestAppNativeAdListener;
 public class StandaloneActivity extends AppCompatActivity {
 
   private static final String TAG = StandaloneActivity.class.getSimpleName();
-
-  private static final InterstitialAdUnit INTERSTITIAL = new InterstitialAdUnit(
-      "/140800857/Endeavour_Interstitial_320x480");
 
   private CriteoBannerView criteoBannerView;
   private CriteoNativeLoader nativeLoader;

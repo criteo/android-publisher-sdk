@@ -34,20 +34,22 @@ import leakcanary.LeakCanary.Config;
 public class PubSdkDemoApplication extends MultiDexApplication {
 
   private static final String TAG = PubSdkDemoApplication.class.getSimpleName();
-  public static final String DFP_BANNER_ADUNIT_ID = "/140800857/Endeavour_320x50";
-  public static final String DFP_INTERSTITIAL_ADUNIT_ID = "/140800857/Endeavour_Interstitial_320x480";
   public static final String MOPUB_BANNER_ADUNIT_ID = "b5acf501d2354859941b13030d2d848a";
   public static final String MOPUB_INTERSTITIAL_ADUNIT_ID = "86c36b6223ce4730acf52323de3baa93";
   public static final String MOPUB_NATIVE_ADUNIT_ID = "a298abc2fdf744cf898791831509cc38";
-  public static final String NATIVE_AD_UNIT_ID = "/140800857/Endeavour_Native";
+
+  public static final InterstitialAdUnit INTERSTITIAL = new InterstitialAdUnit(
+      "/140800857/Endeavour_Interstitial_320x480"
+  );
 
   public static final InterstitialAdUnit INTERSTITIAL_IBV_DEMO = new InterstitialAdUnit(
-      "mf2v6pikq5vqdjdtfo3j");
+      "mf2v6pikq5vqdjdtfo3j"
+  );
 
-  public static final NativeAdUnit NATIVE = new NativeAdUnit(NATIVE_AD_UNIT_ID);
+  public static final NativeAdUnit NATIVE = new NativeAdUnit("/140800857/Endeavour_Native");
 
-  public static final BannerAdUnit STANDALONE_BANNER = new BannerAdUnit(
-      DFP_BANNER_ADUNIT_ID,
+  public static final BannerAdUnit BANNER = new BannerAdUnit(
+      "/140800857/Endeavour_320x50",
       new AdSize(320, 50)
   );
 
@@ -75,22 +77,11 @@ public class PubSdkDemoApplication extends MultiDexApplication {
     });
 
     List<AdUnit> adUnits = new ArrayList<>();
-
-    BannerAdUnit bannerAdUnit = new BannerAdUnit(DFP_BANNER_ADUNIT_ID, new AdSize(320, 50));
-    adUnits.add(bannerAdUnit);
-
-    InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit(DFP_INTERSTITIAL_ADUNIT_ID);
-    adUnits.add(interstitialAdUnit);
-
-    BannerAdUnit moPubBannerAdUnit = new BannerAdUnit(MOPUB_BANNER_ADUNIT_ID, new AdSize(320, 50));
-    adUnits.add(moPubBannerAdUnit);
-
-    InterstitialAdUnit moPubInterstitialAdUnit = new InterstitialAdUnit(
-        MOPUB_INTERSTITIAL_ADUNIT_ID);
-    adUnits.add(moPubInterstitialAdUnit);
-
+    adUnits.add(BANNER);
+    adUnits.add(INTERSTITIAL);
+    adUnits.add(new BannerAdUnit(MOPUB_BANNER_ADUNIT_ID, new AdSize(320, 50)));
+    adUnits.add(new InterstitialAdUnit(MOPUB_INTERSTITIAL_ADUNIT_ID));
     adUnits.add(new NativeAdUnit(MOPUB_NATIVE_ADUNIT_ID));
-
     adUnits.add(INTERSTITIAL_IBV_DEMO);
     adUnits.add(NATIVE);
 

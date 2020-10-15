@@ -16,6 +16,8 @@
 
 package com.criteo.testapp;
 
+import static com.criteo.testapp.PubSdkDemoApplication.BANNER;
+import static com.criteo.testapp.PubSdkDemoApplication.INTERSTITIAL;
 import static com.criteo.testapp.PubSdkDemoApplication.INTERSTITIAL_IBV_DEMO;
 import static com.criteo.testapp.PubSdkDemoApplication.NATIVE;
 
@@ -32,8 +34,6 @@ import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.advancednative.CriteoNativeLoader;
 import com.criteo.publisher.integration.Integration;
-import com.criteo.publisher.model.AdSize;
-import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.testapp.integration.MockedIntegrationRegistry;
 import com.criteo.testapp.listener.TestAppBannerAdListener;
@@ -44,14 +44,6 @@ import java.lang.ref.WeakReference;
 public class InHouseActivity extends AppCompatActivity {
 
   private static final String TAG = InHouseActivity.class.getSimpleName();
-
-  public static final InterstitialAdUnit INTERSTITIAL = new InterstitialAdUnit(
-      "/140800857/Endeavour_Interstitial_320x480");
-
-  public static final BannerAdUnit BANNER = new BannerAdUnit(
-      "/140800857/Endeavour_320x50",
-      new AdSize(320, 50)
-  );
 
   private CriteoBannerView criteoBannerView;
   private FrameLayout nativeAdContainer;
