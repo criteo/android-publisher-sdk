@@ -32,6 +32,7 @@
 - Features
   - CriteoBannerView is now a custom view that can be included directly in a layout file.
   - Add live bidding: Load a fresh bid within a pre-determined time budget and use any valid cached bid as a fallback.
+  - Add `Criteo#getVersion()` method returning the version of the SDK at runtime.
 
 # Version 3.10.1
 - Bug fix

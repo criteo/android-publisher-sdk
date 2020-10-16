@@ -18,6 +18,7 @@ package com.criteo.publisher.integration;
 
 import static com.criteo.publisher.CriteoUtil.TEST_CP_ID;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -25,6 +26,7 @@ import static org.mockito.AdditionalAnswers.answerVoid;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -58,7 +60,7 @@ import org.mockito.MockitoAnnotations;
 public class CriteoFunctionalTest {
 
   @Rule
-  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule().withMockedLogger();
 
   @Rule
   public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(
@@ -85,6 +87,36 @@ public class CriteoFunctionalTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
+  }
+
+  @Test
+  public void getVersion_GivenNotInitializedSdk_ReturnVersion() throws Exception {
+    when(buildConfigWrapper.getSdkVersion()).thenReturn("1.2.3");
+
+    String version = Criteo.getVersion();
+
+    assertThat(version).isEqualTo("1.2.3");
+  }
+
+  @Test
+  public void getVersion_GivenInitializedSdk_ReturnVersion() throws Exception {
+    when(buildConfigWrapper.getSdkVersion()).thenReturn("1.2.3");
+
+    givenInitializedCriteo();
+    String version = Criteo.getVersion();
+
+    assertThat(version).isEqualTo("1.2.3");
+  }
+
+  @Test
+  public void getVersion_GivenExceptionWhileGettingVersion_DoNotThrowAndLog() throws Exception {
+    RuntimeException exception = new RuntimeException();
+    when(buildConfigWrapper.getSdkVersion()).thenThrow(exception);
+
+    String version = Criteo.getVersion();
+
+    assertThat(version).isEmpty();
+    verify(mockedDependenciesRule.getMockedLogger()).error(any(), eq(exception));
   }
 
   @Test
