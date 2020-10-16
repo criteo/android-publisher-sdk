@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
+import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
@@ -134,6 +135,20 @@ public abstract class Criteo {
       @NonNull AdUnit adUnit,
       @NonNull BidResponseListener bidResponseListener
   );
+
+  /**
+   * Return the version of this SDK.
+   */
+  @NonNull
+  public static String getVersion() {
+    try {
+      return DependencyProvider.getInstance().provideBuildConfigWrapper().getSdkVersion();
+    } catch (Throwable t) {
+      Logger logger = DependencyProvider.getInstance().provideLoggerFactory().createLogger(Criteo.class);
+      logger.error("Internal error while getting version.", t);
+      return "";
+    }
+  }
 
   @NonNull
   abstract DeviceInfo getDeviceInfo();
