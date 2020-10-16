@@ -15,7 +15,19 @@
   https://developer.android.com/studio/write/java8-support.
   - Remove the deprecated `Criteo#init` method. [`Criteo.Builder#init`](https://github.com/criteo/android-publisher-sdk/blob/main/publisher-sdk/src/main/java/com/criteo/publisher/Criteo.java#L54)
   should be used instead.
-- CriteoBannerView is now a custom view that can included directly in a layout file.
+  - Update InHouse API:
+    - Replace `Criteo#getBidResponse(AdUnit)` method by `Criteo#loadBid(AdUnit, BidResponseListener)`
+    - Rename `BidResponse` to `Bid`
+    - Remove `BidResponse#isBidSuccess()` method, bid is a success when `Bid` object is not null
+    - Remove `BidResponse#getBidToken()` method and `BidToken` class, the `loadAd` methods (in `CriteoBannerView`,
+    `CriteoInterstitial`, `CriteoNativeLoader`) take a `Bid` object instead
+  - Update AppBidding API:
+    - Replace `Criteo#setBidsForAdUnit(Object, AdUnit)` method by `Criteo#enrichAdObjectWithBid(Object, Bid)`
+    - Use `Criteo#loadBid(AdUnit, BidResponseListener)` method to provide `Bid` object
+
+- Features
+  - CriteoBannerView is now a custom view that can be included directly in a layout file.
+  - Add live bidding: Load a fresh bid within a pre-determined time budget and use any valid cached bid as a fallback.
 
 # Version 3.10.1
 - Bug fix
