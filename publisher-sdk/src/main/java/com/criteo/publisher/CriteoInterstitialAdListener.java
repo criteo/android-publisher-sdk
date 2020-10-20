@@ -38,36 +38,6 @@ public interface CriteoInterstitialAdListener extends CriteoAdListener {
   void onAdReceived(@NonNull CriteoInterstitial interstitial);
 
   /**
-   * Callback invoked when an interstitial ad is requested but none may be provided by the SDK.
-   *
-   * @param code error code indicating the reason of the failure
-   */
-  @UiThread
-  @Override
-  default void onAdFailedToReceive(@NonNull CriteoErrorCode code) {
-    // no-op by default
-  }
-
-  /**
-   * Callback invoked when an user clicks anywhere on the interstitial ad.
-   */
-  @UiThread
-  @Override
-  default void onAdClicked() {
-    // no-op by default
-  }
-
-  /**
-   * Callback invoked when an ad is opened and the user is redirected outside the application, to
-   * the product web page for instance.
-   */
-  @UiThread
-  @Override
-  default void onAdLeftApplication() {
-    // no-op by default
-  }
-
-  /**
    * Callback invoked when an interstitial ad is opened via {@link CriteoInterstitial#show()}.
    */
   @UiThread
