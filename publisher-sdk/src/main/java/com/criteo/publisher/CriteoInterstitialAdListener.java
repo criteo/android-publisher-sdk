@@ -41,7 +41,6 @@ public interface CriteoInterstitialAdListener extends CriteoAdListener {
    * Callback invoked when an interstitial ad is opened via {@link CriteoInterstitial#show()}.
    */
   @UiThread
-  @Override
   default void onAdOpened() {
     // no-op by default
   }
@@ -51,7 +50,6 @@ public interface CriteoInterstitialAdListener extends CriteoAdListener {
    * presses the back button after being redirected to an ad.
    */
   @UiThread
-  @Override
   default void onAdClosed() {
     // no-op by default
   }

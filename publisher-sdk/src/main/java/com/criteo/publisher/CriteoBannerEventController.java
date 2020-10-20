@@ -17,7 +17,6 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.CriteoListenerCode.CLICK;
-import static com.criteo.publisher.CriteoListenerCode.CLOSE;
 import static com.criteo.publisher.CriteoListenerCode.INVALID;
 import static com.criteo.publisher.CriteoListenerCode.VALID;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
@@ -119,7 +118,7 @@ public class CriteoBannerEventController {
 
       @Override
       public void onUserBackFromAd() {
-        notifyFor(CLOSE);
+        // Do nothing
       }
     }, bannerActivityName);
   }

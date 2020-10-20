@@ -17,8 +17,6 @@
 package com.criteo.testapp.listener;
 
 import android.util.Log;
-import android.view.ViewGroup;
-import android.view.View;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
@@ -42,16 +40,6 @@ public class TestAppBannerAdListener implements CriteoBannerAdListener {
   @Override
   public void onAdClicked() {
     Log.d(tag, prefix + " - Banner onAdClicked");
-  }
-
-  @Override
-  public void onAdOpened() {
-    Log.d(tag, prefix + " - Banner onAdOpened");
-  }
-
-  @Override
-  public void onAdClosed() {
-    Log.d(tag, prefix + " - Banner onAdClosed");
   }
 
   @Override
