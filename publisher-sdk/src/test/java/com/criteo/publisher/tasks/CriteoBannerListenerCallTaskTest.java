@@ -91,7 +91,6 @@ public class CriteoBannerListenerCallTaskTest {
 
     verify(criteoBannerAdListener).onAdClicked();
     verify(criteoBannerAdListener).onAdLeftApplication();
-    verify(criteoBannerAdListener).onAdOpened();
     verifyNoMoreInteractions(criteoBannerAdListener);
   }
 
@@ -100,8 +99,7 @@ public class CriteoBannerListenerCallTaskTest {
     CriteoBannerListenerCallTask task = createTask(CriteoListenerCode.CLOSE);
     task.run();
 
-    verify(criteoBannerAdListener).onAdClosed();
-    verifyNoMoreInteractions(criteoBannerAdListener);
+    verifyNoInteractions(criteoBannerAdListener);
   }
 
   private CriteoBannerListenerCallTask createTask(CriteoListenerCode code) {

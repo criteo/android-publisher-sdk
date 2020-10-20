@@ -51,14 +51,4 @@ public interface CriteoAdListener {
     // no-op by default
   }
 
-  /**
-   * Called when browser opened
-   */
-  void onAdOpened();
-
-  /**
-   * Called when browser closed
-   */
-  void onAdClosed();
-
 }
