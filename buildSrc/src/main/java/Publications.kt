@@ -17,7 +17,9 @@
 import groovy.util.Node
 import groovy.util.NodeList
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.api.tasks.javadoc.Javadoc
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.get
 
@@ -54,7 +56,12 @@ class SdkPublication(
   }
 
   fun addJavadocJar(variantName: String) {
-    artifact(project.getJavadocTask(variantName))
+    project.getJavadocTask(variantName).apply {
+      dependsOn(project.getAssembleTask(variantName))
+      setFailOnError(false)
+    }
+
+    artifact(project.getJavadocJarTask(variantName))
   }
 
   private fun Project.createSourcesJarTask(variant: String): Jar {
@@ -69,7 +76,15 @@ class SdkPublication(
     }
   }
 
-  private fun Project.getJavadocTask(variant: String): Jar {
+  private fun Project.getAssembleTask(variant: String): Task {
+    return project.tasks.getByName("assemble${variant.capitalize()}")
+  }
+
+  private fun Project.getJavadocTask(variant: String): Javadoc {
+    return project.tasks.getByName("generate${variant.capitalize()}Javadoc") as Javadoc
+  }
+
+  private fun Project.getJavadocJarTask(variant: String): Jar {
     return project.tasks.getByName("generate${variant.capitalize()}JavadocJar") as Jar
   }
 
