@@ -17,25 +17,39 @@
 package com.criteo.publisher;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.UiThread;
 
+/**
+ * All callbacks are invoked on the UI thread, so it is safe to execute any UI operations in the implementation.
+ */
 public interface CriteoAdListener {
 
   /**
-   * Called when an ad fetch fails.
+   * Callback invoked when an Ad is requested but none may be provided by the SDK.
    *
-   * @param code The reason the fetch failed.
+   * @param code error code indicating the reason of the failure
    */
-  void onAdFailedToReceive(@NonNull CriteoErrorCode code);
+  @UiThread
+  default void onAdFailedToReceive(@NonNull CriteoErrorCode code) {
+    // no-op by default
+  }
 
   /**
-   * Called when an ad is clicked.
+   * Callback invoked when an Ad is clicked and the user is redirected outside the application, to
+   * the product web page for instance.
    */
-  void onAdLeftApplication();
+  @UiThread
+  default void onAdLeftApplication() {
+    // no-op by default
+  }
 
   /**
-   * Called when Ad link clicked.
+   * Callback invoked when an user clicks anywhere on the Ad.
    */
-  void onAdClicked();
+  @UiThread
+  default void onAdClicked() {
+    // no-op by default
+  }
 
   /**
    * Called when browser opened
