@@ -44,7 +44,7 @@ public interface CriteoAdListener {
   }
 
   /**
-   * Callback invoked when an user clicks anywhere on the Ad.
+   * Callback invoked when a user clicks anywhere on the Ad.
    */
   @UiThread
   default void onAdClicked() {
