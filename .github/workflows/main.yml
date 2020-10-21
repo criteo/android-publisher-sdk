@@ -35,7 +35,7 @@ jobs:
           restore-keys: ${{ runner.os }}-android-
 
       - name: Build & Run Java tests
-        run: ./gradlew check assembleAndroidTest
+        run: ./gradlew build assemble assembleAndroidTest
 
       - name: Junit Report to Annotations
         uses: ashley-taylor/junit-report-annotations-action@1.3
