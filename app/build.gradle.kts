@@ -74,7 +74,7 @@ dependencies {
     implementation(project(":publisher-sdk"))
     implementation(project(":test-utils"))
 
-    /*implementation(MoPub("(,${sdkVersion()}.99)")) {
+    implementation(MoPub("(,${sdkVersion()}.99)")) {
         exclude(group = Deps.Criteo.PublisherSdk.group)
         isChanging = true
         because(
@@ -98,7 +98,7 @@ dependencies {
             The .99 is needed because Gradle range does not support + syntax in the range syntax
             """.trimIndent()
         )
-    }*/
+    }
 
     implementation(Deps.Kotlin.Stdlib)
     implementation(Deps.AndroidX.MultiDex)
