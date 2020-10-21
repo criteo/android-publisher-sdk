@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+  <debug-overrides>
+    <trust-anchors>
+      <!-- Trust user added CAs: this allows to spy/mock HTTPS network with Charles Proxy -->
+      <certificates src="user"/>
+    </trust-anchors>
+  </debug-overrides>
+</network-security-config>
