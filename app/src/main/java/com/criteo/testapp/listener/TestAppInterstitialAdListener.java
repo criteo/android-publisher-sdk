@@ -23,12 +23,13 @@ import androidx.annotation.UiThread;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdListener;
+import java.lang.ref.WeakReference;
 
 public class TestAppInterstitialAdListener implements CriteoInterstitialAdListener {
 
   private final String tag;
   private final String prefix;
-  private final Button btnShowInterstitial;
+  private final WeakReference<Button> btnShowInterstitialWeakRef;
 
   public TestAppInterstitialAdListener(
       String tag, String prefix,
@@ -36,13 +37,17 @@ public class TestAppInterstitialAdListener implements CriteoInterstitialAdListen
   ) {
     this.tag = tag;
     this.prefix = prefix;
-    this.btnShowInterstitial = btnShowInterstitial;
+    this.btnShowInterstitialWeakRef = new WeakReference<>(btnShowInterstitial);
   }
 
   @UiThread
   @Override
   public void onAdReceived(@NonNull CriteoInterstitial interstitial) {
-    btnShowInterstitial.setEnabled(true);
+    Button btnShowInterstitial = btnShowInterstitialWeakRef.get();
+    if (btnShowInterstitial != null) {
+      btnShowInterstitial.setEnabled(true);
+    }
+
     Log.d(tag, prefix + "Interstitial ad called onAdReceived");
   }
 
@@ -70,5 +75,4 @@ public class TestAppInterstitialAdListener implements CriteoInterstitialAdListen
   public void onAdClosed() {
     Log.d(tag, prefix + " - Interstitial onAdClosed");
   }
-
 }
