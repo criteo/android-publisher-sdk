@@ -23,7 +23,6 @@ import static com.criteo.testapp.PubSdkDemoApplication.NATIVE;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -48,8 +47,6 @@ public class InHouseActivity extends AppCompatActivity {
   private CriteoBannerView criteoBannerView;
   private FrameLayout nativeAdContainer;
   private CriteoNativeLoader nativeLoader;
-  private Button btnShowInterstitial;
-  private Button btnShowInterstitialIbv;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -62,9 +59,6 @@ public class InHouseActivity extends AppCompatActivity {
     criteoBannerView.setCriteoBannerAdListener(new TestAppBannerAdListener(
         TAG, "In-House"));
 
-    btnShowInterstitial = findViewById(R.id.buttonInhouseInterstitial);
-    btnShowInterstitialIbv = findViewById(R.id.buttonInhouseInterstitialIbv);
-
     nativeLoader = new CriteoNativeLoader(
         NATIVE,
         new TestAppNativeAdListener(TAG, NATIVE.getAdUnitId(), nativeAdContainer),
@@ -73,6 +67,8 @@ public class InHouseActivity extends AppCompatActivity {
 
     findViewById(R.id.buttonInhouseBanner).setOnClickListener(v -> loadBannerAd());
     findViewById(R.id.buttonInhouseNative).setOnClickListener(v -> loadNative());
+    findViewById(R.id.buttonInhouseInterstitial).setOnClickListener(v -> loadInterstitial(INTERSTITIAL));
+    findViewById(R.id.buttonInhouseInterstitialIbv).setOnClickListener(v -> loadInterstitial(INTERSTITIAL_IBV_DEMO));
   }
 
   @Override
@@ -80,21 +76,6 @@ public class InHouseActivity extends AppCompatActivity {
     super.onDestroy();
     if (criteoBannerView != null) {
       criteoBannerView.destroy();
-    }
-  }
-
-  @Override
-  protected void onResume() {
-    super.onResume();
-    btnShowInterstitial.setEnabled(false);
-    btnShowInterstitialIbv.setEnabled(false);
-    loadInterstitialAd(INTERSTITIAL, btnShowInterstitial);
-    loadInterstitialAd(INTERSTITIAL_IBV_DEMO, btnShowInterstitialIbv);
-  }
-
-  private void showInterstitial(CriteoInterstitial interstitial) {
-    if (interstitial.isAdLoaded()) {
-      interstitial.show();
     }
   }
 
@@ -107,17 +88,14 @@ public class InHouseActivity extends AppCompatActivity {
     Criteo.getInstance().loadBid(NATIVE, loadAd(nativeLoader, CriteoNativeLoader::loadAd));
   }
 
-  private void loadInterstitialAd(InterstitialAdUnit adUnit, Button btnShow) {
+  private void loadInterstitial(InterstitialAdUnit adUnit) {
     String prefix = "In-House " + adUnit.getAdUnitId();
 
-    CriteoInterstitial interstitial = new CriteoInterstitial();
-    interstitial.setCriteoInterstitialAdListener(
-        new TestAppInterstitialAdListener(TAG, prefix, btnShow));
+    CriteoInterstitial interstitial = new CriteoInterstitial(adUnit);
+    interstitial.setCriteoInterstitialAdListener(new TestAppInterstitialAdListener(TAG, prefix));
 
-    btnShow.setOnClickListener(v -> showInterstitial(interstitial));
-
-    Log.d(TAG, prefix + " - Interstitial Requested");
-    Criteo.getInstance().loadBid(adUnit, loadAd(interstitial, CriteoInterstitial::loadAd));
+    Log.d(TAG, prefix + "Interstitial Requested");
+    Criteo.getInstance().loadBid(adUnit, interstitial::loadAd);
   }
 
   private <T> BidResponseListener loadAd(@NonNull T adLoader, @NonNull BiConsumer<T, Bid> loadAdAction) {

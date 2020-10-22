@@ -17,38 +17,27 @@
 package com.criteo.testapp.listener;
 
 import android.util.Log;
-import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.UiThread;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdListener;
-import java.lang.ref.WeakReference;
 
 public class TestAppInterstitialAdListener implements CriteoInterstitialAdListener {
 
   private final String tag;
   private final String prefix;
-  private final WeakReference<Button> btnShowInterstitialWeakRef;
 
-  public TestAppInterstitialAdListener(
-      String tag, String prefix,
-      Button btnShowInterstitial
-  ) {
+  public TestAppInterstitialAdListener(String tag, String prefix) {
     this.tag = tag;
     this.prefix = prefix;
-    this.btnShowInterstitialWeakRef = new WeakReference<>(btnShowInterstitial);
   }
 
   @UiThread
   @Override
   public void onAdReceived(@NonNull CriteoInterstitial interstitial) {
-    Button btnShowInterstitial = btnShowInterstitialWeakRef.get();
-    if (btnShowInterstitial != null) {
-      btnShowInterstitial.setEnabled(true);
-    }
-
     Log.d(tag, prefix + "Interstitial ad called onAdReceived");
+    interstitial.show();
   }
 
   @Override

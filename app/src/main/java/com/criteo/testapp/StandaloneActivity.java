@@ -22,7 +22,6 @@ import static com.criteo.testapp.PubSdkDemoApplication.NATIVE;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import com.criteo.publisher.CriteoBannerView;
@@ -42,8 +41,6 @@ public class StandaloneActivity extends AppCompatActivity {
 
   private CriteoBannerView criteoBannerView;
   private CriteoNativeLoader nativeLoader;
-  private Button btnShowInterstitial;
-  private Button btnShowInterstitialIbv;
   private FrameLayout nativeAdContainer;
 
   @Override
@@ -52,8 +49,6 @@ public class StandaloneActivity extends AppCompatActivity {
     setContentView(R.layout.activity_stand_alone);
     MockedIntegrationRegistry.force(Integration.STANDALONE);
 
-    btnShowInterstitial = findViewById(R.id.buttonStandAloneInterstitial);
-    btnShowInterstitialIbv = findViewById(R.id.buttonStandAloneInterstitialIbv);
     criteoBannerView = findViewById(R.id.criteoBannerView);
     nativeAdContainer = findViewById(R.id.nativeAdContainer);
 
@@ -68,6 +63,8 @@ public class StandaloneActivity extends AppCompatActivity {
 
     findViewById(R.id.buttonStandAloneBanner).setOnClickListener(v -> loadBannerAd());
     findViewById(R.id.buttonStandAloneNative).setOnClickListener(v -> loadNative());
+    findViewById(R.id.buttonStandAloneInterstitial).setOnClickListener(v -> loadInterstitial(INTERSTITIAL));
+    findViewById(R.id.buttonStandAloneInterstitialIbv).setOnClickListener(v -> loadInterstitial(INTERSTITIAL_IBV_DEMO));
   }
 
   private void loadBannerAd() {
@@ -83,33 +80,15 @@ public class StandaloneActivity extends AppCompatActivity {
     }
   }
 
-  @Override
-  protected void onResume() {
-    super.onResume();
-    btnShowInterstitial.setEnabled(false);
-    btnShowInterstitialIbv.setEnabled(false);
-    loadInterstitial(INTERSTITIAL, btnShowInterstitial);
-    loadInterstitial(INTERSTITIAL_IBV_DEMO, btnShowInterstitialIbv);
-  }
-
-  private void showInterstitial(CriteoInterstitial interstitial) {
-    if (interstitial.isAdLoaded()) {
-      interstitial.show();
-    }
-  }
-
   private void loadNative() {
     nativeLoader.loadAd();
   }
 
-  private void loadInterstitial(InterstitialAdUnit adUnit, Button btnShow) {
+  private void loadInterstitial(InterstitialAdUnit adUnit) {
     String prefix = "Standalone " + adUnit.getAdUnitId();
 
     CriteoInterstitial criteoInterstitial = new CriteoInterstitial(adUnit);
-    criteoInterstitial.setCriteoInterstitialAdListener(
-        new TestAppInterstitialAdListener(TAG, prefix, btnShow));
-
-    btnShow.setOnClickListener(v -> showInterstitial(criteoInterstitial));
+    criteoInterstitial.setCriteoInterstitialAdListener(new TestAppInterstitialAdListener(TAG, prefix));
 
     Log.d(TAG, prefix + "Interstitial Requested");
     criteoInterstitial.loadAd();
