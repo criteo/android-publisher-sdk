@@ -26,24 +26,26 @@ import com.criteo.publisher.CriteoInterstitial
 class ServerBiddingActivity : AppCompatActivity() {
 
   private lateinit var criteoBannerView: CriteoBannerView
-  private lateinit var criteoInterstitial: CriteoInterstitial
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_server_bidding)
 
+    criteoBannerView = CriteoBannerView(baseContext)
+
     val buttonBanner: Button = findViewById(R.id.buttonBanner)
     buttonBanner.setOnClickListener {
       val bannerViewContainer: LinearLayout = findViewById(R.id.bannerViewContainer)
-      criteoBannerView = CriteoBannerView(this.baseContext)
-      criteoBannerView.loadAdWithDisplayData("https://rdi.eu.criteo.com/delivery/rtb/demo/ajs?" +
-          "zoneid=1417086&width=300&height=250&ibva=0")
+      criteoBannerView.loadAdWithDisplayData(
+          "https://rdi.eu.criteo.com/delivery/rtb/demo/ajs?" +
+              "zoneid=1417086&width=300&height=250&ibva=0"
+      )
       bannerViewContainer.addView(criteoBannerView)
     }
 
     val buttonInterstitial: Button = findViewById(R.id.buttonInterstitial)
     buttonInterstitial.setOnClickListener {
-      criteoInterstitial = CriteoInterstitial()
+      val criteoInterstitial = CriteoInterstitial()
       criteoInterstitial.setCriteoInterstitialAdListener {
         it.show()
       }
