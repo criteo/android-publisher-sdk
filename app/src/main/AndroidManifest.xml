@@ -48,10 +48,10 @@
     <activity
       android:name=".MainActivity"
       android:theme="@style/AppTheme.NoActionBar"/>
+
     <activity
       android:label="@string/title_activity_splash"
       android:name=".SplashActivity"
-      android:parentActivityName=".MainActivity"
       android:theme="@style/AppTheme.NoActionBar">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
@@ -67,6 +67,7 @@
       android:label="@string/title_activity_dfp"
       android:name=".DfpActivity"
       android:configChanges="orientation|screenSize"
+      android:parentActivityName=".MainActivity"
       android:theme="@style/AppTheme">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
@@ -76,6 +77,7 @@
       android:label="@string/title_activity_mediation"
       android:name=".MediationActivity"
       android:configChanges="orientation|screenSize"
+      android:parentActivityName=".MainActivity"
       android:theme="@style/AppTheme">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
@@ -84,6 +86,7 @@
     <activity
       android:name=".InHouseActivity"
       android:configChanges="orientation|screenSize"
+      android:parentActivityName=".MainActivity"
       android:theme="@style/AppTheme">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
@@ -93,6 +96,7 @@
     <activity
       android:name=".AdMobMediationActivity"
       android:configChanges="orientation|screenSize"
+      android:parentActivityName=".MainActivity"
       android:theme="@style/AppTheme">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
@@ -102,6 +106,7 @@
     <activity
       android:name=".PrivacyConsentSelectorActivity"
       android:configChanges="orientation|screenSize"
+      android:parentActivityName=".MainActivity"
       android:theme="@style/AppTheme">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
@@ -111,6 +116,7 @@
     <activity
       android:name=".integration.IntegrationSelectorActivity"
       android:configChanges="orientation|screenSize"
+      android:parentActivityName=".MainActivity"
       android:theme="@style/AppTheme">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
@@ -120,6 +126,7 @@
     <activity
       android:name=".GdprActivity"
       android:configChanges="orientation|screenSize"
+      android:parentActivityName=".MainActivity"
       android:theme="@style/AppTheme">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
@@ -129,6 +136,7 @@
     <activity
       android:name=".StandaloneRecyclerViewActivity"
       android:configChanges="orientation|screenSize"
+      android:parentActivityName=".MainActivity"
       android:theme="@style/AppTheme">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
@@ -139,12 +147,14 @@
       android:label="@string/title_activity_mopub"
       android:name=".MopubActivity"
       android:configChanges="orientation|screenSize"
+      android:parentActivityName=".MainActivity"
       android:theme="@style/AppTheme"/>
 
     <activity
       android:label="@string/title_activity_server_bidding"
       android:name=".ServerBiddingActivity"
       android:configChanges="orientation|screenSize"
+      android:parentActivityName=".MainActivity"
       android:theme="@style/AppTheme"/>
   </application>
 
