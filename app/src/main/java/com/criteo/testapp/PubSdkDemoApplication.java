@@ -88,6 +88,7 @@ public class PubSdkDemoApplication extends MultiDexApplication {
     try {
       new Criteo.Builder(this, "B-056946")
           .adUnits(adUnits)
+          .hashedEmail("theHashedEmail")
           .init();
     } catch (Throwable tr) {
       Log.e(TAG, "FAILED TO INIT SDK!!!!", tr);

@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.FrameLayout;
 import androidx.appcompat.app.AppCompatActivity;
+import com.criteo.publisher.BiddingContextualData;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.advancednative.CriteoNativeLoader;
@@ -70,6 +71,7 @@ public class StandaloneActivity extends AppCompatActivity {
   private void loadBannerAd() {
     Log.d(TAG, "Banner Requested");
     criteoBannerView.loadAd();
+    criteoBannerView.loadAd(new BiddingContextualData("aContentUrl"));
   }
 
   @Override

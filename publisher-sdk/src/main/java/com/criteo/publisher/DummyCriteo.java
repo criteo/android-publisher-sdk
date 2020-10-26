@@ -87,6 +87,11 @@ public class DummyCriteo extends Criteo {
     // do nothing
   }
 
+  @Override
+  public void setHashedEmail(@NonNull String hashedEmail) {
+    // do nothing
+  }
+
   private static class DummyDeviceInfo extends DeviceInfo {
 
     private DummyDeviceInfo() {

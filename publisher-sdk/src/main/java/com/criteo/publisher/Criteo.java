@@ -50,6 +50,9 @@ public abstract class Criteo {
     @Nullable
     private String mopubConsent;
 
+    @Nullable
+    private String hashedEmail;
+
     public Builder(@NonNull Application application, @NonNull String criteoPublisherId) {
       this.application = application;
       this.criteoPublisherId = criteoPublisherId;
@@ -70,8 +73,13 @@ public abstract class Criteo {
       return this;
     }
 
+    public Builder hashedEmail(@NonNull String  hashedEmail) {
+      this.hashedEmail = hashedEmail;
+      return this;
+    }
+
     public Criteo init() throws CriteoInitException {
-      return Criteo.init(application, criteoPublisherId, adUnits, usPrivacyOptOut, mopubConsent);
+      return Criteo.init(application, criteoPublisherId, adUnits, usPrivacyOptOut, mopubConsent, hashedEmail);
     }
   }
 
@@ -80,7 +88,8 @@ public abstract class Criteo {
       @NonNull String criteoPublisherId,
       @Nullable List<AdUnit> adUnits,
       @Nullable Boolean usPrivacyOptOut,
-      @Nullable String mopubConsent
+      @Nullable String mopubConsent,
+      @Nullable String hashedEmail
   ) throws CriteoInitException {
 
     synchronized (Criteo.class) {
@@ -136,6 +145,12 @@ public abstract class Criteo {
       @NonNull BidResponseListener bidResponseListener
   );
 
+  public abstract void loadBid(
+      @NonNull AdUnit adUnit,
+      @NonNull BiddingContextualData biddingContextualData,
+      @NonNull BidResponseListener bidResponseListener
+  );
+
   /**
    * Return the version of this SDK.
    */
@@ -166,4 +181,5 @@ public abstract class Criteo {
 
   public abstract void setMopubConsent(@Nullable String mopubConsent);
 
+  public abstract void setHashedEmail(@NonNull String hashedEmail);
 }

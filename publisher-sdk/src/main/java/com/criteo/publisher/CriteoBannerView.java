@@ -145,6 +145,10 @@ public class CriteoBannerView extends WebView {
     }
   }
 
+  public void loadAd(@NonNull BiddingContextualData biddingContextualData) {
+
+  }
+
   @Keep
   public void loadAdWithDisplayData(@NonNull String displayData) {
     getOrCreateController().notifyFor(CriteoListenerCode.VALID);
@@ -157,6 +161,22 @@ public class CriteoBannerView extends WebView {
   }
 
   public void loadAd(@Nullable Bid bid) {
+    try {
+      doLoadAd(bid);
+    } catch (Throwable tr) {
+      Log.e(TAG, "Internal error while loading banner from bid token.", tr);
+    }
+  }
+
+  public void loadAd(@Nullable Bid bid, @NonNull String contentUrl) {
+    try {
+      doLoadAd(bid);
+    } catch (Throwable tr) {
+      Log.e(TAG, "Internal error while loading banner from bid token.", tr);
+    }
+  }
+
+  public void loadAd(@Nullable Bid bid, @NonNull BiddingContextualData biddingContextualData) {
     try {
       doLoadAd(bid);
     } catch (Throwable tr) {

@@ -190,4 +190,9 @@ final class CriteoInternal extends Criteo {
   public void setMopubConsent(@Nullable String mopubConsent) {
     userPrivacyUtil.storeMopubConsent(mopubConsent);
   }
+
+  @Override
+  public void setHashedEmail(@NonNull String hashedEmail) {
+    // store hashed email in SharedPrefs
+  }
 }
