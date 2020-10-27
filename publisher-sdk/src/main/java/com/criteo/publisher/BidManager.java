@@ -181,6 +181,16 @@ public class BidManager implements ApplicationStoppedListener {
     }
   }
 
+  private void consumeCachedBidIfExpired(@NonNull CacheAdUnit cacheAdUnit) {
+    synchronized (cacheLock) {
+      CdbResponseSlot cdbResponseSlot = cache.peekAdUnit(cacheAdUnit);
+      if (cdbResponseSlot != null && hasBidExpired(cdbResponseSlot)) {
+        cache.remove(cacheAdUnit);
+        bidLifecycleListener.onBidConsumed(cacheAdUnit, cdbResponseSlot);
+      }
+    }
+  }
+
   private CdbResponseSlot consumeCachedBid(@NonNull CacheAdUnit cacheAdUnit) {
     synchronized (cacheLock) {
       CdbResponseSlot cdbResponseSlot = cache.peekAdUnit(cacheAdUnit);
@@ -233,6 +243,8 @@ public class BidManager implements ApplicationStoppedListener {
     }
 
     synchronized (cacheLock) {
+      consumeCachedBidIfExpired(cacheAdUnit);
+
       if (isSilencedFor(cacheAdUnit)) {
         consumeCachedBid(cacheAdUnit, bidListener);
       } else {

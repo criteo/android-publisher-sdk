@@ -1253,7 +1253,7 @@ public class BidManagerFunctionalTest {
   public void fetchForLiveBidRequest_ExpiredSilentBidCached_ShouldFetch() throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    givenExpiredSilentModeBidCached(cacheAdUnit);
+    CdbResponseSlot slot = givenExpiredSilentModeBidCached(cacheAdUnit);
     CdbResponseSlot newSlot = givenMockedCdbRespondingSlot();
 
     BidListener bidListener = mock(BidListener.class);
@@ -1265,6 +1265,7 @@ public class BidManagerFunctionalTest {
     verify(bidListener).onBidResponse(newSlot);
     assertNoLiveBidIsCached();
     assertShouldCallCdb(singletonList(cacheAdUnit));
+    assertLiveBidIsConsumedFromCache(cacheAdUnit, slot);
   }
 
   @Test
