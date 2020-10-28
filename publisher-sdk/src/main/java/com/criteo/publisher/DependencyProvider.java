@@ -48,6 +48,7 @@ import com.criteo.publisher.concurrent.AsyncResources;
 import com.criteo.publisher.concurrent.NoOpAsyncResources;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.concurrent.ThreadPoolExecutorFactory;
+import com.criteo.publisher.context.ConnectionTypeFetcher;
 import com.criteo.publisher.context.ContextProvider;
 import com.criteo.publisher.csm.CsmBidLifecycleListener;
 import com.criteo.publisher.csm.MetricObjectQueueFactory;
@@ -578,7 +579,16 @@ public class DependencyProvider {
 
   @NonNull
   public ContextProvider provideContextProvider() {
-    return getOrCreate(ContextProvider.class, ContextProvider::new);
+    return getOrCreate(ContextProvider.class, () -> new ContextProvider(
+        provideConnectionTypeFetcher()
+    ));
+  }
+
+  @NonNull
+  public ConnectionTypeFetcher provideConnectionTypeFetcher() {
+    return getOrCreate(ConnectionTypeFetcher.class, () -> new ConnectionTypeFetcher(
+        provideContext()
+    ));
   }
 
   public interface Factory<T> {

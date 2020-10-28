@@ -50,15 +50,24 @@ class ContextProviderTest {
   }
 
   @Test
+  fun fetchDeviceConnectionType_DoesNotThrow() {
+    assertThatCode {
+      contextProvider.fetchDeviceConnectionType()
+    }.doesNotThrowAnyException()
+  }
+
+  @Test
   fun fetchUserContext_GivenMockedData_PutThemInRightField() {
     contextProvider.stub {
       doReturn("deviceModel").whenever(mock).fetchDeviceModel()
       doReturn("deviceMake").whenever(mock).fetchDeviceMake()
+      doReturn(42).whenever(mock).fetchDeviceConnectionType()
     }
 
     val expected = mapOf(
         "device.model" to "deviceModel",
-        "device.make" to "deviceMake"
+        "device.make" to "deviceMake",
+        "device.contype" to 42
     )
 
     val context = contextProvider.fetchUserContext()
@@ -71,6 +80,7 @@ class ContextProviderTest {
     contextProvider.stub {
       doReturn(null).whenever(mock).fetchDeviceModel()
       doReturn(null).whenever(mock).fetchDeviceMake()
+      doReturn(null).whenever(mock).fetchDeviceConnectionType()
     }
 
     val context = contextProvider.fetchUserContext()
