@@ -21,7 +21,9 @@ import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.util.filterNotNullValues
 
 @OpenForTesting
-internal class ContextProvider {
+internal class ContextProvider(
+    private val connectionTypeFetcher: ConnectionTypeFetcher
+) {
 
   /**
    * OpenRTB field: `device.make`
@@ -40,15 +42,27 @@ internal class ContextProvider {
    */
   internal fun fetchDeviceModel(): String? = Build.MODEL.takeIf { it != Build.UNKNOWN }
 
+  /**
+   * OpenRTB field: `device.contype`
+   *
+   * ## Definition
+   * Network connection type. Refer to [ConnectionTypeFetcher.ConnectionType].
+   */
+  internal fun fetchDeviceConnectionType(): Int? {
+    return connectionTypeFetcher.fetchConnectionType()?.openRtbValue
+  }
+
   internal fun fetchUserContext(): Map<String, Any> {
     return mapOf(
         DeviceMake to fetchDeviceMake(),
-        DeviceModel to fetchDeviceModel()
+        DeviceModel to fetchDeviceModel(),
+        DeviceConnectionType to fetchDeviceConnectionType()
     ).filterNotNullValues()
   }
 
   private companion object {
     const val DeviceMake = "device.make"
     const val DeviceModel = "device.model"
+    const val DeviceConnectionType = "device.contype"
   }
 }
