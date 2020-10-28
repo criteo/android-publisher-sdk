@@ -148,7 +148,12 @@ class DependenciesAnnotationInjection {
           if (useSpy) {
             // Generate spy from real dependency
             Object realDependency = invocationOnMock.callRealMethod();
-            dependency = spy(realDependency);
+
+            if (mockingDetails(realDependency).isMock()) {
+              dependency = realDependency;
+            } else {
+              dependency = spy(realDependency);
+            }
           } else {
             dependency = mock(field.getType());
           }
