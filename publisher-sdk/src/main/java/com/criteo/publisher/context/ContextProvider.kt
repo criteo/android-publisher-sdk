@@ -21,6 +21,7 @@ import android.os.Build
 import androidx.core.os.ConfigurationCompat
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.util.filterNotNullValues
+import java.util.Locale
 
 @OpenForTesting
 internal class ContextProvider(
@@ -67,10 +68,29 @@ internal class ContextProvider(
    * *Note that alpha-3 codes may be encountered and vendors are encouraged to be tolerant of them.*
    */
   internal fun fetchUserCountry(): String? {
-    val locales = ConfigurationCompat.getLocales(Resources.getSystem().configuration)
-    return Array(locales.size(), locales::get).toList()
+    return fetchLocales()
         .mapNotNull { it.country.takeIf { it.isNotBlank() } }
         .firstOrNull()
+  }
+
+  /**
+   * Custom field: `data.inputLanguage`
+   *
+   * ## Definition
+   * A string array containing the languages setup on the user's device keyboard. Country codes (ISO-3166-1-alpha-2) are
+   * passed in the string array, where "en", "he" = English and Hebrew languages are enabled on the user's device
+   * keyboard
+   */
+  internal fun fetchUserLanguages(): List<String>? {
+    return fetchLocales()
+        .mapNotNull { it.language.takeIf { it.isNotBlank() } }
+        .distinct()
+        .takeIf { it.isNotEmpty() }
+  }
+
+  private fun fetchLocales(): List<Locale> {
+    val locales = ConfigurationCompat.getLocales(Resources.getSystem().configuration)
+    return Array(locales.size(), locales::get).toList()
   }
 
   internal fun fetchUserContext(): Map<String, Any> {
@@ -78,7 +98,8 @@ internal class ContextProvider(
         DeviceMake to fetchDeviceMake(),
         DeviceModel to fetchDeviceModel(),
         DeviceConnectionType to fetchDeviceConnectionType(),
-        UserCountry to fetchUserCountry()
+        UserCountry to fetchUserCountry(),
+        UserLanguages to fetchUserLanguages()
     ).filterNotNullValues()
   }
 
@@ -87,5 +108,6 @@ internal class ContextProvider(
     const val DeviceModel = "device.model"
     const val DeviceConnectionType = "device.contype"
     const val UserCountry = "user.geo.country"
+    const val UserLanguages = "data.inputLanguage"
   }
 }

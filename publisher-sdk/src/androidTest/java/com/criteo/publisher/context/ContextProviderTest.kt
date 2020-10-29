@@ -96,19 +96,55 @@ class ContextProviderTest {
   }
 
   @Test
+  fun fetchUserLanguages_GivenNoLocale_ReturnNull() {
+    Resources.getSystem().configuration.setLocales(LocaleList())
+
+    val country = contextProvider.fetchUserLanguages()
+
+    assertThat(country).isNull()
+  }
+
+  @Test
+  fun fetchUserLanguages_GivenLocaleWithBlankLanguage_ReturnNull() {
+    Resources.getSystem().configuration.setLocales(LocaleList(Locale.ROOT))
+
+    val country = contextProvider.fetchUserLanguages()
+
+    assertThat(country).isNull()
+  }
+
+  @Test
+  fun fetchUserLanguages_GivenManyLocales_ReturnSetOfNonEmpty() {
+    Resources.getSystem().configuration.setLocales(
+        LocaleList(
+            Locale.FRANCE,
+            Locale.ROOT,
+            Locale.CANADA_FRENCH,
+            Locale.SIMPLIFIED_CHINESE
+        )
+    )
+
+    val country = contextProvider.fetchUserLanguages()
+
+    assertThat(country).containsExactly("fr", "zh")
+  }
+
+  @Test
   fun fetchUserContext_GivenMockedData_PutThemInRightField() {
     contextProvider.stub {
       doReturn("deviceModel").whenever(mock).fetchDeviceModel()
       doReturn("deviceMake").whenever(mock).fetchDeviceMake()
       doReturn(42).whenever(mock).fetchDeviceConnectionType()
       doReturn("userCountry").whenever(mock).fetchUserCountry()
+      doReturn(listOf("en", "he")).whenever(mock).fetchUserLanguages()
     }
 
     val expected = mapOf(
         "device.model" to "deviceModel",
         "device.make" to "deviceMake",
         "device.contype" to 42,
-        "user.geo.country" to "userCountry"
+        "user.geo.country" to "userCountry",
+        "data.inputLanguage" to listOf("en", "he")
     )
 
     val context = contextProvider.fetchUserContext()
@@ -123,6 +159,7 @@ class ContextProviderTest {
       doReturn(null).whenever(mock).fetchDeviceMake()
       doReturn(null).whenever(mock).fetchDeviceConnectionType()
       doReturn(null).whenever(mock).fetchUserCountry()
+      doReturn(null).whenever(mock).fetchUserLanguages()
     }
 
     val context = contextProvider.fetchUserContext()
