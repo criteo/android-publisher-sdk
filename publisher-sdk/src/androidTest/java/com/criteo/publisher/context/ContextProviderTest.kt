@@ -176,6 +176,13 @@ class ContextProviderTest {
   }
 
   @Test
+  fun fetchSessionDuration_ReturnStrictlyPositive() {
+    val duration = contextProvider.fetchSessionDuration()
+
+    assertThat(duration).isPositive()
+  }
+
+  @Test
   fun fetchUserContext_GivenMockedData_PutThemInRightField() {
     contextProvider.stub {
       doReturn("deviceModel").whenever(mock).fetchDeviceModel()
@@ -186,6 +193,7 @@ class ContextProviderTest {
       doReturn(1337).whenever(mock).fetchDeviceWidth()
       doReturn(22).whenever(mock).fetchDeviceHeight()
       doReturn("deviceOrientation").whenever(mock).fetchDeviceOrientation()
+      doReturn(10000L).whenever(mock).fetchSessionDuration()
     }
 
     val expected = mapOf(
@@ -196,7 +204,8 @@ class ContextProviderTest {
         "data.inputLanguage" to listOf("en", "he"),
         "device.w" to 1337,
         "device.h" to 22,
-        "data.orientation" to "deviceOrientation"
+        "data.orientation" to "deviceOrientation",
+        "data.sessionDuration" to 10000L
     )
 
     val context = contextProvider.fetchUserContext()
@@ -215,6 +224,7 @@ class ContextProviderTest {
       doReturn(null).whenever(mock).fetchDeviceWidth()
       doReturn(null).whenever(mock).fetchDeviceHeight()
       doReturn(null).whenever(mock).fetchDeviceOrientation()
+      doReturn(null).whenever(mock).fetchSessionDuration()
     }
 
     val context = contextProvider.fetchUserContext()

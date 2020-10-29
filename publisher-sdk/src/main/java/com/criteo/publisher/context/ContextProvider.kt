@@ -23,6 +23,7 @@ import android.graphics.Point
 import android.os.Build
 import android.view.WindowManager
 import androidx.core.os.ConfigurationCompat
+import com.criteo.publisher.Session
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.util.AndroidUtil
 import com.criteo.publisher.util.filterNotNullValues
@@ -33,7 +34,8 @@ import java.util.Locale
 internal class ContextProvider(
     private val context: Context,
     private val connectionTypeFetcher: ConnectionTypeFetcher,
-    private val androidUtil: AndroidUtil
+    private val androidUtil: AndroidUtil,
+    private val session: Session
 ) {
 
   /**
@@ -142,6 +144,18 @@ internal class ContextProvider(
     }
   }
 
+  /**
+   * Custom field: `data.sessionDuration`
+   *
+   * ## Definition
+   * The total duration of time a user has spent so far in a specific app session expressed in seconds. For example, a
+   * user has been playing Word Game for 45 seconds
+   *
+   * ## Note
+   * This duration is approximate: it is the duration since the initialization of the SDK.
+   */
+  internal fun fetchSessionDuration(): Long? = session.getDuration()
+
   internal fun fetchUserContext(): Map<String, Any> {
     return mapOf(
         DeviceMake to fetchDeviceMake(),
@@ -151,7 +165,8 @@ internal class ContextProvider(
         DeviceHeight to fetchDeviceHeight(),
         DeviceOrientation to fetchDeviceOrientation(),
         UserCountry to fetchUserCountry(),
-        UserLanguages to fetchUserLanguages()
+        UserLanguages to fetchUserLanguages(),
+        SessionDuration to fetchSessionDuration()
     ).filterNotNullValues()
   }
 
@@ -164,5 +179,6 @@ internal class ContextProvider(
     const val DeviceOrientation = "data.orientation"
     const val UserCountry = "user.geo.country"
     const val UserLanguages = "data.inputLanguage"
+    const val SessionDuration = "data.sessionDuration"
   }
 }

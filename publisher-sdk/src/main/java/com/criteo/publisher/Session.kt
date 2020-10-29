@@ -14,14 +14,16 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher;
+package com.criteo.publisher
 
-public interface Clock {
+internal class Session(private val clock: Clock) {
+
+  private val startingTime = clock.currentTimeInMillis
 
   /**
-   * Returns the current time in milliseconds.
+   * Returns the current time in milliseconds since the initialization of the SDK.
    *
-   * @return the difference, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC.
+   * @return the difference, measured in milliseconds, between the current time and the SDK init.
    */
-  long getCurrentTimeInMillis();
+  fun getDuration(): Long = clock.currentTimeInMillis - startingTime
 }
