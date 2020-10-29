@@ -75,6 +75,8 @@ final class CriteoInternal extends Criteo {
 
     this.dependencyProvider = dependencyProvider;
 
+    dependencyProvider.provideSession();
+
     deviceInfo = dependencyProvider.provideDeviceInfo();
     deviceInfo.initialize();
 

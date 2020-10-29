@@ -582,7 +582,8 @@ public class DependencyProvider {
     return getOrCreate(ContextProvider.class, () -> new ContextProvider(
         provideContext(),
         provideConnectionTypeFetcher(),
-        provideAndroidUtil()
+        provideAndroidUtil(),
+        provideSession()
     ));
   }
 
@@ -590,6 +591,13 @@ public class DependencyProvider {
   public ConnectionTypeFetcher provideConnectionTypeFetcher() {
     return getOrCreate(ConnectionTypeFetcher.class, () -> new ConnectionTypeFetcher(
         provideContext()
+    ));
+  }
+
+  @NonNull
+  public Session provideSession() {
+    return getOrCreate(Session.class, () -> new Session(
+        provideClock()
     ));
   }
 
