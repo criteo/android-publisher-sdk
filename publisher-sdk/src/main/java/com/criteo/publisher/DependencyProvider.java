@@ -580,6 +580,7 @@ public class DependencyProvider {
   @NonNull
   public ContextProvider provideContextProvider() {
     return getOrCreate(ContextProvider.class, () -> new ContextProvider(
+        provideContext(),
         provideConnectionTypeFetcher()
     ));
   }
