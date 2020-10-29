@@ -16,6 +16,8 @@
 
 package com.criteo.publisher.context
 
+import android.content.res.Resources
+import android.os.LocaleList
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.nhaarman.mockitokotlin2.doReturn
@@ -25,6 +27,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Rule
 import org.junit.Test
+import java.util.Locale
 
 class ContextProviderTest {
 
@@ -57,17 +60,55 @@ class ContextProviderTest {
   }
 
   @Test
+  fun fetchUserCountry_GivenNoLocale_ReturnNull() {
+    Resources.getSystem().configuration.setLocales(LocaleList())
+
+    val country = contextProvider.fetchUserCountry()
+
+    assertThat(country).isNull()
+  }
+
+  @Test
+  fun fetchUserCountry_GivenLocaleWithBlankCountry_ReturnNull() {
+    Resources.getSystem().configuration.setLocales(LocaleList(Locale.FRENCH))
+
+    val country = contextProvider.fetchUserCountry()
+
+    assertThat(country).isNull()
+  }
+
+  @Test
+  fun fetchUserCountry_GivenLocaleWithCountry_ReturnIt() {
+    Resources.getSystem().configuration.setLocales(LocaleList(Locale.FRANCE))
+
+    val country = contextProvider.fetchUserCountry()
+
+    assertThat(country).isEqualTo("FR")
+  }
+
+  @Test
+  fun fetchUserCountry_GivenManyLocales_ReturnFirstOneWithCountry() {
+    Resources.getSystem().configuration.setLocales(LocaleList(Locale.FRENCH, Locale.FRANCE, Locale.CANADA))
+
+    val country = contextProvider.fetchUserCountry()
+
+    assertThat(country).isEqualTo("FR")
+  }
+
+  @Test
   fun fetchUserContext_GivenMockedData_PutThemInRightField() {
     contextProvider.stub {
       doReturn("deviceModel").whenever(mock).fetchDeviceModel()
       doReturn("deviceMake").whenever(mock).fetchDeviceMake()
       doReturn(42).whenever(mock).fetchDeviceConnectionType()
+      doReturn("userCountry").whenever(mock).fetchUserCountry()
     }
 
     val expected = mapOf(
         "device.model" to "deviceModel",
         "device.make" to "deviceMake",
-        "device.contype" to 42
+        "device.contype" to 42,
+        "user.geo.country" to "userCountry"
     )
 
     val context = contextProvider.fetchUserContext()
@@ -81,6 +122,7 @@ class ContextProviderTest {
       doReturn(null).whenever(mock).fetchDeviceModel()
       doReturn(null).whenever(mock).fetchDeviceMake()
       doReturn(null).whenever(mock).fetchDeviceConnectionType()
+      doReturn(null).whenever(mock).fetchUserCountry()
     }
 
     val context = contextProvider.fetchUserContext()

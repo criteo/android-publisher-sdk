@@ -16,7 +16,9 @@
 
 package com.criteo.publisher.context
 
+import android.content.res.Resources
 import android.os.Build
+import androidx.core.os.ConfigurationCompat
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.util.filterNotNullValues
 
@@ -52,11 +54,31 @@ internal class ContextProvider(
     return connectionTypeFetcher.fetchConnectionType()?.openRtbValue
   }
 
+  /**
+   * OpenRTB field: `user.geo.country`
+   *
+   * ## Definition
+   * ### Geo object
+   * This object encapsulates various methods for specifying a geographic location. [...]. When subordinate to a User
+   * object, it indicates the location of the user's home base (i.e., not necessarily their current location).
+   *
+   * ### Country property
+   * Country code using ISO-3166-1-alpha-2.
+   * *Note that alpha-3 codes may be encountered and vendors are encouraged to be tolerant of them.*
+   */
+  internal fun fetchUserCountry(): String? {
+    val locales = ConfigurationCompat.getLocales(Resources.getSystem().configuration)
+    return Array(locales.size(), locales::get).toList()
+        .mapNotNull { it.country.takeIf { it.isNotBlank() } }
+        .firstOrNull()
+  }
+
   internal fun fetchUserContext(): Map<String, Any> {
     return mapOf(
         DeviceMake to fetchDeviceMake(),
         DeviceModel to fetchDeviceModel(),
-        DeviceConnectionType to fetchDeviceConnectionType()
+        DeviceConnectionType to fetchDeviceConnectionType(),
+        UserCountry to fetchUserCountry()
     ).filterNotNullValues()
   }
 
@@ -64,5 +86,6 @@ internal class ContextProvider(
     const val DeviceMake = "device.make"
     const val DeviceModel = "device.model"
     const val DeviceConnectionType = "device.contype"
+    const val UserCountry = "user.geo.country"
   }
 }
