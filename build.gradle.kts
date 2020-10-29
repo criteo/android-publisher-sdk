@@ -36,6 +36,7 @@ sonarqube {
   properties {
     property("sonar.projectKey", "com.criteo.publisher:criteo-publisher-sdk")
     property("sonar.organization", "criteo")
+    property("sonar.login", "a7a661f349105d88f502a9e2820397ce17e5ca20")
     property("sonar.host.url", "https://sonarcloud.io")
     property("sonar.projectVersion", sdkPublicationVersion())
 
