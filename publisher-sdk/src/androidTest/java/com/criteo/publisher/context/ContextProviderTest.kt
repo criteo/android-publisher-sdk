@@ -130,6 +130,20 @@ class ContextProviderTest {
   }
 
   @Test
+  fun fetchDeviceWidth_ReturnStrictlyPositiveWidth() {
+    val width = contextProvider.fetchDeviceWidth()
+
+    assertThat(width).isPositive()
+  }
+
+  @Test
+  fun fetchDeviceHeight_ReturnStrictlyPositiveHeight() {
+    val height = contextProvider.fetchDeviceHeight()
+
+    assertThat(height).isPositive()
+  }
+
+  @Test
   fun fetchUserContext_GivenMockedData_PutThemInRightField() {
     contextProvider.stub {
       doReturn("deviceModel").whenever(mock).fetchDeviceModel()
@@ -137,6 +151,8 @@ class ContextProviderTest {
       doReturn(42).whenever(mock).fetchDeviceConnectionType()
       doReturn("userCountry").whenever(mock).fetchUserCountry()
       doReturn(listOf("en", "he")).whenever(mock).fetchUserLanguages()
+      doReturn(1337).whenever(mock).fetchDeviceWidth()
+      doReturn(22).whenever(mock).fetchDeviceHeight()
     }
 
     val expected = mapOf(
@@ -144,7 +160,9 @@ class ContextProviderTest {
         "device.make" to "deviceMake",
         "device.contype" to 42,
         "user.geo.country" to "userCountry",
-        "data.inputLanguage" to listOf("en", "he")
+        "data.inputLanguage" to listOf("en", "he"),
+        "device.w" to 1337,
+        "device.h" to 22
     )
 
     val context = contextProvider.fetchUserContext()
@@ -160,6 +178,8 @@ class ContextProviderTest {
       doReturn(null).whenever(mock).fetchDeviceConnectionType()
       doReturn(null).whenever(mock).fetchUserCountry()
       doReturn(null).whenever(mock).fetchUserLanguages()
+      doReturn(null).whenever(mock).fetchDeviceWidth()
+      doReturn(null).whenever(mock).fetchDeviceHeight()
     }
 
     val context = contextProvider.fetchUserContext()

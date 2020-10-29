@@ -16,8 +16,11 @@
 
 package com.criteo.publisher.context
 
+import android.content.Context
 import android.content.res.Resources
+import android.graphics.Point
 import android.os.Build
+import android.view.WindowManager
 import androidx.core.os.ConfigurationCompat
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.util.filterNotNullValues
@@ -25,6 +28,7 @@ import java.util.Locale
 
 @OpenForTesting
 internal class ContextProvider(
+    private val context: Context,
     private val connectionTypeFetcher: ConnectionTypeFetcher
 ) {
 
@@ -93,11 +97,40 @@ internal class ContextProvider(
     return Array(locales.size(), locales::get).toList()
   }
 
+  /**
+   * OpenRTB field: `device.w`
+   *
+   * ## Definition
+   * Physical width of the screen in pixels.
+   */
+  internal fun fetchDeviceWidth(): Int? = fetchDevicePhysicalSize()?.x
+
+  /**
+   * OpenRTB field: `device.h`
+   *
+   * ## Definition
+   * Physical height of the screen in pixels.
+   */
+  internal fun fetchDeviceHeight(): Int? = fetchDevicePhysicalSize()?.y
+
+  private fun fetchDevicePhysicalSize(): Point? {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      return null
+    }
+
+    val point = Point()
+    val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    windowManager.defaultDisplay.getRealSize(point)
+    return point
+  }
+
   internal fun fetchUserContext(): Map<String, Any> {
     return mapOf(
         DeviceMake to fetchDeviceMake(),
         DeviceModel to fetchDeviceModel(),
         DeviceConnectionType to fetchDeviceConnectionType(),
+        DeviceWidth to fetchDeviceWidth(),
+        DeviceHeight to fetchDeviceHeight(),
         UserCountry to fetchUserCountry(),
         UserLanguages to fetchUserLanguages()
     ).filterNotNullValues()
@@ -107,6 +140,8 @@ internal class ContextProvider(
     const val DeviceMake = "device.make"
     const val DeviceModel = "device.model"
     const val DeviceConnectionType = "device.contype"
+    const val DeviceWidth = "device.w"
+    const val DeviceHeight = "device.h"
     const val UserCountry = "user.geo.country"
     const val UserLanguages = "data.inputLanguage"
   }
