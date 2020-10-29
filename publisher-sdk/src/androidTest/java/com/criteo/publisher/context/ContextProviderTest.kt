@@ -16,10 +16,12 @@
 
 package com.criteo.publisher.context
 
+import android.content.res.Configuration
 import android.content.res.Resources
 import android.os.LocaleList
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
+import com.criteo.publisher.util.AndroidUtil
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.stub
 import com.nhaarman.mockitokotlin2.whenever
@@ -34,6 +36,9 @@ class ContextProviderTest {
   @Rule
   @JvmField
   val mockedDependenciesRule = MockedDependenciesRule()
+
+  @SpyBean
+  private lateinit var androidUtil: AndroidUtil
 
   @SpyBean
   private lateinit var contextProvider: ContextProvider
@@ -144,6 +149,33 @@ class ContextProviderTest {
   }
 
   @Test
+  fun fetchDeviceOrientation_GivenPortrait_ReturnIt() {
+    doReturn(Configuration.ORIENTATION_PORTRAIT).whenever(androidUtil).orientation
+
+    val orientation = contextProvider.fetchDeviceOrientation()
+
+    assertThat(orientation).isEqualTo("Portrait")
+  }
+
+  @Test
+  fun fetchDeviceOrientation_GivenLandscape_ReturnIt() {
+    doReturn(Configuration.ORIENTATION_LANDSCAPE).whenever(androidUtil).orientation
+
+    val orientation = contextProvider.fetchDeviceOrientation()
+
+    assertThat(orientation).isEqualTo("Landscape")
+  }
+
+  @Test
+  fun fetchDeviceOrientation_GivenUndefined_ReturnNull() {
+    doReturn(Configuration.ORIENTATION_UNDEFINED).whenever(androidUtil).orientation
+
+    val orientation = contextProvider.fetchDeviceOrientation()
+
+    assertThat(orientation).isNull()
+  }
+
+  @Test
   fun fetchUserContext_GivenMockedData_PutThemInRightField() {
     contextProvider.stub {
       doReturn("deviceModel").whenever(mock).fetchDeviceModel()
@@ -153,6 +185,7 @@ class ContextProviderTest {
       doReturn(listOf("en", "he")).whenever(mock).fetchUserLanguages()
       doReturn(1337).whenever(mock).fetchDeviceWidth()
       doReturn(22).whenever(mock).fetchDeviceHeight()
+      doReturn("deviceOrientation").whenever(mock).fetchDeviceOrientation()
     }
 
     val expected = mapOf(
@@ -162,7 +195,8 @@ class ContextProviderTest {
         "user.geo.country" to "userCountry",
         "data.inputLanguage" to listOf("en", "he"),
         "device.w" to 1337,
-        "device.h" to 22
+        "device.h" to 22,
+        "data.orientation" to "deviceOrientation"
     )
 
     val context = contextProvider.fetchUserContext()
@@ -180,6 +214,7 @@ class ContextProviderTest {
       doReturn(null).whenever(mock).fetchUserLanguages()
       doReturn(null).whenever(mock).fetchDeviceWidth()
       doReturn(null).whenever(mock).fetchDeviceHeight()
+      doReturn(null).whenever(mock).fetchDeviceOrientation()
     }
 
     val context = contextProvider.fetchUserContext()

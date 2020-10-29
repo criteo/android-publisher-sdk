@@ -17,19 +17,23 @@
 package com.criteo.publisher.context
 
 import android.content.Context
+import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Point
 import android.os.Build
 import android.view.WindowManager
 import androidx.core.os.ConfigurationCompat
 import com.criteo.publisher.annotation.OpenForTesting
+import com.criteo.publisher.util.AndroidUtil
 import com.criteo.publisher.util.filterNotNullValues
 import java.util.Locale
 
 @OpenForTesting
+@Suppress("TooManyFunctions")
 internal class ContextProvider(
     private val context: Context,
-    private val connectionTypeFetcher: ConnectionTypeFetcher
+    private val connectionTypeFetcher: ConnectionTypeFetcher,
+    private val androidUtil: AndroidUtil
 ) {
 
   /**
@@ -124,6 +128,20 @@ internal class ContextProvider(
     return point
   }
 
+  /**
+   * Custom field: `data.orientation`
+   *
+   * ## Definition
+   * Screen orientation ("Portrait" or "Landscape")
+   */
+  internal fun fetchDeviceOrientation(): String? {
+    return when (androidUtil.orientation) {
+      Configuration.ORIENTATION_PORTRAIT -> "Portrait"
+      Configuration.ORIENTATION_LANDSCAPE -> "Landscape"
+      else -> null
+    }
+  }
+
   internal fun fetchUserContext(): Map<String, Any> {
     return mapOf(
         DeviceMake to fetchDeviceMake(),
@@ -131,6 +149,7 @@ internal class ContextProvider(
         DeviceConnectionType to fetchDeviceConnectionType(),
         DeviceWidth to fetchDeviceWidth(),
         DeviceHeight to fetchDeviceHeight(),
+        DeviceOrientation to fetchDeviceOrientation(),
         UserCountry to fetchUserCountry(),
         UserLanguages to fetchUserLanguages()
     ).filterNotNullValues()
@@ -142,6 +161,7 @@ internal class ContextProvider(
     const val DeviceConnectionType = "device.contype"
     const val DeviceWidth = "device.w"
     const val DeviceHeight = "device.h"
+    const val DeviceOrientation = "data.orientation"
     const val UserCountry = "user.geo.country"
     const val UserLanguages = "data.inputLanguage"
   }
