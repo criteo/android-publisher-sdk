@@ -17,6 +17,7 @@
 package com.criteo.publisher.model
 
 import com.criteo.publisher.bid.UniqueIdGenerator
+import com.criteo.publisher.context.ContextData
 import com.criteo.publisher.integration.IntegrationRegistry
 import com.criteo.publisher.privacy.UserPrivacyUtil
 import com.criteo.publisher.privacy.gdpr.GdprData
@@ -95,6 +96,7 @@ class CdbRequestFactoryTest {
   fun createRequest_GivenInput_BuildRequest() {
     val adUnit = createAdUnit()
     val adUnits: List<CacheAdUnit> = listOf(adUnit)
+    val contextData: ContextData = mock()
     val expectedGdpr: GdprData = mock()
 
     val expectedSlot = CdbRequestSlot.create(
@@ -114,7 +116,7 @@ class CdbRequestFactoryTest {
         .thenReturn("myRequestId")
         .thenReturn("impId")
 
-    val request = factory.createRequest(adUnits)
+    val request = factory.createRequest(adUnits, contextData)
 
     assertThat(request.id).isEqualTo("myRequestId")
     assertThat(request.publisher).isEqualTo(publisher)
@@ -129,6 +131,7 @@ class CdbRequestFactoryTest {
     // request 1
     val adUnit = createAdUnit()
     val adUnits: List<CacheAdUnit> = listOf(adUnit)
+    val contextData: ContextData = mock()
     val expectedGdpr: GdprData = mock()
 
     val expectedSlot = CdbRequestSlot.create(
@@ -154,7 +157,7 @@ class CdbRequestFactoryTest {
         .thenReturn("myRequestId")
         .thenReturn("impId")
 
-    var request = factory.createRequest(adUnits)
+    var request = factory.createRequest(adUnits, contextData)
 
     assertThat(request.id).isEqualTo("myRequestId")
     assertThat(request.publisher).isEqualTo(publisher)
@@ -173,7 +176,7 @@ class CdbRequestFactoryTest {
       on { mopubConsent } doReturn ""
     }
 
-    request = factory.createRequest(adUnits)
+    request = factory.createRequest(adUnits, contextData)
 
     assertThat(request.user.uspIab()).isNull()
     assertThat(request.user.uspOptout()).isNull()
@@ -185,6 +188,7 @@ class CdbRequestFactoryTest {
     val adUnit1 = createAdUnit()
     val adUnit2 = createAdUnit()
     val adUnits: List<CacheAdUnit> = listOf(adUnit1, adUnit2)
+    val contextData: ContextData = mock()
 
     val expectedSlot1 = CdbRequestSlot.create(
         "impId1",
@@ -210,7 +214,7 @@ class CdbRequestFactoryTest {
 
     whenever(integrationRegistry.profileId).thenReturn(1337)
 
-    val request = factory.createRequest(adUnits)
+    val request = factory.createRequest(adUnits, contextData)
 
     assertThat(request.slots).containsExactlyInAnyOrder(expectedSlot1, expectedSlot2)
   }

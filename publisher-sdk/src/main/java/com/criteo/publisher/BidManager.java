@@ -25,6 +25,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
@@ -163,7 +164,7 @@ public class BidManager implements ApplicationStoppedListener {
 
     synchronized (cacheLock) {
       if (!isSilencedFor(cacheAdUnit)) {
-        fetchForCache(cacheAdUnit);
+        fetchForCache(cacheAdUnit, new ContextData() /* TODO */);
       }
 
       return consumeCachedBid(cacheAdUnit);
@@ -225,8 +226,8 @@ public class BidManager implements ApplicationStoppedListener {
   /**
    * load data for next time
    */
-  private void fetchForCache(CacheAdUnit cacheAdUnit) {
-    sendBidRequest(Collections.singletonList(cacheAdUnit));
+  private void fetchForCache(@NonNull CacheAdUnit cacheAdUnit, @NonNull ContextData contextData) {
+    sendBidRequest(Collections.singletonList(cacheAdUnit), contextData);
   }
 
   @VisibleForTesting
@@ -248,24 +249,31 @@ public class BidManager implements ApplicationStoppedListener {
       if (isSilencedFor(cacheAdUnit)) {
         consumeCachedBid(cacheAdUnit, bidListener);
       } else {
-        liveBidRequestSender.sendLiveBidRequest(cacheAdUnit, new LiveCdbCallListener(
-            bidListener,
-            bidLifecycleListener,
-            this,
-            cacheAdUnit
-        ));
+        liveBidRequestSender.sendLiveBidRequest(
+            cacheAdUnit,
+            new ContextData(), // TODO
+            new LiveCdbCallListener(
+                bidListener,
+                bidLifecycleListener,
+                this,
+                cacheAdUnit
+            )
+        );
       }
 
       metricSendingQueueConsumer.sendMetricBatch();
     }
   }
 
-  private void sendBidRequest(List<CacheAdUnit> prefetchCacheAdUnits) {
+  private void sendBidRequest(
+      @NonNull List<CacheAdUnit> prefetchCacheAdUnits,
+      @NonNull ContextData contextData
+  ) {
     if (killSwitchEngaged()) {
       return;
     }
 
-    bidRequestSender.sendBidRequest(prefetchCacheAdUnits, new CacheOnlyCdbCallListener());
+    bidRequestSender.sendBidRequest(prefetchCacheAdUnits, contextData, new CacheOnlyCdbCallListener());
     metricSendingQueueConsumer.sendMetricBatch();
   }
 
@@ -343,7 +351,7 @@ public class BidManager implements ApplicationStoppedListener {
       List<List<CacheAdUnit>> requestedAdUnitsChunks = adUnitMapper.mapToChunks(adUnits);
 
       for (List<CacheAdUnit> requestedAdUnits : requestedAdUnitsChunks) {
-        sendBidRequest(requestedAdUnits);
+        sendBidRequest(requestedAdUnits, new ContextData());
       }
     }
   }
