@@ -19,6 +19,7 @@ package com.criteo.publisher.network
 import com.criteo.publisher.Clock
 import com.criteo.publisher.LiveCdbCallListener
 import com.criteo.publisher.annotation.OpenForTesting
+import com.criteo.publisher.context.ContextData
 import com.criteo.publisher.model.CacheAdUnit
 import com.criteo.publisher.model.CdbRequestFactory
 import com.criteo.publisher.model.Config
@@ -38,6 +39,7 @@ class LiveBidRequestSender(
 
   fun sendLiveBidRequest(
       cacheAdUnit: CacheAdUnit,
+      contextData: ContextData,
       liveCdbCallListener: LiveCdbCallListener
   ) {
     scheduledExecutorService.schedule({
@@ -50,6 +52,7 @@ class LiveBidRequestSender(
             cdbRequestFactory,
             clock,
             listOf(cacheAdUnit),
+            contextData,
             liveCdbCallListener
         )
     )

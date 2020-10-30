@@ -1600,7 +1600,7 @@ public class BidManagerFunctionalTest {
     doAnswer(invocation -> {
       action.run();
       return invocation.callRealMethod();
-    }).when(liveBidRequestSender).sendLiveBidRequest(any(), any());
+    }).when(liveBidRequestSender).sendLiveBidRequest(any(), any(), any());
   }
 
   private CdbResponseSlot givenMockedCdbRespondingSlot() throws Exception {

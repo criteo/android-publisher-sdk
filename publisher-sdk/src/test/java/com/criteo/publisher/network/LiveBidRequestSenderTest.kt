@@ -18,6 +18,7 @@ package com.criteo.publisher.network
 
 import com.criteo.publisher.Clock
 import com.criteo.publisher.LiveCdbCallListener
+import com.criteo.publisher.context.ContextData
 import com.criteo.publisher.model.CacheAdUnit
 import com.criteo.publisher.model.CdbRequest
 import com.criteo.publisher.model.CdbRequestFactory
@@ -50,6 +51,9 @@ class LiveBidRequestSenderTest {
   private lateinit var cacheAdUnit: CacheAdUnit
 
   @Mock
+  private lateinit var contextData: ContextData
+
+  @Mock
   private lateinit var liveCdbCallListener: LiveCdbCallListener
 
   @Mock
@@ -73,7 +77,7 @@ class LiveBidRequestSenderTest {
   fun timeBudgetTimerKicksOff_ThenTimeBudgetExceededTrigger() {
     whenever(cdbRequestFactory.userAgent).thenReturn(userAgentFuture)
     whenever(userAgentFuture.get()).thenReturn("fake_user_agent")
-    whenever(cdbRequestFactory.createRequest(any())).thenReturn(cdbRequest)
+    whenever(cdbRequestFactory.createRequest(eq(listOf(cacheAdUnit)), eq(contextData))).thenReturn(cdbRequest)
     whenever(pubSdkApi.loadCdb(eq(cdbRequest), any())).thenReturn(cdbResponse)
     whenever(config.liveBiddingTimeBudgetInMillis).thenReturn(1)
 
@@ -88,6 +92,7 @@ class LiveBidRequestSenderTest {
 
     liveBidRequestSender.sendLiveBidRequest(
         cacheAdUnit,
+        contextData,
         liveCdbCallListener
     )
 

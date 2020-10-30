@@ -36,6 +36,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.StubConstants;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
@@ -161,7 +162,8 @@ public class PubSdkApiIntegrationTest {
   @Test
   public void loadCdb_GivenGeneratedRequest_ReturnInSuccess() throws Exception {
     CacheAdUnit adUnit = new CacheAdUnit(new AdSize(1, 2), "ad1", CRITEO_BANNER);
-    CdbRequest request = cdbRequestFactory.createRequest(singletonList(adUnit));
+
+    CdbRequest request = cdbRequestFactory.createRequest(singletonList(adUnit), new ContextData());
 
     CdbResponse response = api.loadCdb(request, "myUserAgent");
 
@@ -171,7 +173,7 @@ public class PubSdkApiIntegrationTest {
   @Test
   public void loadCdb_GivenValidBannerAdUnit_ReturnBid() throws Exception {
     CacheAdUnit validAdUnit = adUnitMapper.map(BANNER_320_50);
-    CdbRequest request = cdbRequestFactory.createRequest(singletonList(validAdUnit));
+    CdbRequest request = cdbRequestFactory.createRequest(singletonList(validAdUnit), new ContextData());
 
     CdbResponse response = api.loadCdb(request, "myUserAgent");
 
@@ -197,7 +199,7 @@ public class PubSdkApiIntegrationTest {
     when(deviceUtil.getCurrentScreenSize()).thenReturn(new AdSize(42, 1337));
 
     CacheAdUnit validAdUnit = adUnitMapper.map(INTERSTITIAL);
-    CdbRequest request = cdbRequestFactory.createRequest(singletonList(validAdUnit));
+    CdbRequest request = cdbRequestFactory.createRequest(singletonList(validAdUnit), new ContextData());
 
     CdbResponse response = api.loadCdb(request, "myUserAgent");
 
@@ -221,7 +223,7 @@ public class PubSdkApiIntegrationTest {
   @Test
   public void loadCdb_GivenValidNativeAdUnit_ReturnBid() throws Exception {
     CacheAdUnit validAdUnit = adUnitMapper.map(NATIVE);
-    CdbRequest request = cdbRequestFactory.createRequest(singletonList(validAdUnit));
+    CdbRequest request = cdbRequestFactory.createRequest(singletonList(validAdUnit), new ContextData());
 
     CdbResponse response = api.loadCdb(request, "myUserAgent");
 
@@ -252,7 +254,7 @@ public class PubSdkApiIntegrationTest {
         NATIVE
     )).get(0);
 
-    CdbRequest request = cdbRequestFactory.createRequest(validAdUnits);
+    CdbRequest request = cdbRequestFactory.createRequest(validAdUnits, new ContextData());
     CdbResponse response = api.loadCdb(request, "myUserAgent");
 
     assertThat(validAdUnits).hasSize(3);
@@ -269,7 +271,7 @@ public class PubSdkApiIntegrationTest {
         NATIVE_UNKNOWN
     )).get(0);
 
-    CdbRequest request = cdbRequestFactory.createRequest(validAdUnits);
+    CdbRequest request = cdbRequestFactory.createRequest(validAdUnits, new ContextData());
     CdbResponse response = api.loadCdb(request, "myUserAgent");
 
     assertThat(validAdUnits).hasSize(3);

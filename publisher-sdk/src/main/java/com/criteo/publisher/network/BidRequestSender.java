@@ -22,6 +22,7 @@ import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.CdbCallListener;
 import com.criteo.publisher.Clock;
 import com.criteo.publisher.SafeRunnable;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.Config;
@@ -107,6 +108,7 @@ public class BidRequestSender {
    */
   public void sendBidRequest(
       @NonNull List<CacheAdUnit> adUnits,
+      @NonNull ContextData contextData,
       @NonNull CdbCallListener listener
   ) {
     List<CacheAdUnit> requestedAdUnits = new ArrayList<>(adUnits);
@@ -118,7 +120,7 @@ public class BidRequestSender {
         return;
       }
 
-      task = createCdbCallTask(requestedAdUnits, listener);
+      task = createCdbCallTask(requestedAdUnits, contextData, listener);
 
       for (CacheAdUnit requestedAdUnit : requestedAdUnits) {
         pendingTasks.put(requestedAdUnit, task);
@@ -140,9 +142,10 @@ public class BidRequestSender {
   @NonNull
   private FutureTask<Void> createCdbCallTask(
       @NonNull List<CacheAdUnit> requestedAdUnits,
+      @NonNull ContextData contextData,
       @NonNull CdbCallListener listener
   ) {
-    CdbCall task = new CdbCall(api, cdbRequestFactory, clock, requestedAdUnits, listener);
+    CdbCall task = new CdbCall(api, cdbRequestFactory, clock, requestedAdUnits, contextData, listener);
 
     Runnable withRemovedPendingTasksAfterExecution = new Runnable() {
       @Override

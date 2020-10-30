@@ -20,6 +20,7 @@ import androidx.annotation.NonNull;
 import com.criteo.publisher.CdbCallListener;
 import com.criteo.publisher.Clock;
 import com.criteo.publisher.SafeRunnable;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestFactory;
@@ -43,6 +44,9 @@ class CdbCall extends SafeRunnable {
   private final List<CacheAdUnit> requestedAdUnits;
 
   @NonNull
+  private final ContextData contextData;
+
+  @NonNull
   private final CdbCallListener listener;
 
   CdbCall(
@@ -50,18 +54,20 @@ class CdbCall extends SafeRunnable {
       @NonNull CdbRequestFactory cdbRequestFactory,
       @NonNull Clock clock,
       @NonNull List<CacheAdUnit> requestedAdUnits,
+      @NonNull ContextData contextData,
       @NonNull CdbCallListener listener
   ) {
     this.pubSdkApi = pubSdkApi;
     this.cdbRequestFactory = cdbRequestFactory;
     this.clock = clock;
     this.requestedAdUnits = requestedAdUnits;
+    this.contextData = contextData;
     this.listener = listener;
   }
 
   @Override
   public void runSafely() throws ExecutionException, InterruptedException {
-    CdbRequest cdbRequest = cdbRequestFactory.createRequest(requestedAdUnits);
+    CdbRequest cdbRequest = cdbRequestFactory.createRequest(requestedAdUnits, contextData);
     String userAgent = cdbRequestFactory.getUserAgent().get();
 
     listener.onCdbRequest(cdbRequest);

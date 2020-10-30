@@ -19,6 +19,7 @@ package com.criteo.publisher.network
 import com.criteo.publisher.CdbCallListener
 import com.criteo.publisher.Clock
 import com.criteo.publisher.concurrent.DirectMockExecutor
+import com.criteo.publisher.context.ContextData
 import com.criteo.publisher.model.AdSize
 import com.criteo.publisher.model.CacheAdUnit
 import com.criteo.publisher.model.CdbRequest
@@ -141,19 +142,20 @@ class BidRequestSenderTest {
     fun sendBidRequest_GivenAdUnitAndSuccessfulResponse_NotifyListener() {
         val adUnit = createAdUnit()
         val adUnits = listOf(adUnit)
+        val contextData: ContextData = mock()
         val listener: CdbCallListener = mock()
         val request: CdbRequest = mock()
         val userAgent = "myUserAgent"
         val response: CdbResponse = mock()
 
         cdbRequestFactory.stub {
-            on { createRequest(adUnits) } doReturn request
+            on { createRequest(adUnits, contextData) } doReturn request
             on { it.userAgent } doReturn completedFuture(userAgent)
         }
 
         whenever(api.loadCdb(request, userAgent)).doReturn(response)
 
-        sender.sendBidRequest(adUnits, listener)
+        sender.sendBidRequest(adUnits, contextData, listener)
 
         val inOrder = inOrder(listener)
         inOrder.verify(listener).onCdbRequest(request)
@@ -165,19 +167,20 @@ class BidRequestSenderTest {
     fun sendBidRequest_GivenAdUnitAndError_NotifyListener() {
         val adUnit = createAdUnit()
         val adUnits = listOf(adUnit)
+        val contextData: ContextData = mock()
         val listener: CdbCallListener = mock()
         val request: CdbRequest = mock()
         val userAgent = "myUserAgent"
         val exception = IOException()
 
         cdbRequestFactory.stub {
-            on { createRequest(adUnits) } doReturn request
+            on { createRequest(adUnits, contextData) } doReturn request
             on { it.userAgent } doReturn completedFuture(userAgent)
         }
 
         whenever(api.loadCdb(request, userAgent)).doThrow(exception)
 
-        sender.sendBidRequest(adUnits, listener)
+        sender.sendBidRequest(adUnits, contextData, listener)
 
         val inOrder = inOrder(listener)
         inOrder.verify(listener).onCdbRequest(request)
@@ -195,7 +198,7 @@ class BidRequestSenderTest {
             null
         }.whenever(api).loadCdb(anyOrNull(), anyOrNull())
 
-        sender.sendBidRequest(listOf(createAdUnit()), mock())
+        sender.sendBidRequest(listOf(createAdUnit()), mock(), mock())
 
         executor.verifyExpectations()
     }
@@ -212,8 +215,8 @@ class BidRequestSenderTest {
             null
         }.whenever(api).loadCdb(anyOrNull(), anyOrNull())
 
-        sender.sendBidRequest(listOf(createAdUnit()), mock())
-        sender.sendBidRequest(listOf(createAdUnit()), mock())
+        sender.sendBidRequest(listOf(createAdUnit()), mock(), mock())
+        sender.sendBidRequest(listOf(createAdUnit()), mock(), mock())
 
         bothRequestsAreInParallel.await(1, TimeUnit.SECONDS)
     }
@@ -227,8 +230,8 @@ class BidRequestSenderTest {
 
         val adUnit = createAdUnit()
 
-        sender.sendBidRequest(listOf(adUnit), mock())
-        sender.sendBidRequest(listOf(adUnit), mock())
+        sender.sendBidRequest(listOf(adUnit), mock(), mock())
+        sender.sendBidRequest(listOf(adUnit), mock(), mock())
 
         verify(executor, times(1)).execute(any())
     }
@@ -250,14 +253,14 @@ class BidRequestSenderTest {
         val adUnit = createAdUnit()
         val otherAdUnit = createAdUnit()
 
-        sender.sendBidRequest(listOf(adUnit), mock())
-        sender.sendBidRequest(listOf(adUnit, otherAdUnit), mock())
+        sender.sendBidRequest(listOf(adUnit), mock(), mock())
+        sender.sendBidRequest(listOf(adUnit, otherAdUnit), mock(), mock())
 
         requestsAreScheduled.countDown()
         assertThat(requestsAreDone.await(1, TimeUnit.SECONDS)).isTrue()
 
         argumentCaptor<List<CacheAdUnit>> {
-            verify(cdbRequestFactory, times(2)).createRequest(capture())
+            verify(cdbRequestFactory, times(2)).createRequest(capture(), any())
 
             assertThat(allValues).containsExactlyInAnyOrder(listOf(adUnit), listOf(otherAdUnit))
         }
@@ -265,7 +268,7 @@ class BidRequestSenderTest {
 
     @Test
     fun sendBidRequest_GivenNoAdUnits_DoesNothing() {
-        sender.sendBidRequest(emptyList(), mock())
+        sender.sendBidRequest(emptyList(), mock(), mock())
 
         verifyZeroInteractions(api)
     }
@@ -274,7 +277,7 @@ class BidRequestSenderTest {
     fun sendBidRequest_GivenExceptionDuringCall_TaskIsCleaned() {
         whenever(api.loadCdb(any(), any())).doThrow(RuntimeException::class)
 
-        sender.sendBidRequest(listOf(createAdUnit()), mock())
+        sender.sendBidRequest(listOf(createAdUnit()), mock(), mock())
 
         assertThat(sender.pendingTaskAdUnits).isEmpty()
     }
@@ -285,7 +288,7 @@ class BidRequestSenderTest {
         givenNewSender()
 
         assertThatCode {
-            sender.sendBidRequest(listOf(createAdUnit()), mock())
+            sender.sendBidRequest(listOf(createAdUnit()), mock(), mock())
         }.isInstanceOf(RuntimeException::class.java)
 
         assertThat(sender.pendingTaskAdUnits).isEmpty()
@@ -318,8 +321,8 @@ class BidRequestSenderTest {
             null
         }.whenever(api).loadCdb(anyOrNull(), anyOrNull())
 
-        sender.sendBidRequest(listOf(createAdUnit()), mock())
-        sender.sendBidRequest(listOf(createAdUnit()), mock())
+        sender.sendBidRequest(listOf(createAdUnit()), mock(), mock())
+        sender.sendBidRequest(listOf(createAdUnit()), mock(), mock())
         assertThat(bothCallsAreWaiting.await(1, TimeUnit.SECONDS)).isTrue()
 
         sender.cancelAllPendingTasks()

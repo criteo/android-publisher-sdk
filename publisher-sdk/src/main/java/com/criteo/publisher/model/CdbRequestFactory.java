@@ -20,6 +20,7 @@ import static com.criteo.publisher.util.TextUtils.getNotEmptyOrNullValue;
 
 import androidx.annotation.NonNull;
 import com.criteo.publisher.bid.UniqueIdGenerator;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AdvertisingInfo;
@@ -70,7 +71,11 @@ public class CdbRequestFactory {
   }
 
   @NonNull
-  public CdbRequest createRequest(List<CacheAdUnit> requestedAdUnits) {
+  public CdbRequest createRequest(
+      @NonNull List<CacheAdUnit> requestedAdUnits,
+      @SuppressWarnings("unused") // TODO EE-1321
+      @NonNull ContextData contextData
+  ) {
     User user = User.create(
         advertisingInfo.getAdvertisingId(),
         getNotEmptyOrNullValue(userPrivacyUtil.getMopubConsent()),
