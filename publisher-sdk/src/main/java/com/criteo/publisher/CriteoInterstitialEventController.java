@@ -22,6 +22,7 @@ import static com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
@@ -64,7 +65,7 @@ public class CriteoInterstitialEventController {
     return webViewData.isLoaded();
   }
 
-  public void fetchAdAsync(@Nullable AdUnit adUnit) {
+  public void fetchAdAsync(@Nullable AdUnit adUnit, @NonNull ContextData contextData) {
     if (!interstitialActivityHelper.isAvailable()) {
       notifyForFailure();
       return;
@@ -75,7 +76,7 @@ public class CriteoInterstitialEventController {
     }
 
     webViewData.downloadLoading();
-    criteo.getBidForAdUnit(adUnit, new BidListener() {
+    criteo.getBidForAdUnit(adUnit, contextData, new BidListener() {
       @Override
       public void onBidResponse(@NonNull CdbResponseSlot cdbResponseSlot) {
         fetchCreativeAsync(cdbResponseSlot.getDisplayUrl());

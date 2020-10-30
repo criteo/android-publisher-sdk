@@ -22,6 +22,7 @@ import com.criteo.publisher.ConsumableBidLoader
 import com.criteo.publisher.CriteoErrorCode
 import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
+import com.criteo.publisher.context.ContextData
 import com.criteo.publisher.integration.Integration
 import com.criteo.publisher.integration.IntegrationRegistry
 import com.criteo.publisher.mock.MockBean
@@ -98,6 +99,9 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
   private lateinit var adUnit: NativeAdUnit
 
   @Mock
+  private lateinit var contextData: ContextData
+
+  @Mock
   private lateinit var listener: CriteoNativeAdListener
 
   @Mock
@@ -140,7 +144,7 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
     expectListenerToBeCalledOnUiThread()
     givenNotANativeBidAvailable()
 
-    consumableBidLoader.loadBid(adUnit, nativeLoader::loadAd)
+    consumableBidLoader.loadBid(adUnit, contextData, nativeLoader::loadAd)
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
     verifyNoMoreInteractions(listener)
@@ -166,7 +170,7 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
     expectListenerToBeCalledOnUiThread()
     val nativeAd = givenNativeBidAvailable()
 
-    consumableBidLoader.loadBid(adUnit, nativeLoader::loadAd)
+    consumableBidLoader.loadBid(adUnit, contextData, nativeLoader::loadAd)
 
     verify(listener).onAdReceived(nativeAd)
     verifyNoMoreInteractions(listener)
@@ -176,6 +180,7 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
 
   @Test
   fun loadAd_GivenNoBid_NotifyListenerOnUiThreadForFailure() {
+    contextData = ContextData()
     expectListenerToBeCalledOnUiThread()
     givenNoBidAvailable()
 
@@ -189,6 +194,7 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
 
   @Test
   fun loadAd_GivenNativeBid_NotifyListenerOnUiThreadForSuccess() {
+    contextData = ContextData()
     expectListenerToBeCalledOnUiThread()
     val nativeAd = givenNativeBidAvailable()
 
@@ -202,6 +208,7 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
 
   @Test
   fun loadAd_GivenNotANativeBid_NotifyListenerOnUiThreadForFailure() {
+    contextData = ContextData()
     expectListenerToBeCalledOnUiThread()
     givenNotANativeBidAvailable()
 
@@ -228,13 +235,13 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
   }
 
   private fun givenExceptionWhileFetchingBid() {
-    doThrow(RuntimeException::class).whenever(bidManager).getBidForAdUnit(any(), any())
+    doThrow(RuntimeException::class).whenever(bidManager).getBidForAdUnit(any(), any(), any())
   }
 
   private fun givenNoBidAvailable() {
     doAnswer {
-      it.getArgument<BidListener>(1).onNoBid()
-    }.whenever(bidManager).getBidForAdUnit(eq(adUnit), any())
+      it.getArgument<BidListener>(2).onNoBid()
+    }.whenever(bidManager).getBidForAdUnit(eq(adUnit), eq(contextData), any())
   }
 
   private fun givenNativeBidAvailable(): CriteoNativeAd {
@@ -245,8 +252,8 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
     }
 
     doAnswer {
-      it.getArgument<BidListener>(1).onBidResponse(slot)
-    }.whenever(bidManager).getBidForAdUnit(eq(adUnit), any())
+      it.getArgument<BidListener>(2).onBidResponse(slot)
+    }.whenever(bidManager).getBidForAdUnit(eq(adUnit), eq(contextData), any())
 
     nativeAdMapper.stub {
       on { map(eq(nativeAssets), argThat { listener == get() }, any()) } doReturn nativeAd
@@ -260,8 +267,8 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
     }
 
     doAnswer {
-      it.getArgument<BidListener>(1).onBidResponse(slot)
-    }.whenever(bidManager).getBidForAdUnit(eq(adUnit), any())
+      it.getArgument<BidListener>(2).onBidResponse(slot)
+    }.whenever(bidManager).getBidForAdUnit(eq(adUnit), eq(contextData), any())
   }
 
   private fun expectListenerToBeCalledOnUiThread() {

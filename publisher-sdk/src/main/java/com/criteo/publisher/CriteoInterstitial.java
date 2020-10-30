@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.model.InterstitialAdUnit;
@@ -87,15 +88,15 @@ public class CriteoInterstitial {
     }
 
     try {
-      doLoadAd();
+      doLoadAd(new ContextData());
     } catch (Throwable tr) {
       Log.e(TAG, "Internal error while loading interstitial.", tr);
     }
   }
 
-  private void doLoadAd() {
+  private void doLoadAd(@NonNull ContextData contextData) {
     getIntegrationRegistry().declare(Integration.STANDALONE);
-    getOrCreateController().fetchAdAsync(interstitialAdUnit);
+    getOrCreateController().fetchAdAsync(interstitialAdUnit, contextData);
   }
 
   public void loadAd(@Nullable Bid bid) {

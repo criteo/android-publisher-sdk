@@ -19,6 +19,8 @@ package com.criteo.publisher;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
@@ -27,6 +29,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import android.content.Context;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.mock.MockBean;
@@ -80,7 +83,7 @@ public class CriteoBannerViewTest {
   public void loadAdStandalone_GivenController_DelegateToIt() throws Exception {
     bannerView.loadAd();
 
-    verify(controller).fetchAdAsync(bannerAdUnit);
+    verify(controller).fetchAdAsync(eq(bannerAdUnit), eq(new ContextData()));
     verifyNoMoreInteractions(controller);
     verify(integrationRegistry).declare(Integration.STANDALONE);
   }
@@ -90,7 +93,7 @@ public class CriteoBannerViewTest {
     bannerView.loadAd();
     bannerView.loadAd();
 
-    verify(controller, times(2)).fetchAdAsync(bannerAdUnit);
+    verify(controller, times(2)).fetchAdAsync(eq(bannerAdUnit), eq(new ContextData()));
     verifyNoMoreInteractions(controller);
     verify(integrationRegistry, times(2)).declare(Integration.STANDALONE);
   }
@@ -102,14 +105,14 @@ public class CriteoBannerViewTest {
 
     bannerView.loadAd();
 
-    verify(controller).fetchAdAsync((AdUnit) null);
+    verify(controller).fetchAdAsync(isNull(), eq(new ContextData()));
     verifyNoMoreInteractions(controller);
     verify(integrationRegistry).declare(Integration.STANDALONE);
   }
 
   @Test
   public void loadAdStandalone_GivenControllerThrowing_DoNotThrow() throws Exception {
-    doThrow(RuntimeException.class).when(controller).fetchAdAsync(any(AdUnit.class));
+    doThrow(RuntimeException.class).when(controller).fetchAdAsync(any(AdUnit.class), any(ContextData.class));
 
     assertThatCode(bannerView::loadAd).doesNotThrowAnyException();
   }

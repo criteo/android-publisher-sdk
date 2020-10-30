@@ -30,6 +30,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.CdbRequest;
@@ -149,7 +150,7 @@ public class UserPrivacyFunctionalTest {
     waitForIdleState();
 
     criteo.setUsPrivacyOptOut(false);
-    criteo.getBidForAdUnit(TestAdUnits.BANNER_320_480, mock(BidListener.class));
+    criteo.getBidForAdUnit(TestAdUnits.BANNER_320_480, mock(ContextData.class), mock(BidListener.class));
 
     waitForIdleState();
 
@@ -183,7 +184,7 @@ public class UserPrivacyFunctionalTest {
     waitForIdleState();
 
     criteo.setMopubConsent("fake_mopub_consent");
-    criteo.getBidForAdUnit(TestAdUnits.BANNER_320_480, mock(BidListener.class));
+    criteo.getBidForAdUnit(TestAdUnits.BANNER_320_480, mock(ContextData.class), mock(BidListener.class));
 
     waitForIdleState();
 
@@ -211,7 +212,7 @@ public class UserPrivacyFunctionalTest {
     // then
     Criteo.Builder builder2 = getCriteoBuilder(TestAdUnits.BANNER_320_50);
     Criteo criteo2 = builder2.init();
-    criteo2.getBidForAdUnit(TestAdUnits.BANNER_320_480, mock(BidListener.class));
+    criteo2.getBidForAdUnit(TestAdUnits.BANNER_320_480, mock(ContextData.class), mock(BidListener.class));
     waitForIdleState();
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi, times(3)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));

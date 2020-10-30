@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import androidx.annotation.NonNull;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.WebViewData;
@@ -121,11 +122,11 @@ public class CriteoInterstitialEventControllerTest {
   public void fetchAdAsyncStandalone_GivenUnavailableInterstitialActivity_NotifyForFailureWithoutAskingForBid() throws Exception {
     when(interstitialActivityHelper.isAvailable()).thenReturn(false);
 
-    controller.fetchAdAsync(mock(AdUnit.class));
+    controller.fetchAdAsync(mock(AdUnit.class), mock(ContextData.class));
 
     verify(controller, never()).fetchCreativeAsync(any());
     verify(controller).notifyForFailure();
-    verify(criteo, never()).getBidForAdUnit(any(), any());
+    verify(criteo, never()).getBidForAdUnit(any(), any(), any());
   }
 
   private void givenLoadedWebViewData() {

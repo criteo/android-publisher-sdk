@@ -35,6 +35,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
@@ -142,9 +143,10 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   @Test
   public void fetchAdAsyncStandalone_GivenNoBid_NotifyAdListenerForFailure() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
-    givenMockedNoBidResponse(adUnit);
+    ContextData contextData = mock(ContextData.class);
+    givenMockedNoBidResponse(adUnit, contextData);
 
-    criteoInterstitialEventController.fetchAdAsync(adUnit);
+    criteoInterstitialEventController.fetchAdAsync(adUnit, contextData);
     waitForIdleState();
 
     verify(listener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
@@ -156,11 +158,12 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   public void fetchAdAsyncStandalone_GivenBidAndGoodDisplayUrl_FetchCreativeAndNotifyListenerForSuccess()
       throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
+    ContextData contextData = mock(ContextData.class);
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
     when(slot.getDisplayUrl()).thenReturn(GOOD_DISPLAY_URL);
-    givenMockedBidResponse(adUnit, slot);
+    givenMockedBidResponse(adUnit, contextData, slot);
 
-    criteoInterstitialEventController.fetchAdAsync(adUnit);
+    criteoInterstitialEventController.fetchAdAsync(adUnit, contextData);
     waitForIdleState();
 
     assertThat(criteoInterstitialEventController.isAdLoaded()).isTrue();
@@ -174,11 +177,12 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   public void fetchAdAsyncStandalone_GivenBidAndBadDisplayUrl_NotifyListenerForFailureToDisplay()
       throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
+    ContextData contextData = mock(ContextData.class);
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
     when(slot.getDisplayUrl()).thenReturn(BAD_DISPLAY_URL);
-    givenMockedBidResponse(adUnit, slot);
+    givenMockedBidResponse(adUnit, contextData, slot);
 
-    criteoInterstitialEventController.fetchAdAsync(adUnit);
+    criteoInterstitialEventController.fetchAdAsync(adUnit, contextData);
     waitForIdleState();
 
     assertThat(criteoInterstitialEventController.isAdLoaded()).isFalse();
@@ -192,17 +196,18 @@ public class CriteoInterstitialEventControllerIntegrationTest {
   public void fetchAdAsyncStandalone_GivenBidTwice_FetchCreativeTwiceAndNotifyListenerIfSuccess()
       throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
+    ContextData contextData = mock(ContextData.class);
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
-    givenMockedBidResponse(adUnit, slot);
+    givenMockedBidResponse(adUnit, contextData, slot);
 
     when(slot.getDisplayUrl())
         .thenReturn(GOOD_DISPLAY_URL)
         .thenReturn(BAD_DISPLAY_URL);
 
-    runOnMainThreadAndWait(() -> criteoInterstitialEventController.fetchAdAsync(adUnit));
+    runOnMainThreadAndWait(() -> criteoInterstitialEventController.fetchAdAsync(adUnit, contextData));
     waitForIdleState();
 
-    runOnMainThreadAndWait(() -> criteoInterstitialEventController.fetchAdAsync(adUnit));
+    runOnMainThreadAndWait(() -> criteoInterstitialEventController.fetchAdAsync(adUnit, contextData));
     waitForIdleState();
 
     InOrder inOrder = inOrder(listener, criteoInterstitialEventController);
@@ -296,19 +301,20 @@ public class CriteoInterstitialEventControllerIntegrationTest {
 
   private void givenMockedBidResponse(
       AdUnit adUnit,
+      ContextData contextData,
       CdbResponseSlot cdbResponseSlot
   ) {
-    doAnswer(answerVoid((AdUnit ignored, BidListener bidListener) -> bidListener
+    doAnswer(answerVoid((AdUnit ignored, ContextData ignored2, BidListener bidListener) -> bidListener
         .onBidResponse(cdbResponseSlot)))
         .when(criteo)
-        .getBidForAdUnit(eq(adUnit), any(BidListener.class));
+        .getBidForAdUnit(eq(adUnit), eq(contextData), any(BidListener.class));
   }
 
 
-  private void givenMockedNoBidResponse(AdUnit adUnit) {
-    doAnswer(answerVoid((AdUnit adUnit1, BidListener bidListener) -> bidListener
+  private void givenMockedNoBidResponse(AdUnit adUnit, ContextData contextData) {
+    doAnswer(answerVoid((AdUnit adUnit1, ContextData ignored2, BidListener bidListener) -> bidListener
         .onNoBid()))
         .when(criteo)
-        .getBidForAdUnit(eq(adUnit), any(BidListener.class));
+        .getBidForAdUnit(eq(adUnit), eq(contextData), any(BidListener.class));
   }
 }

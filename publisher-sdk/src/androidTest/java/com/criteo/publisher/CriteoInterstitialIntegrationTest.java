@@ -30,6 +30,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
@@ -83,10 +84,11 @@ public class CriteoInterstitialIntegrationTest {
   @Test
   public void loadAdForStandaloneTwice_GivenOnlyNoBid_ShouldNotifyListenerTwiceForFailure()
       throws Exception {
+    ContextData contextData = mock(ContextData.class);
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
 
     criteo = mock(Criteo.class, Answers.RETURNS_DEEP_STUBS);
-    givenMockedNoBidResponse(interstitialAdUnit);
+    givenMockedNoBidResponse(interstitialAdUnit, contextData);
 
     when(criteo.getDeviceInfo().getUserAgent()).thenReturn(completedFuture(""));
 
@@ -120,10 +122,10 @@ public class CriteoInterstitialIntegrationTest {
   }
 
 
-  private void givenMockedNoBidResponse(AdUnit adUnit) {
+  private void givenMockedNoBidResponse(AdUnit adUnit, ContextData contextData) {
     doAnswer(answerVoid((AdUnit ignored, BidListener bidListener) -> bidListener
         .onNoBid()))
         .when(criteo)
-        .getBidForAdUnit(eq(adUnit), any(BidListener.class));
+        .getBidForAdUnit(eq(adUnit), eq(contextData), any(BidListener.class));
   }
 }

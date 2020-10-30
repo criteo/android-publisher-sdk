@@ -102,18 +102,23 @@ public class BidManager implements ApplicationStoppedListener {
    * {@link BidListener#onBidResponse(CdbResponseSlot)} is invoked only if a bid is available and valide.
    *
    * @param adUnit ad unit to get a bid from (nullable only to accommodate callers)
+   * @param contextData
    * @param bidListener listener to notify
    */
-  public void getBidForAdUnit(@Nullable AdUnit adUnit, @NonNull BidListener bidListener) {
+  public void getBidForAdUnit(
+      @Nullable AdUnit adUnit,
+      @NonNull ContextData contextData,
+      @NonNull BidListener bidListener
+  ) {
     if (adUnit == null) {
       bidListener.onNoBid();
       return;
     }
 
     if (config.isLiveBiddingEnabled()) {
-      getLiveBidForAdUnit(adUnit, bidListener);
+      getLiveBidForAdUnit(adUnit, contextData, bidListener);
     } else {
-      CdbResponseSlot cdbResponseSlot = getBidForAdUnitAndPrefetch(adUnit);
+      CdbResponseSlot cdbResponseSlot = getBidForAdUnitAndPrefetch(adUnit, contextData);
       if (cdbResponseSlot != null) {
         bidListener.onBidResponse(cdbResponseSlot);
       } else {
@@ -149,11 +154,15 @@ public class BidManager implements ApplicationStoppedListener {
    * </ul>
    *
    * @param adUnit Declaration of ad unit to get a bid from
+   * @param contextData Context data provided by the publisher
    * @return a valid bid that may be displayed or <code>null</code> that should be ignored
    */
   @Nullable
   @VisibleForTesting
-  CdbResponseSlot getBidForAdUnitAndPrefetch(@Nullable AdUnit adUnit) {
+  CdbResponseSlot getBidForAdUnitAndPrefetch(
+      @Nullable AdUnit adUnit,
+      @NonNull ContextData contextData
+  ) {
     if (killSwitchEngaged()) {
       return null;
     }
@@ -164,7 +173,7 @@ public class BidManager implements ApplicationStoppedListener {
 
     synchronized (cacheLock) {
       if (!isSilencedFor(cacheAdUnit)) {
-        fetchForCache(cacheAdUnit, new ContextData() /* TODO */);
+        fetchForCache(cacheAdUnit, contextData);
       }
 
       return consumeCachedBid(cacheAdUnit);
@@ -231,7 +240,11 @@ public class BidManager implements ApplicationStoppedListener {
   }
 
   @VisibleForTesting
-  void getLiveBidForAdUnit(@NonNull AdUnit adUnit, @NonNull BidListener bidListener) {
+  void getLiveBidForAdUnit(
+      @NonNull AdUnit adUnit,
+      @NonNull ContextData contextData,
+      @NonNull BidListener bidListener
+  ) {
     if (killSwitchEngaged()) {
       bidListener.onNoBid();
       return;
@@ -251,7 +264,7 @@ public class BidManager implements ApplicationStoppedListener {
       } else {
         liveBidRequestSender.sendLiveBidRequest(
             cacheAdUnit,
-            new ContextData(), // TODO
+            contextData,
             new LiveCdbCallListener(
                 bidListener,
                 bidLifecycleListener,
