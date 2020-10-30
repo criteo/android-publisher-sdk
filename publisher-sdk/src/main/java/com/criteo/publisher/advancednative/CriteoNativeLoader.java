@@ -28,6 +28,7 @@ import com.criteo.publisher.BidManager;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.model.CdbResponseSlot;
@@ -127,16 +128,16 @@ public class CriteoNativeLoader {
    */
   public void loadAd() {
     try {
-      doLoad();
+      doLoad(new ContextData());
     } catch (Throwable t) {
       PreconditionsUtil.throwOrLog(t);
     }
   }
 
-  private void doLoad() {
+  private void doLoad(@NonNull ContextData contextData) {
     getIntegrationRegistry().declare(Integration.STANDALONE);
 
-    getBidManager().getBidForAdUnit(adUnit, new BidListener() {
+    getBidManager().getBidForAdUnit(adUnit, contextData, new BidListener() {
       @Override
       public void onBidResponse(@NonNull CdbResponseSlot cdbResponseSlot) {
         handleNativeAssets(cdbResponseSlot.getNativeAssets());

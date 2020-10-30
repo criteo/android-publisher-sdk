@@ -25,6 +25,7 @@ import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.logging.Logger;
@@ -139,7 +140,7 @@ public class CriteoBannerView extends WebView {
 
   public void loadAd() {
     try {
-      doLoadAd();
+      doLoadAd(new ContextData());
     } catch (Throwable tr) {
       Log.e(TAG, "Internal error while loading banner.", tr);
     }
@@ -151,9 +152,9 @@ public class CriteoBannerView extends WebView {
     getOrCreateController().displayAd(displayData);
   }
 
-  private void doLoadAd() {
+  private void doLoadAd(@NonNull ContextData contextData) {
     getIntegrationRegistry().declare(Integration.STANDALONE);
-    getOrCreateController().fetchAdAsync(bannerAdUnit);
+    getOrCreateController().fetchAdAsync(bannerAdUnit, contextData);
   }
 
   public void loadAd(@Nullable Bid bid) {

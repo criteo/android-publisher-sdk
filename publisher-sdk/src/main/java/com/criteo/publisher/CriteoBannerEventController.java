@@ -30,6 +30,7 @@ import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.adview.AdWebViewClient;
 import com.criteo.publisher.adview.RedirectionListener;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.tasks.CriteoBannerListenerCallTask;
@@ -66,18 +67,18 @@ public class CriteoBannerEventController {
     this.executor = runOnUiThreadExecutor;
   }
 
-  public void fetchAdAsync(@Nullable AdUnit adUnit) {
-   criteo.getBidForAdUnit(adUnit, new BidListener() {
+  public void fetchAdAsync(@Nullable AdUnit adUnit, @NonNull ContextData contextData) {
+    criteo.getBidForAdUnit(adUnit, contextData, new BidListener() {
       @Override
       public void onBidResponse(@NonNull CdbResponseSlot cdbResponseSlot) {
         notifyFor(VALID);
         displayAd(cdbResponseSlot.getDisplayUrl());
       }
 
-     @Override
-     public void onNoBid() {
-       notifyFor(INVALID);
-     }
+      @Override
+      public void onNoBid() {
+        notifyFor(INVALID);
+      }
    });
   }
 

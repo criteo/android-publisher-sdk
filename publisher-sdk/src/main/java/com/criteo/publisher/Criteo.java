@@ -21,6 +21,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.model.AdUnit;
@@ -129,7 +130,11 @@ public abstract class Criteo {
 
   public abstract void enrichAdObjectWithBid(Object object, @Nullable Bid bid);
 
-  abstract void getBidForAdUnit(@Nullable AdUnit adUnit, @NonNull BidListener bidListener);
+  abstract void getBidForAdUnit(
+      @Nullable AdUnit adUnit,
+      @NonNull ContextData contextData,
+      @NonNull BidListener bidListener
+  );
 
   public abstract void loadBid(
       @NonNull AdUnit adUnit,

@@ -17,6 +17,7 @@
 package com.criteo.publisher;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -26,6 +27,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import android.app.Application;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.mock.MockBean;
@@ -68,7 +70,7 @@ public class CriteoInterstitialTest {
     interstitial.loadAd();
     interstitial.loadAd();
 
-    verify(controller, times(2)).fetchAdAsync(adUnit);
+    verify(controller, times(2)).fetchAdAsync(eq(adUnit), eq(new ContextData()));
     verify(integrationRegistry, times(2)).declare(Integration.STANDALONE);
   }
 

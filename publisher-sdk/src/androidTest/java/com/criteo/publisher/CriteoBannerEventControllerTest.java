@@ -39,6 +39,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
@@ -104,10 +105,11 @@ public class CriteoBannerEventControllerTest {
     })).when(criteoBannerAdListener).onAdFailedToReceive(any());
 
     AdUnit adUnit = mock(AdUnit.class);
-    givenMockedNoBidResponse(adUnit);
+    ContextData contextData = mock(ContextData.class);
+    givenMockedNoBidResponse(adUnit, contextData);
 
     runOnMainThreadAndWait(() -> {
-      criteoBannerEventController.fetchAdAsync(adUnit);
+      criteoBannerEventController.fetchAdAsync(adUnit, contextData);
       latch.countDown();
     });
 
@@ -138,9 +140,10 @@ public class CriteoBannerEventControllerTest {
   public void fetchAdAsyncAdUnit_GivenNoBid_NotifyListenerForFailureAndDoNotDisplayAd()
       throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
-    givenMockedNoBidResponse(adUnit);
+    ContextData contextData = mock(ContextData.class);
+    givenMockedNoBidResponse(adUnit, contextData);
 
-    criteoBannerEventController.fetchAdAsync(adUnit);
+    criteoBannerEventController.fetchAdAsync(adUnit, contextData);
     waitForIdleState();
 
     verify(criteoBannerAdListener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
@@ -150,12 +153,13 @@ public class CriteoBannerEventControllerTest {
   @Test
   public void fetchAdAsyncAdUnit_GivenBid_NotifyListenerForSuccessAndDisplayAd() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
+    ContextData contextData = mock(ContextData.class);
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
-    givenMockedBidResponse(adUnit, slot);
+    givenMockedBidResponse(adUnit, contextData, slot);
 
     when(slot.getDisplayUrl()).thenReturn("http://my.display.url");
 
-    criteoBannerEventController.fetchAdAsync(adUnit);
+    criteoBannerEventController.fetchAdAsync(adUnit, contextData);
     waitForIdleState();
 
     verify(criteoBannerAdListener).onAdReceived(criteoBannerView);
@@ -166,17 +170,18 @@ public class CriteoBannerEventControllerTest {
   public void fetchAdAsyncAdUnit_GivenBidTwice_NotifyListenerForSuccessAndDisplayAdTwice()
       throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
+    ContextData contextData = mock(ContextData.class);
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
-    givenMockedBidResponse(adUnit, slot);
+    givenMockedBidResponse(adUnit, contextData, slot);
 
     when(slot.getDisplayUrl())
         .thenReturn("http://my.display.url1")
         .thenReturn("http://my.display.url2");
 
-    runOnMainThreadAndWait(() -> criteoBannerEventController.fetchAdAsync(adUnit));
+    runOnMainThreadAndWait(() -> criteoBannerEventController.fetchAdAsync(adUnit, contextData));
     waitForIdleState();
 
-    runOnMainThreadAndWait(() -> criteoBannerEventController.fetchAdAsync(adUnit));
+    runOnMainThreadAndWait(() -> criteoBannerEventController.fetchAdAsync(adUnit, contextData));
     waitForIdleState();
 
     InOrder inOrder = inOrder(criteoBannerAdListener, criteoBannerEventController);
@@ -279,18 +284,19 @@ public class CriteoBannerEventControllerTest {
 
   private void givenMockedBidResponse(
       AdUnit adUnit,
+      ContextData contextData,
       CdbResponseSlot cdbResponseSlot
   ) {
-    doAnswer(answerVoid((AdUnit ignored, BidListener bidListener) -> bidListener
+    doAnswer(answerVoid((AdUnit ignored, ContextData ignored2, BidListener bidListener) -> bidListener
         .onBidResponse(cdbResponseSlot)))
         .when(criteo)
-        .getBidForAdUnit(eq(adUnit), any(BidListener.class));
+        .getBidForAdUnit(eq(adUnit), eq(contextData), any(BidListener.class));
   }
 
-  private void givenMockedNoBidResponse(AdUnit adUnit) {
-    doAnswer(answerVoid((AdUnit ignored, BidListener bidListener) -> bidListener
+  private void givenMockedNoBidResponse(AdUnit adUnit, ContextData contextData) {
+    doAnswer(answerVoid((AdUnit ignored, ContextData ignored2, BidListener bidListener) -> bidListener
         .onNoBid()))
         .when(criteo)
-        .getBidForAdUnit(eq(adUnit), any(BidListener.class));
+        .getBidForAdUnit(eq(adUnit), eq(contextData), any(BidListener.class));
   }
 }

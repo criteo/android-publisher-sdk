@@ -18,6 +18,7 @@ package com.criteo.publisher;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -31,6 +32,7 @@ import android.app.Application;
 import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.headerbidding.HeaderBidding;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
@@ -222,15 +224,15 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void loadBid_GivenInHouseThrowing_DoNotThrowAndReturnNoBidResponse()
+  public void loadBid_GivenBidLoaderThrowing_DoNotThrowAndReturnNoBidResponse()
       throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
     BidResponseListener listener = mock(BidResponseListener.class);
 
-    ConsumableBidLoader consumableBidLoader = givenMockedInHouse();
+    ConsumableBidLoader consumableBidLoader = givenMockedConsumableBidLoader();
     doAnswer(invocation -> {
       throw new RuntimeException();
-    }).when(consumableBidLoader).loadBid(adUnit, listener);
+    }).when(consumableBidLoader).loadBid(eq(adUnit), eq(new ContextData()), eq(listener));
 
     Criteo criteo = createCriteo();
     criteo.loadBid(adUnit, listener);
@@ -244,11 +246,11 @@ public class CriteoInternalUnitTest {
     BidResponseListener listener = mock(BidResponseListener.class);
     Bid expectedBid = mock(Bid.class);
 
-    ConsumableBidLoader consumableBidLoader = givenMockedInHouse();
+    ConsumableBidLoader consumableBidLoader = givenMockedConsumableBidLoader();
     doAnswer(invocation -> {
-      invocation.<BidResponseListener>getArgument(1).onResponse(expectedBid);
+      invocation.<BidResponseListener>getArgument(2).onResponse(expectedBid);
       return null;
-    }).when(consumableBidLoader).loadBid(adUnit, listener);
+    }).when(consumableBidLoader).loadBid(eq(adUnit), eq(new ContextData()), eq(listener));
 
     Criteo criteo = createCriteo();
     criteo.loadBid(adUnit, listener);
@@ -306,14 +308,15 @@ public class CriteoInternalUnitTest {
   @Test
   public void getBidForAdUnit_GivenBidManager_DelegateToIt() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
+    ContextData contextData = mock(ContextData.class);
     BidListener bidListener = mock(BidListener.class);
 
     BidManager bidManager = givenMockedBidManager();
 
     CriteoInternal criteo = createCriteo();
-    criteo.getBidForAdUnit(adUnit, bidListener);
+    criteo.getBidForAdUnit(adUnit, contextData, bidListener);
 
-    verify(bidManager).getBidForAdUnit(adUnit, bidListener);
+    verify(bidManager).getBidForAdUnit(adUnit, contextData, bidListener);
   }
 
   private void givenMockedUserPrivacyUtil() {
@@ -344,7 +347,7 @@ public class CriteoInternalUnitTest {
     return headerBidding;
   }
 
-  private ConsumableBidLoader givenMockedInHouse() {
+  private ConsumableBidLoader givenMockedConsumableBidLoader() {
     ConsumableBidLoader consumableBidLoader = mock(ConsumableBidLoader.class);
 
     when(dependencyProvider.provideConsumableBidLoader()).thenReturn(consumableBidLoader);

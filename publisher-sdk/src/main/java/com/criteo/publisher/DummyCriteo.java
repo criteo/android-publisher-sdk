@@ -21,6 +21,7 @@ import static com.criteo.publisher.util.CompletableFuture.completedFuture;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
@@ -36,7 +37,11 @@ public class DummyCriteo extends Criteo {
   }
 
   @Override
-  void getBidForAdUnit(@Nullable AdUnit adUnit, @NonNull BidListener bidListener) {
+  void getBidForAdUnit(
+      @Nullable AdUnit adUnit,
+      @NonNull ContextData contextData,
+      @NonNull BidListener bidListener
+  ) {
     bidListener.onNoBid();
   }
 

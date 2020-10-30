@@ -22,6 +22,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.DeviceInfo;
@@ -58,10 +59,11 @@ public class DummyCriteoTest {
   @Test
   public void getBidForAdUnit_GivenAnyAdUnit_ReturnNull() throws Exception {
     BidListener bidListener = mock(BidListener.class);
-    criteo.getBidForAdUnit(null, bidListener);
-    criteo.getBidForAdUnit(banner, bidListener);
-    criteo.getBidForAdUnit(interstitial, bidListener);
-    criteo.getBidForAdUnit(aNative, bidListener);
+    ContextData contextData = mock(ContextData.class);
+    criteo.getBidForAdUnit(null, contextData, bidListener);
+    criteo.getBidForAdUnit(banner, contextData, bidListener);
+    criteo.getBidForAdUnit(interstitial, contextData, bidListener);
+    criteo.getBidForAdUnit(aNative, contextData, bidListener);
     verify(bidListener, times(4)).onNoBid();
   }
 

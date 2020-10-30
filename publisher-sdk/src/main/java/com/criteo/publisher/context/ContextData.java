@@ -105,4 +105,20 @@ public class ContextData {
     return Collections.unmodifiableMap(data);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof ContextData)) {
+      return false;
+    }
+    ContextData that = (ContextData) o;
+    return data.equals(that.data);
+  }
+
+  @Override
+  public int hashCode() {
+    return data.hashCode();
+  }
 }

@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.bid.BidLifecycleListener;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.headerbidding.HeaderBidding;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
@@ -137,8 +138,8 @@ final class CriteoInternal extends Criteo {
    * Method to start new CdbDownload Asynctask [Standalone only]
    */
   @Override
-  void getBidForAdUnit(@Nullable AdUnit adUnit, @NonNull BidListener bidListener) {
-    bidManager.getBidForAdUnit(adUnit, bidListener);
+  void getBidForAdUnit(@Nullable AdUnit adUnit, @NonNull ContextData contextData, @NonNull BidListener bidListener) {
+    bidManager.getBidForAdUnit(adUnit, contextData, bidListener);
   }
 
   @Override
@@ -147,7 +148,7 @@ final class CriteoInternal extends Criteo {
       @NonNull BidResponseListener bidResponseListener
   ) {
     try {
-      consumableBidLoader.loadBid(adUnit, bidResponseListener);
+      consumableBidLoader.loadBid(adUnit, new ContextData(), bidResponseListener);
     } catch (Throwable e) {
       Log.e(TAG, "Internal error while loading bid response.", e);
       bidResponseListener.onResponse(null);
