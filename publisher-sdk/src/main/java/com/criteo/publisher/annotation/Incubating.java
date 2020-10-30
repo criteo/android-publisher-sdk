@@ -34,7 +34,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER, ElementType.ANNOTATION_TYPE})
 public @interface Incubating {
 
-  String NATIVE = "native";
+  String CONTEXT = "context";
 
   /**
    * Marker to indicate the name of the feature, in which this annotated elements belongs to.
