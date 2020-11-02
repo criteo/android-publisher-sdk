@@ -85,7 +85,7 @@ public class StandaloneActivity extends AppCompatActivity {
   }
 
   private void loadNative() {
-    nativeLoader.loadAd();
+    nativeLoader.loadAd(contextData);
   }
 
   private void loadInterstitial(InterstitialAdUnit adUnit) {

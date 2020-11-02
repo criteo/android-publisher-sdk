@@ -99,7 +99,7 @@ public class CriteoNativeLoader {
    * <p>
    * You can add it to your view hierarchy, but it is empty and not rendered yet. To render it, you
    * need to get a {@link CriteoNativeAd} by requesting an ad (see {@link #loadAd()} or {@link
-   * #loadAd(Bid)}), then you can call {@link CriteoNativeAd#renderNativeView(View)}.
+   * #loadAd(Bid)} or {@link #loadAd(ContextData)}), then you can call {@link CriteoNativeAd#renderNativeView(View)}.
    * <p>
    * Note that you are expected to use this method if you're using a recycler view. So you can
    * create your views in <code>onCreateViewHolder</code>, and render them separately in
@@ -127,8 +127,19 @@ public class CriteoNativeLoader {
    * callback.
    */
   public void loadAd() {
+    loadAd(new ContextData());
+  }
+
+  /**
+   * Request the Criteo SDK for a native ad matching the given {@link NativeAdUnit}.
+   * <p>
+   * This method returns immediately. If an ad is available, you will be notified by the {@link
+   * CriteoNativeAdListener#onAdReceived(CriteoNativeAd)} callback. If no ad is available, you will be notified by the
+   * {@link CriteoNativeAdListener#onAdFailedToReceive(CriteoErrorCode)} callback.
+   */
+  public void loadAd(@NonNull ContextData contextData) {
     try {
-      doLoad(new ContextData());
+      doLoad(contextData);
     } catch (Throwable t) {
       PreconditionsUtil.throwOrLog(t);
     }

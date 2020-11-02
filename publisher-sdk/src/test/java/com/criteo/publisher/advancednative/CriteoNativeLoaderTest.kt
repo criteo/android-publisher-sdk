@@ -40,6 +40,7 @@ import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.doThrow
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.stub
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
@@ -179,12 +180,20 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
   }
 
   @Test
+  fun loadAd_GivenNoContext_UseEmptyContext() {
+    nativeLoader = spy(nativeLoader)
+
+    nativeLoader.loadAd()
+
+    verify(nativeLoader).loadAd(eq(ContextData()))
+  }
+
+  @Test
   fun loadAd_GivenNoBid_NotifyListenerOnUiThreadForFailure() {
-    contextData = ContextData()
     expectListenerToBeCalledOnUiThread()
     givenNoBidAvailable()
 
-    nativeLoader.loadAd()
+    nativeLoader.loadAdWithContext()
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
     verifyNoMoreInteractions(listener)
@@ -194,11 +203,10 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
 
   @Test
   fun loadAd_GivenNativeBid_NotifyListenerOnUiThreadForSuccess() {
-    contextData = ContextData()
     expectListenerToBeCalledOnUiThread()
     val nativeAd = givenNativeBidAvailable()
 
-    nativeLoader.loadAd()
+    nativeLoader.loadAdWithContext()
 
     verify(listener).onAdReceived(nativeAd)
     verifyNoMoreInteractions(listener)
@@ -208,11 +216,10 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
 
   @Test
   fun loadAd_GivenNotANativeBid_NotifyListenerOnUiThreadForFailure() {
-    contextData = ContextData()
     expectListenerToBeCalledOnUiThread()
     givenNotANativeBidAvailable()
 
-    nativeLoader.loadAd()
+    nativeLoader.loadAdWithContext()
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL)
     verifyNoMoreInteractions(listener)
@@ -230,7 +237,7 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
 
     // then
     assertThatCode {
-      nativeLoader.loadAd()
+      nativeLoader.loadAdWithContext()
     }.doesNotThrowAnyException()
   }
 
@@ -283,5 +290,9 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
         null
       }
     }
+  }
+
+  private fun CriteoNativeLoader.loadAdWithContext() {
+    loadAd(contextData)
   }
 }

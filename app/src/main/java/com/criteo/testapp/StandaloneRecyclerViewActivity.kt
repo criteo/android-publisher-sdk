@@ -42,6 +42,9 @@ class StandaloneRecyclerViewActivity : AppCompatActivity() {
   private lateinit var nativeLoader: CriteoNativeLoader
   private lateinit var viewAdapter: Adapter
 
+  private val contextData = ContextData()
+      .set(ContextData.CONTENT_URL, "https://dummy.content.url")
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_standalone_recycler_view)
@@ -72,7 +75,7 @@ class StandaloneRecyclerViewActivity : AppCompatActivity() {
     }
 
     findViewById<View>(R.id.buttonStandaloneNative).setOnClickListener {
-      nativeLoader.loadAd()
+      nativeLoader.loadAd(contextData)
     }
   }
 
@@ -84,10 +87,7 @@ class StandaloneRecyclerViewActivity : AppCompatActivity() {
       }
     })
 
-    bannerView.loadAd(
-        ContextData()
-            .set(ContextData.CONTENT_URL, "https://dummy.content.url")
-    )
+    bannerView.loadAd(contextData)
   }
 
   class Adapter(private val nativeLoader: CriteoNativeLoader) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
