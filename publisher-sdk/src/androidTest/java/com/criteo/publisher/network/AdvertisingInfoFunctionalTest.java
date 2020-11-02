@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import com.criteo.publisher.CriteoBannerView;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
@@ -105,7 +106,7 @@ public class AdvertisingInfoFunctionalTest {
 
     runOnMainThreadAndWait(() -> {
       CriteoBannerView bannerView = new CriteoBannerView(context, bannerAdUnit);
-      bannerView.loadAd();
+      bannerView.loadAd(new ContextData());
     });
 
     waitForIdleState();
@@ -125,7 +126,7 @@ public class AdvertisingInfoFunctionalTest {
 
     runOnMainThreadAndWait(() -> {
       CriteoBannerView bannerView = new CriteoBannerView(context, bannerAdUnit);
-      bannerView.loadAd();
+      bannerView.loadAd(new ContextData());
     });
 
     waitForIdleState();
