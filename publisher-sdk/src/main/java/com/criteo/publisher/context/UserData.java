@@ -21,23 +21,11 @@ import static com.criteo.publisher.annotation.Incubating.CONTEXT;
 import com.criteo.publisher.annotation.Incubating;
 
 @Incubating(CONTEXT)
-public class ContextData extends AbstractContextData<ContextData> {
-
-  /**
-   * <h1>Definition</h1>
-   * A single URL of the content, for buy-side contextualization or review.
-   * <p>
-   * <h1>Type</h1>
-   * String, like <em>https://www.criteo.com</em>
-   * <p>
-   * See <a href="https://github.com/InteractiveAdvertisingBureau/AdCOM/blob/master/AdCOM%20v1.0%20FINAL.md#object--content-">Object:
-   * Content</a>
-   */
-  public static final String CONTENT_URL = "content.url";
+public class UserData extends AbstractContextData<UserData> {
 
   @Override
   public boolean equals(Object o) {
-    if (!(o instanceof ContextData)) {
+    if (!(o instanceof UserData)) {
       return false;
     }
     return super.equals(o);
