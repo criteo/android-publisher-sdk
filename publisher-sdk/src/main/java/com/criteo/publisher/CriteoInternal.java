@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
-final class CriteoInternal extends Criteo {
+class CriteoInternal extends Criteo {
 
   private static final String TAG = CriteoInternal.class.getSimpleName();
 
@@ -145,10 +145,11 @@ final class CriteoInternal extends Criteo {
   @Override
   public void loadBid(
       @NonNull AdUnit adUnit,
+      @NonNull ContextData contextData,
       @NonNull BidResponseListener bidResponseListener
   ) {
     try {
-      consumableBidLoader.loadBid(adUnit, new ContextData(), bidResponseListener);
+      consumableBidLoader.loadBid(adUnit, contextData, bidResponseListener);
     } catch (Throwable e) {
       Log.e(TAG, "Internal error while loading bid response.", e);
       bidResponseListener.onResponse(null);

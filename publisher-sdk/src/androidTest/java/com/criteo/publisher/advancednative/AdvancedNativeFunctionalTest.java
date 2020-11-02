@@ -51,6 +51,7 @@ import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.activity.TestNativeActivity;
 import com.criteo.publisher.adview.Redirection;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
@@ -108,7 +109,7 @@ public class AdvancedNativeFunctionalTest {
     mockedDependenciesRule.waitForIdleState();
 
     TestNativeActivity activity = activityRule.getActivity();
-    Criteo.getInstance().loadBid(NATIVE, activity::loadInHouseAdInAdLayout);
+    Criteo.getInstance().loadBid(NATIVE, new ContextData(), activity::loadInHouseAdInAdLayout);
     mockedDependenciesRule.waitForIdleState();
 
     // Check there is one ad
@@ -149,10 +150,10 @@ public class AdvancedNativeFunctionalTest {
     mockedDependenciesRule.waitForIdleState();
 
     TestNativeActivity activity = activityRule.getActivity();
-    Criteo.getInstance().loadBid(NATIVE, activity::loadInHouseAdInRecyclerView);
+    Criteo.getInstance().loadBid(NATIVE, new ContextData(), activity::loadInHouseAdInRecyclerView);
     mockedDependenciesRule.waitForIdleState();
 
-    Criteo.getInstance().loadBid(NATIVE, activity::loadInHouseAdInRecyclerView);
+    Criteo.getInstance().loadBid(NATIVE, new ContextData(), activity::loadInHouseAdInRecyclerView);
     mockedDependenciesRule.waitForIdleState();
 
     // Check there is two ads

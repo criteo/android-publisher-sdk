@@ -48,6 +48,7 @@ public class DummyCriteo extends Criteo {
   @Override
   public void loadBid(
       @NonNull AdUnit adUnit,
+      @NonNull ContextData contextData,
       @NonNull BidResponseListener bidResponseListener
   ) {
     bidResponseListener.onResponse(null);

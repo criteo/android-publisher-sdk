@@ -17,6 +17,7 @@
 package com.criteo.testapp;
 
 import static com.criteo.testapp.PubSdkDemoApplication.BANNER;
+import static com.criteo.testapp.PubSdkDemoApplication.CONTEXT_DATA;
 import static com.criteo.testapp.PubSdkDemoApplication.INTERSTITIAL;
 import static com.criteo.testapp.PubSdkDemoApplication.INTERSTITIAL_IBV_DEMO;
 import static com.criteo.testapp.PubSdkDemoApplication.NATIVE;
@@ -80,11 +81,11 @@ public class InHouseActivity extends AppCompatActivity {
 
   private void loadBannerAd() {
     Log.d(TAG, "Banner Requested");
-    Criteo.getInstance().loadBid(BANNER, loadAd(criteoBannerView, CriteoBannerView::loadAd));
+    Criteo.getInstance().loadBid(BANNER, CONTEXT_DATA, loadAd(criteoBannerView, CriteoBannerView::loadAd));
   }
 
   private void loadNative() {
-    Criteo.getInstance().loadBid(NATIVE, loadAd(nativeLoader, CriteoNativeLoader::loadAd));
+    Criteo.getInstance().loadBid(NATIVE, CONTEXT_DATA, loadAd(nativeLoader, CriteoNativeLoader::loadAd));
   }
 
   private void loadInterstitial(InterstitialAdUnit adUnit) {
@@ -94,7 +95,7 @@ public class InHouseActivity extends AppCompatActivity {
     interstitial.setCriteoInterstitialAdListener(new TestAppInterstitialAdListener(TAG, prefix));
 
     Log.d(TAG, prefix + "Interstitial Requested");
-    Criteo.getInstance().loadBid(adUnit, interstitial::loadAd);
+    Criteo.getInstance().loadBid(adUnit, CONTEXT_DATA, interstitial::loadAd);
   }
 
   private <T> BidResponseListener loadAd(@NonNull T adLoader, @NonNull BiConsumer<T, Bid> loadAdAction) {

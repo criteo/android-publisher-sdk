@@ -136,8 +136,16 @@ public abstract class Criteo {
       @NonNull BidListener bidListener
   );
 
+  public void loadBid(
+      @NonNull AdUnit adUnit,
+      @NonNull BidResponseListener bidResponseListener
+  ) {
+    loadBid(adUnit, new ContextData(), bidResponseListener);
+  }
+
   public abstract void loadBid(
       @NonNull AdUnit adUnit,
+      @NonNull ContextData contextData,
       @NonNull BidResponseListener bidResponseListener
   );
 

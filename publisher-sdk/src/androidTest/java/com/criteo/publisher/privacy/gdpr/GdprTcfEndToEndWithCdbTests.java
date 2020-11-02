@@ -28,6 +28,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.ResultCaptor;
 import com.criteo.publisher.mock.SpyBean;
@@ -274,7 +275,7 @@ public class GdprTcfEndToEndWithCdbTests {
   }
 
   private void whenBidding() {
-    Criteo.getInstance().loadBid(validInterstitialAdUnit, ignore -> { /* no op */ });
+    Criteo.getInstance().loadBid(validInterstitialAdUnit, new ContextData(), ignore -> { /* no op */ });
     waitForBids();
   }
 }

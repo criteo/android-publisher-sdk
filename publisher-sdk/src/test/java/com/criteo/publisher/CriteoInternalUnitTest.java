@@ -25,6 +25,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -224,18 +225,30 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
+  public void loadBid_GivenNoContext_UseEmptyContext() throws Exception {
+    AdUnit adUnit = mock(AdUnit.class);
+    BidResponseListener listener = mock(BidResponseListener.class);
+
+    Criteo criteo = spy(createCriteo());
+    criteo.loadBid(adUnit, listener);
+
+    verify(criteo).loadBid(eq(adUnit), eq(new ContextData()), eq(listener));
+  }
+
+  @Test
   public void loadBid_GivenBidLoaderThrowing_DoNotThrowAndReturnNoBidResponse()
       throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
     BidResponseListener listener = mock(BidResponseListener.class);
+    ContextData contextData = mock(ContextData.class);
 
     ConsumableBidLoader consumableBidLoader = givenMockedConsumableBidLoader();
     doAnswer(invocation -> {
       throw new RuntimeException();
-    }).when(consumableBidLoader).loadBid(eq(adUnit), eq(new ContextData()), eq(listener));
+    }).when(consumableBidLoader).loadBid(adUnit, contextData, listener);
 
     Criteo criteo = createCriteo();
-    criteo.loadBid(adUnit, listener);
+    criteo.loadBid(adUnit, contextData, listener);
 
     verify(listener).onResponse(null);
   }
@@ -244,16 +257,17 @@ public class CriteoInternalUnitTest {
   public void getBidResponse_GivenBidManagerYieldingOne_ReturnIt() throws Exception {
     AdUnit adUnit = mock(AdUnit.class);
     BidResponseListener listener = mock(BidResponseListener.class);
+    ContextData contextData = mock(ContextData.class);
     Bid expectedBid = mock(Bid.class);
 
     ConsumableBidLoader consumableBidLoader = givenMockedConsumableBidLoader();
     doAnswer(invocation -> {
       invocation.<BidResponseListener>getArgument(2).onResponse(expectedBid);
       return null;
-    }).when(consumableBidLoader).loadBid(eq(adUnit), eq(new ContextData()), eq(listener));
+    }).when(consumableBidLoader).loadBid(adUnit, contextData, listener);
 
     Criteo criteo = createCriteo();
-    criteo.loadBid(adUnit, listener);
+    criteo.loadBid(adUnit, contextData, listener);
 
     verify(listener).onResponse(expectedBid);
   }

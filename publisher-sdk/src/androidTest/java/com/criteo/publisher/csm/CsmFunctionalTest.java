@@ -38,6 +38,7 @@ import androidx.test.filters.FlakyTest;
 import com.criteo.publisher.Clock;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.csm.MetricRequest.MetricRequestFeedback;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
@@ -397,6 +398,6 @@ public class CsmFunctionalTest {
   }
 
   private void loadBid(@NonNull AdUnit adUnit) {
-    Criteo.getInstance().loadBid(adUnit, ignored -> { /* no op */ });
+    Criteo.getInstance().loadBid(adUnit, new ContextData(), ignored -> { /* no op */ });
   }
 }

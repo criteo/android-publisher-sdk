@@ -39,6 +39,7 @@ import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.TestAdUnits;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
@@ -98,13 +99,14 @@ public class InHouseFunctionalTest {
 
   @Test
   public void loadBannerAd_GivenValidAdUnit_ThenListenerIsNotifiedOfTheSuccess() throws Exception {
-    Criteo criteo = givenInitializedSdk(validBannerAdUnit);
+    givenInitializedSdk(validBannerAdUnit);
 
     CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
     CriteoBannerView bannerView = createBannerView();
     bannerView.setCriteoBannerAdListener(listener);
 
-    criteo.loadBid(validBannerAdUnit, bannerView::loadAd);
+    Bid bid = loadBid(validBannerAdUnit);
+    bannerView.loadAd(bid);
     waitForIdleState();
 
     verify(listener).onAdReceived(bannerView);
@@ -115,13 +117,14 @@ public class InHouseFunctionalTest {
   @Test
   public void loadBannerAd_GivenInvalidAdUnit_ThenListenerIsNotifiedOfTheFailure()
       throws Exception {
-    Criteo criteo = givenInitializedSdk(invalidBannerAdUnit);
+    givenInitializedSdk(invalidBannerAdUnit);
 
     CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
     CriteoBannerView bannerView = createBannerView();
     bannerView.setCriteoBannerAdListener(listener);
 
-    criteo.loadBid(invalidBannerAdUnit, bannerView::loadAd);
+    Bid bid = loadBid(invalidBannerAdUnit);
+    bannerView.loadAd(bid);
     waitForIdleState();
 
     verify(listener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
@@ -130,16 +133,15 @@ public class InHouseFunctionalTest {
   @Test
   public void loadBannerAd_GivenValidBannerAndTokenUsedTwice_ThenListenerIsNotifiedOfSuccessFirstThenFailure()
       throws Exception {
-    Criteo criteo = givenInitializedSdk(validBannerAdUnit);
+    givenInitializedSdk(validBannerAdUnit);
 
     CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
     CriteoBannerView bannerView = createBannerView();
     bannerView.setCriteoBannerAdListener(listener);
 
-    criteo.loadBid(validBannerAdUnit, bidResponse -> {
-      bannerView.loadAd(bidResponse);
-      bannerView.loadAd(bidResponse);
-    });
+    Bid bid = loadBid(validBannerAdUnit);
+    bannerView.loadAd(bid);
+    bannerView.loadAd(bid);
     waitForIdleState();
 
     InOrder inOrder = inOrder(listener);
@@ -150,13 +152,14 @@ public class InHouseFunctionalTest {
 
   @Test
   public void loadInterstitialAd_GivenValidAdUnit_ThenListenerIsNotifiedOfTheSuccess() throws Exception {
-    Criteo criteo = givenInitializedSdk(validInterstitialAdUnit);
+    givenInitializedSdk(validInterstitialAdUnit);
 
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
     CriteoInterstitial interstitial = createInterstitial();
     interstitial.setCriteoInterstitialAdListener(listener);
 
-    criteo.loadBid(validInterstitialAdUnit, interstitial::loadAd);
+    Bid bid = loadBid(validInterstitialAdUnit);
+    interstitial.loadAd(bid);
     waitForIdleState();
 
     verify(listener).onAdReceived(interstitial);
@@ -167,13 +170,14 @@ public class InHouseFunctionalTest {
   @Test
   public void loadInterstitialAd_GivenInvalidAdUnit_ThenListenerIsNotifiedOfTheFailure()
       throws Exception {
-    Criteo criteo = givenInitializedSdk(invalidInterstitialAdUnit);
+    givenInitializedSdk(invalidInterstitialAdUnit);
 
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
     CriteoInterstitial interstitial = createInterstitial();
     interstitial.setCriteoInterstitialAdListener(listener);
 
-    criteo.loadBid(invalidInterstitialAdUnit, interstitial::loadAd);
+    Bid bid = loadBid(invalidInterstitialAdUnit);
+    interstitial.loadAd(bid);
     waitForIdleState();
 
     verify(listener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
@@ -184,13 +188,14 @@ public class InHouseFunctionalTest {
       throws Exception {
     when(interstitialActivityHelper.isAvailable()).thenReturn(false);
 
-    Criteo criteo = givenInitializedSdk(validInterstitialAdUnit);
+    givenInitializedSdk(validInterstitialAdUnit);
 
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
     CriteoInterstitial interstitial = createInterstitial();
     interstitial.setCriteoInterstitialAdListener(listener);
 
-    criteo.loadBid(validInterstitialAdUnit, interstitial::loadAd);
+    Bid bid = loadBid(validInterstitialAdUnit);
+    interstitial.loadAd(bid);
     waitForIdleState();
 
     verify(listener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
@@ -199,21 +204,18 @@ public class InHouseFunctionalTest {
   @Test
   public void loadInterstitialAd_GivenValidInterstitialAndTokenUsedTwice_ThenListenerIsNotifiedOfSuccessFirstThenFailure()
       throws Exception {
-    Criteo criteo = givenInitializedSdk(validInterstitialAdUnit);
+    givenInitializedSdk(validInterstitialAdUnit);
 
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
     CriteoInterstitial interstitial = createInterstitial();
     interstitial.setCriteoInterstitialAdListener(listener);
 
-    AtomicReference<Bid> bidResponseRef = new AtomicReference<>();
+    Bid bid = loadBid(validInterstitialAdUnit);
 
-    criteo.loadBid(validInterstitialAdUnit, bidResponseRef::set);
+    interstitial.loadAd(bid);
     waitForIdleState();
 
-    interstitial.loadAd(bidResponseRef.get());
-    waitForIdleState();
-
-    interstitial.loadAd(bidResponseRef.get());
+    interstitial.loadAd(bid);
     waitForIdleState();
 
     InOrder inOrder = inOrder(listener);
@@ -236,30 +238,33 @@ public class InHouseFunctionalTest {
     mockedDependenciesRule.waitForIdleState();
   }
 
-  private Criteo givenInitializedSdk(AdUnit... adUnits) throws CriteoInitException {
+  private void givenInitializedSdk(AdUnit... adUnits) throws CriteoInitException {
     if (config.isLiveBiddingEnabled()) {
       // Empty it to show that prefetch has no influence
       adUnits = new AdUnit[]{};
     }
 
-    Criteo criteo = givenInitializedCriteo(adUnits);
+    givenInitializedCriteo(adUnits);
 
     waitForIdleState();
-    return criteo;
   }
 
   private void assertBidRequestHasGoodProfileId() throws Exception {
-    if (config.isLiveBiddingEnabled()) {
-      // With live bidding, InHouse declaration is delayed when bid is consumed. So the declaration is only visible for
-      // the next bid.
-      Criteo.getInstance().loadBid(INTERSTITIAL_UNKNOWN, ignored -> { /* no op */ });
-      waitForIdleState();
-    }
+    // InHouse declaration is delayed when bid is consumed. So the declaration is only visible for
+    // the next bid.
+    loadBid(INTERSTITIAL_UNKNOWN);
 
     verify(api, atLeastOnce()).loadCdb(
         argThat(request -> request.getProfileId() == Integration.IN_HOUSE.getProfileId()),
         any()
     );
+  }
+
+  private Bid loadBid(AdUnit adUnit) {
+    AtomicReference<Bid> bidResponseRef = new AtomicReference<>();
+    Criteo.getInstance().loadBid(adUnit, new ContextData(), bidResponseRef::set);
+    waitForIdleState();
+    return bidResponseRef.get();
   }
 
 }

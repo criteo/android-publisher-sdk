@@ -37,11 +37,13 @@ import android.content.Context;
 import android.view.View;
 import android.webkit.WebView;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.TestAdUnits;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.ResultCaptor;
 import com.criteo.publisher.mock.SpyBean;
@@ -172,11 +174,7 @@ public class MoPubHeaderBiddingFunctionalTest {
     MoPubView moPubView = createMoPubView();
     moPubView.setKeywords("old keywords");
 
-    Criteo.getInstance().loadBid(
-        invalidBannerAdUnit,
-        bid -> Criteo.getInstance().enrichAdObjectWithBid(moPubView, bid)
-    );
-    waitForBids();
+    loadAdAndWait(invalidBannerAdUnit, moPubView);
 
     assertEquals("old keywords", moPubView.getKeywords());
   }
@@ -189,11 +187,7 @@ public class MoPubHeaderBiddingFunctionalTest {
     MoPubInterstitial moPubInterstitial = createMoPubInterstitial();
     moPubInterstitial.setKeywords("old keywords");
 
-    Criteo.getInstance().loadBid(
-        invalidBannerAdUnit,
-        bid -> Criteo.getInstance().enrichAdObjectWithBid(moPubInterstitial, bid)
-    );
-    waitForBids();
+    loadAdAndWait(invalidBannerAdUnit, moPubInterstitial);
 
     assertEquals("old keywords", moPubInterstitial.getKeywords());
   }
@@ -217,11 +211,7 @@ public class MoPubHeaderBiddingFunctionalTest {
 
     MoPubView moPubView = createMoPubView();
 
-    Criteo.getInstance().loadBid(
-        adUnit,
-        bid -> Criteo.getInstance().enrichAdObjectWithBid(moPubView, bid)
-    );
-    waitForBids();
+    loadAdAndWait(adUnit, moPubView);
 
     assertCriteoKeywordsAreInjectedInMoPubView(moPubView.getKeywords(), adUnit);
     assertBidRequestHasGoodProfileId();
@@ -247,11 +237,7 @@ public class MoPubHeaderBiddingFunctionalTest {
 
     MoPubInterstitial moPubInterstitial = createMoPubInterstitial();
 
-    Criteo.getInstance().loadBid(
-        interstitialAdUnit,
-        bid -> Criteo.getInstance().enrichAdObjectWithBid(moPubInterstitial, bid)
-    );
-    waitForBids();
+    loadAdAndWait(interstitialAdUnit, moPubInterstitial);
 
     assertCriteoKeywordsAreInjectedInMoPubView(moPubInterstitial.getKeywords(), interstitialAdUnit);
     assertBidRequestHasGoodProfileId();
@@ -339,11 +325,7 @@ public class MoPubHeaderBiddingFunctionalTest {
 
     MoPubView moPubView = createMoPubView();
 
-    Criteo.getInstance().loadBid(
-        adUnit,
-        bid -> Criteo.getInstance().enrichAdObjectWithBid(moPubView, bid)
-    );
-    waitForBids();
+    loadAdAndWait(adUnit, moPubView);
 
     MoPubSync moPubSync = new MoPubSync(moPubView);
     runOnMainThreadAndWait(moPubView::loadAd);
@@ -358,11 +340,7 @@ public class MoPubHeaderBiddingFunctionalTest {
 
     MoPubInterstitial moPubInterstitial = createMoPubInterstitial();
 
-    Criteo.getInstance().loadBid(
-        adUnit,
-        bid -> Criteo.getInstance().enrichAdObjectWithBid(moPubInterstitial, bid)
-    );
-    waitForBids();
+    loadAdAndWait(adUnit, moPubInterstitial);
 
     MoPubSync moPubSync = new MoPubSync(moPubInterstitial);
     runOnMainThreadAndWait(moPubInterstitial::load);
@@ -380,8 +358,7 @@ public class MoPubHeaderBiddingFunctionalTest {
     if (config.isLiveBiddingEnabled()) {
       // With live bidding, AppBidding declaration is delayed when bid is consumed. So the declaration is only visible
       // from the next bid.
-      Criteo.getInstance().loadBid(invalidBannerAdUnit, ignored -> { /* no op */ });
-      waitForBids();
+      loadAdAndWait(invalidBannerAdUnit, null);
     }
 
     verify(api, atLeastOnce()).loadCdb(
@@ -400,6 +377,15 @@ public class MoPubHeaderBiddingFunctionalTest {
 
   private MoPubInterstitial createMoPubInterstitial() {
     return callOnMainThreadAndWait(() -> new MoPubInterstitial(activityRule.getActivity(), MOPUB_INTERSTITIAL_ID));
+  }
+
+  private void loadAdAndWait(AdUnit adUnit, @Nullable Object moPubAdObject) {
+    Criteo.getInstance().loadBid(
+        adUnit,
+        new ContextData(),
+        bid -> Criteo.getInstance().enrichAdObjectWithBid(moPubAdObject, bid)
+    );
+    waitForBids();
   }
 
   private void givenUsingCdbProd() {

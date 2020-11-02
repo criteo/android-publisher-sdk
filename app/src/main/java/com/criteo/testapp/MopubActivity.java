@@ -16,6 +16,7 @@
 
 package com.criteo.testapp;
 
+import static com.criteo.testapp.PubSdkDemoApplication.CONTEXT_DATA;
 import static com.mopub.common.logging.MoPubLog.LogLevel.DEBUG;
 import static com.mopub.common.logging.MoPubLog.LogLevel.INFO;
 
@@ -97,7 +98,7 @@ public class MopubActivity extends AppCompatActivity {
     publisherAdView = new MoPubView(this);
     publisherAdView.setAdUnitId(MOPUB_BANNER_ADUNIT_ID_HB);
 
-    criteo.loadBid(BANNER, enrich((mThis, bid) -> {
+    criteo.loadBid(BANNER, CONTEXT_DATA, enrich((mThis, bid) -> {
       mThis.criteo.enrichAdObjectWithBid(mThis.publisherAdView, bid);
 
       mThis.publisherAdView.loadAd();
@@ -109,7 +110,7 @@ public class MopubActivity extends AppCompatActivity {
     MoPubInterstitial mInterstitial = new MoPubInterstitial(this, MOPUB_INTERSTITIAL_ADUNIT_ID_HB);
     mInterstitial.setInterstitialAdListener(new TestAppMoPubInterstitialAdListener(TAG, mInterstitial));
 
-    criteo.loadBid(INTERSTITIAL, enrich((mThis, bid) -> {
+    criteo.loadBid(INTERSTITIAL, CONTEXT_DATA, enrich((mThis, bid) -> {
       mThis.criteo.enrichAdObjectWithBid(mInterstitial, bid);
       mInterstitial.load();
     }));
