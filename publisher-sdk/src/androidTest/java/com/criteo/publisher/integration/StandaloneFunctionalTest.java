@@ -245,9 +245,8 @@ public class StandaloneFunctionalTest {
   private View whenLoadingAndDisplayingAnInterstitial(
       CriteoInterstitial interstitial,
       CriteoSync sync
-  )
-      throws Exception {
-    runOnMainThreadAndWait(interstitial::loadAd);
+  ) throws Exception {
+    loadAdAndWait(interstitial);
     sync.waitForBid();
 
     assertThat(interstitial.isAdLoaded()).isTrue();
@@ -266,7 +265,7 @@ public class StandaloneFunctionalTest {
     CriteoInterstitial interstitial = createInterstitial(interstitialAdUnit);
 
     CriteoSync sync = new CriteoSync(interstitial);
-    runOnMainThreadAndWait(interstitial::loadAd);
+    loadAdAndWait(interstitial);
     sync.waitForBid();
 
     return interstitial;
@@ -323,8 +322,7 @@ public class StandaloneFunctionalTest {
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
     CriteoInterstitial interstitial = createInterstitial(invalidInterstitialAdUnit, listener);
 
-    runOnMainThreadAndWait(interstitial::loadAd);
-    waitForBids();
+    loadAdAndWait(interstitial);
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
     verifyNoMoreInteractions(listener);
@@ -341,8 +339,7 @@ public class StandaloneFunctionalTest {
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
     CriteoInterstitial interstitial = createInterstitial(validInterstitialAdUnit, listener);
 
-    runOnMainThreadAndWait(interstitial::loadAd);
-    waitForBids();
+    loadAdAndWait(interstitial);
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
     verifyNoMoreInteractions(listener);
@@ -357,8 +354,7 @@ public class StandaloneFunctionalTest {
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
     CriteoInterstitial interstitial = createInterstitial(validInterstitialAdUnit, listener);
 
-    runOnMainThreadAndWait(interstitial::loadAd);
-    waitForBids();
+    loadAdAndWait(interstitial);
 
     verify(listener).onAdReceived(interstitial);
     verifyNoMoreInteractions(listener);
@@ -430,11 +426,8 @@ public class StandaloneFunctionalTest {
     givenInitializedSdk();
     Mockito.clearInvocations(api);
 
-    runOnMainThreadAndWait(() -> {
-      CriteoInterstitial interstitial = new CriteoInterstitial(validInterstitialAdUnit);
-      interstitial.loadAd();
-    });
-    waitForBids();
+    CriteoInterstitial interstitial = new CriteoInterstitial(validInterstitialAdUnit);
+    loadAdAndWait(interstitial);
 
     verify(api).loadCdb(requestCaptor.capture(), anyString());
     CdbRequest request = requestCaptor.getValue();
@@ -468,12 +461,10 @@ public class StandaloneFunctionalTest {
     CriteoInterstitial interstitial = createInterstitial(validInterstitialAdUnit, listener);
 
     // Given a first bid (that should do a cache miss)
-    runOnMainThreadAndWait(interstitial::loadAd);
-    waitForBids();
+    loadAdAndWait(interstitial);
 
     // Given a second bid (that should succeed)
-    runOnMainThreadAndWait(interstitial::loadAd);
-    waitForBids();
+    loadAdAndWait(interstitial);
 
     InOrder inOrder = inOrder(listener);
     inOrder.verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
@@ -536,6 +527,11 @@ public class StandaloneFunctionalTest {
 
   private void loadAdAndWait(CriteoBannerView bannerView) {
     bannerView.loadAd(new ContextData());
+    waitForBids();
+  }
+
+  private void loadAdAndWait(CriteoInterstitial interstitial) {
+    runOnMainThreadAndWait(() -> interstitial.loadAd(new ContextData()));
     waitForBids();
   }
 
