@@ -42,6 +42,7 @@ import com.criteo.publisher.advancednative.CriteoNativeAdListener;
 import com.criteo.publisher.advancednative.CriteoNativeLoader;
 import com.criteo.publisher.advancednative.CriteoNativeRenderer;
 import com.criteo.publisher.advancednative.RendererHelper;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.tests.R;
 import java.util.ArrayList;
 import java.util.List;
@@ -118,7 +119,7 @@ public class TestNativeActivity extends Activity {
   }
 
   public void loadStandaloneAdInAdLayout() {
-    standaloneNativeLoaderInAdLayout.loadAd();
+    standaloneNativeLoaderInAdLayout.loadAd(new ContextData());
   }
 
   public void loadInHouseAdInAdLayout(@Nullable Bid bid) {
@@ -126,7 +127,7 @@ public class TestNativeActivity extends Activity {
   }
 
   public void loadStandaloneAdInRecyclerView() {
-    standaloneNativeLoaderInRecyclerView.loadAd();
+    standaloneNativeLoaderInRecyclerView.loadAd(new ContextData());
   }
 
   public void loadInHouseAdInRecyclerView(@Nullable Bid bid) {
