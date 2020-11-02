@@ -21,6 +21,7 @@ import android.os.StrictMode;
 import android.util.Log;
 import androidx.multidex.MultiDexApplication;
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
@@ -52,6 +53,9 @@ public class PubSdkDemoApplication extends MultiDexApplication {
       "/140800857/Endeavour_320x50",
       new AdSize(320, 50)
   );
+
+  public static final ContextData CONTEXT_DATA = new ContextData()
+      .set(ContextData.CONTENT_URL, "https://dummy.content.url");
 
   @Override
   public void onCreate() {

@@ -17,6 +17,7 @@
 package com.criteo.testapp;
 
 import static com.criteo.testapp.PubSdkDemoApplication.BANNER;
+import static com.criteo.testapp.PubSdkDemoApplication.CONTEXT_DATA;
 import static com.criteo.testapp.PubSdkDemoApplication.INTERSTITIAL;
 import static com.criteo.testapp.PubSdkDemoApplication.NATIVE;
 
@@ -91,7 +92,7 @@ public class DfpActivity extends AppCompatActivity {
   private void loadAdView(PublisherAdView publisherAdView, AdUnit adUnit) {
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-    criteo.loadBid(adUnit, enrich((mThis, bid) -> {
+    criteo.loadBid(adUnit, CONTEXT_DATA, enrich((mThis, bid) -> {
       mThis.criteo.enrichAdObjectWithBid(builder, bid);
 
       PublisherAdRequest request = builder.build();
@@ -118,7 +119,7 @@ public class DfpActivity extends AppCompatActivity {
 
     PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
-    criteo.loadBid(INTERSTITIAL, enrich((mThis, bid) -> {
+    criteo.loadBid(INTERSTITIAL, CONTEXT_DATA, enrich((mThis, bid) -> {
       mThis.criteo.enrichAdObjectWithBid(builder, bid);
 
       PublisherAdRequest request = builder.build();

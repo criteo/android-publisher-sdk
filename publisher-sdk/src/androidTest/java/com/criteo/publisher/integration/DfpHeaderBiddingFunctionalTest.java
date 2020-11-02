@@ -44,6 +44,7 @@ import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.TestAdUnits;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.ResultCaptor;
@@ -182,11 +183,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().loadBid(
-        adUnit,
-        bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
-    );
-    waitForBids();
+    loadBidAndWait(adUnit, builder);
 
     assertCriteoMacroAreInjectedInDfpBuilder(builder);
     assertBidRequestHasGoodProfileId();
@@ -199,11 +196,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().loadBid(
-        validNativeAdUnit,
-        bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
-    );
-    waitForBids();
+    loadBidAndWait(validNativeAdUnit, builder);
 
     Bundle customTargeting = builder.build().getCustomTargeting();
 
@@ -259,11 +252,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().loadBid(
-        adUnit,
-        bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
-    );
-    waitForBids();
+    loadBidAndWait(adUnit, builder);
 
     Bundle customTargeting = builder.build().getCustomTargeting();
 
@@ -311,11 +300,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().loadBid(
-        adUnit,
-        bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
-    );
-    waitForBids();
+    loadBidAndWait(adUnit, builder);
 
     assertCriteoMacroAreInjectedInDfpBuilder(builder);
 
@@ -345,11 +330,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().loadBid(
-        adUnit,
-        bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
-    );
-    waitForBids();
+    loadBidAndWait(adUnit, builder);
 
     String encodedDisplayUrl = builder.build().getCustomTargeting().getString(MACRO_DISPLAY_URL);
     String decodedDisplayUrl = decodeDfpPayloadComponent(encodedDisplayUrl);
@@ -367,11 +348,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().loadBid(
-        validNativeAdUnit,
-        bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
-    );
-    waitForBids();
+    loadBidAndWait(validNativeAdUnit, builder);
 
     Bundle bundle = builder.build().getCustomTargeting();
 
@@ -557,11 +534,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().loadBid(
-        adUnit,
-        bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
-    );
-    waitForBids();
+    loadBidAndWait(adUnit, builder);
 
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
     PublisherAdRequest request = builder.build();
@@ -579,11 +552,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     Builder builder = new Builder();
 
-    Criteo.getInstance().loadBid(
-        adUnit,
-        bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
-    );
-    waitForBids();
+    loadBidAndWait(adUnit, builder);
 
     builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
     PublisherAdRequest request = builder.build();
@@ -637,14 +606,22 @@ public class DfpHeaderBiddingFunctionalTest {
     if (config.isLiveBiddingEnabled()) {
       // With live bidding, AppBidding declaration is delayed when bid is consumed. So the declaration is only visible
       // from the next bid.
-      Criteo.getInstance().loadBid(invalidBannerAdUnit, ignored -> { /* no op */ });
-      waitForBids();
+      loadBidAndWait(invalidBannerAdUnit, new PublisherAdRequest.Builder());
     }
 
     verify(api, atLeastOnce()).loadCdb(
         argThat(request -> request.getProfileId() == Integration.GAM_APP_BIDDING.getProfileId()),
         any()
     );
+  }
+
+  private void loadBidAndWait(AdUnit adUnit, Builder builder) {
+    Criteo.getInstance().loadBid(
+        adUnit,
+        new ContextData(),
+        bid -> Criteo.getInstance().enrichAdObjectWithBid(builder, bid)
+    );
+    waitForBids();
   }
 
   private void waitForBids() {

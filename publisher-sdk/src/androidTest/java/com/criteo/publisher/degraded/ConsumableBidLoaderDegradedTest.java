@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 
 import com.criteo.publisher.BidResponseListener;
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdUnit;
@@ -50,6 +51,9 @@ public class ConsumableBidLoaderDegradedTest {
   @Mock
   private BidResponseListener listener;
 
+  @Mock
+  private ContextData contextData;
+
   @SpyBean
   private DeviceUtil deviceUtil;
 
@@ -66,7 +70,7 @@ public class ConsumableBidLoaderDegradedTest {
 
   @Test
   public void whenGettingABidResponse_ShouldNotDoAnyCallToCdb() throws Exception {
-    criteo.loadBid(adUnit, listener);
+    criteo.loadBid(adUnit, contextData, listener);
     waitForIdleState();
 
     verifyNoInteractions(api);
@@ -75,10 +79,10 @@ public class ConsumableBidLoaderDegradedTest {
 
   @Test
   public void whenGettingABidResponseTwice_ShouldReturnANoBid() throws Exception {
-    criteo.loadBid(adUnit, listener);
+    criteo.loadBid(adUnit, contextData, listener);
     waitForIdleState();
 
-    criteo.loadBid(adUnit, listener);
+    criteo.loadBid(adUnit, contextData, listener);
     waitForIdleState();
 
     verify(listener, times(2)).onResponse(null);

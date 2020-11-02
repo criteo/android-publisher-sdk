@@ -16,6 +16,7 @@
 
 package com.criteo.testapp;
 
+import static com.criteo.testapp.PubSdkDemoApplication.CONTEXT_DATA;
 import static com.criteo.testapp.PubSdkDemoApplication.INTERSTITIAL;
 import static com.criteo.testapp.PubSdkDemoApplication.INTERSTITIAL_IBV_DEMO;
 import static com.criteo.testapp.PubSdkDemoApplication.NATIVE;
@@ -27,7 +28,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.advancednative.CriteoNativeLoader;
-import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.testapp.integration.MockedIntegrationRegistry;
@@ -43,9 +43,6 @@ public class StandaloneActivity extends AppCompatActivity {
   private CriteoBannerView criteoBannerView;
   private CriteoNativeLoader nativeLoader;
   private FrameLayout nativeAdContainer;
-
-  private final ContextData contextData = new ContextData()
-      .set(ContextData.CONTENT_URL, "https://dummy.content.url");
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +70,7 @@ public class StandaloneActivity extends AppCompatActivity {
 
   private void loadBannerAd() {
     Log.d(TAG, "Banner Requested");
-    criteoBannerView.loadAd(contextData);
+    criteoBannerView.loadAd(CONTEXT_DATA);
   }
 
   @Override
@@ -85,7 +82,7 @@ public class StandaloneActivity extends AppCompatActivity {
   }
 
   private void loadNative() {
-    nativeLoader.loadAd(contextData);
+    nativeLoader.loadAd(CONTEXT_DATA);
   }
 
   private void loadInterstitial(InterstitialAdUnit adUnit) {
@@ -95,7 +92,7 @@ public class StandaloneActivity extends AppCompatActivity {
     criteoInterstitial.setCriteoInterstitialAdListener(new TestAppInterstitialAdListener(TAG, prefix));
 
     Log.d(TAG, prefix + "Interstitial Requested");
-    criteoInterstitial.loadAd(contextData);
+    criteoInterstitial.loadAd(CONTEXT_DATA);
   }
 
 }
