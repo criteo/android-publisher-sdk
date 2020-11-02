@@ -203,7 +203,7 @@ class ProfileIdFunctionalTest {
     givenPreviousInHouseIntegration()
 
     givenInitializedCriteo()
-    CriteoInterstitial(INTERSTITIAL).loadAd()
+    CriteoInterstitial(INTERSTITIAL).loadAd(ContextData())
     mockedDependenciesRule.waitForIdleState()
 
     verifyCdbIsCalledWith(Integration.STANDALONE)
@@ -390,7 +390,7 @@ class ProfileIdFunctionalTest {
   }
 
   private fun bidStandaloneInterstitial() {
-    CriteoInterstitial(INTERSTITIAL).loadAd()
+    CriteoInterstitial(INTERSTITIAL).loadAd(ContextData())
     mockedDependenciesRule.waitForIdleState()
   }
 }

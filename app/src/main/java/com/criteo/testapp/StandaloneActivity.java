@@ -44,6 +44,9 @@ public class StandaloneActivity extends AppCompatActivity {
   private CriteoNativeLoader nativeLoader;
   private FrameLayout nativeAdContainer;
 
+  private final ContextData contextData = new ContextData()
+      .set(ContextData.CONTENT_URL, "https://dummy.content.url");
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -70,8 +73,7 @@ public class StandaloneActivity extends AppCompatActivity {
 
   private void loadBannerAd() {
     Log.d(TAG, "Banner Requested");
-    criteoBannerView.loadAd(new ContextData()
-        .set(ContextData.CONTENT_URL, "https://dummy.content.url"));
+    criteoBannerView.loadAd(contextData);
   }
 
   @Override
@@ -93,7 +95,7 @@ public class StandaloneActivity extends AppCompatActivity {
     criteoInterstitial.setCriteoInterstitialAdListener(new TestAppInterstitialAdListener(TAG, prefix));
 
     Log.d(TAG, prefix + "Interstitial Requested");
-    criteoInterstitial.loadAd();
+    criteoInterstitial.loadAd(contextData);
   }
 
 }

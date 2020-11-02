@@ -54,6 +54,9 @@ public class CriteoInterstitialTest {
 
   private InterstitialAdUnit adUnit = new InterstitialAdUnit("mock");
 
+  @Mock
+  private ContextData contextData;
+
   private CriteoInterstitial interstitial;
 
   @Before
@@ -64,13 +67,22 @@ public class CriteoInterstitialTest {
   }
 
   @Test
+  public void loadAdStandalone_GivenNoContext_LoadAdWithEmptyContext() throws Exception {
+    interstitial = spy(interstitial);
+
+    interstitial.loadAd();
+
+    verify(interstitial).loadAd(eq(new ContextData()));
+  }
+
+  @Test
   public void loadAdStandalone_GivenControllerAndLoadTwice_DelegateToItTwice() throws Exception {
     CriteoInterstitialEventController controller = givenMockedController();
 
-    interstitial.loadAd();
-    interstitial.loadAd();
+    interstitial.loadAd(contextData);
+    interstitial.loadAd(contextData);
 
-    verify(controller, times(2)).fetchAdAsync(eq(adUnit), eq(new ContextData()));
+    verify(controller, times(2)).fetchAdAsync(adUnit, contextData);
     verify(integrationRegistry, times(2)).declare(Integration.STANDALONE);
   }
 
@@ -115,7 +127,7 @@ public class CriteoInterstitialTest {
     CriteoInterstitialEventController controller = givenMockedController();
     Application application = givenNullApplication();
 
-    interstitial.loadAd();
+    interstitial.loadAd(new ContextData());
 
     verifyNoMoreInteractions(controller);
     DependencyProvider.getInstance().setApplication(application);

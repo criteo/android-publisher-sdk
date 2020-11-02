@@ -95,10 +95,10 @@ public class CriteoInterstitialIntegrationTest {
     CriteoInterstitial interstitial = createInterstitial();
     interstitial.setCriteoInterstitialAdListener(listener);
 
-    runOnMainThreadAndWait(interstitial::loadAd);
+    runOnMainThreadAndWait(() -> interstitial.loadAd(new ContextData()));
     waitForIdleState();
 
-    runOnMainThreadAndWait(interstitial::loadAd);
+    runOnMainThreadAndWait(() -> interstitial.loadAd(new ContextData()));
     waitForIdleState();
 
     verify(listener, times(2)).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);

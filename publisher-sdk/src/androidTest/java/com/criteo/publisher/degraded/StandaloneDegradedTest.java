@@ -107,11 +107,8 @@ public class StandaloneDegradedTest {
 
   @Test
   public void whenLoadingAnInterstitial_ShouldNotDoAnyCallToCdb() throws Exception {
-    runOnMainThreadAndWait(() -> {
-      CriteoInterstitial interstitial = new CriteoInterstitial(interstitialAdUnit);
-
-      interstitial.loadAd();
-    });
+    CriteoInterstitial interstitial = new CriteoInterstitial(interstitialAdUnit);
+    interstitial.loadAd(new ContextData());
 
     waitForIdleState();
     verifyNoInteractions(api);
@@ -122,16 +119,15 @@ public class StandaloneDegradedTest {
       throws Exception {
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
 
-    CriteoInterstitial interstitial = callOnMainThreadAndWait(() ->
-        new CriteoInterstitial(interstitialAdUnit));
+    CriteoInterstitial interstitial = new CriteoInterstitial(interstitialAdUnit);
 
     interstitial.setCriteoInterstitialAdListener(listener);
 
-    runOnMainThreadAndWait(interstitial::loadAd);
+    interstitial.loadAd(new ContextData());
     waitForIdleState();
 
     // Load twice, because first one is a cache miss
-    runOnMainThreadAndWait(interstitial::loadAd);
+    interstitial.loadAd(new ContextData());
     waitForIdleState();
 
     verify(listener, never()).onAdReceived(interstitial);
