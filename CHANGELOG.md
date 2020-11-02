@@ -1,5 +1,8 @@
 # Next version
 
+- Features
+  - Add a constructor without `NativeAdUnit` in `CriteoNativeLoader` for InHouse integration
+
 # Version 4.0.0
 
 - Breaking changes

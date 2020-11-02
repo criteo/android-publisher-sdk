@@ -39,7 +39,7 @@ import java.lang.ref.WeakReference;
 @Keep
 public class CriteoNativeLoader {
 
-  @NonNull
+  @Nullable
   private final NativeAdUnit adUnit;
 
   @NonNull
@@ -51,6 +51,20 @@ public class CriteoNativeLoader {
   @Nullable
   private CriteoNativeRenderer renderer;
 
+  /**
+   * Used by in-house auction
+   */
+  public CriteoNativeLoader(
+      @NonNull CriteoNativeAdListener listener,
+      @NonNull CriteoNativeRenderer renderer
+  ) {
+    //noinspection ConstantConditions
+    this(null, listener, renderer);
+  }
+
+  /**
+   * Used by Standalone
+   */
   public CriteoNativeLoader(
       @NonNull NativeAdUnit adUnit,
       @NonNull CriteoNativeAdListener listener,

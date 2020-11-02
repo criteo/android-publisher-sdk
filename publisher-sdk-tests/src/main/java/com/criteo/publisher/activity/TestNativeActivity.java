@@ -64,10 +64,12 @@ public class TestNativeActivity extends Activity {
   public static final Object ADVERTISER_LOGO_TAG = new Object();
   public static final Object PRIVACY_LEGAL_TEXT_TAG = new Object();
 
-  private CriteoNativeLoader nativeLoaderInAdLayout;
+  private CriteoNativeLoader standaloneNativeLoaderInAdLayout;
+  private CriteoNativeLoader inHouseNativeLoaderInAdLayout;
   private ViewGroup adLayout;
 
-  private CriteoNativeLoader nativeLoaderInRecyclerView;
+  private CriteoNativeLoader standaloneNativeLoaderInRecyclerView;
+  private CriteoNativeLoader inHouseNativeLoaderInRecyclerView;
   private Adapter adapter;
 
   private Drawable defaultDrawable;
@@ -92,33 +94,43 @@ public class TestNativeActivity extends Activity {
 
     initDefaultDrawable();
 
-    nativeLoaderInAdLayout = new CriteoNativeLoader(
+    standaloneNativeLoaderInAdLayout = new CriteoNativeLoader(
         TestAdUnits.NATIVE,
         new AdLayoutNativeAdListener(),
         new NativeRenderer()
     );
 
-    nativeLoaderInRecyclerView = new CriteoNativeLoader(
+    standaloneNativeLoaderInRecyclerView = new CriteoNativeLoader(
         TestAdUnits.NATIVE,
+        new RecyclerViewNativeAdListener(),
+        new NativeRenderer()
+    );
+
+    inHouseNativeLoaderInAdLayout = new CriteoNativeLoader(
+        new AdLayoutNativeAdListener(),
+        new NativeRenderer()
+    );
+
+    inHouseNativeLoaderInRecyclerView = new CriteoNativeLoader(
         new RecyclerViewNativeAdListener(),
         new NativeRenderer()
     );
   }
 
   public void loadStandaloneAdInAdLayout() {
-    nativeLoaderInAdLayout.loadAd();
+    standaloneNativeLoaderInAdLayout.loadAd();
   }
 
   public void loadInHouseAdInAdLayout(@Nullable Bid bid) {
-    nativeLoaderInAdLayout.loadAd(bid);
+    inHouseNativeLoaderInAdLayout.loadAd(bid);
   }
 
   public void loadStandaloneAdInRecyclerView() {
-    nativeLoaderInRecyclerView.loadAd();
+    standaloneNativeLoaderInRecyclerView.loadAd();
   }
 
   public void loadInHouseAdInRecyclerView(@Nullable Bid bid) {
-    nativeLoaderInRecyclerView.loadAd(bid);
+    inHouseNativeLoaderInRecyclerView.loadAd(bid);
   }
 
   public Drawable getDefaultDrawable() {
@@ -141,7 +153,7 @@ public class TestNativeActivity extends Activity {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-      View nativeView = nativeLoaderInRecyclerView.createEmptyNativeView(
+      View nativeView = standaloneNativeLoaderInRecyclerView.createEmptyNativeView(
           parent.getContext(),
           parent
       );
