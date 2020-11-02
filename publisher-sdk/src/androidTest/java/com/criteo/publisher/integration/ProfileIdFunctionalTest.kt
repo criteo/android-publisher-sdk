@@ -260,13 +260,13 @@ class ProfileIdFunctionalTest {
     givenInitializedCriteo()
 
     Criteo.getInstance().loadBid(NATIVE) {
-      CriteoNativeLoader(NATIVE, mock(), mock()).loadAd(it)
+      CriteoNativeLoader(mock(), mock()).loadAd(it)
     }
     mockedDependenciesRule.waitForIdleState()
 
     // Need 2 bids: InHouse integration is detected after bid request when loadAd method is invoked.
     Criteo.getInstance().loadBid(NATIVE) {
-      CriteoNativeLoader(NATIVE, mock(), mock()).loadAd(it)
+      CriteoNativeLoader(mock(), mock()).loadAd(it)
     }
     mockedDependenciesRule.waitForIdleState()
 

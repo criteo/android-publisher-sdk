@@ -60,7 +60,6 @@ public class InHouseActivity extends AppCompatActivity {
         TAG, "In-House"));
 
     nativeLoader = new CriteoNativeLoader(
-        NATIVE,
         new TestAppNativeAdListener(TAG, NATIVE.getAdUnitId(), nativeAdContainer),
         new TestAppNativeRenderer()
     );
