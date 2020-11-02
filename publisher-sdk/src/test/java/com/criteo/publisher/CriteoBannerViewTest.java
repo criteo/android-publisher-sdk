@@ -20,9 +20,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -67,6 +67,9 @@ public class CriteoBannerViewTest {
   private BannerAdUnit bannerAdUnit;
 
   @Mock
+  private ContextData contextData;
+
+  @Mock
   private Bid bid;
 
   @Before
@@ -80,20 +83,29 @@ public class CriteoBannerViewTest {
   }
 
   @Test
-  public void loadAdStandalone_GivenController_DelegateToIt() throws Exception {
+  public void loadAdStandalone_GivenNoContext_UseEmptyContext() throws Exception {
+    bannerView = spy(bannerView);
+
     bannerView.loadAd();
 
-    verify(controller).fetchAdAsync(eq(bannerAdUnit), eq(new ContextData()));
+    verify(bannerView).loadAd(eq(new ContextData()));
+  }
+
+  @Test
+  public void loadAdStandalone_GivenController_DelegateToIt() throws Exception {
+    bannerView.loadAd(contextData);
+
+    verify(controller).fetchAdAsync(bannerAdUnit, contextData);
     verifyNoMoreInteractions(controller);
     verify(integrationRegistry).declare(Integration.STANDALONE);
   }
 
   @Test
   public void loadAdStandalone_GivenControllerAndLoadTwice_DelegateToItTwice() throws Exception {
-    bannerView.loadAd();
-    bannerView.loadAd();
+    bannerView.loadAd(contextData);
+    bannerView.loadAd(contextData);
 
-    verify(controller, times(2)).fetchAdAsync(eq(bannerAdUnit), eq(new ContextData()));
+    verify(controller, times(2)).fetchAdAsync(bannerAdUnit, contextData);
     verifyNoMoreInteractions(controller);
     verify(integrationRegistry, times(2)).declare(Integration.STANDALONE);
   }
@@ -103,9 +115,9 @@ public class CriteoBannerViewTest {
     bannerView = spy(new CriteoBannerView(context, null, criteo));
     doReturn(controller).when(criteo).createBannerController(bannerView);
 
-    bannerView.loadAd();
+    bannerView.loadAd(contextData);
 
-    verify(controller).fetchAdAsync(isNull(), eq(new ContextData()));
+    verify(controller).fetchAdAsync(null, contextData);
     verifyNoMoreInteractions(controller);
     verify(integrationRegistry).declare(Integration.STANDALONE);
   }
@@ -114,14 +126,14 @@ public class CriteoBannerViewTest {
   public void loadAdStandalone_GivenControllerThrowing_DoNotThrow() throws Exception {
     doThrow(RuntimeException.class).when(controller).fetchAdAsync(any(AdUnit.class), any(ContextData.class));
 
-    assertThatCode(bannerView::loadAd).doesNotThrowAnyException();
+    assertThatCode(() -> bannerView.loadAd(mock(ContextData.class))).doesNotThrowAnyException();
   }
 
   @Test
   public void loadAdInStandalone_GivenNonInitializedSdk_DoesNotThrow() throws Exception {
     bannerView = givenBannerUsingNonInitializedSdk();
 
-    assertThatCode(bannerView::loadAd).doesNotThrowAnyException();
+    assertThatCode(() -> bannerView.loadAd(mock(ContextData.class))).doesNotThrowAnyException();
   }
 
   @Test

@@ -19,6 +19,7 @@ package com.criteo.publisher.integration;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE;
 import static com.criteo.publisher.StubConstants.STUB_DISPLAY_URL;
+import static com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 import static com.criteo.publisher.view.WebViewClicker.waitUntilWebViewIsLoaded;
 import static com.criteo.publisher.view.WebViewLookup.getRootView;
@@ -54,6 +55,7 @@ import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.concurrent.TrackingCommandsExecutorWithDelay;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
@@ -231,19 +233,13 @@ public class StandaloneFunctionalTest {
   }
 
   private CriteoBannerView whenLoadingABanner(BannerAdUnit bannerAdUnit) throws Exception {
-    AtomicReference<CriteoBannerView> bannerViewRef = new AtomicReference<>();
-    AtomicReference<CriteoSync> syncRef = new AtomicReference<>();
+    CriteoBannerView bannerView = callOnMainThreadAndWait(() -> new CriteoBannerView(context, bannerAdUnit));
+    CriteoSync sync = new CriteoSync(bannerView);
 
-    runOnMainThreadAndWait(() -> {
-      CriteoBannerView bannerView = new CriteoBannerView(context, bannerAdUnit);
-      syncRef.set(new CriteoSync(bannerView));
-      bannerViewRef.set(bannerView);
+    loadAdAndWait(bannerView);
 
-      bannerView.loadAd();
-    });
-
-    syncRef.get().waitForBid();
-    return bannerViewRef.get();
+    sync.waitForBid();
+    return bannerView;
   }
 
   private View whenLoadingAndDisplayingAnInterstitial(
@@ -295,8 +291,7 @@ public class StandaloneFunctionalTest {
     CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
     CriteoBannerView bannerView = createBanner(validBannerAdUnit, listener);
 
-    runOnMainThreadAndWait(bannerView::loadAd);
-    waitForBids();
+    loadAdAndWait(bannerView);
 
     verify(listener).onAdReceived(bannerView);
     verifyNoMoreInteractions(listener);
@@ -314,8 +309,7 @@ public class StandaloneFunctionalTest {
     CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
     CriteoBannerView bannerView = createBanner(invalidBannerAdUnit, listener);
 
-    runOnMainThreadAndWait(bannerView::loadAd);
-    waitForBids();
+    loadAdAndWait(bannerView);
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
     verifyNoMoreInteractions(listener);
@@ -381,15 +375,14 @@ public class StandaloneFunctionalTest {
     CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
     CriteoBannerView bannerView = createBanner(validBannerAdUnit, listener);
 
-    runOnMainThreadAndWait(bannerView::loadAd);
-    waitForBids();
+    loadAdAndWait(bannerView);
 
     verify(listener).onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
     verifyNoMoreInteractions(listener);
   }
 
   @Test
-  public void whenLoadingABanner_GivenLiveBiddingEnabled_TimeBudgetNotExceeded_AndNoBidInCache_OnAdRereceivedIsCalled()
+  public void whenLoadingABanner_GivenLiveBiddingEnabled_TimeBudgetNotExceeded_AndNoBidInCache_OnAdReceivedIsCalled()
       throws Exception {
     givenLiveBidding(true);
     givenInitializedSdk();
@@ -397,8 +390,7 @@ public class StandaloneFunctionalTest {
     CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
     CriteoBannerView bannerView = createBanner(validBannerAdUnit, listener);
 
-    runOnMainThreadAndWait(bannerView::loadAd);
-    waitForBids();
+    loadAdAndWait(bannerView);
 
     verify(listener).onAdReceived(bannerView);
     verifyNoMoreInteractions(listener);
@@ -540,6 +532,11 @@ public class StandaloneFunctionalTest {
 
   private void givenTimeBudgetRespectedWhenFetchingLiveBids() {
     when(config.getLiveBiddingTimeBudgetInMillis()).thenReturn(Integer.MAX_VALUE);
+  }
+
+  private void loadAdAndWait(CriteoBannerView bannerView) {
+    bannerView.loadAd(new ContextData());
+    waitForBids();
   }
 
   private static final class CriteoSync {

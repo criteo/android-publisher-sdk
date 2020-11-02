@@ -27,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.advancednative.CriteoNativeLoader;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.testapp.integration.MockedIntegrationRegistry;
@@ -69,7 +70,8 @@ public class StandaloneActivity extends AppCompatActivity {
 
   private void loadBannerAd() {
     Log.d(TAG, "Banner Requested");
-    criteoBannerView.loadAd();
+    criteoBannerView.loadAd(new ContextData()
+        .set(ContextData.CONTENT_URL, "https://dummy.content.url"));
   }
 
   @Override

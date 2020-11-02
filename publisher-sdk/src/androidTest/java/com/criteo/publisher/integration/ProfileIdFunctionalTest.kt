@@ -27,6 +27,7 @@ import com.criteo.publisher.TestAdUnits.NATIVE
 import com.criteo.publisher.advancednative.CriteoNativeLoader
 import com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait
 import com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait
+import com.criteo.publisher.context.ContextData
 import com.criteo.publisher.csm.MetricHelper
 import com.criteo.publisher.csm.MetricSendingQueueConsumer
 import com.criteo.publisher.mock.MockedDependenciesRule
@@ -190,7 +191,7 @@ class ProfileIdFunctionalTest {
 
     givenInitializedCriteo()
     runOnMainThreadAndWait {
-      CriteoBannerView(context, BANNER_320_480).loadAd()
+      CriteoBannerView(context, BANNER_320_480).loadAd(ContextData())
     }
     mockedDependenciesRule.waitForIdleState()
 

@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.criteo.publisher.CriteoBannerView
 import com.criteo.publisher.advancednative.CriteoNativeAd
 import com.criteo.publisher.advancednative.CriteoNativeLoader
+import com.criteo.publisher.context.ContextData
 import com.criteo.testapp.PubSdkDemoApplication.BANNER
 import com.criteo.testapp.PubSdkDemoApplication.NATIVE
 import com.criteo.testapp.listener.TestAppBannerAdListener
@@ -83,7 +84,10 @@ class StandaloneRecyclerViewActivity : AppCompatActivity() {
       }
     })
 
-    bannerView.loadAd()
+    bannerView.loadAd(
+        ContextData()
+            .set(ContextData.CONTENT_URL, "https://dummy.content.url")
+    )
   }
 
   class Adapter(private val nativeLoader: CriteoNativeLoader) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {

@@ -33,6 +33,7 @@ import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdListener;
+import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdSize;
@@ -77,7 +78,7 @@ public class StandaloneDegradedTest {
   public void whenLoadingABanner_ShouldNotDoAnyCallToCdb() throws Exception {
     runOnMainThreadAndWait(() -> {
       CriteoBannerView bannerView = new CriteoBannerView(context, bannerAdUnit);
-      bannerView.loadAd();
+      bannerView.loadAd(mock(ContextData.class));
     });
 
     waitForIdleState();
@@ -93,11 +94,11 @@ public class StandaloneDegradedTest {
 
     bannerView.setCriteoBannerAdListener(listener);
 
-    runOnMainThreadAndWait(bannerView::loadAd);
+    runOnMainThreadAndWait(() -> bannerView.loadAd(new ContextData()));
     waitForIdleState();
 
     // Load twice, because first one is a cache miss
-    runOnMainThreadAndWait(bannerView::loadAd);
+    runOnMainThreadAndWait(() -> bannerView.loadAd(new ContextData()));
     waitForIdleState();
 
     verify(listener, never()).onAdReceived(any());

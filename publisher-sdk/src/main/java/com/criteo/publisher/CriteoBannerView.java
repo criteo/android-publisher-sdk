@@ -16,6 +16,8 @@
 
 package com.criteo.publisher;
 
+import static com.criteo.publisher.annotation.Incubating.CONTEXT;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
@@ -25,6 +27,7 @@ import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.annotation.Incubating;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
@@ -139,8 +142,13 @@ public class CriteoBannerView extends WebView {
   }
 
   public void loadAd() {
+    loadAd(new ContextData());
+  }
+
+  @Incubating(CONTEXT)
+  public void loadAd(@NonNull ContextData contextData) {
     try {
-      doLoadAd(new ContextData());
+      doLoadAd(contextData);
     } catch (Throwable tr) {
       Log.e(TAG, "Internal error while loading banner.", tr);
     }
