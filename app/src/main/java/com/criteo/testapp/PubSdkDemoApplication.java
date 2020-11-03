@@ -22,6 +22,8 @@ import android.util.Log;
 import androidx.multidex.MultiDexApplication;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.context.ContextData;
+import com.criteo.publisher.context.EmailHasher;
+import com.criteo.publisher.context.UserData;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
@@ -90,9 +92,13 @@ public class PubSdkDemoApplication extends MultiDexApplication {
     adUnits.add(NATIVE);
 
     try {
-      new Criteo.Builder(this, "B-056946")
+      Criteo criteo = new Criteo.Builder(this, "B-056946")
           .adUnits(adUnits)
           .init();
+
+      criteo.setUserData(new UserData()
+          .set(UserData.HASHED_EMAIL, EmailHasher.hash("john.doe@gmail.com"))
+          .set(UserData.DEV_USER_ID, "devUserId"));
     } catch (Throwable tr) {
       Log.e(TAG, "FAILED TO INIT SDK!!!!", tr);
       throw new IllegalStateException("Criteo SDK is not initialized. You may not proceed.", tr);
