@@ -226,6 +226,53 @@ class CdbRequestFactoryTest {
     assertThat(request.slots).containsExactlyInAnyOrder(expectedSlot1, expectedSlot2)
   }
 
+  @Test
+  fun mergeToNestedMap_GivenNoMap_ReturnEmpty() {
+    val nestedMap = factory.mergeToNestedMap()
+
+    assertThat(nestedMap).isEmpty()
+  }
+
+  @Test
+  fun mergeToNestedMap_GivenMultipleMapsWithOverride_ReturnMergedAndNestedMap() {
+    val map1 = mapOf(
+        "a.a.a" to 1337,
+        "a.c.b" to "...",
+        "a.a" to "skipped",
+        "a.a.a.a" to "skipped"
+    )
+
+    val map2 = mapOf(
+        "a.a.a" to 3,
+        "a.b" to "foo",
+        "a.c.a" to listOf("foo", "bar"),
+        "a" to "skipped",
+        ".a" to "skipped",
+        "a.c.c." to "skipped",
+        "a..c.d" to "skipped",
+        "a.c.e" to mapOf("valueMap" to mapOf("a" to "map as value")),
+        "a.c.e.valueMap.b" to "skipped"
+    )
+
+    val expectedMap = mapOf(
+        "a" to mapOf(
+            "a" to mapOf(
+                "a" to 1337
+            ),
+            "c" to mapOf(
+                "b" to "...",
+                "a" to listOf("foo", "bar"),
+                "e" to mapOf("valueMap" to mapOf("a" to "map as value"))
+            ),
+            "b" to "foo"
+        )
+    )
+
+    val nestedMap = factory.mergeToNestedMap(map1, map2)
+
+    assertThat(nestedMap).isEqualTo(expectedMap)
+  }
+
   private fun createAdUnit(): CacheAdUnit {
     val id = "adUnit #" + adUnitId.incrementAndGet()
     return CacheAdUnit(AdSize(1, 2), id, CRITEO_BANNER)
