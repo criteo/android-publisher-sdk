@@ -63,6 +63,15 @@ public class UserData extends AbstractContextData<UserData> {
    */
   public static final String HASHED_EMAIL = "data.hashedEmail";
 
+  /**
+   * <h1>Definition</h1>
+   * A developer's own persistent unique user identifier. In case the publisher support it.
+   *
+   * <h1>Type</h1>
+   * String, example: "abcd12399"
+   */
+  public static final String DEV_USER_ID = "data.devUserId";
+
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof UserData)) {
