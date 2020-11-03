@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.context.ContextData;
+import com.criteo.publisher.context.UserData;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
@@ -90,6 +91,11 @@ public class DummyCriteo extends Criteo {
 
   @Override
   public void setMopubConsent(String mopubConsent) {
+    // do nothing
+  }
+
+  @Override
+  public void setUserData(@NonNull UserData userData) {
     // do nothing
   }
 

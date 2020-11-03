@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.context.ContextData;
+import com.criteo.publisher.context.UserData;
 import com.criteo.publisher.headerbidding.HeaderBidding;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.model.AdUnit;
@@ -193,5 +194,10 @@ class CriteoInternal extends Criteo {
   @Override
   public void setMopubConsent(@Nullable String mopubConsent) {
     userPrivacyUtil.storeMopubConsent(mopubConsent);
+  }
+
+  @Override
+  public void setUserData(@NonNull UserData userData) {
+    dependencyProvider.provideUserDataHolder().set(userData);
   }
 }
