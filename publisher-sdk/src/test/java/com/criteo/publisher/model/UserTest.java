@@ -22,6 +22,7 @@ import static org.junit.Assert.assertEquals;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.util.JsonSerializer;
 import com.criteo.publisher.util.JsonSerializerExtensionsKt;
+import java.util.HashMap;
 import javax.inject.Inject;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,7 +43,8 @@ public class UserTest {
         "deviceId",
         "fake_mopub_consent",
         "fake_usp_iab",
-        "true" /* uspOptout */
+        "true" /* uspOptout */,
+        new HashMap<>()
     );
 
     JSONObject jsonObject = toJson(user);
@@ -61,7 +63,8 @@ public class UserTest {
         "deviceId",
         null,
         null,
-        null
+        null,
+        new HashMap<>()
     );
 
     JSONObject jsonObject = toJson(user);

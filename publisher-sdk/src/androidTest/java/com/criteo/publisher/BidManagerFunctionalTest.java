@@ -75,6 +75,7 @@ import com.criteo.publisher.util.BuildConfigWrapper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
@@ -402,7 +403,8 @@ public class BidManagerFunctionalTest {
         advertisingInfo.getAdvertisingId(),
         null,
         null,
-        null
+        null,
+        new HashMap<>() // TODO EE-1321
     );
 
     verify(api).loadCdb(argThat(cdb -> {

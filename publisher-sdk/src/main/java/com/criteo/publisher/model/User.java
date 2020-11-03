@@ -21,6 +21,7 @@ import androidx.annotation.Nullable;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
+import java.util.Map;
 
 @AutoValue
 public abstract class User {
@@ -29,7 +30,8 @@ public abstract class User {
       @Nullable String deviceId,
       @Nullable String mopubConsent,
       @Nullable String uspIab,
-      @Nullable String uspOptout
+      @Nullable String uspOptout,
+      @NonNull Map<String, Object> ext
   ) {
     return new AutoValue_User(
         deviceId,
@@ -37,7 +39,8 @@ public abstract class User {
         "android",
         mopubConsent,
         uspIab,
-        uspOptout
+        uspOptout,
+        ext
     );
   }
 
@@ -68,4 +71,7 @@ public abstract class User {
    */
   @Nullable
   public abstract String uspOptout();
+
+  @NonNull
+  public abstract Map<String, Object> ext();
 }
