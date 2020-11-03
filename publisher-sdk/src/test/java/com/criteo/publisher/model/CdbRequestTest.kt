@@ -45,7 +45,22 @@ class CdbRequestTest {
     val request = CdbRequest.create(
         "myRequestId",
         Publisher.create(context, "myCpId"),
-        User.create(null, null, null, null),
+        User.create(
+            null,
+            null,
+            null,
+            null,
+            mapOf(
+                "data" to mapOf(
+                    "a" to listOf(1, 2),
+                    "b" to 42.0
+                ),
+                "device" to mapOf(
+                    "make" to "Manufacturer",
+                    "model" to "DummyModel"
+                )
+            )
+        ),
         "1.2.3",
         456,
         GdprData.create("consent", true, 42),
@@ -64,7 +79,17 @@ class CdbRequestTest {
         },
         "user": {
           "deviceIdType": "gaid",
-          "deviceOs": "android"
+          "deviceOs": "android",
+          "ext": {
+            "data": {
+              "a": [1, 2],
+              "b": 42.0
+            },
+            "device": {
+              "make": "Manufacturer",
+              "model": "DummyModel"
+            }
+          }
         },
         "sdkVersion": "1.2.3",
         "profileId": 456,
@@ -75,7 +100,8 @@ class CdbRequestTest {
         },
         "slots": []
       }
-    """.trimIndent())
+    """.trimIndent()
+    )
   }
 
   @Test
@@ -87,7 +113,7 @@ class CdbRequestTest {
     val request = CdbRequest.create(
         "myRequestId",
         Publisher.create(context, "myCpId"),
-        User.create(null, null, null, null),
+        User.create(null, null, null, null, mapOf()),
         "1.2.3",
         456,
         null,
@@ -98,5 +124,4 @@ class CdbRequestTest {
 
     assertThat(json).doesNotContain("gdprConsent")
   }
-
 }

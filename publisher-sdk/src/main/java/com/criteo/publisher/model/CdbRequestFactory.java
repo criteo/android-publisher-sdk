@@ -26,6 +26,7 @@ import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -80,7 +81,8 @@ public class CdbRequestFactory {
         advertisingInfo.getAdvertisingId(),
         getNotEmptyOrNullValue(userPrivacyUtil.getMopubConsent()),
         getNotEmptyOrNullValue(userPrivacyUtil.getIabUsPrivacyString()),
-        getNotEmptyOrNullValue(userPrivacyUtil.getUsPrivacyOptout())
+        getNotEmptyOrNullValue(userPrivacyUtil.getUsPrivacyOptout()),
+        new HashMap<>() // TODO EE-1321
     );
 
     return CdbRequest.create(
