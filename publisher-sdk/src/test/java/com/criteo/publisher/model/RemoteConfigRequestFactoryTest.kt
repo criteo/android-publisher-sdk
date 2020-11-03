@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.model
 
+import android.content.Context
 import com.criteo.publisher.integration.IntegrationRegistry
 import com.criteo.publisher.util.AdvertisingInfo
 import com.criteo.publisher.util.BuildConfigWrapper
@@ -30,7 +31,7 @@ import org.mockito.MockitoAnnotations
 class RemoteConfigRequestFactoryTest {
 
     @Mock
-    private lateinit var publisher: Publisher
+    private lateinit var context: Context
 
     @Mock
     private lateinit var buildConfigWrapper: BuildConfigWrapper
@@ -46,7 +47,13 @@ class RemoteConfigRequestFactoryTest {
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        factory = RemoteConfigRequestFactory(publisher, buildConfigWrapper, integrationRegistry, advertisingInfo)
+        factory = RemoteConfigRequestFactory(
+            context,
+            "myCpId",
+            buildConfigWrapper,
+            integrationRegistry,
+            advertisingInfo
+        )
     }
 
     @Test
@@ -59,9 +66,8 @@ class RemoteConfigRequestFactoryTest {
             on { profileId } doReturn 456
         }
 
-        publisher.stub {
-            on { bundleId } doReturn "my.bundle"
-            on { criteoPublisherId } doReturn "myCpId"
+        context.stub {
+            on { packageName } doReturn "my.bundle"
         }
 
         advertisingInfo.stub {

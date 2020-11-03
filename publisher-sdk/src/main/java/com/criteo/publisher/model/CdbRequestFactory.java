@@ -18,6 +18,7 @@ package com.criteo.publisher.model;
 
 import static com.criteo.publisher.util.TextUtils.getNotEmptyOrNullValue;
 
+import android.content.Context;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.bid.UniqueIdGenerator;
 import com.criteo.publisher.context.ContextData;
@@ -33,7 +34,10 @@ import java.util.concurrent.Future;
 public class CdbRequestFactory {
 
   @NonNull
-  private final Publisher publisher;
+  private final Context context;
+
+  @NonNull
+  private final String criteoPublisherId;
 
   @NonNull
   private final DeviceInfo deviceInfo;
@@ -54,7 +58,8 @@ public class CdbRequestFactory {
   private final IntegrationRegistry integrationRegistry;
 
   public CdbRequestFactory(
-      @NonNull Publisher publisher,
+      @NonNull Context context,
+      @NonNull String criteoPublisherId,
       @NonNull DeviceInfo deviceInfo,
       @NonNull AdvertisingInfo advertisingInfo,
       @NonNull UserPrivacyUtil userPrivacyUtil,
@@ -62,7 +67,8 @@ public class CdbRequestFactory {
       @NonNull BuildConfigWrapper buildConfigWrapper,
       @NonNull IntegrationRegistry integrationRegistry
   ) {
-    this.publisher = publisher;
+    this.context = context;
+    this.criteoPublisherId = criteoPublisherId;
     this.deviceInfo = deviceInfo;
     this.advertisingInfo = advertisingInfo;
     this.userPrivacyUtil = userPrivacyUtil;
@@ -77,6 +83,11 @@ public class CdbRequestFactory {
       @SuppressWarnings("unused") // TODO EE-1321
       @NonNull ContextData contextData
   ) {
+    Publisher publisher = Publisher.create(
+        context.getPackageName(),
+        criteoPublisherId
+    );
+
     User user = User.create(
         advertisingInfo.getAdvertisingId(),
         getNotEmptyOrNullValue(userPrivacyUtil.getMopubConsent()),
