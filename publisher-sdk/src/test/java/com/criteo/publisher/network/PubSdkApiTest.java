@@ -84,7 +84,6 @@ public class PubSdkApiTest {
     when(gdprData.consentData()).thenReturn("fake_consent_data");
     when(gdprData.gdprApplies()).thenReturn(false);
     when(gdprData.version()).thenReturn(1);
-    when(gdprData.toJSONObject()).thenCallRealMethod();
 
     api = new PubSdkApi(buildConfigWrapper, serializer);
   }

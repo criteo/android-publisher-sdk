@@ -31,10 +31,10 @@ import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.JsonSerializer;
 import com.criteo.publisher.util.StreamUtil;
 import com.criteo.publisher.util.TextUtils;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -132,26 +132,13 @@ public class PubSdkApi {
   @Nullable
   @VisibleForTesting
   String getGdprDataStringBase64(@NonNull GdprData gdprData) {
-    String gdprDataStr = null;
-    try {
-      gdprDataStr = gdprData.toJSONObject().toString();
-    } catch (JSONException e) {
-      Log.d(TAG, "Unable to convert gdprString to JSONObject when sending to GUM:" + e.getMessage());
-    }
-
-    if (gdprDataStr == null) {
+    try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+      jsonSerializer.write(gdprData, baos);
+      return Base64.encodeToString(baos.toByteArray(), Base64.NO_WRAP);
+    } catch (IOException e) {
+      Log.d(TAG, "Unable to encode gdprString to base64", e);
       return null;
     }
-
-    String encoded = null;
-
-    try {
-      encoded = Base64.encodeToString(gdprDataStr.getBytes("UTF-8"), Base64.NO_WRAP);
-    } catch (UnsupportedEncodingException e) {
-      Log.d(TAG, "Unable to encode gdprString to base64:" + e.getMessage());
-    }
-
-    return encoded;
   }
 
   @Nullable
