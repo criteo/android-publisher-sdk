@@ -23,6 +23,46 @@ import com.criteo.publisher.annotation.Incubating;
 @Incubating(CONTEXT)
 public class UserData extends AbstractContextData<UserData> {
 
+  /**
+   * <h1>Definition</h1>
+   * Hashed email of the user
+   *
+   * <h2>Hashing Format</h2>
+   * The hashing should be the users’ email address:
+   * <ul>
+   *   <li>Encoded in UTF-8</li>
+   *   <li>Trimmed of any white space (eg: “test@criteo.com “ should become “test@criteo.com”)</li>
+   *   <li>Converted to lower case</li>
+   *   <li>Hashed with MD5 & output as ASCII text</li>
+   *   <li>Hashed with SHA256 and output as ASCII text</li>
+   * </ul>
+   *
+   * <h2>Example</h2>
+   * <dl>
+   *   <dt>Type</dt>
+   *   <dd>String</dd>
+   *
+   *   <dt>Original Email</dt>
+   *   <dd>john.doe@gmail.com</dd>
+   *
+   *   <dt>MD5</dt>
+   *   <dd>e13743a7f1db7f4246badd6fd6ff54ff</dd>
+   *
+   *   <dt>SHA256 of MD5</dt>
+   *   <dd>000e3171a5110c35c69d060112bd0ba55d9631c7c2ec93f1840e4570095b263a</dd>
+   * </dl>
+   *
+   * <h1>Usage</h1>
+   * The {@link EmailHasher} class is a helper to hash an email accordingly to the format above.
+   * <p>
+   * It can be used like:
+   * <pre><code>
+   *   UserData userData = new UserData()
+   *       .set(UserData.HASHED_EMAIL, EmailHasher.hash("john.doe@gmail.com"));
+   * </code></pre>
+   */
+  public static final String HASHED_EMAIL = "data.hashedEmail";
+
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof UserData)) {
