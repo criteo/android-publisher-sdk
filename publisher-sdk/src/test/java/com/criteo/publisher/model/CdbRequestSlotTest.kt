@@ -16,13 +16,27 @@
 
 package com.criteo.publisher.model
 
-import com.criteo.publisher.util.AdUnitType.*
+import com.criteo.publisher.mock.MockedDependenciesRule
+import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
+import com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE
+import com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL
+import com.criteo.publisher.util.JsonSerializer
+import com.criteo.publisher.util.writeIntoString
 import org.assertj.core.api.Assertions.assertThat
 import org.json.JSONArray
 import org.json.JSONObject
+import org.junit.Rule
 import org.junit.Test
+import javax.inject.Inject
 
 class CdbRequestSlotTest {
+
+  @Rule
+  @JvmField
+  val mockedDependenciesRule = MockedDependenciesRule()
+
+  @Inject
+  private lateinit var serializer: JsonSerializer
 
   private companion object {
     const val IMPRESSION_ID = "impId"
@@ -130,5 +144,7 @@ class CdbRequestSlotTest {
         .map { sizes[it] as String }
         .toList()
   }
+
+  private fun CdbRequestSlot.toJson(): JSONObject = JSONObject(serializer.writeIntoString(this))
 
 }
