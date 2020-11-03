@@ -16,14 +16,26 @@
 
 package com.criteo.publisher.privacy.gdpr
 
+import com.criteo.publisher.mock.MockedDependenciesRule
+import com.criteo.publisher.util.JsonSerializer
+import com.criteo.publisher.util.writeIntoString
 import org.json.JSONObject
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
+import javax.inject.Inject
 import kotlin.test.assertEquals
 
 
 class GdprDataFactoryTest {
+
+    @Rule
+    @JvmField
+    val mockedDependenciesRule = MockedDependenciesRule()
+
+    @Inject
+    private lateinit var serializer: JsonSerializer
 
     @Test
     fun testToJSONObject_ConsentGiven_True() {
@@ -68,4 +80,6 @@ class GdprDataFactoryTest {
         assertEquals("fake_consent_data", jsonObject.optString("consentData"))
         assertEquals(1, jsonObject.optInt("version"))
     }
+
+    private fun GdprData.toJSONObject(): JSONObject = JSONObject(serializer.writeIntoString(this))
 }
