@@ -19,10 +19,22 @@ package com.criteo.publisher.model;
 import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
 
+import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.util.JsonSerializer;
+import com.criteo.publisher.util.JsonSerializerExtensionsKt;
+import javax.inject.Inject;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class UserTest {
+
+  @Rule
+  public final MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
+  @Inject
+  private JsonSerializer serializer;
 
   @Test
   public void testToJson_AllFieldsProvided() throws Exception {
@@ -33,7 +45,7 @@ public class UserTest {
         "true" /* uspOptout */
     );
 
-    JSONObject jsonObject = user.toJson();
+    JSONObject jsonObject = toJson(user);
 
     assertEquals("deviceId", jsonObject.get("deviceId"));
     assertEquals("gaid", jsonObject.get("deviceIdType"));
@@ -52,10 +64,14 @@ public class UserTest {
         null
     );
 
-    JSONObject jsonObject = user.toJson();
+    JSONObject jsonObject = toJson(user);
 
     assertFalse(jsonObject.has("uspIab"));
     assertFalse(jsonObject.has("uspOptout"));
     assertFalse(jsonObject.has("mopubConsent"));
+  }
+
+  private JSONObject toJson(User user) throws JSONException {
+    return new JSONObject(JsonSerializerExtensionsKt.writeIntoString(serializer, user));
   }
 }
