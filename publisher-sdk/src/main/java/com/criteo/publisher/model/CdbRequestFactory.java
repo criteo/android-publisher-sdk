@@ -20,6 +20,7 @@ import static com.criteo.publisher.util.TextUtils.getNotEmptyOrNullValue;
 
 import android.content.Context;
 import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.bid.UniqueIdGenerator;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.integration.IntegrationRegistry;
@@ -27,8 +28,14 @@ import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.Future;
 
 public class CdbRequestFactory {
@@ -130,5 +137,105 @@ public class CdbRequestFactory {
   @NonNull
   public Future<String> getUserAgent() {
     return deviceInfo.getUserAgent();
+  }
+
+  /**
+   * Transform given maps in a nested structure and merge them
+   * <p>
+   * The keys of the maps determine the nested structure. A "." (dot) represent a nested level, such as dot notation in
+   * Java. For instance the entry <code>"a.b.c" -> "value"</code> represents <code>{a: {b: { c: "value"}}}</code>
+   * <p>
+   * The merge keeps the first elements and drops the next elements with the same key or with an incompatible structure.
+   * The merge policy uses the iteration order of the keys and the order of given maps. So it is recommended to give map
+   * with a deterministic iteration order such as {@link java.util.SortedMap} or {@link java.util.LinkedHashMap}. Here
+   * is an example of merge:
+   * <pre><code>
+   *   // First map
+   *   a.a.a = 1337 // (1)
+   *   a.c.b = "..."
+   *   a.a = 1 // Skipped because a.a is defined as a node at (1)
+   *   a.a.a.a = 2 // Skipped because a.a.a is defined as a leaf at (1)
+   *
+   *   // Second map
+   *   a.a.a = 42 // Skipped because a.a.a is already defined at (1)
+   *   a.b = "foo"
+   *   a.c.a = ["foo", "bar"]
+   *
+   *   // Gives
+   *   {
+   *     a: {
+   *       a: {
+   *         a: 1337
+   *       },
+   *       c: {
+   *         b: "...",
+   *         a: ["foo", "bar"]
+   *       }
+   *     },
+   *     b: "foo"
+   *   }
+   * </code></pre>
+   *
+   * @param flattenMaps maps to merge into a nested structure
+   * @return nested structure
+   */
+  @NonNull
+  @SafeVarargs
+  @VisibleForTesting
+  public final Map<String, Object> mergeToNestedMap(Map<String, Object>... flattenMaps) {
+    Map<String, Object> nestedMap = new LinkedHashMap<>();
+    Set<Map<String, Object>> subNodes = Collections.newSetFromMap(new IdentityHashMap<>());
+
+    for (Map<String, Object> flattenMap : flattenMaps) {
+      for (Entry<String, Object> entry : flattenMap.entrySet()) {
+        Map<String, Object> node = nestedMap;
+
+        String[] pathParts = entry.getKey().split("\\.", -1);
+        if (isNotValid(pathParts)) {
+          continue;
+        }
+
+        // Go or create nested structure until last path part
+        for (int i = 0; i < pathParts.length - 1; i++) {
+          String pathPart = pathParts[i];
+
+          if (node.containsKey(pathPart)) {
+            Object nestedValue = node.get(pathPart);
+            if (subNodes.contains(nestedValue)) {
+              // It's a sub node, go deeper
+              //noinspection unchecked - safe because only Map<String, Object> are put in subNodes
+              node = (Map<String, Object>) nestedValue;
+            } else {
+              // It's a leaf, abort
+              break;
+            }
+          } else {
+            // Create a new node and go deeper
+            Map<String, Object> newNode = new LinkedHashMap<>();
+            subNodes.add(newNode);
+            node.put(pathPart, newNode);
+            node = newNode;
+          }
+        }
+
+        String lastPathPart = pathParts[pathParts.length - 1];
+        if (!node.containsKey(lastPathPart)) {
+          // If value is already there, abort
+          node.put(lastPathPart, entry.getValue());
+        }
+      }
+    }
+
+    return nestedMap;
+  }
+
+  private boolean isNotValid(String[] pathParts) {
+    for (String pathPart : pathParts) {
+      if (pathPart.isEmpty()) {
+        // Reject empty part
+        return true;
+      }
+    }
+    return false;
   }
 }
