@@ -16,7 +16,6 @@
 
 package com.criteo.publisher.model;
 
-import android.content.Context;
 import androidx.annotation.NonNull;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
@@ -27,8 +26,8 @@ import com.google.gson.annotations.SerializedName;
 public abstract class Publisher {
 
   @NonNull
-  public static Publisher create(@NonNull Context context, @NonNull String criteoPublisherId) {
-    return new AutoValue_Publisher(context.getPackageName(), criteoPublisherId);
+  public static Publisher create(@NonNull String bundleId, @NonNull String criteoPublisherId) {
+    return new AutoValue_Publisher(bundleId, criteoPublisherId);
   }
 
   public static TypeAdapter<Publisher> typeAdapter(Gson gson) {

@@ -72,7 +72,6 @@ import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
-import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.network.BidRequestSender;
 import com.criteo.publisher.network.LiveBidRequestSender;
@@ -284,14 +283,6 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public Publisher providePublisher() {
-    return getOrCreate(Publisher.class, () -> Publisher.create(
-        provideContext(),
-        provideCriteoPublisherId()
-    ));
-  }
-
-  @NonNull
   public BuildConfigWrapper provideBuildConfigWrapper() {
     return getOrCreate(BuildConfigWrapper.class, BuildConfigWrapper::new);
   }
@@ -299,7 +290,8 @@ public class DependencyProvider {
   @NonNull
   public CdbRequestFactory provideCdbRequestFactory() {
     return getOrCreate(CdbRequestFactory.class, () -> new CdbRequestFactory(
-        providePublisher(),
+        provideContext(),
+        provideCriteoPublisherId(),
         provideDeviceInfo(),
         provideAdvertisingInfo(),
         provideUserPrivacyUtil(),
@@ -319,7 +311,8 @@ public class DependencyProvider {
   @NonNull
   public RemoteConfigRequestFactory provideRemoteConfigRequestFactory() {
     return getOrCreate(RemoteConfigRequestFactory.class, () -> new RemoteConfigRequestFactory(
-        providePublisher(),
+        provideContext(),
+        provideCriteoPublisherId(),
         provideBuildConfigWrapper(),
         provideIntegrationRegistry(),
         provideAdvertisingInfo()

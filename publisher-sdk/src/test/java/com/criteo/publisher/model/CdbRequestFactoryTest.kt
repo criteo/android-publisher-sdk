@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.model
 
+import android.content.Context
 import com.criteo.publisher.bid.UniqueIdGenerator
 import com.criteo.publisher.context.ContextData
 import com.criteo.publisher.integration.IntegrationRegistry
@@ -39,9 +40,6 @@ import java.util.concurrent.atomic.AtomicInteger
 class CdbRequestFactoryTest {
 
   @Mock
-  private lateinit var publisher: Publisher
-
-  @Mock
   private lateinit var deviceInfo: DeviceInfo
 
   @Mock
@@ -59,6 +57,11 @@ class CdbRequestFactoryTest {
   @Mock
   private lateinit var integrationRegistry: IntegrationRegistry
 
+  @Mock
+  private lateinit var context: Context
+
+  private val cpId = "myCpId"
+
   private lateinit var factory: CdbRequestFactory
 
   private val adUnitId = AtomicInteger()
@@ -72,7 +75,8 @@ class CdbRequestFactoryTest {
     whenever(userPrivacyUtil.usPrivacyOptout).thenReturn("usPrivacyoptout")
 
     factory = CdbRequestFactory(
-        publisher,
+        context,
+        cpId,
         deviceInfo,
         advertisingInfo,
         userPrivacyUtil,
@@ -110,6 +114,7 @@ class CdbRequestFactoryTest {
       on { sdkVersion } doReturn "1.2.3"
     }
 
+    whenever(context.packageName).thenReturn("bundle.id")
     whenever(integrationRegistry.profileId).thenReturn(42)
     whenever(userPrivacyUtil.gdprData).thenReturn(expectedGdpr)
     whenever(uniqueIdGenerator.generateId())
@@ -119,7 +124,7 @@ class CdbRequestFactoryTest {
     val request = factory.createRequest(adUnits, contextData)
 
     assertThat(request.id).isEqualTo("myRequestId")
-    assertThat(request.publisher).isEqualTo(publisher)
+    assertThat(request.publisher).isEqualTo(Publisher.create("bundle.id", "myCpId"))
     assertThat(request.sdkVersion).isEqualTo("1.2.3")
     assertThat(request.profileId).isEqualTo(42)
     assertThat(request.gdprData).isEqualTo(expectedGdpr)
@@ -152,6 +157,7 @@ class CdbRequestFactoryTest {
       on { mopubConsent } doReturn "mopubConsent"
     }
 
+    whenever(context.packageName).thenReturn("bundle.id")
     whenever(integrationRegistry.profileId).thenReturn(1337)
     whenever(uniqueIdGenerator.generateId())
         .thenReturn("myRequestId")
@@ -160,7 +166,7 @@ class CdbRequestFactoryTest {
     var request = factory.createRequest(adUnits, contextData)
 
     assertThat(request.id).isEqualTo("myRequestId")
-    assertThat(request.publisher).isEqualTo(publisher)
+    assertThat(request.publisher).isEqualTo(Publisher.create("bundle.id", "myCpId"))
     assertThat(request.sdkVersion).isEqualTo("1.2.3")
     assertThat(request.profileId).isEqualTo(1337)
     assertThat(request.gdprData).isEqualTo(expectedGdpr)
@@ -212,6 +218,7 @@ class CdbRequestFactoryTest {
       on { sdkVersion } doReturn "1.2.3"
     }
 
+    whenever(context.packageName).thenReturn("bundle.id")
     whenever(integrationRegistry.profileId).thenReturn(1337)
 
     val request = factory.createRequest(adUnits, contextData)

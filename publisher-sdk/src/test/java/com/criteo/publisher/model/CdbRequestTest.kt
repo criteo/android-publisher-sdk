@@ -15,13 +15,10 @@
  */
 package com.criteo.publisher.model
 
-import android.content.Context
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.privacy.gdpr.GdprData
 import com.criteo.publisher.util.JsonSerializer
 import com.criteo.publisher.util.writeIntoString
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -38,13 +35,9 @@ class CdbRequestTest {
 
   @Test
   fun toJson_GivenAllInformation_MapThemToJson() {
-    val context = mock<Context>() {
-      on { packageName } doReturn "myBundleId"
-    }
-
     val request = CdbRequest.create(
         "myRequestId",
-        Publisher.create(context, "myCpId"),
+        Publisher.create("myBundleId", "myCpId"),
         User.create(
             null,
             null,
@@ -106,13 +99,9 @@ class CdbRequestTest {
 
   @Test
   fun toJson_GivenNoGdpr_DoesNotMapIt() {
-    val context = mock<Context>() {
-      on { packageName } doReturn "myBundleId"
-    }
-
     val request = CdbRequest.create(
         "myRequestId",
-        Publisher.create(context, "myCpId"),
+        Publisher.create("myBundleId", "myCpId"),
         User.create(null, null, null, null, mapOf()),
         "1.2.3",
         456,

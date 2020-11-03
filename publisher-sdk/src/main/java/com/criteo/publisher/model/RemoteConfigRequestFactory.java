@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.model;
 
+import android.content.Context;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.util.AdvertisingInfo;
@@ -24,7 +25,10 @@ import com.criteo.publisher.util.BuildConfigWrapper;
 public class RemoteConfigRequestFactory {
 
   @NonNull
-  private final Publisher publisher;
+  private final Context context;
+
+  @NonNull
+  private final String criteoPublisherId;
 
   @NonNull
   private final BuildConfigWrapper buildConfigWrapper;
@@ -36,12 +40,14 @@ public class RemoteConfigRequestFactory {
   private final AdvertisingInfo advertisingInfo;
 
   public RemoteConfigRequestFactory(
-      @NonNull Publisher publisher,
+      @NonNull Context context,
+      @NonNull String criteoPublisherId,
       @NonNull BuildConfigWrapper buildConfigWrapper,
       @NonNull IntegrationRegistry integrationRegistry,
       @NonNull AdvertisingInfo advertisingInfo
   ) {
-    this.publisher = publisher;
+    this.context = context;
+    this.criteoPublisherId = criteoPublisherId;
     this.buildConfigWrapper = buildConfigWrapper;
     this.integrationRegistry = integrationRegistry;
     this.advertisingInfo = advertisingInfo;
@@ -50,8 +56,8 @@ public class RemoteConfigRequestFactory {
   @NonNull
   public RemoteConfigRequest createRequest() {
     return RemoteConfigRequest.create(
-        publisher.getCriteoPublisherId(),
-        publisher.getBundleId(),
+        criteoPublisherId,
+        context.getPackageName(),
         buildConfigWrapper.getSdkVersion(),
         integrationRegistry.getProfileId(),
         advertisingInfo.getAdvertisingId()

@@ -42,6 +42,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import android.content.Context;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
@@ -102,9 +103,6 @@ public class BidManagerFunctionalTest {
 
   private DependencyProvider dependencyProvider;
 
-  @MockBean
-  private Publisher publisher;
-
   private SdkCache cache;
 
   @MockBean
@@ -137,6 +135,9 @@ public class BidManagerFunctionalTest {
   @SpyBean
   private DeviceInfo deviceInfo;
 
+  @SpyBean
+  private Context context;
+
   @Inject
   private AdvertisingInfo advertisingInfo;
 
@@ -153,8 +154,8 @@ public class BidManagerFunctionalTest {
 
     cache = spy(new SdkCache(dependencyProvider.provideDeviceUtil()));
 
-    when(publisher.getCriteoPublisherId()).thenReturn("cpId");
-    when(publisher.getBundleId()).thenReturn("bundle.id");
+    when(context.getPackageName()).thenReturn("bundle.id");
+    dependencyProvider.setCriteoPublisherId("cpId");
     when(config.isPrefetchOnInitEnabled()).thenReturn(true);
 
     // Should be set to at least 1 because user-level silent mode is set the 0 included
@@ -399,6 +400,11 @@ public class BidManagerFunctionalTest {
     callingCdb.accept(adUnit);
     waitForIdleState();
 
+    Publisher expectedPublisher = Publisher.create(
+        "bundle.id",
+        CriteoUtil.TEST_CP_ID
+    );
+
     User expectedUser = User.create(
         advertisingInfo.getAdvertisingId(),
         null,
@@ -408,7 +414,7 @@ public class BidManagerFunctionalTest {
     );
 
     verify(api).loadCdb(argThat(cdb -> {
-      assertThat(cdb.getPublisher()).isEqualTo(publisher);
+      assertThat(cdb.getPublisher()).isEqualTo(expectedPublisher);
       assertThat(cdb.getUser()).isEqualTo(expectedUser);
       assertThat(getRequestedAdUnits(cdb)).containsExactly(cacheAdUnit);
       assertThat(cdb.getSdkVersion()).isEqualTo("1.2.3");
