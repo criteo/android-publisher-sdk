@@ -18,12 +18,9 @@ package com.criteo.publisher.model;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.criteo.publisher.DependencyProvider;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 @AutoValue
 public abstract class User {
@@ -46,17 +43,6 @@ public abstract class User {
 
   public static TypeAdapter<User> typeAdapter(Gson gson) {
     return new AutoValue_User.GsonTypeAdapter(gson);
-  }
-
-  /**
-   * This method will be removed once {@link com.criteo.publisher.model.CdbRequest} will be migrated
-   * to AutoValue or other annotation based serialization/deserialization solution.
-   */
-  @NonNull
-  public JSONObject toJson() throws JSONException {
-    String s = DependencyProvider.getInstance().provideGson().toJson(this);
-
-    return new JSONObject(s);
   }
 
   @Nullable
