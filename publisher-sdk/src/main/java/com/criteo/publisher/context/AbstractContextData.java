@@ -23,7 +23,7 @@ import androidx.annotation.NonNull;
 import com.criteo.publisher.annotation.Incubating;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +33,7 @@ public abstract class AbstractContextData<T extends AbstractContextData<T>> {
   private final T myself = (T) this;
 
   @NonNull
-  private final Map<String, Object> data = new HashMap<>();
+  private final Map<String, Object> data = new LinkedHashMap<>();
 
   /**
    * Set a new context value in this object
