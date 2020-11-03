@@ -124,7 +124,7 @@ class CdbRequestFactoryTest {
     val request = factory.createRequest(adUnits, contextData)
 
     assertThat(request.id).isEqualTo("myRequestId")
-    assertThat(request.publisher).isEqualTo(Publisher.create("bundle.id", "myCpId"))
+    assertThat(request.publisher).isEqualTo(Publisher.create("bundle.id", "myCpId", mapOf()))
     assertThat(request.sdkVersion).isEqualTo("1.2.3")
     assertThat(request.profileId).isEqualTo(42)
     assertThat(request.gdprData).isEqualTo(expectedGdpr)
@@ -166,7 +166,7 @@ class CdbRequestFactoryTest {
     var request = factory.createRequest(adUnits, contextData)
 
     assertThat(request.id).isEqualTo("myRequestId")
-    assertThat(request.publisher).isEqualTo(Publisher.create("bundle.id", "myCpId"))
+    assertThat(request.publisher).isEqualTo(Publisher.create("bundle.id", "myCpId", mapOf()))
     assertThat(request.sdkVersion).isEqualTo("1.2.3")
     assertThat(request.profileId).isEqualTo(1337)
     assertThat(request.gdprData).isEqualTo(expectedGdpr)

@@ -37,7 +37,19 @@ class CdbRequestTest {
   fun toJson_GivenAllInformation_MapThemToJson() {
     val request = CdbRequest.create(
         "myRequestId",
-        Publisher.create("myBundleId", "myCpId"),
+        Publisher.create(
+            "myBundleId",
+            "myCpId",
+            mapOf(
+                "content" to mapOf(
+                    "url" to "https://www.criteo.com"
+                ),
+                "data" to mapOf(
+                    "a" to listOf(1, 2),
+                    "b" to 42.0
+                )
+            )
+        ),
         User.create(
             null,
             null,
@@ -68,7 +80,16 @@ class CdbRequestTest {
         "id": "myRequestId",
         "publisher": {
           "bundleId": "myBundleId",
-          "cpId": "myCpId"
+          "cpId": "myCpId",
+          "ext": {
+            "content": {
+              "url": "https://www.criteo.com"
+            },
+            "data": {
+              "a": [1, 2],
+              "b": 42.0
+            }
+          }
         },
         "user": {
           "deviceIdType": "gaid",
@@ -101,7 +122,7 @@ class CdbRequestTest {
   fun toJson_GivenNoGdpr_DoesNotMapIt() {
     val request = CdbRequest.create(
         "myRequestId",
-        Publisher.create("myBundleId", "myCpId"),
+        Publisher.create("myBundleId", "myCpId", mapOf()),
         User.create(null, null, null, null, mapOf()),
         "1.2.3",
         456,

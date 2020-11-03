@@ -21,13 +21,18 @@ import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.annotations.SerializedName;
+import java.util.Map;
 
 @AutoValue
 public abstract class Publisher {
 
   @NonNull
-  public static Publisher create(@NonNull String bundleId, @NonNull String criteoPublisherId) {
-    return new AutoValue_Publisher(bundleId, criteoPublisherId);
+  public static Publisher create(
+      @NonNull String bundleId,
+      @NonNull String criteoPublisherId,
+      @NonNull Map<String, Object> ext
+  ) {
+    return new AutoValue_Publisher(bundleId, criteoPublisherId, ext);
   }
 
   public static TypeAdapter<Publisher> typeAdapter(Gson gson) {
@@ -41,5 +46,7 @@ public abstract class Publisher {
   @SerializedName("cpId")
   public abstract String getCriteoPublisherId();
 
+  @NonNull
+  public abstract Map<String, Object> getExt();
 
 }

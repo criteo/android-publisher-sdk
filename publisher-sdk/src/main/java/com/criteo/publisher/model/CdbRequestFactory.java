@@ -85,7 +85,8 @@ public class CdbRequestFactory {
   ) {
     Publisher publisher = Publisher.create(
         context.getPackageName(),
-        criteoPublisherId
+        criteoPublisherId,
+        new HashMap<>() // TODO EE-1321
     );
 
     User user = User.create(
