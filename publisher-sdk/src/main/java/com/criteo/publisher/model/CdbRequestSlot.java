@@ -20,7 +20,6 @@ import static java.util.Collections.singletonList;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.util.AdUnitType;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
@@ -28,8 +27,6 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.annotations.SerializedName;
 import java.util.Collection;
 import java.util.List;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 @AutoValue
 public abstract class CdbRequestSlot {
@@ -76,12 +73,5 @@ public abstract class CdbRequestSlot {
   @NonNull
   @SerializedName("sizes")
   public abstract Collection<String> getSizes();
-
-  @NonNull
-  public JSONObject toJson() throws JSONException {
-    String s = DependencyProvider.getInstance().provideGson().toJson(this);
-
-    return new JSONObject(s);
-  }
 
 }
