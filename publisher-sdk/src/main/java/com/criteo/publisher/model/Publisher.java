@@ -18,13 +18,10 @@ package com.criteo.publisher.model;
 
 import android.content.Context;
 import androidx.annotation.NonNull;
-import com.criteo.publisher.DependencyProvider;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.annotations.SerializedName;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 @AutoValue
 public abstract class Publisher {
@@ -45,11 +42,5 @@ public abstract class Publisher {
   @SerializedName("cpId")
   public abstract String getCriteoPublisherId();
 
-  @NonNull
-  public JSONObject toJson() throws JSONException {
-    String s = DependencyProvider.getInstance().provideGson().toJson(this);
-
-    return new JSONObject(s);
-  }
 
 }
