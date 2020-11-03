@@ -28,6 +28,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -40,6 +41,8 @@ import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.BidManager;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
+import com.criteo.publisher.context.UserData;
+import com.criteo.publisher.context.UserDataHolder;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdUnit;
@@ -83,6 +86,9 @@ public class CriteoFunctionalTest {
 
   @SpyBean
   private BidManager bidManager;
+
+  @Inject
+  private UserDataHolder userDataHolder;
 
   @Before
   public void setUp() throws Exception {
@@ -199,6 +205,17 @@ public class CriteoFunctionalTest {
 
       return true;
     }));
+  }
+
+  @Test
+  public void setUserData_GivenUserData_StoreItForLaterUse() throws Exception {
+    UserData userData = mock(UserData.class);
+
+    givenInitializedCriteo();
+
+    Criteo.getInstance().setUserData(userData);
+
+    assertThat(userDataHolder.get()).isSameAs(userData);
   }
 
   private void waitForBids() {

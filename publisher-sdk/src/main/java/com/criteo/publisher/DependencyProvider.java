@@ -50,6 +50,7 @@ import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.concurrent.ThreadPoolExecutorFactory;
 import com.criteo.publisher.context.ConnectionTypeFetcher;
 import com.criteo.publisher.context.ContextProvider;
+import com.criteo.publisher.context.UserDataHolder;
 import com.criteo.publisher.csm.CsmBidLifecycleListener;
 import com.criteo.publisher.csm.MetricObjectQueueFactory;
 import com.criteo.publisher.csm.MetricParser;
@@ -599,6 +600,11 @@ public class DependencyProvider {
     return getOrCreate(Session.class, () -> new Session(
         provideClock()
     ));
+  }
+
+  @NonNull
+  public UserDataHolder provideUserDataHolder() {
+    return getOrCreate(UserDataHolder.class, UserDataHolder::new);
   }
 
   public interface Factory<T> {
