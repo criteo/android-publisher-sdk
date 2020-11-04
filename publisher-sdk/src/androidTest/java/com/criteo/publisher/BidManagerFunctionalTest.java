@@ -403,7 +403,7 @@ public class BidManagerFunctionalTest {
     Publisher expectedPublisher = Publisher.create(
         "bundle.id",
         CriteoUtil.TEST_CP_ID,
-        new HashMap<>() // TODO EE-1321
+        new HashMap<>()
     );
 
     User expectedUser = User.create(

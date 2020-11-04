@@ -100,7 +100,7 @@ class CdbRequestFactoryTest {
   fun createRequest_GivenInput_BuildRequest() {
     val adUnit = createAdUnit()
     val adUnits: List<CacheAdUnit> = listOf(adUnit)
-    val contextData: ContextData = mock()
+    val contextData: ContextData = ContextData().set("a.a", "foo").set("b", "bar")
     val expectedGdpr: GdprData = mock()
 
     val expectedSlot = CdbRequestSlot.create(
@@ -121,10 +121,19 @@ class CdbRequestFactoryTest {
         .thenReturn("myRequestId")
         .thenReturn("impId")
 
+    val expectedPublisher = Publisher.create(
+        "bundle.id",
+        "myCpId",
+        mapOf(
+            "a" to mapOf("a" to "foo"),
+            "b" to "bar"
+        )
+    )
+
     val request = factory.createRequest(adUnits, contextData)
 
     assertThat(request.id).isEqualTo("myRequestId")
-    assertThat(request.publisher).isEqualTo(Publisher.create("bundle.id", "myCpId", mapOf()))
+    assertThat(request.publisher).isEqualTo(expectedPublisher)
     assertThat(request.sdkVersion).isEqualTo("1.2.3")
     assertThat(request.profileId).isEqualTo(42)
     assertThat(request.gdprData).isEqualTo(expectedGdpr)
@@ -136,7 +145,7 @@ class CdbRequestFactoryTest {
     // request 1
     val adUnit = createAdUnit()
     val adUnits: List<CacheAdUnit> = listOf(adUnit)
-    val contextData: ContextData = mock()
+    val contextData: ContextData = ContextData()
     val expectedGdpr: GdprData = mock()
 
     val expectedSlot = CdbRequestSlot.create(

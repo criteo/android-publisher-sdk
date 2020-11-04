@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.model;
 
+import static com.criteo.publisher.context.ContextUtil.toMap;
 import static com.criteo.publisher.util.TextUtils.getNotEmptyOrNullValue;
 
 import android.content.Context;
@@ -87,13 +88,14 @@ public class CdbRequestFactory {
   @NonNull
   public CdbRequest createRequest(
       @NonNull List<CacheAdUnit> requestedAdUnits,
-      @SuppressWarnings("unused") // TODO EE-1321
       @NonNull ContextData contextData
   ) {
+    Map<String, Object> publisherExt = mergeToNestedMap(toMap(contextData));
+
     Publisher publisher = Publisher.create(
         context.getPackageName(),
         criteoPublisherId,
-        new HashMap<>() // TODO EE-1321
+        publisherExt
     );
 
     User user = User.create(
