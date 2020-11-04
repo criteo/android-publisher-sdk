@@ -16,8 +16,7 @@
 
 package com.criteo.publisher.context
 
-import com.criteo.publisher.annotation.Incubating
-import com.criteo.publisher.annotation.Incubating.CONTEXT
+import androidx.annotation.Keep
 import java.security.MessageDigest
 import java.util.Locale
 
@@ -34,7 +33,7 @@ object EmailHasher {
    * - Hashed with MD5 & output as ASCII text
    * - Hashed with SHA256 and output as ASCII text
    */
-  @Incubating(CONTEXT)
+  @Keep
   @JvmStatic
   fun hash(email: String): String {
     return email.trim().toLowerCase(Locale.ROOT).toHash("MD5").toHash("SHA-256")

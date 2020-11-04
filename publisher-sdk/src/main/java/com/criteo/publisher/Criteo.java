@@ -16,14 +16,12 @@
 
 package com.criteo.publisher;
 
-import static com.criteo.publisher.annotation.Incubating.CONTEXT;
-
 import android.app.Application;
 import android.util.Log;
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
-import com.criteo.publisher.annotation.Incubating;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.context.UserData;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
@@ -183,7 +181,7 @@ public abstract class Criteo {
 
   public abstract void setMopubConsent(@Nullable String mopubConsent);
 
-  @Incubating(CONTEXT)
+  @Keep
   public abstract void setUserData(@NonNull UserData userData);
 
 }

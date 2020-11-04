@@ -16,14 +16,11 @@
 
 package com.criteo.publisher;
 
-import static com.criteo.publisher.annotation.Incubating.CONTEXT;
-
 import android.util.Log;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
-import com.criteo.publisher.annotation.Incubating;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.integration.Integration;
@@ -88,7 +85,7 @@ public class CriteoInterstitial {
     loadAd(new ContextData());
   }
 
-  @Incubating(CONTEXT)
+  @Keep
   public void loadAd(@NonNull ContextData contextData) {
     if (!DependencyProvider.getInstance().isApplicationSet()) {
       Log.w(TAG, "Calling CriteoInterstitial#loadAd with a null application");

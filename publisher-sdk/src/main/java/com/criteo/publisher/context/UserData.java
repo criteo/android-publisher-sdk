@@ -16,11 +16,9 @@
 
 package com.criteo.publisher.context;
 
-import static com.criteo.publisher.annotation.Incubating.CONTEXT;
+import androidx.annotation.Keep;
 
-import com.criteo.publisher.annotation.Incubating;
-
-@Incubating(CONTEXT)
+@Keep
 public class UserData extends AbstractContextData<UserData> {
 
   /**
