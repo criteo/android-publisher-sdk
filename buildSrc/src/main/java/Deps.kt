@@ -106,6 +106,11 @@ object Deps {
     const val AdMob = "com.google.android.gms:play-services-ads:$version"
   }
 
+  object Jacoco {
+    const val version = "0.8.6"
+    const val Core = "org.jacoco:org.jacoco.core:$version"
+  }
+
   object Javax {
     object Inject {
       private const val version = "1"

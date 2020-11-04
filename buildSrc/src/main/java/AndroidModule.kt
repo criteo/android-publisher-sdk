@@ -127,6 +127,7 @@ private fun Project.defaultAndroidModule() {
       }
       create("staging") {
         initWith(debug)
+        isTestCoverageEnabled = false
       }
     }
 
@@ -145,6 +146,10 @@ private fun Project.defaultAndroidModule() {
     testOptions {
       unitTests.isReturnDefaultValues = true
     }
+
+    jacoco {
+      version = Deps.Jacoco.version
+    }
   }
 
   if (hasPublishing()) {
@@ -159,4 +164,8 @@ private fun Project.defaultAndroidModule() {
   }
 
   generateCoverageReportForJvmTests()
+
+  jacoco?.apply {
+    toolVersion = Deps.Jacoco.version
+  }
 }
