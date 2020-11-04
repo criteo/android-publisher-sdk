@@ -19,6 +19,9 @@ package com.criteo.publisher.model
 import android.content.Context
 import com.criteo.publisher.bid.UniqueIdGenerator
 import com.criteo.publisher.context.ContextData
+import com.criteo.publisher.context.ContextProvider
+import com.criteo.publisher.context.UserData
+import com.criteo.publisher.context.UserDataHolder
 import com.criteo.publisher.integration.IntegrationRegistry
 import com.criteo.publisher.privacy.UserPrivacyUtil
 import com.criteo.publisher.privacy.gdpr.GdprData
@@ -60,6 +63,11 @@ class CdbRequestFactoryTest {
   @Mock
   private lateinit var context: Context
 
+  @Mock
+  private lateinit var contextProvider: ContextProvider
+
+  private val userDataHolder = UserDataHolder()
+
   private val cpId = "myCpId"
 
   private lateinit var factory: CdbRequestFactory
@@ -82,7 +90,9 @@ class CdbRequestFactoryTest {
         userPrivacyUtil,
         uniqueIdGenerator,
         buildConfigWrapper,
-        integrationRegistry
+        integrationRegistry,
+        contextProvider,
+        userDataHolder
     )
   }
 
@@ -121,6 +131,18 @@ class CdbRequestFactoryTest {
         .thenReturn("myRequestId")
         .thenReturn("impId")
 
+    whenever(contextProvider.fetchUserContext()).thenReturn(
+        mapOf(
+            "a" to "1",
+            "b.a" to "2"
+        )
+    )
+    userDataHolder.set(
+        UserData()
+            .set("a", "skipped")
+            .set("b.b", "3")
+    )
+
     val expectedPublisher = Publisher.create(
         "bundle.id",
         "myCpId",
@@ -130,10 +152,19 @@ class CdbRequestFactoryTest {
         )
     )
 
+    val expectedUserExt = mapOf(
+        "a" to "1",
+        "b" to mapOf(
+            "a" to "2",
+            "b" to "3"
+        )
+    )
+
     val request = factory.createRequest(adUnits, contextData)
 
     assertThat(request.id).isEqualTo("myRequestId")
     assertThat(request.publisher).isEqualTo(expectedPublisher)
+    assertThat(request.user.ext()).isEqualTo(expectedUserExt)
     assertThat(request.sdkVersion).isEqualTo("1.2.3")
     assertThat(request.profileId).isEqualTo(42)
     assertThat(request.gdprData).isEqualTo(expectedGdpr)
@@ -145,7 +176,7 @@ class CdbRequestFactoryTest {
     // request 1
     val adUnit = createAdUnit()
     val adUnits: List<CacheAdUnit> = listOf(adUnit)
-    val contextData: ContextData = ContextData()
+    val contextData = ContextData()
     val expectedGdpr: GdprData = mock()
 
     val expectedSlot = CdbRequestSlot.create(

@@ -31,8 +31,10 @@ import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.network.PubSdkApi
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.check
+import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -59,6 +61,9 @@ class ContextFunctionalTest(private val integration: TestedIntegration) {
   private lateinit var context: Context
 
   @SpyBean
+  private lateinit var contextProvider: ContextProvider
+
+  @SpyBean
   private lateinit var api: PubSdkApi
 
   @Test
@@ -78,6 +83,56 @@ class ContextFunctionalTest(private val integration: TestedIntegration) {
               "data" to mapOf(
                   "foo" to "bar",
                   "baz" to 42L
+              )
+          )
+      )
+    }, any())
+  }
+
+  @Test
+  fun userExt_GivenSomeUserContext_SdkInternallyFetchSomeContext() {
+    val userData = UserData()
+        .set(UserData.HASHED_EMAIL, EmailHasher.hash("john.doe@gmail.com"))
+        .set(UserData.DEV_USER_ID, "abc123")
+        .set("data.foo", listOf("bar", "baz"))
+        .set("device.make", "ignored")
+
+    doReturn(2).whenever(contextProvider).fetchDeviceConnectionType()
+    doReturn("Apple").whenever(contextProvider).fetchDeviceMake()
+    doReturn("iPhone X").whenever(contextProvider).fetchDeviceModel()
+    doReturn(2048).whenever(contextProvider).fetchDeviceWidth()
+    doReturn(2732).whenever(contextProvider).fetchDeviceHeight()
+    doReturn(listOf("en", "he")).whenever(contextProvider).fetchUserLanguages()
+    doReturn("FR").whenever(contextProvider).fetchUserCountry()
+    doReturn("Portrait").whenever(contextProvider).fetchDeviceOrientation()
+    doReturn(45L).whenever(contextProvider).fetchSessionDuration()
+
+    givenInitializedCriteo()
+    Criteo.getInstance().setUserData(userData)
+    integration.bid(this, ContextData())
+
+    verify(api).loadCdb(check {
+      assertThat(it.user.ext()).isEqualTo(
+          mapOf(
+              "device" to mapOf(
+                  "make" to "Apple",
+                  "model" to "iPhone X",
+                  "contype" to 2,
+                  "w" to 2048,
+                  "h" to 2732
+              ),
+              "data" to mapOf(
+                  "orientation" to "Portrait",
+                  "inputLanguage" to listOf("en", "he"),
+                  "sessionDuration" to 45L,
+                  "hashedEmail" to "000e3171a5110c35c69d060112bd0ba55d9631c7c2ec93f1840e4570095b263a",
+                  "devUserId" to "abc123",
+                  "foo" to listOf("bar", "baz")
+              ),
+              "user" to mapOf(
+                  "geo" to mapOf(
+                      "country" to "FR"
+                  )
               )
           )
       )

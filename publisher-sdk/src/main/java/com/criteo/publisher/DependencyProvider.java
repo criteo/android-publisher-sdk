@@ -297,7 +297,9 @@ public class DependencyProvider {
         provideUserPrivacyUtil(),
         provideUniqueIdGenerator(),
         provideBuildConfigWrapper(),
-        provideIntegrationRegistry()
+        provideIntegrationRegistry(),
+        provideContextProvider(),
+        provideUserDataHolder()
     ));
   }
 

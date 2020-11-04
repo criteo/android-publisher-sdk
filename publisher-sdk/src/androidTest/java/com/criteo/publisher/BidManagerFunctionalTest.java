@@ -48,6 +48,7 @@ import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.concurrent.TrackingCommandsExecutorWithDelay;
 import com.criteo.publisher.context.ContextData;
+import com.criteo.publisher.context.ContextProvider;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.mock.MockBean;
@@ -143,6 +144,9 @@ public class BidManagerFunctionalTest {
 
   @Mock
   private ContextData contextData;
+
+  @MockBean
+  private ContextProvider contextProvider;
 
   private int adUnitId = 0;
 
@@ -393,6 +397,7 @@ public class BidManagerFunctionalTest {
 
     when(buildConfigWrapper.getSdkVersion()).thenReturn("1.2.3");
     when(integrationRegistry.getProfileId()).thenReturn(42);
+    when(contextProvider.fetchUserContext()).thenReturn(new HashMap<>());
 
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
@@ -411,7 +416,7 @@ public class BidManagerFunctionalTest {
         null,
         null,
         null,
-        new HashMap<>() // TODO EE-1321
+        new HashMap<>()
     );
 
     verify(api).loadCdb(argThat(cdb -> {

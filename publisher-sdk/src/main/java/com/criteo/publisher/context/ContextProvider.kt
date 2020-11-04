@@ -156,7 +156,7 @@ internal class ContextProvider(
    */
   internal fun fetchSessionDuration(): Long? = session.getDuration()
 
-  internal fun fetchUserContext(): Map<String, Any> {
+  fun fetchUserContext(): Map<String, Any> {
     return mapOf(
         DeviceMake to fetchDeviceMake(),
         DeviceModel to fetchDeviceModel(),
