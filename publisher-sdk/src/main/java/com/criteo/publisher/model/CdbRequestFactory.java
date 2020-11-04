@@ -24,13 +24,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.bid.UniqueIdGenerator;
 import com.criteo.publisher.context.ContextData;
+import com.criteo.publisher.context.ContextProvider;
+import com.criteo.publisher.context.UserDataHolder;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -65,6 +66,12 @@ public class CdbRequestFactory {
   @NonNull
   private final IntegrationRegistry integrationRegistry;
 
+  @NonNull
+  private final ContextProvider contextProvider;
+
+  @NonNull
+  private final UserDataHolder userDataHolder;
+
   public CdbRequestFactory(
       @NonNull Context context,
       @NonNull String criteoPublisherId,
@@ -73,7 +80,9 @@ public class CdbRequestFactory {
       @NonNull UserPrivacyUtil userPrivacyUtil,
       @NonNull UniqueIdGenerator uniqueIdGenerator,
       @NonNull BuildConfigWrapper buildConfigWrapper,
-      @NonNull IntegrationRegistry integrationRegistry
+      @NonNull IntegrationRegistry integrationRegistry,
+      @NonNull ContextProvider contextProvider,
+      @NonNull UserDataHolder userDataHolder
   ) {
     this.context = context;
     this.criteoPublisherId = criteoPublisherId;
@@ -83,6 +92,8 @@ public class CdbRequestFactory {
     this.uniqueIdGenerator = uniqueIdGenerator;
     this.buildConfigWrapper = buildConfigWrapper;
     this.integrationRegistry = integrationRegistry;
+    this.contextProvider = contextProvider;
+    this.userDataHolder = userDataHolder;
   }
 
   @NonNull
@@ -98,12 +109,17 @@ public class CdbRequestFactory {
         publisherExt
     );
 
+    Map<String, Object> userExt = mergeToNestedMap(
+        contextProvider.fetchUserContext(),
+        toMap(userDataHolder.get())
+    );
+
     User user = User.create(
         advertisingInfo.getAdvertisingId(),
         getNotEmptyOrNullValue(userPrivacyUtil.getMopubConsent()),
         getNotEmptyOrNullValue(userPrivacyUtil.getIabUsPrivacyString()),
         getNotEmptyOrNullValue(userPrivacyUtil.getUsPrivacyOptout()),
-        new HashMap<>() // TODO EE-1321
+        userExt
     );
 
     return CdbRequest.create(
