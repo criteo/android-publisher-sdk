@@ -18,6 +18,7 @@ buildscript {
   addDefaultInputRepository()
 
   dependencies {
+    classpath(Deps.Jacoco.Core)
     classpath(Deps.Android.GradlePlugin)
     classpath(Deps.Kotlin.GradlePlugin)
     classpath(Deps.Kotlin.AllOpenPlugin)
