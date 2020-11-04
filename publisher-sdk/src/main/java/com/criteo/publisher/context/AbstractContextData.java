@@ -16,11 +16,10 @@
 
 package com.criteo.publisher.context;
 
-import static com.criteo.publisher.annotation.Incubating.CONTEXT;
 import static java.util.Collections.unmodifiableList;
 
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
-import com.criteo.publisher.annotation.Incubating;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -42,7 +41,7 @@ public abstract class AbstractContextData<T extends AbstractContextData<T>> {
    * @param value new value for the given key
    * @return <code>this</code> to chain calls
    */
-  @Incubating(CONTEXT)
+  @Keep
   public T set(@NonNull String key, @NonNull String value) {
     data.put(key, value);
     return myself;
@@ -55,7 +54,7 @@ public abstract class AbstractContextData<T extends AbstractContextData<T>> {
    * @param value new value for the given key
    * @return <code>this</code> to chain calls
    */
-  @Incubating(CONTEXT)
+  @Keep
   public T set(@NonNull String key, @NonNull Iterable<String> value) {
     // Copy data so it becomes constant
     List<String> list = new ArrayList<>();
@@ -74,7 +73,7 @@ public abstract class AbstractContextData<T extends AbstractContextData<T>> {
    * @param value new value for the given key
    * @return <code>this</code> to chain calls
    */
-  @Incubating(CONTEXT)
+  @Keep
   public T set(@NonNull String key, long value) {
     data.put(key, value);
     return myself;
@@ -87,7 +86,7 @@ public abstract class AbstractContextData<T extends AbstractContextData<T>> {
    * @param value new value for the given key
    * @return <code>this</code> to chain calls
    */
-  @Incubating(CONTEXT)
+  @Keep
   public T set(@NonNull String key, double value) {
     data.put(key, value);
     return myself;

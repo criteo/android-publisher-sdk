@@ -2,6 +2,7 @@
 
 - Features
   - Add a constructor without `NativeAdUnit` in `CriteoNativeLoader` for InHouse integration
+  - Add API to collect different levels of signals which will be used to bid based on context
 
 # Version 4.0.0
 
