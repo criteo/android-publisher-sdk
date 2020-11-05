@@ -38,7 +38,6 @@ android {
 
     packagingOptions {
         exclude("META-INF/mediation_release.kotlin_module")
-        pickFirst("jacoco-agent.properties")
     }
 
     defaultConfig {

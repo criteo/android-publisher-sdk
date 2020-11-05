@@ -107,7 +107,7 @@ object Deps {
   }
 
   object Jacoco {
-    const val version = "0.8.6"
+    const val version = "0.8.4"
     const val Core = "org.jacoco:org.jacoco.core:$version"
   }
 
