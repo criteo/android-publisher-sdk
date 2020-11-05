@@ -127,7 +127,6 @@ private fun Project.defaultAndroidModule() {
       }
       create("staging") {
         initWith(debug)
-        isTestCoverageEnabled = false
       }
     }
 
