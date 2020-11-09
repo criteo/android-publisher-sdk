@@ -16,14 +16,17 @@
 
 package com.criteo.publisher.context
 
+import android.Manifest.permission.READ_PHONE_STATE
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.telephony.TelephonyManager
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
+import androidx.core.content.ContextCompat
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.logging.LoggerFactory
 
@@ -57,8 +60,10 @@ internal class ConnectionTypeFetcher(
       networkCapabilities == null -> null
       isWired(networkCapabilities) -> ConnectionType.WIRED
       isWifi(networkCapabilities) -> ConnectionType.WIFI
-      // Impossible to get a more precise information without having the dangerous READ_PHONE_STATE permission
-      isCellular(networkCapabilities) -> ConnectionType.CELLULAR_UNKNOWN
+      isCellular(networkCapabilities) -> {
+        val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as? TelephonyManager
+        fetchNewCellularConnectionType(telephonyManager)
+      }
       else -> null
     }
   }
@@ -90,6 +95,24 @@ internal class ConnectionTypeFetcher(
       ConnectivityManager.TYPE_MOBILE -> networkInfo.subtype.toConnectionType()
       else -> null
     }
+  }
+
+  // The SDK won't ask for the permission. It uses it only if publisher's app already got granted for it.
+  @SuppressLint("MissingPermission")
+  @VisibleForTesting
+  internal fun fetchNewCellularConnectionType(telephonyManager: TelephonyManager?): ConnectionType {
+    return if (telephonyManager == null || !checkReadPhoneStatePermission()) {
+      // Impossible to get a more precise information without having the dangerous READ_PHONE_STATE permission
+      ConnectionType.CELLULAR_UNKNOWN
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      telephonyManager.dataNetworkType.toConnectionType()
+    } else {
+      telephonyManager.networkType.toConnectionType()
+    }
+  }
+
+  private fun checkReadPhoneStatePermission(): Boolean {
+    return ContextCompat.checkSelfPermission(context, READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED
   }
 
   /**

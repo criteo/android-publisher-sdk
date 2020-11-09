@@ -16,7 +16,9 @@
 
 package com.criteo.publisher.context
 
+import android.Manifest.permission.READ_PHONE_STATE
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.ConnectivityManager.TYPE_BLUETOOTH
 import android.net.ConnectivityManager.TYPE_ETHERNET
@@ -43,8 +45,10 @@ import com.nhaarman.mockitokotlin2.KStubbing
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.doThrow
+import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
+import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
@@ -215,7 +219,7 @@ class ConnectionTypeFetcherTest {
   }
 
   @Test
-  fun fetchConnectionType_DeprecatedWayNotWorking_CellularCapabilities_ReturnExpectedUnknownCellular() {
+  fun fetchConnectionType_DeprecatedWayNotWorking_CellularCapabilities_UseNewWayOfGettingCellularConnectionType() {
     val network = mock<Network>()
     val networkCapabilities = NetworkCapabilities(null)
     doReturn(true).whenever(connectionTypeFetcher).isCellular(networkCapabilities)
@@ -226,10 +230,71 @@ class ConnectionTypeFetcherTest {
     }
 
     givenDeprecatedWayNotWorking()
+    doReturn(CELLULAR_5G).whenever(connectionTypeFetcher).fetchNewCellularConnectionType(any())
 
     val connectionType = connectionTypeFetcher.fetchConnectionType()
 
+    assertThat(connectionType).isEqualTo(CELLULAR_5G)
+  }
+
+  @Test
+  fun fetchNewCellularConnectionType_NoTelephony_ReturnUnknownCellular() {
+    val connectionType = connectionTypeFetcher.fetchNewCellularConnectionType(null)
+
     assertThat(connectionType).isEqualTo(CELLULAR_UNKNOWN)
+  }
+
+  @Test
+  fun fetchNewCellularConnectionType_NoPermission_ReturnUnknownCellular() {
+    val telephonyManager = mock<TelephonyManager>()
+
+    doReturn(PackageManager.PERMISSION_DENIED).whenever(context).checkPermission(eq(READ_PHONE_STATE), any(), any())
+
+    val connectionType = connectionTypeFetcher.fetchNewCellularConnectionType(telephonyManager)
+
+    assertThat(connectionType).isEqualTo(CELLULAR_UNKNOWN)
+    verifyZeroInteractions(telephonyManager)
+  }
+
+  @Test
+  fun fetchNewCellularConnectionType_HavingPermission_ReturnExpectedCellularType() {
+    fetchNewCellularConnectionType_HavingPermission_ReturnExpectedCellularType(
+        NETWORK_TYPE_UNKNOWN,
+        expected = CELLULAR_UNKNOWN
+    )
+
+    cellular2GTypes.forEach {
+      fetchNewCellularConnectionType_HavingPermission_ReturnExpectedCellularType(it, expected = CELLULAR_2G)
+    }
+
+    cellular3GTypes.forEach {
+      fetchNewCellularConnectionType_HavingPermission_ReturnExpectedCellularType(it, expected = CELLULAR_3G)
+    }
+
+    cellular4GTypes.forEach {
+      fetchNewCellularConnectionType_HavingPermission_ReturnExpectedCellularType(it, expected = CELLULAR_4G)
+    }
+
+    fetchNewCellularConnectionType_HavingPermission_ReturnExpectedCellularType(
+        NETWORK_TYPE_NR,
+        expected = CELLULAR_5G
+    )
+  }
+
+  private fun fetchNewCellularConnectionType_HavingPermission_ReturnExpectedCellularType(
+      networkType: Int,
+      expected: ConnectionType
+  ) {
+    val telephonyManager = mock<TelephonyManager>() {
+      on { dataNetworkType } doReturn networkType
+      on { getNetworkType() } doReturn networkType
+    }
+
+    doReturn(PackageManager.PERMISSION_GRANTED).whenever(context).checkPermission(eq(READ_PHONE_STATE), any(), any())
+
+    val connectionType = connectionTypeFetcher.fetchNewCellularConnectionType(telephonyManager)
+
+    assertThat(connectionType).isEqualTo(expected)
   }
 
   private fun givenMockedConnectivityService(
