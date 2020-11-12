@@ -16,9 +16,11 @@
 
 package com.criteo.publisher;
 
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.UiThread;
 
+@Keep
 public interface CriteoBannerAdListener extends CriteoAdListener {
 
   /**

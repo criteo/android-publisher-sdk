@@ -34,6 +34,7 @@ import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.util.PreconditionsUtil;
 
+@Keep
 public class CriteoBannerView extends WebView {
   private static final String TAG = CriteoBannerView.class.getSimpleName();
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -142,7 +143,6 @@ public class CriteoBannerView extends WebView {
     loadAd(new ContextData());
   }
 
-  @Keep
   public void loadAd(@NonNull ContextData contextData) {
     try {
       doLoadAd(contextData);
@@ -151,7 +151,6 @@ public class CriteoBannerView extends WebView {
     }
   }
 
-  @Keep
   public void loadAdWithDisplayData(@NonNull String displayData) {
     getOrCreateController().notifyFor(CriteoListenerCode.VALID);
     getOrCreateController().displayAd(displayData);

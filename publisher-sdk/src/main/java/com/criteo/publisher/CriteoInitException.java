@@ -16,6 +16,9 @@
 
 package com.criteo.publisher;
 
+import androidx.annotation.Keep;
+
+@Keep
 public final class CriteoInitException extends Exception {
 
   public CriteoInitException(String message, Throwable throwable) {

@@ -32,10 +32,12 @@ import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.util.DeviceUtil;
 import java.util.List;
 
+@Keep
 public abstract class Criteo {
   private static final String TAG = Criteo.class.getSimpleName();
   private static Criteo criteo;
 
+  @Keep
   public static class Builder {
 
     @NonNull
@@ -181,7 +183,6 @@ public abstract class Criteo {
 
   public abstract void setMopubConsent(@Nullable String mopubConsent);
 
-  @Keep
   public abstract void setUserData(@NonNull UserData userData);
 
 }
