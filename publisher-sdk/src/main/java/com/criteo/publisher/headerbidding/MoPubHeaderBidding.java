@@ -20,6 +20,8 @@ import static com.criteo.publisher.util.ReflectionUtil.isInstanceOf;
 
 import androidx.annotation.NonNull;
 import com.criteo.publisher.integration.Integration;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.ReflectionUtil;
@@ -40,6 +42,8 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler {
       CRT_DISPLAY_URL,
       CRT_SIZE
   );
+
+  public final Logger logger = LoggerFactory.getLogger(getClass());
 
   public boolean canHandle(@NonNull Object object) {
     return isInstanceOf(object, MOPUB_ADVIEW_CLASS)
@@ -99,11 +103,6 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler {
     }
 
     StringBuilder keywords = new StringBuilder();
-    Object existingKeywords = ReflectionUtil.callMethodOnObject(object, "getKeywords");
-    if (existingKeywords != null) {
-      keywords.append(existingKeywords);
-      keywords.append(",");
-    }
     keywords.append(CRT_CPM);
     keywords.append(":");
     keywords.append(slot.getCpm());
@@ -119,7 +118,17 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler {
       keywords.append(slot.getWidth()).append("x").append(slot.getHeight());
     }
 
-    ReflectionUtil.callMethodOnObject(object, "setKeywords", keywords.toString());
+    Object existingKeywords = ReflectionUtil.callMethodOnObject(object, "getKeywords");
+    String newKeywords;
+    if (existingKeywords != null) {
+      newKeywords = existingKeywords + "," + keywords.toString();
+    } else {
+      newKeywords = keywords.toString();
+    }
+
+    ReflectionUtil.callMethodOnObject(object, "setKeywords", newKeywords);
+
+    logger.log(AppBiddingLogMessage.onAdObjectEnrichedSuccessfully(getIntegration(), keywords.toString()));
   }
 
 }

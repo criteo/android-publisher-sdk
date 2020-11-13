@@ -18,6 +18,8 @@ package com.criteo.publisher.headerbidding;
 
 import androidx.annotation.NonNull;
 import com.criteo.publisher.integration.Integration;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.util.AdUnitType;
 import java.util.Map;
@@ -27,6 +29,8 @@ public class OtherAdServersHeaderBidding implements HeaderBiddingHandler {
   private static final String CRT_CPM = "crt_cpm";
   private static final String CRT_DISPLAY_URL = "crt_displayUrl";
   private static final String CRT_SIZE = "crt_size";
+
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
   public boolean canHandle(@NonNull Object object) {
@@ -67,9 +71,15 @@ public class OtherAdServersHeaderBidding implements HeaderBiddingHandler {
     map.put(CRT_DISPLAY_URL, slot.getDisplayUrl());
     map.put(CRT_CPM, slot.getCpm());
 
+    String description = CRT_DISPLAY_URL + "=" + slot.getDisplayUrl() + "," + CRT_CPM + "=" + slot.getCpm();
+
     if (adUnitType == AdUnitType.CRITEO_BANNER) {
-      map.put(CRT_SIZE, slot.getWidth() + "x" + slot.getHeight());
+      String size = slot.getWidth() + "x" + slot.getHeight();
+      map.put(CRT_SIZE, size);
+      description = description + "," + CRT_SIZE + "=" + size;
     }
+
+    logger.log(AppBiddingLogMessage.onAdObjectEnrichedSuccessfully(getIntegration(), description));
   }
 
 }
