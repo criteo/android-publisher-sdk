@@ -20,6 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.context.ContextData;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponseSlot;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +33,8 @@ import org.jetbrains.annotations.NotNull;
  * <code>ConsumableBid</code> because it is part of the public API.
  */
 public class ConsumableBidLoader {
+
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @NonNull
   private final BidManager bidManager;
@@ -69,6 +73,8 @@ public class ConsumableBidLoader {
       }
 
       private void responseBid(@Nullable Bid bid) {
+        logger.log(BiddingLogMessage.onConsumableBidLoaded(adUnit, bid));
+
         // The bid object is used for AppBidding and InHouse.
         // For MoPub AppBidding, it is mandatory to be on the main thread.
         // For InHouse, it is preferable.
