@@ -34,7 +34,7 @@ public class Logger {
       @NonNull Class<?> klass,
       @NonNull BuildConfigWrapper buildConfigWrapper
   ) {
-    this.tag = klass.getSimpleName();
+    this.tag = "Crto" + klass.getSimpleName();
     this.buildConfigWrapper = buildConfigWrapper;
   }
 

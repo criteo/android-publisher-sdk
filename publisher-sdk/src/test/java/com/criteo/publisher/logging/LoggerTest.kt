@@ -18,7 +18,15 @@ package com.criteo.publisher.logging
 
 import android.util.Log
 import com.criteo.publisher.util.BuildConfigWrapper
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.anyOrNull
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.inOrder
+import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.spy
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
@@ -92,13 +100,32 @@ class LoggerTest {
     verify(logger).println(Log.INFO, "Hello World")
   }
 
-
   @Test
   fun info_GivenMinLogLevelHigherThanInfo_IgnoreLog() {
     whenever(buildConfigWrapper.minLogLevel).doReturn(Log.WARN)
     val logger = spy(Logger(javaClass, buildConfigWrapper))
 
     logger.info("Hello")
+
+    verify(logger, never()).println(any(), any())
+  }
+
+  @Test
+  fun warning_GivenMessageAndArgs_PrintFormattedMessage() {
+    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.INFO)
+    val logger = spy(Logger(javaClass, buildConfigWrapper))
+
+    logger.warning("Hello %s", "World")
+
+    verify(logger).println(Log.WARN, "Hello World")
+  }
+
+  @Test
+  fun warning_GivenMinLogLevelHigherThanInfo_IgnoreLog() {
+    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.ERROR)
+    val logger = spy(Logger(javaClass, buildConfigWrapper))
+
+    logger.warning("Hello")
 
     verify(logger, never()).println(any(), any())
   }
