@@ -19,7 +19,6 @@ package com.criteo.publisher;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.webkit.WebView;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
@@ -36,13 +35,11 @@ import com.criteo.publisher.util.PreconditionsUtil;
 
 @Keep
 public class CriteoBannerView extends WebView {
-  private static final String TAG = CriteoBannerView.class.getSimpleName();
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private static final int UNSET_DIMENSION_VALUE = -1;
 
   @Nullable
-  @VisibleForTesting
   final BannerAdUnit bannerAdUnit;
 
   /**
@@ -103,6 +100,8 @@ public class CriteoBannerView extends WebView {
     } finally {
       a.recycle();
     }
+
+    logger.log(BannerLogMessage.onBannerViewInitialized(bannerAdUnit));
   }
 
   /**
@@ -128,6 +127,7 @@ public class CriteoBannerView extends WebView {
     super(context);
     this.bannerAdUnit = bannerAdUnit;
     this.criteo = criteo;
+    logger.log(BannerLogMessage.onBannerViewInitialized(bannerAdUnit));
   }
 
   public void setCriteoBannerAdListener(@Nullable CriteoBannerAdListener criteoBannerAdListener) {
@@ -147,7 +147,7 @@ public class CriteoBannerView extends WebView {
     try {
       doLoadAd(contextData);
     } catch (Throwable tr) {
-      Log.e(TAG, "Internal error while loading banner.", tr);
+      logger.error("Internal error while loading banner.", tr);
     }
   }
 
@@ -157,6 +157,7 @@ public class CriteoBannerView extends WebView {
   }
 
   private void doLoadAd(@NonNull ContextData contextData) {
+    logger.log(BannerLogMessage.onBannerViewLoading(this));
     getIntegrationRegistry().declare(Integration.STANDALONE);
     getOrCreateController().fetchAdAsync(bannerAdUnit, contextData);
   }
@@ -165,11 +166,12 @@ public class CriteoBannerView extends WebView {
     try {
       doLoadAd(bid);
     } catch (Throwable tr) {
-      Log.e(TAG, "Internal error while loading banner from bid token.", tr);
+      logger.error("Internal error while loading banner from bid token.", tr);
     }
   }
 
   private void doLoadAd(@Nullable Bid bid) {
+    logger.log(BannerLogMessage.onBannerViewLoading(this, bid));
     getIntegrationRegistry().declare(Integration.IN_HOUSE);
     getOrCreateController().fetchAdAsync(bid);
   }
