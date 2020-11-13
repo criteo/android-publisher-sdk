@@ -22,9 +22,14 @@ import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoListenerCode;
+import com.criteo.publisher.BannerLogMessage;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import java.lang.ref.Reference;
 
 public class CriteoBannerListenerCallTask implements Runnable {
+
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Nullable
   private final CriteoBannerAdListener listener;
@@ -52,6 +57,12 @@ public class CriteoBannerListenerCallTask implements Runnable {
   @Override
   public void run() {
     CriteoBannerView bannerView = bannerViewRef.get();
+
+    if (code == CriteoListenerCode.INVALID) {
+      logger.log(BannerLogMessage.onBannerViewFailedToLoad(bannerView));
+    } else if (code == CriteoListenerCode.VALID) {
+      logger.log(BannerLogMessage.onBannerViewLoaded(bannerView));
+    }
 
     // If banner is null, it means that publisher released it.
     if (listener == null || bannerView == null) {

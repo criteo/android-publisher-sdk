@@ -18,13 +18,16 @@ package com.criteo.publisher.logging
 
 import android.app.Application
 import android.content.Context
+import com.criteo.publisher.BannerLogMessage
 import com.criteo.publisher.Bid
 import com.criteo.publisher.BiddingLogMessage
 import com.criteo.publisher.Criteo
+import com.criteo.publisher.CriteoBannerView
 import com.criteo.publisher.CriteoUtil.givenInitializedCriteo
 import com.criteo.publisher.SdkInitLogMessage
 import com.criteo.publisher.TestAdUnits.BANNER_320_50
 import com.criteo.publisher.TestAdUnits.BANNER_UNKNOWN
+import com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait
 import com.criteo.publisher.headerbidding.AppBiddingLogMessage
 import com.criteo.publisher.integration.Integration.CUSTOM_APP_BIDDING
 import com.criteo.publisher.integration.Integration.GAM_APP_BIDDING
@@ -221,5 +224,65 @@ class DebugLoggingFunctionalTest {
     mockedDependenciesRule.waitForIdleState()
 
     verify(logger).log(BiddingLogMessage.onConsumableBidLoaded(BANNER_320_50, bidRef.get()))
+  }
+
+  @Test
+  fun whenLoadingBannerForStandalone_ValidBid_LogSuccess() {
+    givenInitializedCriteo(BANNER_320_50)
+    mockedDependenciesRule.waitForIdleState()
+
+    val bannerView = callOnMainThreadAndWait { CriteoBannerView(context, BANNER_320_50) }
+    bannerView.loadAd()
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(logger).log(BannerLogMessage.onBannerViewInitialized(BANNER_320_50))
+    verify(logger).log(BannerLogMessage.onBannerViewLoading(bannerView))
+    verify(logger).log(BannerLogMessage.onBannerViewLoaded(bannerView))
+  }
+
+  @Test
+  fun whenLoadingBannerForStandalone_NoBid_LogFailure() {
+    givenInitializedCriteo()
+    mockedDependenciesRule.waitForIdleState()
+
+    val bannerView = callOnMainThreadAndWait { CriteoBannerView(context, BANNER_UNKNOWN) }
+    bannerView.loadAd()
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(logger).log(BannerLogMessage.onBannerViewInitialized(BANNER_UNKNOWN))
+    verify(logger).log(BannerLogMessage.onBannerViewLoading(bannerView))
+    verify(logger).log(BannerLogMessage.onBannerViewFailedToLoad(bannerView))
+  }
+
+  @Test
+  fun whenLoadingBannerForInHouse_ValidBid_LogSuccess() {
+    lateinit var bid: Bid
+    givenInitializedCriteo(BANNER_320_50)
+    mockedDependenciesRule.waitForIdleState()
+
+    val bannerView = callOnMainThreadAndWait { CriteoBannerView(context) }
+    Criteo.getInstance().loadBid(BANNER_320_50) {
+      bid = it!!
+      bannerView.loadAd(it)
+    }
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(logger).log(BannerLogMessage.onBannerViewInitialized(null))
+    verify(logger).log(BannerLogMessage.onBannerViewLoading(bannerView, bid))
+    verify(logger).log(BannerLogMessage.onBannerViewLoaded(bannerView))
+  }
+
+  @Test
+  fun whenLoadingBannerForInHouse_NoBid_LogFailure() {
+    givenInitializedCriteo()
+    mockedDependenciesRule.waitForIdleState()
+
+    val bannerView = callOnMainThreadAndWait { CriteoBannerView(context) }
+    Criteo.getInstance().loadBid(BANNER_UNKNOWN, bannerView::loadAd)
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(logger).log(BannerLogMessage.onBannerViewInitialized(null))
+    verify(logger).log(BannerLogMessage.onBannerViewLoading(bannerView, null))
+    verify(logger).log(BannerLogMessage.onBannerViewFailedToLoad(bannerView))
   }
 }
