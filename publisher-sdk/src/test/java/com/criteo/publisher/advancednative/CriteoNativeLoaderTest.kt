@@ -34,7 +34,6 @@ import com.criteo.publisher.model.NativeAdUnit
 import com.criteo.publisher.model.nativeads.NativeAssets
 import com.criteo.publisher.util.BuildConfigWrapper
 import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.argThat
 import com.nhaarman.mockitokotlin2.doAnswer
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.doThrow
@@ -254,7 +253,7 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
   private fun givenNativeBidAvailable(): CriteoNativeAd {
     val nativeAssets = mock<NativeAssets>()
     val nativeAd = mock<CriteoNativeAd>()
-    val slot = mock<CdbResponseSlot>() {
+    val slot = mock<CdbResponseSlot> {
       on { this.nativeAssets } doReturn nativeAssets
     }
 
@@ -263,13 +262,13 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
     }.whenever(bidManager).getBidForAdUnit(eq(adUnit), eq(contextData), any())
 
     nativeAdMapper.stub {
-      on { map(eq(nativeAssets), argThat { listener == get() }, any()) } doReturn nativeAd
+      on { map(eq(nativeAssets), any(), any()) } doReturn nativeAd
     }
     return nativeAd
   }
 
   private fun givenNotANativeBidAvailable() {
-    val slot = mock<CdbResponseSlot>() {
+    val slot = mock<CdbResponseSlot> {
       on { nativeAssets } doReturn null
     }
 

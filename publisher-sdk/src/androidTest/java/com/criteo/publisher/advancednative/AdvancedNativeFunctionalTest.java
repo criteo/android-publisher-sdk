@@ -30,6 +30,8 @@ import static com.criteo.publisher.activity.TestNativeActivity.PRIVACY_LEGAL_TEX
 import static com.criteo.publisher.activity.TestNativeActivity.PRODUCT_IMAGE_TAG;
 import static com.criteo.publisher.activity.TestNativeActivity.RECYCLER_VIEW_TAG;
 import static com.criteo.publisher.activity.TestNativeActivity.TITLE_TAG;
+import static com.criteo.publisher.advancednative.NativeLogMessage.onNativeClicked;
+import static com.criteo.publisher.advancednative.NativeLogMessage.onNativeImpressionRegistered;
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -41,6 +43,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.verify;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,24 +56,27 @@ import com.criteo.publisher.activity.TestNativeActivity;
 import com.criteo.publisher.adview.Redirection;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.integration.Integration;
+import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
+import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeProduct;
 import com.criteo.publisher.network.PubSdkApi;
 import javax.inject.Inject;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 public class AdvancedNativeFunctionalTest {
 
   @Rule
-  public ActivityTestRule<TestNativeActivity> activityRule = new ActivityTestRule<>(
-      TestNativeActivity.class);
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule().withMockedLogger();
 
   @Rule
-  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+  public ActivityTestRule<TestNativeActivity> activityRule = new ActivityTestRule<>(
+      TestNativeActivity.class, false, false);
 
   @Inject
   private AdChoiceOverlay adChoiceOverlay;
@@ -80,6 +86,16 @@ public class AdvancedNativeFunctionalTest {
 
   @SpyBean
   private PubSdkApi api;
+
+  private Logger logger;
+
+  @Before
+  public void setUp() {
+    // Start activity only there so beans are properly injected
+    activityRule.launchActivity(new Intent());
+
+    logger = mockedDependenciesRule.getMockedLogger();
+  }
 
   @Test
   public void loadStandaloneAdInAdLayout_GivenValidBid_DisplayAllInformationInViews()
@@ -101,6 +117,9 @@ public class AdvancedNativeFunctionalTest {
         argThat(request -> request.getProfileId() == Integration.STANDALONE.getProfileId()),
         any()
     );
+
+    verify(logger).log(onNativeImpressionRegistered(NATIVE));
+    verify(logger, atLeastOnce()).log(onNativeClicked(NATIVE));
   }
 
   @Test
@@ -122,6 +141,9 @@ public class AdvancedNativeFunctionalTest {
         argThat(request -> request.getProfileId() == Integration.IN_HOUSE.getProfileId()),
         any()
     );
+
+    verify(logger).log(onNativeImpressionRegistered((NativeAdUnit) null));
+    verify(logger, atLeastOnce()).log(onNativeClicked((NativeAdUnit) null));
   }
 
   @Test
