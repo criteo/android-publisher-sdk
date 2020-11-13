@@ -32,6 +32,9 @@ import com.criteo.publisher.CriteoListenerCode.VALID
 import com.criteo.publisher.SafeRunnable
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
+import com.criteo.publisher.interstitial.InterstitialLogMessage
+import com.criteo.publisher.logging.Logger
+import com.criteo.publisher.logging.LoggerFactory
 import java.lang.ref.Reference
 import java.lang.ref.WeakReference
 
@@ -41,6 +44,8 @@ class InterstitialListenerNotifier @VisibleForTesting internal constructor(
     private val listenerRef: Reference<CriteoInterstitialAdListener>,
     private val runOnUiThreadExecutor: RunOnUiThreadExecutor
 ) {
+
+  private val logger = LoggerFactory.getLogger(javaClass)
 
   constructor(
       interstitial: CriteoInterstitial,
@@ -53,6 +58,7 @@ class InterstitialListenerNotifier @VisibleForTesting internal constructor(
   )
 
   fun notifyFor(code: CriteoListenerCode) {
+    logger.notifyFor(code)
     runOnUiThreadExecutor.executeAsync(object : SafeRunnable() {
       override fun runSafely() {
         listenerRef.get()?.notifyFor(code)
@@ -72,6 +78,14 @@ class InterstitialListenerNotifier @VisibleForTesting internal constructor(
         onAdClicked()
         onAdLeftApplication()
       }
+    }
+  }
+
+  private fun Logger.notifyFor(code: CriteoListenerCode) {
+    if (code == VALID) {
+      log(InterstitialLogMessage.onInterstitialLoaded(interstitial))
+    } else if (code == INVALID || code == INVALID_CREATIVE) {
+      log(InterstitialLogMessage.onInterstitialFailedToLoad(interstitial))
     }
   }
 }

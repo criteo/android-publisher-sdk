@@ -54,6 +54,10 @@ public class Logger {
     log(formattedLogMessage(Log.INFO, message, args));
   }
 
+  public void warning(String message, Object... args) {
+    log(formattedLogMessage(Log.WARN, message, args));
+  }
+
   public void error(Throwable thrown) {
     log(simpleLogMessage(Log.ERROR, null, thrown));
   }

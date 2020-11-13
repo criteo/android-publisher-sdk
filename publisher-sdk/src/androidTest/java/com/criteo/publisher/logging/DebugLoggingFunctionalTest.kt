@@ -23,15 +23,19 @@ import com.criteo.publisher.Bid
 import com.criteo.publisher.BiddingLogMessage
 import com.criteo.publisher.Criteo
 import com.criteo.publisher.CriteoBannerView
+import com.criteo.publisher.CriteoInterstitial
 import com.criteo.publisher.CriteoUtil.givenInitializedCriteo
 import com.criteo.publisher.SdkInitLogMessage
 import com.criteo.publisher.TestAdUnits.BANNER_320_50
 import com.criteo.publisher.TestAdUnits.BANNER_UNKNOWN
+import com.criteo.publisher.TestAdUnits.INTERSTITIAL
+import com.criteo.publisher.TestAdUnits.INTERSTITIAL_UNKNOWN
 import com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait
 import com.criteo.publisher.headerbidding.AppBiddingLogMessage
 import com.criteo.publisher.integration.Integration.CUSTOM_APP_BIDDING
 import com.criteo.publisher.integration.Integration.GAM_APP_BIDDING
 import com.criteo.publisher.integration.Integration.MOPUB_APP_BIDDING
+import com.criteo.publisher.interstitial.InterstitialLogMessage
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.model.AdSize
@@ -284,5 +288,76 @@ class DebugLoggingFunctionalTest {
     verify(logger).log(BannerLogMessage.onBannerViewInitialized(null))
     verify(logger).log(BannerLogMessage.onBannerViewLoading(bannerView, null))
     verify(logger).log(BannerLogMessage.onBannerViewFailedToLoad(bannerView))
+  }
+
+  @Test
+  fun whenLoadingInterstitialForStandalone_ValidBid_LogSuccess() {
+    givenInitializedCriteo(INTERSTITIAL)
+    mockedDependenciesRule.waitForIdleState()
+
+    val interstitial = CriteoInterstitial(INTERSTITIAL)
+    interstitial.loadAd()
+    mockedDependenciesRule.waitForIdleState()
+
+    if (interstitial.isAdLoaded) {
+      interstitial.show()
+    }
+
+    verify(logger).log(InterstitialLogMessage.onInterstitialInitialized(INTERSTITIAL))
+    verify(logger).log(InterstitialLogMessage.onInterstitialLoading(interstitial))
+    verify(logger).log(InterstitialLogMessage.onInterstitialLoaded(interstitial))
+    verify(logger).log(InterstitialLogMessage.onCheckingIfInterstitialIsLoaded(interstitial, true))
+    verify(logger).log(InterstitialLogMessage.onInterstitialShowing(interstitial))
+  }
+
+  @Test
+  fun whenLoadingInterstitialForStandalone_NoBid_LogFailure() {
+    givenInitializedCriteo(INTERSTITIAL_UNKNOWN)
+    mockedDependenciesRule.waitForIdleState()
+
+    val interstitial = CriteoInterstitial(INTERSTITIAL_UNKNOWN)
+    interstitial.loadAd()
+    mockedDependenciesRule.waitForIdleState()
+
+    if (interstitial.isAdLoaded) {
+      interstitial.show()
+    }
+
+    verify(logger).log(InterstitialLogMessage.onInterstitialInitialized(INTERSTITIAL_UNKNOWN))
+    verify(logger).log(InterstitialLogMessage.onInterstitialLoading(interstitial))
+    verify(logger).log(InterstitialLogMessage.onInterstitialFailedToLoad(interstitial))
+    verify(logger).log(InterstitialLogMessage.onCheckingIfInterstitialIsLoaded(interstitial, false))
+  }
+
+  @Test
+  fun whenLoadingInterstitialForInHouse_ValidBid_LogSuccess() {
+    lateinit var bid: Bid
+    givenInitializedCriteo(INTERSTITIAL)
+    mockedDependenciesRule.waitForIdleState()
+
+    val interstitial = CriteoInterstitial()
+    Criteo.getInstance().loadBid(INTERSTITIAL) {
+      interstitial.loadAd(it)
+      bid = it!!
+    }
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(logger).log(InterstitialLogMessage.onInterstitialInitialized(null))
+    verify(logger).log(InterstitialLogMessage.onInterstitialLoading(interstitial, bid))
+    verify(logger).log(InterstitialLogMessage.onInterstitialLoaded(interstitial))
+  }
+
+  @Test
+  fun whenLoadingInterstitialForInHouse_NoBid_LogFailure() {
+    givenInitializedCriteo(INTERSTITIAL_UNKNOWN)
+    mockedDependenciesRule.waitForIdleState()
+
+    val interstitial = CriteoInterstitial()
+    Criteo.getInstance().loadBid(INTERSTITIAL_UNKNOWN, interstitial::loadAd)
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(logger).log(InterstitialLogMessage.onInterstitialInitialized(null))
+    verify(logger).log(InterstitialLogMessage.onInterstitialLoading(interstitial, null))
+    verify(logger).log(InterstitialLogMessage.onInterstitialFailedToLoad(interstitial))
   }
 }
