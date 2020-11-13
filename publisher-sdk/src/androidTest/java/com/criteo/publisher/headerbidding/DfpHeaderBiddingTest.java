@@ -26,16 +26,18 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
 import com.criteo.publisher.integration.Integration;
+import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.CdbResponseSlot;
@@ -89,10 +91,13 @@ public class DfpHeaderBiddingTest {
   @MockBean
   private DeviceUtil deviceUtil;
 
+  private Logger logger;
+
   private DfpHeaderBidding headerBidding;
 
   @Before
   public void setUp() throws Exception {
+    logger = mockedDependenciesRule.getMockedLogger();
     headerBidding = new DfpHeaderBidding(androidUtil, deviceUtil);
   }
 
@@ -125,7 +130,8 @@ public class DfpHeaderBiddingTest {
 
     headerBidding.enrichBid(builder, CRITEO_BANNER, mock(CdbResponseSlot.class));
 
-    verifyNoMoreInteractions(builder);
+    verifyNoInteractions(builder);
+    verifyNoInteractions(logger);
   }
 
   @Test
@@ -146,6 +152,14 @@ public class DfpHeaderBiddingTest {
     assertEquals("0.10", customTargeting.get(CRT_CPM));
     assertEquals(encodeForDfp("http://display.url"), customTargeting.get(CRT_DISPLAY_URL));
     assertEquals("42x1337", customTargeting.get(CRT_SIZE));
+    verify(logger).log(argThat(logMessage -> {
+      assertThat(logMessage.getMessage()).contains(
+          CRT_CPM + "=0.10,"
+              + CRT_DISPLAY_URL + "=" + encodeForDfp("http://display.url") + ","
+              + CRT_SIZE + "=42x1337"
+      );
+      return true;
+    }));
   }
 
   @Test
@@ -213,6 +227,14 @@ public class DfpHeaderBiddingTest {
     assertEquals("0.10", customTargeting.get(CRT_CPM));
     assertEquals(encodeForDfp("http://display.url"), customTargeting.get(CRT_DISPLAY_URL));
     assertEquals(expectedInjectedSize, customTargeting.get(CRT_SIZE));
+    verify(logger).log(argThat(logMessage -> {
+      assertThat(logMessage.getMessage()).contains(
+          CRT_CPM + "=0.10,"
+              + CRT_DISPLAY_URL + "=" + encodeForDfp("http://display.url") + ","
+              + CRT_SIZE + "=" + expectedInjectedSize
+      );
+      return true;
+    }));
   }
 
   @Test
@@ -312,6 +334,29 @@ public class DfpHeaderBiddingTest {
         customTargeting.get(CRT_NATIVE_PIXEL_URL + "1"));
 
     assertEquals("2", customTargeting.get(CRT_NATIVE_PIXEL_COUNT));
+
+    verify(logger).log(argThat(logMessage -> {
+      assertThat(logMessage.getMessage()).contains(
+          CRT_CPM + "=0.42,"
+              + CRT_NATIVE_TITLE + "=" + encodeForDfp("title") + ","
+              + CRT_NATIVE_DESC + "=" + encodeForDfp("description") + ","
+              + CRT_NATIVE_PRICE + "=" + encodeForDfp("$1337") + ","
+              + CRT_NATIVE_CLICK_URL + "=" + encodeForDfp("http://click.url") + ","
+              + CRT_NATIVE_CTA + "=" + encodeForDfp("call to action") + ","
+              + CRT_NATIVE_IMAGE_URL + "=" + encodeForDfp("http://image.url") + ","
+              + CRT_NATIVE_ADV_NAME + "=" + encodeForDfp("advertiser name") + ","
+              + CRT_NATIVE_ADV_DOMAIN + "=" + encodeForDfp("advertiser domain") + ","
+              + CRT_NATIVE_ADV_LOGO_URL + "=" + encodeForDfp("http://advertiser.logo.url") + ","
+              + CRT_NATIVE_ADV_URL + "=" + encodeForDfp("http://advertiser.url") + ","
+              + CRT_NATIVE_PR_URL + "=" + encodeForDfp("http://privacy.url") + ","
+              + CRT_NATIVE_PR_IMAGE_URL + "=" + encodeForDfp("http://privacy.image.url") + ","
+              + CRT_NATIVE_PR_TEXT + "=" + encodeForDfp("privacy legal text") + ","
+              + CRT_NATIVE_PIXEL_URL + "0=" + encodeForDfp("http://pixel.url/0") + ","
+              + CRT_NATIVE_PIXEL_URL + "1=" + encodeForDfp("http://pixel.url/1") + ","
+              + CRT_NATIVE_PIXEL_COUNT + "=2"
+      );
+      return true;
+    }));
   }
 
   @Test
@@ -339,7 +384,7 @@ public class DfpHeaderBiddingTest {
     String encodedValue = headerBidding.createDfpCompatibleString("displayUrl");
 
     assertThat(encodedValue).isNull();
-    verify(mockedDependenciesRule.getMockedLogger()).error(exception);
+    verify(logger).error(exception);
   }
 
   private String encodeForDfp(String displayUrl) {

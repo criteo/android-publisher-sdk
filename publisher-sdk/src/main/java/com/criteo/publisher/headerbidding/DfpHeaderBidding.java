@@ -17,7 +17,6 @@
 package com.criteo.publisher.headerbidding;
 
 import android.content.res.Configuration;
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -122,6 +121,8 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
         enrichNativeRequest(builder, slot);
         break;
     }
+
+    logger.log(AppBiddingLogMessage.onAdObjectEnrichedSuccessfully(getIntegration(), builder.getDescription()));
   }
 
   /**
@@ -227,11 +228,16 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
 
   private static class SafeDfpBuilder {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @NonNull
     private final PublisherAdRequest.Builder builder;
 
+    private final StringBuilder description;
+
     private SafeDfpBuilder(@NonNull Builder builder) {
       this.builder = builder;
+      this.description = new StringBuilder();
     }
 
     static boolean isDfpBuilder(@NonNull Object candidate) {
@@ -246,8 +252,18 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
       try {
         builder.addCustomTargeting(key, value);
       } catch (LinkageError e) {
-        Log.d(SafeDfpBuilder.class.getSimpleName(), "Error while adding custom target", e);
+        logger.error("Error while adding custom target", e);
+        return;
       }
+
+      if (description.length() != 0) {
+        description.append(",");
+      }
+      description.append(key).append("=").append(value);
+    }
+
+    String getDescription() {
+      return description.toString();
     }
   }
 

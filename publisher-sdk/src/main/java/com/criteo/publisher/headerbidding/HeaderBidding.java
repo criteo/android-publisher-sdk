@@ -20,10 +20,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.Bid;
 import com.criteo.publisher.integration.IntegrationRegistry;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.CdbResponseSlot;
 import java.util.List;
 
 public class HeaderBidding {
+
+  private final Logger logger = LoggerFactory.getLogger(HeaderBidding.class);
 
   @NonNull
   private final List<HeaderBiddingHandler> handlers;
@@ -40,25 +44,28 @@ public class HeaderBidding {
   }
 
   public void enrichBid(@Nullable Object object, @Nullable Bid bid) {
-    if (object == null) {
-      return;
-    }
+    logger.log(AppBiddingLogMessage.onTryingToEnrichAdObjectFromBid(bid));
 
-    for (HeaderBiddingHandler handler : handlers) {
-      if (handler.canHandle(object)) {
-        integrationRegistry.declare(handler.getIntegration());
+    if (object != null) {
+      for (HeaderBiddingHandler handler : handlers) {
+        if (handler.canHandle(object)) {
+          integrationRegistry.declare(handler.getIntegration());
 
-        CdbResponseSlot slot = bid == null ? null : bid.consumeSlot();
-        handler.cleanPreviousBid(object);
+          CdbResponseSlot slot = bid == null ? null : bid.consumeSlot();
+          handler.cleanPreviousBid(object);
 
-        if (slot == null) {
+          if (slot == null) {
+            logger.log(AppBiddingLogMessage.onAdObjectEnrichedWithNoBid(handler.getIntegration()));
+            return;
+          }
+
+          handler.enrichBid(object, bid.getAdUnitType(), slot);
           return;
         }
-
-        handler.enrichBid(object, bid.getAdUnitType(), slot);
-        return;
       }
     }
+
+    logger.log(AppBiddingLogMessage.onUnknownAdObjectEnriched(object));
   }
 
 }
