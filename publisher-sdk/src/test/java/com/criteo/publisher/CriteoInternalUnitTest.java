@@ -107,17 +107,6 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void whenCreatingNewCriteo_GivenBidManagerAndNullAdUnits_ShouldCallPrefetchWithEmptyAdUnits()
-      throws Exception {
-    BidManager bidManager = givenMockedBidManager();
-    adUnits = null;
-
-    createCriteo();
-
-    verify(bidManager).prefetch(Collections.emptyList());
-  }
-
-  @Test
   public void whenCreatingNewCriteo_GivenTrueUsOptOut_ShouldStoreTrueValue() throws Exception {
     givenMockedUserPrivacyUtil();
     usPrivacyOptout = true;

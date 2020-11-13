@@ -17,7 +17,6 @@
 package com.criteo.publisher;
 
 import android.app.Application;
-import android.util.Log;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,15 +25,17 @@ import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.context.UserData;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.util.DeviceUtil;
+import java.util.ArrayList;
 import java.util.List;
 
 @Keep
 public abstract class Criteo {
-  private static final String TAG = Criteo.class.getSimpleName();
+
   private static Criteo criteo;
 
   @Keep
@@ -76,6 +77,9 @@ public abstract class Criteo {
     }
 
     public Criteo init() throws CriteoInitException {
+      if (adUnits == null) {
+        adUnits = new ArrayList<>();
+      }
       return Criteo.init(application, criteoPublisherId, adUnits, usPrivacyOptOut, mopubConsent);
     }
   }
@@ -83,10 +87,11 @@ public abstract class Criteo {
   private static Criteo init(
       @NonNull Application application,
       @NonNull String criteoPublisherId,
-      @Nullable List<AdUnit> adUnits,
+      @NonNull List<AdUnit> adUnits,
       @Nullable Boolean usPrivacyOptOut,
       @Nullable String mopubConsent
   ) throws CriteoInitException {
+    Logger logger = LoggerFactory.getLogger(Criteo.class);
 
     synchronized (Criteo.class) {
       if (criteo == null) {
@@ -108,11 +113,15 @@ public abstract class Criteo {
           } else {
             criteo = new DummyCriteo();
           }
+
+          logger.log(SdkInitLogMessage.onSdkInitialized(criteoPublisherId, adUnits, getVersion()));
         } catch(Throwable tr) {
           criteo = new DummyCriteo();
-          Log.e(TAG, "Internal error initializing Criteo instance.", tr);
+          logger.error("Internal error initializing Criteo instance.", tr);
           throw new CriteoInitException("Internal error initializing Criteo instance.", tr);
         }
+      } else {
+        logger.log(SdkInitLogMessage.onSdkInitializedMoreThanOnce());
       }
       return criteo;
     }
@@ -161,7 +170,7 @@ public abstract class Criteo {
     try {
       return DependencyProvider.getInstance().provideBuildConfigWrapper().getSdkVersion();
     } catch (Throwable t) {
-      Logger logger = DependencyProvider.getInstance().provideLoggerFactory().createLogger(Criteo.class);
+      Logger logger = LoggerFactory.getLogger(Criteo.class);
       logger.error("Internal error while getting version.", t);
       return "";
     }

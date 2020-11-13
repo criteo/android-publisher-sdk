@@ -24,8 +24,6 @@ import com.criteo.publisher.util.BuildConfigWrapper;
 
 public class Logger {
 
-  private static final Object[] EMPTY = new Object[0];
-
   @NonNull
   private final String tag;
 
@@ -41,39 +39,41 @@ public class Logger {
   }
 
   public void debug(String message, Throwable thrown) {
-    log(Log.DEBUG, message, EMPTY, thrown);
+    log(simpleLogMessage(Log.DEBUG, message, thrown));
   }
 
   public void debug(String message, Object... args) {
-    log(Log.DEBUG, message, args, null);
+    log(formattedLogMessage(Log.DEBUG, message, args));
   }
 
   public void info(String message, Throwable thrown) {
-    log(Log.INFO, message, EMPTY, thrown);
+    log(simpleLogMessage(Log.INFO, message, thrown));
   }
 
   public void info(String message, Object... args) {
-    log(Log.INFO, message, args, null);
+    log(formattedLogMessage(Log.INFO, message, args));
   }
 
   public void error(Throwable thrown) {
-    log(Log.ERROR, null, EMPTY, thrown);
+    log(simpleLogMessage(Log.ERROR, null, thrown));
   }
 
   public void error(String message, Throwable thrown) {
-    log(Log.ERROR, message, EMPTY, thrown);
+    log(simpleLogMessage(Log.ERROR, message, thrown));
   }
 
-  private void log(int level, @Nullable String message, Object[] args, @Nullable Throwable thrown) {
+  public void log(@NonNull LogMessage logMessage) {
+    int level = logMessage.getLevel();
     if (!isLoggable(level)) {
       return;
     }
 
-    if (message != null) {
-      String formattedMessage = String.format(message, args);
+    String formattedMessage = logMessage.getMessage();
+    if (formattedMessage != null) {
       println(level, formattedMessage);
     }
 
+    Throwable thrown = logMessage.getThrowable();
     if (thrown != null) {
       println(level, Log.getStackTraceString(thrown));
     }
@@ -86,6 +86,14 @@ public class Logger {
 
   private boolean isLoggable(int level) {
     return level >= buildConfigWrapper.getMinLogLevel();
+  }
+
+  private LogMessage simpleLogMessage(int level, @Nullable String message, @Nullable Throwable throwable) {
+    return new LogMessage(level, message, throwable);
+  }
+
+  private LogMessage formattedLogMessage(int level, @NonNull String message, Object[] args) {
+    return new LogMessage(level, String.format(message, args), null);
   }
 
 }

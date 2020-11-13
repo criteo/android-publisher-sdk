@@ -31,7 +31,6 @@ import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AppLifecycleUtil;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -65,16 +64,11 @@ class CriteoInternal extends Criteo {
 
   CriteoInternal(
       Application application,
-      List<AdUnit> adUnits,
+      @NonNull List<AdUnit> adUnits,
       @Nullable Boolean usPrivacyOptout,
       @Nullable String mopubConsent,
       @NonNull DependencyProvider dependencyProvider
   ) {
-
-    if (adUnits == null) {
-      adUnits = new ArrayList<>();
-    }
-
     this.dependencyProvider = dependencyProvider;
 
     dependencyProvider.provideSession();
