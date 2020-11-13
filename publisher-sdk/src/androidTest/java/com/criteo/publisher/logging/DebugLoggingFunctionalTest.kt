@@ -19,6 +19,7 @@ package com.criteo.publisher.logging
 import android.app.Application
 import android.content.Context
 import com.criteo.publisher.Bid
+import com.criteo.publisher.BiddingLogMessage
 import com.criteo.publisher.Criteo
 import com.criteo.publisher.CriteoUtil.givenInitializedCriteo
 import com.criteo.publisher.SdkInitLogMessage
@@ -46,6 +47,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
 class DebugLoggingFunctionalTest {
@@ -193,5 +195,31 @@ class DebugLoggingFunctionalTest {
     mockedDependenciesRule.waitForIdleState()
 
     verify(logger).log(AppBiddingLogMessage.onUnknownAdObjectEnriched(null))
+  }
+
+  @Test
+  fun whenLoadingBid_NoBid_LogFailure() {
+    givenInitializedCriteo()
+    mockedDependenciesRule.waitForIdleState()
+
+    Criteo.getInstance().loadBid(BANNER_UNKNOWN) {
+      // no op
+    }
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(logger).log(BiddingLogMessage.onConsumableBidLoaded(BANNER_UNKNOWN, null))
+  }
+
+  @Test
+  fun whenLoadingBid_ValidBid_LogSuccess() {
+    givenInitializedCriteo(BANNER_320_50)
+    mockedDependenciesRule.waitForIdleState()
+
+    val bidRef = AtomicReference<Bid>()
+
+    Criteo.getInstance().loadBid(BANNER_320_50, bidRef::set)
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(logger).log(BiddingLogMessage.onConsumableBidLoaded(BANNER_320_50, bidRef.get()))
   }
 }
