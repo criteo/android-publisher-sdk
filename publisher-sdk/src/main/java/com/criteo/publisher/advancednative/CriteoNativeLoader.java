@@ -31,6 +31,8 @@ import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.NativeAdUnit;
 import com.criteo.publisher.model.nativeads.NativeAssets;
@@ -40,8 +42,10 @@ import java.lang.ref.WeakReference;
 @Keep
 public class CriteoNativeLoader {
 
+  private final Logger logger = LoggerFactory.getLogger(getClass());
+
   @Nullable
-  private final NativeAdUnit adUnit;
+  final NativeAdUnit adUnit;
 
   @NonNull
   private final CriteoNativeAdListener listener;
@@ -72,8 +76,9 @@ public class CriteoNativeLoader {
       @NonNull CriteoNativeRenderer renderer
   ) {
     this.adUnit = adUnit;
-    this.listener = listener;
+    this.listener = new LoggingCriteoNativeAdListener(listener, new WeakReference<>(this));
     this.publisherRenderer = renderer;
+    logger.log(NativeLogMessage.onNativeLoaderInitialized(adUnit));
   }
 
   /**
@@ -146,6 +151,7 @@ public class CriteoNativeLoader {
   }
 
   private void doLoad(@NonNull ContextData contextData) {
+    logger.log(NativeLogMessage.onNativeLoading(this));
     getIntegrationRegistry().declare(Integration.STANDALONE);
 
     getBidManager().getBidForAdUnit(adUnit, contextData, new BidListener() {
@@ -170,6 +176,7 @@ public class CriteoNativeLoader {
   }
 
   private void doLoad(@Nullable Bid bid) {
+    logger.log(NativeLogMessage.onNativeLoading(this, bid));
     getIntegrationRegistry().declare(Integration.IN_HOUSE);
 
     NativeAssets assets = bid == null ? null : bid.consumeNativeAssets();
@@ -191,21 +198,11 @@ public class CriteoNativeLoader {
   }
 
   private void notifyForAdAsync(@NonNull CriteoNativeAd nativeAd) {
-    getUiThreadExecutor().executeAsync(new Runnable() {
-      @Override
-      public void run() {
-        listener.onAdReceived(nativeAd);
-      }
-    });
+    getUiThreadExecutor().executeAsync(() -> listener.onAdReceived(nativeAd));
   }
 
   private void notifyForFailureAsync() {
-    getUiThreadExecutor().executeAsync(new Runnable() {
-      @Override
-      public void run() {
-        listener.onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL);
-      }
-    });
+    getUiThreadExecutor().executeAsync(() -> listener.onAdFailedToReceive(CriteoErrorCode.ERROR_CODE_NO_FILL));
   }
 
   @NonNull

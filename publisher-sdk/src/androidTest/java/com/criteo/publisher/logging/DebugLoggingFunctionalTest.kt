@@ -30,6 +30,10 @@ import com.criteo.publisher.TestAdUnits.BANNER_320_50
 import com.criteo.publisher.TestAdUnits.BANNER_UNKNOWN
 import com.criteo.publisher.TestAdUnits.INTERSTITIAL
 import com.criteo.publisher.TestAdUnits.INTERSTITIAL_UNKNOWN
+import com.criteo.publisher.TestAdUnits.NATIVE
+import com.criteo.publisher.TestAdUnits.NATIVE_UNKNOWN
+import com.criteo.publisher.advancednative.CriteoNativeLoader
+import com.criteo.publisher.advancednative.NativeLogMessage
 import com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait
 import com.criteo.publisher.headerbidding.AppBiddingLogMessage
 import com.criteo.publisher.integration.Integration.CUSTOM_APP_BIDDING
@@ -47,6 +51,7 @@ import com.google.android.gms.ads.doubleclick.PublisherAdRequest
 import com.mopub.mobileads.MoPubView
 import com.nhaarman.mockitokotlin2.check
 import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -359,5 +364,65 @@ class DebugLoggingFunctionalTest {
     verify(logger).log(InterstitialLogMessage.onInterstitialInitialized(null))
     verify(logger).log(InterstitialLogMessage.onInterstitialLoading(interstitial, null))
     verify(logger).log(InterstitialLogMessage.onInterstitialFailedToLoad(interstitial))
+  }
+
+  @Test
+  fun whenLoadingNativeForStandalone_ValidBid_LogSuccess() {
+    givenInitializedCriteo(NATIVE)
+    mockedDependenciesRule.waitForIdleState()
+
+    val nativeLoader = CriteoNativeLoader(NATIVE, mock(), mock())
+    nativeLoader.loadAd()
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(logger).log(NativeLogMessage.onNativeLoaderInitialized(NATIVE))
+    verify(logger).log(NativeLogMessage.onNativeLoading(nativeLoader))
+    verify(logger).log(NativeLogMessage.onNativeLoaded(nativeLoader))
+  }
+
+  @Test
+  fun whenLoadingNativeForStandalone_NoBid_LogFailure() {
+    givenInitializedCriteo()
+    mockedDependenciesRule.waitForIdleState()
+
+    val nativeLoader = CriteoNativeLoader(NATIVE_UNKNOWN, mock(), mock())
+    nativeLoader.loadAd()
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(logger).log(NativeLogMessage.onNativeLoaderInitialized(NATIVE_UNKNOWN))
+    verify(logger).log(NativeLogMessage.onNativeLoading(nativeLoader))
+    verify(logger).log(NativeLogMessage.onNativeFailedToLoad(nativeLoader))
+  }
+
+  @Test
+  fun whenLoadingNativeForInHouse_ValidBid_LogSuccess() {
+    lateinit var bid: Bid
+    givenInitializedCriteo(NATIVE)
+    mockedDependenciesRule.waitForIdleState()
+
+    val nativeLoader = CriteoNativeLoader(mock(), mock())
+    Criteo.getInstance().loadBid(NATIVE) {
+      nativeLoader.loadAd(it)
+      bid = it!!
+    }
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(logger).log(NativeLogMessage.onNativeLoaderInitialized(null))
+    verify(logger).log(NativeLogMessage.onNativeLoading(nativeLoader, bid))
+    verify(logger).log(NativeLogMessage.onNativeLoaded(nativeLoader))
+  }
+
+  @Test
+  fun whenLoadingNativeForInHouse_NoBid_LogFailure() {
+    givenInitializedCriteo()
+    mockedDependenciesRule.waitForIdleState()
+
+    val nativeLoader = CriteoNativeLoader(mock(), mock())
+    Criteo.getInstance().loadBid(NATIVE_UNKNOWN, nativeLoader::loadAd)
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(logger).log(NativeLogMessage.onNativeLoaderInitialized(null))
+    verify(logger).log(NativeLogMessage.onNativeLoading(nativeLoader, null))
+    verify(logger).log(NativeLogMessage.onNativeFailedToLoad(nativeLoader))
   }
 }
