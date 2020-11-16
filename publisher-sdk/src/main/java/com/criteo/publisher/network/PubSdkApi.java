@@ -21,6 +21,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.csm.MetricRequest;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.RemoteConfigRequest;
@@ -55,6 +57,9 @@ public class PubSdkApi {
   private static final String GDPR_STRING = "gdprString";
 
   @NonNull
+  private final Logger logger = LoggerFactory.getLogger(getClass());
+
+  @NonNull
   private final BuildConfigWrapper buildConfigWrapper;
 
   @NonNull
@@ -83,11 +88,17 @@ public class PubSdkApi {
   public CdbResponse loadCdb(@NonNull CdbRequest request, @NonNull String userAgent) throws Exception {
     URL url = new URL(buildConfigWrapper.getCdbUrl() + "/inapp/v2");
     HttpURLConnection urlConnection = prepareConnection(url, userAgent, "POST");
-    writePayload(urlConnection, request);
+    urlConnection.setDoOutput(true);
+    try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+      jsonSerializer.write(request, baos);
+      logger.log(NetworkLogMessage.onCdbCallStarted(baos.toString("UTF-8")));
+      urlConnection.getOutputStream().write(baos.toByteArray());
+    }
 
     try (InputStream inputStream = readResponseStreamIfSuccess(urlConnection)) {
-      JSONObject result = readJson(inputStream);
-      return CdbResponse.fromJson(result);
+      String response = StreamUtil.readStream(inputStream);
+      logger.log(NetworkLogMessage.onCdbCallFinished(response));
+      return CdbResponse.fromJson(readJson(response));
     }
   }
 
@@ -186,22 +197,14 @@ public class PubSdkApi {
   @NonNull
   private static JSONObject readJson(@NonNull InputStream inputStream) throws IOException, JSONException {
     String response = StreamUtil.readStream(inputStream);
-    if (!TextUtils.isEmpty(response)) {
-      return new JSONObject(response);
-    }
-    return new JSONObject();
+    return readJson(response);
   }
 
-  private static void writePayload(
-      @NonNull HttpURLConnection urlConnection,
-      @NonNull JSONObject requestJson) throws IOException {
-    byte[] payload = requestJson.toString().getBytes(Charset.forName("UTF-8"));
-
-    urlConnection.setDoOutput(true);
-    try (OutputStream outputStream = urlConnection.getOutputStream()) {
-      outputStream.write(payload);
-      outputStream.flush();
+  private static JSONObject readJson(@NonNull String json) throws JSONException {
+    if (TextUtils.isEmpty(json)) {
+      return new JSONObject();
     }
+    return new JSONObject(json);
   }
 
   private void writePayload(

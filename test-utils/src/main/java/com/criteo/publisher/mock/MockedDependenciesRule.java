@@ -202,10 +202,15 @@ public class MockedDependenciesRule implements MethodRule {
     ThreadingUtil.waitForAllThreads(trackingCommandsExecutor);
   }
 
+  /**
+   * Setup a {@link ResultCaptor} to captur CDB response.
+   *
+   * The {@link PubSdkApi} in this {@link #getDependencyProvider() dependency provider} should already be a mock or a
+   * spy.
+   */
   public ResultCaptor<CdbResponse> captorCdbResult() {
     ResultCaptor<CdbResponse> captor = new ResultCaptor<>();
-    PubSdkApi spyApi = spy(getDependencyProvider().providePubSdkApi());
-    doReturn(spyApi).when(getDependencyProvider()).providePubSdkApi();
+    PubSdkApi spyApi = getDependencyProvider().providePubSdkApi();
 
     try {
       doAnswer(captor).when(spyApi).loadCdb(any(), any());

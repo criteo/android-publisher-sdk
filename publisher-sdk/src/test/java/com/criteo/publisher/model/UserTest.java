@@ -21,7 +21,8 @@ import static org.junit.Assert.assertEquals;
 
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.util.JsonSerializer;
-import com.criteo.publisher.util.JsonSerializerExtensionsKt;
+import com.criteo.publisher.util.JsonSerializerExtKt;
+import java.io.IOException;
 import java.util.HashMap;
 import javax.inject.Inject;
 import org.json.JSONException;
@@ -74,7 +75,7 @@ public class UserTest {
     assertFalse(jsonObject.has("mopubConsent"));
   }
 
-  private JSONObject toJson(User user) throws JSONException {
-    return new JSONObject(JsonSerializerExtensionsKt.writeIntoString(serializer, user));
+  private JSONObject toJson(User user) throws IOException, JSONException {
+    return new JSONObject(JsonSerializerExtKt.writeIntoString(serializer, user));
   }
 }

@@ -14,13 +14,19 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.util
+package com.criteo.publisher.network
 
-import java.io.ByteArrayOutputStream
+import com.criteo.publisher.logging.LogMessage
 
-fun JsonSerializer.writeIntoString(value: Any): String {
-  with(ByteArrayOutputStream()) {
-    this@writeIntoString.write(value, this)
-    return String(toByteArray(), Charsets.UTF_8)
-  }
+internal object NetworkLogMessage {
+
+  @JvmStatic
+  fun onCdbCallStarted(requestPayload: String) = LogMessage(message =
+    "CDB Request initiated: $requestPayload"
+  )
+
+  @JvmStatic
+  fun onCdbCallFinished(responsePayload: String) = LogMessage(message =
+    "CDB Response received: $responsePayload"
+  )
 }
