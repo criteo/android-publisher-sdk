@@ -16,9 +16,12 @@
 
 package com.criteo.publisher;
 
+import androidx.annotation.Keep;
+
 /**
  * Error codes for reasons why an ad request may fail.
  */
+@Keep
 public enum CriteoErrorCode {
   ERROR_CODE_NO_FILL,
   ERROR_CODE_NETWORK_ERROR,

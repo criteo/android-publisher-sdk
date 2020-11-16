@@ -30,6 +30,7 @@ import com.criteo.publisher.model.WebViewData;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 
+@Keep
 public class CriteoInterstitial {
 
   private static final String TAG = CriteoInterstitial.class.getSimpleName();
@@ -85,7 +86,6 @@ public class CriteoInterstitial {
     loadAd(new ContextData());
   }
 
-  @Keep
   public void loadAd(@NonNull ContextData contextData) {
     if (!DependencyProvider.getInstance().isApplicationSet()) {
       Log.w(TAG, "Calling CriteoInterstitial#loadAd with a null application");
@@ -117,7 +117,6 @@ public class CriteoInterstitial {
     }
   }
 
-  @Keep
   public void loadAdWithDisplayData(@NonNull String displayData) {
     if (!DependencyProvider.getInstance().isApplicationSet()) {
       Log.w(TAG, "Calling CriteoInterstitial#loadAdWithDisplayData with a null application");
