@@ -26,6 +26,7 @@ import com.criteo.publisher.CriteoBannerView
 import com.criteo.publisher.CriteoInterstitial
 import com.criteo.publisher.CriteoUtil.givenInitializedCriteo
 import com.criteo.publisher.SdkInitLogMessage
+import com.criteo.publisher.StubConstants
 import com.criteo.publisher.TestAdUnits.BANNER_320_50
 import com.criteo.publisher.TestAdUnits.BANNER_UNKNOWN
 import com.criteo.publisher.TestAdUnits.INTERSTITIAL
@@ -44,11 +45,18 @@ import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.model.AdSize
 import com.criteo.publisher.model.BannerAdUnit
+import com.criteo.publisher.model.CdbRequest
 import com.criteo.publisher.model.InterstitialAdUnit
 import com.criteo.publisher.model.NativeAdUnit
+import com.criteo.publisher.network.NetworkLogMessage
+import com.criteo.publisher.network.PubSdkApi
 import com.criteo.publisher.util.BuildConfigWrapper
+import com.criteo.publisher.util.JsonSerializer
+import com.criteo.publisher.util.writeIntoString
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest
 import com.mopub.mobileads.MoPubView
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.check
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
@@ -74,8 +82,14 @@ class DebugLoggingFunctionalTest {
   @Inject
   private lateinit var context: Context
 
+  @Inject
+  private lateinit var jsonSerializer: JsonSerializer
+
   @SpyBean
   private lateinit var buildConfigWrapper: BuildConfigWrapper
+
+  @SpyBean
+  private lateinit var api: PubSdkApi
 
   private lateinit var logger: Logger
 
@@ -425,4 +439,27 @@ class DebugLoggingFunctionalTest {
     verify(logger).log(NativeLogMessage.onNativeLoading(nativeLoader, null))
     verify(logger).log(NativeLogMessage.onNativeFailedToLoad(nativeLoader))
   }
+
+  @Test
+  fun whenDoingACdbRequest_LogRequestAndResponse() {
+    givenInitializedCriteo()
+    mockedDependenciesRule.waitForIdleState()
+
+    Criteo.getInstance().loadBid(NATIVE) {
+      // no op
+    }
+    mockedDependenciesRule.waitForIdleState()
+
+    argumentCaptor<CdbRequest> {
+      verify(api).loadCdb(capture(), any())
+
+      verify(logger).log(NetworkLogMessage.onCdbCallStarted(jsonSerializer.writeIntoString(lastValue)))
+    }
+
+    verify(logger).log(check {
+      assertThat(it.message?.withoutWhitespace()).contains(StubConstants.STUB_NATIVE_JSON.withoutWhitespace())
+    })
+  }
+
+  private fun String.withoutWhitespace() = replace("\\s".toRegex(), "")
 }
