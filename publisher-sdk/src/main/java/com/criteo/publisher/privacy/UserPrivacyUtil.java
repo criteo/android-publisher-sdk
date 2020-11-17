@@ -23,6 +23,8 @@ import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.privacy.gdpr.GdprData;
 import com.criteo.publisher.privacy.gdpr.GdprDataFetcher;
 import com.criteo.publisher.util.SafeSharedPreferences;
@@ -54,6 +56,8 @@ public class UserPrivacyUtil {
 
   @VisibleForTesting
   static final String MOPUB_CONSENT_SHARED_PREFS_KEY = "MoPubConsent_String";
+
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private final SafeSharedPreferences safeSharedPreferences;
 
@@ -92,6 +96,7 @@ public class UserPrivacyUtil {
     Editor edit = sharedPreferences.edit();
     edit.putString(OPTOUT_USPRIVACY_SHARED_PREFS_KEY, String.valueOf(uspOptout));
     edit.apply();
+    logger.log(PrivacyLogMessage.onUsPrivacyOptOutSet(uspOptout));
   }
 
   @NonNull
@@ -142,6 +147,7 @@ public class UserPrivacyUtil {
     Editor edit = sharedPreferences.edit();
     edit.putString(MOPUB_CONSENT_SHARED_PREFS_KEY, mopubConsent);
     edit.apply();
+    logger.log(PrivacyLogMessage.onMoPubConsentSet(mopubConsent));
   }
 
   @NonNull
