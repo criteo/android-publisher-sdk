@@ -50,6 +50,7 @@ import com.criteo.publisher.model.InterstitialAdUnit
 import com.criteo.publisher.model.NativeAdUnit
 import com.criteo.publisher.network.NetworkLogMessage
 import com.criteo.publisher.network.PubSdkApi
+import com.criteo.publisher.privacy.PrivacyLogMessage
 import com.criteo.publisher.util.BuildConfigWrapper
 import com.criteo.publisher.util.JsonSerializer
 import com.criteo.publisher.util.writeIntoString
@@ -461,5 +462,31 @@ class DebugLoggingFunctionalTest {
     })
   }
 
+  @Test
+  fun whenSettingConsentDuringInit_LogThatConsentIsSet() {
+    Criteo.Builder(application, "any")
+        .mopubConsent("myMoPubConsent")
+        .usPrivacyOptOut(true)
+        .init()
+
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(logger).log(PrivacyLogMessage.onMoPubConsentSet("myMoPubConsent"))
+    verify(logger).log(PrivacyLogMessage.onUsPrivacyOptOutSet(true))
+  }
+
+  @Test
+  fun whenSettingConsentAfterInit_LogThatConsentIsSet() {
+    givenInitializedCriteo()
+    mockedDependenciesRule.waitForIdleState()
+
+    Criteo.getInstance().setMopubConsent("myMoPubConsent")
+    Criteo.getInstance().setUsPrivacyOptOut(true)
+
+    verify(logger).log(PrivacyLogMessage.onMoPubConsentSet("myMoPubConsent"))
+    verify(logger).log(PrivacyLogMessage.onUsPrivacyOptOutSet(true))
+  }
+
   private fun String.withoutWhitespace() = replace("\\s".toRegex(), "")
+
 }
