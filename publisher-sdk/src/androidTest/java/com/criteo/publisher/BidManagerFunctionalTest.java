@@ -51,6 +51,7 @@ import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.context.ContextProvider;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
 import com.criteo.publisher.integration.IntegrationRegistry;
+import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
@@ -100,7 +101,7 @@ public class BidManagerFunctionalTest {
   private static final int DEFAULT_TTL_IN_SECONDS = 900;
 
   @Rule
-  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule().withSpiedLogger();
 
   private DependencyProvider dependencyProvider;
 
@@ -148,6 +149,8 @@ public class BidManagerFunctionalTest {
   @MockBean
   private ContextProvider contextProvider;
 
+  private Logger logger;
+
   private int adUnitId = 0;
 
   @Before
@@ -161,6 +164,8 @@ public class BidManagerFunctionalTest {
     when(context.getPackageName()).thenReturn("bundle.id");
     dependencyProvider.setCriteoPublisherId("cpId");
     when(config.isPrefetchOnInitEnabled()).thenReturn(true);
+
+    logger = mockedDependenciesRule.getSpiedLogger();
 
     // Should be set to at least 1 because user-level silent mode is set the 0 included
     givenMockedClockSetTo(1);
@@ -772,6 +777,7 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     verify(bidManager).setTimeToNextCall(1337);
+    verify(logger).log(BiddingLogMessage.onGlobalSilentModeEnabled(1337));
   }
 
   @Test
@@ -1014,6 +1020,7 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     assertThat(bidManager.isGlobalSilenceEnabled()).isTrue();
+    verify(logger).log(BiddingLogMessage.onGlobalSilentModeEnabled(10));
   }
 
   @Test

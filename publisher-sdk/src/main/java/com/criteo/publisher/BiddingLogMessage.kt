@@ -25,4 +25,9 @@ internal object BiddingLogMessage {
   fun onConsumableBidLoaded(adUnit: AdUnit, bid: Bid?) = LogMessage(message =
     "Getting bid response for $adUnit. Bid: ${bid?.loggingId}, price: ${bid?.price}"
   )
+
+  @JvmStatic
+  fun onGlobalSilentModeEnabled(seconds: Int) = LogMessage(message =
+    "Silent mode is enabled, no requests will be fired for the next $seconds seconds"
+  )
 }
