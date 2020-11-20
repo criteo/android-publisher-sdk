@@ -23,6 +23,9 @@ jobs:
 
       - name: Set up Android SDK
         uses: malinskiy/action-android/install-sdk@release/0.0.7
+        env:
+          # Remove once manlinskiy/action-android doesn't use set-env anymore
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
 
       # This cache below is not fully working: it should go above the "Set up Android SDK" but:
       # - The action does not support having a SDK already setup -> platform-tools, licenses are re-downloaded
@@ -39,6 +42,9 @@ jobs:
 
       - name: Junit Report to Annotations
         uses: ashley-taylor/junit-report-annotations-action@1.3
+        env:
+          # remove once we create a fork that doesn't use set-env commands
+          ACTIOS_ALLOW_UNSECURE_COMMANDS: 'true'
         if: failure()
         with:
           access-token: ${{ secrets.GITHUB_TOKEN }}
@@ -73,10 +79,16 @@ jobs:
 
       - name: Set up Android SDK
         uses: malinskiy/action-android/install-sdk@release/0.0.7
+        env:
+          # Remove once manlinskiy/action-android doesn't use set-env anymore
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
 
       # On merge, run non-flaky-tests without retry then flaky tests with retry policy
       - name: Run all Android tests
         uses: malinskiy/action-android/emulator-run-cmd@release/0.0.7
+        env:
+          # Remove once manlinskiy/action-android doesn't use set-env anymore
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         if: github.event_name != 'pull_request'
         with:
           api: 29
@@ -94,6 +106,9 @@ jobs:
       # Run only non-flaky tests on PR
       - name: Run Android tests w/o @FlakyTest
         uses: malinskiy/action-android/emulator-run-cmd@release/0.0.7
+        env:
+          # Remove once manlinskiy/action-android doesn't use set-env anymore
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
         if: github.event_name == 'pull_request'
         with:
           api: 29
@@ -113,6 +128,9 @@ jobs:
 
       - name: Junit Report to Annotations
         uses: ashley-taylor/junit-report-annotations-action@1.3
+        env:
+          # remove once we create a fork that doesn't use set-env commands
+          ACTIOS_ALLOW_UNSECURE_COMMANDS: 'true'
         if: failure()
         with:
           access-token: ${{ secrets.GITHUB_TOKEN }}
@@ -185,6 +203,9 @@ jobs:
 
       - name: Set up Android SDK
         uses: malinskiy/action-android/install-sdk@release/0.0.7
+        env:
+          # Remove once manlinskiy/action-android doesn't use set-env anymore
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
 
       - name: Deploy artifacts and notify on Slack
         env:
