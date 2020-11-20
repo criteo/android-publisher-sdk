@@ -32,7 +32,7 @@ import java.io.IOException
 class SafeRunnableTest {
     @Rule
     @JvmField
-    var mockedDependenciesRule = MockedDependenciesRule().withMockedLogger()
+    var mockedDependenciesRule = MockedDependenciesRule().withSpiedLogger()
 
     @SpyBean
     private lateinit var buildConfigWrapper: BuildConfigWrapper
@@ -48,7 +48,7 @@ class SafeRunnableTest {
 
     @Test
     fun givenCheckedException_DontThrowInDebugButLogIt() {
-        val logger = mockedDependenciesRule.mockedLogger!!
+        val logger = mockedDependenciesRule.spiedLogger!!
         doReturn(true).whenever(buildConfigWrapper).preconditionThrowsOnException()
 
         val throwable = IOException()

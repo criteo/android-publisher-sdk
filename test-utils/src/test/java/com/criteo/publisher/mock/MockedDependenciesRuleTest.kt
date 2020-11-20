@@ -61,7 +61,7 @@ class MockedDependenciesRuleTest {
 
   @Test
   fun withMockedLogger_GivenAnyCreatedLogger_IsAMockContainsByTheMockedDependencyProvider() {
-    mockedDependenciesRule.withMockedLogger()
+    mockedDependenciesRule.withSpiedLogger()
 
     // Resetting the rule because withMockedLogger should normally be called at the rule creation.
     mockedDependenciesRule.resetAllDependencies()
@@ -70,8 +70,8 @@ class MockedDependenciesRuleTest {
     val logger1 = loggerFactory.createLogger(javaClass)
     val logger2 = loggerFactory.createLogger(loggerFactory.javaClass)
 
-    assertThat(logger1).isSameAs(mockedDependenciesRule.mockedLogger)
-    assertThat(logger2).isSameAs(mockedDependenciesRule.mockedLogger)
+    assertThat(logger1).isSameAs(mockedDependenciesRule.spiedLogger)
+    assertThat(logger2).isSameAs(mockedDependenciesRule.spiedLogger)
   }
 
   @Test
@@ -84,6 +84,6 @@ class MockedDependenciesRuleTest {
 
     assertThat(logger1).isNotNull.isNotEqualTo(logger2)
     assertThat(logger2).isNotNull
-    assertThat(mockedDependenciesRule.mockedLogger).isNull()
+    assertThat(mockedDependenciesRule.spiedLogger).isNull()
   }
 }

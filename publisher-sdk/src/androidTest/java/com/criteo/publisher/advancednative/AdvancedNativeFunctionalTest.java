@@ -72,7 +72,7 @@ import org.junit.Test;
 public class AdvancedNativeFunctionalTest {
 
   @Rule
-  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule().withMockedLogger();
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule().withSpiedLogger();
 
   @Rule
   public ActivityTestRule<TestNativeActivity> activityRule = new ActivityTestRule<>(
@@ -94,7 +94,7 @@ public class AdvancedNativeFunctionalTest {
     // Start activity only there so beans are properly injected
     activityRule.launchActivity(new Intent());
 
-    logger = mockedDependenciesRule.getMockedLogger();
+    logger = mockedDependenciesRule.getSpiedLogger();
   }
 
   @Test

@@ -75,7 +75,7 @@ class DebugLoggingFunctionalTest {
 
   @Rule
   @JvmField
-  val mockedDependenciesRule = MockedDependenciesRule().withMockedLogger()
+  val mockedDependenciesRule = MockedDependenciesRule().withSpiedLogger()
 
   @Inject
   private lateinit var application: Application
@@ -96,7 +96,7 @@ class DebugLoggingFunctionalTest {
 
   @Before
   fun setUp() {
-    logger = mockedDependenciesRule.mockedLogger!!
+    logger = mockedDependenciesRule.spiedLogger!!
   }
 
   @Test

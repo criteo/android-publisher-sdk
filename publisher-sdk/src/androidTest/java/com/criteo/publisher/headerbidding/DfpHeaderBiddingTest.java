@@ -83,7 +83,7 @@ public class DfpHeaderBiddingTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule()
-      .withMockedLogger();
+      .withSpiedLogger();
 
   @MockBean
   private AndroidUtil androidUtil;
@@ -97,7 +97,7 @@ public class DfpHeaderBiddingTest {
 
   @Before
   public void setUp() throws Exception {
-    logger = mockedDependenciesRule.getMockedLogger();
+    logger = mockedDependenciesRule.getSpiedLogger();
     headerBidding = new DfpHeaderBidding(androidUtil, deviceUtil);
   }
 
