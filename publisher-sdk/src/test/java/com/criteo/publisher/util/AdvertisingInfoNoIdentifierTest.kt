@@ -32,7 +32,7 @@ class AdvertisingInfoNoIdentifierTest {
 
   @Rule
   @JvmField
-  val mockedDependenciesRule = MockedDependenciesRule().withMockedLogger()
+  val mockedDependenciesRule = MockedDependenciesRule().withSpiedLogger()
 
   private lateinit var logger: Logger
 
@@ -55,7 +55,7 @@ via IntelliJ delegating test run to Gradle.
 """
     ).isInstanceOf(ClassNotFoundException::class.java)
 
-    logger = mockedDependenciesRule.mockedLogger!!
+    logger = mockedDependenciesRule.spiedLogger!!
   }
 
   @Test

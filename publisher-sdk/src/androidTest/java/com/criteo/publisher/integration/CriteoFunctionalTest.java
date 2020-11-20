@@ -63,7 +63,7 @@ import org.mockito.MockitoAnnotations;
 public class CriteoFunctionalTest {
 
   @Rule
-  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule().withMockedLogger();
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule().withSpiedLogger();
 
   @Rule
   public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(
@@ -122,7 +122,7 @@ public class CriteoFunctionalTest {
     String version = Criteo.getVersion();
 
     assertThat(version).isEmpty();
-    verify(mockedDependenciesRule.getMockedLogger()).error(any(), eq(exception));
+    verify(mockedDependenciesRule.getSpiedLogger()).error(any(), eq(exception));
   }
 
   @Test

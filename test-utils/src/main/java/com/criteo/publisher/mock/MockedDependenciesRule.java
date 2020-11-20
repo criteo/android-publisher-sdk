@@ -19,7 +19,6 @@ package com.criteo.publisher.mock;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -80,8 +79,8 @@ public class MockedDependenciesRule implements MethodRule {
   private final boolean injectCdbMockServer = true;
 
   @Nullable
-  private Logger mockedLogger = null;
-  private boolean injectMockedLogger = false;
+  private Logger spiedLogger = null;
+  private boolean injectSpiedLogger = false;
   private TrackingCommandsExecutor trackingCommandsExecutor;
 
   protected DependencyProvider dependencyProvider;
@@ -91,17 +90,17 @@ public class MockedDependenciesRule implements MethodRule {
   private CdbMock cdbMock;
 
   /**
-   * Activate mocking of {@link Logger}.
+   * Activate spying of {@link Logger}.
    * <p>
-   * All loggers created through the {@link LoggerFactory} are mocked and represented by a single
-   * instance given by {@link #getMockedLogger()}.
+   * All loggers created through the {@link LoggerFactory} are spied and represented by a single
+   * instance given by {@link #getSpiedLogger()}.
    * <p>
    * Note that this option should be used when creating the {@link org.junit.Rule}.
    *
    * @return this for chaining calls
    */
-  public MockedDependenciesRule withMockedLogger() {
-    injectMockedLogger = true;
+  public MockedDependenciesRule withSpiedLogger() {
+    injectSpiedLogger = true;
     return this;
   }
 
@@ -132,7 +131,7 @@ public class MockedDependenciesRule implements MethodRule {
             cdbMock.shutdown();
           }
 
-          mockedLogger = null;
+          spiedLogger = null;
         }
       }
     };
@@ -170,19 +169,19 @@ public class MockedDependenciesRule implements MethodRule {
   }
 
   @Nullable
-  public Logger getMockedLogger() {
-    return mockedLogger;
+  public Logger getSpiedLogger() {
+    return spiedLogger;
   }
 
-  private void setUpMockedLogger() {
-    if (!injectMockedLogger) {
+  private void setUpSpiedLogger() {
+    if (!injectSpiedLogger) {
       return;
     }
 
-    mockedLogger = mock(Logger.class);
+    spiedLogger = spy(dependencyProvider.provideLoggerFactory().createLogger(getClass()));
 
     LoggerFactory loggerFactory = spy(dependencyProvider.provideLoggerFactory());
-    doReturn(mockedLogger).when(loggerFactory).createLogger(any());
+    doReturn(spiedLogger).when(loggerFactory).createLogger(any());
     when(dependencyProvider.provideLoggerFactory()).thenReturn(loggerFactory);
   }
 
@@ -251,7 +250,7 @@ public class MockedDependenciesRule implements MethodRule {
 
     setUpDependencyProvider();
     setUpCdbMock();
-    setUpMockedLogger();
+    setUpSpiedLogger();
     injectDependencies();
   }
 

@@ -44,7 +44,7 @@ public class AppEventTaskTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule()
-      .withMockedLogger();
+      .withSpiedLogger();
 
   private AppEventTask appEventTask;
 
@@ -134,7 +134,7 @@ public class AppEventTaskTest {
 
     appEventTask.doInBackground("eventType");
 
-    verify(mockedDependenciesRule.getMockedLogger()).debug(any(), eq(exception));
+    verify(mockedDependenciesRule.getSpiedLogger()).debug(any(), eq(exception));
   }
 
 }
