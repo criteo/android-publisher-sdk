@@ -27,6 +27,8 @@ import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CacheAdUnit;
@@ -47,6 +49,9 @@ public class BidManager implements ApplicationStoppedListener {
    * Default TTL (15 minutes in seconds) overridden on immediate bids (CPM > 0, TTL = 0).
    */
   private static final int DEFAULT_TTL_IN_SECONDS = 15 * 60;
+
+  @NonNull
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @NonNull
   @GuardedBy("cacheLock")
@@ -325,7 +330,8 @@ public class BidManager implements ApplicationStoppedListener {
 
   void setTimeToNextCall(int seconds) {
     if (seconds > 0) {
-      this.cdbTimeToNextCall.set(clock.getCurrentTimeInMillis() + seconds * 1000);
+      logger.log(BiddingLogMessage.onGlobalSilentModeEnabled(seconds));
+      cdbTimeToNextCall.set(clock.getCurrentTimeInMillis() + seconds * 1000);
     }
   }
 
