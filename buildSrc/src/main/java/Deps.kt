@@ -171,7 +171,7 @@ object Deps {
     }
 
     object Picasso {
-      private const val version = "2.71828"
+      private const val version = "2.8"
 
       const val Picasso = "com.squareup.picasso:picasso:$version"
     }
