@@ -18,15 +18,14 @@ package com.criteo.publisher.logging;
 
 import androidx.annotation.NonNull;
 import com.criteo.publisher.DependencyProvider;
-import com.criteo.publisher.util.BuildConfigWrapper;
 
 public class LoggerFactory {
 
   @NonNull
-  private final BuildConfigWrapper buildConfigWrapper;
+  private final ConsoleHandler consoleHandler;
 
-  public LoggerFactory(@NonNull BuildConfigWrapper buildConfigWrapper) {
-    this.buildConfigWrapper = buildConfigWrapper;
+  public LoggerFactory(@NonNull ConsoleHandler consoleHandler) {
+    this.consoleHandler = consoleHandler;
   }
 
   @NonNull
@@ -35,7 +34,7 @@ public class LoggerFactory {
   }
 
   public Logger createLogger(@NonNull Class<?> klass) {
-    return new Logger(klass, buildConfigWrapper);
+    return new Logger(klass, consoleHandler);
   }
 
 }
