@@ -20,7 +20,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
-import com.criteo.publisher.util.BuildConfigWrapper;
 
 public class Logger {
 
@@ -28,14 +27,22 @@ public class Logger {
   private final String tag;
 
   @NonNull
-  private final BuildConfigWrapper buildConfigWrapper;
+  private final ConsoleHandler consoleHandler;
 
   public Logger(
       @NonNull Class<?> klass,
-      @NonNull BuildConfigWrapper buildConfigWrapper
+      @NonNull ConsoleHandler consoleHandler
   ) {
-    this.tag = "Crto" + klass.getSimpleName();
-    this.buildConfigWrapper = buildConfigWrapper;
+    this(klass.getSimpleName(), consoleHandler);
+  }
+
+  @VisibleForTesting
+  Logger(
+      @NonNull String tag,
+      @NonNull ConsoleHandler consoleHandler
+  ) {
+    this.tag = tag;
+    this.consoleHandler = consoleHandler;
   }
 
   public void debug(String message, Throwable thrown) {
@@ -67,29 +74,7 @@ public class Logger {
   }
 
   public void log(@NonNull LogMessage logMessage) {
-    int level = logMessage.getLevel();
-    if (!isLoggable(level)) {
-      return;
-    }
-
-    String formattedMessage = logMessage.getMessage();
-    if (formattedMessage != null) {
-      println(level, formattedMessage);
-    }
-
-    Throwable thrown = logMessage.getThrowable();
-    if (thrown != null) {
-      println(level, Log.getStackTraceString(thrown));
-    }
-  }
-
-  @VisibleForTesting
-  void println(int level, @NonNull String message) {
-    Log.println(level, tag, message);
-  }
-
-  private boolean isLoggable(int level) {
-    return level >= buildConfigWrapper.getMinLogLevel();
+    consoleHandler.log(tag, logMessage);
   }
 
   private LogMessage simpleLogMessage(int level, @Nullable String message, @Nullable Throwable throwable) {

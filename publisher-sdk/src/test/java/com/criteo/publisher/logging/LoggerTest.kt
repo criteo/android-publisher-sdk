@@ -17,16 +17,9 @@
 package com.criteo.publisher.logging
 
 import android.util.Log
-import com.criteo.publisher.util.BuildConfigWrapper
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.anyOrNull
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.inOrder
-import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
@@ -40,128 +33,68 @@ class LoggerTest {
   val mockitoRule: MockitoRule = MockitoJUnit.rule()
 
   @Mock
-  private lateinit var buildConfigWrapper: BuildConfigWrapper
+  private lateinit var handler: ConsoleHandler
+
+  private lateinit var logger: Logger
+
+  @Before
+  fun setUp() {
+    logger = spy(Logger("myTag", handler))
+  }
 
   @Test
-  fun debug_GivenMessageAndArgs_PrintFormattedMessage() {
-    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.VERBOSE)
-    val logger = spy(Logger(javaClass, buildConfigWrapper))
-
+  fun debug_GivenMessageAndArgs_DelegateFormattedMessage() {
     logger.debug("Hello %s", "World")
 
-    verify(logger).println(Log.DEBUG, "Hello World")
+    verify(handler).log("myTag", LogMessage(Log.DEBUG, "Hello World"))
   }
 
   @Test
-  fun debug_GivenMessageAndThrowable_PrintMessageThenStacktrace() {
-    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.DEBUG)
-    val logger = spy(Logger(javaClass, buildConfigWrapper))
+  fun debug_GivenMessageAndThrowable_DelegateMessageAndThrowable() {
+    val exception = Exception()
+    logger.debug("Hello", exception)
 
-    logger.debug("Hello", Exception())
-
-    inOrder(logger) {
-      verify(logger).println(Log.DEBUG, "Hello")
-      verify(logger).println(eq(Log.DEBUG), anyOrNull())
-      verifyNoMoreInteractions()
-    }
+    verify(handler).log("myTag", LogMessage(Log.DEBUG, "Hello", exception))
   }
 
   @Test
-  fun debug_GivenMinLogLevelHigherThanDebug_IgnoreLog() {
-    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.INFO)
-    val logger = spy(Logger(javaClass, buildConfigWrapper))
+  fun info_GivenMessageAndThrowable_DelegateMessageAndThrowable() {
+    val exception = Exception()
 
-    logger.debug("Hello")
+    logger.info("Hello", exception)
 
-    verify(logger, never()).println(any(), any())
-  }
-
-  @Test
-  fun info_GivenMessageAndThrowable_PrintMessageThenStacktrace() {
-    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.INFO)
-    val logger = spy(Logger(javaClass, buildConfigWrapper))
-
-    logger.info("Hello", Exception())
-
-    inOrder(logger) {
-      verify(logger).println(Log.INFO, "Hello")
-      verify(logger).println(eq(Log.INFO), anyOrNull())
-      verifyNoMoreInteractions()
-    }
+    verify(handler).log("myTag", LogMessage(Log.INFO, "Hello", exception))
   }
 
   @Test
   fun info_GivenMessageAndArgs_PrintFormattedMessage() {
-    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.INFO)
-    val logger = spy(Logger(javaClass, buildConfigWrapper))
-
     logger.info("Hello %s", "World")
 
-    verify(logger).println(Log.INFO, "Hello World")
-  }
-
-  @Test
-  fun info_GivenMinLogLevelHigherThanInfo_IgnoreLog() {
-    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.WARN)
-    val logger = spy(Logger(javaClass, buildConfigWrapper))
-
-    logger.info("Hello")
-
-    verify(logger, never()).println(any(), any())
+    verify(handler).log("myTag", LogMessage(Log.INFO, "Hello World"))
   }
 
   @Test
   fun warning_GivenMessageAndArgs_PrintFormattedMessage() {
-    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.INFO)
-    val logger = spy(Logger(javaClass, buildConfigWrapper))
-
     logger.warning("Hello %s", "World")
 
-    verify(logger).println(Log.WARN, "Hello World")
+    verify(handler).log("myTag", LogMessage(Log.WARN, "Hello World"))
   }
 
   @Test
-  fun warning_GivenMinLogLevelHigherThanInfo_IgnoreLog() {
-    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.ERROR)
-    val logger = spy(Logger(javaClass, buildConfigWrapper))
+  fun error_GivenJustThrowable_DelegateOnlyThrowable() {
+    val exception = Exception()
 
-    logger.warning("Hello")
+    logger.error(exception)
 
-    verify(logger, never()).println(any(), any())
-  }
-
-  @Test
-  fun error_GivenJustThrowable_PrintStacktrace() {
-    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.ERROR)
-    val logger = spy(Logger(javaClass, buildConfigWrapper))
-
-    logger.error(Exception())
-
-    verify(logger).println(eq(Log.ERROR), anyOrNull())
+    verify(handler).log("myTag", LogMessage(Log.ERROR, null, exception))
   }
 
   @Test
   fun error_GivenThrowableAndMessage_PrintMessageThenStacktrace() {
-    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.INFO)
-    val logger = spy(Logger(javaClass, buildConfigWrapper))
+    val exception = Exception()
 
-    logger.error("Hello", Exception())
+    logger.error("Hello", exception)
 
-    inOrder(logger) {
-      verify(logger).println(Log.ERROR, "Hello")
-      verify(logger).println(eq(Log.ERROR), anyOrNull())
-      verifyNoMoreInteractions()
-    }
+    verify(handler).log("myTag", LogMessage(Log.ERROR, "Hello", exception))
   }
-
-  @Test
-  fun error_GivenMinLogLevelHigherThanError_IgnoreLog() {
-    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.ASSERT)
-    val logger = spy(Logger(javaClass, buildConfigWrapper))
-
-    logger.error(Exception())
-
-    verify(logger, never()).println(any(), any())
-  }
-
 }

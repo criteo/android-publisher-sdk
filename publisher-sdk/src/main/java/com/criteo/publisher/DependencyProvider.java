@@ -67,6 +67,7 @@ import com.criteo.publisher.headerbidding.OtherAdServersHeaderBidding;
 import com.criteo.publisher.integration.IntegrationDetector;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
+import com.criteo.publisher.logging.ConsoleHandler;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CdbRequestFactory;
@@ -569,6 +570,13 @@ public class DependencyProvider {
   @NonNull
   public LoggerFactory provideLoggerFactory() {
     return getOrCreate(LoggerFactory.class, () -> new LoggerFactory(
+        provideConsoleHandler()
+    ));
+  }
+
+  @NonNull
+  public ConsoleHandler provideConsoleHandler() {
+    return getOrCreate(ConsoleHandler.class, () -> new ConsoleHandler(
         provideBuildConfigWrapper()
     ));
   }
