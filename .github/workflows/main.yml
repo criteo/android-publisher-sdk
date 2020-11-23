@@ -9,7 +9,7 @@ on:
 
 jobs:
   java-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -152,7 +152,7 @@ jobs:
             **/test-results/gordon/*.xml
 
   quality-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     needs:
       - java-tests
