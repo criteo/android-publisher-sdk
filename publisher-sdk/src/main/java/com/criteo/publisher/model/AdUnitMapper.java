@@ -20,7 +20,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
-import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.DeviceUtil;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -52,11 +51,10 @@ public class AdUnitMapper {
    */
   private static final AdSize NATIVE_SIZE = new AdSize(2, 2);
 
-  private final AndroidUtil androidUtil;
+  @NonNull
   private final DeviceUtil deviceUtil;
 
-  public AdUnitMapper(AndroidUtil androidUtil, DeviceUtil deviceUtil) {
-    this.androidUtil = androidUtil;
+  public AdUnitMapper(@NonNull DeviceUtil deviceUtil) {
     this.deviceUtil = deviceUtil;
   }
 

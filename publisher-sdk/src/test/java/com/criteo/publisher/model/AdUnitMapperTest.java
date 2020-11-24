@@ -29,7 +29,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.DeviceUtil;
 import java.util.List;
 import org.junit.Before;
@@ -40,9 +39,6 @@ import org.mockito.MockitoAnnotations;
 public class AdUnitMapperTest {
 
   @Mock
-  private AndroidUtil androidUtil;
-
-  @Mock
   private DeviceUtil deviceUtil;
 
   private AdUnitMapper mapper;
@@ -51,7 +47,7 @@ public class AdUnitMapperTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
 
-    mapper = new AdUnitMapper(androidUtil, deviceUtil);
+    mapper = new AdUnitMapper(deviceUtil);
   }
 
   @Test
