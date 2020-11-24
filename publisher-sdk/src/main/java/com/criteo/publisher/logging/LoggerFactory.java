@@ -18,6 +18,7 @@ package com.criteo.publisher.logging;
 
 import androidx.annotation.NonNull;
 import com.criteo.publisher.DependencyProvider;
+import java.util.Collections;
 
 public class LoggerFactory {
 
@@ -34,7 +35,7 @@ public class LoggerFactory {
   }
 
   public Logger createLogger(@NonNull Class<?> klass) {
-    return new Logger(klass, consoleHandler);
+    return new Logger(klass, Collections.singletonList(consoleHandler));
   }
 
 }
