@@ -65,6 +65,15 @@ class LoggerTest {
   }
 
   @Test
+  fun debug_GivenOnlyThrowable_DelegateThrowable() {
+    val exception = Exception()
+    logger.debug(exception)
+
+    verify(handler1).log("myTag", LogMessage(Log.DEBUG, null, exception))
+    verify(handler2).log("myTag", LogMessage(Log.DEBUG, null, exception))
+  }
+
+  @Test
   fun info_GivenMessageAndThrowable_DelegateMessageAndThrowable() {
     val exception = Exception()
 
