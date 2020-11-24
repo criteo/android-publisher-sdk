@@ -109,7 +109,7 @@ public class DependencyProvider {
   private Application application;
   private String criteoPublisherId;
 
-  private DependencyProvider() {
+  protected DependencyProvider() {
   }
 
   @NonNull
@@ -465,7 +465,7 @@ public class DependencyProvider {
   }
 
   @SuppressWarnings("unchecked")
-  private <T> T getOrCreate(Class<T> klass, Factory<T> factory) {
+  protected <T> T getOrCreate(Class<T> klass, Factory<T> factory) {
     Object service = MapUtilKt.getOrCompute(services, klass, (Function0<T>) factory::create);
 
     // safe because the services map is only filled there by typed factory

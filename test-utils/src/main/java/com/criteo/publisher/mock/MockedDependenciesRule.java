@@ -16,9 +16,11 @@
 
 package com.criteo.publisher.mock;
 
+import static org.mockito.AdditionalAnswers.delegatesTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -42,10 +44,13 @@ import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.InstrumentationUtil;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.internal.runners.statements.FailOnTimeout;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
+import org.mockito.stubbing.Answer;
 
 /**
  * Use this Rule when writing tests that require mocking global dependencies.
@@ -137,8 +142,12 @@ public class MockedDependenciesRule implements MethodRule {
     };
   }
 
+  protected DependencyProvider createDependencyProvider() {
+    return DependencyProvider.getInstance();
+  }
+
   private void setUpDependencyProvider() {
-    DependencyProvider originalDependencyProvider = DependencyProvider.getInstance();
+    DependencyProvider originalDependencyProvider = createDependencyProvider();
 
     Application application = InstrumentationUtil.getApplication();
     originalDependencyProvider.setApplication(application);
@@ -178,11 +187,46 @@ public class MockedDependenciesRule implements MethodRule {
       return;
     }
 
-    spiedLogger = spy(dependencyProvider.provideLoggerFactory().createLogger(getClass()));
+    /*
+     Special care needs to be taken when mocking the logger:
+     - Logger depends on beans such as the ConsoleHandler
+     - (2) Other beans depends on Logger via LoggerFactory#createLogger which is called during beans' creation.
 
-    LoggerFactory loggerFactory = spy(dependencyProvider.provideLoggerFactory());
-    doReturn(spiedLogger).when(loggerFactory).createLogger(any());
-    when(dependencyProvider.provideLoggerFactory()).thenReturn(loggerFactory);
+     When @SpyBean/@MockBean/@Injected beans are injected, loggers are created (2). So the logger factory should
+     already be mocked to serve a spy/mock logger.
+     But the logger factory should not be created before the injection step because its dependencies (1) would not be
+     injected properly.
+
+     So we have:
+     - Logger should be mocked before injection step
+     - LoggerFactory should be created after injection step
+
+     This implementation is creating first a mocked logger before injection step. This is the logger that will be
+     provided to other beans. The LoggerFactory is not created, only mocked.
+     When mocked logger is used (so after the injection step), then one real LoggerFactory is created and used to create
+     one real logger. Then the mocked logger delegates to the real logger.
+    */
+
+    LoggerFactory mockLoggerFactory = mock(LoggerFactory.class);
+
+    AtomicBoolean isFetchingRealLoggerFactory = new AtomicBoolean(false);
+    AtomicReference<Answer<?>> lazyDelegateAnswerRef = new AtomicReference<>();
+    spiedLogger = mock(Logger.class, invocation -> {
+      if (lazyDelegateAnswerRef.get() == null) {
+        isFetchingRealLoggerFactory.set(true);
+        Logger realLogger = dependencyProvider.provideLoggerFactory().createLogger(MockedDependenciesRule.class);
+        lazyDelegateAnswerRef.compareAndSet(null, delegatesTo(realLogger));
+      }
+      return lazyDelegateAnswerRef.get().answer(invocation);
+    });
+    doReturn(spiedLogger).when(mockLoggerFactory).createLogger(any());
+
+    doAnswer(invocation -> {
+      if (isFetchingRealLoggerFactory.compareAndSet(true, false)) {
+        return invocation.callRealMethod();
+      }
+      return mockLoggerFactory;
+    }).when(dependencyProvider).provideLoggerFactory();
   }
 
   @RequiresApi(api = VERSION_CODES.O)
@@ -256,10 +300,12 @@ public class MockedDependenciesRule implements MethodRule {
 
   @RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)
   private void resetAllPersistedData() {
-    // Clear all states retained in shared preferences used by the SDK.
-    dependencyProvider.provideSharedPreferences().edit().clear().apply();
+    if (dependencyProvider != null) {
+      // Clear all states retained in shared preferences used by the SDK.
+      dependencyProvider.provideSharedPreferences().edit().clear().apply();
 
-    // Clear CSM
-    MetricHelper.cleanState(dependencyProvider);
+      // Clear CSM
+      MetricHelper.cleanState(dependencyProvider);
+    }
   }
 }
