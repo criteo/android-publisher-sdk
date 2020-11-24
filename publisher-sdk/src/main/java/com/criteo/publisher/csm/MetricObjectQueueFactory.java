@@ -89,7 +89,7 @@ public class MetricObjectQueueFactory {
       } catch (IOException e) {
         exception.addSuppressed(e);
       } finally {
-        logger.error("Error while reading CSM queue file. "
+        logger.warning("Error while reading CSM queue file. "
             + "Recovering by recreating it or using in-memory queue", exception);
       }
     }

@@ -16,9 +16,6 @@
 
 package com.criteo.publisher;
 
-import static android.content.ContentValues.TAG;
-
-import android.util.Log;
 import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -322,7 +319,7 @@ public class BidManager implements ApplicationStoppedListener {
   CacheAdUnit mapToCacheAdUnit(@Nullable AdUnit adUnit) {
     CacheAdUnit cacheAdUnit = adUnitMapper.map(adUnit);
     if (cacheAdUnit == null) {
-      Log.e(TAG, "Valid AdUnit is required.");
+      logger.warning("Valid AdUnit is required.");
       return null;
     }
     return cacheAdUnit;

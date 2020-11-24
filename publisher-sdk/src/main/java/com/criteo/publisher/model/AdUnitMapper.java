@@ -16,10 +16,11 @@
 
 package com.criteo.publisher.model;
 
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.util.DeviceUtil;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,8 +30,6 @@ import java.util.List;
 import java.util.Set;
 
 public class AdUnitMapper {
-
-  private static final String TAG = AdUnitMapper.class.getSimpleName();
 
   /**
    * Ad units are grouped into chunks so bid request size stay reasonable and this may improve the
@@ -50,6 +49,9 @@ public class AdUnitMapper {
    * Special size representing a native ad.
    */
   private static final AdSize NATIVE_SIZE = new AdSize(2, 2);
+
+  @NonNull
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @NonNull
   private final DeviceUtil deviceUtil;
@@ -131,7 +133,7 @@ public class AdUnitMapper {
       if (cacheAdUnit.getPlacementId().isEmpty()
           || cacheAdUnit.getSize().getWidth() <= 0
           || cacheAdUnit.getSize().getHeight() <= 0) {
-        Log.e(TAG, "Found an invalid AdUnit: " + cacheAdUnit);
+        logger.warning("Found an invalid AdUnit: " + cacheAdUnit);
         continue;
       }
       validatedCacheAdUnits.add(cacheAdUnit);

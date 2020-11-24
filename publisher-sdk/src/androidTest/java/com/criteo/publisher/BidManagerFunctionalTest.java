@@ -1647,7 +1647,7 @@ public class BidManagerFunctionalTest {
 
   private AdUnitMapper givenMockedAdUnitMapper() {
     AdUnitMapper mapper = mock(AdUnitMapper.class);
-    when(dependencyProvider.provideAdUnitMapper()).thenReturn(mapper);
+    doReturn(mapper).when(dependencyProvider).provideAdUnitMapper();
     return mapper;
   }
 

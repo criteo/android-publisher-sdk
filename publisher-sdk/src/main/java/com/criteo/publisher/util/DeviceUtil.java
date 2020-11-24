@@ -16,15 +16,16 @@
 
 package com.criteo.publisher.util;
 
-import static android.content.ContentValues.TAG;
-
 import android.content.Context;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import androidx.annotation.NonNull;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.AdSize;
 
 public class DeviceUtil {
+
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @NonNull
   private final Context context;
@@ -63,7 +64,7 @@ public class DeviceUtil {
 
   public boolean isVersionSupported() {
     if (android.os.Build.VERSION.SDK_INT < 19) {
-      Log.e(TAG, "Unsupported Android version");
+      logger.info("Unsupported Android version");
       return false;
     }
 
