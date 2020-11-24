@@ -409,6 +409,19 @@ public class CdbResponseSlotTest {
   }
 
   @Test
+  public void isValid_GivenSilentBid_ReturnTrue() throws Exception {
+    String json = "{\n"
+        + "  \"placementId\": \"myAdUnit\",\n"
+        + "  \"cpm\": \"0.00\",\n"
+        + "  \"currency\": \"USD\",\n"
+        + "  \"ttl\": 60,\n"
+        + "}";
+    CdbResponseSlot slot = CdbResponseSlot.fromJson(new JSONObject(json));
+
+    assertThat(slot.isValid()).isTrue();
+  }
+
+  @Test
   public void getTtl_GivenImmediateBid_ShouldNotOverrideTtl() throws Exception {
     // Immediate bid means CPM > 0 and TTL = 0
     // Business logic is managed by the BidManager. This is only expected to decode CDB payload.
