@@ -87,6 +87,15 @@ public class UserPrivacyUtil {
     return gdprDataFetcher.fetch();
   }
 
+  @Nullable
+  public String getGdprConsentData() {
+    GdprData gdprData = gdprDataFetcher.fetch();
+    if (gdprData == null) {
+      return null;
+    }
+    return gdprData.consentData();
+  }
+
   @NonNull
   public String getIabUsPrivacyString() {
     return safeSharedPreferences.getString(IAB_USPRIVACY_SHARED_PREFS_KEY, "");

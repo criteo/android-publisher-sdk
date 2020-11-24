@@ -141,7 +141,7 @@ public class PubSdkApiTest {
   public void postAppEvent_GivenSenderId_SendGetRequest() throws Exception {
     mockWebServer.enqueue(new MockResponse());
 
-    api.postAppEvent(42, "", null, "", 0, "", gdprData);
+    api.postAppEvent(42, "", null, "", 0, "", "fake_consent_data");
 
     RecordedRequest request = mockWebServer.takeRequest();
     assertThat(request.getRequestUrl().encodedPath()).isEqualTo("/appevent/v1/42");
@@ -153,21 +153,21 @@ public class PubSdkApiTest {
   public void postAppEvent_GivenRequest_SendThemInQueryString() throws Exception {
     mockWebServer.enqueue(new MockResponse());
 
-    api.postAppEvent(42, "myApp", "myGaid", "myEvent", 1337, "", gdprData);
+    api.postAppEvent(42, "myApp", "myGaid", "myEvent", 1337, "", "fake_consent_data");
 
     RecordedRequest request = mockWebServer.takeRequest();
     assertThat(request.getRequestUrl().queryParameter("appId")).isEqualTo("myApp");
     assertThat(request.getRequestUrl().queryParameter("gaid")).isEqualTo("myGaid");
     assertThat(request.getRequestUrl().queryParameter("eventType")).isEqualTo("myEvent");
     assertThat(request.getRequestUrl().queryParameter("limitedAdTracking")).isEqualTo("1337");
-    assertThat(request.getRequestUrl().queryParameter("gdprString")).isEqualTo("eyJjb25zZW50RGF0YSI6ImZha2VfY29uc2VudF9kYXRhIiwiZ2RwckFwcGxpZXMiOmZhbHNlLCJ2ZXJzaW9uIjoxfQ==");
+    assertThat(request.getRequestUrl().queryParameter("gdprString")).isEqualTo("fake_consent_data");
   }
 
   @Test
   public void postAppEvent_GivenNoGaid_IsNotPutInQueryString() throws Exception {
     mockWebServer.enqueue(new MockResponse());
 
-    api.postAppEvent(42, "", null, "", 0, "", gdprData);
+    api.postAppEvent(42, "", null, "", 0, "", gdprData.consentData());
 
     RecordedRequest request = mockWebServer.takeRequest();
     assertThat(request.getRequestUrl().queryParameter("gaid")).isNull();
@@ -187,7 +187,7 @@ public class PubSdkApiTest {
   public void postAppEvent_GivenUserAgent_SetItInHttpHeader() throws Exception {
     mockWebServer.enqueue(new MockResponse());
 
-    api.postAppEvent(42, "", null, "", 0, "myUserAgent", gdprData);
+    api.postAppEvent(42, "", null, "", 0, "myUserAgent", "fake_consent_data");
 
     RecordedRequest request = mockWebServer.takeRequest();
     assertThat(request.getHeader("User-Agent")).isEqualTo("myUserAgent");
@@ -197,7 +197,7 @@ public class PubSdkApiTest {
   public void postAppEvent_GivenConnectionError_SetItInHttpHeader() throws Exception {
     givenConnectionError();
 
-    assertThatCode(() -> api.postAppEvent(42, "", null, "", 0, "myUserAgent", gdprData))
+    assertThatCode(() -> api.postAppEvent(42, "", null, "", 0, "myUserAgent", "fake_consent_data"))
         .isInstanceOf(IOException.class);
   }
 
@@ -205,7 +205,7 @@ public class PubSdkApiTest {
   public void postAppEvent_GivenHttpError_ThrowException() throws Exception {
     mockWebServer.enqueue(new MockResponse().setResponseCode(400));
 
-    assertThatCode(() -> api.postAppEvent(42, "", null, "", 0, "myUserAgent", gdprData))
+    assertThatCode(() -> api.postAppEvent(42, "", null, "", 0, "myUserAgent", gdprData.consentData()))
         .isInstanceOf(IOException.class);
   }
 

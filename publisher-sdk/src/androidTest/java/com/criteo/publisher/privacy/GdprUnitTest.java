@@ -122,4 +122,10 @@ public class GdprUnitTest {
 
     Assert.assertNotNull(gdprData);
   }
+
+  @Test
+  public void testGdprConsentData() {
+    initializeGdprParameters("1", "fake_gdpr_consent_data");;
+    Assert.assertEquals("fake_gdpr_consent_data", userPrivacyUtil.getGdprConsentData());
+  }
 }

@@ -26,7 +26,6 @@ import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -70,7 +69,6 @@ public class PubSdkApiIntegrationTest {
   private String gaid;
   private String eventType;
   private String appId;
-  private GdprData gdprData;
 
   @Inject
   private Context context;
@@ -138,7 +136,7 @@ public class PubSdkApiIntegrationTest {
         eventType,
         limitedAdTracking,
         "",
-        gdprData
+        "fakeConsentData"
     );
 
     // nothing to assert, no thrown exception means success
@@ -153,7 +151,7 @@ public class PubSdkApiIntegrationTest {
         eventType,
         limitedAdTracking,
         "",
-        gdprData
+        "fakeConsentData"
     );
 
     // nothing to assert, no thrown exception means success
@@ -279,28 +277,6 @@ public class PubSdkApiIntegrationTest {
   }
 
   @Test
-  public void testGetGdprDataString_WhenUsingTcf2() {
-    // Given
-    setupGdprDataWithTcf2(
-      "0",
-      "ssds"
-    );
-    gdprData = userPrivacyUtil.getGdprData();
-
-    // When
-    String gdprString = api.getGdprDataStringBase64(gdprData);
-
-    // Then
-
-    // Value generated using: https://www.base64decode.org/ on:
-    // {"consentData":"ssds","gdprApplies":false,"version":2}
-    assertEquals(
-        "eyJjb25zZW50RGF0YSI6InNzZHMiLCJnZHByQXBwbGllcyI6ZmFsc2UsInZlcnNpb24iOjJ9",
-        gdprString
-    );
-  }
-
-  @Test
   public void testPostAppEvent_WhenUsingEmptyGdprData() throws Exception {
     // Given
     setupGdprDataWithTcf2(
@@ -313,8 +289,6 @@ public class PubSdkApiIntegrationTest {
         ""
     );
 
-    gdprData = userPrivacyUtil.getGdprData();
-
     // When
     JSONObject jsonObject = api.postAppEvent(
         senderId,
@@ -323,35 +297,11 @@ public class PubSdkApiIntegrationTest {
         eventType,
         limitedAdTracking,
         "",
-        gdprData
+        "fakeConsentData"
     );
 
     // Then
     assertNotNull(jsonObject);
-  }
-
-  @Test
-  public void testGetGdprDataString_WhenUsingTcf1() {
-    // Given
-    setupGdprDataWithTcf1(
-        "1",
-        "ssds"
-    );
-    gdprData = userPrivacyUtil.getGdprData();
-
-    // When
-
-    // Value generated using: https://www.base64decode.org/ on:
-    // {"consentData":"ssds","gdprApplies":true,"version":1}
-    String gdprString = api.getGdprDataStringBase64(gdprData);
-
-    // Then
-    assertEquals(
-        "eyJjb25zZW50RGF0YSI6InNzZHMiLCJnZHByQXBwbGllcyI6dHJ1ZSwidmVyc2lvbiI6MX0=",
-        gdprString
-    );
-
-    gdprData = userPrivacyUtil.getGdprData();
   }
 
   private void setupGdprDataWithTcf1(String gdprApplies, String tcString) {

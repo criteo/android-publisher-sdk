@@ -17,6 +17,7 @@
 package com.criteo.publisher.headerbidding;
 
 import android.content.res.Configuration;
+import android.util.Base64;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -28,7 +29,6 @@ import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeProduct;
 import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.AndroidUtil;
-import com.criteo.publisher.util.Base64;
 import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.util.PreconditionsUtil;
 import com.criteo.publisher.util.TextUtils;

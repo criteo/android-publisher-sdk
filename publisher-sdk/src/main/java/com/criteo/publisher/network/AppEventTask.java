@@ -87,7 +87,7 @@ public class AppEventTask extends SafeRunnable {
         eventType,
         limitedAdTracking,
         userAgent,
-        userPrivacyUtil.getGdprData()
+        userPrivacyUtil.getGdprConsentData()
     );
 
     logger.debug("App event response: %s", response);

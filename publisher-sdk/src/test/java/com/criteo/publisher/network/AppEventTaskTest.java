@@ -102,7 +102,8 @@ public class AppEventTaskTest {
 
   @Test
   public void backgroundTask_GivenUserAgent_CallApiWithIt() throws Exception {
-    when(userPrivacyUtil.getGdprData()).thenReturn(gdprData);
+    when(deviceInfo.getUserAgent()).thenReturn(completedFuture("myUserAgent"));
+    when(userPrivacyUtil.getGdprConsentData()).thenReturn("fakeConsentData");
 
     AppEventTask appEventTask = createTask("eventType");
     appEventTask.run();
@@ -114,7 +115,7 @@ public class AppEventTaskTest {
         eq("eventType"),
         anyInt(),
         eq("myUserAgent"),
-        eq(gdprData)
+        eq("fakeConsentData")
     );
   }
 
