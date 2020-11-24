@@ -18,26 +18,36 @@ package com.criteo.publisher.model;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
 import android.webkit.WebView;
 import androidx.annotation.NonNull;
 import androidx.annotation.UiThread;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.util.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DeviceInfo {
 
-  private static final String TAG = DeviceInfo.class.getSimpleName();
+  @NonNull
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
+  @NonNull
   private final Context context;
+
+  @NonNull
   private final RunOnUiThreadExecutor runOnUiThreadExecutor;
+
+  @NonNull
   private final CompletableFuture<String> userAgentFuture = new CompletableFuture<>();
+
+  @NonNull
   private final AtomicBoolean isInitialized = new AtomicBoolean(false);
 
-  public DeviceInfo(Context context, RunOnUiThreadExecutor runOnUiThreadExecutor) {
+  public DeviceInfo(@NonNull Context context, @NonNull RunOnUiThreadExecutor runOnUiThreadExecutor) {
     this.context = context;
     this.runOnUiThreadExecutor = runOnUiThreadExecutor;
   }
@@ -64,14 +74,10 @@ public class DeviceInfo {
   }
 
   private void runOnUiThread(Runnable runnable) {
-    Runnable safeRunnable = new Runnable() {
+    Runnable safeRunnable = new SafeRunnable() {
       @Override
-      public void run() {
-        try {
-          runnable.run();
-        } catch (Throwable tr) {
-          Log.e(TAG, "Internal error while setting user-agent.", tr);
-        }
+      public void runSafely() {
+        runnable.run();
       }
     };
 
@@ -110,13 +116,13 @@ public class DeviceInfo {
   }
 
   @NonNull
-  private static String getDefaultUserAgent() {
+  private String getDefaultUserAgent() {
     String userAgent = null;
 
     try {
       userAgent = System.getProperty("http.agent");
     } catch (Throwable tr) {
-      Log.e(TAG, "Unable to retrieve system user-agent.", tr);
+      logger.error("Unable to retrieve system user-agent.", tr);
     }
 
     return userAgent != null ? userAgent : "";

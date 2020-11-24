@@ -20,9 +20,10 @@ import static com.criteo.publisher.util.ObjectUtils.getOrElse;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.util.JsonSerializer;
 import com.criteo.publisher.util.SafeSharedPreferences;
 import java.io.ByteArrayInputStream;
@@ -32,8 +33,6 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 public class Config {
-
-  private static final String TAG = Config.class.getSimpleName();
 
   /**
    * Key in local storage where all configuration from remote is persisted.
@@ -53,6 +52,8 @@ public class Config {
     private static final boolean PREFETCH_ON_INIT_ENABLED = true;
 
   }
+
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   // NOTE: This entire object is not at all thread-safe, but except the kill switch, other config
   //  are only accessed at display time. As they are only updated during SDK init, before any bids
@@ -101,7 +102,7 @@ public class Config {
     try (InputStream inputStream = new ByteArrayInputStream(remoteConfigJsonBytes)) {
       readConfig = jsonSerializer.read(RemoteConfigResponse.class, inputStream);
     } catch (IOException e) {
-      Log.d(TAG, "Couldn't read cached values", e);
+      logger.debug("Couldn't read cached values", e);
       return config;
     }
 
@@ -173,7 +174,7 @@ public class Config {
       jsonSerializer.write(response, baos);
       remoteConfigJson = new String(baos.toByteArray(), Charset.forName("UTF-8"));
     } catch (Exception e) {
-      Log.d(TAG, "Couldn't persist values", e);
+      logger.debug("Couldn't persist values", e);
       return;
     }
 

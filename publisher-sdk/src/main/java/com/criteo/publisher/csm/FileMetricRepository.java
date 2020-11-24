@@ -17,9 +17,10 @@
 package com.criteo.publisher.csm;
 
 import android.os.Build.VERSION_CODES;
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.util.MapUtilKt;
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +34,7 @@ import kotlin.jvm.functions.Function0;
 @RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)
 class FileMetricRepository extends MetricRepository {
 
-  private static final String TAG = FileMetricRepository.class.getSimpleName();
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @NonNull
   private final MetricDirectory directory;
@@ -53,7 +54,7 @@ class FileMetricRepository extends MetricRepository {
     try {
       syncMetricFile.update(updater);
     } catch (IOException e) {
-      Log.d(TAG, "Error while updating metric", e);
+      logger.debug("Error while updating metric", e);
     }
   }
 
@@ -65,7 +66,7 @@ class FileMetricRepository extends MetricRepository {
     try {
       syncMetricFile.moveWith(mover);
     } catch (IOException e) {
-      Log.d(TAG, "Error while moving metric", e);
+      logger.debug("Error while moving metric", e);
     }
   }
 
@@ -80,7 +81,7 @@ class FileMetricRepository extends MetricRepository {
         Metric metric = getOrCreateMetricFile(metricFile).read();
         metrics.add(metric);
       } catch (IOException e) {
-        Log.d(TAG, "Error while reading metric", e);
+        logger.debug("Error while reading metric", e);
       }
     }
     return metrics;
