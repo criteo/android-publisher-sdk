@@ -669,8 +669,22 @@ public class BidManagerFunctionalTest {
 
     BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
+    waitForIdleState();
 
     assertNoLiveBidIsCached();
+  }
+
+  @Test
+  public void getBidForAdUnitAndPrefetch_GivenSilentBidFetched_ShouldPopulateCache() throws Exception {
+    CacheAdUnit cacheAdUnit = sampleAdUnit();
+    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
+    CdbResponseSlot slot = givenSilentBidFetched();
+
+    BidManager bidManager = createBidManager();
+    bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
+    waitForIdleState();
+
+    assertLiveBidIsCached(slot);
   }
 
   @Test
@@ -697,6 +711,7 @@ public class BidManagerFunctionalTest {
 
     BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
+    waitForIdleState();
 
     assertShouldNotCallCdbAndNotPopulateCache();
   }
@@ -1299,9 +1314,7 @@ public class BidManagerFunctionalTest {
       throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    CdbResponseSlot newSlot = givenMockedCdbRespondingSlot();
-    when(newSlot.getCpmAsNumber()).thenReturn(0.);
-    when(newSlot.getTtlInSeconds()).thenReturn(1);
+    CdbResponseSlot newSlot = givenSilentBidFetched();
 
     BidListener bidListener = mock(BidListener.class);
 
@@ -1634,6 +1647,15 @@ public class BidManagerFunctionalTest {
     when(slot.getCpmAsNumber()).thenReturn(1337.);
     when(slot.getTtlInSeconds()).thenReturn(42);
     when(slot.getDisplayUrl()).thenReturn("http://foo.bar");
+    CdbResponse response = givenMockedCdbResponse();
+    when(response.getSlots()).thenReturn(singletonList(slot));
+    return slot;
+  }
+
+  private CdbResponseSlot givenSilentBidFetched() throws Exception {
+    CdbResponseSlot slot = spy(CdbResponseSlot.class);
+    when(slot.getCpmAsNumber()).thenReturn(0.);
+    when(slot.getTtlInSeconds()).thenReturn(42);
     CdbResponse response = givenMockedCdbResponse();
     when(response.getSlots()).thenReturn(singletonList(slot));
     return slot;

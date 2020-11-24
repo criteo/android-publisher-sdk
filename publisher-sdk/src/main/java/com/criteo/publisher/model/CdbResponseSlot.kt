@@ -66,11 +66,13 @@ data class CdbResponseSlot(
   fun isValid(): Boolean {
     val hasInvalidCpm = cpmAsNumber ?: -1.0 < 0.0
     val isNoBid = cpmAsNumber == 0.0 && ttlInSeconds == 0
-    if (hasInvalidCpm || isNoBid) {
-      return false
-    }
+    val isSilentBid = cpmAsNumber == 0.0 && ttlInSeconds > 0
 
-    return isNative || URLUtil.isValidUrl(displayUrl)
+    return when {
+      hasInvalidCpm || isNoBid -> false
+      isSilentBid -> true
+      else -> isNative || URLUtil.isValidUrl(displayUrl)
+    }
   }
 
   fun isExpired(clock: Clock): Boolean {
