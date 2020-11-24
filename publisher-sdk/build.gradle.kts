@@ -34,7 +34,7 @@ allOpen {
     annotation("com.criteo.publisher.annotation.OpenForTesting")
 }
 
-androidLibModule() {
+androidLibModule {
     // Network
     addBuildConfigField<String>("cdbUrl")
     addBuildConfigField<String>("eventUrl")
@@ -53,7 +53,7 @@ androidLibModule() {
 
     // Misc
     addBuildConfigField<String>("pubSdkSharedPreferences")
-    addBuildConfigField<Int>("minLogLevel")
+    addBuildConfigField<Int>("defaultMinLogLevel")
     addBuildConfigField<Boolean>("preconditionThrowsOnException")
 }
 

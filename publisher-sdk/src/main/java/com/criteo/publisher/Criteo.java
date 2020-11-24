@@ -17,6 +17,7 @@
 package com.criteo.publisher;
 
 import android.app.Application;
+import android.util.Log;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,8 +48,8 @@ public abstract class Criteo {
     @NonNull
     private final Application application;
 
-    @Nullable
-    private List<AdUnit> adUnits;
+    @NonNull
+    private List<AdUnit> adUnits = new ArrayList<>();
 
     @Nullable
     private Boolean usPrivacyOptOut;
@@ -56,13 +57,19 @@ public abstract class Criteo {
     @Nullable
     private String mopubConsent;
 
+    private boolean isDebugLogsEnabled = false;
+
     public Builder(@NonNull Application application, @NonNull String criteoPublisherId) {
       this.application = application;
       this.criteoPublisherId = criteoPublisherId;
     }
 
     public Builder adUnits(@Nullable List<AdUnit> adUnits) {
-      this.adUnits = adUnits;
+      if (adUnits == null) {
+        this.adUnits = new ArrayList<>();
+      } else {
+        this.adUnits = adUnits;
+      }
       return this;
     }
 
@@ -76,45 +83,44 @@ public abstract class Criteo {
       return this;
     }
 
+    public Builder debugLogsEnabled(boolean isDebugLogsEnabled) {
+      this.isDebugLogsEnabled = isDebugLogsEnabled;
+      return this;
+    }
+
     public Criteo init() throws CriteoInitException {
-      if (adUnits == null) {
-        adUnits = new ArrayList<>();
-      }
-      return Criteo.init(application, criteoPublisherId, adUnits, usPrivacyOptOut, mopubConsent);
+      return Criteo.init(this);
     }
   }
 
-  private static Criteo init(
-      @NonNull Application application,
-      @NonNull String criteoPublisherId,
-      @NonNull List<AdUnit> adUnits,
-      @Nullable Boolean usPrivacyOptOut,
-      @Nullable String mopubConsent
-  ) throws CriteoInitException {
+  private static Criteo init(@NonNull Builder builder) throws CriteoInitException {
     Logger logger = LoggerFactory.getLogger(Criteo.class);
 
     synchronized (Criteo.class) {
       if (criteo == null) {
         try {
           DependencyProvider dependencyProvider = DependencyProvider.getInstance();
-          dependencyProvider.setApplication(application);
-          dependencyProvider.setCriteoPublisherId(criteoPublisherId);
+          dependencyProvider.setApplication(builder.application);
+          dependencyProvider.setCriteoPublisherId(builder.criteoPublisherId);
+
+          if (builder.isDebugLogsEnabled) {
+            dependencyProvider.provideConsoleHandler().setMinLogLevel(Log.INFO);
+          }
 
           DeviceUtil deviceUtil = dependencyProvider.provideDeviceUtil();
-
           if (deviceUtil.isVersionSupported()) {
             criteo = new CriteoInternal(
-                application,
-                adUnits,
-                usPrivacyOptOut,
-                mopubConsent,
+                builder.application,
+                builder.adUnits,
+                builder.usPrivacyOptOut,
+                builder.mopubConsent,
                 dependencyProvider
             );
           } else {
             criteo = new DummyCriteo();
           }
 
-          logger.log(SdkInitLogMessage.onSdkInitialized(criteoPublisherId, adUnits, getVersion()));
+          logger.log(SdkInitLogMessage.onSdkInitialized(builder.criteoPublisherId, builder.adUnits, getVersion()));
         } catch(Throwable tr) {
           criteo = new DummyCriteo();
           logger.error("Internal error initializing Criteo instance.", tr);

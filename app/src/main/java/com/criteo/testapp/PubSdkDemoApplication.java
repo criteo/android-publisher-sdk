@@ -21,6 +21,7 @@ import android.os.StrictMode;
 import android.util.Log;
 import androidx.multidex.MultiDexApplication;
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.Criteo.Builder;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.context.EmailHasher;
 import com.criteo.publisher.context.UserData;
@@ -92,8 +93,18 @@ public class PubSdkDemoApplication extends MultiDexApplication {
     adUnits.add(NATIVE);
 
     try {
-      Criteo criteo = new Criteo.Builder(this, "B-056946")
-          .adUnits(adUnits)
+      Builder builder = new Builder(this, "B-056946")
+          .adUnits(adUnits);
+
+      //noinspection ConstantConditions
+      if ("release".equals(BuildConfig.BUILD_TYPE)) {
+        // Enable debug logs only on release build.
+        // As debug and staging already have a default min log level set to debug, activating the feature would degrade
+        // the logs.
+        builder.debugLogsEnabled(true);
+      }
+
+      Criteo criteo = builder
           .init();
 
       criteo.setUserData(new UserData()

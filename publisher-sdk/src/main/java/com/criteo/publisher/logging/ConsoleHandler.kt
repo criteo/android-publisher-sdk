@@ -24,6 +24,13 @@ import com.criteo.publisher.util.BuildConfigWrapper
 @OpenForTesting
 internal class ConsoleHandler(private val buildConfigWrapper: BuildConfigWrapper) {
 
+  private companion object {
+    private const val UnsetLogLevel = -1
+  }
+
+  var minLogLevel: Int = UnsetLogLevel
+    get() = field.takeIf { it != UnsetLogLevel } ?: buildConfigWrapper.defaultMinLogLevel
+
   fun log(tag: String, logMessage: LogMessage) {
     val level = logMessage.level
     if (!isLoggable(level)) {
@@ -54,6 +61,6 @@ internal class ConsoleHandler(private val buildConfigWrapper: BuildConfigWrapper
   fun getStackTraceString(throwable: Throwable): String? = Log.getStackTraceString(throwable)
 
   private fun isLoggable(level: Int): Boolean {
-    return level >= buildConfigWrapper.minLogLevel
+    return level >= minLogLevel
   }
 }

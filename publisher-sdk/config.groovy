@@ -17,7 +17,7 @@ pubSdkSharedPreferences = 'com.criteo.publisher.sdkSharedPreferences'
  */
 
 /**
- * Included minimum level of logs to print
+ * Included default minimum level of logs to print
  * Values are from {@link android.util.Log}:
  * <ul>
  *     <li>2 = VERBOSE</li>
@@ -28,7 +28,7 @@ pubSdkSharedPreferences = 'com.criteo.publisher.sdkSharedPreferences'
  *     <li>7 = ASSERT</li>
  * </ul>
  */
-minLogLevel = 5 // Warning
+defaultMinLogLevel = 5 // Warning
 
 /**
  * Indicate if exceptions that could be ignored should be thrown.
@@ -88,7 +88,7 @@ environments {
         cdbUrl = 'https://directbidder-test-app.par.preprod.crto.in' // preprod
         // cdbUrl = 'http://10.0.2.2:9991' // local
 
-        minLogLevel = 2 // All
+        defaultMinLogLevel = 2 // All
         preconditionThrowsOnException = true
     }
 
@@ -96,7 +96,7 @@ environments {
         cdbUrl = 'https://bidder.criteo.com'
         eventUrl = 'https://gum.criteo.com'
 
-        minLogLevel = 2 // All
+        defaultMinLogLevel = 2 // All
     }
 
     release {

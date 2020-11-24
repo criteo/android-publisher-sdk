@@ -18,12 +18,14 @@ package com.criteo.publisher.logging
 
 import android.app.Application
 import android.content.Context
+import android.util.Log
 import com.criteo.publisher.BannerLogMessage
 import com.criteo.publisher.Bid
 import com.criteo.publisher.BiddingLogMessage
 import com.criteo.publisher.Criteo
 import com.criteo.publisher.CriteoBannerView
 import com.criteo.publisher.CriteoInterstitial
+import com.criteo.publisher.CriteoUtil
 import com.criteo.publisher.CriteoUtil.givenInitializedCriteo
 import com.criteo.publisher.SdkInitLogMessage
 import com.criteo.publisher.StubConstants
@@ -59,8 +61,11 @@ import com.mopub.mobileads.MoPubView
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.check
+import com.nhaarman.mockitokotlin2.clearInvocations
 import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -91,6 +96,9 @@ class DebugLoggingFunctionalTest {
 
   @SpyBean
   private lateinit var api: PubSdkApi
+
+  @SpyBean
+  private lateinit var consoleHandler: ConsoleHandler
 
   private lateinit var logger: Logger
 
@@ -487,6 +495,42 @@ class DebugLoggingFunctionalTest {
     verify(logger).log(PrivacyLogMessage.onUsPrivacyOptOutSet(true))
   }
 
+  @Test
+  fun whenDebugLogsIsEnabled_LogsInConsoleHandler() {
+    assumeInfoLogsAreNotExpectedByDefault()
+
+    givenInitializedCriteo(true)
+    mockedDependenciesRule.waitForIdleState()
+
+    // Only [SdkLogMessage.onSdkInitialized] is expected
+    verify(consoleHandler, times(1)).println(eq(Log.INFO), any(), any())
+  }
+
+  @Test
+  fun whenDebugLogsIsNotEnabled_LogsNothingInConsoleHandler() {
+    assumeInfoLogsAreNotExpectedByDefault()
+
+    givenInitializedCriteo(false)
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(consoleHandler, never()).println(eq(Log.INFO), any(), any())
+  }
+
+  private fun assumeInfoLogsAreNotExpectedByDefault() {
+    whenever(buildConfigWrapper.defaultMinLogLevel).doReturn(Log.WARN)
+
+    consoleHandler.log("any", LogMessage(Log.INFO, "any"))
+
+    verify(consoleHandler, never()).println(any(), any(), any())
+    clearInvocations(consoleHandler)
+  }
+
   private fun String.withoutWhitespace() = replace("\\s".toRegex(), "")
+
+  private fun givenInitializedCriteo(isDebugLogsEnabled: Boolean = true) {
+    CriteoUtil.getCriteoBuilder()
+        .debugLogsEnabled(isDebugLogsEnabled)
+        .init()
+  }
 
 }
