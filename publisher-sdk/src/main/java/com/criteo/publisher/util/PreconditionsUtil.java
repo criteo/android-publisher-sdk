@@ -16,18 +16,18 @@
 
 package com.criteo.publisher.util;
 
-import android.util.Log;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.DependencyProvider;
+import com.criteo.publisher.logging.Logger;
 
 public class PreconditionsUtil {
-  private static final String TAG = PreconditionsUtil.class.getSimpleName();
 
   /**
    * Throw a runtime exception and log if the SDK runs in debug mode, or just log otherwise
    */
   public static void throwOrLog(@NonNull Throwable exception) {
-    Log.w(TAG, exception);
+    Logger logger = DependencyProvider.getInstance().provideLoggerFactory().createLogger(PreconditionsUtil.class);
+    logger.error(exception);
 
     if (DependencyProvider.getInstance().provideBuildConfigWrapper().preconditionThrowsOnException()) {
       throw new RuntimeException(exception);

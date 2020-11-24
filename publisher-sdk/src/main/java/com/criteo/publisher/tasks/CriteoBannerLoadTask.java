@@ -16,16 +16,14 @@
 
 package com.criteo.publisher.tasks;
 
-import android.util.Log;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
+import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.model.Config;
 import java.lang.ref.Reference;
 
-public class CriteoBannerLoadTask implements Runnable {
-
-  private static final String TAG = "Criteo.BLT";
+public class CriteoBannerLoadTask extends SafeRunnable {
 
   @NonNull
   private final Reference<? extends WebView> webViewRef;
@@ -56,12 +54,8 @@ public class CriteoBannerLoadTask implements Runnable {
   }
 
   @Override
-  public void run() {
-    try {
-      loadWebview();
-    } catch (Throwable tr) {
-      Log.e(TAG, "Internal BLT exec error.", tr);
-    }
+  public void runSafely() {
+    loadWebview();
   }
 
   private void loadWebview() {

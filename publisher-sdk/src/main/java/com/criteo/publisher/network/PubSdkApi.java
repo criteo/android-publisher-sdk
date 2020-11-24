@@ -16,7 +16,6 @@
 
 package com.criteo.publisher.network;
 
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -47,8 +46,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class PubSdkApi {
-
-  private static final String TAG = PubSdkApi.class.getSimpleName();
 
   private static final String APP_ID = "appId";
   private static final String GAID = "gaid";
@@ -147,7 +144,7 @@ public class PubSdkApi {
       jsonSerializer.write(gdprData, baos);
       return Base64.encodeToString(baos.toByteArray(), Base64.NO_WRAP);
     } catch (IOException e) {
-      Log.d(TAG, "Unable to encode gdprString to base64", e);
+      logger.debug("Unable to encode gdprString to base64", e);
       return null;
     }
   }
@@ -216,7 +213,7 @@ public class PubSdkApi {
     }
   }
 
-  private static String getParamsString(Map<String, String> params) {
+  private String getParamsString(Map<String, String> params) {
     StringBuilder queryString = new StringBuilder();
     try {
       for (Map.Entry<String, String> entry : params.entrySet()) {
@@ -226,7 +223,7 @@ public class PubSdkApi {
         queryString.append("&");
       }
     } catch (Exception e) {
-      Log.e(TAG, e.getMessage());
+      logger.debug("Impossible to encode params string", e);
     }
 
     // drop the last '&' if result is not empty

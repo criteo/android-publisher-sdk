@@ -17,7 +17,6 @@
 package com.criteo.publisher;
 
 import android.app.Application;
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.AppEvents.AppEvents;
@@ -26,6 +25,8 @@ import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.context.UserData;
 import com.criteo.publisher.headerbidding.HeaderBidding;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
@@ -36,7 +37,8 @@ import java.util.concurrent.Executor;
 
 class CriteoInternal extends Criteo {
 
-  private static final String TAG = CriteoInternal.class.getSimpleName();
+  @NonNull
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @NonNull
   private final DependencyProvider dependencyProvider;
@@ -121,7 +123,7 @@ class CriteoInternal extends Criteo {
     try {
       doSetBidsForAdUnit(object, bid);
     } catch (Throwable e) {
-      Log.e(TAG, "Internal error while setting bids for adUnit.", e);
+      logger.error("Internal error while setting bids for adUnit.", e);
     }
   }
 
@@ -146,7 +148,7 @@ class CriteoInternal extends Criteo {
     try {
       consumableBidLoader.loadBid(adUnit, contextData, bidResponseListener);
     } catch (Throwable e) {
-      Log.e(TAG, "Internal error while loading bid response.", e);
+      logger.error("Internal error while loading bid response.", e);
       bidResponseListener.onResponse(null);
     }
   }
