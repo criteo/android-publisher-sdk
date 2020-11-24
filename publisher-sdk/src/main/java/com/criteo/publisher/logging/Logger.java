@@ -50,6 +50,10 @@ public class Logger {
     this.handlers = handlers;
   }
 
+  public void debug(Throwable thrown) {
+    log(simpleLogMessage(Log.DEBUG, null, thrown));
+  }
+
   public void debug(String message, Throwable thrown) {
     log(simpleLogMessage(Log.DEBUG, message, thrown));
   }

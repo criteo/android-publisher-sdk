@@ -47,16 +47,31 @@ class SafeRunnableTest {
     }
 
     @Test
-    fun givenCheckedException_DontThrowInDebugButLogIt() {
+    fun givenCheckedException_DontThrowInDebugButLogItInError() {
         val logger = mockedDependenciesRule.spiedLogger!!
         doReturn(true).whenever(buildConfigWrapper).preconditionThrowsOnException()
 
-        val throwable = IOException()
-        val safeRunnable = createThrowingRunnable(IOException())
+        val throwable = Exception()
+        val safeRunnable = createThrowingRunnable(throwable)
 
         assertThatCode { safeRunnable.run() }.doesNotThrowAnyException()
 
         verify(logger).error(check {
+            assertThat(it).hasCause(throwable)
+        })
+    }
+
+    @Test
+    fun givenIOException_LogItInDebug() {
+        val logger = mockedDependenciesRule.spiedLogger!!
+        doReturn(true).whenever(buildConfigWrapper).preconditionThrowsOnException()
+
+        val throwable = IOException()
+        val safeRunnable = createThrowingRunnable(throwable)
+
+        assertThatCode { safeRunnable.run() }.doesNotThrowAnyException()
+
+        verify(logger).debug(check<Throwable> {
             assertThat(it).hasCause(throwable)
         })
     }
