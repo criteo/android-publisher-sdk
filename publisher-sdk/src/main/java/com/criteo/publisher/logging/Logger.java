@@ -16,33 +16,38 @@
 
 package com.criteo.publisher.logging;
 
+import static com.criteo.publisher.logging.ConsoleHandler.TagPrefix;
+
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import java.util.List;
 
 public class Logger {
+
+  private static final String FALLBACK_TAG = TagPrefix + "Logger";
 
   @NonNull
   private final String tag;
 
   @NonNull
-  private final ConsoleHandler consoleHandler;
+  private final List<LogHandler> handlers;
 
   public Logger(
       @NonNull Class<?> klass,
-      @NonNull ConsoleHandler consoleHandler
+      @NonNull List<LogHandler> handlers
   ) {
-    this(klass.getSimpleName(), consoleHandler);
+    this(klass.getSimpleName(), handlers);
   }
 
   @VisibleForTesting
   Logger(
       @NonNull String tag,
-      @NonNull ConsoleHandler consoleHandler
+      @NonNull List<LogHandler> handlers
   ) {
     this.tag = tag;
-    this.consoleHandler = consoleHandler;
+    this.handlers = handlers;
   }
 
   public void debug(String message, Throwable thrown) {
@@ -74,7 +79,13 @@ public class Logger {
   }
 
   public void log(@NonNull LogMessage logMessage) {
-    consoleHandler.log(tag, logMessage);
+    for (LogHandler handler : handlers) {
+      try {
+        handler.log(tag, logMessage);
+      } catch (Exception e) {
+        Log.w(FALLBACK_TAG, "Impossible to log with handler: " + handler.getClass(), e);
+      }
+    }
   }
 
   private LogMessage simpleLogMessage(int level, @Nullable String message, @Nullable Throwable throwable) {

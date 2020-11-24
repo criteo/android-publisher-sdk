@@ -22,16 +22,17 @@ import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.util.BuildConfigWrapper
 
 @OpenForTesting
-internal class ConsoleHandler(private val buildConfigWrapper: BuildConfigWrapper) {
+internal class ConsoleHandler(private val buildConfigWrapper: BuildConfigWrapper) : LogHandler {
 
-  private companion object {
+  companion object {
+    const val TagPrefix = "Crto"
     private const val UnsetLogLevel = -1
   }
 
   var minLogLevel: Int = UnsetLogLevel
     get() = field.takeIf { it != UnsetLogLevel } ?: buildConfigWrapper.defaultMinLogLevel
 
-  fun log(tag: String, logMessage: LogMessage) {
+  override fun log(tag: String, logMessage: LogMessage) {
     val level = logMessage.level
     if (!isLoggable(level)) {
       return
@@ -49,7 +50,7 @@ internal class ConsoleHandler(private val buildConfigWrapper: BuildConfigWrapper
 
   @VisibleForTesting
   fun println(level: Int, tag: String, message: String) {
-    Log.println(level, "Crto$tag", message)
+    Log.println(level, "$TagPrefix$tag", message)
   }
 
   private val Throwable.stacktraceString get() = getStackTraceString(this)

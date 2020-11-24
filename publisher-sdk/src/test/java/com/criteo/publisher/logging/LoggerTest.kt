@@ -17,8 +17,10 @@
 package com.criteo.publisher.logging
 
 import android.util.Log
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,20 +35,24 @@ class LoggerTest {
   val mockitoRule: MockitoRule = MockitoJUnit.rule()
 
   @Mock
-  private lateinit var handler: ConsoleHandler
+  private lateinit var handler1: LogHandler
+
+  @Mock
+  private lateinit var handler2: LogHandler
 
   private lateinit var logger: Logger
 
   @Before
   fun setUp() {
-    logger = spy(Logger("myTag", handler))
+    logger = spy(Logger("myTag", listOf(handler1, handler2)))
   }
 
   @Test
   fun debug_GivenMessageAndArgs_DelegateFormattedMessage() {
     logger.debug("Hello %s", "World")
 
-    verify(handler).log("myTag", LogMessage(Log.DEBUG, "Hello World"))
+    verify(handler1).log("myTag", LogMessage(Log.DEBUG, "Hello World"))
+    verify(handler2).log("myTag", LogMessage(Log.DEBUG, "Hello World"))
   }
 
   @Test
@@ -54,7 +60,8 @@ class LoggerTest {
     val exception = Exception()
     logger.debug("Hello", exception)
 
-    verify(handler).log("myTag", LogMessage(Log.DEBUG, "Hello", exception))
+    verify(handler1).log("myTag", LogMessage(Log.DEBUG, "Hello", exception))
+    verify(handler2).log("myTag", LogMessage(Log.DEBUG, "Hello", exception))
   }
 
   @Test
@@ -63,21 +70,24 @@ class LoggerTest {
 
     logger.info("Hello", exception)
 
-    verify(handler).log("myTag", LogMessage(Log.INFO, "Hello", exception))
+    verify(handler1).log("myTag", LogMessage(Log.INFO, "Hello", exception))
+    verify(handler2).log("myTag", LogMessage(Log.INFO, "Hello", exception))
   }
 
   @Test
   fun info_GivenMessageAndArgs_PrintFormattedMessage() {
     logger.info("Hello %s", "World")
 
-    verify(handler).log("myTag", LogMessage(Log.INFO, "Hello World"))
+    verify(handler1).log("myTag", LogMessage(Log.INFO, "Hello World"))
+    verify(handler2).log("myTag", LogMessage(Log.INFO, "Hello World"))
   }
 
   @Test
   fun warning_GivenMessageAndArgs_PrintFormattedMessage() {
     logger.warning("Hello %s", "World")
 
-    verify(handler).log("myTag", LogMessage(Log.WARN, "Hello World"))
+    verify(handler1).log("myTag", LogMessage(Log.WARN, "Hello World"))
+    verify(handler2).log("myTag", LogMessage(Log.WARN, "Hello World"))
   }
 
   @Test
@@ -86,7 +96,8 @@ class LoggerTest {
 
     logger.error(exception)
 
-    verify(handler).log("myTag", LogMessage(Log.ERROR, null, exception))
+    verify(handler1).log("myTag", LogMessage(Log.ERROR, null, exception))
+    verify(handler2).log("myTag", LogMessage(Log.ERROR, null, exception))
   }
 
   @Test
@@ -95,6 +106,17 @@ class LoggerTest {
 
     logger.error("Hello", exception)
 
-    verify(handler).log("myTag", LogMessage(Log.ERROR, "Hello", exception))
+    verify(handler1).log("myTag", LogMessage(Log.ERROR, "Hello", exception))
+    verify(handler2).log("myTag", LogMessage(Log.ERROR, "Hello", exception))
+  }
+
+  @Test
+  fun log_GivenOneHandlerThrowing_IgnoreErrorAndKeepLoggingWithOtherHandler() {
+    whenever(handler1.log(any(), any())).thenThrow(Exception::class.java)
+    val logMessage = LogMessage(Log.INFO, "message")
+
+    logger.log(logMessage)
+
+    verify(handler2).log("myTag", logMessage)
   }
 }
