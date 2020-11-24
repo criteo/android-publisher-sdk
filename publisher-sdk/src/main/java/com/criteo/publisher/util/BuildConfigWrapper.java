@@ -90,7 +90,7 @@ public class BuildConfigWrapper {
   }
 
   /**
-   * Included minimum level of logs to print
+   * Included default minimum level of logs to print
    * Values are from {@link android.util.Log}:
    * <ul>
    *     <li>2 = VERBOSE</li>
@@ -101,8 +101,8 @@ public class BuildConfigWrapper {
    *     <li>7 = ASSERT</li>
    * </ul>
    */
-  public int getMinLogLevel() {
-    return BuildConfig.minLogLevel;
+  public int getDefaultMinLogLevel() {
+    return BuildConfig.defaultMinLogLevel;
   }
 
   /**

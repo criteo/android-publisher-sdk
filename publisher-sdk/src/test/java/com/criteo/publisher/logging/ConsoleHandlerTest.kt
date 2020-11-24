@@ -25,6 +25,7 @@ import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -49,9 +50,17 @@ class ConsoleHandlerTest {
   }
 
   @Test
-  fun log_GivenLogLevelAboveMinimum_PrintMessage() {
-    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.VERBOSE)
+  fun new_GivenBuildConfigWrapper_UseDefaultMinLogLevel() {
+    whenever(buildConfigWrapper.defaultMinLogLevel).doReturn(Log.DEBUG)
 
+    handler = ConsoleHandler(buildConfigWrapper)
+
+    assertThat(handler.minLogLevel).isEqualTo(Log.DEBUG)
+  }
+
+  @Test
+  fun log_GivenLogLevelAboveMinimum_PrintMessage() {
+    handler.minLogLevel = Log.VERBOSE
     handler.log("tag", LogMessage(Log.DEBUG, "foo"))
 
     verify(handler).println(Log.DEBUG, "tag", "foo")
@@ -59,8 +68,7 @@ class ConsoleHandlerTest {
 
   @Test
   fun log_GivenMinLogLevelHigherThanLogMessage_IgnoreLog() {
-    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.INFO)
-
+    handler.minLogLevel = Log.INFO
     handler.log("tag", LogMessage(Log.DEBUG, "foo"))
 
     verify(handler, never()).println(any(), any(), any())
@@ -69,9 +77,9 @@ class ConsoleHandlerTest {
   @Test
   fun log_GivenMessageAndThrowable_PrintMessageThenStacktrace() {
     val exception = Exception()
-    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.INFO)
     doReturn("stacktrace").whenever(handler).getStackTraceString(exception)
 
+    handler.minLogLevel = Log.INFO
     handler.log("tag", LogMessage(Log.INFO, "foo", exception))
 
     inOrder(handler) {
@@ -83,9 +91,9 @@ class ConsoleHandlerTest {
   @Test
   fun log_GivenOnlyThrowable_PrintStacktrace() {
     val exception = Exception()
-    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.WARN)
     doReturn("stacktrace").whenever(handler).getStackTraceString(exception)
 
+    handler.minLogLevel = Log.WARN
     handler.log("tag", LogMessage(Log.WARN, null, exception))
 
     inOrder(handler) {
@@ -96,7 +104,7 @@ class ConsoleHandlerTest {
 
   @Test
   fun log_GivenNoMessageAndNoThrowable_IgnoreLog() {
-    whenever(buildConfigWrapper.minLogLevel).doReturn(Log.INFO)
+    whenever(buildConfigWrapper.defaultMinLogLevel).doReturn(Log.INFO)
 
     handler.log("tag", LogMessage(Log.INFO, null, null))
 
