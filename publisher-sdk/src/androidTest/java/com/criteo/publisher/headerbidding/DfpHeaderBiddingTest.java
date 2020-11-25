@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.headerbidding;
 
+import static com.criteo.publisher.ErrorLogMessage.onAssertFailed;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL;
@@ -40,10 +41,12 @@ import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeProduct;
 import com.criteo.publisher.util.AndroidUtil;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.DeviceUtil;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import java.io.UnsupportedEncodingException;
@@ -90,6 +93,9 @@ public class DfpHeaderBiddingTest {
 
   @MockBean
   private DeviceUtil deviceUtil;
+
+  @SpyBean
+  private BuildConfigWrapper buildConfigWrapper;
 
   private Logger logger;
 
@@ -376,6 +382,8 @@ public class DfpHeaderBiddingTest {
   @Test
   public void createDfpCompatibleString_GivenExceptionDuringEncoding_ReturnNullAndLogError()
       throws Exception {
+    when(buildConfigWrapper.preconditionThrowsOnException()).thenReturn(false);
+
     UnsupportedEncodingException exception = mock(UnsupportedEncodingException.class);
 
     headerBidding = spy(headerBidding);
@@ -384,7 +392,7 @@ public class DfpHeaderBiddingTest {
     String encodedValue = headerBidding.createDfpCompatibleString("displayUrl");
 
     assertThat(encodedValue).isNull();
-    verify(logger).error(exception);
+    verify(logger).log(onAssertFailed(exception));
   }
 
   private String encodeForDfp(String displayUrl) {

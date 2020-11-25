@@ -16,6 +16,7 @@
 
 package com.criteo.publisher;
 
+import static com.criteo.publisher.ErrorLogMessage.onUncaughtErrorAtPublicApi;
 import static com.criteo.publisher.interstitial.InterstitialActivityHelper.CALLING_ACTIVITY;
 import static com.criteo.publisher.interstitial.InterstitialActivityHelper.RESULT_RECEIVER;
 import static com.criteo.publisher.interstitial.InterstitialActivityHelper.WEB_VIEW_DATA;
@@ -55,7 +56,7 @@ public class CriteoInterstitialActivity extends Activity {
       super.onCreate(savedInstanceState);
       doOnCreate();
     } catch (Throwable t) {
-      logger.error("Error while creating interstitial activity.", t);
+      logger.log(onUncaughtErrorAtPublicApi("CriteoInterstitialActivity#onCreate(Bundle)", t));
       finish();
     }
   }

@@ -30,6 +30,7 @@ import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.Base64;
 import com.criteo.publisher.util.DeviceUtil;
+import com.criteo.publisher.util.PreconditionsUtil;
 import com.criteo.publisher.util.TextUtils;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest.Builder;
@@ -215,7 +216,7 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
     try {
       return encode(encode(base64Url));
     } catch (UnsupportedEncodingException e) {
-      logger.error(e);
+      PreconditionsUtil.throwOrLog(e);
     }
 
     return null;
@@ -227,8 +228,6 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
   }
 
   private static class SafeDfpBuilder {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @NonNull
     private final PublisherAdRequest.Builder builder;
@@ -252,7 +251,7 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
       try {
         builder.addCustomTargeting(key, value);
       } catch (LinkageError e) {
-        logger.error("Error while adding custom target", e);
+        PreconditionsUtil.throwOrLog(e);
         return;
       }
 

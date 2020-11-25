@@ -16,6 +16,8 @@
 
 package com.criteo.publisher;
 
+import static com.criteo.publisher.ErrorLogMessage.onUncaughtErrorInThread;
+
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.util.PreconditionsUtil;
@@ -52,7 +54,7 @@ public abstract class SafeRunnable implements Runnable {
         // Those are normal and expected situations. So they are not considered as errors.
         logger.debug(e);
       } else {
-        logger.error(e);
+        logger.log(onUncaughtErrorInThread(e));
       }
     }
   }

@@ -16,6 +16,8 @@
 
 package com.criteo.publisher;
 
+import static com.criteo.publisher.ErrorLogMessage.onUncaughtErrorAtPublicApi;
+
 import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -123,7 +125,7 @@ class CriteoInternal extends Criteo {
     try {
       doSetBidsForAdUnit(object, bid);
     } catch (Throwable e) {
-      logger.error("Internal error while setting bids for adUnit.", e);
+      logger.log(onUncaughtErrorAtPublicApi("CriteoInternal#enrichAdObjectWithBid(Object, Bid)", e));
     }
   }
 
@@ -148,7 +150,7 @@ class CriteoInternal extends Criteo {
     try {
       consumableBidLoader.loadBid(adUnit, contextData, bidResponseListener);
     } catch (Throwable e) {
-      logger.error("Internal error while loading bid response.", e);
+      logger.log(onUncaughtErrorAtPublicApi("CriteoInternal#loadBid(AdUnit, ContextData, BidResponseListener", e));
       bidResponseListener.onResponse(null);
     }
   }

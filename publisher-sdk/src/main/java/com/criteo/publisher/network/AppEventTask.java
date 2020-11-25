@@ -20,6 +20,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.DeviceInfo;
@@ -106,11 +107,12 @@ public class AppEventTask extends AsyncTask<Object, Void, JSONObject> {
 
   @Override
   protected void onPostExecute(@Nullable JSONObject result) {
-    try {
-      doOnPostExecute(result);
-    } catch (Throwable tr) {
-      logger.error("Internal AET PostExec error.", tr);
-    }
+    new SafeRunnable() {
+      @Override
+      public void runSafely() {
+        doOnPostExecute(result);
+      }
+    }.run();
   }
 
   private void doOnPostExecute(@Nullable JSONObject result) {

@@ -20,7 +20,6 @@ import static com.criteo.publisher.logging.ConsoleHandler.TagPrefix;
 
 import android.util.Log;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import java.util.List;
 
@@ -51,23 +50,15 @@ public class Logger {
   }
 
   public void debug(Throwable thrown) {
-    log(simpleLogMessage(Log.DEBUG, null, thrown));
+    log(new LogMessage(Log.DEBUG, null, thrown));
   }
 
   public void debug(String message, Throwable thrown) {
-    log(simpleLogMessage(Log.DEBUG, message, thrown));
+    log(new LogMessage(Log.DEBUG, message, thrown));
   }
 
   public void debug(String message, Object... args) {
-    log(formattedLogMessage(Log.DEBUG, message, args));
-  }
-
-  public void error(Throwable thrown) {
-    log(simpleLogMessage(Log.ERROR, null, thrown));
-  }
-
-  public void error(String message, Throwable thrown) {
-    log(simpleLogMessage(Log.ERROR, message, thrown));
+    log(new LogMessage(Log.DEBUG, String.format(message, args), null));
   }
 
   public void log(@NonNull LogMessage logMessage) {
@@ -78,14 +69,6 @@ public class Logger {
         Log.w(FALLBACK_TAG, "Impossible to log with handler: " + handler.getClass(), e);
       }
     }
-  }
-
-  private LogMessage simpleLogMessage(int level, @Nullable String message, @Nullable Throwable throwable) {
-    return new LogMessage(level, message, throwable);
-  }
-
-  private LogMessage formattedLogMessage(int level, @NonNull String message, Object[] args) {
-    return new LogMessage(level, String.format(message, args), null);
   }
 
 }

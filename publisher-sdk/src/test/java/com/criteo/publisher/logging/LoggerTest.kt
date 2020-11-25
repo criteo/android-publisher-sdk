@@ -74,26 +74,6 @@ class LoggerTest {
   }
 
   @Test
-  fun error_GivenJustThrowable_DelegateOnlyThrowable() {
-    val exception = Exception()
-
-    logger.error(exception)
-
-    verify(handler1).log("myTag", LogMessage(Log.ERROR, null, exception))
-    verify(handler2).log("myTag", LogMessage(Log.ERROR, null, exception))
-  }
-
-  @Test
-  fun error_GivenThrowableAndMessage_PrintMessageThenStacktrace() {
-    val exception = Exception()
-
-    logger.error("Hello", exception)
-
-    verify(handler1).log("myTag", LogMessage(Log.ERROR, "Hello", exception))
-    verify(handler2).log("myTag", LogMessage(Log.ERROR, "Hello", exception))
-  }
-
-  @Test
   fun log_GivenOneHandlerThrowing_IgnoreErrorAndKeepLoggingWithOtherHandler() {
     whenever(handler1.log(any(), any())).thenThrow(Exception::class.java)
     val logMessage = LogMessage(Log.INFO, "message")

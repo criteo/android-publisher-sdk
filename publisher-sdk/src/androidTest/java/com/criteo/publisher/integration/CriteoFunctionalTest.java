@@ -26,7 +26,6 @@ import static org.mockito.AdditionalAnswers.answerVoid;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -122,7 +121,7 @@ public class CriteoFunctionalTest {
     String version = Criteo.getVersion();
 
     assertThat(version).isEmpty();
-    verify(mockedDependenciesRule.getSpiedLogger()).error(any(), eq(exception));
+    verify(mockedDependenciesRule.getSpiedLogger()).log(argThat(logMessage -> logMessage.getThrowable() == exception));
   }
 
   @Test
