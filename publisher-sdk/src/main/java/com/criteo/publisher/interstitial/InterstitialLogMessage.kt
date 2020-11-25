@@ -20,6 +20,7 @@ import android.util.Log
 import com.criteo.publisher.Bid
 import com.criteo.publisher.CriteoInterstitial
 import com.criteo.publisher.adUnit
+import com.criteo.publisher.logging.CallerInferrer
 import com.criteo.publisher.logging.LogMessage
 import com.criteo.publisher.loggingId
 import com.criteo.publisher.model.InterstitialAdUnit
@@ -62,7 +63,9 @@ internal object InterstitialLogMessage {
   )
 
   @JvmStatic
-  fun onMethodCalledWithNullApplication(methodName: String) = LogMessage(Log.WARN, message =
-    "Calling CriteoInterstitial#$methodName with a null application"
+  @CallerInferrer.Transparent
+  @Suppress("NOTHING_TO_INLINE")
+  fun onMethodCalledWithNullApplication() = LogMessage(Log.WARN, message =
+    "Calling ${CallerInferrer.inferCallerName()} with a null application"
   )
 }

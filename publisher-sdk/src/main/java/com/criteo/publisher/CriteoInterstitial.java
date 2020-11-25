@@ -97,14 +97,14 @@ public class CriteoInterstitial {
 
   public void loadAd(@NonNull ContextData contextData) {
     if (!DependencyProvider.getInstance().isApplicationSet()) {
-      logger.log(onMethodCalledWithNullApplication("loadAd"));
+      logger.log(onMethodCalledWithNullApplication());
       return;
     }
 
     try {
       doLoadAd(contextData);
     } catch (Throwable tr) {
-      logger.log(onUncaughtErrorAtPublicApi("CriteoInterstitial#loadAd(ContextData)", tr));
+      logger.log(onUncaughtErrorAtPublicApi(tr));
     }
   }
 
@@ -116,20 +116,20 @@ public class CriteoInterstitial {
 
   public void loadAd(@Nullable Bid bid) {
     if (!DependencyProvider.getInstance().isApplicationSet()) {
-      logger.log(onMethodCalledWithNullApplication("loadAd(bid)"));
+      logger.log(onMethodCalledWithNullApplication());
       return;
     }
 
     try {
       doLoadAd(bid);
     } catch (Throwable tr) {
-      logger.log(onUncaughtErrorAtPublicApi("CriteoInterstitial#loadAd(Bid)", tr));
+      logger.log(onUncaughtErrorAtPublicApi(tr));
     }
   }
 
   public void loadAdWithDisplayData(@NonNull String displayData) {
     if (!DependencyProvider.getInstance().isApplicationSet()) {
-      logger.log(onMethodCalledWithNullApplication("loadAdWithDisplayData"));
+      logger.log(onMethodCalledWithNullApplication());
       return;
     }
 
@@ -148,21 +148,21 @@ public class CriteoInterstitial {
       logger.log(onCheckingIfInterstitialIsLoaded(this, isAdLoaded));
       return isAdLoaded;
     } catch (Throwable tr) {
-      logger.log(onUncaughtErrorAtPublicApi("CriteoInterstitial#isAdLoaded()", tr));
+      logger.log(onUncaughtErrorAtPublicApi(tr));
       return false;
     }
   }
 
   public void show() {
     if (!DependencyProvider.getInstance().isApplicationSet()) {
-      logger.log(onMethodCalledWithNullApplication("show"));
+      logger.log(onMethodCalledWithNullApplication());
       return;
     }
 
     try {
       doShow();
     } catch (Throwable tr) {
-      logger.log(onUncaughtErrorAtPublicApi("CriteoInterstitial#show()", tr));
+      logger.log(onUncaughtErrorAtPublicApi(tr));
     }
   }
 

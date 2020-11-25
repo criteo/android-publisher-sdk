@@ -147,7 +147,7 @@ public class CriteoBannerView extends WebView {
     try {
       doLoadAd(contextData);
     } catch (Throwable tr) {
-      logger.log(onUncaughtErrorAtPublicApi("CriteoBannerView#loadAd(ContextData)", tr));
+      logger.log(onUncaughtErrorAtPublicApi(tr));
     }
   }
 
@@ -166,7 +166,7 @@ public class CriteoBannerView extends WebView {
     try {
       doLoadAd(bid);
     } catch (Throwable tr) {
-      logger.log(onUncaughtErrorAtPublicApi("CriteoBannerView#loadAd(Bid)", tr));
+      logger.log(onUncaughtErrorAtPublicApi(tr));
     }
   }
 

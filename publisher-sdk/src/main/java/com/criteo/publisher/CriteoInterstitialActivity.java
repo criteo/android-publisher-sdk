@@ -56,7 +56,7 @@ public class CriteoInterstitialActivity extends Activity {
       super.onCreate(savedInstanceState);
       doOnCreate();
     } catch (Throwable t) {
-      logger.log(onUncaughtErrorAtPublicApi("CriteoInterstitialActivity#onCreate(Bundle)", t));
+      logger.log(onUncaughtErrorAtPublicApi(t));
       finish();
     }
   }
