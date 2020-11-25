@@ -16,6 +16,7 @@
 
 package com.criteo.publisher;
 
+import static com.criteo.publisher.ErrorLogMessage.onUncaughtErrorAtPublicApi;
 import static com.criteo.publisher.interstitial.InterstitialLogMessage.onCheckingIfInterstitialIsLoaded;
 import static com.criteo.publisher.interstitial.InterstitialLogMessage.onInterstitialInitialized;
 import static com.criteo.publisher.interstitial.InterstitialLogMessage.onInterstitialLoading;
@@ -103,7 +104,7 @@ public class CriteoInterstitial {
     try {
       doLoadAd(contextData);
     } catch (Throwable tr) {
-      logger.error("Internal error while loading interstitial.", tr);
+      logger.log(onUncaughtErrorAtPublicApi("CriteoInterstitial#loadAd(ContextData)", tr));
     }
   }
 
@@ -122,7 +123,7 @@ public class CriteoInterstitial {
     try {
       doLoadAd(bid);
     } catch (Throwable tr) {
-      logger.error("Internal error while loading interstitial from bid token.", tr);
+      logger.log(onUncaughtErrorAtPublicApi("CriteoInterstitial#loadAd(Bid)", tr));
     }
   }
 
@@ -147,7 +148,7 @@ public class CriteoInterstitial {
       logger.log(onCheckingIfInterstitialIsLoaded(this, isAdLoaded));
       return isAdLoaded;
     } catch (Throwable tr) {
-      logger.error("Internal error while detecting interstitial load state.", tr);
+      logger.log(onUncaughtErrorAtPublicApi("CriteoInterstitial#isAdLoaded()", tr));
       return false;
     }
   }
@@ -161,7 +162,7 @@ public class CriteoInterstitial {
     try {
       doShow();
     } catch (Throwable tr) {
-      logger.error("Internal error while showing interstitial.", tr);
+      logger.log(onUncaughtErrorAtPublicApi("CriteoInterstitial#show()", tr));
     }
   }
 

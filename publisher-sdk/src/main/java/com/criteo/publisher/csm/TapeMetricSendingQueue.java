@@ -16,6 +16,8 @@
 
 package com.criteo.publisher.csm;
 
+import static com.criteo.publisher.csm.CsmLogMessage.onErrorWhenPollingCsmQueueFile;
+
 import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -119,7 +121,7 @@ class TapeMetricSendingQueue extends MetricSendingQueue {
       }
 
       if (exception != null) {
-        logger.error("Error when polling CSM metrics", exception);
+        logger.log(onErrorWhenPollingCsmQueueFile(exception));
       }
 
       return metrics;

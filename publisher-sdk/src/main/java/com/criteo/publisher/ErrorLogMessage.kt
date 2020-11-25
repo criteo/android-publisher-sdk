@@ -18,34 +18,27 @@ package com.criteo.publisher
 
 import android.util.Log
 import com.criteo.publisher.logging.LogMessage
-import com.criteo.publisher.model.AdUnit
 
-internal object SdkInitLogMessage {
-
-  @JvmStatic
-  fun onDummySdkInitialized() = LogMessage(message =
-    "Unsupported Android version, Criteo SDK is deactivated and won't do anything"
-  )
+internal object ErrorLogMessage {
 
   @JvmStatic
-  fun onSdkInitialized(
-      cpId: String,
-      adUnits: List<AdUnit>,
-      version: String
-  ) = LogMessage(message =
-    """Criteo SDK version $version is initialized with Publisher ID $cpId and ${adUnits.size} ad units:
-${adUnits.joinToString("\n") { "- $it" }}"""
-  )
-
-  @JvmStatic
-  fun onSdkInitializedMoreThanOnce() = LogMessage(Log.WARN, message =
-    "Criteo SDK initialization method cannot be called more than once"
-  )
-
-  @JvmStatic
-  fun onErrorDuringSdkInitialization(criteoInitException: CriteoInitException) = LogMessage(
+  fun onUncaughtErrorAtPublicApi(callerName: String, throwable: Throwable) = LogMessage(
       Log.ERROR,
-      null,
-      criteoInitException
+      "Internal error in $callerName",
+      throwable
+  )
+
+  @JvmStatic
+  fun onUncaughtErrorInThread(throwable: Throwable) = LogMessage(
+      Log.ERROR,
+      "Uncaught error in thread",
+      throwable
+  )
+
+  @JvmStatic
+  fun onAssertFailed(throwable: Throwable) = LogMessage(
+      Log.ERROR,
+      "Assertion failed",
+      throwable
   )
 }

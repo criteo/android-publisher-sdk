@@ -27,6 +27,7 @@ import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.util.CompletableFuture;
+import com.criteo.publisher.util.PreconditionsUtil;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -120,9 +121,10 @@ public class DeviceInfo {
     String userAgent = null;
 
     try {
+      // There is no SecurityException on Android, so normally this safe
       userAgent = System.getProperty("http.agent");
     } catch (Throwable tr) {
-      logger.error("Unable to retrieve system user-agent.", tr);
+      PreconditionsUtil.throwOrLog(tr);
     }
 
     return userAgent != null ? userAgent : "";

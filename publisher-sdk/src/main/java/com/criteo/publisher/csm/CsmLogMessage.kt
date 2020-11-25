@@ -27,4 +27,11 @@ internal object CsmLogMessage {
       "Error while reading CSM queue file. Recovering by recreating it or using in-memory queue",
       exception
   )
+
+  @JvmStatic
+  fun onErrorWhenPollingCsmQueueFile(exception: Exception) = LogMessage(
+      Log.WARN,
+      "Error when polling CSM metrics",
+      exception
+  )
 }

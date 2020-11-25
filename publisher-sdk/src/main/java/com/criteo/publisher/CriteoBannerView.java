@@ -16,6 +16,8 @@
 
 package com.criteo.publisher;
 
+import static com.criteo.publisher.ErrorLogMessage.onUncaughtErrorAtPublicApi;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
@@ -145,7 +147,7 @@ public class CriteoBannerView extends WebView {
     try {
       doLoadAd(contextData);
     } catch (Throwable tr) {
-      logger.error("Internal error while loading banner.", tr);
+      logger.log(onUncaughtErrorAtPublicApi("CriteoBannerView#loadAd(ContextData)", tr));
     }
   }
 
@@ -164,7 +166,7 @@ public class CriteoBannerView extends WebView {
     try {
       doLoadAd(bid);
     } catch (Throwable tr) {
-      logger.error("Internal error while loading banner from bid token.", tr);
+      logger.log(onUncaughtErrorAtPublicApi("CriteoBannerView#loadAd(Bid)", tr));
     }
   }
 

@@ -16,6 +16,12 @@
 
 package com.criteo.publisher;
 
+import static com.criteo.publisher.ErrorLogMessage.onUncaughtErrorAtPublicApi;
+import static com.criteo.publisher.SdkInitLogMessage.onDummySdkInitialized;
+import static com.criteo.publisher.SdkInitLogMessage.onErrorDuringSdkInitialization;
+import static com.criteo.publisher.SdkInitLogMessage.onSdkInitialized;
+import static com.criteo.publisher.SdkInitLogMessage.onSdkInitializedMoreThanOnce;
+
 import android.app.Application;
 import android.util.Log;
 import androidx.annotation.Keep;
@@ -117,19 +123,24 @@ public abstract class Criteo {
                 dependencyProvider
             );
 
-            logger.log(SdkInitLogMessage.onSdkInitialized(builder.criteoPublisherId, builder.adUnits, getVersion()));
+            logger.log(onSdkInitialized(builder.criteoPublisherId, builder.adUnits, getVersion()));
           } else {
             criteo = new DummyCriteo();
 
-            logger.log(SdkInitLogMessage.onDummySdkInitialized());
+            logger.log(onDummySdkInitialized());
           }
         } catch(Throwable tr) {
           criteo = new DummyCriteo();
-          logger.error("Internal error initializing Criteo instance.", tr);
-          throw new CriteoInitException("Internal error initializing Criteo instance.", tr);
+
+          CriteoInitException criteoInitException = new CriteoInitException(
+              "Internal error initializing Criteo instance.",
+              tr
+          );
+          logger.log(onErrorDuringSdkInitialization(criteoInitException));
+          throw criteoInitException;
         }
       } else {
-        logger.log(SdkInitLogMessage.onSdkInitializedMoreThanOnce());
+        logger.log(onSdkInitializedMoreThanOnce());
       }
       return criteo;
     }
@@ -179,7 +190,7 @@ public abstract class Criteo {
       return DependencyProvider.getInstance().provideBuildConfigWrapper().getSdkVersion();
     } catch (Throwable t) {
       Logger logger = LoggerFactory.getLogger(Criteo.class);
-      logger.error("Internal error while getting version.", t);
+      logger.log(onUncaughtErrorAtPublicApi("Criteo#getVersion()", t));
       return "";
     }
   }

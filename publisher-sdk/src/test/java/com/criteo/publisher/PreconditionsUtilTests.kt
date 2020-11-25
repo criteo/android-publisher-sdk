@@ -48,7 +48,7 @@ class PreconditionsUtilTests {
             PreconditionsUtil.throwOrLog(exception)
         }.isInstanceOf(RuntimeException::class.java)
 
-        verify(logger).error(exception)
+        verify(logger).log(ErrorLogMessage.onAssertFailed(exception))
     }
 
     @Test
@@ -58,7 +58,7 @@ class PreconditionsUtilTests {
 
         PreconditionsUtil.throwOrLog(exception)
 
-        verify(logger).error(exception)
+        verify(logger).log(ErrorLogMessage.onAssertFailed(exception))
     }
 
     private fun givenDebugMode(isDebugMode: Boolean) {

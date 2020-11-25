@@ -16,6 +16,8 @@
 
 package com.criteo.publisher.util;
 
+import static com.criteo.publisher.ErrorLogMessage.onAssertFailed;
+
 import androidx.annotation.NonNull;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.logging.Logger;
@@ -27,7 +29,7 @@ public class PreconditionsUtil {
    */
   public static void throwOrLog(@NonNull Throwable exception) {
     Logger logger = DependencyProvider.getInstance().provideLoggerFactory().createLogger(PreconditionsUtil.class);
-    logger.error(exception);
+    logger.log(onAssertFailed(exception));
 
     if (DependencyProvider.getInstance().provideBuildConfigWrapper().preconditionThrowsOnException()) {
       throw new RuntimeException(exception);
