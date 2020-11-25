@@ -20,6 +20,7 @@ import android.app.Application;
 import android.os.Build.VERSION;
 import androidx.test.core.app.ApplicationProvider;
 import com.criteo.publisher.mock.ApplicationMock;
+import com.criteo.publisher.mock.UnregisteringApplication;
 
 public class InstrumentationUtil {
 
@@ -29,7 +30,7 @@ public class InstrumentationUtil {
 
   public static Application getApplication() {
     if (isRunningInInstrumentationTest()) {
-      return ApplicationProvider.getApplicationContext();
+      return UnregisteringApplication.of(ApplicationProvider.getApplicationContext());
     } else {
       return ApplicationMock.newMock();
     }

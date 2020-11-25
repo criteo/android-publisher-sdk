@@ -21,7 +21,6 @@ import static com.criteo.publisher.ErrorLogMessage.onUncaughtErrorAtPublicApi;
 import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.context.UserData;
@@ -33,7 +32,6 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
-import com.criteo.publisher.util.AppLifecycleUtil;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -99,9 +97,7 @@ class CriteoInternal extends Criteo {
       userPrivacyUtil.storeMopubConsent(mopubConsent);
     }
 
-    AppEvents appEvents = dependencyProvider.provideAppEvents();
-    AppLifecycleUtil lifecycleCallback = new AppLifecycleUtil(appEvents, bidManager);
-    application.registerActivityLifecycleCallbacks(lifecycleCallback);
+    application.registerActivityLifecycleCallbacks(dependencyProvider.provideAppLifecycleUtil());
 
     dependencyProvider.provideTopActivityFinder().registerActivityLifecycleFor(application);
 

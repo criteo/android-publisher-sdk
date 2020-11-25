@@ -17,7 +17,6 @@
 package com.criteo.publisher;
 
 import android.app.Application;
-import androidx.test.InstrumentationRegistry;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.util.InstrumentationUtil;
 import java.util.Arrays;
@@ -48,8 +47,7 @@ public class CriteoUtil {
   }
 
   public static Criteo.Builder getCriteoBuilder(AdUnit... preloadedAdUnits) {
-    Application app = (Application) InstrumentationRegistry.getTargetContext()
-        .getApplicationContext();
+    Application app = InstrumentationUtil.getApplication();
 
     // clears any side effects from previous calls
     Criteo.setInstance(null);

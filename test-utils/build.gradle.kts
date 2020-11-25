@@ -60,6 +60,7 @@ dependencies {
   testImplementation(Deps.Mockito.Kotlin)
   testImplementation(Deps.AssertJ.AssertJ)
 
+  androidTestImplementation(project(":publisher-sdk"))
   androidTestImplementation(Deps.AndroidX.Test.Runner)
   androidTestImplementation(Deps.AssertJ.AssertJ)
   androidTestImplementation(Deps.Mockito.Android)
