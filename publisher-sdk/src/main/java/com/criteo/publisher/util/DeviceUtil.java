@@ -63,11 +63,6 @@ public class DeviceUtil {
   }
 
   public boolean isVersionSupported() {
-    if (android.os.Build.VERSION.SDK_INT < 19) {
-      logger.info("Unsupported Android version");
-      return false;
-    }
-
-    return true;
+    return android.os.Build.VERSION.SDK_INT >= 19;
   }
 }

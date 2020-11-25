@@ -83,11 +83,9 @@ public class CriteoBannerView extends WebView {
       String adUnitId = a.getString(R.styleable.CriteoBannerView_criteoAdUnitId);
 
       if (adUnitId != null && width != UNSET_DIMENSION_VALUE && height != UNSET_DIMENSION_VALUE) {
-        logger.info("CriteoBannerView inflated for Standalone integration.");
         bannerAdUnit = new BannerAdUnit(adUnitId, new AdSize(width, height));
       } else if (adUnitId == null && width == UNSET_DIMENSION_VALUE
           && height == UNSET_DIMENSION_VALUE) {
-        logger.info("CriteoBannerView inflated for InHouse integration.");
         bannerAdUnit = null;
       } else {
         bannerAdUnit = null;

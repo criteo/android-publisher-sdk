@@ -16,6 +16,12 @@
 
 package com.criteo.publisher;
 
+import static com.criteo.publisher.interstitial.InterstitialLogMessage.onCheckingIfInterstitialIsLoaded;
+import static com.criteo.publisher.interstitial.InterstitialLogMessage.onInterstitialInitialized;
+import static com.criteo.publisher.interstitial.InterstitialLogMessage.onInterstitialLoading;
+import static com.criteo.publisher.interstitial.InterstitialLogMessage.onInterstitialShowing;
+import static com.criteo.publisher.interstitial.InterstitialLogMessage.onMethodCalledWithNullApplication;
+
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,7 +30,6 @@ import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
-import com.criteo.publisher.interstitial.InterstitialLogMessage;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.InterstitialAdUnit;
@@ -76,7 +81,7 @@ public class CriteoInterstitial {
   ) {
     this.interstitialAdUnit = interstitialAdUnit;
     this.criteo = criteo;
-    logger.log(InterstitialLogMessage.onInterstitialInitialized(interstitialAdUnit));
+    logger.log(onInterstitialInitialized(interstitialAdUnit));
   }
 
   public void setCriteoInterstitialAdListener(
@@ -91,7 +96,7 @@ public class CriteoInterstitial {
 
   public void loadAd(@NonNull ContextData contextData) {
     if (!DependencyProvider.getInstance().isApplicationSet()) {
-      logger.warning("Calling CriteoInterstitial#loadAd with a null application");
+      logger.log(onMethodCalledWithNullApplication("loadAd"));
       return;
     }
 
@@ -103,14 +108,14 @@ public class CriteoInterstitial {
   }
 
   private void doLoadAd(@NonNull ContextData contextData) {
-    logger.log(InterstitialLogMessage.onInterstitialLoading(this));
+    logger.log(onInterstitialLoading(this));
     getIntegrationRegistry().declare(Integration.STANDALONE);
     getOrCreateController().fetchAdAsync(interstitialAdUnit, contextData);
   }
 
   public void loadAd(@Nullable Bid bid) {
     if (!DependencyProvider.getInstance().isApplicationSet()) {
-      logger.warning("Calling CriteoInterstitial#loadAd(bidToken) with a null application");
+      logger.log(onMethodCalledWithNullApplication("loadAd(bid)"));
       return;
     }
 
@@ -123,7 +128,7 @@ public class CriteoInterstitial {
 
   public void loadAdWithDisplayData(@NonNull String displayData) {
     if (!DependencyProvider.getInstance().isApplicationSet()) {
-      logger.warning("Calling CriteoInterstitial#loadAdWithDisplayData with a null application");
+      logger.log(onMethodCalledWithNullApplication("loadAdWithDisplayData"));
       return;
     }
 
@@ -131,7 +136,7 @@ public class CriteoInterstitial {
   }
 
   private void doLoadAd(@Nullable Bid bid) {
-    logger.log(InterstitialLogMessage.onInterstitialLoading(this, bid));
+    logger.log(onInterstitialLoading(this, bid));
     getIntegrationRegistry().declare(Integration.IN_HOUSE);
     getOrCreateController().fetchAdAsync(bid);
   }
@@ -139,7 +144,7 @@ public class CriteoInterstitial {
   public boolean isAdLoaded() {
     try {
       boolean isAdLoaded = getOrCreateController().isAdLoaded();
-      logger.log(InterstitialLogMessage.onCheckingIfInterstitialIsLoaded(this, isAdLoaded));
+      logger.log(onCheckingIfInterstitialIsLoaded(this, isAdLoaded));
       return isAdLoaded;
     } catch (Throwable tr) {
       logger.error("Internal error while detecting interstitial load state.", tr);
@@ -149,7 +154,7 @@ public class CriteoInterstitial {
 
   public void show() {
     if (!DependencyProvider.getInstance().isApplicationSet()) {
-      logger.warning("Calling CriteoInterstitial#show with a null application");
+      logger.log(onMethodCalledWithNullApplication("show"));
       return;
     }
 
@@ -161,7 +166,7 @@ public class CriteoInterstitial {
   }
 
   private void doShow() {
-    logger.log(InterstitialLogMessage.onInterstitialShowing(this));
+    logger.log(onInterstitialShowing(this));
     getOrCreateController().show();
   }
 

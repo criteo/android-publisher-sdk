@@ -74,32 +74,6 @@ class LoggerTest {
   }
 
   @Test
-  fun info_GivenMessageAndThrowable_DelegateMessageAndThrowable() {
-    val exception = Exception()
-
-    logger.info("Hello", exception)
-
-    verify(handler1).log("myTag", LogMessage(Log.INFO, "Hello", exception))
-    verify(handler2).log("myTag", LogMessage(Log.INFO, "Hello", exception))
-  }
-
-  @Test
-  fun info_GivenMessageAndArgs_PrintFormattedMessage() {
-    logger.info("Hello %s", "World")
-
-    verify(handler1).log("myTag", LogMessage(Log.INFO, "Hello World"))
-    verify(handler2).log("myTag", LogMessage(Log.INFO, "Hello World"))
-  }
-
-  @Test
-  fun warning_GivenMessageAndArgs_PrintFormattedMessage() {
-    logger.warning("Hello %s", "World")
-
-    verify(handler1).log("myTag", LogMessage(Log.WARN, "Hello World"))
-    verify(handler2).log("myTag", LogMessage(Log.WARN, "Hello World"))
-  }
-
-  @Test
   fun error_GivenJustThrowable_DelegateOnlyThrowable() {
     val exception = Exception()
 
