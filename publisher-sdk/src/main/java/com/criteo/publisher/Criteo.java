@@ -190,7 +190,7 @@ public abstract class Criteo {
       return DependencyProvider.getInstance().provideBuildConfigWrapper().getSdkVersion();
     } catch (Throwable t) {
       Logger logger = LoggerFactory.getLogger(Criteo.class);
-      logger.log(onUncaughtErrorAtPublicApi("Criteo#getVersion()", t));
+      logger.log(onUncaughtErrorAtPublicApi(t));
       return "";
     }
   }

@@ -17,14 +17,17 @@
 package com.criteo.publisher
 
 import android.util.Log
+import com.criteo.publisher.logging.CallerInferrer
 import com.criteo.publisher.logging.LogMessage
 
 internal object ErrorLogMessage {
 
   @JvmStatic
-  fun onUncaughtErrorAtPublicApi(callerName: String, throwable: Throwable) = LogMessage(
+  @CallerInferrer.Transparent
+  @Suppress("NOTHING_TO_INLINE")
+  inline fun onUncaughtErrorAtPublicApi(throwable: Throwable) = LogMessage(
       Log.ERROR,
-      "Internal error in $callerName",
+      "Internal error in ${CallerInferrer.inferCallerName()}",
       throwable
   )
 

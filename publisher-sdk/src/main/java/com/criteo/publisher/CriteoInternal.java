@@ -125,7 +125,7 @@ class CriteoInternal extends Criteo {
     try {
       doSetBidsForAdUnit(object, bid);
     } catch (Throwable e) {
-      logger.log(onUncaughtErrorAtPublicApi("CriteoInternal#enrichAdObjectWithBid(Object, Bid)", e));
+      logger.log(onUncaughtErrorAtPublicApi(e));
     }
   }
 
@@ -150,7 +150,7 @@ class CriteoInternal extends Criteo {
     try {
       consumableBidLoader.loadBid(adUnit, contextData, bidResponseListener);
     } catch (Throwable e) {
-      logger.log(onUncaughtErrorAtPublicApi("CriteoInternal#loadBid(AdUnit, ContextData, BidResponseListener", e));
+      logger.log(onUncaughtErrorAtPublicApi(e));
       bidResponseListener.onResponse(null);
     }
   }
