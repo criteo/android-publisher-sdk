@@ -116,11 +116,13 @@ public abstract class Criteo {
                 builder.mopubConsent,
                 dependencyProvider
             );
+
+            logger.log(SdkInitLogMessage.onSdkInitialized(builder.criteoPublisherId, builder.adUnits, getVersion()));
           } else {
             criteo = new DummyCriteo();
-          }
 
-          logger.log(SdkInitLogMessage.onSdkInitialized(builder.criteoPublisherId, builder.adUnits, getVersion()));
+            logger.log(SdkInitLogMessage.onDummySdkInitialized());
+          }
         } catch(Throwable tr) {
           criteo = new DummyCriteo();
           logger.error("Internal error initializing Criteo instance.", tr);

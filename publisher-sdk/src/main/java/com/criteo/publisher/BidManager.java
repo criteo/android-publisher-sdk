@@ -317,12 +317,7 @@ public class BidManager implements ApplicationStoppedListener {
   @Nullable
   @VisibleForTesting
   CacheAdUnit mapToCacheAdUnit(@Nullable AdUnit adUnit) {
-    CacheAdUnit cacheAdUnit = adUnitMapper.map(adUnit);
-    if (cacheAdUnit == null) {
-      logger.warning("Valid AdUnit is required.");
-      return null;
-    }
-    return cacheAdUnit;
+    return adUnitMapper.map(adUnit);
   }
 
   void setTimeToNextCall(int seconds) {

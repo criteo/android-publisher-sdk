@@ -14,31 +14,17 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher
+package com.criteo.publisher.csm
 
 import android.util.Log
 import com.criteo.publisher.logging.LogMessage
-import com.criteo.publisher.model.AdUnit
 
-internal object SdkInitLogMessage {
-
-  @JvmStatic
-  fun onDummySdkInitialized() = LogMessage(message =
-    "Unsupported Android version, Criteo SDK is deactivated and won't do anything"
-  )
+internal object CsmLogMessage {
 
   @JvmStatic
-  fun onSdkInitialized(
-      cpId: String,
-      adUnits: List<AdUnit>,
-      version: String
-  ) = LogMessage(message =
-    """Criteo SDK version $version is initialized with Publisher ID $cpId and ${adUnits.size} ad units:
-${adUnits.joinToString("\n") { "- $it" }}"""
-  )
-
-  @JvmStatic
-  fun onSdkInitializedMoreThanOnce() = LogMessage(Log.WARN, message =
-    "Criteo SDK initialization method cannot be called more than once"
+  fun onRecoveringFromStaleCsmQueueFile(exception: Exception) = LogMessage(
+      Log.WARN,
+      "Error while reading CSM queue file. Recovering by recreating it or using in-memory queue",
+      exception
   )
 }

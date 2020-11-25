@@ -16,6 +16,8 @@
 
 package com.criteo.publisher.model;
 
+import static com.criteo.publisher.BiddingLogMessage.onInvalidAdUnit;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -133,7 +135,7 @@ public class AdUnitMapper {
       if (cacheAdUnit.getPlacementId().isEmpty()
           || cacheAdUnit.getSize().getWidth() <= 0
           || cacheAdUnit.getSize().getHeight() <= 0) {
-        logger.warning("Found an invalid AdUnit: " + cacheAdUnit);
+        logger.log(onInvalidAdUnit(cacheAdUnit));
         continue;
       }
       validatedCacheAdUnits.add(cacheAdUnit);

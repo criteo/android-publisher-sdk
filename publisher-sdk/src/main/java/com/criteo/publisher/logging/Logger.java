@@ -62,18 +62,6 @@ public class Logger {
     log(formattedLogMessage(Log.DEBUG, message, args));
   }
 
-  public void info(String message, Throwable thrown) {
-    log(simpleLogMessage(Log.INFO, message, thrown));
-  }
-
-  public void info(String message, Object... args) {
-    log(formattedLogMessage(Log.INFO, message, args));
-  }
-
-  public void warning(String message, Object... args) {
-    log(formattedLogMessage(Log.WARN, message, args));
-  }
-
   public void error(Throwable thrown) {
     log(simpleLogMessage(Log.ERROR, null, thrown));
   }

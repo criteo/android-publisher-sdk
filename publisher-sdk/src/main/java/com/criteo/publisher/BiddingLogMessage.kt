@@ -16,8 +16,10 @@
 
 package com.criteo.publisher
 
+import android.util.Log
 import com.criteo.publisher.logging.LogMessage
 import com.criteo.publisher.model.AdUnit
+import com.criteo.publisher.model.CacheAdUnit
 
 internal object BiddingLogMessage {
 
@@ -29,5 +31,10 @@ internal object BiddingLogMessage {
   @JvmStatic
   fun onGlobalSilentModeEnabled(seconds: Int) = LogMessage(message =
     "Silent mode is enabled, no requests will be fired for the next $seconds seconds"
+  )
+
+  @JvmStatic
+  fun onInvalidAdUnit(adUnit: CacheAdUnit) = LogMessage(Log.WARN, message =
+    "Found an invalid AdUnit: $adUnit"
   )
 }

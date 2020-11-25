@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.interstitial
 
+import android.util.Log
 import com.criteo.publisher.Bid
 import com.criteo.publisher.CriteoInterstitial
 import com.criteo.publisher.adUnit
@@ -58,5 +59,10 @@ internal object InterstitialLogMessage {
   @JvmStatic
   fun onInterstitialShowing(interstitial: CriteoInterstitial) = LogMessage(message =
     "Interstitial(${interstitial.adUnit}) is showing"
+  )
+
+  @JvmStatic
+  fun onMethodCalledWithNullApplication(methodName: String) = LogMessage(Log.WARN, message =
+    "Calling CriteoInterstitial#$methodName with a null application"
   )
 }

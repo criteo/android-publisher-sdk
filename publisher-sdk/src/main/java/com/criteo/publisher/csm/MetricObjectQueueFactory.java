@@ -16,6 +16,8 @@
 
 package com.criteo.publisher.csm;
 
+import static com.criteo.publisher.csm.CsmLogMessage.onRecoveringFromStaleCsmQueueFile;
+
 import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -89,8 +91,7 @@ public class MetricObjectQueueFactory {
       } catch (IOException e) {
         exception.addSuppressed(e);
       } finally {
-        logger.warning("Error while reading CSM queue file. "
-            + "Recovering by recreating it or using in-memory queue", exception);
+        logger.log(onRecoveringFromStaleCsmQueueFile(exception));
       }
     }
 
