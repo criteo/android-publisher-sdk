@@ -80,6 +80,7 @@ import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.AndroidUtil;
+import com.criteo.publisher.util.AppLifecycleUtil;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.CustomAdapterFactory;
 import com.criteo.publisher.util.DeviceUtil;
@@ -279,6 +280,14 @@ public class DependencyProvider {
         providePubSdkApi(),
         provideUserPrivacyUtil(),
         provideDeviceInfo()
+    ));
+  }
+
+  @NonNull
+  public AppLifecycleUtil provideAppLifecycleUtil() {
+    return getOrCreate(AppLifecycleUtil.class, () -> new AppLifecycleUtil(
+        provideAppEvents(),
+        provideBidManager()
     ));
   }
 

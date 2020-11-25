@@ -21,7 +21,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runners.model.Statement
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
@@ -35,6 +37,9 @@ class MockedDependenciesRuleTest {
 
   @Inject
   private lateinit var asyncResources: AsyncResources
+
+  @Inject
+  private lateinit var executor: Executor
 
   @Test(timeout = 2000)
   fun waitForIdleState_GivenAsyncTasksDeclaredByAsyncResources_WaitForResourceReleasing() {
@@ -85,5 +90,29 @@ class MockedDependenciesRuleTest {
     assertThat(logger1).isNotNull.isNotEqualTo(logger2)
     assertThat(logger2).isNotNull
     assertThat(mockedDependenciesRule.spiedLogger).isNull()
+  }
+
+  @Test
+  fun withConcurrentThread_TestShouldBeRanInIsolation() {
+    val latch = CountDownLatch(1)
+    var hadTimeout = false
+
+    mockedDependenciesRule.apply(object : Statement() {
+      override fun evaluate() {
+        executor.execute {
+          hadTimeout = !latch.await(500, TimeUnit.MILLISECONDS)
+        }
+      }
+    }, null, this).evaluate()
+
+    mockedDependenciesRule.apply(object : Statement() {
+      override fun evaluate() {
+        executor.execute {
+          latch.countDown()
+        }
+      }
+    }, null, this).evaluate()
+
+    assertThat(hadTimeout).isTrue()
   }
 }

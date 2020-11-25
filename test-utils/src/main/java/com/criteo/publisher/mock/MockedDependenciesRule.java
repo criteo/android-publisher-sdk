@@ -81,8 +81,7 @@ public class MockedDependenciesRule implements MethodRule {
    * This server answers like the preprod of CDB, except that it works only for Ad Units defined in
    * {@link com.criteo.publisher.TestAdUnits}.
    */
-  @SuppressWarnings("FieldCanBeLocal")
-  private final boolean injectCdbMockServer = true;
+  private boolean injectCdbMockServer = true;
 
   @Nullable
   private Logger spiedLogger = null;
@@ -132,6 +131,11 @@ public class MockedDependenciesRule implements MethodRule {
           throwable = t;
         } finally {
           try {
+            // Isolate tests to remove side effect. Some code use the dependency provider singleton: so if a previous
+            // test is still living, it can use a dependency provider of a new test and provide unexpected side effect.
+            resetActivityLifecycleCallbacks();
+            waitForIdleState();
+
             resetAllPersistedData();
 
             // clean after self and ensures no side effects for subsequent tests
@@ -177,6 +181,11 @@ public class MockedDependenciesRule implements MethodRule {
     doReturn(trackingCommandsExecutor).when(dependencyProvider).provideThreadPoolExecutor();
     doReturn(trackingCommandsExecutor.asAsyncResources()).when(dependencyProvider)
         .provideAsyncResources();
+  }
+
+  public MockedDependenciesRule withoutCdbMock() {
+    injectCdbMockServer = false;
+    return this;
   }
 
   private void setUpCdbMock() {
@@ -314,6 +323,11 @@ public class MockedDependenciesRule implements MethodRule {
    */
   @RequiresApi(api = VERSION_CODES.O)
   public void resetAllDependencies() {
+    if (dependencyProvider != null) {
+      resetActivityLifecycleCallbacks();
+      waitForIdleState();
+    }
+
     MockableDependencyProvider.setInstance(null);
     CriteoUtil.clearCriteo();
 
@@ -337,5 +351,11 @@ public class MockedDependenciesRule implements MethodRule {
       // Clear CSM
       MetricHelper.cleanState(dependencyProvider);
     }
+  }
+
+  private void resetActivityLifecycleCallbacks() {
+    // Many callbacks can be registered to an application: for instance, the GUM calls are sent because of such
+    // callbacks. Then at the end of a test session, all callbacks are unregistered so they can't affect next tests.
+    UnregisteringApplication.unregisterAllActivityLifecycleCallbacks();
   }
 }
