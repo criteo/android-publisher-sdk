@@ -118,6 +118,7 @@ public class MockedDependenciesRule implements MethodRule {
       @RequiresApi(api = VERSION_CODES.O)
       @Override
       public void evaluate() throws Throwable {
+        Throwable throwable = null;
         try {
           resetAllDependencies();
           resetAllPersistedData();
@@ -127,17 +128,31 @@ public class MockedDependenciesRule implements MethodRule {
           } else {
             timeout.build(base).evaluate();
           }
+        } catch (Throwable t) {
+          throwable = t;
         } finally {
-          resetAllPersistedData();
+          try {
+            resetAllPersistedData();
 
-          // clean after self and ensures no side effects for subsequent tests
-          MockableDependencyProvider.setInstance(null);
+            // clean after self and ensures no side effects for subsequent tests
+            MockableDependencyProvider.setInstance(null);
 
-          if (cdbMock != null) {
-            cdbMock.shutdown();
+            if (cdbMock != null) {
+              cdbMock.shutdown();
+            }
+
+            spiedLogger = null;
+          } catch (Throwable t) {
+            if (throwable != null) {
+              throwable.addSuppressed(t);
+            } else {
+              throwable = t;
+            }
+          } finally {
+            if (throwable != null) {
+              throw throwable;
+            }
           }
-
-          spiedLogger = null;
         }
       }
     };
