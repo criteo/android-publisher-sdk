@@ -18,6 +18,7 @@ package com.criteo.publisher.mock;
 
 import static org.mockito.AdditionalAnswers.delegatesTo;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -209,24 +210,37 @@ public class MockedDependenciesRule implements MethodRule {
 
     LoggerFactory mockLoggerFactory = mock(LoggerFactory.class);
 
-    AtomicBoolean isFetchingRealLoggerFactory = new AtomicBoolean(false);
+    AtomicBoolean isFetchingRealLogger = new AtomicBoolean(false);
     AtomicReference<Answer<?>> lazyDelegateAnswerRef = new AtomicReference<>();
     spiedLogger = mock(Logger.class, invocation -> {
       if (lazyDelegateAnswerRef.get() == null) {
-        isFetchingRealLoggerFactory.set(true);
-        Logger realLogger = dependencyProvider.provideLoggerFactory().createLogger(MockedDependenciesRule.class);
-        lazyDelegateAnswerRef.compareAndSet(null, delegatesTo(realLogger));
+        isFetchingRealLogger.set(true);
+        dependencyProvider.provideLoggerFactory();
       }
       return lazyDelegateAnswerRef.get().answer(invocation);
     });
     doReturn(spiedLogger).when(mockLoggerFactory).createLogger(any());
 
     doAnswer(invocation -> {
-      if (isFetchingRealLoggerFactory.compareAndSet(true, false)) {
-        return invocation.callRealMethod();
+      if (isFetchingRealLogger.compareAndSet(true, false)) {
+        LoggerFactory realLoggerFactory = (LoggerFactory) invocation.callRealMethod();
+        Logger realLogger = realLoggerFactory.createLogger(MockedDependenciesRule.class);
+        lazyDelegateAnswerRef.compareAndSet(null, delegatesTo(realLogger));
       }
       return mockLoggerFactory;
     }).when(dependencyProvider).provideLoggerFactory();
+  }
+
+  /**
+   * Interact with logger to force generation of spied logger as described in {@link #setUpSpiedLogger()}.
+   * This is done here, while there is only a single thread, because Mockito is not thread-safe during stubbing.
+   */
+  private void finishSetUpSpiedLogger() {
+    if (spiedLogger != null) {
+      //noinspection ResultOfMethodCallIgnored
+      dependencyProvider.provideLoggerFactory().createLogger(MockedDependenciesRule.class).toString();
+      clearInvocations(spiedLogger);
+    }
   }
 
   @RequiresApi(api = VERSION_CODES.O)
@@ -296,6 +310,7 @@ public class MockedDependenciesRule implements MethodRule {
     setUpCdbMock();
     setUpSpiedLogger();
     injectDependencies();
+    finishSetUpSpiedLogger();
   }
 
   @RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)
