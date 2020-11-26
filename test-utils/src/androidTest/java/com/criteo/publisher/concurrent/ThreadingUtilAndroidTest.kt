@@ -21,6 +21,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Test
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
 class ThreadingUtilAndroidTest {
@@ -71,6 +72,60 @@ class ThreadingUtilAndroidTest {
     ThreadingUtil.waitForMessageQueueToBeIdle()
 
     assertThat(isSetInSecondJob).isTrue
+  }
+
+  @Test
+  fun waitForAllThreads_GivenWorkerJobsPostingUiJobsInCascadeFinishingByWorkerJob_WaitForAllJobs() {
+    val executor = TrackingCommandsExecutor(Executors.newFixedThreadPool(10))
+    val handler = Handler(Looper.getMainLooper())
+    val isSetInLastJob = AtomicBoolean(false)
+
+    fun postJobs(remainingIteration: Int = 10) {
+      handler.post {
+        simulateUiWork()
+        executor.execute {
+          simulateUiWork()
+
+          if (remainingIteration == 0) {
+            isSetInLastJob.set(true)
+          } else {
+            postJobs(remainingIteration - 1)
+          }
+        }
+      }
+    }
+
+    postJobs()
+    ThreadingUtil.waitForAllThreads(executor)
+
+    assertThat(isSetInLastJob).isTrue
+  }
+
+  @Test
+  fun waitForAllThreads_GivenWorkerJobsPostingUiJobsInCascadeFinishingByUiJob_WaitForAllJobs() {
+    val executor = TrackingCommandsExecutor(Executors.newFixedThreadPool(10))
+    val handler = Handler(Looper.getMainLooper())
+    val isSetInLastJob = AtomicBoolean(false)
+
+    fun postJobs(remainingIteration: Int = 10) {
+      executor.execute {
+        simulateUiWork()
+        handler.post {
+          simulateUiWork()
+
+          if (remainingIteration == 0) {
+            isSetInLastJob.set(true)
+          } else {
+            postJobs(remainingIteration - 1)
+          }
+        }
+      }
+    }
+
+    postJobs()
+    ThreadingUtil.waitForAllThreads(executor)
+
+    assertThat(isSetInLastJob).isTrue
   }
 
   @Test
