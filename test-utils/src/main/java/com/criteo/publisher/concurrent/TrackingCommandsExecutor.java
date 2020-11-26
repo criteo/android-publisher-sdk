@@ -38,8 +38,11 @@ public class TrackingCommandsExecutor implements Executor {
     commandLatches.add(latch);
 
     Runnable trackedCommand = () -> {
-      command.run();
-      latch.countDown();
+      try {
+        command.run();
+      } finally {
+        latch.countDown();
+      }
     };
 
     delegate.execute(trackedCommand);
