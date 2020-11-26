@@ -17,10 +17,8 @@
 package com.criteo.publisher.AppEvents;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.Clock;
-import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.network.AppEventTask;
 import com.criteo.publisher.network.PubSdkApi;
@@ -29,6 +27,7 @@ import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.AppEventResponseListener;
 import com.criteo.publisher.util.ApplicationStoppedListener;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class AppEvents implements AppEventResponseListener, ApplicationStoppedListener {
 
@@ -36,10 +35,7 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
   private static final String EVENT_ACTIVE = "Active";
   private static final String EVENT_LAUNCH = "Launch";
 
-  private AppEventTask eventTask;
   private final Context mContext;
-  private int appEventThrottle = -1;
-  private long throttleSetTime = 0;
 
   private final AdvertisingInfo advertisingInfo;
   private final Clock clock;
@@ -49,13 +45,19 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
   @NonNull
   private final DeviceInfo deviceInfo;
 
+  @NonNull
+  private final Executor executor;
+
+  private final AtomicLong silencedUntilTimeInMillis = new AtomicLong(-1);
+
   public AppEvents(
       @NonNull Context context,
       @NonNull AdvertisingInfo advertisingInfo,
       @NonNull Clock clock,
       @NonNull PubSdkApi api,
       @NonNull UserPrivacyUtil userPrivacyUtil,
-      @NonNull DeviceInfo deviceInfo
+      @NonNull DeviceInfo deviceInfo,
+      @NonNull Executor executor
   ) {
     this.mContext = context;
     this.advertisingInfo = advertisingInfo;
@@ -63,34 +65,33 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
     this.api = api;
     this.userPrivacyUtil = userPrivacyUtil;
     this.deviceInfo = deviceInfo;
-    this.eventTask = createEventTask();
+    this.executor = executor;
   }
 
   private void postAppEvent(String eventType) {
-    if (shouldCallBearcat()) {
-      if (appEventThrottle > 0 &&
-          clock.getCurrentTimeInMillis() - throttleSetTime < appEventThrottle * 1000) {
-        return;
-      }
-      if (eventTask.getStatus() == AsyncTask.Status.FINISHED) {
-        eventTask = createEventTask();
-      }
-      if (eventTask.getStatus() != AsyncTask.Status.RUNNING) {
-        Executor threadPoolExecutor = DependencyProvider.getInstance().provideThreadPoolExecutor();
-        eventTask.executeOnExecutor(threadPoolExecutor, eventType);
-      }
+    if (!shouldCallBearcat()) {
+      return;
     }
-  }
 
-  @NonNull
-  private AppEventTask createEventTask() {
-    return new AppEventTask(mContext, this, advertisingInfo, api, deviceInfo, userPrivacyUtil);
+    long silencedUntil = silencedUntilTimeInMillis.get();
+    if (silencedUntil > 0 && clock.getCurrentTimeInMillis() < silencedUntil) {
+      return;
+    }
+
+    executor.execute(new AppEventTask(
+        mContext,
+        this,
+        advertisingInfo,
+        api,
+        deviceInfo,
+        userPrivacyUtil,
+        eventType
+    ));
   }
 
   @Override
-  public void setThrottle(int throttle) {
-    this.appEventThrottle = throttle;
-    this.throttleSetTime = clock.getCurrentTimeInMillis();
+  public void setThrottle(int throttleInSec) {
+    this.silencedUntilTimeInMillis.set(clock.getCurrentTimeInMillis() + throttleInSec * 1000);
   }
 
   public void sendLaunchEvent() {
