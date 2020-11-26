@@ -6,13 +6,25 @@ on:
       - main
       - v*.*.* # Version branches such as v4.2.1
   pull_request:
+  workflow_dispatch:
+    inputs:
+      git-ref:
+        description: Git Ref (optional)
+        required: false
 
 jobs:
   java-tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout (latest)
         uses: actions/checkout@v2
+        if: github.event.inputs.git-ref == ''
+
+      - name: Checkout (custom ref)
+        uses: actions/checkout@v2
+        if: github.event.inputs.git-ref != ''
+        with:
+          ref: ${{ github.event.inputs.git-ref }}
 
       - name: Store Gradle cache
         uses: actions/cache@v2
@@ -67,8 +79,15 @@ jobs:
   android-tests:
     runs-on: macos-latest
     steps:
-      - name: Checkout
+      - name: Checkout (latest)
         uses: actions/checkout@v2
+        if: github.event.inputs.git-ref == ''
+
+      - name: Checkout (custom ref)
+        uses: actions/checkout@v2
+        if: github.event.inputs.git-ref != ''
+        with:
+          ref: ${{ github.event.inputs.git-ref }}
 
       - name: Store Gradle cache
         uses: actions/cache@v2
@@ -89,7 +108,7 @@ jobs:
         env:
           # Remove once manlinskiy/action-android doesn't use set-env anymore
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'push'
         with:
           api: 29
           tag: google_apis
@@ -109,7 +128,7 @@ jobs:
         env:
           # Remove once manlinskiy/action-android doesn't use set-env anymore
           ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
-        if: github.event_name == 'pull_request'
+        if: github.event_name != 'push'
         with:
           api: 29
           tag: google_apis
@@ -159,12 +178,20 @@ jobs:
       - android-tests
 
     steps:
-      - name: Checkout
+      - name: Checkout (latest)
         uses: actions/checkout@v2
+        if: github.event.inputs.git-ref == ''
         with:
           # Fetch the whole history to activate the auto-assignment of Sonar issues.
           # Also, Sonar needs the base branch to be fetched in order to provide a good report.
           fetch-depth: 0
+
+      - name: Checkout (custom ref)
+        uses: actions/checkout@v2
+        if: github.event.inputs.git-ref != ''
+        with:
+          fetch-depth: 0 # Same as above
+          ref: ${{ github.event.inputs.git-ref }}
 
       # Sonar drops support of Java 8 in favor of the new LTS: Java 11.
       # See https://sonarcloud.io/documentation/user-guide/move-analysis-java-11/
@@ -191,7 +218,7 @@ jobs:
 
   deploy-development-artifacts:
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request' # Only deploy on merge
+    if: github.event_name == 'push' # Only deploy on merge
 
     needs:
       - java-tests
