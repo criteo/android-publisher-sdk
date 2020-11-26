@@ -98,30 +98,30 @@ public class ThreadingUtil {
    */
   @RequiresApi(api = VERSION_CODES.M)
   public static void waitForAllThreads(@NonNull TrackingCommandsExecutor trackingCommandsExecutor) {
-    // FIXME EE-764 This is a wait with two different steps (main and async). Because of those steps, it
-    //  may me possible that we're not awaiting all threads. For instance, given an async task
-    //  posting in main thread, which is again posting in async thread. Then the last task is not
-    //  waited.
-    //  Generally we have three level of tasks: main first, then async and finally on main thread.
-    //  This is because the bid manager is prefetch on main thread. Then network is done on async.
-    //  And finally listener are called on main thread again.
-    //  But it would be great to have a single async entry point and consider main thread just as an
-    //  normal async task.
+    boolean newUiCommandMightHaveBeenPosted;
 
-    if (isRunningInInstrumentationTest()) {
-      waitForMessageQueueToBeIdle();
-    }
+    do {
+      // At this point, there might be pending UI and worker commands.
 
-    try {
-      trackingCommandsExecutor.waitCommands();
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      throw new RuntimeException(e);
-    }
+      if (isRunningInInstrumentationTest()) {
+        waitForMessageQueueToBeIdle();
+      }
 
-    if (isRunningInInstrumentationTest()) {
-      waitForMessageQueueToBeIdle();
-    }
+      // At this point, there might be pending worker commands.
+
+      try {
+        // If we had to wait for a command, this means that a new UI commands might have been posted.
+        newUiCommandMightHaveBeenPosted = trackingCommandsExecutor.waitCommands();
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new RuntimeException(e);
+      }
+
+      // At this point, there might be pending UI commands if newUiCommandMightHaveBeenPosted is true.
+      // Then we loop again and restart waiting for both UI and worker commands.
+      // If false, then no commands should be pending. We can stop looping.
+
+    } while (newUiCommandMightHaveBeenPosted);
   }
 
   /**

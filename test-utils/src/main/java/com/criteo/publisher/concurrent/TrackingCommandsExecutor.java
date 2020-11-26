@@ -55,18 +55,22 @@ public class TrackingCommandsExecutor implements Executor {
   /**
    * Wait for all the commands passed to the {@link Executor} to finish executing
    *
+   * @return <code>true</code> if at least one command has been waited on.
    * @throws InterruptedException
    */
-  public void waitCommands() throws InterruptedException {
+  public boolean waitCommands() throws InterruptedException {
     CountDownLatch latch;
+    boolean hasWaited = false;
     while ((latch = commandLatches.poll()) != null) {
       try {
         latch.await();
+        hasWaited = true;
       } catch (InterruptedException e) {
         commandLatches.add(latch);
         throw e;
       }
     }
+    return hasWaited;
   }
 
   private class TrackingAsyncResources extends AsyncResources {
