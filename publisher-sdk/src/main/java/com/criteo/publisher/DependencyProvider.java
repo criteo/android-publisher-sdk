@@ -279,7 +279,8 @@ public class DependencyProvider {
         provideClock(),
         providePubSdkApi(),
         provideUserPrivacyUtil(),
-        provideDeviceInfo()
+        provideDeviceInfo(),
+        provideThreadPoolExecutor()
     ));
   }
 
