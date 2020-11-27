@@ -19,9 +19,14 @@ plugins {
   `maven-publish`
   jacoco
   kotlin("android")
+  id("kotlin-allopen")
   id("com.vanniktech.android.javadoc") version "0.3.0"
   id("com.jfrog.bintray")
   id("io.gitlab.arturbosch.detekt")
+}
+
+allOpen {
+  annotation("com.criteo.publisher.annotation.OpenForTesting")
 }
 
 androidLibModule()

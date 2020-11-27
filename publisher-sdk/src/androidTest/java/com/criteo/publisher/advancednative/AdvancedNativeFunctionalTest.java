@@ -87,14 +87,13 @@ public class AdvancedNativeFunctionalTest {
   @SpyBean
   private PubSdkApi api;
 
+  @SpyBean
   private Logger logger;
 
   @Before
   public void setUp() {
     // Start activity only there so beans are properly injected
     activityRule.launchActivity(new Intent());
-
-    logger = mockedDependenciesRule.getSpiedLogger();
   }
 
   @Test

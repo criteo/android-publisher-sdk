@@ -27,7 +27,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
+import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.privacy.gdpr.GdprData;
@@ -69,6 +71,9 @@ public class AppEventTaskTest {
 
   @Mock
   private GdprData gdprData;
+
+  @SpyBean
+  private Logger logger;
 
   @Before
   public void setUp() throws Exception {
@@ -128,7 +133,7 @@ public class AppEventTaskTest {
     AppEventTask appEventTask = createTask("eventType");
     appEventTask.run();
 
-    verify(mockedDependenciesRule.getSpiedLogger()).log(argThat(
+    verify(logger).log(argThat(
         logMessage -> logMessage.getThrowable().getCause() == exception
     ));
   }

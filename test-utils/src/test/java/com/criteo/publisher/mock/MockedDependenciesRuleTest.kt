@@ -75,8 +75,7 @@ class MockedDependenciesRuleTest {
     val logger1 = loggerFactory.createLogger(javaClass)
     val logger2 = loggerFactory.createLogger(loggerFactory.javaClass)
 
-    assertThat(logger1).isSameAs(mockedDependenciesRule.spiedLogger)
-    assertThat(logger2).isSameAs(mockedDependenciesRule.spiedLogger)
+    assertThat(logger1).isSameAs(logger2)
   }
 
   @Test
@@ -89,7 +88,6 @@ class MockedDependenciesRuleTest {
 
     assertThat(logger1).isNotNull.isNotEqualTo(logger2)
     assertThat(logger2).isNotNull
-    assertThat(mockedDependenciesRule.spiedLogger).isNull()
   }
 
   @Test

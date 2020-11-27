@@ -16,10 +16,10 @@
 
 package com.criteo.publisher.mock
 
-import com.criteo.publisher.DependencyProvider
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.logging.ConsoleHandler
 import com.criteo.publisher.logging.LogMessage
+import com.criteo.publisher.logging.Logger
 import com.criteo.publisher.logging.LoggerFactory
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.eq
@@ -44,9 +44,12 @@ class MockedDependenciesRuleLoggingTest {
   @SpyBean
   private lateinit var consoleHandler: ConsoleHandler
 
+  @SpyBean
+  private lateinit var logger: Logger
+
   @Test
   fun withSpiedLogger_InjectSpiedLoggerAndBeansProperly() {
-    assertThat(beansWithLogger.logger).isNotNull.isSameAs(mockedDependenciesRule.spiedLogger)
+    assertThat(beansWithLogger.logger).isNotNull.isSameAs(logger)
     assertThat(consoleHandler).isSpy()
     assertThat(beansWithLogger).isSpy()
   }
@@ -55,7 +58,7 @@ class MockedDependenciesRuleLoggingTest {
   fun withSpiedLogger_WhenLogging_DelegateToInjectedConsoleHandler() {
     val logMessage = LogMessage(message = "dummy")
 
-    mockedDependenciesRule.spiedLogger!!.log(logMessage)
+    logger.log(logMessage)
 
     verify(consoleHandler).log(any(), eq(logMessage))
   }
@@ -67,7 +70,7 @@ class MockedDependenciesRuleLoggingTest {
   }
 
   @OpenForTesting
-  class TestedDependencyProvider : DependencyProvider() {
+  class TestedDependencyProvider : TestDependencyProvider() {
     fun provideBeansWithLogger(): BeansWithLogger {
       return getOrCreate(BeansWithLogger::class.java, ::BeansWithLogger)
     }

@@ -16,6 +16,7 @@
 
 package com.criteo.publisher
 
+import com.criteo.publisher.logging.Logger
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.util.BuildConfigWrapper
@@ -37,6 +38,9 @@ class SafeRunnableTest {
     @SpyBean
     private lateinit var buildConfigWrapper: BuildConfigWrapper
 
+    @SpyBean
+    private lateinit var logger: Logger
+
     @Test
     fun dontThrowInProduction() {
         doReturn(false).whenever(buildConfigWrapper).preconditionThrowsOnException()
@@ -48,7 +52,6 @@ class SafeRunnableTest {
 
     @Test
     fun givenCheckedException_DontThrowInDebugButLogItInError() {
-        val logger = mockedDependenciesRule.spiedLogger!!
         doReturn(true).whenever(buildConfigWrapper).preconditionThrowsOnException()
 
         val throwable = Exception()
@@ -63,7 +66,6 @@ class SafeRunnableTest {
 
     @Test
     fun givenIOException_LogItInDebug() {
-        val logger = mockedDependenciesRule.spiedLogger!!
         doReturn(true).whenever(buildConfigWrapper).preconditionThrowsOnException()
 
         val throwable = IOException()

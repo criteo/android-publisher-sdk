@@ -28,7 +28,6 @@ import static org.mockito.Mockito.when;
 import android.app.Application;
 import android.os.Build.VERSION_CODES;
 import android.os.Debug;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import com.criteo.publisher.CriteoUtil;
@@ -88,7 +87,7 @@ public class MockedDependenciesRule implements MethodRule {
   private boolean injectSpiedLogger = false;
   private TrackingCommandsExecutor trackingCommandsExecutor;
 
-  protected DependencyProvider dependencyProvider;
+  protected TestDependencyProvider dependencyProvider;
   private Object target;
 
   @Nullable
@@ -98,7 +97,8 @@ public class MockedDependenciesRule implements MethodRule {
    * Activate spying of {@link Logger}.
    * <p>
    * All loggers created through the {@link LoggerFactory} are spied and represented by a single
-   * instance given by {@link #getSpiedLogger()}.
+   * instance given by {@link TestDependencyProvider#provideLogger()}. You can obtain it via annotation injection (see
+   * {@link DependenciesAnnotationInjection}).
    * <p>
    * Note that this option should be used when creating the {@link org.junit.Rule}.
    *
@@ -162,12 +162,12 @@ public class MockedDependenciesRule implements MethodRule {
     };
   }
 
-  protected DependencyProvider createDependencyProvider() {
-    return DependencyProvider.getInstance();
+  protected TestDependencyProvider createDependencyProvider() {
+    return new TestDependencyProvider();
   }
 
   private void setUpDependencyProvider() {
-    DependencyProvider originalDependencyProvider = createDependencyProvider();
+    TestDependencyProvider originalDependencyProvider = createDependencyProvider();
 
     Application application = InstrumentationUtil.getApplication();
     originalDependencyProvider.setApplication(application);
@@ -200,11 +200,8 @@ public class MockedDependenciesRule implements MethodRule {
     when(buildConfigWrapper.getCdbUrl()).thenReturn(cdbMock.getUrl());
     when(buildConfigWrapper.getEventUrl()).thenReturn(cdbMock.getUrl());
     when(dependencyProvider.provideBuildConfigWrapper()).thenReturn(buildConfigWrapper);
-  }
 
-  @Nullable
-  public Logger getSpiedLogger() {
-    return spiedLogger;
+    doReturn(cdbMock).when(dependencyProvider).provideCdbMock();
   }
 
   private void setUpSpiedLogger() {
@@ -253,6 +250,8 @@ public class MockedDependenciesRule implements MethodRule {
       }
       return mockLoggerFactory;
     }).when(dependencyProvider).provideLoggerFactory();
+
+    doReturn(spiedLogger).when(dependencyProvider).provideLogger();
   }
 
   /**
@@ -262,7 +261,7 @@ public class MockedDependenciesRule implements MethodRule {
   private void finishSetUpSpiedLogger() {
     if (spiedLogger != null) {
       //noinspection ResultOfMethodCallIgnored
-      dependencyProvider.provideLoggerFactory().createLogger(MockedDependenciesRule.class).toString();
+      dependencyProvider.provideLogger().toString();
       clearInvocations(spiedLogger);
     }
   }
@@ -300,14 +299,6 @@ public class MockedDependenciesRule implements MethodRule {
     }
 
     return captor;
-  }
-
-  @NonNull
-  public CdbMock getCdbMock() {
-    if (cdbMock == null) {
-      throw new IllegalStateException("CDB mock is only available while test is running");
-    }
-    return cdbMock;
   }
 
   /**
