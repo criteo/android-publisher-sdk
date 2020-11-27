@@ -95,6 +95,7 @@ private fun Project.defaultAndroidModule() {
       versionCode = 1
       versionName = sdkVersion()
       testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+      testInstrumentationRunnerArgument("disableAnalytics", "true")
     }
 
     fun BuildType.addProguardIfExists() {
