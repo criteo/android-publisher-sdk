@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.mock
+package com.criteo.publisher.application
 
 import android.app.Application
 import org.mockito.ArgumentMatchers.any

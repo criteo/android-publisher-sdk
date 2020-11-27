@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.mock
+package com.criteo.publisher.network
 
 import com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE
 import com.criteo.publisher.StubConstants.STUB_NATIVE_JSON

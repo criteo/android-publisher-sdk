@@ -24,9 +24,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import android.content.Context;
+import com.criteo.publisher.application.InstrumentationUtil;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.model.BannerAdUnit;
-import com.criteo.publisher.util.InstrumentationUtil;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Rule;

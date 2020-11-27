@@ -16,15 +16,10 @@
 
 package com.criteo.publisher.mock;
 
-import static org.mockito.AdditionalAnswers.delegatesTo;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
 
-import android.annotation.SuppressLint;
 import android.os.Build.VERSION_CODES;
 import android.os.Debug;
 import androidx.annotation.NonNull;
@@ -33,27 +28,23 @@ import androidx.annotation.RequiresApi;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.MockableDependencyProvider;
-import com.criteo.publisher.concurrent.ThreadingUtil;
-import com.criteo.publisher.concurrent.TrackingCommandsExecutor;
+import com.criteo.publisher.application.ApplicationResource;
+import com.criteo.publisher.concurrent.MultiThreadResource;
 import com.criteo.publisher.csm.MetricHelper;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
+import com.criteo.publisher.logging.SpyLoggerResource;
 import com.criteo.publisher.mock.TestResource.CompositeTestResource;
 import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.network.CdbMockResource;
 import com.criteo.publisher.network.PubSdkApi;
-import com.criteo.publisher.util.BuildConfigWrapper;
-import com.criteo.publisher.util.InstrumentationUtil;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import org.junit.internal.runners.statements.FailOnTimeout;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
-import org.mockito.stubbing.Answer;
 
 /**
  * Use this Rule when writing tests that require mocking global dependencies.
@@ -295,156 +286,6 @@ public class MockedDependenciesRule implements MethodRule {
     inMemoryResource = null;
   }
 
-  private static class CdbMockResource implements TestResource {
-
-    @NonNull
-    private final DependencyProviderRef dependencyProviderRef;
-
-    @Nullable
-    private CdbMock cdbMock;
-
-    private CdbMockResource(@NonNull DependencyProviderRef dependencyProviderRef) {
-      this.dependencyProviderRef = dependencyProviderRef;
-    }
-
-    @Override
-    public void setUp() {
-      TestDependencyProvider dependencyProvider = dependencyProviderRef.get();
-      cdbMock = new CdbMock(dependencyProvider.provideJsonSerializer());
-      cdbMock.start();
-
-      BuildConfigWrapper buildConfigWrapper = spy(dependencyProvider.provideBuildConfigWrapper());
-      when(buildConfigWrapper.getCdbUrl()).thenReturn(cdbMock.getUrl());
-      when(buildConfigWrapper.getEventUrl()).thenReturn(cdbMock.getUrl());
-      when(dependencyProvider.provideBuildConfigWrapper()).thenReturn(buildConfigWrapper);
-
-      doReturn(cdbMock).when(dependencyProvider).provideCdbMock();
-    }
-
-    @Override
-    public void tearDown() {
-      if (cdbMock != null) {
-        cdbMock.shutdown();
-      }
-
-      cdbMock = null;
-    }
-  }
-
-  private static class MultiThreadResource implements TestResource {
-
-    @NonNull
-    private final DependencyProviderRef dependencyProviderRef;
-
-    @Nullable
-    private TrackingCommandsExecutor trackingCommandsExecutor;
-
-    private MultiThreadResource(@NonNull DependencyProviderRef dependencyProviderRef) {
-      this.dependencyProviderRef = dependencyProviderRef;
-    }
-
-    @RequiresApi(api = VERSION_CODES.M)
-    void waitForIdleState() {
-      if (trackingCommandsExecutor != null) {
-        ThreadingUtil.waitForAllThreads(trackingCommandsExecutor);
-      }
-    }
-
-    @Override
-    public void setUp() {
-      DependencyProvider dependencyProvider = dependencyProviderRef.get();
-      Executor oldExecutor = dependencyProvider.provideThreadPoolExecutor();
-
-      trackingCommandsExecutor = new TrackingCommandsExecutor(oldExecutor);
-      doReturn(trackingCommandsExecutor).when(dependencyProvider).provideThreadPoolExecutor();
-      doReturn(trackingCommandsExecutor.asAsyncResources()).when(dependencyProvider).provideAsyncResources();
-    }
-
-    @Override
-    @SuppressLint("NewApi")
-    public void tearDown() {
-      // Wait for an idle state so we're sure that the previous test won't have any impact on the next tests.
-      waitForIdleState();
-      trackingCommandsExecutor = null;
-    }
-  }
-
-  private static class SpyLoggerResource implements TestResource {
-
-    @NonNull
-    private final DependencyProviderRef dependencyProviderRef;
-
-    private Logger spiedLogger;
-
-    private SpyLoggerResource(@NonNull DependencyProviderRef dependencyProviderRef) {
-      this.dependencyProviderRef = dependencyProviderRef;
-    }
-
-    @Override
-    public void setUp() {
-      /*
-       Special care needs to be taken when mocking the logger:
-       - Logger depends on beans such as the ConsoleHandler
-       - (2) Other beans depends on Logger via LoggerFactory#createLogger which is called during beans' creation.
-
-       When @SpyBean/@MockBean/@Injected beans are injected, loggers are created (2). So the logger factory should
-       already be mocked to serve a spy/mock logger.
-       But the logger factory should not be created before the injection step because its dependencies (1) would not be
-       injected properly.
-
-       So we have:
-       - Logger should be mocked before injection step
-       - LoggerFactory should be created after injection step
-
-       This implementation is creating first a mocked logger before injection step. This is the logger that will be
-       provided to other beans. The LoggerFactory is not created, only mocked.
-       When mocked logger is used (so after the injection step), then one real LoggerFactory is created and used to create
-       one real logger. Then the mocked logger delegates to the real logger.
-      */
-
-      TestDependencyProvider dependencyProvider = dependencyProviderRef.get();
-      LoggerFactory mockLoggerFactory = mock(LoggerFactory.class);
-
-      AtomicBoolean isFetchingRealLogger = new AtomicBoolean(false);
-      AtomicReference<Answer<?>> lazyDelegateAnswerRef = new AtomicReference<>();
-      spiedLogger = mock(Logger.class, invocation -> {
-        if (lazyDelegateAnswerRef.get() == null) {
-          isFetchingRealLogger.set(true);
-          dependencyProvider.provideLoggerFactory();
-        }
-        return lazyDelegateAnswerRef.get().answer(invocation);
-      });
-      doReturn(spiedLogger).when(mockLoggerFactory).createLogger(any());
-
-      doAnswer(invocation -> {
-        if (isFetchingRealLogger.compareAndSet(true, false)) {
-          LoggerFactory realLoggerFactory = (LoggerFactory) invocation.callRealMethod();
-          Logger realLogger = realLoggerFactory.createLogger(MockedDependenciesRule.class);
-        lazyDelegateAnswerRef.compareAndSet(null, delegatesTo(realLogger));
-      }
-      return mockLoggerFactory;
-    }).when(dependencyProvider).provideLoggerFactory();
-
-    doReturn(spiedLogger).when(dependencyProvider).provideLogger();
-  }
-
-    /**
-     * Interact with logger to force generation of spied logger as described in {@link #setUp()}.
-     * This is done here, while there is only a single thread, because Mockito is not thread-safe during stubbing.
-     */
-    void finishSetup() {
-      if (spiedLogger != null) {
-        //noinspection ResultOfMethodCallIgnored
-        spiedLogger.toString();
-      }
-    }
-
-    @Override
-    public void tearDown() {
-      spiedLogger = null;
-    }
-  }
-
   private class DependencyProviderResource implements TestResource {
 
     @NonNull
@@ -469,27 +310,4 @@ public class MockedDependenciesRule implements MethodRule {
     }
   }
 
-  private static class ApplicationResource implements TestResource {
-
-    @NonNull
-    private final DependencyProviderRef dependencyProviderRef;
-
-    private ApplicationResource(@NonNull DependencyProviderRef dependencyProviderRef) {
-      this.dependencyProviderRef = dependencyProviderRef;
-    }
-
-    @Override
-    public void setUp() {
-      DependencyProvider dependencyProvider = dependencyProviderRef.get();
-      dependencyProvider.setApplication(InstrumentationUtil.getApplication());
-      dependencyProvider.setCriteoPublisherId(CriteoUtil.TEST_CP_ID);
-    }
-
-    @Override
-    public void tearDown() {
-      // Many callbacks can be registered to an application: for instance, the GUM calls are sent because of such
-      // callbacks. Then at the end of a test session, all callbacks are unregistered so they can't affect next tests.
-      UnregisteringApplication.unregisterAllActivityLifecycleCallbacks();
-    }
-  }
 }

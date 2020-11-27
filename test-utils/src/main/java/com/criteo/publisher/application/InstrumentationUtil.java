@@ -14,13 +14,11 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.util;
+package com.criteo.publisher.application;
 
 import android.app.Application;
 import android.os.Build.VERSION;
 import androidx.test.core.app.ApplicationProvider;
-import com.criteo.publisher.mock.ApplicationMock;
-import com.criteo.publisher.mock.UnregisteringApplication;
 
 public class InstrumentationUtil {
 

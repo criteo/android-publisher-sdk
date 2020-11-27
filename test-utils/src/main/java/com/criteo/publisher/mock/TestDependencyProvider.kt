@@ -19,6 +19,7 @@ package com.criteo.publisher.mock
 import com.criteo.publisher.DependencyProvider
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.logging.Logger
+import com.criteo.publisher.network.CdbMock
 
 @OpenForTesting
 class TestDependencyProvider : DependencyProvider() {

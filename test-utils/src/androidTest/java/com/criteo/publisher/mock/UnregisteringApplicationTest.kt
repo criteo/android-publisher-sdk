@@ -20,6 +20,7 @@ import android.app.Application
 import com.criteo.publisher.CriteoUtil
 import com.criteo.publisher.DependencyProvider
 import com.criteo.publisher.MockableDependencyProvider
+import com.criteo.publisher.application.UnregisteringApplication
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import org.junit.After

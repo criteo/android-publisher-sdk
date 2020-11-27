@@ -18,6 +18,7 @@ package com.criteo.publisher.util;
 
 import static org.junit.Assert.assertTrue;
 
+import com.criteo.publisher.application.InstrumentationUtil;
 import org.junit.Test;
 
 public class InstrumentationUtilAndroidTest {
