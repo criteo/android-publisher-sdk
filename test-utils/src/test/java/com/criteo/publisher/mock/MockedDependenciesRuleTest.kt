@@ -95,21 +95,16 @@ class MockedDependenciesRuleTest {
     val latch = CountDownLatch(1)
     var hadTimeout = false
 
-    mockedDependenciesRule.apply(object : Statement() {
-      override fun evaluate() {
-        executor.execute {
-          hadTimeout = !latch.await(500, TimeUnit.MILLISECONDS)
-        }
-      }
-    }, null, this).evaluate()
+    executor.execute {
+      hadTimeout = !latch.await(500, TimeUnit.MILLISECONDS)
+    }
 
-    mockedDependenciesRule.apply(object : Statement() {
-      override fun evaluate() {
-        executor.execute {
-          latch.countDown()
-        }
-      }
-    }, null, this).evaluate()
+    // Simulating a new test
+    mockedDependenciesRule.resetAllDependencies()
+
+    executor.execute {
+      latch.countDown()
+    }
 
     assertThat(hadTimeout).isTrue()
   }
