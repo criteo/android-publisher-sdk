@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.mock;
+package com.criteo.publisher.application;
 
 import static org.mockito.AdditionalAnswers.returnsArgAt;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;

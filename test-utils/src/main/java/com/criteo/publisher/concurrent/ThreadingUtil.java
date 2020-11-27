@@ -16,7 +16,7 @@
 
 package com.criteo.publisher.concurrent;
 
-import static com.criteo.publisher.util.InstrumentationUtil.isRunningInInstrumentationTest;
+import static com.criteo.publisher.application.InstrumentationUtil.isRunningInInstrumentationTest;
 
 import android.os.Build.VERSION_CODES;
 import android.os.Handler;

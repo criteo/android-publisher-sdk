@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.util
 
+import com.criteo.publisher.application.InstrumentationUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 

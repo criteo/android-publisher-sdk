@@ -17,8 +17,8 @@
 package com.criteo.publisher;
 
 import android.app.Application;
+import com.criteo.publisher.application.InstrumentationUtil;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.util.InstrumentationUtil;
 import java.util.Arrays;
 import java.util.List;
 

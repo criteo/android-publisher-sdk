@@ -26,8 +26,8 @@ import static org.mockito.Mockito.when;
 
 import android.app.Application;
 import android.content.Context;
+import com.criteo.publisher.application.ApplicationMock;
 import com.criteo.publisher.csm.MetricSendingQueue;
-import com.criteo.publisher.mock.ApplicationMock;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.util.AdvertisingInfo;
