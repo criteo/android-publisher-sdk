@@ -97,13 +97,13 @@ public class DfpHeaderBiddingTest {
   @SpyBean
   private BuildConfigWrapper buildConfigWrapper;
 
+  @SpyBean
   private Logger logger;
 
   private DfpHeaderBidding headerBidding;
 
   @Before
   public void setUp() throws Exception {
-    logger = mockedDependenciesRule.getSpiedLogger();
     headerBidding = new DfpHeaderBidding(androidUtil, deviceUtil);
   }
 

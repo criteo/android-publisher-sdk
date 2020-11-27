@@ -149,6 +149,7 @@ public class BidManagerFunctionalTest {
   @MockBean
   private ContextProvider contextProvider;
 
+  @SpyBean
   private Logger logger;
 
   private int adUnitId = 0;
@@ -164,8 +165,6 @@ public class BidManagerFunctionalTest {
     when(context.getPackageName()).thenReturn("bundle.id");
     dependencyProvider.setCriteoPublisherId("cpId");
     when(config.isPrefetchOnInitEnabled()).thenReturn(true);
-
-    logger = mockedDependenciesRule.getSpiedLogger();
 
     // Should be set to at least 1 because user-level silent mode is set the 0 included
     givenMockedClockSetTo(1);

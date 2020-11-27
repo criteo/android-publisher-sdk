@@ -17,6 +17,7 @@ package com.criteo.publisher.util
 
 import com.criteo.publisher.logging.Logger
 import com.criteo.publisher.mock.MockedDependenciesRule
+import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.util.AdvertisingInfo.MissingPlayServicesAdsIdentifierException
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.times
@@ -34,6 +35,7 @@ class AdvertisingInfoNoIdentifierTest {
   @JvmField
   val mockedDependenciesRule = MockedDependenciesRule().withSpiedLogger()
 
+  @SpyBean
   private lateinit var logger: Logger
 
   @Inject
@@ -54,8 +56,6 @@ To run those test locally and properly, you should use Gradle. Either via gradle
 via IntelliJ delegating test run to Gradle.
 """
     ).isInstanceOf(ClassNotFoundException::class.java)
-
-    logger = mockedDependenciesRule.spiedLogger!!
   }
 
   @Test

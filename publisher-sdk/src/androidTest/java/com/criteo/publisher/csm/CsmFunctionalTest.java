@@ -42,6 +42,7 @@ import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.csm.MetricRequest.MetricRequestFeedback;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
+import com.criteo.publisher.mock.CdbMock;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdUnit;
@@ -77,6 +78,9 @@ public class CsmFunctionalTest {
 
   @SpyBean
   private Clock clock;
+
+  @Inject
+  private CdbMock cdbMock;
 
   @Before
   public void setUp() throws Exception {
@@ -269,7 +273,7 @@ public class CsmFunctionalTest {
     waitForIdleState();
 
     // Timeout
-    mockedDependenciesRule.getCdbMock().simulatorSlowNetworkOnNextRequest();
+    cdbMock.simulatorSlowNetworkOnNextRequest();
     when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenReturn(1);
     loadBid(TestAdUnits.INTERSTITIAL);
     waitForIdleState();

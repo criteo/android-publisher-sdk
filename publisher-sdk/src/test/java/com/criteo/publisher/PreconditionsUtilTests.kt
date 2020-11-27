@@ -19,6 +19,7 @@ package com.criteo.publisher
 import com.criteo.publisher.logging.Logger
 import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
+import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.util.BuildConfigWrapper
 import com.criteo.publisher.util.PreconditionsUtil
 import com.nhaarman.mockitokotlin2.doReturn
@@ -37,7 +38,8 @@ class PreconditionsUtilTests {
     @MockBean
     private lateinit var buildConfigWrapper: BuildConfigWrapper
 
-    private val logger: Logger get() = mockedDependenciesRule.spiedLogger!!
+    @SpyBean
+    private lateinit var logger: Logger
 
     @Test
     fun givenDebug_RuntimeExceptionShouldBeThrown() {

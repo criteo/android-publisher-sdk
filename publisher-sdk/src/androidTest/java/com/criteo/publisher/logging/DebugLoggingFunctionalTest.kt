@@ -70,7 +70,6 @@ import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.atomic.AtomicReference
@@ -100,12 +99,8 @@ class DebugLoggingFunctionalTest {
   @SpyBean
   private lateinit var consoleHandler: ConsoleHandler
 
+  @SpyBean
   private lateinit var logger: Logger
-
-  @Before
-  fun setUp() {
-    logger = mockedDependenciesRule.spiedLogger!!
-  }
 
   @Test
   fun whenCriteoInitIsCalled_LogCpIdAndAdUnits() {

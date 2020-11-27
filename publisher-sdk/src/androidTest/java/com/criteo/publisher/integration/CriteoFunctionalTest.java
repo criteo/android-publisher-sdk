@@ -42,6 +42,7 @@ import com.criteo.publisher.Criteo;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.context.UserData;
 import com.criteo.publisher.context.UserDataHolder;
+import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdUnit;
@@ -89,6 +90,9 @@ public class CriteoFunctionalTest {
   @Inject
   private UserDataHolder userDataHolder;
 
+  @SpyBean
+  private Logger logger;
+
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
@@ -121,7 +125,7 @@ public class CriteoFunctionalTest {
     String version = Criteo.getVersion();
 
     assertThat(version).isEmpty();
-    verify(mockedDependenciesRule.getSpiedLogger()).log(argThat(logMessage -> logMessage.getThrowable() == exception));
+    verify(logger).log(argThat(logMessage -> logMessage.getThrowable() == exception));
   }
 
   @Test
