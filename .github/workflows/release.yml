@@ -13,10 +13,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up Android SDK
-        uses: malinskiy/action-android/install-sdk@release/0.0.7
-        env:
-          # Remove once manlinskiy/action-android doesn't use set-env anymore
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
+        uses: malinskiy/action-android/install-sdk@release/0.0.8
 
       - name: Deploy artifacts and notify on Slack
         env:
