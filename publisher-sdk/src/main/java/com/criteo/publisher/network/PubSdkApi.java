@@ -18,7 +18,6 @@ package com.criteo.publisher.network;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
@@ -26,8 +25,6 @@ import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.RemoteConfigRequest;
 import com.criteo.publisher.model.RemoteConfigResponse;
-import com.criteo.publisher.privacy.gdpr.GdprData;
-import com.criteo.publisher.util.Base64;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.JsonSerializer;
 import com.criteo.publisher.util.StreamUtil;
@@ -107,7 +104,7 @@ public class PubSdkApi {
       @NonNull String eventType,
       int limitedAdTracking,
       @NonNull String userAgent,
-      @Nullable GdprData gdprData
+      @Nullable String gdprConsentData
   ) throws Exception {
     Map<String, String> parameters = new HashMap<>();
     parameters.put(APP_ID, appId);
@@ -120,32 +117,14 @@ public class PubSdkApi {
     parameters.put(EVENT_TYPE, eventType);
     parameters.put(LIMITED_AD_TRACKING, String.valueOf(limitedAdTracking));
 
-    if (gdprData != null) {
-      String gdprString = getGdprDataStringBase64(gdprData);
-      if (gdprString != null && !gdprString.isEmpty()) {
-        parameters.put(GDPR_STRING, gdprString);
-      }
+    if (gdprConsentData != null) {
+        parameters.put(GDPR_STRING, gdprConsentData);
     }
 
     String query = "/appevent/v1/" + senderId + "?" + getParamsString(parameters);
     URL url = new URL(buildConfigWrapper.getEventUrl() + query);
     try (InputStream inputStream = executeRawGet(url, userAgent)) {
       return readJson(inputStream);
-    }
-  }
-
-  /**
-   * @return a {@link String} representing the base64 encoded JSON string for GdprData object
-   */
-  @Nullable
-  @VisibleForTesting
-  String getGdprDataStringBase64(@NonNull GdprData gdprData) {
-    try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-      jsonSerializer.write(gdprData, baos);
-      return Base64.encodeToString(baos.toByteArray(), Base64.NO_WRAP);
-    } catch (IOException e) {
-      logger.debug("Unable to encode gdprString to base64", e);
-      return null;
     }
   }
 
