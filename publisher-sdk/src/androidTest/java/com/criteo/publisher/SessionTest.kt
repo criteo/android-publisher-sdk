@@ -35,11 +35,11 @@ class SessionTest {
 
     CriteoUtil.givenInitializedCriteo()
 
-    whenever(clock.currentTimeInMillis).thenReturn(1379L)
+    whenever(clock.currentTimeInMillis).thenReturn(2337L)
 
     val session = DependencyProvider.getInstance().provideSession()
-    val duration = session.getDuration()
+    val duration = session.getDurationInSeconds()
 
-    assertThat(duration).isEqualTo(42L)
+    assertThat(duration).isEqualTo(1)
   }
 }

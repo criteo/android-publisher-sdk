@@ -154,7 +154,7 @@ internal class ContextProvider(
    * ## Note
    * This duration is approximate: it is the duration since the initialization of the SDK.
    */
-  internal fun fetchSessionDuration(): Long? = session.getDuration()
+  internal fun fetchSessionDuration(): Int? = session.getDurationInSeconds()
 
   fun fetchUserContext(): Map<String, Any> {
     return mapOf(
