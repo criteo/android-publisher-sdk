@@ -105,7 +105,7 @@ class ContextFunctionalTest(private val integration: TestedIntegration) {
     doReturn(listOf("en", "he")).whenever(contextProvider).fetchUserLanguages()
     doReturn("FR").whenever(contextProvider).fetchUserCountry()
     doReturn("Portrait").whenever(contextProvider).fetchDeviceOrientation()
-    doReturn(45L).whenever(contextProvider).fetchSessionDuration()
+    doReturn(45).whenever(contextProvider).fetchSessionDuration()
 
     givenInitializedCriteo()
     Criteo.getInstance().setUserData(userData)
@@ -124,7 +124,7 @@ class ContextFunctionalTest(private val integration: TestedIntegration) {
               "data" to mapOf(
                   "orientation" to "Portrait",
                   "inputLanguage" to listOf("en", "he"),
-                  "sessionDuration" to 45L,
+                  "sessionDuration" to 45,
                   "hashedEmail" to "000e3171a5110c35c69d060112bd0ba55d9631c7c2ec93f1840e4570095b263a",
                   "devUserId" to "abc123",
                   "foo" to listOf("bar", "baz")

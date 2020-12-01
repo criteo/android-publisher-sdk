@@ -17,13 +17,16 @@
 package com.criteo.publisher
 
 internal class Session(private val clock: Clock) {
+  companion object {
+    const val MILLIS_IN_SECOND = 1000
+  }
 
   private val startingTime = clock.currentTimeInMillis
 
   /**
-   * Returns the current time in milliseconds since the initialization of the SDK.
+   * Returns the current time in seconds since the initialization of the SDK.
    *
-   * @return the difference, measured in milliseconds, between the current time and the SDK init.
+   * @return the difference, measured in seconds, between the current time and the SDK init.
    */
-  fun getDuration(): Long = clock.currentTimeInMillis - startingTime
+  fun getDurationInSeconds(): Int = ((clock.currentTimeInMillis - startingTime) / MILLIS_IN_SECOND).toInt()
 }
