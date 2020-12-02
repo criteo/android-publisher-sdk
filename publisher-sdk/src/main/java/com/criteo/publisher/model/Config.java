@@ -24,6 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
+import com.criteo.publisher.model.RemoteConfigResponse.RemoteLogLevel;
 import com.criteo.publisher.util.JsonSerializer;
 import com.criteo.publisher.util.SafeSharedPreferences;
 import java.io.ByteArrayInputStream;
@@ -50,6 +51,7 @@ public class Config {
     private static final boolean LIVE_BIDDING_ENABLED = false;
     private static final int LIVE_BIDDING_TIME_BUDGET_IN_MILLIS = 8_000;
     private static final boolean PREFETCH_ON_INIT_ENABLED = true;
+    private static final RemoteLogLevel REMOTE_LOG_LEVEL = RemoteLogLevel.WARNING;
 
   }
 
@@ -150,6 +152,10 @@ public class Config {
         getOrElse(
             overrideRemoteConfig.getPrefetchOnInitEnabled(),
             baseRemoteConfig.getPrefetchOnInitEnabled()
+        ),
+        getOrElse(
+            overrideRemoteConfig.getRemoteLogLevel(),
+            baseRemoteConfig.getRemoteLogLevel()
         )
     );
   }
@@ -262,6 +268,14 @@ public class Config {
     return getOrElse(
         cachedRemoteConfig.getAndroidAdTagDataMode(),
         DefaultConfig.AD_TAG_DATA_MODE
+    );
+  }
+
+  @NonNull
+  public RemoteLogLevel getRemoteLogLevel() {
+    return getOrElse(
+        cachedRemoteConfig.getRemoteLogLevel(),
+        DefaultConfig.REMOTE_LOG_LEVEL
     );
   }
 

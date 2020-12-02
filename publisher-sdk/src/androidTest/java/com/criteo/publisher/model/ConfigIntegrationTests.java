@@ -39,6 +39,7 @@ import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
+import com.criteo.publisher.model.RemoteConfigResponse.RemoteLogLevel;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.JsonSerializer;
@@ -311,7 +312,8 @@ public class ConfigIntegrationTests {
         false,
         true,
         1337,
-        true
+        true,
+        RemoteLogLevel.DEBUG
     );
 
     givenRemoteConfigInLocalStorage(persistedConfig);
@@ -337,6 +339,7 @@ public class ConfigIntegrationTests {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -349,7 +352,8 @@ public class ConfigIntegrationTests {
         false,
         true,
         42,
-        false
+        false,
+        RemoteLogLevel.INFO
     );
 
     RemoteConfigResponse expectedRemoteConfig = RemoteConfigResponse.create(
@@ -361,7 +365,8 @@ public class ConfigIntegrationTests {
         false,
         true,
         42,
-        false
+        false,
+        RemoteLogLevel.INFO
     );
 
     givenRemoteConfigInLocalStorage(oldPersistedConfig);

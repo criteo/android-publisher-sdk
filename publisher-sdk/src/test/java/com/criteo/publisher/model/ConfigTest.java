@@ -27,18 +27,20 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
+import com.criteo.publisher.model.RemoteConfigResponse.RemoteLogLevel;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.JsonSerializer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.function.Function;
 import org.junit.Before;
 import org.junit.Rule;
@@ -200,6 +202,16 @@ public class ConfigTest {
     refreshConfig_assertItIsUnchanged(newConfig, Config::isPrefetchOnInitEnabled);
   }
 
+  @Test
+  public void refreshConfig_GivenMissingRemoteLogLevel_ItIsUnchanged() throws Exception {
+    givenNewConfig();
+
+    RemoteConfigResponse newConfig = givenFullNewPayload(config);
+    when(newConfig.getRemoteLogLevel()).thenReturn(null);
+
+    refreshConfig_assertItIsUnchanged(newConfig, Config::getRemoteLogLevel);
+  }
+
   private <T> void refreshConfig_assertItIsUnchanged(
       RemoteConfigResponse newConfig,
       Function<Config, T> projection
@@ -227,7 +239,8 @@ public class ConfigTest {
         false,
         false,
         42,
-        false
+        false,
+        RemoteLogLevel.ERROR
     );
 
     doAnswer(answerVoid((RemoteConfigResponse ignored, OutputStream outputStream) -> {
@@ -255,7 +268,7 @@ public class ConfigTest {
 
     config.refreshConfig(newConfig);
 
-    verifyZeroInteractions(editor);
+    verifyNoInteractions(editor);
   }
 
   @Test
@@ -300,6 +313,13 @@ public class ConfigTest {
     when(response.getLiveBiddingEnabled()).thenReturn(!config.isLiveBiddingEnabled());
     when(response.getLiveBiddingTimeBudgetInMillis()).thenReturn(1 + config.getLiveBiddingTimeBudgetInMillis());
     when(response.getPrefetchOnInitEnabled()).thenReturn(!config.isPrefetchOnInitEnabled());
+
+    // Get any value that is not the one set in the given config
+    RemoteLogLevel otherLogLevel = Arrays.stream(RemoteLogLevel.values())
+        .filter(logLevel -> logLevel != config.getRemoteLogLevel())
+        .findFirst().get();
+
+    when(response.getRemoteLogLevel()).thenReturn(otherLogLevel);
     return response;
   }
 

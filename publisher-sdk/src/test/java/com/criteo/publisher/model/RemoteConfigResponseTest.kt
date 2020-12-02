@@ -17,6 +17,7 @@
 package com.criteo.publisher.model
 
 import com.criteo.publisher.mock.MockedDependenciesRule
+import com.criteo.publisher.model.RemoteConfigResponse.RemoteLogLevel
 import com.criteo.publisher.util.JsonSerializer
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
@@ -70,6 +71,7 @@ class RemoteConfigResponseTest {
     assertThat(response.liveBiddingEnabled).isNull()
     assertThat(response.liveBiddingTimeBudgetInMillis).isNull()
     assertThat(response.prefetchOnInitEnabled).isNull()
+    assertThat(response.remoteLogLevel).isNull()
   }
 
   @Test
@@ -83,7 +85,8 @@ class RemoteConfigResponseTest {
       "csmEnabled": true,
       "liveBiddingEnabled": true,
       "liveBiddingTimeBudgetInMillis": 42,
-      "prefetchOnInitEnabled": true
+      "prefetchOnInitEnabled": true,
+      "remoteLogLevel": "Warning"
     }""".trimIndent()
 
     val response = readFromString(json)
@@ -97,6 +100,7 @@ class RemoteConfigResponseTest {
     assertThat(response.liveBiddingEnabled).isTrue()
     assertThat(response.liveBiddingTimeBudgetInMillis).isEqualTo(42)
     assertThat(response.prefetchOnInitEnabled).isTrue()
+    assertThat(response.remoteLogLevel).isEqualTo(RemoteLogLevel.WARNING)
   }
 
   @Test
@@ -133,6 +137,26 @@ class RemoteConfigResponseTest {
   }
 
   @Test
+  fun readRemoteLogLevel_GivenSerialized_ReturnExpected() {
+    readRemoteLogLevel_GivenSerialized_ReturnExpected("Debug", RemoteLogLevel.DEBUG)
+    readRemoteLogLevel_GivenSerialized_ReturnExpected("Info", RemoteLogLevel.INFO)
+    readRemoteLogLevel_GivenSerialized_ReturnExpected("Warning", RemoteLogLevel.WARNING)
+    readRemoteLogLevel_GivenSerialized_ReturnExpected("Error", RemoteLogLevel.ERROR)
+    readRemoteLogLevel_GivenSerialized_ReturnExpected("None", RemoteLogLevel.NONE)
+    readRemoteLogLevel_GivenSerialized_ReturnExpected("unknown value", null)
+  }
+
+  private fun readRemoteLogLevel_GivenSerialized_ReturnExpected(serialized: String, expected: RemoteLogLevel?) {
+    val json = """{
+      "remoteLogLevel": "$serialized"
+    }""".trimIndent()
+
+    val response = readFromString(json)
+
+    assertThat(response.remoteLogLevel).isEqualTo(expected)
+  }
+
+  @Test
   fun read_GivenIllFormedJson_ThrowIOException() {
     assertThatCode {
       readFromString("{")
@@ -151,5 +175,4 @@ class RemoteConfigResponseTest {
       jsonSerializer.read(RemoteConfigResponse::class.java, it)
     }
   }
-
 }
