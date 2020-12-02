@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.model;
 
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.auto.value.AutoValue;
@@ -36,7 +37,8 @@ public abstract class RemoteConfigResponse {
       @Nullable Boolean csmEnabled,
       @Nullable Boolean liveBiddingEnabled,
       @Nullable Integer liveBiddingTimeBudgetInMillis,
-      @Nullable Boolean prefetchOnInitEnabled
+      @Nullable Boolean prefetchOnInitEnabled,
+      @Nullable RemoteLogLevel remoteLogLevel
   ) {
     return new AutoValue_RemoteConfigResponse(
         killSwitch,
@@ -47,13 +49,15 @@ public abstract class RemoteConfigResponse {
         csmEnabled,
         liveBiddingEnabled,
         liveBiddingTimeBudgetInMillis,
-        prefetchOnInitEnabled
+        prefetchOnInitEnabled,
+        remoteLogLevel
     );
   }
 
   @NonNull
   public static RemoteConfigResponse createEmpty() {
     return create(
+        null,
         null,
         null,
         null,
@@ -77,7 +81,8 @@ public abstract class RemoteConfigResponse {
         getCsmEnabled(),
         getLiveBiddingEnabled(),
         getLiveBiddingTimeBudgetInMillis(),
-        getPrefetchOnInitEnabled()
+        getPrefetchOnInitEnabled(),
+        getRemoteLogLevel()
     );
   }
 
@@ -182,4 +187,39 @@ public abstract class RemoteConfigResponse {
    */
   @Nullable
   public abstract Boolean getPrefetchOnInitEnabled();
+
+  /**
+   * Desired level of logs to get from the remote logs handler.
+   * <p>
+   * Logs with log level equals or greater to this would be sent remotely. Other logs are skipped.
+   * Here, "greater" reflects to this order (from lower to higher):
+   * <ul>
+   *   <li>{@link RemoteLogLevel#DEBUG}</li>
+   *   <li>{@link RemoteLogLevel#INFO}</li>
+   *   <li>{@link RemoteLogLevel#WARNING}</li>
+   *   <li>{@link RemoteLogLevel#ERROR}</li>
+   *   <li>{@link RemoteLogLevel#NONE}</li>
+   * <p>
+   * If this value is <code>null</code>, then the previous persisted value is taken. If there is no previous value, this
+   * means that this is a fresh start of a new application, then a default value is taken.
+   */
+  @Nullable
+  public abstract RemoteLogLevel getRemoteLogLevel();
+
+  enum RemoteLogLevel {
+    @SerializedName("Debug")
+    DEBUG,
+
+    @SerializedName("Info")
+    INFO,
+
+    @SerializedName("Warning")
+    WARNING,
+
+    @SerializedName("Error")
+    ERROR,
+
+    @SerializedName("None")
+    NONE
+  }
 }

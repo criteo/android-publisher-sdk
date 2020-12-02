@@ -49,7 +49,6 @@ import com.criteo.publisher.model.RemoteConfigRequest;
 import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.model.RemoteConfigResponse;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
-import com.criteo.publisher.privacy.gdpr.GdprData;
 import com.criteo.publisher.util.DeviceUtil;
 import java.util.List;
 import javax.inject.Inject;
@@ -343,7 +342,8 @@ public class PubSdkApiIntegrationTest {
         true,
         false,
         8000,
-        true
+        true,
+        null
     );
   }
 }
