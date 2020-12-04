@@ -16,11 +16,17 @@
 
 package com.criteo.publisher.logging
 
+import com.criteo.publisher.logging.RemoteLogRecords.RemoteLogLevel.Companion.fromAndroidLogLevel
+import com.criteo.publisher.model.Config
+
 internal class RemoteHandler(
     private val remoteLogRecordsFactory: RemoteLogRecordsFactory,
-    private val sendingQueue: RemoteLogSendingQueue
+    private val sendingQueue: RemoteLogSendingQueue,
+    private val config: Config
 ) : LogHandler {
   override fun log(tag: String, logMessage: LogMessage) {
+    fromAndroidLogLevel(logMessage.level)?.takeIf { it >= config.remoteLogLevel } ?: return
+
     remoteLogRecordsFactory.createLogRecords(logMessage)?.let {
       sendingQueue.offer(it)
     }
