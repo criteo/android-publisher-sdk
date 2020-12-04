@@ -16,13 +16,24 @@
 
 package com.criteo.publisher.csm
 
-import com.criteo.publisher.csm.MetricObjectQueueFactory.MetricConverter
-import com.criteo.publisher.csm.TapeMetricSendingQueueTest.Companion.TapeImplementation.EMPTY_QUEUE_FILE
-import com.criteo.publisher.csm.TapeMetricSendingQueueTest.Companion.TapeImplementation.NEW_FILE
+import com.criteo.publisher.csm.ObjectQueueFactory.AdapterConverter
+import com.criteo.publisher.csm.TapeSendingQueueTest.Companion.TapeImplementation.EMPTY_QUEUE_FILE
+import com.criteo.publisher.csm.TapeSendingQueueTest.Companion.TapeImplementation.NEW_FILE
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.util.BuildConfigWrapper
-import com.nhaarman.mockitokotlin2.*
+import com.criteo.publisher.util.JsonSerializer
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.doAnswer
+import com.nhaarman.mockitokotlin2.doNothing
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.doThrow
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.spy
+import com.nhaarman.mockitokotlin2.stub
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyZeroInteractions
+import com.nhaarman.mockitokotlin2.whenever
 import com.squareup.tape.FileException
 import com.squareup.tape.FileObjectQueue
 import com.squareup.tape.InMemoryObjectQueue
@@ -40,7 +51,7 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.stubbing.Answer
 import java.io.File
-import java.util.*
+import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
@@ -49,7 +60,7 @@ import javax.inject.Inject
 
 
 @RunWith(Parameterized::class)
-class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementation) {
+class TapeSendingQueueTest(private val tapeImplementation: TapeImplementation) {
 
   @Rule
   @JvmField
@@ -77,14 +88,14 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
   private lateinit var buildConfigWrapper: BuildConfigWrapper
 
   @Inject
-  private lateinit var metricParser: MetricParser
+  private lateinit var jsonSerializer: JsonSerializer
 
   private lateinit var tapeQueue: ObjectQueue<Metric>
 
-  private lateinit var queue: TapeMetricSendingQueue
+  private lateinit var queue: TapeSendingQueue<Metric>
 
   @Mock
-  private lateinit var metricObjectQueueFactory: MetricObjectQueueFactory
+  private lateinit var objectQueueFactory: ObjectQueueFactory<Metric>
 
   private var file: File? = null
 
@@ -93,8 +104,8 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
     MockitoAnnotations.initMocks(this)
 
     tapeQueue = spy(createObjectQueue())
-    doReturn(tapeQueue).whenever(metricObjectQueueFactory).create()
-    queue = TapeMetricSendingQueue(metricObjectQueueFactory)
+    doReturn(tapeQueue).whenever(objectQueueFactory).create()
+    queue = TapeSendingQueue(objectQueueFactory)
   }
 
   @Test
@@ -121,7 +132,7 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
 
     // Create new instance of TapeMetricSendingQueue to force recreating the queue reference when polling
     // Since the queue is persistent, we should still find the metrics that were previously saved
-    queue = TapeMetricSendingQueue(metricObjectQueueFactory)
+    queue = TapeSendingQueue(objectQueueFactory)
 
     val size = queue.totalSize
 
@@ -210,7 +221,7 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
 
     // Create new instance of TapeMetricSendingQueue to force recreating the queue reference when polling
     // Since the queue is persistent, we should still find the metrics that were previously saved
-    queue = TapeMetricSendingQueue(metricObjectQueueFactory)
+    queue = TapeSendingQueue(objectQueueFactory)
 
     val metrics = queue.poll(2)
 
@@ -336,12 +347,12 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
     }
   }
 
-  private fun createFileObjectQueue() = FileObjectQueue(file, MetricConverter(metricParser))
+  private fun createFileObjectQueue() = FileObjectQueue(file, AdapterConverter(jsonSerializer, Metric::class.java))
 
   private fun givenMockedTapeQueue(defaultAnswer: Answer<Any>? = null) {
     tapeQueue = mock(defaultAnswer = defaultAnswer)
-    doReturn(tapeQueue).whenever(metricObjectQueueFactory).create()
-    queue = TapeMetricSendingQueue(metricObjectQueueFactory)
+    doReturn(tapeQueue).whenever(objectQueueFactory).create()
+    queue = TapeSendingQueue(objectQueueFactory)
   }
 
   private fun givenDeactivatedPreconditionUtils() {
@@ -358,4 +369,3 @@ class TapeMetricSendingQueueTest(private val tapeImplementation: TapeImplementat
         .build()
   }
 }
-

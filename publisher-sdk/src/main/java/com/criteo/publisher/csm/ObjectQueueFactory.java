@@ -16,7 +16,7 @@
 
 package com.criteo.publisher.csm;
 
-import static com.criteo.publisher.csm.CsmLogMessage.onRecoveringFromStaleCsmQueueFile;
+import static com.criteo.publisher.csm.SendingQueueLogMessage.onRecoveringFromStaleQueueFile;
 
 import android.content.Context;
 import androidx.annotation.NonNull;
@@ -24,7 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
-import com.criteo.publisher.util.BuildConfigWrapper;
+import com.criteo.publisher.util.JsonSerializer;
 import com.squareup.tape.FileObjectQueue;
 import com.squareup.tape.InMemoryObjectQueue;
 import com.squareup.tape.ObjectQueue;
@@ -33,7 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class MetricObjectQueueFactory {
+public class ObjectQueueFactory<T> {
 
   @NonNull
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -42,36 +42,39 @@ public class MetricObjectQueueFactory {
   private final Context context;
 
   @NonNull
-  private final MetricParser metricParser;
+  private final JsonSerializer jsonSerializer;
 
   @NonNull
-  private final BuildConfigWrapper buildConfigWrapper;
+  private final SendingQueueConfiguration<T> sendingQueueConfiguration;
 
-  public MetricObjectQueueFactory(
+  public ObjectQueueFactory(
       @NonNull Context context,
-      @NonNull MetricParser metricParser,
-      @NonNull BuildConfigWrapper buildConfigWrapper
+      @NonNull JsonSerializer jsonSerializer,
+      @NonNull SendingQueueConfiguration<T> sendingQueueConfiguration
   ) {
     this.context = context;
-    this.metricParser = metricParser;
-    this.buildConfigWrapper = buildConfigWrapper;
+    this.jsonSerializer = jsonSerializer;
+    this.sendingQueueConfiguration = sendingQueueConfiguration;
   }
 
   @NonNull
-  public ObjectQueue<Metric> create() {
+  public ObjectQueue<T> create() {
     File file = getQueueFile();
     return createTapeObjectQueue(file);
   }
 
   @VisibleForTesting
   File getQueueFile() {
-    return new File(context.getFilesDir(), buildConfigWrapper.getCsmQueueFilename());
+    return new File(context.getFilesDir(), sendingQueueConfiguration.getQueueFilename());
   }
 
-  private ObjectQueue<Metric> createTapeObjectQueue(@NonNull File file) {
+  private ObjectQueue<T> createTapeObjectQueue(@NonNull File file) {
     Exception exception;
     try {
-      FileObjectQueue<Metric> queue = new FileObjectQueue<>(file, new MetricConverter(metricParser));
+      FileObjectQueue<T> queue = new FileObjectQueue<>(file, new AdapterConverter<>(
+          jsonSerializer,
+          sendingQueueConfiguration.getElementClass()
+      ));
 
       // Try to peek to be sure that the queue is not corrupted.
       queue.peek();
@@ -87,11 +90,14 @@ public class MetricObjectQueueFactory {
 
     if (isDeleted) {
       try {
-        return new FileObjectQueue<>(file, new MetricConverter(metricParser));
+        return new FileObjectQueue<>(file, new AdapterConverter<>(
+            jsonSerializer,
+            sendingQueueConfiguration.getElementClass()
+        ));
       } catch (IOException e) {
         exception.addSuppressed(e);
       } finally {
-        logger.log(onRecoveringFromStaleCsmQueueFile(exception));
+        logger.log(onRecoveringFromStaleQueueFile(exception));
       }
     }
 
@@ -114,30 +120,38 @@ public class MetricObjectQueueFactory {
   }
 
   @VisibleForTesting
-  static class MetricConverter implements FileObjectQueue.Converter<Metric> {
-    @NonNull
-    private final MetricParser parser;
+  static class AdapterConverter<T> implements FileObjectQueue.Converter<T> {
 
-    MetricConverter(@NonNull MetricParser parser) {
-      this.parser = parser;
+    @NonNull
+    private final JsonSerializer jsonSerializer;
+
+    @NonNull
+    private final Class<T> elementClass;
+
+    AdapterConverter(
+        @NonNull JsonSerializer jsonSerializer,
+        @NonNull Class<T> elementClass
+    ) {
+      this.jsonSerializer = jsonSerializer;
+      this.elementClass = elementClass;
     }
 
     @Nullable
     @Override
-    public Metric from(@Nullable byte[] bytes) throws IOException {
+    public T from(@Nullable byte[] bytes) throws IOException {
       if (bytes == null) {
         return null;
       }
 
       try (ByteArrayInputStream input = new ByteArrayInputStream(bytes)) {
-        return parser.read(input);
+        return jsonSerializer.read(elementClass, input);
       }
     }
 
     @Override
-    public void toStream(@Nullable Metric metric, @Nullable OutputStream outputStream) throws IOException {
-      if (metric != null && outputStream != null) {
-        parser.write(metric, outputStream);
+    public void toStream(@Nullable T element, @Nullable OutputStream outputStream) throws IOException {
+      if (element != null && outputStream != null) {
+        jsonSerializer.write(element, outputStream);
       }
     }
   }

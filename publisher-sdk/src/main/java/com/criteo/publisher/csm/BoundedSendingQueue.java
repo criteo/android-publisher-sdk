@@ -18,42 +18,41 @@ package com.criteo.publisher.csm;
 
 import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
-import com.criteo.publisher.util.BuildConfigWrapper;
 import java.util.List;
 
-class BoundedMetricSendingQueue implements MetricSendingQueue {
+class BoundedSendingQueue<T> implements ConcurrentSendingQueue<T> {
 
   @NonNull
   @GuardedBy("delegateLock")
-  private final MetricSendingQueue delegate;
+  private final ConcurrentSendingQueue<T> delegate;
 
   @NonNull
   private final Object delegateLock = new Object();
 
   @NonNull
-  private final BuildConfigWrapper buildConfigWrapper;
+  private final SendingQueueConfiguration<T> sendingQueueConfiguration;
 
-  BoundedMetricSendingQueue(
-      @NonNull MetricSendingQueue delegate,
-      @NonNull BuildConfigWrapper buildConfigWrapper
+  BoundedSendingQueue(
+      @NonNull ConcurrentSendingQueue<T> delegate,
+      @NonNull SendingQueueConfiguration<T> sendingQueueConfiguration
   ) {
     this.delegate = delegate;
-    this.buildConfigWrapper = buildConfigWrapper;
+    this.sendingQueueConfiguration = sendingQueueConfiguration;
   }
 
   @Override
-  public boolean offer(@NonNull Metric metric) {
+  public boolean offer(@NonNull T element) {
     synchronized (delegateLock) {
-      if (getTotalSize() >= buildConfigWrapper.getMaxSizeOfCsmMetricSendingQueue()) {
+      if (getTotalSize() >= sendingQueueConfiguration.getMaxSizeOfSendingQueue()) {
         delegate.poll(1);
       }
-      return delegate.offer(metric);
+      return delegate.offer(element);
     }
   }
 
   @NonNull
   @Override
-  public List<Metric> poll(int max) {
+  public List<T> poll(int max) {
     synchronized (delegateLock) {
       return delegate.poll(max);
     }

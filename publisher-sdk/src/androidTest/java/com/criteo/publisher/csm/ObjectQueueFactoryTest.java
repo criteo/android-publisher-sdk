@@ -27,6 +27,7 @@ import android.content.Context;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.util.BuildConfigWrapper;
+import com.criteo.publisher.util.JsonSerializer;
 import com.squareup.tape.ObjectQueue;
 import com.squareup.tape.QueueFile;
 import java.io.File;
@@ -39,7 +40,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class MetricObjectQueueFactoryTest {
+public class ObjectQueueFactoryTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
@@ -50,24 +51,23 @@ public class MetricObjectQueueFactoryTest {
   private Context context;
 
   @Inject
-  private MetricParser metricParser;
+  private JsonSerializer jsonSerializer;
+
+  @SpyBean
+  private MetricSendingQueueConfiguration configuration;
 
   @SpyBean
   private BuildConfigWrapper buildConfigWrapper;
 
-  private MetricObjectQueueFactory factory;
+  private ObjectQueueFactory<Metric> factory;
 
   @Before
   public void setUp() throws Exception {
-    when(buildConfigWrapper.getCsmQueueFilename()).thenReturn("queueFile");
+    when(configuration.getQueueFilename()).thenReturn("queueFile");
 
     queueFile = new File(context.getFilesDir(), "queueFile");
 
-    factory = spy(new MetricObjectQueueFactory(
-        context,
-        metricParser,
-        buildConfigWrapper
-    ));
+    factory = spy(new ObjectQueueFactory<>(context, jsonSerializer, configuration));
 
     doReturn(queueFile).when(factory).getQueueFile();
   }
@@ -162,13 +162,11 @@ public class MetricObjectQueueFactoryTest {
   @Test
   public void offer_GivenATonsOfMetrics_AcceptAllOfThemButEvictOlderOnesToStayAroundMemoryLimit() throws Exception {
     int smallSizeEstimationPerMetrics = 150;
-    int maxSize = buildConfigWrapper.getMaxSizeOfCsmMetricSendingQueue();
+    int maxSize = configuration.getMaxSizeOfSendingQueue();
     int requiredMetricsForOverflow = maxSize / smallSizeEstimationPerMetrics;
     int requiredMetricsForOverflowWithMargin = (int) (requiredMetricsForOverflow * 1.20);
 
-    MetricSendingQueue tapeQueue = new TapeMetricSendingQueue(factory);
-    BoundedMetricSendingQueue boundedMetricSendingQueue = new BoundedMetricSendingQueue(tapeQueue,
-        buildConfigWrapper);
+    ConcurrentSendingQueue<Metric> boundedSendingQueue = new SendingQueueFactory<>(factory, configuration).create();
 
     for (int i = 0; i < requiredMetricsForOverflowWithMargin; i++) {
       Metric metric = Metric.builder("id" + i)
@@ -177,11 +175,11 @@ public class MetricObjectQueueFactoryTest {
           .setElapsedTimestamp(2L)
           .build();
 
-      boundedMetricSendingQueue.offer(metric);
+      boundedSendingQueue.offer(metric);
     }
 
     // The last element can overflow the limit, so we are lenient (up to 1%) on the below condition.
-    assertTrue(boundedMetricSendingQueue.getTotalSize() * 0.99 <= maxSize);
+    assertTrue(boundedSendingQueue.getTotalSize() * 0.99 <= maxSize);
 
     // The queue file grows in power of 2. So it can be, at most, twice larger than expected.
     // To not waste this memory, the max size should be near a power of 2. We are lenient (up to

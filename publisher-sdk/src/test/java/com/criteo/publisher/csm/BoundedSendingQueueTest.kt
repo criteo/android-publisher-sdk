@@ -16,7 +16,6 @@
 
 package com.criteo.publisher.csm
 
-import com.criteo.publisher.util.BuildConfigWrapper
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.stub
@@ -29,7 +28,7 @@ import org.mockito.Mock
 import org.mockito.junit.MockitoJUnit
 import org.mockito.junit.MockitoRule
 
-class BoundedMetricSendingQueueTest {
+class BoundedSendingQueueTest {
 
   @Rule
   @JvmField
@@ -39,10 +38,10 @@ class BoundedMetricSendingQueueTest {
   private lateinit var delegate: MetricSendingQueue
 
   @Mock
-  private lateinit var buildConfigWrapper: BuildConfigWrapper
+  private lateinit var sendingQueueConfiguration: SendingQueueConfiguration<Metric>
 
   @InjectMocks
-  private lateinit var queue: BoundedMetricSendingQueue
+  private lateinit var queue: BoundedSendingQueue<Metric>
 
   @Test
   fun poll_GivenDelegate_DelegateToIt() {
@@ -77,8 +76,8 @@ class BoundedMetricSendingQueueTest {
       on { offer(metric) } doReturn true
     }
 
-    buildConfigWrapper.stub {
-      on { maxSizeOfCsmMetricSendingQueue } doReturn 1337
+    sendingQueueConfiguration.stub {
+      on { maxSizeOfSendingQueue } doReturn 1337
     }
 
     val success = queue.offer(metric)
@@ -96,8 +95,8 @@ class BoundedMetricSendingQueueTest {
       on { offer(metric) } doReturn true
     }
 
-    buildConfigWrapper.stub {
-      on { maxSizeOfCsmMetricSendingQueue } doReturn 42
+    sendingQueueConfiguration.stub {
+      on { maxSizeOfSendingQueue } doReturn 42
     }
 
     val success = queue.offer(metric)
@@ -106,5 +105,4 @@ class BoundedMetricSendingQueueTest {
     verify(delegate).offer(metric)
     verify(delegate).poll(1)
   }
-
 }

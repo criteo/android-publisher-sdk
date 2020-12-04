@@ -18,28 +18,27 @@ package com.criteo.publisher.csm;
 
 import androidx.annotation.NonNull;
 import com.criteo.publisher.DependencyProvider.Factory;
-import com.criteo.publisher.util.BuildConfigWrapper;
 
-public class MetricSendingQueueFactory implements Factory<MetricSendingQueue> {
-
-  @NonNull
-  private final MetricObjectQueueFactory metricObjectQueueFactory;
+public class SendingQueueFactory<T> implements Factory<ConcurrentSendingQueue<T>> {
 
   @NonNull
-  private final BuildConfigWrapper buildConfigWrapper;
+  private final ObjectQueueFactory<T> objectQueueFactory;
 
-  public MetricSendingQueueFactory(
-      @NonNull MetricObjectQueueFactory metricObjectQueueFactory,
-      @NonNull BuildConfigWrapper buildConfigWrapper
+  @NonNull
+  private final SendingQueueConfiguration<T> sendingQueueConfiguration;
+
+  public SendingQueueFactory(
+      @NonNull ObjectQueueFactory<T> objectQueueFactory,
+      @NonNull SendingQueueConfiguration<T> sendingQueueConfiguration
   ) {
-    this.metricObjectQueueFactory = metricObjectQueueFactory;
-    this.buildConfigWrapper = buildConfigWrapper;
+    this.objectQueueFactory = objectQueueFactory;
+    this.sendingQueueConfiguration = sendingQueueConfiguration;
   }
 
   @NonNull
   @Override
-  public MetricSendingQueue create() {
-    MetricSendingQueue tapeQueue = new TapeMetricSendingQueue(metricObjectQueueFactory);
-    return new BoundedMetricSendingQueue(tapeQueue, buildConfigWrapper);
+  public ConcurrentSendingQueue<T> create() {
+    ConcurrentSendingQueue<T> tapeQueue = new TapeSendingQueue<>(objectQueueFactory);
+    return new BoundedSendingQueue<>(tapeQueue, sendingQueueConfiguration);
   }
 }

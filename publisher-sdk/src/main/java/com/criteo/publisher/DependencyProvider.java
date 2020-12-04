@@ -52,14 +52,17 @@ import com.criteo.publisher.context.ConnectionTypeFetcher;
 import com.criteo.publisher.context.ContextProvider;
 import com.criteo.publisher.context.UserDataHolder;
 import com.criteo.publisher.csm.CsmBidLifecycleListener;
-import com.criteo.publisher.csm.MetricObjectQueueFactory;
+import com.criteo.publisher.csm.Metric;
 import com.criteo.publisher.csm.MetricParser;
 import com.criteo.publisher.csm.MetricRepository;
 import com.criteo.publisher.csm.MetricRepositoryFactory;
 import com.criteo.publisher.csm.MetricSendingQueue;
+import com.criteo.publisher.csm.MetricSendingQueue.AdapterMetricSendingQueue;
+import com.criteo.publisher.csm.MetricSendingQueueConfiguration;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
-import com.criteo.publisher.csm.MetricSendingQueueFactory;
 import com.criteo.publisher.csm.MetricSendingQueueProducer;
+import com.criteo.publisher.csm.ObjectQueueFactory;
+import com.criteo.publisher.csm.SendingQueueFactory;
 import com.criteo.publisher.headerbidding.DfpHeaderBidding;
 import com.criteo.publisher.headerbidding.HeaderBidding;
 import com.criteo.publisher.headerbidding.MoPubHeaderBidding;
@@ -532,18 +535,25 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public MetricObjectQueueFactory provideObjectQueueFactory() {
-    return getOrCreate(MetricObjectQueueFactory.class, () -> new MetricObjectQueueFactory(
-        provideContext(),
-        provideMetricParser(),
-        provideBuildConfigWrapper()
-    ));
+  public MetricSendingQueue provideMetricSendingQueue() {
+    return getOrCreate(MetricSendingQueue.class, () -> {
+      MetricSendingQueueConfiguration configuration = provideMetricSendingQueueConfiguration();
+
+      SendingQueueFactory<Metric> factory = new SendingQueueFactory<>(
+          new ObjectQueueFactory<>(
+              provideContext(),
+              provideJsonSerializer(),
+              configuration
+          ),
+          configuration
+      );
+      return new AdapterMetricSendingQueue(factory.create());
+    });
   }
 
   @NonNull
-  public MetricSendingQueue provideMetricSendingQueue() {
-    return getOrCreate(MetricSendingQueue.class, new MetricSendingQueueFactory(
-        provideObjectQueueFactory(),
+  public MetricSendingQueueConfiguration provideMetricSendingQueueConfiguration() {
+    return getOrCreate(MetricSendingQueueConfiguration.class, () -> new MetricSendingQueueConfiguration(
         provideBuildConfigWrapper()
     ));
   }

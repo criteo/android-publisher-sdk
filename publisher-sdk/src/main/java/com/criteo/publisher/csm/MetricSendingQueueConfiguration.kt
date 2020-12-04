@@ -13,16 +13,20 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package com.criteo.publisher.csm
 
-// this interface serves as marker interface for dependency injection
-internal interface MetricSendingQueue : ConcurrentSendingQueue<Metric> {
-  class AdapterMetricSendingQueue(private val delegate: ConcurrentSendingQueue<Metric>) : MetricSendingQueue {
-    override fun offer(element: Metric) = delegate.offer(element)
+import com.criteo.publisher.annotation.OpenForTesting
+import com.criteo.publisher.util.BuildConfigWrapper
 
-    override fun poll(max: Int): List<Metric> = delegate.poll(max)
-
-    override val totalSize: Int
-      get() = delegate.totalSize
-  }
+@OpenForTesting
+internal class MetricSendingQueueConfiguration(
+    private val buildConfigWrapper: BuildConfigWrapper
+) : SendingQueueConfiguration<Metric> {
+  override val maxSizeOfSendingQueue: Int
+    get() = buildConfigWrapper.maxSizeOfCsmMetricSendingQueue
+  override val queueFilename: String
+    get() = buildConfigWrapper.csmQueueFilename
+  override val elementClass: Class<Metric>
+    get() = Metric::class.java
 }
