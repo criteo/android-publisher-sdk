@@ -16,7 +16,7 @@
 
 package com.criteo.publisher.csm;
 
-import static com.criteo.publisher.csm.CsmLogMessage.onErrorWhenPollingCsmQueueFile;
+import static com.criteo.publisher.csm.SendingQueueLogMessage.onErrorWhenPollingQueueFile;
 
 import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
@@ -34,17 +34,17 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-class TapeMetricSendingQueue implements MetricSendingQueue {
+class TapeSendingQueue<T> implements ConcurrentSendingQueue<T> {
 
   @NonNull
-  private final Logger logger = LoggerFactory.getLogger(TapeMetricSendingQueue.class);
+  private final Logger logger = LoggerFactory.getLogger(TapeSendingQueue.class);
 
   @NonNull
   private final Object queueLock = new Object();
 
   @Nullable
   @GuardedBy("queueLock")
-  private ObjectQueue<Metric> queue;
+  private ObjectQueue<T> queue;
 
   @Nullable
   private Method usedBytesMethod;
@@ -53,21 +53,21 @@ class TapeMetricSendingQueue implements MetricSendingQueue {
   private QueueFile queueFile;
 
   @NonNull
-  private final MetricObjectQueueFactory queueFactory;
+  private final ObjectQueueFactory<T> queueFactory;
 
-  TapeMetricSendingQueue(@NonNull MetricObjectQueueFactory queueFactory) {
+  TapeSendingQueue(@NonNull ObjectQueueFactory<T> queueFactory) {
     this.queueFactory = queueFactory;
     this.usedBytesMethod = null;
     this.queueFile = null;
   }
 
   @Override
-  public boolean offer(@NonNull Metric metric) {
+  public boolean offer(@NonNull T element) {
     synchronized (queueLock) {
-      ObjectQueue<Metric> queue = createQueueIfNecessary();
+      ObjectQueue<T> queue = createQueueIfNecessary();
 
       try {
-        queue.add(metric);
+        queue.add(element);
         return true;
       } catch (FileException e) {
         PreconditionsUtil.throwOrLog(e);
@@ -78,22 +78,22 @@ class TapeMetricSendingQueue implements MetricSendingQueue {
 
   @NonNull
   @Override
-  public List<Metric> poll(int max) {
+  public List<T> poll(int max) {
     synchronized (queueLock) {
-      ObjectQueue<Metric> queue = createQueueIfNecessary();
+      ObjectQueue<T> queue = createQueueIfNecessary();
 
-      List<Metric> metrics = new ArrayList<>();
+      List<T> elements = new ArrayList<>();
       Exception exception = null;
 
       for (int i = 0; i < max; i++) {
         try {
-          Metric metric = queue.peek();
+          T element = queue.peek();
 
-          if (metric == null) {
+          if (element == null) {
             break;
           }
 
-          metrics.add(metric);
+          elements.add(element);
         } catch (FileException e) {
           if (exception == null) {
             exception = e;
@@ -121,10 +121,10 @@ class TapeMetricSendingQueue implements MetricSendingQueue {
       }
 
       if (exception != null) {
-        logger.log(onErrorWhenPollingCsmQueueFile(exception));
+        logger.log(onErrorWhenPollingQueueFile(exception));
       }
 
-      return metrics;
+      return elements;
     }
   }
 
@@ -141,7 +141,7 @@ class TapeMetricSendingQueue implements MetricSendingQueue {
       // There is a usedBytes method in the internal queueFile of the file object queue. This method
       // is used to get the real size of the queue.
 
-      ObjectQueue<Metric> queue = createQueueIfNecessary();
+      ObjectQueue<T> queue = createQueueIfNecessary();
 
       if (!(queue instanceof FileObjectQueue)) {
         return 0;
@@ -181,7 +181,7 @@ class TapeMetricSendingQueue implements MetricSendingQueue {
     return queueFile;
   }
 
-  private ObjectQueue<Metric> createQueueIfNecessary() {
+  private ObjectQueue<T> createQueueIfNecessary() {
     if (queue == null) {
       queue = queueFactory.create();
     }

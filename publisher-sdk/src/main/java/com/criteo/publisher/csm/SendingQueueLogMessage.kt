@@ -13,16 +13,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package com.criteo.publisher.csm
 
-// this interface serves as marker interface for dependency injection
-internal interface MetricSendingQueue : ConcurrentSendingQueue<Metric> {
-  class AdapterMetricSendingQueue(private val delegate: ConcurrentSendingQueue<Metric>) : MetricSendingQueue {
-    override fun offer(element: Metric) = delegate.offer(element)
+import android.util.Log
+import com.criteo.publisher.logging.LogMessage
 
-    override fun poll(max: Int): List<Metric> = delegate.poll(max)
+internal object SendingQueueLogMessage {
 
-    override val totalSize: Int
-      get() = delegate.totalSize
-  }
+  @JvmStatic
+  fun onRecoveringFromStaleQueueFile(exception: Exception) = LogMessage(
+      Log.WARN,
+      "Error while reading queue file. Recovering by recreating it or using in-memory queue",
+      exception
+  )
+
+  @JvmStatic
+  fun onErrorWhenPollingQueueFile(exception: Exception) = LogMessage(
+      Log.WARN,
+      "Error when polling element from queue file",
+      exception
+  )
 }

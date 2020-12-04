@@ -16,22 +16,20 @@
 
 package com.criteo.publisher.csm
 
-import android.util.Log
-import com.criteo.publisher.logging.LogMessage
+internal interface SendingQueueConfiguration<T> {
 
-internal object CsmLogMessage {
+  /**
+   * Maximum size (in bytes) of elements stored in the sending queue.
+   */
+  val maxSizeOfSendingQueue: Int
 
-  @JvmStatic
-  fun onRecoveringFromStaleCsmQueueFile(exception: Exception) = LogMessage(
-      Log.WARN,
-      "Error while reading CSM queue file. Recovering by recreating it or using in-memory queue",
-      exception
-  )
+  /**
+   * The relative path in application folder of the sending queue file.
+   */
+  val queueFilename: String
 
-  @JvmStatic
-  fun onErrorWhenPollingCsmQueueFile(exception: Exception) = LogMessage(
-      Log.WARN,
-      "Error when polling CSM metrics",
-      exception
-  )
+  /**
+   * Runtime class of the elements contained in the sending queue.
+   */
+  val elementClass: Class<T>
 }
