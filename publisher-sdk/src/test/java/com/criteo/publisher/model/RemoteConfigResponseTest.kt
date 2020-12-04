@@ -16,8 +16,8 @@
 
 package com.criteo.publisher.model
 
+import com.criteo.publisher.logging.RemoteLogRecords.RemoteLogLevel
 import com.criteo.publisher.mock.MockedDependenciesRule
-import com.criteo.publisher.model.RemoteConfigResponse.RemoteLogLevel
 import com.criteo.publisher.util.JsonSerializer
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode

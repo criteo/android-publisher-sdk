@@ -32,9 +32,9 @@ import static org.mockito.Mockito.when;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import com.criteo.publisher.logging.RemoteLogRecords.RemoteLogLevel;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
-import com.criteo.publisher.model.RemoteConfigResponse.RemoteLogLevel;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.JsonSerializer;
 import java.io.IOException;

@@ -24,7 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
-import com.criteo.publisher.model.RemoteConfigResponse.RemoteLogLevel;
+import com.criteo.publisher.logging.RemoteLogRecords.RemoteLogLevel;
 import com.criteo.publisher.util.JsonSerializer;
 import com.criteo.publisher.util.SafeSharedPreferences;
 import java.io.ByteArrayInputStream;

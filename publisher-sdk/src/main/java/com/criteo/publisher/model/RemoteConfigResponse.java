@@ -16,9 +16,9 @@
 
 package com.criteo.publisher.model;
 
-import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.criteo.publisher.logging.RemoteLogRecords.RemoteLogLevel;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
@@ -205,21 +205,4 @@ public abstract class RemoteConfigResponse {
    */
   @Nullable
   public abstract RemoteLogLevel getRemoteLogLevel();
-
-  enum RemoteLogLevel {
-    @SerializedName("Debug")
-    DEBUG,
-
-    @SerializedName("Info")
-    INFO,
-
-    @SerializedName("Warning")
-    WARNING,
-
-    @SerializedName("Error")
-    ERROR,
-
-    @SerializedName("None")
-    NONE
-  }
 }
