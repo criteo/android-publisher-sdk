@@ -16,12 +16,20 @@
 
 package com.criteo.publisher.logging
 
+import android.util.Log
+import com.criteo.publisher.logging.RemoteLogRecords.RemoteLogLevel
 import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
+import com.criteo.publisher.model.Config
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
 import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import com.nhaarman.mockitokotlin2.whenever
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import javax.inject.Inject
@@ -33,6 +41,9 @@ class RemoteHandlerTest {
   val mockedDependenciesRule = MockedDependenciesRule()
 
   @MockBean
+  private lateinit var config: Config
+
+  @MockBean
   private lateinit var sendingQueue: RemoteLogSendingQueue
 
   @MockBean
@@ -40,6 +51,32 @@ class RemoteHandlerTest {
 
   @Inject
   private lateinit var remoteHandler: RemoteHandler
+
+  @Before
+  fun setUp() {
+    whenever(config.remoteLogLevel).doReturn(RemoteLogLevel.DEBUG)
+  }
+
+  @Test
+  fun log_GivenConfiguredRemoteLogLevel_OnlyPushMessageWithLogLevelAboveOrEqual() {
+    val info = LogMessage(level = Log.INFO, message = "dummy")
+    val warning = LogMessage(level = Log.WARN, message = "dummy")
+    val error = LogMessage(level = Log.ERROR, message = "dummy")
+
+    whenever(config.remoteLogLevel).doReturn(RemoteLogLevel.WARNING)
+
+    val logRecords = mock<RemoteLogRecords>()
+    whenever(remoteLogRecordsFactory.createLogRecords(any())).thenReturn(logRecords)
+
+    remoteHandler.log("tag", info)
+    remoteHandler.log("tag", warning)
+    remoteHandler.log("tag", error)
+
+    verify(sendingQueue, times(2)).offer(any())
+    verify(remoteLogRecordsFactory).createLogRecords(warning)
+    verify(remoteLogRecordsFactory).createLogRecords(error)
+    verifyNoMoreInteractions(remoteLogRecordsFactory)
+  }
 
   @Test
   fun log_GivenNoRemoteLogFromFactory_DoesNothing() {
