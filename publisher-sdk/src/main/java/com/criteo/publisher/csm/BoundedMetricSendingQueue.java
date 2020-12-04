@@ -42,7 +42,7 @@ class BoundedMetricSendingQueue extends MetricSendingQueue {
   }
 
   @Override
-  boolean offer(@NonNull Metric metric) {
+  public boolean offer(@NonNull Metric metric) {
     synchronized (delegateLock) {
       if (getTotalSize() >= buildConfigWrapper.getMaxSizeOfCsmMetricSendingQueue()) {
         delegate.poll(1);
@@ -53,14 +53,14 @@ class BoundedMetricSendingQueue extends MetricSendingQueue {
 
   @NonNull
   @Override
-  List<Metric> poll(int max) {
+  public List<Metric> poll(int max) {
     synchronized (delegateLock) {
       return delegate.poll(max);
     }
   }
 
   @Override
-  int getTotalSize() {
+  public int getTotalSize() {
     return delegate.getTotalSize();
   }
 }

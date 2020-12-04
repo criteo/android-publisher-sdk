@@ -69,6 +69,9 @@ import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.logging.ConsoleHandler;
 import com.criteo.publisher.logging.LoggerFactory;
+import com.criteo.publisher.logging.RemoteHandler;
+import com.criteo.publisher.logging.RemoteLogRecordsFactory;
+import com.criteo.publisher.logging.RemoteLogSendingQueue;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.Config;
@@ -617,6 +620,28 @@ public class DependencyProvider {
   @NonNull
   public UserDataHolder provideUserDataHolder() {
     return getOrCreate(UserDataHolder.class, UserDataHolder::new);
+  }
+
+  @NonNull
+  public RemoteLogSendingQueue provideRemoteLogSendingQueue() {
+    return getOrCreate(RemoteLogSendingQueue.class, () -> {
+      throw new UnsupportedOperationException("TODO-1347");
+    });
+  }
+
+  @NonNull
+  public RemoteLogRecordsFactory provideRemoteLogRecordsFactory() {
+    return getOrCreate(RemoteLogRecordsFactory.class, () -> {
+      throw new UnsupportedOperationException("TODO-1351");
+    });
+  }
+
+  @NonNull
+  public RemoteHandler provideRemoteHandler() {
+    return getOrCreate(RemoteHandler.class, () -> new RemoteHandler(
+        provideRemoteLogRecordsFactory(),
+        provideRemoteLogSendingQueue()
+    ));
   }
 
   public interface Factory<T> {

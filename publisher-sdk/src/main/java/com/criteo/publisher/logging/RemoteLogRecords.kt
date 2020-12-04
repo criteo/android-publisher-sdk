@@ -16,8 +16,10 @@
 
 package com.criteo.publisher.logging
 
+import com.criteo.publisher.annotation.OpenForTesting
 import com.google.gson.annotations.SerializedName
 
+@OpenForTesting
 data class RemoteLogRecords(
     @SerializedName("context") val context: RemoteLogContext,
     @SerializedName("errors") val logRecords: List<RemoteLogRecord>

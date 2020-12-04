@@ -14,8 +14,10 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.csm;
+package com.criteo.publisher.logging
 
-public abstract class MetricSendingQueue implements ConcurrentSendingQueue<Metric> {
-  // this class serve as marker class for dependency injection
+import com.criteo.publisher.csm.ConcurrentSendingQueue
+
+internal interface RemoteLogSendingQueue : ConcurrentSendingQueue<RemoteLogRecords> {
+  // this interface serves as a marker interface for dependency injection
 }

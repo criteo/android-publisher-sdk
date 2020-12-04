@@ -62,7 +62,7 @@ class TapeMetricSendingQueue extends MetricSendingQueue {
   }
 
   @Override
-  boolean offer(@NonNull Metric metric) {
+  public boolean offer(@NonNull Metric metric) {
     synchronized (queueLock) {
       ObjectQueue<Metric> queue = createQueueIfNecessary();
 
@@ -78,7 +78,7 @@ class TapeMetricSendingQueue extends MetricSendingQueue {
 
   @NonNull
   @Override
-  List<Metric> poll(int max) {
+  public List<Metric> poll(int max) {
     synchronized (queueLock) {
       ObjectQueue<Metric> queue = createQueueIfNecessary();
 
@@ -129,7 +129,7 @@ class TapeMetricSendingQueue extends MetricSendingQueue {
   }
 
   @Override
-  int getTotalSize() {
+  public int getTotalSize() {
     synchronized (queueLock) {
       // This size is mainly used to bound this queue. For this, it is not enough to get the size of
       // the queue file. The file grows in power of 2. Even if it is the real size, then this means
