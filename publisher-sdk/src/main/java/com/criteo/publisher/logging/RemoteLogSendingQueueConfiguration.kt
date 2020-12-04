@@ -14,18 +14,17 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.csm
+package com.criteo.publisher.logging
 
-import com.criteo.publisher.annotation.OpenForTesting
+import com.criteo.publisher.csm.SendingQueueConfiguration
 import com.criteo.publisher.util.BuildConfigWrapper
 
-@OpenForTesting
-internal class MetricSendingQueueConfiguration(
+class RemoteLogSendingQueueConfiguration(
     private val buildConfigWrapper: BuildConfigWrapper
-) : SendingQueueConfiguration<Metric> {
+) : SendingQueueConfiguration<RemoteLogRecords> {
   override val maxSizeOfSendingQueue: Int
-    get() = buildConfigWrapper.maxSizeOfCsmMetricSendingQueue
+    get() = buildConfigWrapper.maxSizeOfRemoteLogSendingQueue
   override val queueFilename: String
-    get() = buildConfigWrapper.csmQueueFilename
-  override val elementClass = Metric::class.java
+    get() = buildConfigWrapper.remoteLogQueueFilename
+  override val elementClass = RemoteLogRecords::class.java
 }

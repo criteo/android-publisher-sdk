@@ -67,7 +67,7 @@ public class BuildConfigWrapper {
   }
 
   /**
-   * The relative path in application folder of the sending queue file
+   * The relative path in application folder of the sending queue file for CSM
    */
   @NonNull
   public String getCsmQueueFilename() {
@@ -117,5 +117,21 @@ public class BuildConfigWrapper {
    */
   public int getAdChoiceIconHeightInDp() {
     return BuildConfig.adChoiceIconHeightInDp;
+  }
+
+
+  /**
+   * Maximum size (in bytes) of metric elements stored in the remote log sending queue.
+   */
+  public int getMaxSizeOfRemoteLogSendingQueue() {
+    return BuildConfig.maxSizeOfRemoteLogSendingQueue;
+  }
+
+  /**
+   * The relative path in application folder of the sending queue file for remote logs
+   */
+  @NonNull
+  public String getRemoteLogQueueFilename() {
+    return BuildConfig.remoteLogQueueFilename;
   }
 }
