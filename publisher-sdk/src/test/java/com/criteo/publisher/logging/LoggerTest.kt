@@ -17,8 +17,11 @@
 package com.criteo.publisher.logging
 
 import android.util.Log
+import com.criteo.publisher.CriteoNotInitializedException
+import com.criteo.publisher.dependency.LazyDependency
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argThat
+import com.nhaarman.mockitokotlin2.doThrow
 import com.nhaarman.mockitokotlin2.inOrder
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.spy
@@ -47,7 +50,7 @@ class LoggerTest {
 
   @Before
   fun setUp() {
-    logger = spy(Logger("myTag", listOf(handler1, handler2)))
+    logger = spy(Logger("myTag", listOf(LazyDependency { handler1 }, LazyDependency { handler2 })))
   }
 
   @Test
@@ -78,8 +81,22 @@ class LoggerTest {
 
   @Test
   fun log_GivenOneHandlerThrowing_IgnoreErrorAndKeepLoggingWithOtherHandler() {
-    whenever(handler1.log(any(), any())).thenThrow(Exception::class.java)
+    whenever(handler1.log(any(), any())).doThrow(Exception::class)
     val logMessage = LogMessage(Log.INFO, "message")
+
+    logger.log(logMessage)
+
+    verify(handler2).log("myTag", logMessage)
+  }
+
+  @Test
+  fun log_GivenOneHandlerProviderThrowing_IgnoreErrorAndKeepLoggingWithOtherHandler() {
+    val logMessage = LogMessage(Log.INFO, "message")
+
+    logger = Logger("myTag", listOf(
+        LazyDependency<LogHandler> { throw CriteoNotInitializedException("") },
+        LazyDependency { handler2 }
+    ))
 
     logger.log(logMessage)
 
@@ -108,7 +125,7 @@ class LoggerTest {
       }
     }
 
-    logger = Logger("myTag", listOf(handler1, handler2))
+    logger = Logger("myTag", listOf(LazyDependency { handler1 }, LazyDependency { handler2 }))
     logger.log(LogMessage(message = "dummy message"))
 
     inOrder(handler) {
@@ -133,7 +150,7 @@ class LoggerTest {
     lateinit var handler1: LogHandler
     lateinit var handler2: LogHandler
 
-    fun newLogger(): Logger = Logger("myTag", listOf(handler1, handler2))
+    fun newLogger(): Logger = Logger("myTag", listOf(LazyDependency { handler1 }, LazyDependency { handler2 }))
 
     val handler = mock<LogHandler>()
 

@@ -64,6 +64,7 @@ import com.criteo.publisher.csm.MetricSendingQueueProducer;
 import com.criteo.publisher.csm.ObjectQueueFactory;
 import com.criteo.publisher.csm.SendingQueueConfiguration;
 import com.criteo.publisher.csm.SendingQueueFactory;
+import com.criteo.publisher.dependency.LazyDependency;
 import com.criteo.publisher.headerbidding.DfpHeaderBidding;
 import com.criteo.publisher.headerbidding.HeaderBidding;
 import com.criteo.publisher.headerbidding.MoPubHeaderBidding;
@@ -99,6 +100,7 @@ import com.criteo.publisher.util.TextUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executor;
@@ -595,9 +597,10 @@ public class DependencyProvider {
 
   @NonNull
   public LoggerFactory provideLoggerFactory() {
-    return getOrCreate(LoggerFactory.class, () -> new LoggerFactory(
-        provideConsoleHandler()
-    ));
+    return getOrCreate(LoggerFactory.class, () -> new LoggerFactory(Arrays.asList(
+        new LazyDependency<>("ConsoleHandler", this::provideConsoleHandler),
+        new LazyDependency<>("RemoteHandler", this::provideRemoteHandler)
+    )));
   }
 
   @NonNull
