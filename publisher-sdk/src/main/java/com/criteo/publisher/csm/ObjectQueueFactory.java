@@ -64,7 +64,7 @@ public class ObjectQueueFactory<T> {
   }
 
   @VisibleForTesting
-  File getQueueFile() {
+  public File getQueueFile() {
     return new File(context.getFilesDir(), sendingQueueConfiguration.getQueueFilename());
   }
 
