@@ -34,7 +34,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-class TapeMetricSendingQueue extends MetricSendingQueue {
+class TapeMetricSendingQueue implements MetricSendingQueue {
 
   @NonNull
   private final Logger logger = LoggerFactory.getLogger(TapeMetricSendingQueue.class);

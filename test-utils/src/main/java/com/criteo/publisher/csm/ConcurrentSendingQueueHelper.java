@@ -13,7 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.criteo.publisher.csm
 
-// this interface serves as marker interface for dependency injection
-internal interface MetricSendingQueue : ConcurrentSendingQueue<Metric>
+package com.criteo.publisher.csm;
+
+public class ConcurrentSendingQueueHelper {
+
+  @SuppressWarnings("KotlinInternalInJava")
+  public static void emptyQueue(ConcurrentSendingQueue<?> queue) {
+    queue.poll(Integer.MAX_VALUE);
+  }
+}
