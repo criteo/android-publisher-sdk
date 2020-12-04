@@ -159,34 +159,6 @@ public class ObjectQueueFactoryTest {
     assertNull(metricObjectQueue.peek());
   }
 
-  @Test
-  public void offer_GivenATonsOfMetrics_AcceptAllOfThemButEvictOlderOnesToStayAroundMemoryLimit() throws Exception {
-    int smallSizeEstimationPerMetrics = 150;
-    int maxSize = configuration.getMaxSizeOfSendingQueue();
-    int requiredMetricsForOverflow = maxSize / smallSizeEstimationPerMetrics;
-    int requiredMetricsForOverflowWithMargin = (int) (requiredMetricsForOverflow * 1.20);
-
-    ConcurrentSendingQueue<Metric> boundedSendingQueue = new SendingQueueFactory<>(factory, configuration).create();
-
-    for (int i = 0; i < requiredMetricsForOverflowWithMargin; i++) {
-      Metric metric = Metric.builder("id" + i)
-          .setCdbCallStartTimestamp(0L)
-          .setCdbCallEndTimestamp(1L)
-          .setElapsedTimestamp(2L)
-          .build();
-
-      boundedSendingQueue.offer(metric);
-    }
-
-    // The last element can overflow the limit, so we are lenient (up to 1%) on the below condition.
-    assertTrue(boundedSendingQueue.getTotalSize() * 0.99 <= maxSize);
-
-    // The queue file grows in power of 2. So it can be, at most, twice larger than expected.
-    // To not waste this memory, the max size should be near a power of 2. We are lenient (up to
-    // 10%) on this condition.
-    assertTrue(queueFile.length() <= maxSize * 1.10);
-  }
-
   private void givenDeactivatedPreconditionUtils() {
     when(buildConfigWrapper.preconditionThrowsOnException()).thenReturn(false);
   }

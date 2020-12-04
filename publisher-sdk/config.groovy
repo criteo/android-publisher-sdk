@@ -83,8 +83,8 @@ adChoiceIconHeightInDp = 15
 remoteLogQueueFilename = 'criteo_remote_logs_queue'
 
 // Maximum size (in bytes) of remote log elements stored in the sending queue.
-// 200KB represents ~41 logs (with ~5000 bytes/log with big stacktrace) which already represent an extreme case.
-maxSizeOfRemoteLogSendingQueue = 200 * 1024
+// 250KB represents ~51 logs (with ~5000 bytes/log with big stacktrace) which already represent an extreme case.
+maxSizeOfRemoteLogSendingQueue = 250 * 1024
 
 environments {
     debug {
