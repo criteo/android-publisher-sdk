@@ -32,8 +32,7 @@ object MetricHelper {
     }
 
     // Empty sending queue
-    val queue = dependencyProvider.provideMetricSendingQueue()
-    queue.poll(Integer.MAX_VALUE)
+    ConcurrentSendingQueueHelper.emptyQueue(dependencyProvider.provideMetricSendingQueue())
   }
 
   val MetricRequest.internalProfileId: Int

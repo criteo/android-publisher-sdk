@@ -21,7 +21,7 @@ import androidx.annotation.NonNull;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import java.util.List;
 
-class BoundedMetricSendingQueue extends MetricSendingQueue {
+class BoundedMetricSendingQueue implements MetricSendingQueue {
 
   @NonNull
   @GuardedBy("delegateLock")
