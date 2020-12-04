@@ -56,7 +56,7 @@ internal class ConsoleHandler(private val buildConfigWrapper: BuildConfigWrapper
   private val Throwable.stacktraceString get() = getStackTraceString(this)
 
   /**
-   * This method is nullable because on JVM tests, because methods from AndroidSDK return null
+   * This method is nullable because on JVM tests, methods from AndroidSDK returns null
    */
   @VisibleForTesting
   fun getStackTraceString(throwable: Throwable): String? = Log.getStackTraceString(throwable)

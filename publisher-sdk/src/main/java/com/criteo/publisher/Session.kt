@@ -16,12 +16,26 @@
 
 package com.criteo.publisher
 
-internal class Session(private val clock: Clock) {
+import com.criteo.publisher.annotation.OpenForTesting
+import com.criteo.publisher.bid.UniqueIdGenerator
+
+@OpenForTesting
+internal class Session(
+    private val clock: Clock,
+    private val uniqueIdGenerator: UniqueIdGenerator
+) {
   companion object {
     const val MILLIS_IN_SECOND = 1000
   }
 
   private val startingTime = clock.currentTimeInMillis
+
+  /**
+   * Return a unique ID for this session.
+   */
+  val sessionId: String by lazy {
+    uniqueIdGenerator.generateId()
+  }
 
   /**
    * Returns the current time in seconds since the initialization of the SDK.

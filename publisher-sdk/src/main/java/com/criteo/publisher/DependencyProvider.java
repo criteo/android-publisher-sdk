@@ -613,7 +613,8 @@ public class DependencyProvider {
   @NonNull
   public Session provideSession() {
     return getOrCreate(Session.class, () -> new Session(
-        provideClock()
+        provideClock(),
+        provideUniqueIdGenerator()
     ));
   }
 
@@ -631,9 +632,14 @@ public class DependencyProvider {
 
   @NonNull
   public RemoteLogRecordsFactory provideRemoteLogRecordsFactory() {
-    return getOrCreate(RemoteLogRecordsFactory.class, () -> {
-      throw new UnsupportedOperationException("TODO-1351");
-    });
+    return getOrCreate(RemoteLogRecordsFactory.class, () -> new RemoteLogRecordsFactory(
+        provideBuildConfigWrapper(),
+        provideContext(),
+        provideAdvertisingInfo(),
+        provideSession(),
+        provideIntegrationRegistry(),
+        provideClock()
+    ));
   }
 
   @NonNull

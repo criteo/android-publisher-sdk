@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.logging
 
+import android.util.Log
 import com.criteo.publisher.annotation.OpenForTesting
 import com.google.gson.annotations.SerializedName
 
@@ -32,7 +33,7 @@ data class RemoteLogRecords(
   data class RemoteLogContext(
       @SerializedName("version") val version: String,
       @SerializedName("bundleId") val bundleId: String,
-      @SerializedName("deviceId") val deviceId: String,
+      @SerializedName("deviceId") val deviceId: String?,
       @SerializedName("sessionId") val sessionId: String,
       @SerializedName("profileId") val profileId: Int,
       @SerializedName("exception") val exceptionType: String?
@@ -52,6 +53,16 @@ data class RemoteLogRecords(
     ERROR,
 
     @SerializedName("None")
-    NONE
+    NONE;
+
+    companion object {
+      fun fromAndroidLogLevel(logLevel: Int): RemoteLogLevel? = when (logLevel) {
+        Log.DEBUG -> DEBUG
+        Log.INFO -> INFO
+        Log.WARN -> WARNING
+        Log.ERROR -> ERROR
+        else -> null
+      }
+    }
   }
 }
