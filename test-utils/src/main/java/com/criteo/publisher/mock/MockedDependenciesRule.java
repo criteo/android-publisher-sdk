@@ -88,9 +88,6 @@ public class MockedDependenciesRule implements MethodRule {
   private MultiThreadResource multiThreadResource;
 
   @Nullable
-  private SpyLoggerResource spyLoggerResource;
-
-  @Nullable
   private TestResource inMemoryResource;
 
   public MockedDependenciesRule() {
@@ -128,8 +125,7 @@ public class MockedDependenciesRule implements MethodRule {
       }
 
       if (injectSpiedLogger) {
-        spyLoggerResource = new SpyLoggerResource(dependencyProviderRef);
-        resources.add(spyLoggerResource);
+        resources.add(new SpyLoggerResource(dependencyProviderRef));
       }
 
       inMemoryResource = new CompositeTestResource(resources);
@@ -256,10 +252,6 @@ public class MockedDependenciesRule implements MethodRule {
 
     getInMemoryResource().setUp();
     setUpInjectedDependencies();
-
-    if (spyLoggerResource != null) {
-      spyLoggerResource.finishSetup();
-    }
   }
 
   @RequiresApi(api = VERSION_CODES.O)
@@ -282,7 +274,6 @@ public class MockedDependenciesRule implements MethodRule {
 
   private void clearInternalState() {
     multiThreadResource = null;
-    spyLoggerResource = null;
     inMemoryResource = null;
   }
 

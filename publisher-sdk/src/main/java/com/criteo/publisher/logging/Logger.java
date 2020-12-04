@@ -19,6 +19,7 @@ package com.criteo.publisher.logging;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.dependency.LazyDependency;
 import java.util.List;
 
 public class Logger {
@@ -29,7 +30,7 @@ public class Logger {
   private final String tag;
 
   @NonNull
-  private final List<LogHandler> handlers;
+  private final List<LazyDependency<LogHandler>> handlers;
 
   /**
    * Indicate if one handler is logging another message and prevent infinite recursive loop.
@@ -73,7 +74,7 @@ public class Logger {
 
   public Logger(
       @NonNull Class<?> klass,
-      @NonNull List<LogHandler> handlers
+      @NonNull List<LazyDependency<LogHandler>> handlers
   ) {
     this(klass.getSimpleName(), handlers);
   }
@@ -81,7 +82,7 @@ public class Logger {
   @VisibleForTesting
   Logger(
       @NonNull String tag,
-      @NonNull List<LogHandler> handlers
+      @NonNull List<LazyDependency<LogHandler>> handlers
   ) {
     this.tag = tag;
     this.handlers = handlers;
@@ -105,12 +106,12 @@ public class Logger {
       return;
     }
 
-    for (LogHandler handler : handlers) {
+    for (LazyDependency<LogHandler> handler : handlers) {
       logRecursionDepth.set(depth + 1);
       try {
-        handler.log(tag, logMessage);
+        handler.get().log(tag, logMessage);
       } catch (Exception e) {
-        Log.w(FALLBACK_TAG, "Impossible to log with handler: " + handler.getClass(), e);
+        Log.w(FALLBACK_TAG, "Impossible to log with handler: " + handler, e);
       } finally {
         if (depth == 0) {
           // See Sonar S5164: Clean current thread state to avoid memory leaks

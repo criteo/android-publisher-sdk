@@ -16,20 +16,15 @@
 
 package com.criteo.publisher.logging;
 
-import static org.mockito.AdditionalAnswers.delegatesTo;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 
 import androidx.annotation.NonNull;
 import com.criteo.publisher.mock.DependencyProviderRef;
-import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.TestDependencyProvider;
 import com.criteo.publisher.mock.TestResource;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-import org.mockito.stubbing.Answer;
 
 public class SpyLoggerResource implements TestResource {
 
@@ -44,61 +39,13 @@ public class SpyLoggerResource implements TestResource {
 
   @Override
   public void setUp() {
-    /*
-     Special care needs to be taken when mocking the logger:
-     - Logger depends on beans such as the ConsoleHandler
-     - (2) Other beans depends on Logger via LoggerFactory#createLogger which is called during beans' creation.
-
-     When @SpyBean/@MockBean/@Injected beans are injected, loggers are created (2). So the logger factory should
-     already be mocked to serve a spy/mock logger.
-     But the logger factory should not be created before the injection step because its dependencies (1) would not be
-     injected properly.
-
-     So we have:
-     - Logger should be mocked before injection step
-     - LoggerFactory should be created after injection step
-
-     This implementation is creating first a mocked logger before injection step. This is the logger that will be
-     provided to other beans. The LoggerFactory is not created, only mocked.
-     When mocked logger is used (so after the injection step), then one real LoggerFactory is created and used to create
-     one real logger. Then the mocked logger delegates to the real logger.
-    */
-
     TestDependencyProvider dependencyProvider = dependencyProviderRef.get();
     LoggerFactory mockLoggerFactory = mock(LoggerFactory.class);
 
-    AtomicBoolean isFetchingRealLogger = new AtomicBoolean(false);
-    AtomicReference<Answer<?>> lazyDelegateAnswerRef = new AtomicReference<>();
-    spiedLogger = mock(Logger.class, invocation -> {
-      if (lazyDelegateAnswerRef.get() == null) {
-        isFetchingRealLogger.set(true);
-        dependencyProvider.provideLoggerFactory();
-      }
-      return lazyDelegateAnswerRef.get().answer(invocation);
-    });
-    doReturn(spiedLogger).when(mockLoggerFactory).createLogger(any());
-
-    doAnswer(invocation -> {
-      if (isFetchingRealLogger.compareAndSet(true, false)) {
-        LoggerFactory realLoggerFactory = (LoggerFactory) invocation.callRealMethod();
-        Logger realLogger = realLoggerFactory.createLogger(MockedDependenciesRule.class);
-        lazyDelegateAnswerRef.compareAndSet(null, delegatesTo(realLogger));
-      }
-      return mockLoggerFactory;
-    }).when(dependencyProvider).provideLoggerFactory();
-
+    spiedLogger = spy(dependencyProvider.provideLoggerFactory().createLogger(getClass()));
     doReturn(spiedLogger).when(dependencyProvider).provideLogger();
-  }
-
-  /**
-   * Interact with logger to force generation of spied logger as described in {@link #setUp()}.
-   * This is done here, while there is only a single thread, because Mockito is not thread-safe during stubbing.
-   */
-  public void finishSetup() {
-    if (spiedLogger != null) {
-      //noinspection ResultOfMethodCallIgnored
-      spiedLogger.toString();
-    }
+    doReturn(spiedLogger).when(mockLoggerFactory).createLogger(any());
+    doReturn(mockLoggerFactory).when(dependencyProvider).provideLoggerFactory();
   }
 
   @Override

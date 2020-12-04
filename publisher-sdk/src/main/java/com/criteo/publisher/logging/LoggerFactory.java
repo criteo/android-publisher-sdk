@@ -18,15 +18,16 @@ package com.criteo.publisher.logging;
 
 import androidx.annotation.NonNull;
 import com.criteo.publisher.DependencyProvider;
-import java.util.Collections;
+import com.criteo.publisher.dependency.LazyDependency;
+import java.util.List;
 
 public class LoggerFactory {
 
   @NonNull
-  private final ConsoleHandler consoleHandler;
+  private final List<LazyDependency<LogHandler>> logHandlers;
 
-  public LoggerFactory(@NonNull ConsoleHandler consoleHandler) {
-    this.consoleHandler = consoleHandler;
+  public LoggerFactory(@NonNull List<LazyDependency<LogHandler>> logHandlers) {
+    this.logHandlers = logHandlers;
   }
 
   @NonNull
@@ -35,7 +36,7 @@ public class LoggerFactory {
   }
 
   public Logger createLogger(@NonNull Class<?> klass) {
-    return new Logger(klass, Collections.singletonList(consoleHandler));
+    return new Logger(klass, logHandlers);
   }
 
 }
