@@ -51,8 +51,8 @@ import com.criteo.publisher.concurrent.ThreadPoolExecutorFactory;
 import com.criteo.publisher.context.ConnectionTypeFetcher;
 import com.criteo.publisher.context.ContextProvider;
 import com.criteo.publisher.context.UserDataHolder;
+import com.criteo.publisher.csm.ConcurrentSendingQueue;
 import com.criteo.publisher.csm.CsmBidLifecycleListener;
-import com.criteo.publisher.csm.Metric;
 import com.criteo.publisher.csm.MetricParser;
 import com.criteo.publisher.csm.MetricRepository;
 import com.criteo.publisher.csm.MetricRepositoryFactory;
@@ -62,6 +62,7 @@ import com.criteo.publisher.csm.MetricSendingQueueConfiguration;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
 import com.criteo.publisher.csm.MetricSendingQueueProducer;
 import com.criteo.publisher.csm.ObjectQueueFactory;
+import com.criteo.publisher.csm.SendingQueueConfiguration;
 import com.criteo.publisher.csm.SendingQueueFactory;
 import com.criteo.publisher.headerbidding.DfpHeaderBidding;
 import com.criteo.publisher.headerbidding.HeaderBidding;
@@ -75,6 +76,8 @@ import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.logging.RemoteHandler;
 import com.criteo.publisher.logging.RemoteLogRecordsFactory;
 import com.criteo.publisher.logging.RemoteLogSendingQueue;
+import com.criteo.publisher.logging.RemoteLogSendingQueue.AdapterRemoteLogSendingQueue;
+import com.criteo.publisher.logging.RemoteLogSendingQueueConfiguration;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.Config;
@@ -536,19 +539,20 @@ public class DependencyProvider {
 
   @NonNull
   public MetricSendingQueue provideMetricSendingQueue() {
-    return getOrCreate(MetricSendingQueue.class, () -> {
-      MetricSendingQueueConfiguration configuration = provideMetricSendingQueueConfiguration();
+    return getOrCreate(MetricSendingQueue.class, () -> new AdapterMetricSendingQueue(
+        provideSendingQueue(provideMetricSendingQueueConfiguration())
+    ));
+  }
 
-      SendingQueueFactory<Metric> factory = new SendingQueueFactory<>(
-          new ObjectQueueFactory<>(
-              provideContext(),
-              provideJsonSerializer(),
-              configuration
-          ),
-          configuration
-      );
-      return new AdapterMetricSendingQueue(factory.create());
-    });
+  private <T> ConcurrentSendingQueue<T> provideSendingQueue(SendingQueueConfiguration<T> configuration) {
+    return new SendingQueueFactory<>(
+        new ObjectQueueFactory<>(
+            provideContext(),
+            provideJsonSerializer(),
+            configuration
+        ),
+        configuration
+    ).create();
   }
 
   @NonNull
@@ -635,9 +639,16 @@ public class DependencyProvider {
 
   @NonNull
   public RemoteLogSendingQueue provideRemoteLogSendingQueue() {
-    return getOrCreate(RemoteLogSendingQueue.class, () -> {
-      throw new UnsupportedOperationException("TODO-1347");
-    });
+    return getOrCreate(RemoteLogSendingQueue.class, () -> new AdapterRemoteLogSendingQueue(
+        provideSendingQueue(provideRemoteLogSendingQueueConfiguration())
+    ));
+  }
+
+  @NonNull
+  public RemoteLogSendingQueueConfiguration provideRemoteLogSendingQueueConfiguration() {
+    return getOrCreate(RemoteLogSendingQueueConfiguration.class, () -> new RemoteLogSendingQueueConfiguration(
+        provideBuildConfigWrapper()
+    ));
   }
 
   @NonNull

@@ -20,4 +20,15 @@ import com.criteo.publisher.csm.ConcurrentSendingQueue
 
 internal interface RemoteLogSendingQueue : ConcurrentSendingQueue<RemoteLogRecords> {
   // this interface serves as a marker interface for dependency injection
+
+  class AdapterRemoteLogSendingQueue(
+      private val delegate: ConcurrentSendingQueue<RemoteLogRecords>
+  ) : RemoteLogSendingQueue {
+    override fun offer(element: RemoteLogRecords) = delegate.offer(element)
+
+    override fun poll(max: Int): List<RemoteLogRecords> = delegate.poll(max)
+
+    override val totalSize: Int
+      get() = delegate.totalSize
+  }
 }
