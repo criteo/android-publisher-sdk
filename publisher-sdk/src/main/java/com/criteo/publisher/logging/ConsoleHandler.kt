@@ -25,7 +25,6 @@ import com.criteo.publisher.util.BuildConfigWrapper
 internal class ConsoleHandler(private val buildConfigWrapper: BuildConfigWrapper) : LogHandler {
 
   companion object {
-    const val TagPrefix = "Crto"
     private const val UnsetLogLevel = -1
   }
 
@@ -50,7 +49,7 @@ internal class ConsoleHandler(private val buildConfigWrapper: BuildConfigWrapper
 
   @VisibleForTesting
   fun println(level: Int, tag: String, message: String) {
-    Log.println(level, "$TagPrefix$tag", message)
+    Log.println(level, LogTag.with(tag), message)
   }
 
   private val Throwable.stacktraceString get() = getStackTraceString(this)
