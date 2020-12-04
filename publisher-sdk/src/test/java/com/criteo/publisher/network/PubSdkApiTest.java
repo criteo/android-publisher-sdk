@@ -160,7 +160,7 @@ public class PubSdkApiTest {
     assertThat(request.getRequestUrl().queryParameter("gaid")).isEqualTo("myGaid");
     assertThat(request.getRequestUrl().queryParameter("eventType")).isEqualTo("myEvent");
     assertThat(request.getRequestUrl().queryParameter("limitedAdTracking")).isEqualTo("1337");
-    assertThat(request.getRequestUrl().queryParameter("gdprString")).isEqualTo("fake_consent_data");
+    assertThat(request.getRequestUrl().queryParameter("gdpr_consent")).isEqualTo("fake_consent_data");
   }
 
   @Test
@@ -180,7 +180,7 @@ public class PubSdkApiTest {
     api.postAppEvent(42, "", "myGaid", "", 0, "", null);
 
     RecordedRequest request = mockWebServer.takeRequest();
-    assertThat(request.getRequestUrl().queryParameter("gdprString")).isNull();
+    assertThat(request.getRequestUrl().queryParameter("gdpr_consent")).isNull();
   }
 
   @Test
