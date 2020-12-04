@@ -14,8 +14,15 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.csm;
+package com.criteo.publisher.logging
 
-public abstract class MetricSendingQueue implements ConcurrentSendingQueue<Metric> {
-  // this class serve as marker class for dependency injection
+internal class RemoteHandler(
+    private val remoteLogRecordsFactory: RemoteLogRecordsFactory,
+    private val sendingQueue: RemoteLogSendingQueue
+) : LogHandler {
+  override fun log(tag: String, logMessage: LogMessage) {
+    remoteLogRecordsFactory.createLogRecords(logMessage)?.let {
+      sendingQueue.offer(it)
+    }
+  }
 }
