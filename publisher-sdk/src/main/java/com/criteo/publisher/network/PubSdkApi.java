@@ -48,7 +48,7 @@ public class PubSdkApi {
   private static final String GAID = "gaid";
   private static final String EVENT_TYPE = "eventType";
   private static final String LIMITED_AD_TRACKING = "limitedAdTracking";
-  private static final String GDPR_STRING = "gdprString";
+  private static final String GDPR_CONSENT = "gdpr_consent";
 
   @NonNull
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -118,7 +118,7 @@ public class PubSdkApi {
     parameters.put(LIMITED_AD_TRACKING, String.valueOf(limitedAdTracking));
 
     if (gdprConsentData != null) {
-        parameters.put(GDPR_STRING, gdprConsentData);
+        parameters.put(GDPR_CONSENT, gdprConsentData);
     }
 
     String query = "/appevent/v1/" + senderId + "?" + getParamsString(parameters);
