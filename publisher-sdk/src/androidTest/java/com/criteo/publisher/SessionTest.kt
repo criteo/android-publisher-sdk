@@ -20,9 +20,16 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Before
 import org.junit.Test
 
 class SessionTest {
+
+  @Before
+  fun setUp() {
+    MockableDependencyProvider.setInstance(null)
+    CriteoUtil.clearCriteo()
+  }
 
   @Test
   fun getDuration_GivenSdkInitialized_SessionDurationIsStarted() {
@@ -41,5 +48,24 @@ class SessionTest {
     val duration = session.getDurationInSeconds()
 
     assertThat(duration).isEqualTo(1)
+  }
+
+  @Test
+  fun sessionId_GivenSdkInitialized_ReturnAlwaysPerSession() {
+    CriteoUtil.givenInitializedCriteo()
+
+    val session1 = DependencyProvider.getInstance().provideSession()
+    val sessionId1 = session1.sessionId
+    val sessionId2 = session1.sessionId
+
+    MockableDependencyProvider.setInstance(null)
+    CriteoUtil.givenInitializedCriteo()
+
+    val session2 = DependencyProvider.getInstance().provideSession()
+    val sessionId3 = session2.sessionId
+    val sessionId4 = session2.sessionId
+
+    assertThat(sessionId1).isEqualTo(sessionId2).isNotEqualTo(sessionId3)
+    assertThat(sessionId3).isEqualTo(sessionId4)
   }
 }
