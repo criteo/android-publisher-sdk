@@ -16,8 +16,6 @@
 
 package com.criteo.publisher.logging;
 
-import static com.criteo.publisher.logging.ConsoleHandler.TagPrefix;
-
 import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
@@ -25,7 +23,7 @@ import java.util.List;
 
 public class Logger {
 
-  private static final String FALLBACK_TAG = TagPrefix + "Logger";
+  private static final String FALLBACK_TAG = LogTag.with("Logger");
 
   @NonNull
   private final String tag;
