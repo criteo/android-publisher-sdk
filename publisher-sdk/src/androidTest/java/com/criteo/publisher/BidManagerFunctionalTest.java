@@ -32,6 +32,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -260,6 +261,9 @@ public class BidManagerFunctionalTest {
       runnable.run();
       waitForMessageQueueToBeIdle();
     });
+
+    // Deactivate logging as it interferes with verification
+    doNothing().when(logger).log(any());
 
     List<AdUnit> prefetchAdUnits = Arrays.asList(
         mock(AdUnit.class),
