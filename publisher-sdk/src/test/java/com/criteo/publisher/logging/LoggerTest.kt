@@ -18,6 +18,9 @@ package com.criteo.publisher.logging
 
 import android.util.Log
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.argThat
+import com.nhaarman.mockitokotlin2.inOrder
+import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -81,5 +84,93 @@ class LoggerTest {
     logger.log(logMessage)
 
     verify(handler2).log("myTag", logMessage)
+  }
+
+  @Test
+  fun log_GivenLogsProducedWhileLogging_LogItOnlyOnceAndStopRecursion() {
+    lateinit var logger: Logger
+
+    val handler = mock<LogHandler>()
+
+    handler1 = object : LogHandler {
+      override fun log(tag: String, logMessage: LogMessage) {
+        logger.debug("start handler1#log")
+        handler.log(tag, logMessage.copy(message = "handler1: ${logMessage.message}"))
+        logger.debug("end handler1#log")
+      }
+    }
+
+    handler2 = object : LogHandler {
+      override fun log(tag: String, logMessage: LogMessage) {
+        logger.debug("start handler2#log")
+        handler.log(tag, logMessage.copy(message = "handler2: ${logMessage.message}"))
+        logger.debug("end handler2#log")
+      }
+    }
+
+    logger = Logger("myTag", listOf(handler1, handler2))
+    logger.log(LogMessage(message = "dummy message"))
+
+    inOrder(handler) {
+      verify(handler).log(any(), argThat { message == "handler1: start handler1#log" })
+      verify(handler).log(any(), argThat { message == "handler2: start handler1#log" })
+      verify(handler).log(any(), argThat { message == "handler1: dummy message" })
+      verify(handler).log(any(), argThat { message == "handler1: end handler1#log" })
+      verify(handler).log(any(), argThat { message == "handler2: end handler1#log" })
+
+      verify(handler).log(any(), argThat { message == "handler1: start handler2#log" })
+      verify(handler).log(any(), argThat { message == "handler2: start handler2#log" })
+      verify(handler).log(any(), argThat { message == "handler2: dummy message" })
+      verify(handler).log(any(), argThat { message == "handler1: end handler2#log" })
+      verify(handler).log(any(), argThat { message == "handler2: end handler2#log" })
+
+      verifyNoMoreInteractions()
+    }
+  }
+
+  @Test
+  fun log_GivenManyLoggersProducingLogsWhileLogging_LogItOnlyOnceAndStopRecursion() {
+    lateinit var handler1: LogHandler
+    lateinit var handler2: LogHandler
+
+    fun newLogger(): Logger = Logger("myTag", listOf(handler1, handler2))
+
+    val handler = mock<LogHandler>()
+
+    handler1 = object : LogHandler {
+      override fun log(tag: String, logMessage: LogMessage) {
+        val logger = newLogger()
+        logger.debug("start handler1#log")
+        handler.log(tag, logMessage.copy(message = "handler1: ${logMessage.message}"))
+        logger.debug("end handler1#log")
+      }
+    }
+
+    handler2 = object : LogHandler {
+      override fun log(tag: String, logMessage: LogMessage) {
+        val logger = newLogger()
+        logger.debug("start handler2#log")
+        handler.log(tag, logMessage.copy(message = "handler2: ${logMessage.message}"))
+        logger.debug("end handler2#log")
+      }
+    }
+
+    newLogger().log(LogMessage(message = "dummy message"))
+
+    inOrder(handler) {
+      verify(handler).log(any(), argThat { message == "handler1: start handler1#log" })
+      verify(handler).log(any(), argThat { message == "handler2: start handler1#log" })
+      verify(handler).log(any(), argThat { message == "handler1: dummy message" })
+      verify(handler).log(any(), argThat { message == "handler1: end handler1#log" })
+      verify(handler).log(any(), argThat { message == "handler2: end handler1#log" })
+
+      verify(handler).log(any(), argThat { message == "handler1: start handler2#log" })
+      verify(handler).log(any(), argThat { message == "handler2: start handler2#log" })
+      verify(handler).log(any(), argThat { message == "handler2: dummy message" })
+      verify(handler).log(any(), argThat { message == "handler1: end handler2#log" })
+      verify(handler).log(any(), argThat { message == "handler2: end handler2#log" })
+
+      verifyNoMoreInteractions()
+    }
   }
 }
