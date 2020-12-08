@@ -16,12 +16,13 @@
 
 package com.criteo.publisher.logging
 
+import com.criteo.publisher.csm.ConcurrentSendingQueue
 import com.criteo.publisher.logging.RemoteLogRecords.RemoteLogLevel.Companion.fromAndroidLogLevel
 import com.criteo.publisher.model.Config
 
 internal class RemoteHandler(
     private val remoteLogRecordsFactory: RemoteLogRecordsFactory,
-    private val sendingQueue: RemoteLogSendingQueue,
+    private val sendingQueue: ConcurrentSendingQueue<RemoteLogRecords>,
     private val config: Config
 ) : LogHandler {
   override fun log(tag: String, logMessage: LogMessage) {

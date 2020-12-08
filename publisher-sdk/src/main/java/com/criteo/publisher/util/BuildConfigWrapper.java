@@ -119,6 +119,9 @@ public class BuildConfigWrapper {
     return BuildConfig.adChoiceIconHeightInDp;
   }
 
+  public int getRemoteLogBatchSize() {
+    return BuildConfig.remoteLogBatchSize;
+  }
 
   /**
    * Maximum size (in bytes) of metric elements stored in the remote log sending queue.
