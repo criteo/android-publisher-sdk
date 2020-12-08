@@ -81,6 +81,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
         "/csm" -> handleCsmRequest()
         "/config/app" -> handleConfigRequest()
         "/inapp/v2" -> handleBidRequest(request.body)
+        "/inapp/logs" -> handleLogsRequest()
         "/delivery/ajs.php" -> handleCasperRequest(request)
         "/appevent/v1/2379" -> handleBearcatRequest()
         else -> MockResponse().setResponseCode(HttpURLConnection.HTTP_NOT_FOUND)
@@ -97,6 +98,10 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
 
     private fun handleCsmRequest(): MockResponse {
       return MockResponse().setStatus("HTTP/1.1 204 No Content")
+    }
+
+    private fun handleLogsRequest(): MockResponse {
+      return MockResponse().setStatus("HTTP/1.1 200 OK")
     }
 
     @Suppress("MaxLineLength")

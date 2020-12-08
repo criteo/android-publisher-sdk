@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 
 import androidx.annotation.NonNull;
 import com.criteo.publisher.csm.MetricRequest;
+import com.criteo.publisher.logging.RemoteLogRecords;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.CdbRequest;
@@ -41,6 +42,8 @@ import java.io.OutputStream;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -86,6 +89,55 @@ public class PubSdkApiTest {
     when(gdprData.version()).thenReturn(1);
 
     api = new PubSdkApi(buildConfigWrapper, serializer);
+  }
+
+  @Test
+  public void postLogs_GivenSerializedRequest_SendItWithPost() throws Exception {
+    List<RemoteLogRecords> request = new ArrayList<>();
+    String json = "{\"expectedJson\": 42}";
+
+    givenSerializerWriting(request, json);
+
+    mockWebServer.enqueue(new MockResponse().setResponseCode(204));
+
+    api.postLogs(request);
+
+    RecordedRequest webRequest = mockWebServer.takeRequest();
+    assertThat(webRequest.getPath()).isEqualTo("/inapp/logs");
+    assertThat(webRequest.getMethod()).isEqualTo("POST");
+    assertThat(webRequest.getHeader("Content-Type")).isEqualTo("text/plain");
+    assertThat(webRequest.getBody().snapshot().utf8()).isEqualTo(json);
+  }
+
+  @Test
+  public void postLogs_GivenConnectionError_ThrowIOException() throws Exception {
+    List<RemoteLogRecords> request = new ArrayList<>();
+
+    givenConnectionError();
+
+    assertThatCode(() -> api.postLogs(request)).isInstanceOf(IOException.class);
+  }
+
+  @Test
+  public void postLogs_GivenHttpError_ThrowIOException() throws Exception {
+    List<RemoteLogRecords> request = new ArrayList<>();
+
+    mockWebServer.enqueue(new MockResponse().setResponseCode(400));
+
+    assertThatCode(() -> api.postLogs(request)).isInstanceOf(IOException.class);
+  }
+
+  @Test
+  public void postLogs_GivenLongRequestError_ThrowTimeoutError() throws Exception {
+    when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenReturn(10);
+
+    List<RemoteLogRecords> request = new ArrayList<>();
+
+    mockWebServer.enqueue(new MockResponse()
+        .throttleBody(1, 100, TimeUnit.MILLISECONDS)
+        .setResponseCode(200));
+
+    assertThatCode(() -> api.postLogs(request)).isInstanceOf(SocketTimeoutException.class);
   }
 
   @Test
