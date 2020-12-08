@@ -52,6 +52,7 @@ androidLibModule {
     addBuildConfigField<Int>("adChoiceIconHeightInDp")
 
     // Remote logs
+    addBuildConfigField<Int>("remoteLogBatchSize")
     addBuildConfigField<String>("remoteLogQueueFilename")
     addBuildConfigField<Int>("maxSizeOfRemoteLogSendingQueue")
 
