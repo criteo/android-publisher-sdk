@@ -53,6 +53,7 @@ import com.criteo.publisher.context.ContextProvider;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.RemoteLogSendingQueueConsumer;
 import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
@@ -131,6 +132,9 @@ public class BidManagerFunctionalTest {
 
   @MockBean
   private MetricSendingQueueConsumer metricSendingQueueConsumer;
+
+  @MockBean
+  private RemoteLogSendingQueueConsumer remoteLogSendingQueueConsumer;
 
   @SpyBean
   private UserPrivacyUtil userPrivacyUtil;
@@ -817,6 +821,7 @@ public class BidManagerFunctionalTest {
     clearInvocations(api);
     clearInvocations(bidLifecycleListener);
     clearInvocations(metricSendingQueueConsumer);
+    clearInvocations(remoteLogSendingQueueConsumer);
 
     // Given a second fetch, without any clock change
     CdbResponseSlot slot = givenMockedCdbRespondingSlot();
@@ -891,6 +896,7 @@ public class BidManagerFunctionalTest {
 
     verify(bidListener).onNoBid();
     verify(metricSendingQueueConsumer, never()).sendMetricBatch();
+    verify(remoteLogSendingQueueConsumer, never()).sendRemoteLogBatch();
   }
 
   @Test
@@ -912,6 +918,7 @@ public class BidManagerFunctionalTest {
 
     verify(bidListener).onNoBid();
     verify(metricSendingQueueConsumer, never()).sendMetricBatch();
+    verify(remoteLogSendingQueueConsumer, never()).sendRemoteLogBatch();
   }
 
   @Test
@@ -930,6 +937,7 @@ public class BidManagerFunctionalTest {
     assertNoLiveBidIsCached();
     assertShouldNotCallCdbAndNotPopulateCache();
     verify(metricSendingQueueConsumer).sendMetricBatch();
+    verify(remoteLogSendingQueueConsumer).sendRemoteLogBatch();
   }
 
   @Test
@@ -949,6 +957,7 @@ public class BidManagerFunctionalTest {
     assertNoLiveBidIsCached();
     assertShouldNotCallCdbAndNotPopulateCache();
     verify(metricSendingQueueConsumer).sendMetricBatch();
+    verify(remoteLogSendingQueueConsumer).sendRemoteLogBatch();
   }
 
   @Test
@@ -968,6 +977,7 @@ public class BidManagerFunctionalTest {
     assertNoLiveBidIsCached();
     assertShouldNotCallCdbAndNotPopulateCache();
     verify(metricSendingQueueConsumer).sendMetricBatch();
+    verify(remoteLogSendingQueueConsumer).sendRemoteLogBatch();
   }
 
   @Test
@@ -987,6 +997,7 @@ public class BidManagerFunctionalTest {
     assertNoLiveBidIsCached();
     assertShouldNotCallCdbAndNotPopulateCache();
     verify(metricSendingQueueConsumer).sendMetricBatch();
+    verify(remoteLogSendingQueueConsumer).sendRemoteLogBatch();
   }
 
   @Test
@@ -1002,6 +1013,7 @@ public class BidManagerFunctionalTest {
 
     assertShouldCallCdb(singletonList(cacheAdUnit));
     verify(metricSendingQueueConsumer).sendMetricBatch();
+    verify(remoteLogSendingQueueConsumer).sendRemoteLogBatch();
   }
 
   @Test
@@ -1506,6 +1518,7 @@ public class BidManagerFunctionalTest {
     verify(bidLifecycleListener).onCdbCallStarted(any());
     verify(bidLifecycleListener).onCdbCallFinished(any(), any());
     verify(metricSendingQueueConsumer).sendMetricBatch();
+    verify(remoteLogSendingQueueConsumer).sendRemoteLogBatch();
   }
 
   private void assertShouldNotCallCdbAndNotPopulateCache() throws Exception {
@@ -1735,7 +1748,8 @@ public class BidManagerFunctionalTest {
         dependencyProvider.provideBidRequestSender(),
         dependencyProvider.provideLiveBidRequestSender(),
         dependencyProvider.provideBidLifecycleListener(),
-        dependencyProvider.provideMetricSendingQueueConsumer()
+        dependencyProvider.provideMetricSendingQueueConsumer(),
+        remoteLogSendingQueueConsumer
     );
   }
 
