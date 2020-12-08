@@ -79,6 +79,7 @@ import com.criteo.publisher.logging.RemoteLogRecordsFactory;
 import com.criteo.publisher.logging.RemoteLogSendingQueue;
 import com.criteo.publisher.logging.RemoteLogSendingQueue.AdapterRemoteLogSendingQueue;
 import com.criteo.publisher.logging.RemoteLogSendingQueueConfiguration;
+import com.criteo.publisher.logging.RemoteLogSendingQueueConsumer;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.Config;
@@ -263,7 +264,8 @@ public class DependencyProvider {
         provideBidRequestSender(),
         provideLiveBidRequestSender(),
         provideBidLifecycleListener(),
-        provideMetricSendingQueueConsumer()
+        provideMetricSendingQueueConsumer(),
+        provideRemoteLogSendingQueueConsumer()
     ));
   }
 
@@ -369,7 +371,7 @@ public class DependencyProvider {
   public BidLifecycleListener provideBidLifecycleListener() {
     return getOrCreate(BidLifecycleListener.class, () -> {
       CompositeBidLifecycleListener listener = new CompositeBidLifecycleListener();
-      listener.add(new LoggingBidLifecycleListener());
+      listener.add(new LoggingBidLifecycleListener(provideRemoteLogSendingQueueConsumer()));
 
       if (android.os.Build.VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN_MR1) {
         listener.add(new CsmBidLifecycleListener(
@@ -672,6 +674,16 @@ public class DependencyProvider {
         provideRemoteLogRecordsFactory(),
         provideRemoteLogSendingQueue(),
         provideConfig()
+    ));
+  }
+
+  @NonNull
+  public RemoteLogSendingQueueConsumer provideRemoteLogSendingQueueConsumer() {
+    return getOrCreate(RemoteLogSendingQueueConsumer.class, () -> new RemoteLogSendingQueueConsumer(
+        provideRemoteLogSendingQueue(),
+        providePubSdkApi(),
+        provideBuildConfigWrapper(),
+        provideThreadPoolExecutor()
     ));
   }
 

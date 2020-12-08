@@ -26,6 +26,7 @@ import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
+import com.criteo.publisher.logging.RemoteLogSendingQueueConsumer;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CacheAdUnit;
@@ -78,6 +79,9 @@ public class BidManager implements ApplicationStoppedListener {
   @NonNull
   private final MetricSendingQueueConsumer metricSendingQueueConsumer;
 
+  @NonNull
+  private final RemoteLogSendingQueueConsumer remoteLogSendingQueueConsumer;
+
   BidManager(
       @NonNull SdkCache sdkCache,
       @NonNull Config config,
@@ -86,7 +90,8 @@ public class BidManager implements ApplicationStoppedListener {
       @NonNull BidRequestSender bidRequestSender,
       @NonNull LiveBidRequestSender liveBidRequestSender,
       @NonNull BidLifecycleListener bidLifecycleListener,
-      @NonNull MetricSendingQueueConsumer metricSendingQueueConsumer
+      @NonNull MetricSendingQueueConsumer metricSendingQueueConsumer,
+      @NonNull RemoteLogSendingQueueConsumer remoteLogSendingQueueConsumer
   ) {
     this.cache = sdkCache;
     this.config = config;
@@ -96,6 +101,7 @@ public class BidManager implements ApplicationStoppedListener {
     this.liveBidRequestSender = liveBidRequestSender;
     this.bidLifecycleListener = bidLifecycleListener;
     this.metricSendingQueueConsumer = metricSendingQueueConsumer;
+    this.remoteLogSendingQueueConsumer = remoteLogSendingQueueConsumer;
   }
 
   /**
@@ -277,6 +283,7 @@ public class BidManager implements ApplicationStoppedListener {
       }
 
       metricSendingQueueConsumer.sendMetricBatch();
+      remoteLogSendingQueueConsumer.sendRemoteLogBatch();
     }
   }
 
@@ -290,6 +297,7 @@ public class BidManager implements ApplicationStoppedListener {
 
     bidRequestSender.sendBidRequest(prefetchCacheAdUnits, contextData, new CacheOnlyCdbCallListener());
     metricSendingQueueConsumer.sendMetricBatch();
+    remoteLogSendingQueueConsumer.sendRemoteLogBatch();
   }
 
   void setCacheAdUnits(@NonNull List<CdbResponseSlot> slots) {

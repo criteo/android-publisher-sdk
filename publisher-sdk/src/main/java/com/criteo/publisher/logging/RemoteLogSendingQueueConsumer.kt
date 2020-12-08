@@ -17,11 +17,13 @@
 package com.criteo.publisher.logging
 
 import com.criteo.publisher.SafeRunnable
+import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.csm.ConcurrentSendingQueue
 import com.criteo.publisher.network.PubSdkApi
 import com.criteo.publisher.util.BuildConfigWrapper
 import java.util.concurrent.Executor
 
+@OpenForTesting
 internal class RemoteLogSendingQueueConsumer(
     private val sendingQueue: ConcurrentSendingQueue<RemoteLogRecords>,
     private val api: PubSdkApi,

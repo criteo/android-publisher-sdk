@@ -19,6 +19,7 @@ package com.criteo.publisher.bid;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
+import com.criteo.publisher.logging.RemoteLogSendingQueueConsumer;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
@@ -31,9 +32,17 @@ public class LoggingBidLifecycleListener implements BidLifecycleListener {
 
   private final Logger logger = LoggerFactory.getLogger(LoggingBidLifecycleListener.class);
 
+  @NonNull
+  private final RemoteLogSendingQueueConsumer remoteLogSendingQueueConsumer;
+
+  public LoggingBidLifecycleListener(@NonNull RemoteLogSendingQueueConsumer remoteLogSendingQueueConsumer) {
+    this.remoteLogSendingQueueConsumer = remoteLogSendingQueueConsumer;
+  }
+
   @Override
   public void onSdkInitialized() {
     logger.debug("onSdkInitialized");
+    remoteLogSendingQueueConsumer.sendRemoteLogBatch();
   }
 
   @Override
