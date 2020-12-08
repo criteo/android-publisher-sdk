@@ -673,7 +673,8 @@ public class DependencyProvider {
     return getOrCreate(RemoteHandler.class, () -> new RemoteHandler(
         provideRemoteLogRecordsFactory(),
         provideRemoteLogSendingQueue(),
-        provideConfig()
+        provideConfig(),
+        provideThreadPoolExecutor()
     ));
   }
 

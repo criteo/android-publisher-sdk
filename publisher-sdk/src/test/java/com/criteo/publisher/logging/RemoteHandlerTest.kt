@@ -71,6 +71,7 @@ class RemoteHandlerTest {
     remoteHandler.log("tag", info)
     remoteHandler.log("tag", warning)
     remoteHandler.log("tag", error)
+    mockedDependenciesRule.waitForIdleState()
 
     verify(sendingQueue, times(2)).offer(any())
     verify(remoteLogRecordsFactory).createLogRecords(warning)
@@ -85,6 +86,7 @@ class RemoteHandlerTest {
     whenever(remoteLogRecordsFactory.createLogRecords(logMessage)).thenReturn(null)
 
     remoteHandler.log("tag", logMessage)
+    mockedDependenciesRule.waitForIdleState()
 
     verifyZeroInteractions(sendingQueue)
   }
@@ -97,6 +99,7 @@ class RemoteHandlerTest {
     whenever(remoteLogRecordsFactory.createLogRecords(logMessage)).thenReturn(logRecords)
 
     remoteHandler.log("tag", logMessage)
+    mockedDependenciesRule.waitForIdleState()
 
     verify(sendingQueue).offer(logRecords)
   }
