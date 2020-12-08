@@ -33,10 +33,14 @@ import static org.mockito.Mockito.when;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.StubConstants;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.csm.MetricRequest;
+import com.criteo.publisher.logging.LogMessage;
+import com.criteo.publisher.logging.RemoteLogRecords;
+import com.criteo.publisher.logging.RemoteLogRecordsFactory;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdSize;
@@ -90,6 +94,9 @@ public class PubSdkApiIntegrationTest {
   @Inject
   private RemoteConfigRequestFactory remoteConfigRequestFactory;
 
+  @Inject
+  private RemoteLogRecordsFactory remoteLogRecordsFactory;
+
   @Before
   public void setup() {
     appId = context.getApplicationContext().getPackageName();
@@ -113,6 +120,25 @@ public class PubSdkApiIntegrationTest {
     RemoteConfigResponse response = api.loadConfig(request);
 
     assertThat(response).isEqualTo(defaultRemoteConfigResponse());
+  }
+
+  @Test
+  public void postLogs_GivenRemoteLogs_ReturnInSuccess() throws Exception {
+    RemoteLogRecords logRecords1 = remoteLogRecordsFactory.createLogRecords(new LogMessage(
+        Log.INFO,
+        "dummy message 1",
+        null
+    ));
+
+    RemoteLogRecords logRecords2 = remoteLogRecordsFactory.createLogRecords(new LogMessage(
+        Log.WARN,
+        "dummy message 2",
+        new Exception()
+    ));
+
+    api.postLogs(asList(logRecords1, logRecords2));
+
+    // nothing to assert, no thrown exception means success
   }
 
   @Test

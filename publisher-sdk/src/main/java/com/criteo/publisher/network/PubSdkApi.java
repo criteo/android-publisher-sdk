@@ -21,6 +21,7 @@ import androidx.annotation.Nullable;
 import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
+import com.criteo.publisher.logging.RemoteLogRecords;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.RemoteConfigRequest;
@@ -38,6 +39,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -134,7 +136,15 @@ public class PubSdkApi {
   }
 
   public void postCsm(@NonNull MetricRequest request) throws IOException {
-    URL url = new URL(buildConfigWrapper.getCdbUrl() + "/csm");
+    postToCdb("/csm", request);
+  }
+
+  public void postLogs(@NonNull List<RemoteLogRecords> request) throws IOException {
+    postToCdb("/inapp/logs", request);
+  }
+
+  private void postToCdb(@NonNull String apiPath, @NonNull Object request) throws IOException {
+    URL url = new URL(buildConfigWrapper.getCdbUrl() + apiPath);
     HttpURLConnection urlConnection = prepareConnection(url, null, "POST");
     writePayload(urlConnection, request);
     readResponseStreamIfSuccess(urlConnection).close();
