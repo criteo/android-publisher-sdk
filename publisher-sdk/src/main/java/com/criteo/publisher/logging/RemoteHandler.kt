@@ -16,20 +16,28 @@
 
 package com.criteo.publisher.logging
 
+import com.criteo.publisher.SafeRunnable
 import com.criteo.publisher.csm.ConcurrentSendingQueue
 import com.criteo.publisher.logging.RemoteLogRecords.RemoteLogLevel.Companion.fromAndroidLogLevel
 import com.criteo.publisher.model.Config
+import java.util.concurrent.Executor
 
 internal class RemoteHandler(
     private val remoteLogRecordsFactory: RemoteLogRecordsFactory,
     private val sendingQueue: ConcurrentSendingQueue<RemoteLogRecords>,
-    private val config: Config
+    private val config: Config,
+    private val executor: Executor
 ) : LogHandler {
   override fun log(tag: String, logMessage: LogMessage) {
     fromAndroidLogLevel(logMessage.level)?.takeIf { it >= config.remoteLogLevel } ?: return
 
     remoteLogRecordsFactory.createLogRecords(logMessage)?.let {
-      sendingQueue.offer(it)
+      // Asynchronously post log to avoid doing IO on the current thread
+      executor.execute(object : SafeRunnable() {
+        override fun runSafely() {
+          sendingQueue.offer(it)
+        }
+      })
     }
   }
 }
