@@ -39,9 +39,9 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
+import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.AppLifecycleUtil;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -194,6 +194,16 @@ public class CriteoInternalUnitTest {
     createCriteo();
 
     verify(deviceInfo).initialize();
+  }
+
+  @Test
+  public void whenCreatingNewCriteo_GivenAdvertisingInfo_PrefetchIt() throws Exception {
+    AdvertisingInfo advertisingInfo = mock(AdvertisingInfo.class);
+    doReturn(advertisingInfo).when(dependencyProvider).provideAdvertisingInfo();
+
+    createCriteo();
+
+    verify(advertisingInfo).prefetch();
   }
 
   @Test

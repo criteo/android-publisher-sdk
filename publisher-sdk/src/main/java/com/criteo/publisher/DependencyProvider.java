@@ -200,7 +200,8 @@ public class DependencyProvider {
   @NonNull
   public AdvertisingInfo provideAdvertisingInfo() {
     return getOrCreate(AdvertisingInfo.class, () -> new AdvertisingInfo(
-        provideContext()
+        provideContext(),
+        provideThreadPoolExecutor()
     ));
   }
 
