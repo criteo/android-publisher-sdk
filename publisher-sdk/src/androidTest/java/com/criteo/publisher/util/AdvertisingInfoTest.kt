@@ -16,13 +16,17 @@
 package com.criteo.publisher.util
 
 import android.content.Context
+import com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait
+import com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait
 import com.criteo.publisher.mock.MockedDependenciesRule
+import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.spy
+import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.util.concurrent.Executor
 import javax.inject.Inject
 
 class AdvertisingInfoTest {
@@ -38,12 +42,11 @@ class AdvertisingInfoTest {
   @Inject
   private lateinit var context: Context
 
-  private lateinit var advertisingInfo: AdvertisingInfo
+  @Inject
+  private lateinit var executor: Executor
 
-  @Before
-  fun setUp() {
-    advertisingInfo = AdvertisingInfo(context)
-  }
+  @Inject
+  private lateinit var advertisingInfo: AdvertisingInfo
 
   @Test
   fun getAdvertisingId_GivenPlayServiceAdsIdentifierInClasspath_ReturnNonNull() {
@@ -51,14 +54,68 @@ class AdvertisingInfoTest {
 
     val advertisingId = advertisingInfo.advertisingId
 
-    assertThat(advertisingId).isNotNull()
+    assertThat(advertisingId).isNotEmpty().isNotEqualTo(DEVICE_ID_LIMITED)
+  }
+
+  @Test
+  fun getAdvertisingId_CalledFromUiThread_ReturnNull() {
+    // Assume that the advertising ID is available, this is a case on new clean emulators/devices
+
+    val advertisingId = callOnMainThreadAndWait {
+      advertisingInfo.advertisingId
+    }
+
+    assertThat(advertisingId).isNull()
+  }
+
+  @Test
+  fun getAdvertisingId_CalledFromUiThreadAfterBeingCalledOnWorkerThread_ReturnNonNull() {
+    // Assume that the advertising ID is available, this is a case on new clean emulators/devices
+
+    val advertisingIdFromWorkerThread = advertisingInfo.advertisingId
+    val advertisingIdFromMainThread = callOnMainThreadAndWait {
+      advertisingInfo.advertisingId
+    }
+
+    assertThat(advertisingIdFromWorkerThread).isNotEmpty()
+        .isNotEqualTo(DEVICE_ID_LIMITED)
+        .isEqualTo(advertisingIdFromMainThread)
+  }
+
+  @Test
+  fun getAdvertisingId_CalledFromUiThreadAfterAPrefetch_ReturnNonNull() {
+    // Assume that the advertising ID is available, this is a case on new clean emulators/devices
+
+    advertisingInfo.prefetch()
+    val advertisingId = callOnMainThreadAndWait {
+      advertisingInfo.advertisingId
+    }
+
+    assertThat(advertisingId).isNotEmpty().isNotEqualTo(DEVICE_ID_LIMITED)
+  }
+
+  @Test
+  fun getAdvertisingId_CalledFromUiThreadAfterAPrefetchFromMainThread_ReturnNonNull() {
+    // Assume that the advertising ID is available, this is a case on new clean emulators/devices
+
+    runOnMainThreadAndWait {
+      advertisingInfo.prefetch()
+    }
+    mockedDependenciesRule.waitForIdleState()
+
+    val advertisingId = callOnMainThreadAndWait {
+      advertisingInfo.advertisingId
+    }
+
+    assertThat(advertisingId).isNotEmpty().isNotEqualTo(DEVICE_ID_LIMITED)
   }
 
   @Test
   fun getAdvertisingId_GivenLimitedAdTracking_ReturnLimitedDeviceId() {
-    advertisingInfo = spy(advertisingInfo) {
-      on { isLimitAdTrackingEnabled } doReturn true
+    val advertisingIdClient = spy(AdvertisingInfo.SafeAdvertisingIdClient()) {
+      doReturn(true).whenever(mock).isLimitAdTrackingEnabled(any())
     }
+    advertisingInfo = AdvertisingInfo(context, executor, advertisingIdClient)
 
     val advertisingId = advertisingInfo.advertisingId
 
@@ -74,4 +131,14 @@ class AdvertisingInfoTest {
     assertThat(isLimitAdTrackingEnabled).isFalse()
   }
 
+  @Test
+  fun isLimitAdTrackingEnabled_CalledFromUiThread_ReturnFalse() {
+    // Assume that the advertising ID is available, this is a case on new clean emulators/devices
+
+    val isLimitAdTrackingEnabled = callOnMainThreadAndWait {
+      advertisingInfo.isLimitAdTrackingEnabled
+    }
+
+    assertThat(isLimitAdTrackingEnabled).isFalse()
+  }
 }

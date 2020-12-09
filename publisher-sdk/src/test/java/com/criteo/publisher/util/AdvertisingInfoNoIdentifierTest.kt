@@ -20,7 +20,6 @@ import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.util.AdvertisingInfo.MissingPlayServicesAdsIdentifierException
 import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
@@ -63,7 +62,7 @@ via IntelliJ delegating test run to Gradle.
     val advertisingId = advertisingInfo.advertisingId
 
     assertThat(advertisingId).isNull()
-    verify(logger, times(2)).debug(any(), any<MissingPlayServicesAdsIdentifierException>())
+    verify(logger).debug(any(), any<MissingPlayServicesAdsIdentifierException>())
   }
 
   @Test

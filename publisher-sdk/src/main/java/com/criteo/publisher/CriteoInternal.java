@@ -78,6 +78,8 @@ class CriteoInternal extends Criteo {
     deviceInfo = dependencyProvider.provideDeviceInfo();
     deviceInfo.initialize();
 
+    dependencyProvider.provideAdvertisingInfo().prefetch();
+
     config = dependencyProvider.provideConfig();
 
     bidManager = dependencyProvider.provideBidManager();
