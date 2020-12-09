@@ -41,6 +41,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import android.content.Intent;
@@ -130,9 +131,13 @@ public class AdvancedNativeFunctionalTest {
     Criteo.getInstance().loadBid(NATIVE, new ContextData(), activity::loadInHouseAdInAdLayout);
     mockedDependenciesRule.waitForIdleState();
 
-    // Check there is one ad
+    // Load a second ad because detection of InHouse profileId is delayed of one bid
+    Criteo.getInstance().loadBid(NATIVE, new ContextData(), activity::loadInHouseAdInAdLayout);
+    mockedDependenciesRule.waitForIdleState();
+
+    // Check there is two ads
     ViewGroup adLayout = getAdLayout();
-    assertEquals(1, adLayout.getChildCount());
+    assertEquals(2, adLayout.getChildCount());
 
     checkAllInformationAreDisplayed((ViewGroup) adLayout.getChildAt(0));
 
@@ -141,7 +146,7 @@ public class AdvancedNativeFunctionalTest {
         any()
     );
 
-    verify(logger).log(onNativeImpressionRegistered((NativeAdUnit) null));
+    verify(logger, times(2)).log(onNativeImpressionRegistered((NativeAdUnit) null));
     verify(logger, atLeastOnce()).log(onNativeClicked((NativeAdUnit) null));
   }
 
