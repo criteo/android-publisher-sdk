@@ -33,6 +33,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
+@Suppress("LongParameterList")
 @OpenForTesting
 internal class RemoteLogRecordsFactory(
     private val buildConfigWrapper: BuildConfigWrapper,
@@ -40,7 +41,8 @@ internal class RemoteLogRecordsFactory(
     private val advertisingInfo: AdvertisingInfo,
     private val session: Session,
     private val integrationRegistry: IntegrationRegistry,
-    private val clock: Clock
+    private val clock: Clock,
+    private val publisherCodeRemover: PublisherCodeRemover
 ) {
 
   private val iso8601Format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ROOT).apply {
@@ -97,7 +99,7 @@ internal class RemoteLogRecordsFactory(
   @VisibleForTesting
   fun getCurrentThreadName(): String = Thread.currentThread().name
 
-  private val Throwable.stacktraceString get() = getStackTraceString(this)
+  private val Throwable.stacktraceString get() = getStackTraceString(publisherCodeRemover.removePublisherCode(this))
 
   /**
    * This method is nullable because on JVM tests, methods from AndroidSDK returns null
