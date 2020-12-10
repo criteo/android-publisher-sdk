@@ -74,6 +74,7 @@ import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.logging.ConsoleHandler;
 import com.criteo.publisher.logging.LoggerFactory;
+import com.criteo.publisher.logging.PublisherCodeRemover;
 import com.criteo.publisher.logging.RemoteHandler;
 import com.criteo.publisher.logging.RemoteLogRecordsFactory;
 import com.criteo.publisher.logging.RemoteLogSendingQueue;
@@ -665,8 +666,14 @@ public class DependencyProvider {
         provideAdvertisingInfo(),
         provideSession(),
         provideIntegrationRegistry(),
-        provideClock()
+        provideClock(),
+        providePublisherCodeRemover()
     ));
+  }
+
+  @NonNull
+  public PublisherCodeRemover providePublisherCodeRemover() {
+    return getOrCreate(PublisherCodeRemover.class, PublisherCodeRemover::new);
   }
 
   @NonNull
