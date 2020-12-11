@@ -101,7 +101,10 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
     }
 
     private fun handleLogsRequest(): MockResponse {
-      return MockResponse().setStatus("HTTP/1.1 200 OK")
+      return MockResponse()
+          .setStatus("HTTP/1.1 200 OK")
+          .setBody("OK")
+          .setHeader(CONTENT_TYPE, "application/octet-stream")
     }
 
     @Suppress("MaxLineLength")
