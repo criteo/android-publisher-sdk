@@ -70,7 +70,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -244,7 +243,6 @@ public class MoPubHeaderBiddingFunctionalTest {
   }
 
   @Test
-  @Ignore("JIRA EE-1192")
   public void loadingMoPubBanner_GivenValidBanner_MoPubViewContainsCreative() throws Exception {
     String html = loadMoPubHtmlBanner(validBannerAdUnit);
 
@@ -252,7 +250,6 @@ public class MoPubHeaderBiddingFunctionalTest {
   }
 
   @Test
-  @Ignore("JIRA EE-1192")
   public void loadingMoPubBanner_GivenDemoBanner_MoPubViewUsesDemoDisplayUrl() throws Exception {
     givenUsingCdbProd();
     ResultCaptor<CdbResponse> cdbResultCaptor = mockedDependenciesRule.captorCdbResult();
