@@ -355,11 +355,8 @@ public class MoPubHeaderBiddingFunctionalTest {
   }
 
   private void assertBidRequestHasGoodProfileId() throws Exception {
-    if (config.isLiveBiddingEnabled()) {
-      // With live bidding, AppBidding declaration is delayed when bid is consumed. So the declaration is only visible
-      // from the next bid.
-      loadAdAndWait(invalidBannerAdUnit, null);
-    }
+    // AppBidding declaration is delayed when bid is consumed. So the declaration is only visible from the next bid.
+    loadAdAndWait(invalidBannerAdUnit, null);
 
     verify(api, atLeastOnce()).loadCdb(
         argThat(request -> request.getProfileId() == Integration.MOPUB_APP_BIDDING.getProfileId()),
