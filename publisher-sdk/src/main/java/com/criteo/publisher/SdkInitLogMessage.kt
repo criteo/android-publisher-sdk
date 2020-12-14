@@ -38,8 +38,11 @@ ${adUnits.joinToString("\n") { "- $it" }}"""
   )
 
   @JvmStatic
-  fun onSdkInitializedMoreThanOnce() = LogMessage(Log.WARN, message =
-    "Criteo SDK initialization method cannot be called more than once"
+  fun onSdkInitializedMoreThanOnce() = LogMessage(message =
+    "Criteo SDK initialization method cannot be called more than once. " +
+        // The mediation adapters always call init before asking for an Ad.
+        // Publishers can't do anything, so they can ignore this log.
+        "Please ignore this if you are using a mediation adapter."
   )
 
   @JvmStatic
