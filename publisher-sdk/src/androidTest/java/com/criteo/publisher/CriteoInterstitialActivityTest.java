@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -56,7 +57,6 @@ import com.criteo.publisher.view.WebViewLookup;
 import java.util.Collection;
 import javax.inject.Inject;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -129,7 +129,6 @@ public class CriteoInterstitialActivityTest {
   }
 
   @Test
-  @Ignore("FIXME EE-1191")
   public void whenUserClickOnAd_GivenHtmlWithHttpUrl_RedirectUserAndNotifyListener()
       throws Exception {
     Activity activity = whenUserClickOnAd("https://criteo.com");
@@ -137,6 +136,7 @@ public class CriteoInterstitialActivityTest {
     assertFalse(getActivitiesInStage(RESUMED).contains(activity));
     verify(listener).onAdClicked();
     verify(listener).onAdLeftApplication();
+    verify(listener, atMostOnce()).onAdClosed();
     verifyNoMoreInteractions(listener);
   }
 
@@ -152,13 +152,13 @@ public class CriteoInterstitialActivityTest {
   }
 
   @Test
-  @FlakyTest
   public void whenUserClickOnAd_GivenHtmlWithHandledDeepLink_RedirectUserAndNotifyListener() throws Exception {
     Activity activity = whenUserClickOnAd("criteo-test://dummy-ad-activity");
 
     assertFalse(getActivitiesInStage(RESUMED).contains(activity));
     verify(listener).onAdClicked();
     verify(listener).onAdLeftApplication();
+    verify(listener, atMostOnce()).onAdClosed();
     verifyNoMoreInteractions(listener);
   }
 
