@@ -40,6 +40,7 @@ import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.logging.LogMessage;
 import com.criteo.publisher.logging.RemoteLogRecords;
+import com.criteo.publisher.logging.RemoteLogRecords.RemoteLogLevel;
 import com.criteo.publisher.logging.RemoteLogRecordsFactory;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
@@ -369,7 +370,7 @@ public class PubSdkApiIntegrationTest {
         false,
         8000,
         true,
-        null
+        RemoteLogLevel.WARNING
     );
   }
 }
