@@ -16,11 +16,13 @@
 
 package com.criteo.publisher.logging
 
+import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.csm.ConcurrentSendingQueue
 
 internal interface RemoteLogSendingQueue : ConcurrentSendingQueue<RemoteLogRecords> {
   // this interface serves as a marker interface for dependency injection
 
+  @OpenForTesting
   class AdapterRemoteLogSendingQueue(
       private val delegate: ConcurrentSendingQueue<RemoteLogRecords>
   ) : RemoteLogSendingQueue {
