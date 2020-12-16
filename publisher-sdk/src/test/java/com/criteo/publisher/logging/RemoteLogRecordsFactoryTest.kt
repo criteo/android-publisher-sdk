@@ -84,7 +84,7 @@ class RemoteLogRecordsFactoryTest {
 
   @Test
   fun createLogRecord_GivenValidLog_ReturnLogRecords() {
-    val timestamp = ZonedDateTime.of(2042, 6, 22, 13, 37, 28, 2, ZoneOffset.UTC).toInstant().toEpochMilli()
+    val timestamp = ZonedDateTime.of(2042, 6, 22, 13, 37, 28, 123_000_000, ZoneOffset.UTC).toInstant().toEpochMilli()
 
     whenever(buildConfigWrapper.sdkVersion).doReturn("1.2.3")
     whenever(context.packageName).doReturn("org.dummy")
@@ -101,7 +101,11 @@ class RemoteLogRecordsFactoryTest {
 
     val logRecords = factory.createLogRecords(logMessage)
 
-    val expectedMessage = "`message of log`,`throwable message+stacktrace`,threadId:thread-name,2042-06-22T13:37:28Z"
+    val expectedMessage = "`message of log`," +
+        "`throwable message+stacktrace`," +
+        "threadId:thread-name," +
+        "2042-06-22T13:37:28.123Z"
+
     assertThat(logRecords).isEqualTo(RemoteLogRecords(
         RemoteLogContext(
             "1.2.3",
@@ -126,7 +130,7 @@ class RemoteLogRecordsFactoryTest {
 
   @Test
   fun createMessageBody_GivenOnlyMessage_FormatItWithoutStacktrace() {
-    val timestamp = ZonedDateTime.of(2042, 6, 22, 13, 37, 28, 2, ZoneOffset.UTC).toInstant().toEpochMilli()
+    val timestamp = ZonedDateTime.of(2042, 6, 22, 13, 37, 28, 123_000, ZoneOffset.UTC).toInstant().toEpochMilli()
     whenever(clock.currentTimeInMillis).doReturn(timestamp)
     doReturn("thread-name").whenever(factory).getCurrentThreadName()
 
@@ -134,13 +138,13 @@ class RemoteLogRecordsFactoryTest {
 
     val messageBody = factory.createMessageBody(logMessage)
 
-    assertThat(messageBody).isEqualTo("dummy message,threadId:thread-name,2042-06-22T13:37:28Z")
+    assertThat(messageBody).isEqualTo("dummy message,threadId:thread-name,2042-06-22T13:37:28.000Z")
   }
 
   @Test
   fun createMessageBody_GivenOnlyThrowable_FormatItWithStacktrace() {
     val throwable = NullPointerException()
-    val timestamp = ZonedDateTime.of(2042, 6, 22, 13, 37, 28, 2, ZoneOffset.UTC).toInstant().toEpochMilli()
+    val timestamp = ZonedDateTime.of(2042, 6, 22, 13, 37, 28, 12_300_000, ZoneOffset.UTC).toInstant().toEpochMilli()
     whenever(clock.currentTimeInMillis).doReturn(timestamp)
     doReturn("thread-name").whenever(factory).getCurrentThreadName()
     doReturn("throwable message+stacktrace").whenever(factory).getStackTraceString(throwable)
@@ -149,6 +153,6 @@ class RemoteLogRecordsFactoryTest {
 
     val messageBody = factory.createMessageBody(logMessage)
 
-    assertThat(messageBody).isEqualTo("throwable message+stacktrace,threadId:thread-name,2042-06-22T13:37:28Z")
+    assertThat(messageBody).isEqualTo("throwable message+stacktrace,threadId:thread-name,2042-06-22T13:37:28.012Z")
   }
 }
