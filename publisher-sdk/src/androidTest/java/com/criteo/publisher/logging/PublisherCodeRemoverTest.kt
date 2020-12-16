@@ -157,6 +157,46 @@ class PublisherCodeRemoverTest {
   }
 
   @Test
+  fun removePublisherCode_GivenSdkExceptionWithMessageOfPublisherException_RemovePublisherMessageInSdkException() {
+    val publisherCode = DummyPublisherCode.sdkDummyInterfaceThrowingGenericException()
+
+    // Stack is: JUnit + this test (intercept exception) + publisher code (cause)
+    val exception = exceptionThrownBy {
+      try {
+        publisherCode.foo()
+      } catch (e: Exception) {
+        // JDK copy the publisher's message into the SDK exception.
+        // This demonstrates that remover works recursively and works on exception caused by publishers but also on
+        // exception caused by the SDK (which is caused by publishers), ...:
+        // - let's say the message of e is foo and e is of type FooException
+        // - SdkException(e).message is then FooException: foo
+        // - SdkException(SdkException(e)).message is then SdkException: FooException: foo
+        // - SdkException(SdkException(SdkException(e))).message is then SdkException: SdkException: FooException: foo
+        //
+        // Expected messages are, respectively (ignoring the packages):
+        // - An exception occurred from publisher's code (with exception of type PublisherException)
+        // - PublisherException: An exception occurred from publisher's code
+        // - SdkException: PublisherException: An exception occurred from publisher's code
+        // - SdkException: SdkException: PublisherException: An exception occurred from publisher's code
+        throw SdkException(SdkException(SdkException(e)))
+      }
+    }
+
+    // Expect:
+    // - cause exception is changed to a publisher exception, stacktrace is cleaned
+    // - sdk exceptions have message changed
+    val cleaned = removePublisherCode(exception)
+
+    val packagePattern = "[${'$'}a-zA-Z.]+"
+    assertThat(cleaned.message).matches("${packagePattern}SdkException: " +
+        "${packagePattern}SdkException: " +
+        "${packagePattern}PublisherException: An exception occurred from publisher's code")
+    assertThat(cleaned.printStacktraceToString())
+        .doesNotContain(DummyPublisherCode.secrets)
+        .doesNotContain("com.dummypublisher")
+  }
+
+  @Test
   fun removePublisherCode_GivenExceptionDuringOperation_ReturnMarkerException() {
     val keptStack = StackTraceElement("keep", "this", null, -1)
     val exception = spy(IllegalStateException("message of the exception")) {
@@ -241,7 +281,7 @@ class PublisherCodeRemoverTest {
   }
 
   class SdkException : RuntimeException {
-    constructor(message: String) : super(message)
     constructor(message: String, throwable: Throwable) : super(message, throwable)
+    constructor(throwable: Throwable) : super(throwable)
   }
 }

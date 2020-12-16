@@ -96,9 +96,20 @@ internal class PublisherCodeRemover {
 
     visited[original] = cleanedException
 
+    val isMessageDerivedFromCause = original.cause?.let { it.toString() == original.message } ?: false
+
     removePublisherCodeFromCause(original, cleanedException, visited)
     removePublisherCodeFromSuppressedExceptions(original, cleanedException, visited)
     removePublisherCodeFromStacktrace(original, cleanedException)
+
+    cleanedException.cause?.let {
+      if (isMessageDerivedFromCause) {
+        // Reset message from new cause as it can have been changed meanwhile
+        with(ThrowableInternal) {
+          cleanedException.internalDetailMessage = it.toString()
+        }
+      }
+    }
 
     return cleanedException
   }
@@ -171,8 +182,8 @@ internal class PublisherCodeRemover {
   object ThrowableInternal {
 
     private val causeField: Field = getField("cause")
-
     private val suppressedField: Field = getField("suppressedExceptions")
+    private val detailMessageField: Field = getField("detailMessage")
 
     private fun getField(name: String): Field {
       val field = java.lang.Throwable::class.java.getDeclaredField(name)
@@ -188,6 +199,10 @@ internal class PublisherCodeRemover {
     var Throwable.internalSuppressedExceptions: List<Throwable>?
       get() = suppressedField.get(this) as List<Throwable>?
       set(value) = suppressedField.set(this, value)
+
+    var Throwable.internalDetailMessage: String?
+      get() = detailMessageField.get(this) as String?
+      set(value) = detailMessageField.set(this, value)
   }
 
   class PublisherException : RuntimeException("An exception occurred from publisher's code")
