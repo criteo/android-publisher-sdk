@@ -89,6 +89,7 @@ import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.network.BidRequestSender;
 import com.criteo.publisher.network.LiveBidRequestSender;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.privacy.ConsentData;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.AndroidUtil;
@@ -267,7 +268,8 @@ public class DependencyProvider {
         provideLiveBidRequestSender(),
         provideBidLifecycleListener(),
         provideMetricSendingQueueConsumer(),
-        provideRemoteLogSendingQueueConsumer()
+        provideRemoteLogSendingQueueConsumer(),
+        provideConsentData()
     ));
   }
 
@@ -378,9 +380,10 @@ public class DependencyProvider {
       if (android.os.Build.VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN_MR1) {
         listener.add(new CsmBidLifecycleListener(
             provideMetricRepository(),
-            new MetricSendingQueueProducer(provideMetricSendingQueue()),
+            provideMetricSendingQueueProducer(),
             provideClock(),
             provideConfig(),
+            provideConsentData(),
             provideThreadPoolExecutor()
         ));
       }
@@ -544,6 +547,14 @@ public class DependencyProvider {
   }
 
   @NonNull
+  public MetricSendingQueueProducer provideMetricSendingQueueProducer() {
+    return getOrCreate(MetricSendingQueueProducer.class, () -> new MetricSendingQueueProducer(
+        provideMetricSendingQueue()
+    ));
+  }
+
+
+  @NonNull
   public MetricSendingQueue provideMetricSendingQueue() {
     return getOrCreate(MetricSendingQueue.class, () -> new AdapterMetricSendingQueue(
         provideSendingQueue(provideMetricSendingQueueConfiguration())
@@ -694,6 +705,11 @@ public class DependencyProvider {
         provideBuildConfigWrapper(),
         provideThreadPoolExecutor()
     ));
+  }
+
+  @NonNull
+  public ConsentData provideConsentData() {
+    return getOrCreate(ConsentData.class, ConsentData::new);
   }
 
   public interface Factory<T> {

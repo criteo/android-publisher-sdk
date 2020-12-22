@@ -1749,7 +1749,8 @@ public class BidManagerFunctionalTest {
         dependencyProvider.provideLiveBidRequestSender(),
         dependencyProvider.provideBidLifecycleListener(),
         dependencyProvider.provideMetricSendingQueueConsumer(),
-        remoteLogSendingQueueConsumer
+        remoteLogSendingQueueConsumer,
+        dependencyProvider.provideConsentData()
     );
   }
 

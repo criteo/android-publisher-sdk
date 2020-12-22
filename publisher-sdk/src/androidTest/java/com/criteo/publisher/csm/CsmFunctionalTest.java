@@ -37,6 +37,7 @@ import androidx.core.util.Consumer;
 import androidx.test.filters.FlakyTest;
 import com.criteo.publisher.Clock;
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.csm.MetricRequest.MetricRequestFeedback;
@@ -86,6 +87,7 @@ public class CsmFunctionalTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     integrationRegistry.declare(Integration.IN_HOUSE);
+    givenConsentGiven();
   }
 
   @Test
@@ -137,6 +139,16 @@ public class CsmFunctionalTest {
 
       return true;
     }));
+  }
+
+  /**
+   * Consent status is updated after the first response from CDB. Therefore, a first bid-request
+   * is made here to get the wanted side-effect.
+   */
+  private void givenConsentGiven() throws CriteoInitException {
+    givenInitializedCriteo(TestAdUnits.BANNER_320_480);
+    waitForIdleState();
+    MetricHelper.cleanState(mockedDependenciesRule.getDependencyProvider());
   }
 
   @Test

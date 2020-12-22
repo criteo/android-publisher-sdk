@@ -36,6 +36,7 @@ import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.network.BidRequestSender;
 import com.criteo.publisher.network.LiveBidRequestSender;
+import com.criteo.publisher.privacy.ConsentData;
 import com.criteo.publisher.util.ApplicationStoppedListener;
 import java.util.Collections;
 import java.util.List;
@@ -82,6 +83,9 @@ public class BidManager implements ApplicationStoppedListener {
   @NonNull
   private final RemoteLogSendingQueueConsumer remoteLogSendingQueueConsumer;
 
+  @NonNull
+  private final ConsentData consentData;
+
   BidManager(
       @NonNull SdkCache sdkCache,
       @NonNull Config config,
@@ -91,7 +95,8 @@ public class BidManager implements ApplicationStoppedListener {
       @NonNull LiveBidRequestSender liveBidRequestSender,
       @NonNull BidLifecycleListener bidLifecycleListener,
       @NonNull MetricSendingQueueConsumer metricSendingQueueConsumer,
-      @NonNull RemoteLogSendingQueueConsumer remoteLogSendingQueueConsumer
+      @NonNull RemoteLogSendingQueueConsumer remoteLogSendingQueueConsumer,
+      @NonNull ConsentData consentData
   ) {
     this.cache = sdkCache;
     this.config = config;
@@ -102,12 +107,14 @@ public class BidManager implements ApplicationStoppedListener {
     this.bidLifecycleListener = bidLifecycleListener;
     this.metricSendingQueueConsumer = metricSendingQueueConsumer;
     this.remoteLogSendingQueueConsumer = remoteLogSendingQueueConsumer;
+    this.consentData = consentData;
   }
 
   /**
    * Notify the given listener for bid or no bid for the given ad unit.
    * <p>
-   * {@link BidListener#onBidResponse(CdbResponseSlot)} is invoked only if a bid is available and valide.
+   * {@link BidListener#onBidResponse(CdbResponseSlot)} is invoked only if a bid is available and
+   * valid.
    *
    * @param adUnit ad unit to get a bid from (nullable only to accommodate callers)
    * @param contextData
@@ -277,7 +284,8 @@ public class BidManager implements ApplicationStoppedListener {
                 bidListener,
                 bidLifecycleListener,
                 this,
-                cacheAdUnit
+                cacheAdUnit,
+                consentData
             )
         );
       }
@@ -295,7 +303,11 @@ public class BidManager implements ApplicationStoppedListener {
       return;
     }
 
-    bidRequestSender.sendBidRequest(prefetchCacheAdUnits, contextData, new CacheOnlyCdbCallListener());
+    bidRequestSender.sendBidRequest(
+        prefetchCacheAdUnits,
+        contextData,
+        new CacheOnlyCdbCallListener()
+    );
     metricSendingQueueConsumer.sendMetricBatch();
     remoteLogSendingQueueConsumer.sendRemoteLogBatch();
   }
@@ -389,7 +401,7 @@ public class BidManager implements ApplicationStoppedListener {
   private class CacheOnlyCdbCallListener extends CdbCallListener {
 
     public CacheOnlyCdbCallListener() {
-      super(bidLifecycleListener, BidManager.this);
+      super(bidLifecycleListener, BidManager.this, consentData);
     }
 
     @Override

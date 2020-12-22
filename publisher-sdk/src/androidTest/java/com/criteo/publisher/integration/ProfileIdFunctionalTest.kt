@@ -29,10 +29,14 @@ import com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait
 import com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait
 import com.criteo.publisher.context.ContextData
 import com.criteo.publisher.csm.MetricHelper
+import com.criteo.publisher.csm.MetricRepository
 import com.criteo.publisher.csm.MetricSendingQueueConsumer
+import com.criteo.publisher.csm.MetricSendingQueueProducer
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.network.PubSdkApi
+import com.criteo.publisher.privacy.ConsentData
+import com.criteo.publisher.privacy.ConsentData.ConsentStatus.CONSENT_GIVEN
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest
 import com.mopub.mobileads.MoPubInterstitial
 import com.mopub.mobileads.MoPubView
@@ -48,6 +52,7 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
+import java.util.concurrent.Executor
 import javax.inject.Inject
 
 class ProfileIdFunctionalTest {
@@ -63,7 +68,19 @@ class ProfileIdFunctionalTest {
   private lateinit var metricSendingQueueConsumer: MetricSendingQueueConsumer
 
   @SpyBean
+  private lateinit var metricSendingQueueProducer: MetricSendingQueueProducer
+
+  @SpyBean
   private lateinit var api: PubSdkApi
+
+  @SpyBean
+  private lateinit var threadPoolExecutor: Executor
+
+  @SpyBean
+  private lateinit var metricRepository: MetricRepository
+
+  @SpyBean
+  private lateinit var consentData: ConsentData
 
   @Test
   fun prefetch_GivenSdkUsedForTheFirstTime_UseFallbackProfileId() {
@@ -75,7 +92,7 @@ class ProfileIdFunctionalTest {
 
   @Test
   fun prefetch_GivenUsedSdk_UseLatestProfileId() {
-    givenPreviousInHouseIntegration()
+    givenPreviousInHouseIntegrationWithResetDependencies()
 
     givenInitializedCriteo(BANNER_320_480)
     mockedDependenciesRule.waitForIdleState()
@@ -95,7 +112,7 @@ class ProfileIdFunctionalTest {
 
   @Test
   fun remoteConfig_GivenUsedSdk_UseLastProfileId() {
-    givenPreviousInHouseIntegration()
+    givenPreviousInHouseIntegrationWithResetDependencies()
 
     givenInitializedCriteo()
     mockedDependenciesRule.waitForIdleState()
@@ -121,9 +138,11 @@ class ProfileIdFunctionalTest {
 
   @Test
   fun csm_GivenPrefetchWithUsedSdk_UseLatestProfileId() {
-    givenPreviousInHouseIntegration()
+    givenPreviousInHouseIntegrationWithResetDependencies()
 
-    // Clean the metric yields above to avoid interference
+    givenConsentGiven()
+
+    // Clean the metrics generated from the above InHouse bidding, to avoid interference
     triggerMetricRequest()
     clearInvocations(api)
 
@@ -143,6 +162,8 @@ class ProfileIdFunctionalTest {
   @Test
   fun csm_GivenIntegrationSpecificBidConsumedWithSdkUsedForTheFirstTime_UseIntegrationProfileId() {
     givenInitializedCriteo()
+    givenConsentGiven()
+
     bidStandaloneInterstitial()
 
     triggerMetricRequest()
@@ -160,8 +181,10 @@ class ProfileIdFunctionalTest {
     doNothing().whenever(metricSendingQueueConsumer).sendMetricBatch()
 
     givenInitializedCriteo()
-    bidStandaloneInterstitial()
 
+    givenConsentGiven()
+
+    bidStandaloneInterstitial()
     bidOtherAdServer()
 
     doCallRealMethod().whenever(metricSendingQueueConsumer).sendMetricBatch()
@@ -184,7 +207,7 @@ class ProfileIdFunctionalTest {
 
   @Test
   fun bidStandaloneBanner_GivenAnyPreviousIntegration_UseStandaloneProfileId() {
-    givenPreviousInHouseIntegration()
+    givenPreviousInHouseIntegrationWithResetDependencies()
 
     givenInitializedCriteo()
     runOnMainThreadAndWait {
@@ -197,7 +220,7 @@ class ProfileIdFunctionalTest {
 
   @Test
   fun bidStandaloneInterstitial_GivenAnyPreviousIntegration_UseStandaloneProfileId() {
-    givenPreviousInHouseIntegration()
+    givenPreviousInHouseIntegrationWithResetDependencies()
 
     givenInitializedCriteo()
     CriteoInterstitial(INTERSTITIAL).loadAd(ContextData())
@@ -208,7 +231,7 @@ class ProfileIdFunctionalTest {
 
   @Test
   fun bidStandaloneNative_GivenAnyPreviousIntegration_UseStandaloneProfileId() {
-    givenPreviousInHouseIntegration()
+    givenPreviousInHouseIntegrationWithResetDependencies()
 
     givenInitializedCriteo()
     CriteoNativeLoader(NATIVE, mock(), mock()).loadAd(ContextData())
@@ -227,7 +250,7 @@ class ProfileIdFunctionalTest {
       mockedDependenciesRule.waitForIdleState()
     }
 
-    givenPreviousStandaloneIntegration()
+    givenPreviousStandaloneIntegrationWithResetDependencies()
 
     givenInitializedCriteo()
 
@@ -241,7 +264,7 @@ class ProfileIdFunctionalTest {
 
   @Test
   fun bidInHouseInterstitial_GivenAnyPreviousIntegration_UseInHouseProfileId() {
-    givenPreviousStandaloneIntegration()
+    givenPreviousStandaloneIntegrationWithResetDependencies()
 
     givenInitializedCriteo()
 
@@ -261,7 +284,7 @@ class ProfileIdFunctionalTest {
       mockedDependenciesRule.waitForIdleState()
     }
 
-    givenPreviousStandaloneIntegration()
+    givenPreviousStandaloneIntegrationWithResetDependencies()
 
     givenInitializedCriteo()
 
@@ -274,7 +297,7 @@ class ProfileIdFunctionalTest {
 
   @Test
   fun bidCustomAppBidding_GivenAnyPreviousIntegration_UseCustomAppBiddingProfileId() {
-    givenPreviousInHouseIntegration()
+    givenPreviousInHouseIntegrationWithResetDependencies()
 
     givenInitializedCriteo()
 
@@ -294,7 +317,7 @@ class ProfileIdFunctionalTest {
       mockedDependenciesRule.waitForIdleState()
     }
 
-    givenPreviousInHouseIntegration()
+    givenPreviousInHouseIntegrationWithResetDependencies()
 
     givenInitializedCriteo()
 
@@ -315,7 +338,7 @@ class ProfileIdFunctionalTest {
       }
       mockedDependenciesRule.waitForIdleState()
     }
-    givenPreviousInHouseIntegration()
+    givenPreviousInHouseIntegrationWithResetDependencies()
 
     givenInitializedCriteo()
 
@@ -338,7 +361,7 @@ class ProfileIdFunctionalTest {
       }
       mockedDependenciesRule.waitForIdleState()
     }
-    givenPreviousInHouseIntegration()
+    givenPreviousInHouseIntegrationWithResetDependencies()
 
     givenInitializedCriteo()
 
@@ -349,21 +372,20 @@ class ProfileIdFunctionalTest {
     verifyCdbIsCalledWith(Integration.MOPUB_APP_BIDDING)
   }
 
-  private fun givenPreviousInHouseIntegration() {
+  private fun givenPreviousInHouseIntegrationWithResetDependencies() {
     givenInitializedCriteo()
     bidInHouseInterstitial()
     mockedDependenciesRule.resetAllDependencies()
   }
 
-  private fun givenPreviousStandaloneIntegration() {
+  private fun givenPreviousStandaloneIntegrationWithResetDependencies() {
     givenInitializedCriteo()
     bidStandaloneInterstitial()
     mockedDependenciesRule.resetAllDependencies()
   }
 
   private fun triggerMetricRequest() {
-    // CSM are put in queue during SDK init but they are not sent, so we need to trigger it.
-    givenInitializedCriteo()
+    metricSendingQueueProducer.pushAllInQueue(metricRepository)
     mockedDependenciesRule.waitForIdleState()
     metricSendingQueueConsumer.sendMetricBatch()
     mockedDependenciesRule.waitForIdleState()
@@ -392,5 +414,9 @@ class ProfileIdFunctionalTest {
       Criteo.getInstance().enrichAdObjectWithBid(mutableMapOf<Any, Any>(), it)
     }
     mockedDependenciesRule.waitForIdleState()
+  }
+
+  private fun givenConsentGiven() {
+    whenever(consentData.consentStatus).thenReturn(CONSENT_GIVEN)
   }
 }

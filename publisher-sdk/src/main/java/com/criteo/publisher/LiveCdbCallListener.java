@@ -26,6 +26,7 @@ import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.CdbResponseSlot;
+import com.criteo.publisher.privacy.ConsentData;
 import com.criteo.publisher.util.PreconditionsUtil;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -61,9 +62,10 @@ public class LiveCdbCallListener extends CdbCallListener {
       @NonNull BidListener bidListener,
       @NonNull BidLifecycleListener bidLifecycleListener,
       @NonNull BidManager bidManager,
-      @NonNull CacheAdUnit cacheAdUnit
+      @NonNull CacheAdUnit cacheAdUnit,
+      @NonNull ConsentData consentData
   ) {
-    super(bidLifecycleListener, bidManager);
+    super(bidLifecycleListener, bidManager, consentData);
     this.bidListener = bidListener;
     this.bidLifecycleListener = bidLifecycleListener;
     this.bidManager = bidManager;

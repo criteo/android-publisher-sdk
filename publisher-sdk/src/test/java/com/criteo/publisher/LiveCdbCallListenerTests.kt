@@ -21,6 +21,7 @@ import com.criteo.publisher.model.CacheAdUnit
 import com.criteo.publisher.model.CdbRequest
 import com.criteo.publisher.model.CdbResponse
 import com.criteo.publisher.model.CdbResponseSlot
+import com.criteo.publisher.privacy.ConsentData
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.never
 import com.nhaarman.mockitokotlin2.times
@@ -44,6 +45,9 @@ class LiveCdbCallListenerTests {
 
   @Mock
   private lateinit var cacheAdUnit: CacheAdUnit
+
+  @Mock
+  private lateinit var consentData: ConsentData
 
   @InjectMocks
   private lateinit var liveCdbCallListener: LiveCdbCallListener
@@ -181,5 +185,23 @@ class LiveCdbCallListenerTests {
     verify(bidLifecycleListener).onCdbCallFailed(cdbRequest, exception)
     verify(bidLifecycleListener, never()).onBidConsumed(any(), any())
     verify(bidLifecycleListener).onCdbCallFailed(cdbRequest, exception)
+  }
+
+  @Test
+  fun onBidResponse_givenConsentGiven_ThenUpdateConsentDataAccordingly() {
+    whenever(cdbResponse.consentGiven).thenReturn(true)
+
+    liveCdbCallListener.onCdbResponse(cdbRequest, cdbResponse)
+
+    verify(consentData).consentStatus = ConsentData.ConsentStatus.CONSENT_GIVEN
+  }
+
+  @Test
+  fun onBidResponse_givenConsentNotGiven_ThenUpdateConsentDataAccordingly() {
+    whenever(cdbResponse.consentGiven).thenReturn(false)
+
+    liveCdbCallListener.onCdbResponse(cdbRequest, cdbResponse)
+
+    verify(consentData).consentStatus = ConsentData.ConsentStatus.CONSENT_NOT_GIVEN
   }
 }

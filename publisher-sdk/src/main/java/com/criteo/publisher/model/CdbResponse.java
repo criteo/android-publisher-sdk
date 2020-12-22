@@ -30,18 +30,23 @@ public class CdbResponse {
 
   private static final String TIME_TO_NEXT_CALL = "timeToNextCall";
   private static final String SLOTS = "slots";
+  private static final String CONSENT_GIVEN = "consentGiven";
 
   @NonNull
   private final List<CdbResponseSlot> slots;
 
   private final int timeToNextCall;
 
+  private final boolean consentGiven;
+
   public CdbResponse(
       @NonNull List<CdbResponseSlot> slots,
-      int timeToNextCall
-  ) {
+      int timeToNextCall,
+      @NonNull boolean consentGiven
+      ) {
     this.slots = slots;
     this.timeToNextCall = timeToNextCall;
+    this.consentGiven = consentGiven;
   }
 
   @NonNull
@@ -64,19 +69,28 @@ public class CdbResponse {
       try {
         array = json.getJSONArray(SLOTS);
       } catch (JSONException ex) {
-        logger.debug("Exception while reading slots array" + ex.getMessage());
+        logger.debug("Exception while reading slots array", ex);
       }
       for (int i = 0; i < array.length(); i++) {
         try {
           JSONObject slotStr = array.getJSONObject(i);
           slots.add(CdbResponseSlot.fromJson(slotStr));
         } catch (Exception ex) {
-          logger.debug("Exception while reading slot from slots array" + ex.getMessage());
+          logger.debug("Exception while reading slot from slots array", ex);
         }
       }
     }
 
-    return new CdbResponse(slots, timeToNextCall);
+    boolean consentGiven = false;
+    if (json.has(CONSENT_GIVEN)) {
+      try {
+        consentGiven = json.getBoolean(CONSENT_GIVEN);
+      } catch (JSONException ex) {
+        logger.debug("Exception while reading consentGiven", ex);
+      }
+    }
+
+    return new CdbResponse(slots, timeToNextCall, consentGiven);
   }
 
   @NonNull
@@ -87,6 +101,8 @@ public class CdbResponse {
   public int getTimeToNextCall() {
     return timeToNextCall;
   }
+
+  public boolean getConsentGiven() { return consentGiven; }
 
   @Nullable
   public CdbResponseSlot getSlotByImpressionId(@NonNull String impressionId) {
@@ -104,6 +120,7 @@ public class CdbResponse {
     return "CdbResponse{" +
         "slots=" + slots +
         ", timeToNextCall=" + timeToNextCall +
+        ", consentGiven = " + consentGiven +
         '}';
   }
 }
