@@ -17,6 +17,7 @@
 package com.criteo.publisher.csm;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 
 public class MetricSendingQueueProducer {
 
@@ -27,7 +28,8 @@ public class MetricSendingQueueProducer {
     this.queue = queue;
   }
 
-  void pushAllInQueue(@NonNull MetricRepository repository) {
+  @VisibleForTesting
+  public void pushAllInQueue(@NonNull MetricRepository repository) {
     for (Metric metric : repository.getAllStoredMetrics()) {
       pushInQueue(repository, metric.getImpressionId());
     }

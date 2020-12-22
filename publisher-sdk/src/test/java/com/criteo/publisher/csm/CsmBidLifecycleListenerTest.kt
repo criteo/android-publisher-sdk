@@ -24,11 +24,13 @@ import com.criteo.publisher.model.CdbRequestSlot
 import com.criteo.publisher.model.CdbResponse
 import com.criteo.publisher.model.CdbResponseSlot
 import com.criteo.publisher.model.Config
+import com.criteo.publisher.privacy.ConsentData
+import com.criteo.publisher.privacy.ConsentData.ConsentStatus.CONSENT_GIVEN
+import com.criteo.publisher.privacy.ConsentData.ConsentStatus.CONSENT_NOT_GIVEN
 import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.check
-import com.nhaarman.mockitokotlin2.doAnswer
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
@@ -63,6 +65,9 @@ class CsmBidLifecycleListenerTest {
   @Mock
   private lateinit var config: Config
 
+  @Mock
+  private lateinit var consentData: ConsentData
+
   private lateinit var executor: Executor
 
   private lateinit var listener: CsmBidLifecycleListener
@@ -77,13 +82,23 @@ class CsmBidLifecycleListenerTest {
       on { isCsmEnabled } doReturn true
     }
 
+    whenever(consentData.consentStatus).thenReturn(CONSENT_GIVEN)
+
     listener = CsmBidLifecycleListener(
         repository,
         sendingQueueProducer,
         clock,
         config,
+        consentData,
         executor
     )
+  }
+
+  @Test
+  fun onSdkInitialized_PushAllMetricsInQueue() {
+    listener.onSdkInitialized()
+
+    verify(sendingQueueProducer).pushAllInQueue(repository)
   }
 
   @Test
@@ -96,15 +111,26 @@ class CsmBidLifecycleListenerTest {
   }
 
   @Test
-  fun onSdkInitialized_PushAllMetricsInQueue() {
+  fun onSdkInitialized_GivenConsentNotGiven_DoNothing() {
+    givenConsentNotGiven()
+
     listener.onSdkInitialized()
 
-    verify(sendingQueueProducer).pushAllInQueue(repository)
+    verifyFeatureIsDeactivated()
   }
 
   @Test
   fun onCdbCallStarted_GivenDeactivatedFeature_DoNothing() {
     givenDeactivatedFeature()
+
+    listener.onCdbCallStarted(mock())
+
+    verifyFeatureIsDeactivated()
+  }
+
+  @Test
+  fun onCdbCallStarted_GivenConsentNotGiven_DoNothing() {
+    givenConsentNotGiven()
 
     listener.onCdbCallStarted(mock())
 
@@ -139,7 +165,7 @@ class CsmBidLifecycleListenerTest {
 
     verifyFeatureIsDeactivated()
   }
-
+  
   @Test
   fun onCdbCallFinished_GivenOnlyNoBid_PushReadyToSendInQueue() {
     val request = givenCdbRequestWithSlots("id")
@@ -231,6 +257,15 @@ class CsmBidLifecycleListenerTest {
   }
 
   @Test
+  fun onCdbCallFailed_GivenConsentNotGiven_DoNothing() {
+    givenConsentNotGiven()
+
+    listener.onCdbCallFailed(mock(), mock())
+
+    verifyFeatureIsDeactivated()
+  }
+
+  @Test
   fun onCdbCallFailed_GivenNotATimeoutException_UpdateAllForNetworkError() {
     val request = givenCdbRequestWithSlots("id1", "id2")
 
@@ -238,6 +273,9 @@ class CsmBidLifecycleListenerTest {
 
     assertNetworkErrorIsReceived("id1")
     assertNetworkErrorIsReceived("id2")
+
+    verify(sendingQueueProducer).pushInQueue(repository, "id1")
+    verify(sendingQueueProducer).pushInQueue(repository, "id2")
   }
 
   @Test
@@ -283,6 +321,18 @@ class CsmBidLifecycleListenerTest {
 
     verifyFeatureIsDeactivated()
   }
+
+  @Test
+  fun onBidConsumed_GivenConsentNotGiven_DoNothing() {
+    givenConsentNotGiven()
+
+    val adUnit = CacheAdUnit(AdSize(1, 2), "myAdUnit", CRITEO_BANNER)
+
+    listener.onBidConsumed(adUnit, mock())
+
+    verifyFeatureIsDeactivated()
+  }
+
 
   @Test
   fun onBidConsumed_GivenNotExpiredBid_SetElapsedTimeAndReadyToSend() {
@@ -339,6 +389,24 @@ class CsmBidLifecycleListenerTest {
   }
 
   @Test
+  fun onBidsCached_GivenDeactivatedFeature_DoNothing() {
+    givenDeactivatedFeature()
+
+    listener.onBidCached(mock())
+
+    verifyFeatureIsDeactivated()
+  }
+
+  @Test
+  fun onBidsCached_GivenConsentNotGiven_DoNothing() {
+    givenConsentNotGiven()
+
+    listener.onBidCached(mock())
+
+    verifyFeatureIsDeactivated()
+  }
+
+  @Test
   fun onBidsCached_GivenValidSlots_SetCachedBidUsed() {
     val validSlot = mock<CdbResponseSlot>() {
       on { isValid() } doReturn true
@@ -384,7 +452,10 @@ class CsmBidLifecycleListenerTest {
       verifier: (Metric.Builder) -> Unit
   ) {
     argumentCaptor<String> {
-      verify(repository, times(impressionIds.size)).addOrUpdateById(capture(), verifier.asArgChecker())
+      verify(repository, times(impressionIds.size)).addOrUpdateById(
+          capture(),
+          verifier.asArgChecker()
+      )
 
       assertThat(allValues).containsExactlyInAnyOrder(*impressionIds)
     }
@@ -447,16 +518,13 @@ class CsmBidLifecycleListenerTest {
     }
   }
 
+  private fun givenConsentNotGiven() {
+    whenever(consentData.consentStatus).thenReturn(CONSENT_NOT_GIVEN)
+  }
+
   private fun verifyFeatureIsDeactivated() {
     verifyZeroInteractions(repository)
     verifyZeroInteractions(clock)
     verifyZeroInteractions(sendingQueueProducer)
-  }
-
-  private fun givenExecutor(executor: Executor) {
-    doAnswer {
-      val command = it.arguments[0] as Runnable
-      executor.execute(command)
-    }.whenever(this.executor).execute(any())
   }
 }

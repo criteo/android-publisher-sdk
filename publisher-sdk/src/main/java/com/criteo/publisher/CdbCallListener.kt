@@ -22,12 +22,16 @@ import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.bid.BidLifecycleListener
 import com.criteo.publisher.model.CdbRequest
 import com.criteo.publisher.model.CdbResponse
+import com.criteo.publisher.privacy.ConsentData
+import com.criteo.publisher.privacy.ConsentData.ConsentStatus.CONSENT_GIVEN
+import com.criteo.publisher.privacy.ConsentData.ConsentStatus.CONSENT_NOT_GIVEN
 
 @Internal
 @OpenForTesting
 abstract class CdbCallListener(
     private val bidLifecycleListener: BidLifecycleListener,
-    private val bidManager: BidManager
+    private val bidManager: BidManager,
+    private val consentData: ConsentData
 ) {
   @CallSuper
   fun onCdbRequest(cdbRequest: CdbRequest) {
@@ -41,6 +45,12 @@ abstract class CdbCallListener(
 
   @CallSuper
   fun onCdbResponse(cdbRequest: CdbRequest, cdbResponse: CdbResponse) {
+    if (cdbResponse.consentGiven) {
+      consentData.consentStatus = CONSENT_GIVEN
+    } else {
+      consentData.consentStatus = CONSENT_NOT_GIVEN
+    }
+
     bidManager.setTimeToNextCall(cdbResponse.timeToNextCall)
     bidLifecycleListener.onCdbCallFinished(cdbRequest, cdbResponse)
   }

@@ -106,7 +106,7 @@ public class CdbResponseTest {
 
   @Test
   public void getSlotByImpressionId_GivenEmptySlots_ReturnNull() throws Exception {
-    CdbResponse cdbResponse = new CdbResponse(emptyList(), 0);
+    CdbResponse cdbResponse = new CdbResponse(emptyList(), 0, false);
 
     assertThat(cdbResponse.getSlotByImpressionId("id")).isNull();
   }
@@ -121,7 +121,7 @@ public class CdbResponseTest {
     when(slot2.getImpressionId()).thenReturn(null);
     when(slot3.getImpressionId()).thenReturn("impId3");
 
-    CdbResponse cdbResponse = new CdbResponse(asList(slot1, slot2, slot3), 0);
+    CdbResponse cdbResponse = new CdbResponse(asList(slot1, slot2, slot3), 0, false);
 
     assertThat(cdbResponse.getSlotByImpressionId("id")).isNull();
   }
@@ -136,9 +136,25 @@ public class CdbResponseTest {
     when(slot2.getImpressionId()).thenReturn(null);
     when(slot3.getImpressionId()).thenReturn("id");
 
-    CdbResponse cdbResponse = new CdbResponse(asList(slot1, slot2, slot3), 0);
+    CdbResponse cdbResponse = new CdbResponse(asList(slot1, slot2, slot3), 0, false);
 
     assertThat(cdbResponse.getSlotByImpressionId("id")).isEqualTo(slot3);
+  }
+
+  @Test
+  public void fromJson_GivenConsentInfoTrue() throws Exception {
+    String json = "{\"slots\":[], \"consentGiven\": true}";
+    CdbResponse cdbResponse = CdbResponse.fromJson(new JSONObject(json));
+
+    assertThat(cdbResponse.getConsentGiven()).isTrue();
+  }
+
+  @Test
+  public void fromJson_GivenNoConsentInfoFalse() throws Exception {
+    String json = "{\"slots\":[], \"consentGiven\": false}";
+    CdbResponse cdbResponse = CdbResponse.fromJson(new JSONObject(json));
+
+    assertThat(cdbResponse.getConsentGiven()).isFalse();
   }
 
 }

@@ -141,9 +141,11 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
 
       val responseSlots = cdbRequest.slots.mapNotNull { it.toResponseSlot() }.joinToString()
       val requestId = UUID.randomUUID().toString()
+
       val cdbResponse = """
       {
         "slots": [$responseSlots],
+        "consentGiven": "true",
         "requestId":"$requestId"
       }
     """.trimIndent()
