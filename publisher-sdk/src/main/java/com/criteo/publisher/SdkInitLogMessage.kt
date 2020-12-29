@@ -49,6 +49,7 @@ ${adUnits.joinToString("\n") { "- $it" }}"""
   fun onErrorDuringSdkInitialization(criteoInitException: CriteoInitException) = LogMessage(
       Log.ERROR,
       null,
-      criteoInitException
+      criteoInitException,
+      "onErrorDuringSdkInitialization"
   )
 }

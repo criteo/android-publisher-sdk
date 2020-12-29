@@ -34,7 +34,9 @@ internal object BiddingLogMessage {
   )
 
   @JvmStatic
-  fun onInvalidAdUnit(adUnit: CacheAdUnit) = LogMessage(Log.WARN, message =
-    "Found an invalid AdUnit: $adUnit"
+  fun onInvalidAdUnit(adUnit: CacheAdUnit) = LogMessage(
+      level = Log.WARN,
+      message = "Found an invalid AdUnit: $adUnit",
+      logId = "onInvalidAdUnit"
   )
 }

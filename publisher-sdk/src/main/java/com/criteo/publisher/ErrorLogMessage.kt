@@ -28,20 +28,23 @@ internal object ErrorLogMessage {
   inline fun onUncaughtErrorAtPublicApi(throwable: Throwable) = LogMessage(
       Log.ERROR,
       "Internal error in ${CallerInferrer.inferCallerName()}",
-      throwable
+      throwable,
+      "onUncaughtErrorAtPublicApi"
   )
 
   @JvmStatic
   fun onUncaughtErrorInThread(throwable: Throwable) = LogMessage(
       Log.ERROR,
       "Uncaught error in thread",
-      throwable
+      throwable,
+      "onUncaughtErrorInThread"
   )
 
   @JvmStatic
   fun onAssertFailed(throwable: Throwable) = LogMessage(
       Log.ERROR,
       "Assertion failed",
-      throwable
+      throwable,
+      "onAssertFailed"
   )
 }

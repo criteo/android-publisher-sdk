@@ -65,7 +65,9 @@ internal object InterstitialLogMessage {
   @JvmStatic
   @CallerInferrer.Transparent
   @Suppress("NOTHING_TO_INLINE")
-  fun onMethodCalledWithNullApplication() = LogMessage(Log.WARN, message =
-    "Calling ${CallerInferrer.inferCallerName()} with a null application"
+  fun onMethodCalledWithNullApplication() = LogMessage(
+      level = Log.WARN,
+      message = "Calling ${CallerInferrer.inferCallerName()} with a null application",
+      logId = "onMethodCalledWithNullApplication"
   )
 }

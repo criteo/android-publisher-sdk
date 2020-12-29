@@ -40,7 +40,9 @@ internal object AppBiddingLogMessage {
   )
 
   @JvmStatic
-  fun onUnknownAdObjectEnriched(adObject: Any?) = LogMessage(Log.ERROR, message =
-    "Failed to set bids: unknown '${adObject?.javaClass}' object given"
+  fun onUnknownAdObjectEnriched(adObject: Any?) = LogMessage(
+      level = Log.ERROR,
+      message = "Failed to set bids: unknown '${adObject?.javaClass}' object given",
+      logId = "onUnknownAdObjectEnriched"
   )
 }
