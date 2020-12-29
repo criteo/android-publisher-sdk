@@ -51,7 +51,6 @@ import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
-import java.util.concurrent.Executor
 import javax.inject.Inject
 
 class ProfileIdFunctionalTest {
@@ -71,9 +70,6 @@ class ProfileIdFunctionalTest {
 
   @SpyBean
   private lateinit var api: PubSdkApi
-
-  @SpyBean
-  private lateinit var threadPoolExecutor: Executor
 
   @SpyBean
   private lateinit var metricRepository: MetricRepository
@@ -416,6 +412,6 @@ class ProfileIdFunctionalTest {
   }
 
   private fun givenConsentGiven() {
-    whenever(consentData.consentGiven).thenReturn(true)
+    whenever(consentData.isConsentGiven()).thenReturn(true)
   }
 }

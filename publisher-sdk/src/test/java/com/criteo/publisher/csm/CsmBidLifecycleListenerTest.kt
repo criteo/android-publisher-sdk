@@ -80,7 +80,7 @@ class CsmBidLifecycleListenerTest {
       on { isCsmEnabled } doReturn true
     }
 
-    whenever(consentData.consentGiven).thenReturn(true)
+    whenever(consentData.isConsentGiven()).thenReturn(true)
 
     listener = CsmBidLifecycleListener(
         repository,
@@ -517,7 +517,7 @@ class CsmBidLifecycleListenerTest {
   }
 
   private fun givenConsentNotGiven() {
-    whenever(consentData.consentGiven).thenReturn(false)
+    whenever(consentData.isConsentGiven()).thenReturn(false)
   }
 
   private fun verifyFeatureIsDeactivated() {

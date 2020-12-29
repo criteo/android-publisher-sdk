@@ -193,7 +193,7 @@ class LiveCdbCallListenerTests {
 
     liveCdbCallListener.onCdbResponse(cdbRequest, cdbResponse)
 
-    verify(consentData).consentGiven = true
+    verify(consentData).setConsentGiven(true)
   }
 
   @Test
@@ -202,6 +202,6 @@ class LiveCdbCallListenerTests {
 
     liveCdbCallListener.onCdbResponse(cdbRequest, cdbResponse)
 
-    verify(consentData).consentGiven = false
+    verify(consentData).setConsentGiven(false)
   }
 }

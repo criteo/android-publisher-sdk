@@ -43,7 +43,7 @@ abstract class CdbCallListener(
 
   @CallSuper
   fun onCdbResponse(cdbRequest: CdbRequest, cdbResponse: CdbResponse) {
-    consentData.consentGiven = cdbResponse.consentGiven
+    consentData.setConsentGiven(cdbResponse.consentGiven)
     bidManager.setTimeToNextCall(cdbResponse.timeToNextCall)
     bidLifecycleListener.onCdbCallFinished(cdbRequest, cdbResponse)
   }

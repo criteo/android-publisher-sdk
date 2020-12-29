@@ -16,14 +16,22 @@
 
 package com.criteo.publisher.privacy
 
+import android.content.SharedPreferences
 import com.criteo.publisher.annotation.OpenForTesting
-import java.util.concurrent.atomic.AtomicBoolean
 
 @OpenForTesting
-class ConsentData {
-  private val valueRef = AtomicBoolean(false)
+class ConsentData(val sharedPreferences: SharedPreferences) {
+  companion object {
+    private const val CRITEO_CONSENT_GIVEN_KEY = "CRTO_ConsentGiven"
+  }
 
-  var consentGiven: Boolean
-    get() = valueRef.get()
-    set(value) = valueRef.set(value)
+  @Synchronized
+  fun isConsentGiven() = sharedPreferences.getBoolean(CRITEO_CONSENT_GIVEN_KEY, false)
+
+  @Synchronized
+  fun setConsentGiven(consentGiven: Boolean) {
+      val editor = sharedPreferences.edit()
+      editor.putBoolean(CRITEO_CONSENT_GIVEN_KEY, consentGiven)
+      editor.apply()
+    }
 }

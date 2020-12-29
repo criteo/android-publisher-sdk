@@ -709,7 +709,7 @@ public class DependencyProvider {
 
   @NonNull
   public ConsentData provideConsentData() {
-    return getOrCreate(ConsentData.class, ConsentData::new);
+    return getOrCreate(ConsentData.class, () -> new ConsentData(provideSharedPreferences()));
   }
 
   public interface Factory<T> {
