@@ -17,27 +17,13 @@
 package com.criteo.publisher.privacy
 
 import com.criteo.publisher.annotation.OpenForTesting
-import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.atomic.AtomicBoolean
 
 @OpenForTesting
 class ConsentData {
+  private val valueRef = AtomicBoolean(false)
 
-  /**
-   * Consent can be in any of the following two states:
-   *
-   * <ul>
-   *  <li> CONSENT_GIVEN: it is known that consent has been given by the user</li>
-   *  <li> CONSENT_NOT_GIVEN: it is known that consent has not been given by the user,
-   *  or isn't known yet.</li>
-   * </ul>
-   */
-  enum class ConsentStatus {
-    CONSENT_GIVEN,
-    CONSENT_NOT_GIVEN
-  }
-  private val valueRef = AtomicReference<ConsentStatus>(ConsentStatus.CONSENT_NOT_GIVEN)
-
-  var consentStatus: ConsentStatus
+  var consentGiven: Boolean
     get() = valueRef.get()
     set(value) = valueRef.set(value)
 }

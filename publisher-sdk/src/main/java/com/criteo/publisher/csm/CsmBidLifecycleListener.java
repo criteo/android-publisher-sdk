@@ -16,8 +16,6 @@
 
 package com.criteo.publisher.csm;
 
-import static com.criteo.publisher.privacy.ConsentData.ConsentStatus.CONSENT_NOT_GIVEN;
-
 import androidx.annotation.NonNull;
 import com.criteo.publisher.Clock;
 import com.criteo.publisher.SafeRunnable;
@@ -296,6 +294,6 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
   }
 
   private boolean isCsmDisabled() {
-    return !config.isCsmEnabled() || consentData.getConsentStatus() == CONSENT_NOT_GIVEN;
+    return !config.isCsmEnabled() || !consentData.getConsentGiven();
   }
 }
