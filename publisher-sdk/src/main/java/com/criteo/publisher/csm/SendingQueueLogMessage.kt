@@ -25,13 +25,15 @@ internal object SendingQueueLogMessage {
   fun onRecoveringFromStaleQueueFile(exception: Exception) = LogMessage(
       Log.WARN,
       "Error while reading queue file. Recovering by recreating it or using in-memory queue",
-      exception
+      exception,
+      "onRecoveringFromStaleQueueFile"
   )
 
   @JvmStatic
   fun onErrorWhenPollingQueueFile(exception: Exception) = LogMessage(
       Log.WARN,
       "Error when polling element from queue file",
-      exception
+      exception,
+      "onErrorWhenPollingQueueFile"
   )
 }
