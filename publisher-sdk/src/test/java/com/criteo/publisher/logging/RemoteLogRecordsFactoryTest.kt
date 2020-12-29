@@ -94,7 +94,7 @@ class RemoteLogRecordsFactoryTest {
     whenever(clock.currentTimeInMillis).doReturn(timestamp)
 
     val throwable = UnsupportedOperationException()
-    val logMessage = LogMessage(Log.WARN, "`message of log`", throwable)
+    val logMessage = LogMessage(Log.WARN, "`message of log`", throwable, "myLogId")
 
     doReturn("`throwable message+stacktrace`").whenever(factory).getStackTraceString(throwable)
     doReturn("thread-name").whenever(factory).getCurrentThreadName()
@@ -112,8 +112,9 @@ class RemoteLogRecordsFactoryTest {
             "org.dummy",
             "device-id",
             "session-id",
-        42,
-            "UnsupportedOperationException"
+            42,
+            "UnsupportedOperationException",
+            "myLogId"
         ),
         listOf(RemoteLogRecord(RemoteLogLevel.WARNING, listOf(expectedMessage)))
     ))

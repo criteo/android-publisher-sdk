@@ -21,5 +21,6 @@ import android.util.Log
 internal data class LogMessage(
     val level: Int = Log.INFO,
     val message: String?,
-    val throwable: Throwable? = null
+    val throwable: Throwable? = null,
+    val logId: String? = null
 )

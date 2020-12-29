@@ -128,13 +128,15 @@ public class PubSdkApiIntegrationTest {
     RemoteLogRecords logRecords1 = remoteLogRecordsFactory.createLogRecords(new LogMessage(
         Log.INFO,
         "dummy message 1",
+        null,
         null
     ));
 
     RemoteLogRecords logRecords2 = remoteLogRecordsFactory.createLogRecords(new LogMessage(
         Log.WARN,
         "dummy message 2",
-        new Exception()
+        new Exception(),
+        "dummyLogId"
     ));
 
     api.postLogs(asList(logRecords1, logRecords2));

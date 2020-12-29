@@ -89,15 +89,15 @@ public class Logger {
   }
 
   public void debug(Throwable thrown) {
-    log(new LogMessage(Log.DEBUG, null, thrown));
+    log(new LogMessage(Log.DEBUG, null, thrown, null));
   }
 
   public void debug(String message, Throwable thrown) {
-    log(new LogMessage(Log.DEBUG, message, thrown));
+    log(new LogMessage(Log.DEBUG, message, thrown, null));
   }
 
   public void debug(String message, Object... args) {
-    log(new LogMessage(Log.DEBUG, String.format(message, args), null));
+    log(new LogMessage(Log.DEBUG, String.format(message, args), null, null));
   }
 
   public void log(@NonNull LogMessage logMessage) {

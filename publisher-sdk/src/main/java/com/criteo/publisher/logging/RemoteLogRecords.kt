@@ -36,7 +36,8 @@ data class RemoteLogRecords(
       @SerializedName("deviceId") val deviceId: String?,
       @SerializedName("sessionId") val sessionId: String,
       @SerializedName("profileId") val profileId: Int,
-      @SerializedName("exception") val exceptionType: String?
+      @SerializedName("exception") val exceptionType: String?,
+      @SerializedName("logId") val logId: String?
   )
 
   enum class RemoteLogLevel {

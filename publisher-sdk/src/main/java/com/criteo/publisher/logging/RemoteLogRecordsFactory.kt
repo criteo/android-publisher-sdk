@@ -71,7 +71,8 @@ internal class RemoteLogRecordsFactory(
         advertisingInfo.advertisingId,
         session.sessionId,
         integrationRegistry.profileId,
-        logMessage.throwable?.javaClass?.simpleName
+        logMessage.throwable?.javaClass?.simpleName,
+        logMessage.logId
     )
 
     return RemoteLogRecords(context, listOf(logRecord))
