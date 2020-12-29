@@ -47,6 +47,7 @@ class RemoteLogRecordsTest {
                 "my-device-id",
                 "my-session-id",
                 42,
+                null,
                 null
             ),
             listOf(
@@ -70,7 +71,8 @@ class RemoteLogRecordsTest {
                 "my-device-id2",
                 "my-session-id2",
                 1337,
-                "NullPointerException"
+                "NullPointerException",
+                "myLogId"
             ),
             listOf(
                 RemoteLogRecord(
@@ -120,7 +122,8 @@ class RemoteLogRecordsTest {
             "deviceId": "my-device-id2",
             "sessionId": "my-session-id2",
             "profileId": 1337,
-            "exception": "NullPointerException"
+            "exception": "NullPointerException",
+            "logId": "myLogId"
           },
           "errors": [
             {
