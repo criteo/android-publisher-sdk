@@ -36,7 +36,6 @@ import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.network.PubSdkApi
 import com.criteo.publisher.privacy.ConsentData
-import com.criteo.publisher.privacy.ConsentData.ConsentStatus.CONSENT_GIVEN
 import com.google.android.gms.ads.doubleclick.PublisherAdRequest
 import com.mopub.mobileads.MoPubInterstitial
 import com.mopub.mobileads.MoPubView
@@ -417,6 +416,6 @@ class ProfileIdFunctionalTest {
   }
 
   private fun givenConsentGiven() {
-    whenever(consentData.consentStatus).thenReturn(CONSENT_GIVEN)
+    whenever(consentData.consentGiven).thenReturn(true)
   }
 }

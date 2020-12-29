@@ -25,8 +25,6 @@ import com.criteo.publisher.model.CdbResponse
 import com.criteo.publisher.model.CdbResponseSlot
 import com.criteo.publisher.model.Config
 import com.criteo.publisher.privacy.ConsentData
-import com.criteo.publisher.privacy.ConsentData.ConsentStatus.CONSENT_GIVEN
-import com.criteo.publisher.privacy.ConsentData.ConsentStatus.CONSENT_NOT_GIVEN
 import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
@@ -82,7 +80,7 @@ class CsmBidLifecycleListenerTest {
       on { isCsmEnabled } doReturn true
     }
 
-    whenever(consentData.consentStatus).thenReturn(CONSENT_GIVEN)
+    whenever(consentData.consentGiven).thenReturn(true)
 
     listener = CsmBidLifecycleListener(
         repository,
@@ -519,7 +517,7 @@ class CsmBidLifecycleListenerTest {
   }
 
   private fun givenConsentNotGiven() {
-    whenever(consentData.consentStatus).thenReturn(CONSENT_NOT_GIVEN)
+    whenever(consentData.consentGiven).thenReturn(false)
   }
 
   private fun verifyFeatureIsDeactivated() {
