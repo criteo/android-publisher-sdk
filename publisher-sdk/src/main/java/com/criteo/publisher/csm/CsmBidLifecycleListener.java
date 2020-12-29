@@ -294,6 +294,6 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
   }
 
   private boolean isCsmDisabled() {
-    return !config.isCsmEnabled() || !consentData.getConsentGiven();
+    return !config.isCsmEnabled() || !consentData.isConsentGiven();
   }
 }
