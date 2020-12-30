@@ -25,10 +25,8 @@ class ConsentData(val sharedPreferences: SharedPreferences) {
     private const val CRITEO_CONSENT_GIVEN_KEY = "CRTO_ConsentGiven"
   }
 
-  @Synchronized
   fun isConsentGiven() = sharedPreferences.getBoolean(CRITEO_CONSENT_GIVEN_KEY, false)
 
-  @Synchronized
   fun setConsentGiven(consentGiven: Boolean) {
       val editor = sharedPreferences.edit()
       editor.putBoolean(CRITEO_CONSENT_GIVEN_KEY, consentGiven)
