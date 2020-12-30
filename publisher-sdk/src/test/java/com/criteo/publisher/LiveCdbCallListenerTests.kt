@@ -204,4 +204,13 @@ class LiveCdbCallListenerTests {
 
     verify(consentData).setConsentGiven(false)
   }
+
+  @Test
+  fun onBidResponse_givenConsentNull_ThenDontUpdateConsentData() {
+    whenever(cdbResponse.consentGiven).thenReturn(null)
+
+    liveCdbCallListener.onCdbResponse(cdbRequest, cdbResponse)
+
+    verify(consentData, never()).setConsentGiven(any())
+  }
 }

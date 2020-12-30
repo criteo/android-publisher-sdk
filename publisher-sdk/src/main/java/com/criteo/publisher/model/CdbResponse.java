@@ -37,12 +37,13 @@ public class CdbResponse {
 
   private final int timeToNextCall;
 
-  private final boolean consentGiven;
+  @Nullable
+  private final Boolean consentGiven;
 
   public CdbResponse(
       @NonNull List<CdbResponseSlot> slots,
       int timeToNextCall,
-      @NonNull boolean consentGiven
+      @Nullable Boolean consentGiven
       ) {
     this.slots = slots;
     this.timeToNextCall = timeToNextCall;
@@ -81,7 +82,7 @@ public class CdbResponse {
       }
     }
 
-    boolean consentGiven = false;
+    Boolean consentGiven = null;
     if (json.has(CONSENT_GIVEN)) {
       try {
         consentGiven = json.getBoolean(CONSENT_GIVEN);
@@ -102,7 +103,8 @@ public class CdbResponse {
     return timeToNextCall;
   }
 
-  public boolean getConsentGiven() { return consentGiven; }
+  @Nullable
+  public Boolean getConsentGiven() { return consentGiven; }
 
   @Nullable
   public CdbResponseSlot getSlotByImpressionId(@NonNull String impressionId) {
