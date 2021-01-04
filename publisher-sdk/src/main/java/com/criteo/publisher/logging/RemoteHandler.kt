@@ -20,17 +20,22 @@ import com.criteo.publisher.SafeRunnable
 import com.criteo.publisher.csm.ConcurrentSendingQueue
 import com.criteo.publisher.logging.RemoteLogRecords.RemoteLogLevel.Companion.fromAndroidLogLevel
 import com.criteo.publisher.model.Config
+import com.criteo.publisher.privacy.ConsentData
 import java.util.concurrent.Executor
 
 internal class RemoteHandler(
     private val remoteLogRecordsFactory: RemoteLogRecordsFactory,
     private val sendingQueue: ConcurrentSendingQueue<RemoteLogRecords>,
     private val config: Config,
-    private val executor: Executor
+    private val executor: Executor,
+    private val consentData: ConsentData
 ) : LogHandler {
   override fun log(tag: String, logMessage: LogMessage) {
-    fromAndroidLogLevel(logMessage.level)?.takeIf { it >= config.remoteLogLevel } ?: return
+    if (!consentData.isConsentGiven()) {
+      return
+    }
 
+    fromAndroidLogLevel(logMessage.level)?.takeIf { it >= config.remoteLogLevel } ?: return
     remoteLogRecordsFactory.createLogRecords(logMessage)?.let {
       // Asynchronously post log to avoid doing IO on the current thread
       executor.execute(object : SafeRunnable() {
