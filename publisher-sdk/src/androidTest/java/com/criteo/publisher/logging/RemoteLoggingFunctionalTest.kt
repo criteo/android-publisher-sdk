@@ -20,6 +20,7 @@ import com.criteo.publisher.CriteoUtil.givenInitializedCriteo
 import com.criteo.publisher.SafeRunnable
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
+import com.criteo.publisher.privacy.ConsentData
 import com.criteo.publisher.util.BuildConfigWrapper
 import com.dummypublisher.DummyPublisherCode
 import com.nhaarman.mockitokotlin2.check
@@ -27,6 +28,7 @@ import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -40,10 +42,18 @@ class RemoteLoggingFunctionalTest {
   private lateinit var buildConfigWrapper: BuildConfigWrapper
 
   @SpyBean
+  private lateinit var consentData: ConsentData
+
+  @SpyBean
   private lateinit var remoteLogSendingQueueConsumer: RemoteLogSendingQueueConsumer
 
   @SpyBean
   private lateinit var remoteLogSendingQueue: RemoteLogSendingQueue
+
+  @Before
+  fun setUp() {
+    whenever(consentData.isConsentGiven()).thenReturn(true)
+  }
 
   @Test
   fun whenCriteoInitIsCalled_SendRemoteLogBatch() {

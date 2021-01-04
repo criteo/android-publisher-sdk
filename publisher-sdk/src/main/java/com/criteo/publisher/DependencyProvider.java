@@ -693,7 +693,8 @@ public class DependencyProvider {
         provideRemoteLogRecordsFactory(),
         provideRemoteLogSendingQueue(),
         provideConfig(),
-        provideThreadPoolExecutor()
+        provideThreadPoolExecutor(),
+        provideConsentData()
     ));
   }
 

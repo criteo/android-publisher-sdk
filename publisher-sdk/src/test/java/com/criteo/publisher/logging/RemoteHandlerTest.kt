@@ -21,6 +21,7 @@ import com.criteo.publisher.logging.RemoteLogRecords.RemoteLogLevel
 import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.model.Config
+import com.criteo.publisher.privacy.ConsentData
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
@@ -49,12 +50,16 @@ class RemoteHandlerTest {
   @MockBean
   private lateinit var remoteLogRecordsFactory: RemoteLogRecordsFactory
 
+  @MockBean
+  private lateinit var consentData: ConsentData
+
   @Inject
   private lateinit var remoteHandler: RemoteHandler
 
   @Before
   fun setUp() {
     whenever(config.remoteLogLevel).doReturn(RemoteLogLevel.DEBUG)
+    whenever(consentData.isConsentGiven()).thenReturn(true)
   }
 
   @Test
@@ -102,5 +107,17 @@ class RemoteHandlerTest {
     mockedDependenciesRule.waitForIdleState()
 
     verify(sendingQueue).offer(logRecords)
+  }
+
+  @Test
+  fun log_GivenConsentNotGiven_DoesNothing() {
+    whenever(consentData.isConsentGiven()).thenReturn(false)
+    val logMessage = LogMessage(message = null)
+
+    remoteHandler.log("tag", logMessage)
+    mockedDependenciesRule.waitForIdleState()
+
+    verifyZeroInteractions(remoteLogRecordsFactory)
+    verifyZeroInteractions(sendingQueue)
   }
 }
