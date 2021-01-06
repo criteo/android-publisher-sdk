@@ -145,8 +145,8 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
       val cdbResponse = """
       {
         "slots": [$responseSlots],
-        "consentGiven": "true",
-        "requestId":"$requestId"
+        "requestId":"$requestId",
+        "consentGiven": "true"
       }
     """.trimIndent()
 
