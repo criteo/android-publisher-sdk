@@ -80,8 +80,8 @@ adChoiceIconHeightInDp = 15
  */
 
 // The batch size of logs sent, at most, in each remote logs request.
-// Given below estimation, a request can have a size of 50KB.
-remoteLogBatchSize = 10
+// Given below estimation, a request can have a size of 1MB.
+remoteLogBatchSize = 200
 
 // The relative path in application folder of the sending queue file
 remoteLogQueueFilename = 'criteo_remote_logs_queue'
