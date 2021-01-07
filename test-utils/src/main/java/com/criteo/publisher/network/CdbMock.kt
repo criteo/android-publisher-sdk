@@ -146,7 +146,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
       {
         "slots": [$responseSlots],
         "requestId":"$requestId",
-        "consentGiven": "true"
+        "consentGiven": true
       }
     """.trimIndent()
 
