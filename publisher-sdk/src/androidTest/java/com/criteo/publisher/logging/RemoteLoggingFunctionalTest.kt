@@ -16,10 +16,15 @@
 
 package com.criteo.publisher.logging
 
+import com.criteo.publisher.Criteo
 import com.criteo.publisher.CriteoUtil.givenInitializedCriteo
 import com.criteo.publisher.SafeRunnable
+import com.criteo.publisher.TestAdUnits
+import com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
+import com.criteo.publisher.model.Config
+import com.criteo.publisher.network.PubSdkApi
 import com.criteo.publisher.privacy.ConsentData
 import com.criteo.publisher.util.BuildConfigWrapper
 import com.dummypublisher.DummyPublisherCode
@@ -50,9 +55,35 @@ class RemoteLoggingFunctionalTest {
   @SpyBean
   private lateinit var remoteLogSendingQueue: RemoteLogSendingQueue
 
+  @SpyBean
+  private lateinit var api: PubSdkApi
+
+  @SpyBean
+  private lateinit var config: Config
+
   @Before
   fun setUp() {
     whenever(consentData.isConsentGiven()).thenReturn(true)
+  }
+
+  @Test
+  fun whenCriteoInitIsCalledFromMainThread_AllLogsHaveDeviceId() {
+    whenever(config.remoteLogLevel).thenReturn(RemoteLogRecords.RemoteLogLevel.INFO)
+
+    runOnMainThreadAndWait {
+      givenInitializedCriteo()
+    }
+    mockedDependenciesRule.waitForIdleState()
+
+    // Get a new bid to trigger sending of remote logs
+    Criteo.getInstance().loadBid(TestAdUnits.INTERSTITIAL) {
+      // ignored
+    }
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(api).postLogs(check {
+      assertThat(it.map { it.context.deviceId }).isNotEmpty.doesNotContainNull()
+    })
   }
 
   @Test

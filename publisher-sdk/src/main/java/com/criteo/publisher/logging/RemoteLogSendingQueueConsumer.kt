@@ -20,6 +20,7 @@ import com.criteo.publisher.SafeRunnable
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.csm.ConcurrentSendingQueue
 import com.criteo.publisher.network.PubSdkApi
+import com.criteo.publisher.util.AdvertisingInfo
 import com.criteo.publisher.util.BuildConfigWrapper
 import java.util.concurrent.Executor
 
@@ -28,16 +29,18 @@ internal class RemoteLogSendingQueueConsumer(
     private val sendingQueue: ConcurrentSendingQueue<RemoteLogRecords>,
     private val api: PubSdkApi,
     private val buildConfigWrapper: BuildConfigWrapper,
+    private val advertisingInfo: AdvertisingInfo,
     private val executor: Executor
 ) {
   fun sendRemoteLogBatch() {
-    executor.execute(RemoteLogSendingTask(sendingQueue, api, buildConfigWrapper))
+    executor.execute(RemoteLogSendingTask(sendingQueue, api, buildConfigWrapper, advertisingInfo))
   }
 
   class RemoteLogSendingTask(
       private val sendingQueue: ConcurrentSendingQueue<RemoteLogRecords>,
       private val api: PubSdkApi,
-      private val buildConfigWrapper: BuildConfigWrapper
+      private val buildConfigWrapper: BuildConfigWrapper,
+      private val advertisingInfo: AdvertisingInfo
   ) : SafeRunnable() {
     override fun runSafely() {
       val remoteLogRecords = sendingQueue.poll(buildConfigWrapper.remoteLogBatchSize)
@@ -48,12 +51,25 @@ internal class RemoteLogSendingQueueConsumer(
       var isSuccessful = false
 
       try {
+        injectMissingDeviceId(remoteLogRecords)
         api.postLogs(remoteLogRecords)
         isSuccessful = true
       } finally {
         if (!isSuccessful) {
           remoteLogRecords.forEach {
             sendingQueue.offer(it)
+          }
+        }
+      }
+    }
+
+    private fun injectMissingDeviceId(remoteLogRecords: List<RemoteLogRecords>) {
+      // When called a first time on the main thread, the AdvertiserInfo can return null
+      // In this context, we're in a worker thread. So we can inject the deviceId when it is missing.
+      advertisingInfo.advertisingId?.let { deviceId ->
+        remoteLogRecords.forEach {
+          if (it.context.deviceId == null) {
+            it.context.deviceId = deviceId
           }
         }
       }
