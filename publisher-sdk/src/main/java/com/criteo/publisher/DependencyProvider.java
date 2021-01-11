@@ -704,6 +704,7 @@ public class DependencyProvider {
         provideRemoteLogSendingQueue(),
         providePubSdkApi(),
         provideBuildConfigWrapper(),
+        provideAdvertisingInfo(),
         provideThreadPoolExecutor()
     ));
   }

@@ -21,6 +21,7 @@ import com.criteo.publisher.csm.ConcurrentSendingQueue
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.network.PubSdkApi
+import com.criteo.publisher.util.AdvertisingInfo
 import com.criteo.publisher.util.BuildConfigWrapper
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doAnswer
@@ -49,6 +50,9 @@ class RemoteLogSendingQueueConsumerTest {
   @Mock
   private lateinit var api: PubSdkApi
 
+  @Mock
+  private lateinit var advertisingInfo: AdvertisingInfo
+
   @SpyBean
   private lateinit var buildConfigWrapper: BuildConfigWrapper
 
@@ -66,6 +70,7 @@ class RemoteLogSendingQueueConsumerTest {
         queue,
         api,
         buildConfigWrapper,
+        advertisingInfo,
         executor
     )
   }
@@ -122,4 +127,34 @@ class RemoteLogSendingQueueConsumerTest {
     executor.verifyExpectations()
   }
 
+  @Test
+  fun injectMissingDeviceId_GivenRemoteLogWithoutDeviceId_InjectIt() {
+    val contextWithoutDeviceId = mock<RemoteLogRecords.RemoteLogContext>() {
+      on { deviceId } doReturn null
+    }
+    val contextWithDeviceId = mock<RemoteLogRecords.RemoteLogContext>() {
+      on { deviceId } doReturn "device-id"
+    }
+
+    val logsWithoutDeviceId = mock<RemoteLogRecords>() {
+      on { context } doReturn contextWithoutDeviceId
+    }
+    val logsWithDeviceId = mock<RemoteLogRecords>() {
+      on { context } doReturn contextWithDeviceId
+    }
+
+    whenever(advertisingInfo.advertisingId).doReturn("new-device-id")
+    whenever(queue.poll(any())).doReturn(listOf(logsWithoutDeviceId, logsWithDeviceId))
+
+    doAnswer {
+      executor.expectIsRunningInExecutor()
+    }.whenever(api).postLogs(any())
+
+    consumer.sendRemoteLogBatch()
+
+    verify(contextWithDeviceId, never()).deviceId = any()
+    verify(contextWithoutDeviceId).deviceId = "new-device-id"
+    verify(api).postLogs(any())
+    executor.verifyExpectations()
+  }
 }
