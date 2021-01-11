@@ -30,10 +30,11 @@ data class RemoteLogRecords(
       @SerializedName("messages") val messages: List<String>
   )
 
+  @OpenForTesting
   data class RemoteLogContext(
       @SerializedName("version") val version: String,
       @SerializedName("bundleId") val bundleId: String,
-      @SerializedName("deviceId") val deviceId: String?,
+      @SerializedName("deviceId") var deviceId: String?,
       @SerializedName("sessionId") val sessionId: String,
       @SerializedName("profileId") val profileId: Int,
       @SerializedName("exception") val exceptionType: String?,

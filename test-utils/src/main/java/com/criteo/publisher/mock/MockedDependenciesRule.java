@@ -30,6 +30,7 @@ import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.MockableDependencyProvider;
 import com.criteo.publisher.application.ApplicationResource;
 import com.criteo.publisher.concurrent.MultiThreadResource;
+import com.criteo.publisher.csm.ConcurrentSendingQueueHelper;
 import com.criteo.publisher.csm.MetricHelper;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
@@ -270,6 +271,7 @@ public class MockedDependenciesRule implements MethodRule {
 
     // Clear CSM
     MetricHelper.cleanState(dependencyProvider);
+    ConcurrentSendingQueueHelper.emptyQueue(dependencyProvider.provideRemoteLogSendingQueue());
   }
 
   private void clearInternalState() {

@@ -16,10 +16,14 @@
 
 package com.criteo.publisher.csm;
 
+import static org.mockito.Mockito.mockingDetails;
+
 public class ConcurrentSendingQueueHelper {
 
   @SuppressWarnings("KotlinInternalInJava")
   public static void emptyQueue(ConcurrentSendingQueue<?> queue) {
-    queue.poll(Integer.MAX_VALUE);
+    if (!mockingDetails(queue).isMock() || mockingDetails(queue).isSpy()) {
+      queue.poll(Integer.MAX_VALUE);
+    }
   }
 }
