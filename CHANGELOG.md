@@ -1,5 +1,10 @@
 # Next Version
 
+# Version 4.2.1
+
+- Bug fixes
+  - Fix crash when initializing the SDK
+
 # Version 4.2.0
 - Features
   - Add remote logging support.
