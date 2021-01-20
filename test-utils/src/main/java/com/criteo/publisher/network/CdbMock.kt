@@ -35,7 +35,6 @@ import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import okio.Buffer
 import java.net.HttpURLConnection
-import java.util.UUID
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -140,12 +139,11 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
       }
 
       val responseSlots = cdbRequest.slots.mapNotNull { it.toResponseSlot() }.joinToString()
-      val requestId = UUID.randomUUID().toString()
 
       val cdbResponse = """
       {
         "slots": [$responseSlots],
-        "requestId":"$requestId",
+        "requestId":"${cdbRequest.id}",
         "consentGiven": true
       }
     """.trimIndent()
