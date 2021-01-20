@@ -28,7 +28,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Rule
 import org.junit.Test
-import java.io.IOException
+import java.net.SocketException
 
 class SafeRunnableTest {
     @Rule
@@ -65,10 +65,10 @@ class SafeRunnableTest {
     }
 
     @Test
-    fun givenIOException_LogItInDebug() {
+    fun givenSocketException_LogItInDebug() {
         doReturn(true).whenever(buildConfigWrapper).preconditionThrowsOnException()
 
-        val throwable = IOException()
+        val throwable = SocketException()
         val safeRunnable = createThrowingRunnable(throwable)
 
         assertThatCode { safeRunnable.run() }.doesNotThrowAnyException()
