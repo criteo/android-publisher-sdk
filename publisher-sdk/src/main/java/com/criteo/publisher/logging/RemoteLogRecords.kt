@@ -17,6 +17,7 @@
 package com.criteo.publisher.logging
 
 import android.util.Log
+import androidx.annotation.Keep
 import com.criteo.publisher.annotation.OpenForTesting
 import com.google.gson.annotations.SerializedName
 
@@ -41,6 +42,7 @@ data class RemoteLogRecords(
       @SerializedName("logId") val logId: String?
   )
 
+  @Keep // for serialization
   enum class RemoteLogLevel {
     @SerializedName("Debug")
     DEBUG,

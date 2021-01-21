@@ -21,7 +21,7 @@ import static com.criteo.publisher.ErrorLogMessage.onUncaughtErrorInThread;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.util.PreconditionsUtil;
-import java.io.IOException;
+import java.net.SocketException;
 import java.util.concurrent.ExecutionException;
 
 public abstract class SafeRunnable implements Runnable {
@@ -49,8 +49,8 @@ public abstract class SafeRunnable implements Runnable {
 
       if (throwable instanceof RuntimeException) {
         PreconditionsUtil.throwOrLog(e);
-      } else if (throwable instanceof IOException) {
-        // IO exceptions happen when network is slow/bad/unavailable or when disk is full/unavailable, ...
+      } else if (throwable instanceof SocketException) {
+        // Socket exceptions happen when network is slow/bad/unavailable, ...
         // Those are normal and expected situations. So they are not considered as errors.
         logger.debug(e);
       } else {
