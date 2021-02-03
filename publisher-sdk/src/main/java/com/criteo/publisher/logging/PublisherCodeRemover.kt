@@ -46,6 +46,7 @@ internal class PublisherCodeRemover {
       "com.android.",
       "androidx.",
       "dalvik.",
+      "libcore.",
 
       // Mediation Libs: The SDK is coupled to these libraries through the mediation adapters.
       // This will indicate if an exception happens during mediation.
