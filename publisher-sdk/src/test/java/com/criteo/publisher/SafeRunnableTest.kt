@@ -16,11 +16,13 @@
 
 package com.criteo.publisher
 
+import android.util.Log
 import com.criteo.publisher.logging.Logger
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.util.BuildConfigWrapper
 import com.nhaarman.mockitokotlin2.check
+import com.nhaarman.mockitokotlin2.clearInvocations
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -29,6 +31,7 @@ import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Rule
 import org.junit.Test
 import java.net.SocketException
+import java.net.UnknownHostException
 
 class SafeRunnableTest {
     @Rule
@@ -65,16 +68,21 @@ class SafeRunnableTest {
     }
 
     @Test
-    fun givenSocketException_LogItInDebug() {
+    fun givenExpectedException_LogItAsExpectedException() {
+        givenExpectedException_LogItAsExpectedException(SocketException())
+        givenExpectedException_LogItAsExpectedException(UnknownHostException())
+    }
+
+    private fun givenExpectedException_LogItAsExpectedException(throwable: Throwable) {
         doReturn(true).whenever(buildConfigWrapper).preconditionThrowsOnException()
 
-        val throwable = SocketException()
         val safeRunnable = createThrowingRunnable(throwable)
 
         assertThatCode { safeRunnable.run() }.doesNotThrowAnyException()
 
-        verify(logger).debug(check<Throwable> {
-            assertThat(it).hasCause(throwable)
+        verify(logger).log(check {
+            assertThat(it.level).isEqualTo(Log.INFO)
+            assertThat(it.throwable).hasCause(throwable)
         })
     }
 
