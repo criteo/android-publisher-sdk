@@ -47,4 +47,15 @@ internal object ErrorLogMessage {
       throwable,
       "onAssertFailed"
   )
+
+  /**
+   * Represent normal and expected situations, such as network errors. So they are not considered as errors.
+   */
+  @JvmStatic
+  fun onUncaughtExpectedExceptionInThread(throwable: Throwable) = LogMessage(
+      Log.INFO,
+      "Uncaught expected exception in thread",
+      throwable,
+      "onUncaughtExpectedExceptionInThread"
+  )
 }
