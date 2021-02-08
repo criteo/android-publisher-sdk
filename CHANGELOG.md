@@ -1,5 +1,10 @@
 # Next Version
 
+# Version 4.2.2
+
+- Bug fixes
+  - Reduce log level of `UnknownHostException` from error to info
+
 # Version 4.2.1
 
 - Bug fixes

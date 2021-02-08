@@ -17,11 +17,14 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.ErrorLogMessage.onUncaughtErrorInThread;
+import static com.criteo.publisher.ErrorLogMessage.onUncaughtExpectedExceptionInThread;
 
+import androidx.annotation.NonNull;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.util.PreconditionsUtil;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.concurrent.ExecutionException;
 
 public abstract class SafeRunnable implements Runnable {
@@ -49,10 +52,10 @@ public abstract class SafeRunnable implements Runnable {
 
       if (throwable instanceof RuntimeException) {
         PreconditionsUtil.throwOrLog(e);
-      } else if (throwable instanceof SocketException) {
+      } else if (isThrowableNotAnError(throwable)) {
         // Socket exceptions happen when network is slow/bad/unavailable, ...
         // Those are normal and expected situations. So they are not considered as errors.
-        logger.debug(e);
+        logger.log(onUncaughtExpectedExceptionInThread(e));
       } else {
         logger.log(onUncaughtErrorInThread(e));
       }
@@ -60,4 +63,16 @@ public abstract class SafeRunnable implements Runnable {
   }
 
   public abstract void runSafely() throws Throwable;
+
+  private boolean isThrowableNotAnError(@NonNull Throwable throwable) {
+    // Those are normal and expected situations. So they are not considered as errors.
+    if (throwable instanceof SocketException) {
+      // Happen when network is slow/bad/unavailable, ...
+      return true;
+    } else if (throwable instanceof UnknownHostException) {
+      // Happen when there is no connection, and it is not possible to de a DNS lookup.
+      return true;
+    }
+    return false;
+  }
 }
