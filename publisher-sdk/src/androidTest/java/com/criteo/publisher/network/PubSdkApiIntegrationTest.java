@@ -370,7 +370,7 @@ public class PubSdkApiIntegrationTest {
         "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>",
         true,
         false,
-        8000,
+        1000,
         true,
         RemoteLogLevel.WARNING
     );
