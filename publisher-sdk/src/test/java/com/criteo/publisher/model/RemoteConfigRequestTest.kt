@@ -52,7 +52,8 @@ class RemoteConfigRequestTest {
         "bundleId" : "my.bundle.id",
         "sdkVersion" : "1.2.3",
         "rtbProfileId": 456,
-        "deviceId": "myDeviceId"
+        "deviceId": "myDeviceId",
+        "deviceOs": "android"
       }
     """.trimIndent())
   }
