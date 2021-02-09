@@ -409,7 +409,8 @@ public class PubSdkApiTest {
         + "  \"bundleId\" : \"myAppId\",\n"
         + "  \"sdkVersion\" : \"myVersion\",\n"
         + "  \"rtbProfileId\": 456,\n"
-        + "  \"deviceId\": \"myDeviceId\""
+        + "  \"deviceId\": \"myDeviceId\",\n"
+        + "  \"deviceOs\": \"android\""
         + "}";
 
     mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody("{}"));

@@ -34,7 +34,7 @@ public abstract class RemoteConfigRequest {
       int profileId,
       @Nullable String deviceId
   ) {
-    return new AutoValue_RemoteConfigRequest(criteoPublisherId, bundleId, sdkVersion, profileId, deviceId);
+    return new AutoValue_RemoteConfigRequest(criteoPublisherId, bundleId, sdkVersion, profileId, deviceId, "android");
   }
 
   public static TypeAdapter<RemoteConfigRequest> typeAdapter(Gson gson) {
@@ -59,5 +59,8 @@ public abstract class RemoteConfigRequest {
    */
   @Nullable
   public abstract String getDeviceId();
+
+  @NonNull
+  public abstract String getDeviceOs();
 
 }
