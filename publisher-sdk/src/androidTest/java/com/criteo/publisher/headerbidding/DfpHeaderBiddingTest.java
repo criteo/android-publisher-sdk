@@ -48,7 +48,7 @@ import com.criteo.publisher.model.nativeads.NativeProduct;
 import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.DeviceUtil;
-import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
+import com.google.android.gms.ads.admanager.AdManagerAdRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import org.junit.Before;
@@ -123,7 +123,7 @@ public class DfpHeaderBiddingTest {
 
   @Test
   public void canHandle_GivenDfpBuilder_ReturnTrue() throws Exception {
-    PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
+    AdManagerAdRequest.Builder builder = new AdManagerAdRequest.Builder();
 
     boolean handling = headerBidding.canHandle(builder);
 
@@ -149,9 +149,9 @@ public class DfpHeaderBiddingTest {
     when(slot.getWidth()).thenReturn(42);
     when(slot.getHeight()).thenReturn(1337);
 
-    PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
+    AdManagerAdRequest.Builder builder = new AdManagerAdRequest.Builder();
     headerBidding.enrichBid(builder, CRITEO_BANNER, slot);
-    PublisherAdRequest request = builder.build();
+    AdManagerAdRequest request = builder.build();
     Bundle customTargeting = request.getCustomTargeting();
 
     assertEquals(3, customTargeting.size());
@@ -224,9 +224,9 @@ public class DfpHeaderBiddingTest {
     when(slot.getWidth()).thenReturn(slotWidth);
     when(slot.getHeight()).thenReturn(slotHeight);
 
-    PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
+    AdManagerAdRequest.Builder builder = new AdManagerAdRequest.Builder();
     headerBidding.enrichBid(builder, CRITEO_INTERSTITIAL, slot);
-    PublisherAdRequest request = builder.build();
+    AdManagerAdRequest request = builder.build();
     Bundle customTargeting = request.getCustomTargeting();
 
     assertEquals(3, customTargeting.size());
@@ -271,9 +271,9 @@ public class DfpHeaderBiddingTest {
     when(slot.getCpm()).thenReturn("0.42");
     when(slot.getNativeAssets()).thenReturn(nativeAssets);
 
-    PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
+    AdManagerAdRequest.Builder builder = new AdManagerAdRequest.Builder();
     headerBidding.enrichBid(builder, CRITEO_CUSTOM_NATIVE, slot);
-    PublisherAdRequest request = builder.build();
+    AdManagerAdRequest request = builder.build();
     Bundle customTargeting = request.getCustomTargeting();
 
     assertEquals(17, customTargeting.size());

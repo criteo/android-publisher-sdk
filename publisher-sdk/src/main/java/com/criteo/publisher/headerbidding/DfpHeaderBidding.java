@@ -32,8 +32,8 @@ import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.util.PreconditionsUtil;
 import com.criteo.publisher.util.TextUtils;
-import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
-import com.google.android.gms.ads.doubleclick.PublisherAdRequest.Builder;
+import com.google.android.gms.ads.admanager.AdManagerAdRequest;
+import com.google.android.gms.ads.admanager.AdManagerAdRequest.Builder;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -230,7 +230,7 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
   private static class SafeDfpBuilder {
 
     @NonNull
-    private final PublisherAdRequest.Builder builder;
+    private final AdManagerAdRequest.Builder builder;
 
     private final StringBuilder description;
 

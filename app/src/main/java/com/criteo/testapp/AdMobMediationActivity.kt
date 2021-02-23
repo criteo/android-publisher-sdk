@@ -18,7 +18,6 @@ package com.criteo.testapp
 
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
@@ -31,11 +30,12 @@ import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.InterstitialAd
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
-import com.google.android.gms.ads.formats.UnifiedNativeAd
-import com.google.android.gms.ads.formats.UnifiedNativeAdView
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.ads.nativead.NativeAdView
 
 class AdMobMediationActivity : AppCompatActivity() {
 
@@ -93,28 +93,23 @@ class AdMobMediationActivity : AppCompatActivity() {
   }
 
   private fun loadInterstitial() {
-    val interstitialAd = InterstitialAd(this)
-    interstitialAd.adUnitId = ADMOB_INTERSTITIAL
-    interstitialAd.adListener = object : TestAppDfpAdListener(tag, "Interstitial") {
-      override fun onAdLoaded() {
-        super.onAdLoaded()
-
-        if (interstitialAd.isLoaded) {
-          interstitialAd.show()
-        } else {
-          Log.d(tag, "The interstitial wasn't loaded yet.")
+    val activity = this
+    InterstitialAd.load(
+        activity,
+        ADMOB_INTERSTITIAL,
+        AdRequest.Builder().build(),
+        object : InterstitialAdLoadCallback() {
+          override fun onAdLoaded(interstitialAd: InterstitialAd) {
+            interstitialAd.show(activity)
+          }
         }
-      }
-    }
-
-    val adRequest = AdRequest.Builder().build()
-    interstitialAd.loadAd(adRequest)
+    )
   }
 
   private fun loadNative() {
     val adLoader = AdLoader.Builder(this, ADMOB_NATIVE)
-        .forUnifiedNativeAd {
-          val adView = layoutInflater.inflate(R.layout.native_admob_ad, null) as UnifiedNativeAdView
+        .forNativeAd {
+          val adView = layoutInflater.inflate(R.layout.native_admob_ad, null) as NativeAdView
           it.renderInView(adView)
           adLayout.removeAllViews()
           adLayout.addView(adView)
@@ -126,7 +121,7 @@ class AdMobMediationActivity : AppCompatActivity() {
     adLoader.loadAd(adRequest)
   }
 
-  private fun UnifiedNativeAd.renderInView(nativeView: UnifiedNativeAdView) {
+  private fun NativeAd.renderInView(nativeView: NativeAdView) {
     nativeView.findViewById<TextView>(R.id.ad_headline).text = headline
     nativeView.findViewById<TextView>(R.id.ad_body).text = body
     nativeView.findViewById<TextView>(R.id.ad_price).text = price

@@ -101,7 +101,7 @@ object Deps {
   }
 
   object Google {
-    private const val version = "19.0.1"
+    private const val version = "19.7.0"
 
     const val AdMob = "com.google.android.gms:play-services-ads:$version"
   }
