@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.nio.charset.Charset;
 
 public class JsonSerializer {
 
@@ -53,7 +54,7 @@ public class JsonSerializer {
       @NonNull Object object,
       @NonNull OutputStream outputStream
   ) throws IOException {
-    OutputStreamWriter writer = new OutputStreamWriter(outputStream);
+    OutputStreamWriter writer = new OutputStreamWriter(outputStream, Charset.forName("UTF-8"));
 
     try {
       gson.toJson(object, writer);
@@ -82,7 +83,7 @@ public class JsonSerializer {
       @NonNull Class<T> expectedClass,
       @NonNull InputStream inputStream
   ) throws IOException {
-    Reader reader = new InputStreamReader(inputStream);
+    Reader reader = new InputStreamReader(inputStream, Charset.forName("UTF-8"));
 
     T object;
     try {
