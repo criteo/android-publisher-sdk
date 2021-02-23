@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import com.criteo.publisher.Bid;
 import com.criteo.publisher.BidResponseListener;
@@ -34,10 +35,16 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.testapp.integration.MockedIntegrationRegistry;
 import com.criteo.testapp.listener.TestAppDfpAdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.doubleclick.PublisherAdRequest;
-import com.google.android.gms.ads.doubleclick.PublisherAdView;
-import com.google.android.gms.ads.doubleclick.PublisherInterstitialAd;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.RequestConfiguration;
+import com.google.android.gms.ads.admanager.AdManagerAdRequest;
+import com.google.android.gms.ads.admanager.AdManagerAdView;
+import com.google.android.gms.ads.admanager.AdManagerInterstitialAd;
+import com.google.android.gms.ads.admanager.AdManagerInterstitialAdLoadCallback;
 import java.lang.ref.WeakReference;
+import java.util.Collections;
+import org.jetbrains.annotations.NotNull;
 
 public class DfpActivity extends AppCompatActivity {
 
@@ -58,72 +65,74 @@ public class DfpActivity extends AppCompatActivity {
     criteo = Criteo.getInstance();
 
     linearLayout = findViewById(R.id.adViewHolder);
-    findViewById(R.id.buttonBanner).setOnClickListener((View v) -> {
-      onBannerClick();
-    });
-    findViewById(R.id.buttonInterstitial).setOnClickListener((View v) -> {
-      onInterstitialClick();
-    });
-    findViewById(R.id.buttonCustomNative).setOnClickListener((View v) -> {
-      onNativeClick();
-    });
+    findViewById(R.id.buttonBanner).setOnClickListener((View v) -> onBannerClick());
+    findViewById(R.id.buttonInterstitial).setOnClickListener((View v) -> onInterstitialClick());
+    findViewById(R.id.buttonCustomNative).setOnClickListener((View v) -> onNativeClick());
   }
 
   private void onNativeClick() {
-    PublisherAdView publisherAdView = new PublisherAdView(DfpActivity.this);
-    publisherAdView.setAdSizes(com.google.android.gms.ads.AdSize.FLUID);
-    publisherAdView.setAdUnitId(DFP_NATIVE_ID);
-    publisherAdView.setAdListener(new TestAppDfpAdListener(TAG, "Custom NativeAd"));
-    publisherAdView.setManualImpressionsEnabled(true);
+    AdManagerAdView adManagerAdView = new AdManagerAdView(DfpActivity.this);
+    adManagerAdView.setAdSizes(com.google.android.gms.ads.AdSize.FLUID);
+    adManagerAdView.setAdUnitId(DFP_NATIVE_ID);
+    adManagerAdView.setAdListener(new TestAppDfpAdListener(TAG, "Custom NativeAd"));
+    adManagerAdView.setManualImpressionsEnabled(true);
 
-    loadAdView(publisherAdView, NATIVE);
+    loadAdView(adManagerAdView, NATIVE);
   }
 
 
   private void onBannerClick() {
-    PublisherAdView publisherAdView = new PublisherAdView(this);
-    publisherAdView.setAdSizes(com.google.android.gms.ads.AdSize.BANNER);
-    publisherAdView.setAdUnitId(DFP_BANNER_ID);
-    publisherAdView.setAdListener(new TestAppDfpAdListener(TAG, "Banner"));
+    AdManagerAdView adManagerAdView = new AdManagerAdView(this);
+    adManagerAdView.setAdSizes(com.google.android.gms.ads.AdSize.BANNER);
+    adManagerAdView.setAdUnitId(DFP_BANNER_ID);
+    adManagerAdView.setAdListener(new TestAppDfpAdListener(TAG, "Banner"));
 
-    loadAdView(publisherAdView, BANNER);
+    loadAdView(adManagerAdView, BANNER);
   }
 
-  private void loadAdView(PublisherAdView publisherAdView, AdUnit adUnit) {
-    PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-    builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
+  private void loadAdView(AdManagerAdView adManagerAdView, AdUnit adUnit) {
+    AdManagerAdRequest.Builder builder = new AdManagerAdRequest.Builder();
+
+    RequestConfiguration requestConfiguration = new RequestConfiguration.Builder().setTestDeviceIds(Collections.singletonList(AdRequest.DEVICE_ID_EMULATOR)).build();
+    MobileAds.setRequestConfiguration(requestConfiguration);
+
     criteo.loadBid(adUnit, CONTEXT_DATA, enrich((mThis, bid) -> {
       mThis.criteo.enrichAdObjectWithBid(builder, bid);
 
-      PublisherAdRequest request = builder.build();
-      publisherAdView.loadAd(request);
-      mThis.linearLayout.addView(publisherAdView);
+      AdManagerAdRequest request = builder.build();
+      adManagerAdView.loadAd(request);
+      mThis.linearLayout.addView(adManagerAdView);
     }));
   }
 
   private void onInterstitialClick() {
-    PublisherInterstitialAd mPublisherInterstitialAd = new PublisherInterstitialAd(this);
-    mPublisherInterstitialAd.setAdUnitId(DFP_INTERSTITIAL_ID);
-    mPublisherInterstitialAd.setAdListener(new TestAppDfpAdListener(TAG, "Interstitial") {
-      @Override
-      public void onAdLoaded() {
-        super.onAdLoaded();
+    AdManagerAdRequest.Builder builder = new AdManagerAdRequest.Builder();
 
-        if (mPublisherInterstitialAd.isLoaded()) {
-          mPublisherInterstitialAd.show();
-        } else {
-          Log.d(TAG, "The interstitial wasn't loaded yet.");
-        }
-      }
-    });
+    RequestConfiguration requestConfiguration = new RequestConfiguration.Builder().setTestDeviceIds(Collections.singletonList(AdRequest.DEVICE_ID_EMULATOR)).build();
+    MobileAds.setRequestConfiguration(requestConfiguration);
 
-    PublisherAdRequest.Builder builder = new PublisherAdRequest.Builder();
-    builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
     criteo.loadBid(INTERSTITIAL, CONTEXT_DATA, enrich((mThis, bid) -> {
       mThis.criteo.enrichAdObjectWithBid(builder, bid);
 
-      PublisherAdRequest request = builder.build();
-      mPublisherInterstitialAd.loadAd(request);
+      AdManagerAdRequest request = builder.build();
+
+      AdManagerInterstitialAd.load(
+          this.getApplicationContext(),
+          DFP_INTERSTITIAL_ID,
+          request,
+          new AdManagerInterstitialAdLoadCallback() {
+            @Override
+            public void onAdLoaded(@NonNull AdManagerInterstitialAd adManagerInterstitialAd) {
+              Log.d(TAG,  "Interstitial - called: onAdLoaded");
+              adManagerInterstitialAd.show(mThis);
+            }
+
+            @Override
+            public void onAdFailedToLoad(@NotNull LoadAdError loadAdError) {
+              Log.d(TAG, "Interstitial - called: onAdFailedToLoad");
+            }
+          }
+      );
     }));
   }
 

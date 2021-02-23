@@ -36,7 +36,7 @@ import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.network.PubSdkApi
 import com.criteo.publisher.privacy.ConsentData
-import com.google.android.gms.ads.doubleclick.PublisherAdRequest
+import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import com.mopub.mobileads.MoPubInterstitial
 import com.mopub.mobileads.MoPubView
 import com.nhaarman.mockitokotlin2.any
@@ -307,7 +307,7 @@ class ProfileIdFunctionalTest {
   fun bidGamAppBidding_GivenAnyPreviousIntegration_UseGamAppBiddingProfileId() {
     fun loadBid() {
       Criteo.getInstance().loadBid(BANNER_320_480, ContextData()) {
-        Criteo.getInstance().enrichAdObjectWithBid(PublisherAdRequest.Builder(), it)
+        Criteo.getInstance().enrichAdObjectWithBid(AdManagerAdRequest.Builder(), it)
       }
       mockedDependenciesRule.waitForIdleState()
     }

@@ -535,7 +535,7 @@ public class DfpHeaderBiddingFunctionalTest {
     return loadDfpHtmlBannerOrNative(adUnit, createDfpNativeView());
   }
 
-  private String loadDfpHtmlBannerOrNative(AdUnit adUnit, AdManagerAdView publisherAdView)
+  private String loadDfpHtmlBannerOrNative(AdUnit adUnit, AdManagerAdView adManagerAdView)
       throws Exception {
     givenInitializedCriteo(adUnit);
 
@@ -548,12 +548,12 @@ public class DfpHeaderBiddingFunctionalTest {
 
     AdManagerAdRequest request = builder.build();
 
-    DfpSync dfpSync = new DfpSync(publisherAdView);
+    DfpSync dfpSync = new DfpSync(adManagerAdView);
 
-    runOnMainThreadAndWait(() -> publisherAdView.loadAd(request));
+    runOnMainThreadAndWait(() -> adManagerAdView.loadAd(request));
     dfpSync.waitForBid();
 
-    return webViewLookup.lookForHtmlContent(publisherAdView).get();
+    return webViewLookup.lookForHtmlContent(adManagerAdView).get();
   }
 
   private String loadDfpHtmlInterstitial(InterstitialAdUnit adUnit) throws Exception {
@@ -594,19 +594,19 @@ public class DfpHeaderBiddingFunctionalTest {
   }
 
   private AdManagerAdView createDfpBannerView() {
-    AdManagerAdView publisherAdView = new AdManagerAdView(
+    AdManagerAdView adManagerAdView = new AdManagerAdView(
         activityRule.getActivity().getApplicationContext());
-    publisherAdView.setAdSizes(com.google.android.gms.ads.AdSize.BANNER);
-    publisherAdView.setAdUnitId(DFP_BANNER_ID);
-    return publisherAdView;
+    adManagerAdView.setAdSizes(com.google.android.gms.ads.AdSize.BANNER);
+    adManagerAdView.setAdUnitId(DFP_BANNER_ID);
+    return adManagerAdView;
   }
 
   private AdManagerAdView createDfpNativeView() {
-    AdManagerAdView publisherAdView = new AdManagerAdView(
+    AdManagerAdView adManagerAdView = new AdManagerAdView(
         activityRule.getActivity().getApplicationContext());
-    publisherAdView.setAdSizes(com.google.android.gms.ads.AdSize.FLUID);
-    publisherAdView.setAdUnitId(DFP_NATIVE_ID);
-    return publisherAdView;
+    adManagerAdView.setAdSizes(com.google.android.gms.ads.AdSize.FLUID);
+    adManagerAdView.setAdUnitId(DFP_NATIVE_ID);
+    return adManagerAdView;
   }
 
   private void assertCriteoMacroAreInjectedInDfpBuilder(Builder builder) {
@@ -694,7 +694,7 @@ public class DfpHeaderBiddingFunctionalTest {
       public void onAdFailedToLoad(LoadAdError loadAdError) {
         LoggerFactory.getLogger(DfpHeaderBiddingFunctionalTest.class)
             .debug("onAdFailedToLoad for reason %d. "
-                    + "See: https://developers.google.com/android/reference/com/google/android/gms/ads/doubleclick/PublisherAdRequest",
+                    + "See: https://developers.google.com/android/reference/com/google/android/gms/ads/admanager/AdManagerAdRequest",
                 loadAdError);
         isLoaded.countDown();
       }
@@ -717,7 +717,7 @@ public class DfpHeaderBiddingFunctionalTest {
       public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
         LoggerFactory.getLogger(DfpHeaderBiddingFunctionalTest.class)
             .debug("onAdFailedToLoad for reason %d. "
-                    + "See: https://developers.google.com/android/reference/com/google/android/gms/ads/doubleclick/PublisherAdRequest",
+                    + "See: https://developers.google.com/android/reference/com/google/android/gms/ads/admanager/AdManagerAdRequest",
                 loadAdError);
         isLoaded.countDown();
       }

@@ -18,6 +18,7 @@ package com.criteo.testapp.listener;
 
 import android.util.Log;
 import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.LoadAdError;
 
 public class TestAppDfpAdListener extends AdListener {
 
@@ -35,14 +36,7 @@ public class TestAppDfpAdListener extends AdListener {
   }
 
   @Override
-  public void onAdFailedToLoad(int var1) {
-    Log.d(tag, prefix + " - called: onAdFailedToLoad");
-  }
-
-  @Override
-  public void onAdLeftApplication() {
-    Log.d(tag, prefix + " - called: onAdLeftApplication");
-  }
+  public void onAdFailedToLoad(LoadAdError loadAdError) { Log.d(tag, prefix + " - called: onAdFailedToLoad"); }
 
   @Override
   public void onAdOpened() {
@@ -63,5 +57,4 @@ public class TestAppDfpAdListener extends AdListener {
   public void onAdImpression() {
     Log.d(tag, prefix + " - called: onAdImpression");
   }
-
 }

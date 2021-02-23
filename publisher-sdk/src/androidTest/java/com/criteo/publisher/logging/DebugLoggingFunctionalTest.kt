@@ -56,7 +56,7 @@ import com.criteo.publisher.privacy.PrivacyLogMessage
 import com.criteo.publisher.util.BuildConfigWrapper
 import com.criteo.publisher.util.JsonSerializer
 import com.criteo.publisher.util.writeIntoString
-import com.google.android.gms.ads.doubleclick.PublisherAdRequest
+import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import com.mopub.mobileads.MoPubView
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.argumentCaptor
@@ -132,7 +132,7 @@ class DebugLoggingFunctionalTest {
     givenInitializedCriteo()
 
     Criteo.getInstance().loadBid(BANNER_UNKNOWN) {
-      Criteo.getInstance().enrichAdObjectWithBid(PublisherAdRequest.Builder(), it)
+      Criteo.getInstance().enrichAdObjectWithBid(AdManagerAdRequest.Builder(), it)
       Criteo.getInstance().enrichAdObjectWithBid(MoPubView(context), it)
       Criteo.getInstance().enrichAdObjectWithBid(HashMap<String, String>(), it)
     }
@@ -151,7 +151,7 @@ class DebugLoggingFunctionalTest {
     mockedDependenciesRule.waitForIdleState()
 
     Criteo.getInstance().loadBid(BANNER_320_50) {
-      Criteo.getInstance().enrichAdObjectWithBid(PublisherAdRequest.Builder(), it)
+      Criteo.getInstance().enrichAdObjectWithBid(AdManagerAdRequest.Builder(), it)
       bid = it!!
     }
     mockedDependenciesRule.waitForIdleState()
