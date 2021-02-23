@@ -68,6 +68,9 @@ public class DfpActivity extends AppCompatActivity {
     findViewById(R.id.buttonBanner).setOnClickListener((View v) -> onBannerClick());
     findViewById(R.id.buttonInterstitial).setOnClickListener((View v) -> onInterstitialClick());
     findViewById(R.id.buttonCustomNative).setOnClickListener((View v) -> onNativeClick());
+
+    RequestConfiguration requestConfiguration = new RequestConfiguration.Builder().setTestDeviceIds(Collections.singletonList(AdRequest.DEVICE_ID_EMULATOR)).build();
+    MobileAds.setRequestConfiguration(requestConfiguration);
   }
 
   private void onNativeClick() {
@@ -93,9 +96,6 @@ public class DfpActivity extends AppCompatActivity {
   private void loadAdView(AdManagerAdView adManagerAdView, AdUnit adUnit) {
     AdManagerAdRequest.Builder builder = new AdManagerAdRequest.Builder();
 
-    RequestConfiguration requestConfiguration = new RequestConfiguration.Builder().setTestDeviceIds(Collections.singletonList(AdRequest.DEVICE_ID_EMULATOR)).build();
-    MobileAds.setRequestConfiguration(requestConfiguration);
-
     criteo.loadBid(adUnit, CONTEXT_DATA, enrich((mThis, bid) -> {
       mThis.criteo.enrichAdObjectWithBid(builder, bid);
 
@@ -107,9 +107,6 @@ public class DfpActivity extends AppCompatActivity {
 
   private void onInterstitialClick() {
     AdManagerAdRequest.Builder builder = new AdManagerAdRequest.Builder();
-
-    RequestConfiguration requestConfiguration = new RequestConfiguration.Builder().setTestDeviceIds(Collections.singletonList(AdRequest.DEVICE_ID_EMULATOR)).build();
-    MobileAds.setRequestConfiguration(requestConfiguration);
 
     criteo.loadBid(INTERSTITIAL, CONTEXT_DATA, enrich((mThis, bid) -> {
       mThis.criteo.enrichAdObjectWithBid(builder, bid);

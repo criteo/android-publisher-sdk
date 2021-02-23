@@ -36,6 +36,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import androidx.annotation.NonNull;
@@ -46,7 +47,7 @@ import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.context.ContextData;
-import com.criteo.publisher.integration.DfpHeaderBiddingFunctionalTest.DfpSync.SyncAdManagerInterstitialAdLoadCallback;
+import com.criteo.publisher.integration.DfpHeaderBiddingFunctionalTest.DfpSync.SyncInterstitialAdListener;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.ResultCaptor;
@@ -85,6 +86,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -168,9 +170,15 @@ public class DfpHeaderBiddingFunctionalTest {
   @SpyBean
   private Config config;
 
+  @Inject
+  private Context context;
+
   @Before
   public void setUp() {
     doReturn(isLiveBiddingEnabled).when(config).isLiveBiddingEnabled();
+
+    RequestConfiguration requestConfiguration = new RequestConfiguration.Builder().setTestDeviceIds(Collections.singletonList(AdRequest.DEVICE_ID_EMULATOR)).build();
+    MobileAds.setRequestConfiguration(requestConfiguration);
   }
 
   @Test
@@ -543,9 +551,6 @@ public class DfpHeaderBiddingFunctionalTest {
 
     loadBidAndWait(adUnit, builder);
 
-    RequestConfiguration requestConfiguration = new RequestConfiguration.Builder().setTestDeviceIds(Collections.singletonList(AdRequest.DEVICE_ID_EMULATOR)).build();
-    MobileAds.setRequestConfiguration(requestConfiguration);
-
     AdManagerAdRequest request = builder.build();
 
     DfpSync dfpSync = new DfpSync(adManagerAdView);
@@ -563,30 +568,25 @@ public class DfpHeaderBiddingFunctionalTest {
 
     loadBidAndWait(adUnit, builder);
 
-    RequestConfiguration requestConfiguration = new RequestConfiguration.Builder().setTestDeviceIds(Collections.singletonList(AdRequest.DEVICE_ID_EMULATOR)).build();
-    MobileAds.setRequestConfiguration(requestConfiguration);
-
     AdManagerAdRequest request = builder.build();
 
     DfpSync dfpSync = new DfpSync();
-    SyncAdManagerInterstitialAdLoadCallback syncAdManagerInterstitialAdLoadCallback = dfpSync.getSyncAdManagerInterstitialAdLoadCallback();
+    SyncInterstitialAdListener syncInterstitialAdListener = dfpSync.getSyncInterstitialAdListener();
 
     runOnMainThreadAndWait(() -> {
       AdManagerInterstitialAd.load(
-          activityRule.getActivity().getApplicationContext(),
+          context,
           DFP_INTERSTITIAL_ID,
           request,
-          syncAdManagerInterstitialAdLoadCallback
+          syncInterstitialAdListener
       );
     });
     dfpSync.waitForBid();
 
     View interstitialView = getRootView(webViewLookup.lookForResumedActivity(() -> {
       runOnMainThreadAndWait(() -> {
-        AdManagerInterstitialAd adManagerInterstitialAd = syncAdManagerInterstitialAdLoadCallback.getAdManagerInterstitialAd();
-        if (adManagerInterstitialAd != null) {
-          adManagerInterstitialAd.show(activityRule.getActivity());
-        }
+        AdManagerInterstitialAd adManagerInterstitialAd = syncInterstitialAdListener.lastInterstitialAd;
+        adManagerInterstitialAd.show(activityRule.getActivity());
       });
     }).get(DFP_INTERSTITIAL_OPENING_TIMEOUT_MS, TimeUnit.MILLISECONDS));
 
@@ -594,16 +594,14 @@ public class DfpHeaderBiddingFunctionalTest {
   }
 
   private AdManagerAdView createDfpBannerView() {
-    AdManagerAdView adManagerAdView = new AdManagerAdView(
-        activityRule.getActivity().getApplicationContext());
+    AdManagerAdView adManagerAdView = new AdManagerAdView(context);
     adManagerAdView.setAdSizes(com.google.android.gms.ads.AdSize.BANNER);
     adManagerAdView.setAdUnitId(DFP_BANNER_ID);
     return adManagerAdView;
   }
 
   private AdManagerAdView createDfpNativeView() {
-    AdManagerAdView adManagerAdView = new AdManagerAdView(
-        activityRule.getActivity().getApplicationContext());
+    AdManagerAdView adManagerAdView = new AdManagerAdView(context);
     adManagerAdView.setAdSizes(com.google.android.gms.ads.AdSize.FLUID);
     adManagerAdView.setAdUnitId(DFP_NATIVE_ID);
     return adManagerAdView;
@@ -664,7 +662,7 @@ public class DfpHeaderBiddingFunctionalTest {
     when(config.isLiveBiddingEnabled()).thenReturn(true);
   }
 
-  public static final class DfpSync {
+  static final class DfpSync {
 
     private final CountDownLatch isLoaded = new CountDownLatch(1);
 
@@ -675,8 +673,8 @@ public class DfpHeaderBiddingFunctionalTest {
     private DfpSync() {
     }
 
-    SyncAdManagerInterstitialAdLoadCallback getSyncAdManagerInterstitialAdLoadCallback() {
-      return new SyncAdManagerInterstitialAdLoadCallback();
+    SyncInterstitialAdListener getSyncInterstitialAdListener() {
+      return new SyncInterstitialAdListener();
     }
 
     void waitForBid() throws InterruptedException {
@@ -693,23 +691,17 @@ public class DfpHeaderBiddingFunctionalTest {
       @Override
       public void onAdFailedToLoad(LoadAdError loadAdError) {
         LoggerFactory.getLogger(DfpHeaderBiddingFunctionalTest.class)
-            .debug("onAdFailedToLoad for reason %d. "
-                    + "See: https://developers.google.com/android/reference/com/google/android/gms/ads/admanager/AdManagerAdRequest",
-                loadAdError);
+            .debug("onAdFailedToLoad for reason %d.", loadAdError);
         isLoaded.countDown();
       }
     }
 
-    public class SyncAdManagerInterstitialAdLoadCallback extends AdManagerInterstitialAdLoadCallback {
-      private AdManagerInterstitialAd _adManagerInterstitialAd;
-
-      public AdManagerInterstitialAd getAdManagerInterstitialAd() {
-        return _adManagerInterstitialAd;
-      }
+    class SyncInterstitialAdListener extends AdManagerInterstitialAdLoadCallback {
+      private AdManagerInterstitialAd lastInterstitialAd;
 
       @Override
       public void onAdLoaded(@NonNull AdManagerInterstitialAd adManagerInterstitialAd) {
-        _adManagerInterstitialAd = adManagerInterstitialAd;
+        lastInterstitialAd = adManagerInterstitialAd;
         isLoaded.countDown();
       }
 
