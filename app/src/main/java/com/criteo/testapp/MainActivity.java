@@ -42,10 +42,6 @@ public class MainActivity extends AppCompatActivity {
       Intent intent = new Intent(getApplicationContext(), DfpActivity.class);
       startActivity(intent);
     });
-    findViewById(R.id.buttonMediationCall).setOnClickListener((View v) -> {
-      Intent intent = new Intent(getApplicationContext(), MediationActivity.class);
-      startActivity(intent);
-    });
     findViewById(R.id.buttonStandalone).setOnClickListener((View v) -> {
       Intent intent = new Intent(getApplicationContext(), StandaloneActivity.class);
       startActivity(intent);

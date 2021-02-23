@@ -75,16 +75,6 @@
         android:value=".MainActivity"/>
     </activity>
     <activity
-      android:label="@string/title_activity_mediation"
-      android:name=".MediationActivity"
-      android:configChanges="orientation|screenSize"
-      android:parentActivityName=".MainActivity"
-      android:theme="@style/AppTheme">
-      <meta-data
-        android:name="android.support.PARENT_ACTIVITY"
-        android:value=".MainActivity"/>
-    </activity>
-    <activity
       android:name=".InHouseActivity"
       android:configChanges="orientation|screenSize"
       android:parentActivityName=".MainActivity"
