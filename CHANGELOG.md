@@ -1,5 +1,9 @@
 # Next Version
 
+# Version 4.2.3
+- Features
+  - Prepare support for Google SDK v20
+
 # Version 4.2.2
 
 - Bug fixes
