@@ -19,8 +19,8 @@ import groovy.util.ConfigObject
 import groovy.util.ConfigSlurper
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.getValue
-import org.gradle.kotlin.dsl.getting
+import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.kotlin.dsl.*
 import kotlin.reflect.KClass
 
 class AndroidModule(private val project: Project) {
@@ -167,5 +167,11 @@ private fun Project.defaultAndroidModule() {
 
   jacoco?.apply {
     toolVersion = Deps.Jacoco.version
+  }
+
+  afterEvaluate {
+    tasks.withType<JavaCompile> {
+      options.compilerArgs.add("-Xlint:deprecation")
+    }
   }
 }
