@@ -22,7 +22,6 @@ import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.util.BuildConfigWrapper
 import com.nhaarman.mockitokotlin2.check
-import com.nhaarman.mockitokotlin2.clearInvocations
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -30,8 +29,11 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Rule
 import org.junit.Test
+import java.net.ProtocolException
 import java.net.SocketException
+import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import javax.net.ssl.SSLException
 
 class SafeRunnableTest {
     @Rule
@@ -71,6 +73,9 @@ class SafeRunnableTest {
     fun givenExpectedException_LogItAsExpectedException() {
         givenExpectedException_LogItAsExpectedException(SocketException())
         givenExpectedException_LogItAsExpectedException(UnknownHostException())
+        givenExpectedException_LogItAsExpectedException(SSLException(""))
+        givenExpectedException_LogItAsExpectedException(ProtocolException())
+        givenExpectedException_LogItAsExpectedException(SocketTimeoutException())
     }
 
     private fun givenExpectedException_LogItAsExpectedException(throwable: Throwable) {
