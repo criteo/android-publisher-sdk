@@ -88,9 +88,14 @@ internal class PublisherCodeRemover {
     }
 
     val cleanedException = if (original.mightBeThrownByPublisher()) {
-      // Hide exceptions coming from publisher. Exception message or class name might contain sensitive/private
-      // information. So they are removed.
-      PublisherException()
+      // Hide exceptions coming from publisher. So they are removed.
+      if (original.isAllowedFramework()) {
+        // Exception class name is known but message might contain sensitive/private information.
+        PublisherException(original)
+      } else {
+        // Exception message or class name might contain sensitive/private information.
+        PublisherException()
+      }
     } else {
       original
     }
@@ -180,6 +185,10 @@ internal class PublisherCodeRemover {
     return !firstNotFrameworkStackTraceElement.isSdk()
   }
 
+  private fun Throwable.isAllowedFramework(): Boolean {
+    return allowedFrameworkPackagePrefixes.any { javaClass.name.startsWith(it) }
+  }
+
   object ThrowableInternal {
 
     private val causeField: Field = getField("cause")
@@ -206,7 +215,11 @@ internal class PublisherCodeRemover {
       set(value) = detailMessageField.set(this, value)
   }
 
-  class PublisherException : RuntimeException("An exception occurred from publisher's code")
+  class PublisherException : RuntimeException {
+    constructor() : this("custom")
+    constructor(throwable: Throwable) : this(throwable.javaClass.simpleName)
+    private constructor(exceptionName: String) : super("A $exceptionName exception occurred from publisher's code")
+  }
 
   /**
    * Exception thrown when removing publisher code from a throwable.

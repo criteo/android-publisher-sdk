@@ -26,6 +26,10 @@ object DummyPublisherCode {
     throw IllegalArgumentException(secrets)
   }
 
+  fun sdkDummyInterfaceThrowingCustomException() = sdkDummyInterfaceCalling {
+    throw DummyPublisherException()
+  }
+
   fun sdkDummyInterfaceCallingSdkCode(sdkCode: () -> Unit) = sdkDummyInterfaceCalling(sdkCode)
 
   private fun sdkDummyInterfaceCalling(code: () -> Unit): PublisherCodeRemoverTest.SdkDummyInterface {
@@ -45,4 +49,6 @@ object DummyPublisherCode {
       addDummyStacks(nbStack - 1, thenAction)
     }
   }
+
+  private class DummyPublisherException: Exception(secrets)
 }

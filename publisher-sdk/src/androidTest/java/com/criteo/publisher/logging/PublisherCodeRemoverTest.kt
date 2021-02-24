@@ -157,7 +157,7 @@ class PublisherCodeRemoverTest {
   }
 
   @Test
-  fun removePublisherCode_GivenSdkExceptionWithMessageOfPublisherException_RemovePublisherMessageInSdkException() {
+  fun removePublisherCode_GivenSdkExceptionWithMessageOfGenericPublisherException_RemovePublisherMessageInSdkExceptionButKeepInfoAboutGenericException() {
     val publisherCode = DummyPublisherCode.sdkDummyInterfaceThrowingGenericException()
 
     // Stack is: JUnit + this test (intercept exception) + publisher code (cause)
@@ -190,7 +190,25 @@ class PublisherCodeRemoverTest {
     val packagePattern = "[${'$'}a-zA-Z.]+"
     assertThat(cleaned.message).matches("${packagePattern}SdkException: " +
         "${packagePattern}SdkException: " +
-        "${packagePattern}PublisherException: An exception occurred from publisher's code")
+        "${packagePattern}PublisherException: A IllegalArgumentException exception occurred from publisher's code")
+    assertThat(cleaned.printStacktraceToString())
+        .doesNotContain(DummyPublisherCode.secrets)
+        .doesNotContain("com.dummypublisher")
+  }
+
+  @Test
+  fun removePublisherCode_GivenSdkExceptionWithMessageOfCustomPublisherException_RemovePublisherMessageInSdkException() {
+    // Stack is: JUnit + this test (intercept exception) + publisher code (cause)
+    val exception = exceptionThrownBy {
+      DummyPublisherCode.sdkDummyInterfaceThrowingCustomException().foo()
+    }
+
+    // Expect:
+    // - cause exception is changed to a publisher exception, stacktrace is cleaned
+    // - sdk exceptions have message changed
+    val cleaned = removePublisherCode(exception)
+
+    assertThat(cleaned.message).isEqualTo("A custom exception occurred from publisher's code")
     assertThat(cleaned.printStacktraceToString())
         .doesNotContain(DummyPublisherCode.secrets)
         .doesNotContain("com.dummypublisher")
