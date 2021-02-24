@@ -1,5 +1,11 @@
 # Next Version
 
+# Version 4.3.0
+- Breaking changes
+  - Removed support of Google SDK < v19.7.0 (see https://developers.google.com/admob/android/migration)
+- Features
+  - Added support of Google SDK v20.0.0
+
 # Version 4.2.2
 
 - Bug fixes

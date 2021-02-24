@@ -31,7 +31,7 @@ class DfpHeaderBiddingNoDfpTest {
   @Before
   fun setUp() {
     assertThatCode {
-      Class.forName("com.google.android.gms.ads.doubleclick.PublisherAdRequest")
+      Class.forName("com.google.android.gms.ads.admanager.AdManagerAdRequest")
     }.withFailMessage("""
 The tests in this file validate that DFP feature is only degraded, but do not throw, if the
 dependency is not provided at runtime.
