@@ -20,6 +20,7 @@ import com.criteo.publisher.util.printStacktraceToString
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
+import java.lang.RuntimeException
 
 class PublisherCodeRemoverJvmTest {
 
@@ -40,7 +41,7 @@ class PublisherCodeRemoverJvmTest {
   @Test
   @Suppress("MaxLineLength", "LongMethod")
   fun removePublisherCode_GivenExceptionWithPublisherCodeAndSdkCode_ReturnExceptionWithOnlySdkCode() {
-    val publisherException = IllegalStateException("secret")
+    val publisherException = IllegalStateException("secret 1")
     publisherException.stackTrace = arrayOf(
         StackTraceElement("com.publisher.FooBar", "foo", "FooBar.java", 1),
         StackTraceElement("com.publisher.FooBar", "bar", "FooBar.java", 2),
@@ -55,14 +56,14 @@ class PublisherCodeRemoverJvmTest {
         StackTraceElement("kotlin.concurrent.ThreadsKt", "thread", "Threads.kt", 1337)
     )
 
-    val thirdPartyOfPublisherCalledFromSdkException = IllegalStateException("secret")
+    val thirdPartyOfPublisherCalledFromSdkException = IllegalArgumentException("secret 2")
     thirdPartyOfPublisherCalledFromSdkException.stackTrace = arrayOf(
         StackTraceElement("com.thirdparty.Dummy", "dummy", "Dummy.groovy", -2),
         StackTraceElement("com.publisher.FooBar", "foo", "FooBar.java", 1),
         StackTraceElement("com.criteo.mediation.Bar", "foo", "Bar.java", 42)
     )
 
-    val thirdPartyOfSdkCalledFromPublisherException = IllegalStateException("secret")
+    val thirdPartyOfSdkCalledFromPublisherException = RuntimeException("secret 3")
     thirdPartyOfSdkCalledFromPublisherException.stackTrace = arrayOf(
         StackTraceElement("com.squareup.picasso.Picasso", "get", "Picasso.java", 3),
         StackTraceElement("com.publisher.FooBar", "bar", "FooBar.java", 2)
@@ -86,7 +87,7 @@ class PublisherCodeRemoverJvmTest {
     val cleaned = remover.removePublisherCode(publisherException)
 
     assertThat(cleaned.printStacktraceToString()).isEqualToIgnoringWhitespace("""
-      com.criteo.publisher.logging.PublisherCodeRemover${'$'}PublisherException: An exception occurred from publisher's code
+      com.criteo.publisher.logging.PublisherCodeRemover${'$'}PublisherException: A IllegalStateException exception occurred from publisher's code
       	at <private class>.<private method>(Unknown Source)
       	at android.app.Activity.onCreate(Activity.java:42)
       	at java.lang.Thread.run(Thread.java:1337)
@@ -94,19 +95,19 @@ class PublisherCodeRemoverJvmTest {
       	at com.criteo.mediation.Bar.foo(Bar.java:42)
       	at <private class>.<private method>(Unknown Source)
       	at kotlin.concurrent.ThreadsKt.thread(Threads.kt:1337)
-      	Suppressed: com.criteo.publisher.logging.PublisherCodeRemover${'$'}PublisherException: An exception occurred from publisher's code
+      	Suppressed: com.criteo.publisher.logging.PublisherCodeRemover${'$'}PublisherException: A IllegalArgumentException exception occurred from publisher's code
       		at <private class>.<private method>(Unknown Source)
       		at com.criteo.mediation.Bar.foo(Bar.java:42)
-      		Suppressed: com.criteo.publisher.logging.PublisherCodeRemover${'$'}PublisherException: An exception occurred from publisher's code
+      		Suppressed: com.criteo.publisher.logging.PublisherCodeRemover${'$'}PublisherException: A RuntimeException exception occurred from publisher's code
       			at com.squareup.picasso.Picasso.get(Picasso.java:3)
       			at <private class>.<private method>(Unknown Source)
       		Caused by: java.lang.IllegalArgumentException: sdk message 2
       			at com.squareup.picasso.Picasso.get(Picasso.java:3)
       			at com.criteo.mediation.Bar.foo(Bar.java:42)
       			... 1 more
-      		Caused by: [CIRCULAR REFERENCE:java.lang.IllegalArgumentException: sdk message 1]
-      	Caused by: [CIRCULAR REFERENCE:com.criteo.publisher.logging.PublisherCodeRemover${'$'}PublisherException: An exception occurred from publisher's code]
-      Caused by: [CIRCULAR REFERENCE:com.criteo.publisher.logging.PublisherCodeRemover${'$'}PublisherException: An exception occurred from publisher's code]
+      		Caused by: [CIRCULAR REFERENCE: java.lang.IllegalArgumentException: sdk message 1]
+      	Caused by: [CIRCULAR REFERENCE: com.criteo.publisher.logging.PublisherCodeRemover${'$'}PublisherException: A IllegalStateException exception occurred from publisher's code]
+      Caused by: [CIRCULAR REFERENCE: com.criteo.publisher.logging.PublisherCodeRemover${'$'}PublisherException: A IllegalArgumentException exception occurred from publisher's code]
     """.trimIndent())
   }
 }
