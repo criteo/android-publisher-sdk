@@ -32,4 +32,9 @@ internal interface SendingQueueConfiguration<T> {
    * Runtime class of the elements contained in the sending queue.
    */
   val elementClass: Class<T>
+
+  /**
+   * Estimated size in bytes of one element in the sending queue.
+   */
+  val estimatedSize: Int
 }

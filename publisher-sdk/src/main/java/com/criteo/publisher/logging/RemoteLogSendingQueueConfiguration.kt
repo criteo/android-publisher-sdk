@@ -27,4 +27,6 @@ class RemoteLogSendingQueueConfiguration(
   override val queueFilename: String
     get() = buildConfigWrapper.remoteLogQueueFilename
   override val elementClass = RemoteLogRecords::class.java
+  override val estimatedSize: Int
+    get() = buildConfigWrapper.estimatedSizeOfRemoteLog
 }

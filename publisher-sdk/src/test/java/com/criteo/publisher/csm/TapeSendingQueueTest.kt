@@ -97,6 +97,9 @@ class TapeSendingQueueTest(private val tapeImplementation: TapeImplementation) {
   @Mock
   private lateinit var objectQueueFactory: ObjectQueueFactory<Metric>
 
+  @Inject
+  private lateinit var sendingQueueConfiguration: MetricSendingQueueConfiguration
+
   private var file: File? = null
 
   @Before
@@ -105,7 +108,7 @@ class TapeSendingQueueTest(private val tapeImplementation: TapeImplementation) {
 
     tapeQueue = spy(createObjectQueue())
     doReturn(tapeQueue).whenever(objectQueueFactory).create()
-    queue = TapeSendingQueue(objectQueueFactory)
+    queue = TapeSendingQueue(objectQueueFactory, sendingQueueConfiguration)
   }
 
   @Test
@@ -132,15 +135,11 @@ class TapeSendingQueueTest(private val tapeImplementation: TapeImplementation) {
 
     // Create new instance of TapeMetricSendingQueue to force recreating the queue reference when polling
     // Since the queue is persistent, we should still find the metrics that were previously saved
-    queue = TapeSendingQueue(objectQueueFactory)
+    queue = TapeSendingQueue(objectQueueFactory, sendingQueueConfiguration)
 
     val size = queue.totalSize
 
-    if (tapeImplementation == TapeImplementation.IN_MEMORY) {
-      assertThat(size).isZero()
-    } else {
-      assertThat(size).isGreaterThan(estimatedSizePerMetric * 200)
-    }
+    assertThat(size).isGreaterThanOrEqualTo(estimatedSizePerMetric * 200)
   }
 
   @Test
@@ -221,7 +220,7 @@ class TapeSendingQueueTest(private val tapeImplementation: TapeImplementation) {
 
     // Create new instance of TapeMetricSendingQueue to force recreating the queue reference when polling
     // Since the queue is persistent, we should still find the metrics that were previously saved
-    queue = TapeSendingQueue(objectQueueFactory)
+    queue = TapeSendingQueue(objectQueueFactory, sendingQueueConfiguration)
 
     val metrics = queue.poll(2)
 
@@ -352,7 +351,7 @@ class TapeSendingQueueTest(private val tapeImplementation: TapeImplementation) {
   private fun givenMockedTapeQueue(defaultAnswer: Answer<Any>? = null) {
     tapeQueue = mock(defaultAnswer = defaultAnswer)
     doReturn(tapeQueue).whenever(objectQueueFactory).create()
-    queue = TapeSendingQueue(objectQueueFactory)
+    queue = TapeSendingQueue(objectQueueFactory, sendingQueueConfiguration)
   }
 
   private fun givenDeactivatedPreconditionUtils() {

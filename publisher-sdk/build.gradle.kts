@@ -46,6 +46,7 @@ androidLibModule {
     addBuildConfigField<Int>("csmBatchSize")
     addBuildConfigField<Int>("maxSizeOfCsmMetricsFolder")
     addBuildConfigField<Int>("maxSizeOfCsmMetricSendingQueue")
+    addBuildConfigField<Int>("estimatedSizeOfCsmMetric")
 
     // Advanced Native
     addBuildConfigField<Int>("adChoiceIconWidthInDp")
@@ -55,6 +56,7 @@ androidLibModule {
     addBuildConfigField<Int>("remoteLogBatchSize")
     addBuildConfigField<String>("remoteLogQueueFilename")
     addBuildConfigField<Int>("maxSizeOfRemoteLogSendingQueue")
+    addBuildConfigField<Int>("estimatedSizeOfRemoteLog")
 
     // Misc
     addBuildConfigField<String>("pubSdkSharedPreferences")

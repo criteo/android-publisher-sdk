@@ -55,8 +55,15 @@ class TapeSendingQueue<T> implements ConcurrentSendingQueue<T> {
   @NonNull
   private final ObjectQueueFactory<T> queueFactory;
 
-  TapeSendingQueue(@NonNull ObjectQueueFactory<T> queueFactory) {
+  @NonNull
+  private final SendingQueueConfiguration<T> sendingQueueConfiguration;
+
+  TapeSendingQueue(
+      @NonNull ObjectQueueFactory<T> queueFactory,
+      @NonNull SendingQueueConfiguration<T> sendingQueueConfiguration
+  ) {
     this.queueFactory = queueFactory;
+    this.sendingQueueConfiguration = sendingQueueConfiguration;
     this.usedBytesMethod = null;
     this.queueFile = null;
   }
@@ -143,18 +150,18 @@ class TapeSendingQueue<T> implements ConcurrentSendingQueue<T> {
 
       ObjectQueue<T> queue = createQueueIfNecessary();
 
-      if (!(queue instanceof FileObjectQueue)) {
-        return 0;
+      if (queue instanceof FileObjectQueue) {
+        try {
+          Method usedBytesMethod = getUsedBytesMethod();
+          QueueFile queueFile = getQueueFile((FileObjectQueue) queue);
+          return (Integer) usedBytesMethod.invoke(queueFile);
+        } catch (Exception e) {
+          PreconditionsUtil.throwOrLog(e);
+        }
       }
 
-      try {
-        Method usedBytesMethod = getUsedBytesMethod();
-        QueueFile queueFile = getQueueFile((FileObjectQueue) queue);
-        return (Integer) usedBytesMethod.invoke(queueFile);
-      } catch (Exception e) {
-        PreconditionsUtil.throwOrLog(e);
-        return 0;
-      }
+      // In case of error or in-memory queue, we fallback on estimation
+      return queue.size() * sendingQueueConfiguration.getEstimatedSize();
     }
   }
 

@@ -38,7 +38,7 @@ public class SendingQueueFactory<T> implements Factory<ConcurrentSendingQueue<T>
   @NonNull
   @Override
   public ConcurrentSendingQueue<T> create() {
-    ConcurrentSendingQueue<T> tapeQueue = new TapeSendingQueue<>(objectQueueFactory);
+    ConcurrentSendingQueue<T> tapeQueue = new TapeSendingQueue<>(objectQueueFactory, sendingQueueConfiguration);
     return new BoundedSendingQueue<>(tapeQueue, sendingQueueConfiguration);
   }
 }

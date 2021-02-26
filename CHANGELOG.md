@@ -8,6 +8,7 @@
 - Bug fixes
   - Reduce log level of network exception from error to info
   - Fix infinite `NoSuchMethodException` when Proguard is used with method inlining enabled
+  - Estimate size of in-memory queue and bound its size to avoid potential OOM
 
 # Version 4.2.2
 
