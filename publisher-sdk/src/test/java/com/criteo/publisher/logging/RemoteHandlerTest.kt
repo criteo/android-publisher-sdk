@@ -17,14 +17,19 @@
 package com.criteo.publisher.logging
 
 import android.util.Log
+import com.criteo.publisher.dependency.LazyDependency
 import com.criteo.publisher.logging.RemoteLogRecords.RemoteLogLevel
 import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.model.Config
 import com.criteo.publisher.privacy.ConsentData
 import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.atLeastOnce
+import com.nhaarman.mockitokotlin2.atMost
+import com.nhaarman.mockitokotlin2.doAnswer
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.spy
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.verifyNoMoreInteractions
@@ -119,5 +124,28 @@ class RemoteHandlerTest {
 
     verifyZeroInteractions(remoteLogRecordsFactory)
     verifyZeroInteractions(sendingQueue)
+  }
+
+  @Test
+  fun log_GivenSendingQueueLogging_StopRecursion() {
+    remoteHandler = spy(remoteHandler) {
+      on { isMainThread() } doReturn true doReturn false
+    }
+
+    val logRecords = mock<RemoteLogRecords>()
+    whenever(remoteLogRecordsFactory.createLogRecords(any())).thenReturn(logRecords)
+
+    val logger = Logger("tag", listOf(LazyDependency { remoteHandler as LogHandler }))
+
+    doAnswer {
+      logger.debug("dummy")
+      true
+    }.whenever(sendingQueue).offer(any())
+
+    logger.debug("dummy")
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(sendingQueue, atLeastOnce()).offer(any())
+    verify(sendingQueue, atMost(3)).offer(any())
   }
 }

@@ -16,13 +16,17 @@
 
 package com.criteo.publisher.logging
 
+import android.os.Looper
+import androidx.annotation.VisibleForTesting
 import com.criteo.publisher.SafeRunnable
+import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.csm.ConcurrentSendingQueue
 import com.criteo.publisher.logging.RemoteLogRecords.RemoteLogLevel.Companion.fromAndroidLogLevel
 import com.criteo.publisher.model.Config
 import com.criteo.publisher.privacy.ConsentData
 import java.util.concurrent.Executor
 
+@OpenForTesting
 internal class RemoteHandler(
     private val remoteLogRecordsFactory: RemoteLogRecordsFactory,
     private val sendingQueue: ConcurrentSendingQueue<RemoteLogRecords>,
@@ -37,12 +41,21 @@ internal class RemoteHandler(
 
     fromAndroidLogLevel(logMessage.level)?.takeIf { it >= config.remoteLogLevel } ?: return
     remoteLogRecordsFactory.createLogRecords(logMessage)?.let {
-      // Asynchronously post log to avoid doing IO on the current thread
-      executor.execute(object : SafeRunnable() {
-        override fun runSafely() {
-          sendingQueue.offer(it)
-        }
-      })
+      if (isMainThread()) {
+        // Asynchronously post log to avoid doing IO on the main thread
+        executor.execute(object : SafeRunnable() {
+          override fun runSafely() {
+            sendingQueue.offer(it)
+          }
+        })
+      } else {
+        sendingQueue.offer(it)
+      }
     }
+  }
+
+  @VisibleForTesting
+  internal fun isMainThread(): Boolean {
+    return Thread.currentThread() == Looper.getMainLooper()?.thread
   }
 }
