@@ -1,1 +1,10 @@
+# Used in DfpHeaderBiddingHandler
 -keep class com.google.android.gms.ads.** { *; }
+
+# Used in TapeSendingQueue
+-keepclassmembers class com.squareup.tape.QueueFile {
+  private int usedBytes();
+}
+-keepclassmembers class com.squareup.tape.FileObjectQueue {
+  private com.squareup.tape.QueueFile queueFile;
+}
