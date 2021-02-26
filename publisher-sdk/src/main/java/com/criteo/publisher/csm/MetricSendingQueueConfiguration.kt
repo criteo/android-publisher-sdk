@@ -28,4 +28,6 @@ internal class MetricSendingQueueConfiguration(
   override val queueFilename: String
     get() = buildConfigWrapper.csmQueueFilename
   override val elementClass = Metric::class.java
+  override val estimatedSize: Int
+    get() = buildConfigWrapper.estimatedSizeOfCsmMetric
 }

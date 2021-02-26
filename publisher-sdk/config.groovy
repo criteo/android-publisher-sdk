@@ -67,6 +67,7 @@ maxSizeOfCsmMetricsFolder = 48 * 1024
 
 // Maximum size (in bytes) of metric elements stored in the metric sending queue.
 // 60KB represents ~360 metrics (with ~170 bytes/metric) which already represent an extreme case.
+estimatedSizeOfCsmMetric = 170
 maxSizeOfCsmMetricSendingQueue = 60 * 1024
 
 /**
@@ -88,6 +89,7 @@ remoteLogQueueFilename = 'criteo_remote_logs_queue'
 
 // Maximum size (in bytes) of remote log elements stored in the sending queue.
 // 250KB represents ~51 logs (with ~5000 bytes/log with big stacktrace) which already represent an extreme case.
+estimatedSizeOfRemoteLog = 5000
 maxSizeOfRemoteLogSendingQueue = 250 * 1024
 
 environments {

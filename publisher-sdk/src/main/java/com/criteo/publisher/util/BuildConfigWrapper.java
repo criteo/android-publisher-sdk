@@ -67,6 +67,13 @@ public class BuildConfigWrapper {
   }
 
   /**
+   * Estimated size (in bytes) of metric elements stored in the metric sending queue.
+   */
+  public int getEstimatedSizeOfCsmMetric() {
+    return BuildConfig.estimatedSizeOfCsmMetric;
+  }
+
+  /**
    * The relative path in application folder of the sending queue file for CSM
    */
   @NonNull
@@ -124,10 +131,17 @@ public class BuildConfigWrapper {
   }
 
   /**
-   * Maximum size (in bytes) of metric elements stored in the remote log sending queue.
+   * Maximum size (in bytes) of elements stored in the remote log sending queue.
    */
   public int getMaxSizeOfRemoteLogSendingQueue() {
     return BuildConfig.maxSizeOfRemoteLogSendingQueue;
+  }
+
+  /**
+   * Estimated size (in bytes) of elements stored in the remote log sending queue.
+   */
+  public int getEstimatedSizeOfRemoteLog() {
+    return BuildConfig.estimatedSizeOfRemoteLog;
   }
 
   /**
