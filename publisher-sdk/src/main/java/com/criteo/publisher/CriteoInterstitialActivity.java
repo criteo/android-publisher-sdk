@@ -112,7 +112,6 @@ public class CriteoInterstitialActivity extends Activity {
   protected void onDestroy() {
     super.onDestroy();
     adLayout.removeAllViews();
-    webView.setWebViewClient(null);
     webView.destroy();
     webView = null;
   }
