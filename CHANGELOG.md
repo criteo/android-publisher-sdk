@@ -5,6 +5,7 @@
   - Removed support of Google SDK < v19.7.0 (see https://developers.google.com/admob/android/migration)
 - Features
   - Added support of Google SDK v20.0.0
+  - Added support of Android 11 (API level 30)
 - Bug fixes
   - Reduce log level of network exception from error to info
   - Fix infinite `NoSuchMethodException` when Proguard is used with method inlining enabled
