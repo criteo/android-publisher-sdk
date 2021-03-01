@@ -39,7 +39,8 @@ data class RemoteLogRecords(
       @SerializedName("sessionId") val sessionId: String,
       @SerializedName("profileId") val profileId: Int,
       @SerializedName("exception") val exceptionType: String?,
-      @SerializedName("logId") val logId: String?
+      @SerializedName("logId") val logId: String?,
+      @SerializedName("deviceOs") val deviceOs: String?
   )
 
   @Keep // for serialization

@@ -17,6 +17,7 @@
 package com.criteo.publisher.logging
 
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import androidx.annotation.VisibleForTesting
 import com.criteo.publisher.Clock
@@ -72,7 +73,8 @@ internal class RemoteLogRecordsFactory(
         session.sessionId,
         integrationRegistry.profileId,
         logMessage.throwable?.javaClass?.simpleName,
-        logMessage.logId
+        logMessage.logId,
+        "android-${Build.VERSION.SDK_INT}"
     )
 
     return RemoteLogRecords(context, listOf(logRecord))

@@ -114,7 +114,8 @@ class RemoteLogRecordsFactoryTest {
             "session-id",
             42,
             "UnsupportedOperationException",
-            "myLogId"
+            "myLogId",
+            "android-0"
         ),
         listOf(RemoteLogRecord(RemoteLogLevel.WARNING, listOf(expectedMessage)))
     ))
