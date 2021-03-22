@@ -30,7 +30,16 @@ fun ScriptHandler.addDefaultInputRepository() {
 
 internal fun RepositoryHandler.addDefaultInputRepository() {
   google()
-  jcenter()
+  mavenCentral()
+  jcenter {
+    content {
+      includeGroup("com.mopub")
+      includeGroup("com.criteo.mediation.mopub")
+      includeGroup("com.criteo.mediation.google")
+      includeModule("org.jetbrains.trove4j", "trove4j") // https://youtrack.jetbrains.com/issue/IDEA-261387#focus=Comments-27-4726891.0-0
+      includeGroup("org.jetbrains.kotlinx") // https://github.com/Kotlin/kotlinx.html/issues/173
+    }
+  }
   maven {
     setUrl("https://jitpack.io")
   }

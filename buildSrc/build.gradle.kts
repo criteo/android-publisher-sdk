@@ -20,7 +20,12 @@ plugins {
 
 repositories {
   google()
-  jcenter()
+  mavenCentral()
+  jcenter {
+    content {
+      includeGroup("org.jetbrains.kotlinx") // https://github.com/Kotlin/kotlinx.html/issues/173
+    }
+  }
   gradlePluginPortal()
   maven("https://www.jitpack.io")
 }
