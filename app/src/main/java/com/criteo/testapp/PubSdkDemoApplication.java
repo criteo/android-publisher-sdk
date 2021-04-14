@@ -43,7 +43,7 @@ public class PubSdkDemoApplication extends MultiDexApplication {
   public static final String MOPUB_NATIVE_ADUNIT_ID = "a298abc2fdf744cf898791831509cc38";
 
   public static final InterstitialAdUnit INTERSTITIAL = new InterstitialAdUnit(
-      "/140800857/Endeavour_Interstitial_320x480"
+      "hackathon_3"
   );
 
   public static final InterstitialAdUnit INTERSTITIAL_IBV_DEMO = new InterstitialAdUnit(
@@ -53,8 +53,8 @@ public class PubSdkDemoApplication extends MultiDexApplication {
   public static final NativeAdUnit NATIVE = new NativeAdUnit("/140800857/Endeavour_Native");
 
   public static final BannerAdUnit BANNER = new BannerAdUnit(
-      "/140800857/Endeavour_320x50",
-      new AdSize(320, 50)
+      "hackathon_1",
+      new AdSize(300, 250)
   );
 
   public static final ContextData CONTEXT_DATA = new ContextData()

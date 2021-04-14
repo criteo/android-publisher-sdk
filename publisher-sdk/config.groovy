@@ -103,6 +103,7 @@ environments {
         // Uncomment to use another CDB, you'll also need to deactivate the CDB stub in
         // MockedDependenciesRule
         cdbUrl = 'https://directbidder-test-app.par.preprod.crto.in' // preprod
+        cdbUrl = 'https://directbidder-app-hackathon.par.preprod.crto.in' // hackathon
         // cdbUrl = 'http://10.0.2.2:9991' // local
 
         defaultMinLogLevel = 2 // All
@@ -111,6 +112,7 @@ environments {
 
     staging {
         cdbUrl = 'https://bidder.criteo.com'
+        cdbUrl = 'https://directbidder-app-hackathon.par.preprod.crto.in'
         eventUrl = 'https://gum.criteo.com'
 
         defaultMinLogLevel = 2 // All
