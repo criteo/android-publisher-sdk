@@ -23,7 +23,6 @@ plugins {
     signing
     kotlin("android")
     id("com.vanniktech.android.javadoc") version "0.3.0"
-    id("com.jfrog.bintray")
     id("io.gitlab.arturbosch.detekt")
 }
 
@@ -69,15 +68,6 @@ addPublication("Apk") {
                 builtBy(assembleProvider)
             }
         }
-    }
-}
-
-addBintrayRepository {
-    // JCenter only accepts packages representing library with .jar or .aar
-    // The test app is not in this case. Hence, we push it on Bintray but in a dedicated package,
-    // that will not get sync with JCenter (as it is not needed).
-    with(pkg) {
-        name = "publisher-sdk-test-app"
     }
 }
 

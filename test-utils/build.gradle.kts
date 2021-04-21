@@ -22,7 +22,6 @@ plugins {
   kotlin("android")
   id("kotlin-allopen")
   id("com.vanniktech.android.javadoc") version "0.3.0"
-  id("com.jfrog.bintray")
   id("io.gitlab.arturbosch.detekt")
 }
 
@@ -85,5 +84,3 @@ addPublication("debug") {
   artifactId = "criteo-publisher-sdk-test-utils"
   pom.description.set("Utilities for tests on the Criteo Publisher SDK")
 }
-
-addBintrayRepository()

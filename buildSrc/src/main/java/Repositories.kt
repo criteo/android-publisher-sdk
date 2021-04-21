@@ -14,7 +14,6 @@
  *    limitations under the License.
  */
 
-import com.jfrog.bintray.gradle.BintrayExtension
 import io.github.gradlenexus.publishplugin.NexusPublishExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
@@ -72,35 +71,5 @@ fun Project.addSonatypeOutputRepository() {
         password.set(System.getenv("SONATYPE_PASSWORD"))
       }
     }
-  }
-}
-
-fun Project.addBintrayRepository(configure: BintrayExtension.() -> Unit = {}) {
-  the<BintrayExtension>().apply {
-    user = System.getenv("BINTRAY_USER")
-    key = System.getenv("BINTRAY_KEY")
-    publish = true
-
-    with(pkg) {
-      repo = "mobile"
-      userOrg = "criteo"
-      name = "publisher-sdk"
-      desc = Publications.sdkDescription
-      websiteUrl = Publications.website
-      vcsUrl = Publications.githubUrl
-      setLicenses("Apache-2.0")
-      publicDownloadNumbers = true
-
-      with(version) {
-        name = sdkPublicationVersion()
-      }
-    }
-
-    afterEvaluate {
-      val publicationNames = publishing.publications.map { it.name }.toTypedArray()
-      setPublications(*publicationNames)
-    }
-
-    configure(this)
   }
 }
