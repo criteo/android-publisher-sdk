@@ -21,6 +21,7 @@ plugins {
     id("com.android.application")
     `maven-publish`
     kotlin("android")
+    id("com.vanniktech.android.javadoc") version "0.3.0"
     id("com.jfrog.bintray")
     id("io.gitlab.arturbosch.detekt")
 }
@@ -47,6 +48,12 @@ android {
 
 // Export APK for all build types (release, staging, debug)
 addPublication("Apk") {
+    afterEvaluate {
+        val mainVariant = "memoryLeaksHuntRelease"
+        addSourcesJar(mainVariant)
+        addJavadocJar(mainVariant)
+    }
+
     groupId = "com.criteo.publisher"
     artifactId = "criteo-publisher-sdk-test-app"
 
