@@ -15,6 +15,7 @@
  */
 
 import com.jfrog.bintray.gradle.BintrayExtension
+import io.github.gradlenexus.publishplugin.NexusPublishExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.initialization.dsl.ScriptHandler
@@ -58,6 +59,17 @@ internal fun Project.addDevRepository() {
       maven {
         name = "Dev"
         setUrl("file://$devRepository")
+      }
+    }
+  }
+}
+
+fun Project.addSonatypeOutputRepository() {
+  the<NexusPublishExtension>().apply {
+    repositories {
+      sonatype {
+        username.set("criteo-oss")
+        password.set(System.getenv("SONATYPE_PASSWORD"))
       }
     }
   }

@@ -1,4 +1,5 @@
 # Next Version
+- Artifacts are now delivered through `Maven Central` repository instead of `JCenter` which is deprecated.
 
 # Version 4.3.0
 - Breaking changes

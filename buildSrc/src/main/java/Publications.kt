@@ -14,7 +14,6 @@
  *    limitations under the License.
  */
 
-import groovy.util.Node
 import groovy.util.NodeList
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -44,11 +43,12 @@ fun Project.addPublication(name: String, publication: SdkPublication.() -> Unit)
 
 class SdkPublication(
     private val project: Project,
-    mavenPublication: MavenPublication
+    private val mavenPublication: MavenPublication
 ) : MavenPublication by mavenPublication {
 
   init {
     setDefaultValue()
+    signPublication()
   }
 
   fun addSourcesJar(variantName: String) {
@@ -58,7 +58,7 @@ class SdkPublication(
   fun addJavadocJar(variantName: String) {
     project.getJavadocTask(variantName).apply {
       dependsOn(project.getAssembleTask(variantName))
-      setFailOnError(false)
+      isFailOnError = false
     }
 
     artifact(project.getJavadocJarTask(variantName))
@@ -89,6 +89,7 @@ class SdkPublication(
   }
 
   private fun setDefaultValue() {
+    groupId = project.rootProject.group as String
     version = project.sdkPublicationVersion()
 
     pom {
@@ -120,6 +121,12 @@ class SdkPublication(
 
       developers {
         // We rely on Git to recognize contributors
+        developer {
+          name.set("R&D Direct")
+          email.set("rnd-direct@criteo.com")
+          organization.set("Criteo")
+          organizationUrl.set("https://www.criteo.com/")
+        }
       }
 
       scm {
@@ -131,5 +138,17 @@ class SdkPublication(
   }
 
   private operator fun NodeList.get(name: String): NodeList = getAt(name)
+
+  private fun signPublication() {
+    project.signing?.apply {
+      val secretKey = System.getenv("MAVEN_SECRING_GPG_BASE64")
+      val password = System.getenv("SONATYPE_PASSWORD")
+
+      if (secretKey != null && password != null) {
+        useInMemoryPgpKeys(secretKey, password)
+        sign(mavenPublication)
+      }
+    }
+  }
 
 }

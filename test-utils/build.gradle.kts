@@ -17,6 +17,7 @@
 plugins {
   id("com.android.library")
   `maven-publish`
+  signing
   jacoco
   kotlin("android")
   id("kotlin-allopen")
@@ -81,7 +82,6 @@ addPublication("debug") {
     addJavadocJar("debug")
   }
 
-  groupId = "com.criteo.publisher"
   artifactId = "criteo-publisher-sdk-test-utils"
   pom.description.set("Utilities for tests on the Criteo Publisher SDK")
 }
