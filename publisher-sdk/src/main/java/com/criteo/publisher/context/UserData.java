@@ -29,7 +29,7 @@ public class UserData extends AbstractContextData<UserData> {
    * The hashing should be the users’ email address:
    * <ul>
    *   <li>Encoded in UTF-8</li>
-   *   <li>Trimmed of any white space (eg: “test@criteo.com “ should become “test@criteo.com”)</li>
+   *   <li>Trimmed of any white space (eg: “test@criteo.com “ should become “test@criteo.com“)</li>
    *   <li>Converted to lower case</li>
    *   <li>Hashed with MD5 & output as ASCII text</li>
    *   <li>Hashed with SHA256 and output as ASCII text</li>
