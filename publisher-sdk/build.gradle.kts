@@ -17,6 +17,7 @@
 plugins {
     id("com.android.library")
     `maven-publish`
+    signing
     jacoco
     kotlin("android")
     id("kotlin-allopen")
@@ -82,8 +83,6 @@ android {
                 addSourcesJar(variantName)
                 addJavadocJar(variantName)
             }
-
-            groupId = "com.criteo.publisher"
 
             artifactId = if (variantName == "release" && isSnapshot()) {
                 "criteo-publisher-sdk-development"

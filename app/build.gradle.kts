@@ -20,6 +20,7 @@ import Deps.Criteo.Mediation.MoPub
 plugins {
     id("com.android.application")
     `maven-publish`
+    signing
     kotlin("android")
     id("com.vanniktech.android.javadoc") version "0.3.0"
     id("com.jfrog.bintray")
@@ -54,7 +55,6 @@ addPublication("Apk") {
         addJavadocJar(mainVariant)
     }
 
-    groupId = "com.criteo.publisher"
     artifactId = "criteo-publisher-sdk-test-app"
 
     pom {

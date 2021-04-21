@@ -25,13 +25,17 @@ buildscript {
   }
 }
 
+plugins {
+  id("org.sonarqube") version "3.0"
+  id("io.github.gradle-nexus.publish-plugin")
+}
+
 allprojects {
   addDefaultInputRepository()
 }
 
-plugins {
-  id("org.sonarqube") version "3.0"
-}
+group = Deps.Criteo.PublisherSdk.group
+addSonatypeOutputRepository()
 
 sonarqube {
   properties {

@@ -37,4 +37,5 @@ dependencies {
   implementation("com.jfrog.bintray.gradle:gradle-bintray-plugin:1.8.5")
   implementation("com.banno.gordon:gordon-plugin:1.4.2")
   implementation("io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.10.0")
+  implementation("io.github.gradle-nexus:publish-plugin:1.0.0")
 }

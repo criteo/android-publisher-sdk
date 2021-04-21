@@ -21,6 +21,7 @@ import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.publish.PublishingExtension
+import org.gradle.plugins.signing.SigningExtension
 import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
 
 internal val Project.androidBase: BaseExtension
@@ -38,6 +39,10 @@ internal val Project.detekt: DetektExtension?
 internal val Project.jacoco: JacocoPluginExtension?
   get() =
     (this as ExtensionAware).extensions.findByType(JacocoPluginExtension::class.java)
+
+internal val Project.signing: SigningExtension?
+  get() =
+    (this as ExtensionAware).extensions.findByType(SigningExtension::class.java)
 
 internal fun Project.androidBase(configure: BaseExtension.() -> Unit): Unit =
     (this as ExtensionAware).extensions.configure("android", configure)
