@@ -118,5 +118,5 @@ private fun testAppUrl(version: String): String {
   //  broken. A proper solution could be to get the publication from the test-app module, but it may
   //  be extracted outside this project.
   //  But coordinates are pretty constant, so this is not a big deal for now.
-  return "https://search.maven.org/remotecontent?filepath=com/criteo/publisher/criteo-publisher-sdk-test-app/$version/criteo-publisher-sdk-test-app-$version-staging.apk"
+  return "https://oss.sonatype.org/service/local/repo_groups/public/content/com/criteo/publisher/criteo-publisher-sdk-test-app/$version/criteo-publisher-sdk-test-app-$version-staging.apk"
 }
