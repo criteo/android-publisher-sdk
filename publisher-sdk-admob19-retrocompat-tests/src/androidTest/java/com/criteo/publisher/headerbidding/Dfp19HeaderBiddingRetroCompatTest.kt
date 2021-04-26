@@ -16,36 +16,20 @@
 
 package com.criteo.publisher.headerbidding
 
-import com.criteo.publisher.mock.MockBean
-import com.criteo.publisher.mock.MockedDependenciesRule
-import com.criteo.publisher.util.AndroidUtil
-import com.criteo.publisher.util.DeviceUtil
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
+import android.os.Bundle
+import com.google.android.gms.ads.doubleclick.PublisherAdRequest
+import java.util.function.Consumer
 
-class Dfp19HeaderBiddingRetroCompatTest {
+class Dfp19HeaderBiddingRetroCompatTest: AbstractDfpHeaderBiddingTest() {
 
-  @Rule
-  @JvmField
-  val mockedDependenciesRule = MockedDependenciesRule()
+  override fun versionName(): String = "AdMob19"
 
-  @MockBean
-  private lateinit var androidUtil: AndroidUtil
+  override fun newBuilder(): Any = PublisherAdRequest.Builder()
 
-  @MockBean
-  private lateinit var deviceUtil: DeviceUtil
-
-  private lateinit var handler: DfpHeaderBidding
-
-  @Before
-  fun setUp() {
-    handler = DfpHeaderBidding(androidUtil, deviceUtil)
+  override fun customTargetingFrom(action: Consumer<Any>): Bundle {
+    val builder = PublisherAdRequest.Builder()
+    action.accept(builder)
+    return builder.build().customTargeting
   }
 
-  @Test
-  fun test() {
-    assertThat(handler.canHandle(this)).isFalse()
-  }
 }

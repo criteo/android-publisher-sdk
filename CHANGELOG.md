@@ -1,5 +1,6 @@
 # Next Version
 - Artifacts are now delivered through `Maven Central` repository instead of `JCenter` which is deprecated.
+- Handle retro compatibility of AdMob < v19.7.0
 
 # Version 4.3.0
 - Breaking changes

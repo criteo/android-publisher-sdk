@@ -18,6 +18,7 @@ package com.criteo.publisher.headerbidding;
 
 import android.content.res.Configuration;
 import android.util.Base64;
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -35,6 +36,8 @@ import com.criteo.publisher.util.TextUtils;
 import com.google.android.gms.ads.admanager.AdManagerAdRequest;
 import com.google.android.gms.ads.admanager.AdManagerAdRequest.Builder;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
@@ -102,11 +105,11 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
       @NonNull AdUnitType adUnitType,
       @NonNull CdbResponseSlot slot
   ) {
-    if (!canHandle(object)) {
+    SafeDfpBuilder builder = SafeDfpBuilder.newBuilder(object);
+    if (builder == null) {
       return;
     }
 
-    SafeDfpBuilder builder = new SafeDfpBuilder((Builder) object);
     builder.addCustomTargeting(CRT_CPM, slot.getCpm());
 
     switch (adUnitType) {
@@ -227,16 +230,56 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
     return URLEncoder.encode(encoded, Charset.forName("UTF-8").name());
   }
 
-  private static class SafeDfpBuilder {
+  private static abstract class SafeDfpBuilder {
+
+    @NonNull
+    private final String name;
+
+    @NonNull
+    private final StringBuilder description;
+
+    private SafeDfpBuilder(@NonNull String name) {
+      this.name = name;
+      this.description = new StringBuilder();
+    }
+
+    static boolean isDfpBuilder(@NonNull Object candidate) {
+      return SafeDfp20Builder.isDfpBuilder(candidate) || SafeDfp19Builder.isDfpBuilder(candidate);
+    }
+
+    @Nullable
+    static SafeDfpBuilder newBuilder(@NonNull Object candidate) {
+      if (SafeDfp20Builder.isDfpBuilder(candidate)) {
+        return new SafeDfp20Builder((Builder) candidate);
+      } else if (SafeDfp19Builder.isDfpBuilder(candidate)) {
+        return new SafeDfp19Builder(candidate);
+      }
+      return null;
+    }
+
+    @CallSuper
+    protected void addCustomTargeting(String key, String value) {
+      if (description.length() != 0) {
+        description.append(",");
+      } else {
+        description.append(name).append(':');
+      }
+      description.append(key).append("=").append(value);
+    }
+
+    final String getDescription() {
+      return description.toString();
+    }
+  }
+
+  private static class SafeDfp20Builder extends SafeDfpBuilder {
 
     @NonNull
     private final AdManagerAdRequest.Builder builder;
 
-    private final StringBuilder description;
-
-    private SafeDfpBuilder(@NonNull Builder builder) {
+    private SafeDfp20Builder(@NonNull Builder builder) {
+      super("AdMob20");
       this.builder = builder;
-      this.description = new StringBuilder();
     }
 
     static boolean isDfpBuilder(@NonNull Object candidate) {
@@ -247,7 +290,8 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
       }
     }
 
-    void addCustomTargeting(String key, String value) {
+    @Override
+    protected void addCustomTargeting(String key, String value) {
       try {
         builder.addCustomTargeting(key, value);
       } catch (LinkageError e) {
@@ -255,14 +299,65 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
         return;
       }
 
-      if (description.length() != 0) {
-        description.append(",");
-      }
-      description.append(key).append("=").append(value);
+      super.addCustomTargeting(key, value);
+    }
+  }
+
+  private static class SafeDfp19Builder extends SafeDfpBuilder {
+
+    @Nullable
+    private static Class<?> builderClass;
+
+    @Nullable
+    private static Method addCustomTargeting;
+
+    @NonNull
+    private final Object builder;
+
+    private SafeDfp19Builder(@NonNull Object builder) {
+      super("AdMob19");
+      this.builder = builder;
     }
 
-    String getDescription() {
-      return description.toString();
+    static boolean isDfpBuilder(@NonNull Object candidate) {
+      return initStaticState(candidate.getClass().getClassLoader()) && builderClass.isAssignableFrom(candidate.getClass());
+    }
+
+    @Override
+    protected void addCustomTargeting(String key, String value) {
+      try {
+        addCustomTargeting.invoke(builder, key, value);
+      } catch (IllegalAccessException e) {
+        PreconditionsUtil.throwOrLog(e);
+      } catch (InvocationTargetException e) {
+        PreconditionsUtil.throwOrLog(e);
+      }
+
+      super.addCustomTargeting(key, value);
+    }
+
+    private static boolean initStaticState(ClassLoader classLoader) {
+      if (builderClass != null && addCustomTargeting != null) {
+        return true;
+      }
+
+      try {
+        builderClass = Class.forName(
+            "com.google.android.gms.ads.doubleclick.PublisherAdRequest$Builder",
+            false,
+            classLoader
+        );
+
+        addCustomTargeting = builderClass.getMethod("addCustomTargeting", String.class, String.class);
+
+        return true;
+      } catch (ClassNotFoundException e) {
+        // This is normal if AdMob 19 is not in the classpath
+      } catch (NoSuchMethodException e) {
+        PreconditionsUtil.throwOrLog(e);
+      }
+
+      return false;
     }
   }
 
