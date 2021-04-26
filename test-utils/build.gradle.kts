@@ -44,6 +44,7 @@ android {
 
 dependencies {
   compileOnly(project(":publisher-sdk"))
+  compileOnly(Deps.AssertJ.AssertJ)
 
   implementation(Deps.AndroidX.MultiDex)
   implementation(Deps.JUnit.JUnit)
