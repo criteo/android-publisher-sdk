@@ -111,6 +111,9 @@ public abstract class AbstractDfpHeaderBiddingTest {
   }
 
   @NonNull
+  protected abstract String versionName();
+
+  @NonNull
   protected abstract Object newBuilder();
 
   @NonNull
@@ -166,7 +169,8 @@ public abstract class AbstractDfpHeaderBiddingTest {
     assertEquals("42x1337", customTargeting.get(CRT_SIZE));
     verify(logger).log(argThat(logMessage -> {
       assertThat(logMessage.getMessage()).contains(
-          CRT_CPM + "=0.10,"
+          versionName() + ":"
+              + CRT_CPM + "=0.10,"
               + CRT_DISPLAY_URL + "=" + encodeForDfp("http://display.url") + ","
               + CRT_SIZE + "=42x1337"
       );
@@ -238,7 +242,8 @@ public abstract class AbstractDfpHeaderBiddingTest {
     assertEquals(expectedInjectedSize, customTargeting.get(CRT_SIZE));
     verify(logger).log(argThat(logMessage -> {
       assertThat(logMessage.getMessage()).contains(
-          CRT_CPM + "=0.10,"
+          versionName() + ":"
+              + CRT_CPM + "=0.10,"
               + CRT_DISPLAY_URL + "=" + encodeForDfp("http://display.url") + ","
               + CRT_SIZE + "=" + expectedInjectedSize
       );
@@ -343,7 +348,8 @@ public abstract class AbstractDfpHeaderBiddingTest {
 
     verify(logger).log(argThat(logMessage -> {
       assertThat(logMessage.getMessage()).contains(
-          CRT_CPM + "=0.42,"
+          versionName() + ":"
+              + CRT_CPM + "=0.42,"
               + CRT_NATIVE_TITLE + "=" + encodeForDfp("title") + ","
               + CRT_NATIVE_DESC + "=" + encodeForDfp("description") + ","
               + CRT_NATIVE_PRICE + "=" + encodeForDfp("$1337") + ","

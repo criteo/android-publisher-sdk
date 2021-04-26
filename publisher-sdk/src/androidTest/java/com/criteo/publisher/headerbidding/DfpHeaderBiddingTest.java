@@ -27,6 +27,12 @@ import java.util.function.Consumer;
  */
 public class DfpHeaderBiddingTest extends AbstractDfpHeaderBiddingTest {
 
+  @NonNull
+  @Override
+  protected String versionName() {
+    return "AdMob20";
+  }
+
   @Override
   @NonNull
   protected Object newBuilder() {

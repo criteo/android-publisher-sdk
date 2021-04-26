@@ -40,8 +40,8 @@ dependencies {
   implementation(project(":publisher-sdk"))
   implementation(project(":test-utils"))
   implementation(Deps.Kotlin.Stdlib)
+  implementation(Deps.Google.AdMob19)
 
-  androidTestImplementation(Deps.Google.AdMob19)
   androidTestImplementation(Deps.AndroidX.Test.Runner)
   androidTestImplementation(Deps.AssertJ.AssertJ)
   androidTestImplementation(Deps.Mockito.Android)
