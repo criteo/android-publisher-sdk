@@ -34,7 +34,7 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle-
 
       - name: Set up Android SDK
-        uses: malinskiy/action-android/install-sdk@release/0.0.8
+        uses: malinskiy/action-android/install-sdk@release/0.1.2
 
       # This cache below is not fully working: it should go above the "Set up Android SDK" but:
       # - The action does not support having a SDK already setup -> platform-tools, licenses are re-downloaded
@@ -92,11 +92,11 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle-
 
       - name: Set up Android SDK
-        uses: malinskiy/action-android/install-sdk@release/0.0.8
+        uses: malinskiy/action-android/install-sdk@release/0.1.2
 
       # On merge, run non-flaky-tests without retry then flaky tests with retry policy
       - name: Run all Android tests
-        uses: malinskiy/action-android/emulator-run-cmd@release/0.0.8
+        uses: malinskiy/action-android/emulator-run-cmd@release/0.1.2
         if: github.event_name == 'push'
         with:
           api: 29
@@ -113,7 +113,7 @@ jobs:
 
       # Run only non-flaky tests on PR
       - name: Run Android tests w/o @FlakyTest
-        uses: malinskiy/action-android/emulator-run-cmd@release/0.0.8
+        uses: malinskiy/action-android/emulator-run-cmd@release/0.1.2
         if: github.event_name != 'push'
         with:
           api: 29
@@ -213,7 +213,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up Android SDK
-        uses: malinskiy/action-android/install-sdk@release/0.0.8
+        uses: malinskiy/action-android/install-sdk@release/0.1.2
 
       - name: Deploy artifacts and notify on Slack
         env:
