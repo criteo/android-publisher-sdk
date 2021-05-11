@@ -23,19 +23,19 @@ object Deps {
   }
 
   object AndroidX {
-    const val AppCompat = "androidx.appcompat:appcompat:1.1.0"
-    const val Annotations = "androidx.annotation:annotation:1.0.0"
-    const val MaterialComponents = "com.google.android.material:material:1.0.0"
+    const val AppCompat = "androidx.appcompat:appcompat:1.2.0"
+    const val Annotations = "androidx.annotation:annotation:1.2.0"
+    const val MaterialComponents = "com.google.android.material:material:1.3.0"
     const val MultiDex = "androidx.multidex:multidex:2.0.1"
-    const val RecyclerView = "androidx.recyclerview:recyclerview:1.1.0"
+    const val RecyclerView = "androidx.recyclerview:recyclerview:1.2.0"
     const val SupportCoreUtils = "androidx.legacy:legacy-support-core-utils:1.0.0"
 
     object Constraint {
-      const val ConstraintLayout = "androidx.constraintlayout:constraintlayout:2.0.0-beta6"
+      const val ConstraintLayout = "androidx.constraintlayout:constraintlayout:2.0.4"
     }
 
     object Test {
-      private const val version = "1.2.0"
+      private const val version = "1.3.0"
       const val Core = "androidx.test:core:$version"
       const val Monitor = "androidx.test:monitor:$version"
       const val Runner = "androidx.test:runner:$version"
@@ -44,7 +44,7 @@ object Deps {
   }
 
   object AssertJ {
-    private const val version = "3.16.1"
+    private const val version = "3.19.0"
 
     const val AssertJ = "org.assertj:assertj-core:$version"
   }
@@ -72,12 +72,12 @@ object Deps {
   }
 
   object Detekt {
-    const val version = "1.10.0"
+    const val version = "1.16.0"
     const val DetektFormatting = "io.gitlab.arturbosch.detekt:detekt-formatting:$version"
   }
 
   object EqualsVerifier {
-    private const val version = "3.3"
+    private const val version = "3.6"
 
     const val EqualsVerifier = "nl.jqno.equalsverifier:equalsverifier:$version"
   }
@@ -103,7 +103,7 @@ object Deps {
   }
 
   object JUnit {
-    private const val version = "4.13"
+    private const val version = "4.13.2"
 
     const val JUnit = "junit:junit:$version"
   }
@@ -124,15 +124,15 @@ object Deps {
   }
 
   object Mockito {
-    private const val version = "3.3.0"
+    private const val version = "3.9.0"
 
     const val Android = "org.mockito:mockito-android:$version"
     const val Core = "org.mockito:mockito-core:$version"
-    const val Kotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
+    const val Kotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:3.2.0"
   }
 
   object MoPub {
-    private const val version = "5.13.1"
+    private const val version = "5.16.4"
 
     const val Banner = "com.mopub:mopub-sdk-banner:$version@aar"
     const val Interstitial = "com.mopub:mopub-sdk-fullscreen:$version@aar"
@@ -141,13 +141,13 @@ object Deps {
 
   object Square {
     object LeakCanary {
-      private const val version = "2.4"
+      private const val version = "2.7"
 
       const val LeakCanary = "com.squareup.leakcanary:leakcanary-android:$version"
     }
 
     object OkHttp {
-      private const val version = "4.7.2"
+      private const val version = "4.9.1"
 
       const val MockWebServer = "com.squareup.okhttp3:mockwebserver:$version"
       const val OkHttp = "com.squareup.okhttp3:okhttp:$version"
