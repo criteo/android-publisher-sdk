@@ -28,15 +28,15 @@ import com.criteo.publisher.privacy.gdpr.GdprData
 import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
 import com.criteo.publisher.util.AdvertisingInfo
 import com.criteo.publisher.util.BuildConfigWrapper
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.stub
-import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.stub
+import org.mockito.kotlin.whenever
 import java.util.concurrent.Future
 import java.util.concurrent.atomic.AtomicInteger
 

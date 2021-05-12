@@ -17,9 +17,9 @@
 package com.criteo.publisher.privacy.gdpr
 
 import com.criteo.publisher.util.SafeSharedPreferences
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
 import org.junit.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 

@@ -29,11 +29,11 @@ import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.util.AdvertisingInfo
 import com.criteo.publisher.util.BuildConfigWrapper
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.whenever
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 

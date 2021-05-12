@@ -23,13 +23,17 @@ import com.criteo.publisher.CriteoNotInitializedException
 import com.criteo.publisher.CriteoUtil.clearCriteo
 import com.criteo.publisher.CriteoUtil.givenInitializedCriteo
 import com.criteo.publisher.MockableDependencyProvider
-import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyZeroInteractions
+import org.mockito.kotlin.whenever
 
 class AdChoiceOverlayNativeRendererTest {
 

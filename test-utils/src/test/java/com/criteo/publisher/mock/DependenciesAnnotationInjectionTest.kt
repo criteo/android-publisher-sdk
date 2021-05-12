@@ -17,14 +17,14 @@
 package com.criteo.publisher.mock
 
 import com.criteo.publisher.mock.DependenciesAnnotationInjection.InjectionException
-import com.nhaarman.mockitokotlin2.anyOrNull
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.spy
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Test
 import org.mockito.Mockito.mockingDetails
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.spy
 import javax.inject.Inject
 
 class DependenciesAnnotationInjectionTest {

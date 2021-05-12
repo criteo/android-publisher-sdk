@@ -21,11 +21,11 @@ import com.criteo.publisher.CriteoUtil
 import com.criteo.publisher.DependencyProvider
 import com.criteo.publisher.MockableDependencyProvider
 import com.criteo.publisher.application.UnregisteringApplication
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
 import org.junit.After
 import org.junit.Test
 import org.junit.runners.model.Statement
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 class UnregisteringApplicationTest {
 

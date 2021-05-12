@@ -18,14 +18,14 @@ package com.criteo.publisher.util
 
 import android.content.Context
 import android.util.DisplayMetrics
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.stub
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Answers
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.stub
 
 class AndroidUtilUnitTest {
 

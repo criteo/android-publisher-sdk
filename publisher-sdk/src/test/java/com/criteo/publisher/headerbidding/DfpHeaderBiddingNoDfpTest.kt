@@ -17,12 +17,12 @@
 package com.criteo.publisher.headerbidding
 
 import com.criteo.publisher.util.AdUnitType
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verifyZeroInteractions
 
 class DfpHeaderBiddingNoDfpTest {
 

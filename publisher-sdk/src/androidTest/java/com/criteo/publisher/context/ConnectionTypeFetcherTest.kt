@@ -41,19 +41,19 @@ import com.criteo.publisher.context.ConnectionTypeFetcher.ConnectionType.WIFI
 import com.criteo.publisher.context.ConnectionTypeFetcher.ConnectionType.WIRED
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
-import com.nhaarman.mockitokotlin2.KStubbing
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.doThrow
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.stub
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
-import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.KStubbing
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doThrow
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.stub
+import org.mockito.kotlin.verifyZeroInteractions
+import org.mockito.kotlin.whenever
 
 @Suppress("DEPRECATION")
 class ConnectionTypeFetcherTest {

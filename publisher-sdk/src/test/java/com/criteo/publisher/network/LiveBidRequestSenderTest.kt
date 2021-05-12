@@ -24,14 +24,14 @@ import com.criteo.publisher.model.CdbRequest
 import com.criteo.publisher.model.CdbRequestFactory
 import com.criteo.publisher.model.CdbResponse
 import com.criteo.publisher.model.Config
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.Future

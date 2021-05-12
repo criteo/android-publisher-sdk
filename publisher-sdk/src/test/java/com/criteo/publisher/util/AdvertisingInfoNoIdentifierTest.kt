@@ -19,13 +19,13 @@ import com.criteo.publisher.logging.Logger
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.util.AdvertisingInfo.MissingPlayServicesAdsIdentifierException
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
 import javax.inject.Inject
 
 class AdvertisingInfoNoIdentifierTest {

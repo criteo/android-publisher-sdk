@@ -16,13 +16,18 @@
 
 package com.criteo.publisher.advancednative
 
-import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.never
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.lang.ref.Reference
 import java.net.URL
 

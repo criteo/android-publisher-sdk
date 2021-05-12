@@ -17,10 +17,10 @@
 package com.criteo.publisher.bid
 
 import com.criteo.publisher.EpochClock
-import com.nhaarman.mockitokotlin2.mock
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
-import java.util.*
+import org.mockito.kotlin.mock
+import java.util.UUID
 
 class UniqueIdGeneratorTest {
 

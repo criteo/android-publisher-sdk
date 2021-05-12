@@ -128,7 +128,7 @@ object Deps {
 
     const val Android = "org.mockito:mockito-android:$version"
     const val Core = "org.mockito:mockito-core:$version"
-    const val Kotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
+    const val Kotlin = "org.mockito.kotlin:mockito-kotlin:3.2.0"
   }
 
   object MoPub {

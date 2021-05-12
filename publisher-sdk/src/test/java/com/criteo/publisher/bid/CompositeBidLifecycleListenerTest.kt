@@ -16,16 +16,20 @@
 
 package com.criteo.publisher.bid
 
-import com.criteo.publisher.model.*
+import com.criteo.publisher.model.AdSize
+import com.criteo.publisher.model.CacheAdUnit
+import com.criteo.publisher.model.CdbRequest
+import com.criteo.publisher.model.CdbResponse
+import com.criteo.publisher.model.CdbResponseSlot
 import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnit
 import org.mockito.junit.MockitoRule
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 
 class CompositeBidLifecycleListenerTest {
 
