@@ -27,18 +27,18 @@ import com.criteo.publisher.CriteoListenerCode.INVALID_CREATIVE
 import com.criteo.publisher.CriteoListenerCode.OPEN
 import com.criteo.publisher.CriteoListenerCode.VALID
 import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.doAnswer
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.doThrow
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doThrow
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.lang.ref.Reference
 
 class InterstitialListenerNotifierTest {

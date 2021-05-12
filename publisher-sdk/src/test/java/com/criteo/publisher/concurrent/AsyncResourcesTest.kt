@@ -16,9 +16,9 @@
 
 package com.criteo.publisher.concurrent
 
-import com.nhaarman.mockitokotlin2.spy
-import com.nhaarman.mockitokotlin2.verify
 import org.junit.Test
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.verify
 
 class AsyncResourcesTest {
 

@@ -21,11 +21,17 @@ import com.criteo.publisher.activity.TopActivityFinder
 import com.criteo.publisher.adview.Redirection
 import com.criteo.publisher.adview.RedirectionListener
 import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor
-import com.nhaarman.mockitokotlin2.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.stub
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyZeroInteractions
 import java.net.URI
 
 class ClickHelperTest {

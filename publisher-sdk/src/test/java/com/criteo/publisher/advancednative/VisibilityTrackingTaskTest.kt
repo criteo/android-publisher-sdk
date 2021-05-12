@@ -19,16 +19,18 @@ package com.criteo.publisher.advancednative
 import android.view.View
 import android.view.ViewTreeObserver
 import com.criteo.publisher.advancednative.VisibilityTracker.VisibilityTrackingTask
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Answers
 import org.mockito.Mock
-import org.mockito.Mockito.*
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.never
+import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.lang.ref.Reference
 
 class VisibilityTrackingTaskTest {

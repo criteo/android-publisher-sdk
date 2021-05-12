@@ -15,9 +15,9 @@
  */
 package com.criteo.publisher.mock
 
-import com.nhaarman.mockitokotlin2.spy
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Test
+import org.mockito.kotlin.spy
 
 class DependenciesAnnotationInjectionAndroidTest {
 

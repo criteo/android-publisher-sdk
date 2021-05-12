@@ -17,10 +17,14 @@
 package com.criteo.publisher.util
 
 import com.criteo.publisher.mock.MockedDependenciesRule
-import com.nhaarman.mockitokotlin2.*
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doThrow
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import java.io.IOException
 import java.io.OutputStream
 import javax.inject.Inject

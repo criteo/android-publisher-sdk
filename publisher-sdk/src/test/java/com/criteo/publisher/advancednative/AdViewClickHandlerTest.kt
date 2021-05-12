@@ -17,11 +17,11 @@
 package com.criteo.publisher.advancednative
 
 import com.criteo.publisher.adview.RedirectionListener
-import com.nhaarman.mockitokotlin2.argumentCaptor
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
 import org.junit.Test
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import java.lang.ref.WeakReference
 import java.net.URI
 

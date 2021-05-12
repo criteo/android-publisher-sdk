@@ -22,9 +22,9 @@ import com.criteo.publisher.DependencyProvider
 import com.criteo.publisher.MockableDependencyProvider
 import com.criteo.publisher.integration.IntegrationDetector
 import com.criteo.publisher.integration.IntegrationRegistry
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.spy
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.whenever
 
 internal object MockedDependencyProvider {
 

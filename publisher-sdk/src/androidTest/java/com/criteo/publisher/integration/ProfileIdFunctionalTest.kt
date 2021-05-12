@@ -39,18 +39,18 @@ import com.criteo.publisher.privacy.ConsentData
 import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import com.mopub.mobileads.MoPubInterstitial
 import com.mopub.mobileads.MoPubView
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.atLeastOnce
-import com.nhaarman.mockitokotlin2.check
-import com.nhaarman.mockitokotlin2.clearInvocations
-import com.nhaarman.mockitokotlin2.doCallRealMethod
-import com.nhaarman.mockitokotlin2.doNothing
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.check
+import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.doCallRealMethod
+import org.mockito.kotlin.doNothing
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import javax.inject.Inject
 
 class ProfileIdFunctionalTest {

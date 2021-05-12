@@ -17,8 +17,13 @@
 package com.criteo.publisher.advancednative
 
 import com.criteo.publisher.adview.RedirectionListener
-import com.nhaarman.mockitokotlin2.*
 import org.junit.Test
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import java.lang.ref.SoftReference
 import java.net.URI
 

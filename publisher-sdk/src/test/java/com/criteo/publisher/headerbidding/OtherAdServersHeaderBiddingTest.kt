@@ -20,11 +20,11 @@ import com.criteo.publisher.integration.Integration
 import com.criteo.publisher.model.CdbResponseSlot
 import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
 import com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verifyZeroInteractions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verifyZeroInteractions
 
 class OtherAdServersHeaderBiddingTest {
 

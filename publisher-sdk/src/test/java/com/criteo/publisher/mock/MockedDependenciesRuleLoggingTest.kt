@@ -21,14 +21,14 @@ import com.criteo.publisher.logging.ConsoleHandler
 import com.criteo.publisher.logging.LogMessage
 import com.criteo.publisher.logging.Logger
 import com.criteo.publisher.logging.LoggerFactory
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.ObjectAssert
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.verify
 
 class MockedDependenciesRuleLoggingTest {
 
