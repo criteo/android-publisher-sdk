@@ -48,6 +48,7 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
   private static final String CRT_CPM = "crt_cpm";
   private static final String CRT_DISPLAY_URL = "crt_displayurl";
   private static final String CRT_SIZE = "crt_size";
+  private static final String CRT_FORMAT = "crt_format";
   private static final String CRT_NATIVE_TITLE = "crtn_title";
   private static final String CRT_NATIVE_DESC = "crtn_desc";
   private static final String CRT_NATIVE_PRICE = "crtn_price";
@@ -63,6 +64,8 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
   private static final String CRT_NATIVE_PR_TEXT = "crtn_prtext";
   private static final String CRT_NATIVE_PIXEL_URL = "crtn_pixurl_";
   private static final String CRT_NATIVE_PIXEL_COUNT = "crtn_pixcount";
+
+  private static final String VIDEO = "video";
 
   @NonNull
   private final AndroidUtil androidUtil;
@@ -114,11 +117,11 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
 
     switch (adUnitType) {
       case CRITEO_BANNER:
-        checkAndReflect(builder, slot.getDisplayUrl(), CRT_DISPLAY_URL);
+        addEncodedDisplayUrl(builder, slot);
         builder.addCustomTargeting(CRT_SIZE, slot.getWidth() + "x" + slot.getHeight());
         break;
       case CRITEO_INTERSTITIAL:
-        checkAndReflect(builder, slot.getDisplayUrl(), CRT_DISPLAY_URL);
+        addEncodedDisplayUrl(builder, slot);
         builder.addCustomTargeting(CRT_SIZE, getDfpSizeForInterstitial(slot));
         break;
       case CRITEO_CUSTOM_NATIVE:
@@ -126,7 +129,32 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
         break;
     }
 
+    if (slot.isVideo()) {
+      builder.addCustomTargeting(CRT_FORMAT, VIDEO);
+    }
+
     logger.log(AppBiddingLogMessage.onAdObjectEnrichedSuccessfully(getIntegration(), builder.getDescription()));
+  }
+
+  private void addEncodedDisplayUrl(@NonNull SafeDfpBuilder builder, @NonNull CdbResponseSlot slot) {
+    String displayUrl = slot.getDisplayUrl();
+    if (TextUtils.isEmpty(displayUrl)) {
+      return;
+    }
+
+    String encodedDisplayUrl;
+    if (slot.isVideo()) {
+      try {
+        encodedDisplayUrl = encode(encode(displayUrl));
+      } catch (UnsupportedEncodingException e) {
+        PreconditionsUtil.throwOrLog(e);
+        return;
+      }
+    } else {
+      encodedDisplayUrl = createDfpCompatibleString(displayUrl);
+    }
+
+    builder.addCustomTargeting(CRT_DISPLAY_URL, encodedDisplayUrl);
   }
 
   /**
