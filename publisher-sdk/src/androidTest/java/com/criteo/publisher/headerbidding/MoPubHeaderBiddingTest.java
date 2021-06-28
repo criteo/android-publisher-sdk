@@ -203,6 +203,21 @@ public class MoPubHeaderBiddingTest {
   }
 
   @Test
+  public void cleanPreviousBid_GivenMoPubVideoWithPreviousCriteoData_RemoveOnlyCriteoData()
+      throws Exception {
+    MoPubInterstitial moPub = givenMoPubInterstitial();
+    moPub.setKeywords(
+        "previousData,that:\"shouldn't be cleaned\",crt_cpm:0.10,crt_displayUrl:http%3A%2F%2Furl,crt_size:42x1337,crt_format:video,crt_cpm_notcriteo,this:\"one neither\"");
+
+    headerBidding.cleanPreviousBid(moPub);
+    String keywords = moPub.getKeywords();
+
+    assertThat(keywords)
+        .isEqualTo(
+            "previousData,that:\"shouldn't be cleaned\",crt_cpm_notcriteo,this:\"one neither\"");
+  }
+
+  @Test
   public void enrichBid_GivenNotHandledObject_DoNothing() throws Exception {
     Object builder = mock(Object.class);
 
@@ -239,6 +254,21 @@ public class MoPubHeaderBiddingTest {
     String keywords = moPub.getKeywords();
 
     assertEquals("previousData,crt_cpm:0.10,crt_displayUrl:http://display.url", keywords);
+  }
+
+  @Test
+  public void enrichBid_GivenMoPubVideoInterstitialAndInterstitialBidAvailable_EnrichBuilder() throws Exception {
+    CdbResponseSlot slot = mock(CdbResponseSlot.class);
+    when(slot.getCpm()).thenReturn("0.10");
+    when(slot.getDisplayUrl()).thenReturn("http://display.url");
+    when(slot.isVideo()).thenReturn(true);
+
+    MoPubInterstitial moPub = givenMoPubInterstitial();
+    moPub.setKeywords("previousData");
+    headerBidding.enrichBid(moPub, CRITEO_INTERSTITIAL, slot);
+    String keywords = moPub.getKeywords();
+
+    assertEquals("previousData,crt_cpm:0.10,crt_displayUrl:http%3A%2F%2Fdisplay.url,crt_format:video", keywords);
   }
 
   private MoPubView givenMoPubView() {

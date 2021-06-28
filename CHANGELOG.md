@@ -1,4 +1,6 @@
 # Next Version
+- MoPub AppBidding: Add support for VAST Video ads
+- GAM AppBidding: Add support for VAST Video ads
 
 # Version 4.4.0
 - Artifacts are now delivered through `Maven Central` repository instead of `JCenter` which is deprecated.

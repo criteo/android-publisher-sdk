@@ -67,6 +67,7 @@ public class CdbResponseSlotTest {
     assertThat(slot.getTtlInSeconds()).isZero();
     assertThat(slot.getDisplayUrl()).isNull();
     assertThat(slot.getNativeAssets()).isNull();
+    assertThat(slot.isVideo()).isFalse();
   }
 
   @Test
@@ -518,6 +519,37 @@ public class CdbResponseSlotTest {
     boolean expired = slot.isExpired(clock);
 
     assertThat(expired).isTrue();
+  }
+
+  @Test
+  public void isVideo_GivenNothingInResponse_ReturnFalse() throws Exception {
+    CdbResponseSlot slot = CdbResponseSlot.fromJson((getJSONSlot()));
+
+    boolean isVideo = slot.isVideo();
+
+    assertThat(isVideo).isFalse();
+  }
+
+  @Test
+  public void isVideo_GivenFalseInResponse_ReturnFalse() throws Exception {
+    JSONObject jsonSlot = getJSONSlot();
+    jsonSlot.put("isVideo", "false");
+    CdbResponseSlot slot = CdbResponseSlot.fromJson(jsonSlot);
+
+    boolean isVideo = slot.isVideo();
+
+    assertThat(isVideo).isFalse();
+  }
+
+  @Test
+  public void isVideo_GivenTrueInResponse_ReturnFalse() throws Exception {
+    JSONObject jsonSlot = getJSONSlot();
+    jsonSlot.put("isVideo", "true");
+    CdbResponseSlot slot = CdbResponseSlot.fromJson((jsonSlot));
+
+    boolean isVideo = slot.isVideo();
+
+    assertThat(isVideo).isTrue();
   }
 
   private JSONObject getNativeJSONSlot() throws Exception{
