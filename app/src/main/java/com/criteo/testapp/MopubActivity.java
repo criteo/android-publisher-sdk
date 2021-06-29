@@ -49,6 +49,7 @@ public class MopubActivity extends AppCompatActivity {
   private static final String SDK_BUILD_ID = "b195f8dd8ded45fe847ad89ed1d016da";
   public static final String MOPUB_BANNER_ADUNIT_ID_HB = "d2f3ed80e5da4ae1acde0971eac30fa4";
   public static final String MOPUB_INTERSTITIAL_ADUNIT_ID_HB = "83a2996696284da881edaf1a480e5d7c";
+  public static final String MOPUB_INTERSTITIAL_VIDEO_ADUNIT_ID_HB = "1654e4c6298741e98ad09743d9e6b630";
 
   private static final InterstitialAdUnit INTERSTITIAL = new InterstitialAdUnit(
       MOPUB_INTERSTITIAL_ADUNIT_ID_HB);
@@ -56,6 +57,9 @@ public class MopubActivity extends AppCompatActivity {
   private static final BannerAdUnit BANNER = new BannerAdUnit(
       MOPUB_BANNER_ADUNIT_ID_HB,
       new AdSize(320, 50));
+
+  private static final InterstitialAdUnit INTERSTITIAL_VIDEO = new InterstitialAdUnit(
+      MOPUB_INTERSTITIAL_VIDEO_ADUNIT_ID_HB);
 
   private MoPubView publisherAdView;
   private LinearLayout linearLayout;
@@ -73,6 +77,7 @@ public class MopubActivity extends AppCompatActivity {
     linearLayout = findViewById(R.id.adViewHolder);
     findViewById(R.id.buttonBanner).setOnClickListener((View v) -> onBannerClick());
     findViewById(R.id.buttonInterstitial).setOnClickListener((View v) -> onInterstitialClick());
+    findViewById(R.id.buttonInterstitialVideo).setOnClickListener((View v) -> onInterstitialVideoClick());
   }
 
   public static void initializeMoPubSdk(Context context) {
@@ -107,10 +112,18 @@ public class MopubActivity extends AppCompatActivity {
   }
 
   private void onInterstitialClick() {
-    MoPubInterstitial mInterstitial = new MoPubInterstitial(this, MOPUB_INTERSTITIAL_ADUNIT_ID_HB);
+    onInterstitialClick(MOPUB_INTERSTITIAL_ADUNIT_ID_HB, INTERSTITIAL);
+  }
+
+  private void onInterstitialVideoClick() {
+    onInterstitialClick(MOPUB_INTERSTITIAL_VIDEO_ADUNIT_ID_HB, INTERSTITIAL_VIDEO);
+  }
+
+  private void onInterstitialClick(String mopubAdUnit, InterstitialAdUnit criteoAdUnit) {
+    MoPubInterstitial mInterstitial = new MoPubInterstitial(this, mopubAdUnit);
     mInterstitial.setInterstitialAdListener(new TestAppMoPubInterstitialAdListener(TAG, mInterstitial));
 
-    criteo.loadBid(INTERSTITIAL, CONTEXT_DATA, enrich((mThis, bid) -> {
+    criteo.loadBid(criteoAdUnit, CONTEXT_DATA, enrich((mThis, bid) -> {
       mThis.criteo.enrichAdObjectWithBid(mInterstitial, bid);
       mInterstitial.load();
     }));

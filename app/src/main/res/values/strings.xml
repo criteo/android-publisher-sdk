@@ -11,6 +11,7 @@
 
   <string name="btn_interstitial">Interstitial</string>
   <string name="btn_interstitial_ibv">Interstitial IBV</string>
+  <string name="btn_interstitial_video">Interstitial Video</string>
   <string name="btn_banner">Banner</string>
   <string name="btn_google_dfp_with_version">Google DFP \n v4.5.1</string>
   <string name="btn_standalone">Standalone</string>
