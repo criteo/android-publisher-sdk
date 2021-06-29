@@ -19,6 +19,7 @@ package com.criteo.testapp;
 import static com.criteo.testapp.PubSdkDemoApplication.BANNER;
 import static com.criteo.testapp.PubSdkDemoApplication.CONTEXT_DATA;
 import static com.criteo.testapp.PubSdkDemoApplication.INTERSTITIAL;
+import static com.criteo.testapp.PubSdkDemoApplication.INTERSTITIAL_VIDEO;
 import static com.criteo.testapp.PubSdkDemoApplication.NATIVE;
 
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import com.criteo.publisher.BidResponseListener;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.testapp.integration.MockedIntegrationRegistry;
 import com.criteo.testapp.listener.TestAppDfpAdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -52,6 +54,7 @@ public class DfpActivity extends AppCompatActivity {
   private static final String DFP_INTERSTITIAL_ID = INTERSTITIAL.getAdUnitId();
   private static final String DFP_BANNER_ID = BANNER.getAdUnitId();
   private static final String DFP_NATIVE_ID = NATIVE.getAdUnitId();
+  private static final String DFP_INTERSTITIAL_VIDEO_ID = INTERSTITIAL_VIDEO.getAdUnitId();
 
   private LinearLayout linearLayout;
   private Criteo criteo;
@@ -67,6 +70,7 @@ public class DfpActivity extends AppCompatActivity {
     linearLayout = findViewById(R.id.adViewHolder);
     findViewById(R.id.buttonBanner).setOnClickListener((View v) -> onBannerClick());
     findViewById(R.id.buttonInterstitial).setOnClickListener((View v) -> onInterstitialClick());
+    findViewById(R.id.buttonInterstitialVideo).setOnClickListener((View v) -> onInterstitialVideoClick());
     findViewById(R.id.buttonCustomNative).setOnClickListener((View v) -> onNativeClick());
 
     RequestConfiguration requestConfiguration = new RequestConfiguration.Builder().setTestDeviceIds(Collections.singletonList(AdRequest.DEVICE_ID_EMULATOR)).build();
@@ -106,16 +110,24 @@ public class DfpActivity extends AppCompatActivity {
   }
 
   private void onInterstitialClick() {
+    onInterstitialClick(DFP_INTERSTITIAL_ID, INTERSTITIAL);
+  }
+
+  private void onInterstitialVideoClick() {
+    onInterstitialClick(DFP_INTERSTITIAL_VIDEO_ID, INTERSTITIAL_VIDEO);
+  }
+
+  private void onInterstitialClick(@NonNull String dfpInterstitialAdUnit, @NonNull InterstitialAdUnit criteoInterstitialAdUnit) {
     AdManagerAdRequest.Builder builder = new AdManagerAdRequest.Builder();
 
-    criteo.loadBid(INTERSTITIAL, CONTEXT_DATA, enrich((mThis, bid) -> {
+    criteo.loadBid(criteoInterstitialAdUnit, CONTEXT_DATA, enrich((mThis, bid) -> {
       mThis.criteo.enrichAdObjectWithBid(builder, bid);
 
       AdManagerAdRequest request = builder.build();
 
       AdManagerInterstitialAd.load(
           this.getApplicationContext(),
-          DFP_INTERSTITIAL_ID,
+          dfpInterstitialAdUnit,
           request,
           new AdManagerInterstitialAdLoadCallback() {
             @Override

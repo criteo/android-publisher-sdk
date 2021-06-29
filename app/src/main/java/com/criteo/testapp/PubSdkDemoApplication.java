@@ -50,6 +50,10 @@ public class PubSdkDemoApplication extends MultiDexApplication {
       "mf2v6pikq5vqdjdtfo3j"
   );
 
+  public static final InterstitialAdUnit INTERSTITIAL_VIDEO = new InterstitialAdUnit(
+      "/140800857/Endeavour_InterstitialVideo_320x480"
+  );
+
   public static final NativeAdUnit NATIVE = new NativeAdUnit("/140800857/Endeavour_Native");
 
   public static final BannerAdUnit BANNER = new BannerAdUnit(
@@ -90,6 +94,7 @@ public class PubSdkDemoApplication extends MultiDexApplication {
     adUnits.add(new InterstitialAdUnit(MOPUB_INTERSTITIAL_ADUNIT_ID));
     adUnits.add(new NativeAdUnit(MOPUB_NATIVE_ADUNIT_ID));
     adUnits.add(INTERSTITIAL_IBV_DEMO);
+    adUnits.add(INTERSTITIAL_VIDEO);
     adUnits.add(NATIVE);
 
     try {
