@@ -20,6 +20,7 @@ import static com.criteo.publisher.TestAdUnits.BANNER_320_50;
 import static com.criteo.publisher.TestAdUnits.BANNER_UNKNOWN;
 import static com.criteo.publisher.TestAdUnits.INTERSTITIAL;
 import static com.criteo.publisher.TestAdUnits.INTERSTITIAL_UNKNOWN;
+import static com.criteo.publisher.TestAdUnits.INTERSTITIAL_VIDEO;
 import static com.criteo.publisher.TestAdUnits.NATIVE;
 import static com.criteo.publisher.TestAdUnits.NATIVE_UNKNOWN;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
@@ -243,6 +244,34 @@ public class PubSdkApiIntegrationTest {
       assertThat(slot.getDisplayUrl()).isNotEmpty().matches(StubConstants.STUB_DISPLAY_URL);
       assertThat(slot.getNativeAssets()).isNull();
       assertThat(slot.isValid()).isTrue();
+      assertThat(slot.isVideo()).isFalse();
+    });
+  }
+
+  @Test
+  public void loadCdb_GivenValidInterstitialVideoAdUnit_ReturnBid() throws Exception {
+    when(deviceUtil.getCurrentScreenSize()).thenReturn(new AdSize(42, 1337));
+
+    CacheAdUnit validAdUnit = adUnitMapper.map(INTERSTITIAL_VIDEO);
+    CdbRequest request = cdbRequestFactory.createRequest(singletonList(validAdUnit), new ContextData());
+
+    CdbResponse response = api.loadCdb(request, "myUserAgent");
+
+    assertThat(response.getTimeToNextCall()).isZero();
+    assertThat(response.getSlots()).hasSize(1).allSatisfy(slot -> {
+      assertThat(slot.getImpressionId()).isNotNull();
+      assertThat(slot.getZoneId()).isNotNull();
+      assertThat(slot.isNative()).isFalse();
+      assertThat(slot.getPlacementId()).isEqualTo(INTERSTITIAL_VIDEO.getAdUnitId());
+      assertThat(slot.getCpm()).isNotEmpty();
+      assertThat(slot.getWidth()).isEqualTo(42);
+      assertThat(slot.getHeight()).isEqualTo(1337);
+      assertThat(slot.getCurrency()).isNotEmpty();
+      assertThat(slot.getTtlInSeconds()).isEqualTo(3600);
+      assertThat(slot.getDisplayUrl()).isNotEmpty().matches(StubConstants.STUB_VAST_DISPLAY_URL);
+      assertThat(slot.getNativeAssets()).isNull();
+      assertThat(slot.isValid()).isTrue();
+      assertThat(slot.isVideo()).isTrue();
     });
   }
 

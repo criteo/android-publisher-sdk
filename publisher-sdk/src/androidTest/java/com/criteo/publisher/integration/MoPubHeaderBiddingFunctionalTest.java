@@ -87,6 +87,9 @@ public class MoPubHeaderBiddingFunctionalTest {
   private static final Pattern EXPECTED_KEYWORDS_FOR_BANNER = Pattern
       .compile("(.+,)?crt_cpm:[0-9]+\\.[0-9]{2},crt_displayUrl:.+,crt_size:[0-9]+x[0-9]+");
 
+  private static final Pattern EXPECTED_KEYWORDS_FOR_VIDEO = Pattern
+      .compile("(.+,)?crt_cpm:[0-9]+\\.[0-9]{2},crt_displayUrl:.+,crt_format:video");
+
   /**
    * Those are adunit IDs that are declared on MoPub server. We need it to get an accepted bid from
    * MoPub.
@@ -147,6 +150,11 @@ public class MoPubHeaderBiddingFunctionalTest {
         EXPECTED_KEYWORDS_FOR_BANNER.matcher("").matches()
     );
 
+    assertFalse(
+        "Keywords should not be empty",
+        EXPECTED_KEYWORDS_FOR_VIDEO.matcher("").matches()
+    );
+
     assertTrue(
         "Keywords should use crt_cpm and crt_displayUrl",
         EXPECTED_KEYWORDS.matcher("crt_cpm:1234.56,crt_displayUrl:http://my.super/creative")
@@ -156,6 +164,11 @@ public class MoPubHeaderBiddingFunctionalTest {
         EXPECTED_KEYWORDS_FOR_BANNER.matcher("crt_cpm:1234.56,crt_displayUrl:http://my.super/creative,crt_size:42x1337")
             .matches());
 
+    assertTrue(
+        "Keywords should use crt_cpm and crt_displayUrl and crt_format",
+        EXPECTED_KEYWORDS_FOR_VIDEO.matcher("crt_cpm:1234.56,crt_displayUrl:http%3A%2F%2Fmy.super%2Fcreative,crt_format:video")
+            .matches());
+
     assertTrue("Keywords should accept older keywords from outside",
         EXPECTED_KEYWORDS.matcher(
             "previous keywords setup by someone,crt_cpm:1234.56,crt_displayUrl:http://my.super/creative")
@@ -163,6 +176,11 @@ public class MoPubHeaderBiddingFunctionalTest {
 
     assertTrue("Keywords for banner should accept older keywords from outside",
         EXPECTED_KEYWORDS_FOR_BANNER.matcher("previous keywords setup by someone,crt_cpm:1234.56,crt_displayUrl:http://my.super/creative,crt_size:42x1337")
+            .matches());
+
+    assertTrue("Keywords should accept older keywords from outside",
+        EXPECTED_KEYWORDS_FOR_VIDEO.matcher(
+            "previous keywords setup by someone,crt_cpm:1234.56,crt_displayUrl:http%3A%2F%2Fmy.super%2Fcreative,crt_format:video")
             .matches());
   }
 
@@ -213,25 +231,32 @@ public class MoPubHeaderBiddingFunctionalTest {
 
     loadAdAndWait(adUnit, moPubView);
 
-    assertCriteoKeywordsAreInjectedInMoPubView(moPubView.getKeywords(), adUnit);
+    assertCriteoKeywordsAreInjectedInMoPubView(moPubView.getKeywords(), adUnit, false);
     assertBidRequestHasGoodProfileId();
   }
 
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchValidInterstitialId_CriteoKeywordsAreInjectedInMoPub()
       throws Exception {
-    whenGettingBid_GivenValidCpIdAndValidInterstitialId_CriteoKeywordsAreInjectedInMoPub(validInterstitialAdUnit);
+    whenGettingBid_GivenValidCpIdAndValidInterstitialId_CriteoKeywordsAreInjectedInMoPub(validInterstitialAdUnit, false);
+  }
+
+  @Test
+  public void whenGettingBid_GivenValidCpIdAndPrefetchValidInterstitialVideoId_CriteoKeywordsAreInjectedInMoPub()
+      throws Exception {
+    whenGettingBid_GivenValidCpIdAndValidInterstitialId_CriteoKeywordsAreInjectedInMoPub(TestAdUnits.INTERSTITIAL_VIDEO, true);
   }
 
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchDemoInterstitialId_CriteoKeywordsAreInjectedInMoPub()
       throws Exception {
     givenUsingCdbProd();
-    whenGettingBid_GivenValidCpIdAndValidInterstitialId_CriteoKeywordsAreInjectedInMoPub(demoInterstitialAdUnit);
+    whenGettingBid_GivenValidCpIdAndValidInterstitialId_CriteoKeywordsAreInjectedInMoPub(demoInterstitialAdUnit, false);
   }
 
   private void whenGettingBid_GivenValidCpIdAndValidInterstitialId_CriteoKeywordsAreInjectedInMoPub(
-      InterstitialAdUnit interstitialAdUnit
+      InterstitialAdUnit interstitialAdUnit,
+      boolean isVideo
   ) throws Exception {
     givenInitializedCriteo(interstitialAdUnit);
 
@@ -239,7 +264,7 @@ public class MoPubHeaderBiddingFunctionalTest {
 
     loadAdAndWait(interstitialAdUnit, moPubInterstitial);
 
-    assertCriteoKeywordsAreInjectedInMoPubView(moPubInterstitial.getKeywords(), interstitialAdUnit);
+    assertCriteoKeywordsAreInjectedInMoPubView(moPubInterstitial.getKeywords(), interstitialAdUnit, isVideo);
     assertBidRequestHasGoodProfileId();
   }
 
@@ -349,8 +374,8 @@ public class MoPubHeaderBiddingFunctionalTest {
     return moPubInterstitial;
   }
 
-  private void assertCriteoKeywordsAreInjectedInMoPubView(String keywords, AdUnit adUnit) {
-    Pattern expectedKeywords = adUnit instanceof BannerAdUnit ? EXPECTED_KEYWORDS_FOR_BANNER : EXPECTED_KEYWORDS;
+  private void assertCriteoKeywordsAreInjectedInMoPubView(String keywords, AdUnit adUnit, boolean isVideo) {
+    Pattern expectedKeywords = adUnit instanceof BannerAdUnit ? EXPECTED_KEYWORDS_FOR_BANNER : isVideo ? EXPECTED_KEYWORDS_FOR_VIDEO : EXPECTED_KEYWORDS;
     assertThat(keywords).matches(expectedKeywords);
   }
 

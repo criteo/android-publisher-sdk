@@ -102,6 +102,7 @@ public class DfpHeaderBiddingFunctionalTest {
   private static final String MACRO_CPM = "crt_cpm";
   private static final String MACRO_DISPLAY_URL = "crt_displayurl";
   private static final String MACRO_SIZE = "crt_size";
+  private static final String MACRO_FORMAT = "crt_format";
   private static final String MACRO_NATIVE_TITLE = "crtn_title";
   private static final String MACRO_NATIVE_DESCRIPTION = "crtn_desc";
   private static final String MACRO_NATIVE_IMAGE = "crtn_imageurl";
@@ -184,23 +185,29 @@ public class DfpHeaderBiddingFunctionalTest {
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchValidBannerId_CriteoMacroAreInjectedInDfpBuilder()
       throws Exception {
-    whenGettingBid_GivenValidCpIdAndValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(validBannerAdUnit);
+    whenGettingBid_GivenValidCpIdAndValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(validBannerAdUnit, false);
   }
 
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchValidInterstitialId_CriteoMacroAreInjectedInDfpBuilder()
       throws Exception {
-    whenGettingBid_GivenValidCpIdAndValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(validInterstitialAdUnit);
+    whenGettingBid_GivenValidCpIdAndValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(validInterstitialAdUnit, false);
   }
 
-  private void whenGettingBid_GivenValidCpIdAndValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(AdUnit adUnit) throws Exception {
+  @Test
+  public void whenGettingBid_GivenValidCpIdAndPrefetchValidInterstitialVideoId_CriteoMacroAreInjectedInDfpBuilder()
+      throws Exception {
+    whenGettingBid_GivenValidCpIdAndValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(TestAdUnits.INTERSTITIAL_VIDEO, true);
+  }
+
+  private void whenGettingBid_GivenValidCpIdAndValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(AdUnit adUnit, boolean isVideo) throws Exception {
     givenInitializedCriteo(adUnit);
 
     Builder builder = new Builder();
 
     loadBidAndWait(adUnit, builder);
 
-    assertCriteoMacroAreInjectedInDfpBuilder(builder);
+    assertCriteoMacroAreInjectedInDfpBuilder(builder, isVideo);
     assertBidRequestHasGoodProfileId();
   }
 
@@ -317,7 +324,7 @@ public class DfpHeaderBiddingFunctionalTest {
 
     loadBidAndWait(adUnit, builder);
 
-    assertCriteoMacroAreInjectedInDfpBuilder(builder);
+    assertCriteoMacroAreInjectedInDfpBuilder(builder, false);
 
     // The amount is not that important, but the format is
     String cpm = builder.build().getCustomTargeting().getString(MACRO_CPM);
@@ -607,13 +614,18 @@ public class DfpHeaderBiddingFunctionalTest {
     return adManagerAdView;
   }
 
-  private void assertCriteoMacroAreInjectedInDfpBuilder(Builder builder) {
+  private void assertCriteoMacroAreInjectedInDfpBuilder(Builder builder, boolean isVideo) {
     Bundle customTargeting = builder.build().getCustomTargeting();
 
     assertNotNull(customTargeting.getString(MACRO_CPM));
     assertNotNull(customTargeting.getString(MACRO_DISPLAY_URL));
     assertNotNull(customTargeting.getString(MACRO_SIZE));
-    assertEquals(3, customTargeting.size());
+    if (isVideo) {
+      assertNotNull(customTargeting.getString(MACRO_FORMAT));
+      assertEquals(4, customTargeting.size());
+    } else {
+      assertEquals(3, customTargeting.size());
+    }
   }
 
   private void assertBidRequestHasGoodProfileId() throws Exception {
