@@ -30,6 +30,9 @@ public class StubConstants {
   public static final Pattern STUB_DISPLAY_URL = Pattern.compile(
       "https?://(.+)/delivery/ajs.php\\?width=[0-9]+(&|&amp;)height=[0-9]+");
 
+  public static final Pattern STUB_VAST_DISPLAY_URL = Pattern.compile(
+      "https?://(.+)/delivery/vast.php");
+
   /**
    * Image that is shown in the AJS creative (see {@link #STUB_DISPLAY_URL}) returned by CDB stub.
    * This is also the image of the single product in case of native response from CDB.

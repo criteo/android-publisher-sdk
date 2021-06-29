@@ -21,6 +21,7 @@ import com.criteo.publisher.StubConstants.STUB_NATIVE_JSON
 import com.criteo.publisher.TestAdUnits.BANNER_320_480
 import com.criteo.publisher.TestAdUnits.BANNER_320_50
 import com.criteo.publisher.TestAdUnits.INTERSTITIAL
+import com.criteo.publisher.TestAdUnits.INTERSTITIAL_VIDEO
 import com.criteo.publisher.TestAdUnits.NATIVE
 import com.criteo.publisher.model.AdSize
 import com.criteo.publisher.model.BannerAdUnit
@@ -38,6 +39,7 @@ import java.net.HttpURLConnection
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
+@Suppress("TooManyFunctions")
 class CdbMock(private val jsonSerializer: JsonSerializer) {
 
   companion object {
@@ -82,6 +84,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
         "/inapp/v2" -> handleBidRequest(request.body)
         "/inapp/logs" -> handleLogsRequest()
         "/delivery/ajs.php" -> handleCasperRequest(request)
+        "/delivery/vast.php" -> handleVastCasperRequest()
         "/appevent/v1/2379" -> handleBearcatRequest()
         else -> MockResponse().setResponseCode(HttpURLConnection.HTTP_NOT_FOUND)
       }.also {
@@ -156,6 +159,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
     private fun shouldNotBid(cdbRequest: CdbRequest) =
         cdbRequest.gdprData?.consentData() in setOf(TCF1_CONSENT_NOT_GIVEN, TCF2_CONSENT_NOT_GIVEN)
 
+    @Suppress("LongMethod")
     private fun CdbRequestSlot.toResponseSlot(): String? {
       val size = sizes.first().toAdSize()
       val width = size.width
@@ -179,6 +183,23 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
           "height": $height,
           "ttl": $PREPROD_TTL,
           "displayUrl": "$url/delivery/ajs.php?width=$width&height=$height"
+        }
+      """.trimIndent()
+        }
+        interstitialAdUnit == INTERSTITIAL_VIDEO -> {
+          """
+        {
+          "impId": "$impressionId",
+          "placementId": "$placementId",
+          "arbitrageId": "arbitrage_id",
+          "zoneId": $PREPROD_ZONE_ID,
+          "cpm": "$PREPROD_CPM",
+          "currency": "$PREPROD_CURRENCY",
+          "width": $width,
+          "height": $height,
+          "ttl": $PREPROD_TTL,
+          "displayUrl": "$url/delivery/vast.php",
+          "isVideo": "true"
         }
       """.trimIndent()
         }
@@ -222,6 +243,14 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
       s += "\n";
       document.write(s);})();
     """.trimIndent()
+
+      return MockResponse()
+          .setHeader(CONTENT_TYPE, "text/plain; charset=utf-8")
+          .setBody(response)
+    }
+
+    private fun handleVastCasperRequest(): MockResponse {
+      val response = """TODO""".trimIndent() // TODO When it will be possible to have E2E tests with redirection handler
 
       return MockResponse()
           .setHeader(CONTENT_TYPE, "text/plain; charset=utf-8")
