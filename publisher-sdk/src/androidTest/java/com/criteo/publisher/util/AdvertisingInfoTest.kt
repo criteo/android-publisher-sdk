@@ -19,12 +19,14 @@ import android.content.Context
 import com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait
 import com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait
 import com.criteo.publisher.mock.MockedDependenciesRule
+import com.criteo.publisher.mock.SpyBean
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.spy
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.Executor
 import javax.inject.Inject
@@ -45,8 +47,41 @@ class AdvertisingInfoTest {
   @Inject
   private lateinit var executor: Executor
 
-  @Inject
+  @SpyBean
   private lateinit var advertisingInfo: AdvertisingInfo
+
+  @Test
+  fun prefetchAsync_FromWorkerThread_DispatchAsync() {
+    val initialThread = Thread.currentThread()
+
+    whenever(advertisingInfo.advertisingId).then {
+      assertThat(Thread.currentThread()).isNotEqualTo(initialThread)
+      null
+    }
+
+    advertisingInfo.prefetchAsync()
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(advertisingInfo).advertisingId
+  }
+
+  @Test
+  fun prefetchAsync_FromMainThread_DispatchAsync() {
+    lateinit var initialThread: Thread
+
+    whenever(advertisingInfo.advertisingId).then {
+      assertThat(Thread.currentThread()).isNotEqualTo(initialThread)
+      null
+    }
+
+    runOnMainThreadAndWait {
+      initialThread = Thread.currentThread()
+      advertisingInfo.prefetchAsync()
+    }
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(advertisingInfo).advertisingId
+  }
 
   @Test
   fun getAdvertisingId_GivenPlayServiceAdsIdentifierInClasspath_ReturnNonNull() {
@@ -83,10 +118,12 @@ class AdvertisingInfoTest {
   }
 
   @Test
-  fun getAdvertisingId_CalledFromUiThreadAfterAPrefetch_ReturnNonNull() {
+  fun getAdvertisingId_CalledFromUiThreadAfterAFinishedPrefetch_ReturnNonNull() {
     // Assume that the advertising ID is available, this is a case on new clean emulators/devices
 
-    advertisingInfo.prefetch()
+    advertisingInfo.prefetchAsync()
+    mockedDependenciesRule.waitForIdleState()
+
     val advertisingId = callOnMainThreadAndWait {
       advertisingInfo.advertisingId
     }
@@ -95,11 +132,11 @@ class AdvertisingInfoTest {
   }
 
   @Test
-  fun getAdvertisingId_CalledFromUiThreadAfterAPrefetchFromMainThread_ReturnNonNull() {
+  fun getAdvertisingId_CalledFromUiThreadAfterAFinishedPrefetchFromMainThread_ReturnNonNull() {
     // Assume that the advertising ID is available, this is a case on new clean emulators/devices
 
     runOnMainThreadAndWait {
-      advertisingInfo.prefetch()
+      advertisingInfo.prefetchAsync()
     }
     mockedDependenciesRule.waitForIdleState()
 

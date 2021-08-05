@@ -203,7 +203,7 @@ public class CriteoInternalUnitTest {
 
     createCriteo();
 
-    verify(advertisingInfo).prefetch();
+    verify(advertisingInfo).prefetchAsync();
   }
 
   @Test

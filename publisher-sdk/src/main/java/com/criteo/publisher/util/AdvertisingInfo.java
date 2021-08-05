@@ -65,8 +65,13 @@ public class AdvertisingInfo {
     this.advertisingIdClient = advertisingIdClient;
   }
 
-  public void prefetch() {
-    getAdvertisingIdResult();
+  public void prefetchAsync() {
+    executor.execute(new SafeRunnable() {
+      @Override
+      public void runSafely() {
+        getAdvertisingId();
+      }
+    });
   }
 
   @Nullable

@@ -1,4 +1,7 @@
 # Next Version
+- Bug fixes
+  - If SDK init is called from a worker thread, then GAID is fetched asynchronously in another worker thread to not 
+    block the caller's thread.
 
 # Version 4.4.0
 - Artifacts are now delivered through `Maven Central` repository instead of `JCenter` which is deprecated.
