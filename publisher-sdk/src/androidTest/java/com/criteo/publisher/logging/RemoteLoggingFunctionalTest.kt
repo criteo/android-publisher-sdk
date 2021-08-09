@@ -32,6 +32,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.check
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.verify
@@ -81,7 +82,7 @@ class RemoteLoggingFunctionalTest {
     }
     mockedDependenciesRule.waitForIdleState()
 
-    verify(api).postLogs(check {
+    verify(api, atLeastOnce()).postLogs(check {
       assertThat(it.map { it.context.deviceId }).isNotEmpty.doesNotContainNull()
     })
   }

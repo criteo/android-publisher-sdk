@@ -56,6 +56,9 @@ public class TestAdUnits {
   public static final InterstitialAdUnit INTERSTITIAL_IBV_DEMO = new InterstitialAdUnit(
       "mf2v6pikq5vqdjdtfo3j");
 
+  public static final InterstitialAdUnit INTERSTITIAL_VIDEO = new InterstitialAdUnit(
+      "test-PubSdk-Video");
+
   public static final NativeAdUnit NATIVE = new NativeAdUnit(
       "test-PubSdk-Native");
 

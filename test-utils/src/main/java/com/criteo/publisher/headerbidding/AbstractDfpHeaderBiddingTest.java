@@ -66,6 +66,7 @@ public abstract class AbstractDfpHeaderBiddingTest {
   private static final String CRT_CPM = "crt_cpm";
   private static final String CRT_DISPLAY_URL = "crt_displayurl";
   private static final String CRT_SIZE = "crt_size";
+  private static final String CRT_FORMAT = "crt_format";
   private static final String CRT_NATIVE_TITLE = "crtn_title";
   private static final String CRT_NATIVE_DESC = "crtn_desc";
   private static final String CRT_NATIVE_PRICE = "crtn_price";
@@ -246,6 +247,40 @@ public abstract class AbstractDfpHeaderBiddingTest {
               + CRT_CPM + "=0.10,"
               + CRT_DISPLAY_URL + "=" + encodeForDfp("http://display.url") + ","
               + CRT_SIZE + "=" + expectedInjectedSize
+      );
+      return true;
+    }));
+  }
+
+  @Test
+  public void enrichBid_GivenVideoInterstitialBidAvailable_EnrichBuilder() {
+    when(deviceUtil.isTablet()).thenReturn(true);
+    when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_LANDSCAPE);
+
+    CdbResponseSlot slot = mock(CdbResponseSlot.class);
+    when(slot.isNative()).thenReturn(false);
+    when(slot.getCpm()).thenReturn("0.10");
+    when(slot.getDisplayUrl()).thenReturn("http://display.url");
+    when(slot.getWidth()).thenReturn(1024);
+    when(slot.getHeight()).thenReturn(768);
+    when(slot.isVideo()).thenReturn(true);
+
+    String encodedDisplayUrl = "http%253A%252F%252Fdisplay.url";
+
+    Bundle customTargeting = customTargetingFrom(builder -> headerBidding.enrichBid(builder, CRITEO_INTERSTITIAL, slot));
+
+    assertEquals(4, customTargeting.size());
+    assertEquals("0.10", customTargeting.get(CRT_CPM));
+    assertEquals(encodedDisplayUrl, customTargeting.get(CRT_DISPLAY_URL));
+    assertEquals(TABLET_INTERSTITIAL_LANDSCAPE_SIZE, customTargeting.get(CRT_SIZE));
+    assertEquals("video", customTargeting.get(CRT_FORMAT));
+    verify(logger).log(argThat(logMessage -> {
+      assertThat(logMessage.getMessage()).contains(
+          versionName() + ":"
+              + CRT_CPM + "=0.10,"
+              + CRT_DISPLAY_URL + "=" + encodedDisplayUrl + ","
+              + CRT_SIZE + "=" + TABLET_INTERSTITIAL_LANDSCAPE_SIZE + ","
+              + CRT_FORMAT + "=video"
       );
       return true;
     }));

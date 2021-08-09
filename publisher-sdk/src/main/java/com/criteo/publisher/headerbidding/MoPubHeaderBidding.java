@@ -19,12 +19,17 @@ package com.criteo.publisher.headerbidding;
 import static com.criteo.publisher.util.ReflectionUtil.isInstanceOf;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.util.AdUnitType;
+import com.criteo.publisher.util.PreconditionsUtil;
 import com.criteo.publisher.util.ReflectionUtil;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 
@@ -36,11 +41,14 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler {
   private static final String CRT_CPM = "crt_cpm";
   private static final String CRT_DISPLAY_URL = "crt_displayUrl";
   private static final String CRT_SIZE = "crt_size";
+  private static final String CRT_FORMAT = "crt_format";
+  private static final String VIDEO = "video";
 
   private static final List<String> CRITEO_KEYWORDS = Arrays.asList(
       CRT_CPM,
       CRT_DISPLAY_URL,
-      CRT_SIZE
+      CRT_SIZE,
+      CRT_FORMAT
   );
 
   public final Logger logger = LoggerFactory.getLogger(getClass());
@@ -102,6 +110,11 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler {
       return;
     }
 
+    String displayUrl = slot.getDisplayUrl();
+    if (slot.isVideo()) {
+      displayUrl = urlEncode(displayUrl);
+    }
+
     StringBuilder keywords = new StringBuilder();
     keywords.append(CRT_CPM);
     keywords.append(":");
@@ -109,7 +122,7 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler {
     keywords.append(",");
     keywords.append(CRT_DISPLAY_URL);
     keywords.append(":");
-    keywords.append(slot.getDisplayUrl());
+    keywords.append(displayUrl);
 
     if (adUnitType == AdUnitType.CRITEO_BANNER) {
       keywords.append(",");
@@ -118,10 +131,17 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler {
       keywords.append(slot.getWidth()).append("x").append(slot.getHeight());
     }
 
+    if (slot.isVideo()) {
+      keywords.append(",");
+      keywords.append(CRT_FORMAT);
+      keywords.append(":");
+      keywords.append(VIDEO);
+    }
+
     Object existingKeywords = ReflectionUtil.callMethodOnObject(object, "getKeywords");
     String newKeywords;
     if (existingKeywords != null) {
-      newKeywords = existingKeywords + "," + keywords.toString();
+      newKeywords = existingKeywords + "," + keywords;
     } else {
       newKeywords = keywords.toString();
     }
@@ -129,6 +149,20 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler {
     ReflectionUtil.callMethodOnObject(object, "setKeywords", newKeywords);
 
     logger.log(AppBiddingLogMessage.onAdObjectEnrichedSuccessfully(getIntegration(), keywords.toString()));
+  }
+
+  @Nullable
+  String urlEncode(@Nullable String toEncode) {
+    if (toEncode == null) {
+      return null;
+    }
+
+    try {
+      return URLEncoder.encode(toEncode, Charset.forName("UTF-8").name());
+    } catch (UnsupportedEncodingException e) {
+      PreconditionsUtil.throwOrLog(e);
+      return null;
+    }
   }
 
 }

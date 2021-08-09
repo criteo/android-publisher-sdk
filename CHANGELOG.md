@@ -1,4 +1,7 @@
 # Next Version
+- Features
+  - MoPub AppBidding: Add support for VAST Video ads
+  - GAM AppBidding: Add support for VAST Video ads
 - Bug fixes
   - If SDK init is called from a worker thread, then GAID is fetched asynchronously in another worker thread to not 
     block the caller's thread.

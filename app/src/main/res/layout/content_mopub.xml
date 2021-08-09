@@ -39,6 +39,17 @@
       android:layout_weight=".5"
       android:background="#81C784"
       android:text="@string/btn_interstitial"/>
+
+    <Button
+      android:id="@+id/buttonInterstitialVideo"
+      style="@style/Widget.AppCompat.Button.Colored"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="10dp"
+      android:layout_marginLeft="10dp"
+      android:layout_weight="0.5"
+      android:background="#81C784"
+      android:text="@string/btn_interstitial_video"/>
   </LinearLayout>
 
   <LinearLayout
