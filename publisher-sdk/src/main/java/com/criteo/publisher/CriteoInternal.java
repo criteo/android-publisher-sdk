@@ -78,7 +78,7 @@ class CriteoInternal extends Criteo {
     deviceInfo = dependencyProvider.provideDeviceInfo();
     deviceInfo.initialize();
 
-    dependencyProvider.provideAdvertisingInfo().prefetch();
+    dependencyProvider.provideAdvertisingInfo().prefetchAsync();
 
     config = dependencyProvider.provideConfig();
 

@@ -1,6 +1,10 @@
 # Next Version
-- MoPub AppBidding: Add support for VAST Video ads
-- GAM AppBidding: Add support for VAST Video ads
+- Features
+  - MoPub AppBidding: Add support for VAST Video ads
+  - GAM AppBidding: Add support for VAST Video ads
+- Bug fixes
+  - If SDK init is called from a worker thread, then GAID is fetched asynchronously in another worker thread to not 
+    block the caller's thread.
 
 # Version 4.4.0
 - Artifacts are now delivered through `Maven Central` repository instead of `JCenter` which is deprecated.
