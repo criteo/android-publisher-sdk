@@ -22,7 +22,7 @@ import com.criteo.publisher.logging.LogMessage
 internal object SendingQueueLogMessage {
 
   @JvmStatic
-  fun onRecoveringFromStaleQueueFile(exception: Exception) = LogMessage(
+  fun onRecoveringFromStaleQueueFile(exception: Throwable) = LogMessage(
       Log.WARN,
       "Error while reading queue file. Recovering by recreating it or using in-memory queue",
       exception,
