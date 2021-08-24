@@ -16,7 +16,10 @@
 
 package com.criteo.testapp;
 
+import static com.criteo.testapp.PubSdkDemoApplication.BANNER;
 import static com.criteo.testapp.PubSdkDemoApplication.CONTEXT_DATA;
+import static com.criteo.testapp.PubSdkDemoApplication.INTERSTITIAL;
+import static com.criteo.testapp.PubSdkDemoApplication.INTERSTITIAL_VIDEO;
 import static com.mopub.common.logging.MoPubLog.LogLevel.DEBUG;
 import static com.mopub.common.logging.MoPubLog.LogLevel.INFO;
 
@@ -31,8 +34,6 @@ import com.criteo.publisher.Bid;
 import com.criteo.publisher.BidResponseListener;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.integration.Integration;
-import com.criteo.publisher.model.AdSize;
-import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.testapp.integration.MockedIntegrationRegistry;
 import com.criteo.testapp.listener.TestAppMoPubInterstitialAdListener;
@@ -50,16 +51,6 @@ public class MopubActivity extends AppCompatActivity {
   public static final String MOPUB_BANNER_ADUNIT_ID_HB = "d2f3ed80e5da4ae1acde0971eac30fa4";
   public static final String MOPUB_INTERSTITIAL_ADUNIT_ID_HB = "83a2996696284da881edaf1a480e5d7c";
   public static final String MOPUB_INTERSTITIAL_VIDEO_ADUNIT_ID_HB = "1654e4c6298741e98ad09743d9e6b630";
-
-  private static final InterstitialAdUnit INTERSTITIAL = new InterstitialAdUnit(
-      MOPUB_INTERSTITIAL_ADUNIT_ID_HB);
-
-  private static final BannerAdUnit BANNER = new BannerAdUnit(
-      MOPUB_BANNER_ADUNIT_ID_HB,
-      new AdSize(320, 50));
-
-  private static final InterstitialAdUnit INTERSTITIAL_VIDEO = new InterstitialAdUnit(
-      MOPUB_INTERSTITIAL_VIDEO_ADUNIT_ID_HB);
 
   private MoPubView publisherAdView;
   private LinearLayout linearLayout;

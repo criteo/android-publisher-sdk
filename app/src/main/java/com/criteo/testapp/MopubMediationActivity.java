@@ -16,10 +16,10 @@
 
 package com.criteo.testapp;
 
+import static com.criteo.publisher.TestAdUnits.MOPUB_MEDIATION_BANNER_ADUNIT_ID;
+import static com.criteo.publisher.TestAdUnits.MOPUB_MEDIATION_INTERSTITIAL_ADUNIT_ID;
+import static com.criteo.publisher.TestAdUnits.MOPUB_MEDIATION_NATIVE_ADUNIT_ID;
 import static com.criteo.testapp.MopubActivity.initializeMoPubSdk;
-import static com.criteo.testapp.PubSdkDemoApplication.MOPUB_BANNER_ADUNIT_ID;
-import static com.criteo.testapp.PubSdkDemoApplication.MOPUB_INTERSTITIAL_ADUNIT_ID;
-import static com.criteo.testapp.PubSdkDemoApplication.MOPUB_NATIVE_ADUNIT_ID;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -59,7 +59,7 @@ public class MopubMediationActivity extends AppCompatActivity {
     initializeMoPubSdk(this);
 
     initMoPubNative();
-    mInterstitial = new MoPubInterstitial(this, MOPUB_INTERSTITIAL_ADUNIT_ID);
+    mInterstitial = new MoPubInterstitial(this, MOPUB_MEDIATION_INTERSTITIAL_ADUNIT_ID);
 
     linearLayout = findViewById(R.id.AdLayout);
     findViewById(R.id.buttonMopubMediationBanner).setOnClickListener((View v) -> onBannerClick());
@@ -69,7 +69,7 @@ public class MopubMediationActivity extends AppCompatActivity {
   }
 
   private void initMoPubNative() {
-    moPubNative = new MoPubNative(this, MOPUB_NATIVE_ADUNIT_ID, new MoPubNativeNetworkListener() {
+    moPubNative = new MoPubNative(this, MOPUB_MEDIATION_NATIVE_ADUNIT_ID, new MoPubNativeNetworkListener() {
       @Override
       public void onNativeLoad(NativeAd nativeAd) {
         Log.d(TAG, "Native onNativeLoad");
@@ -95,7 +95,7 @@ public class MopubMediationActivity extends AppCompatActivity {
     linearLayout.removeAllViews();
     linearLayout.setVisibility(View.VISIBLE);
     publisherAdView = new MoPubView(this);
-    publisherAdView.setAdUnitId(MOPUB_BANNER_ADUNIT_ID);
+    publisherAdView.setAdUnitId(MOPUB_MEDIATION_BANNER_ADUNIT_ID);
     publisherAdView.loadAd();
     linearLayout.addView(publisherAdView);
   }

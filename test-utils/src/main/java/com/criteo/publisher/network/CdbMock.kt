@@ -18,11 +18,21 @@ package com.criteo.publisher.network
 
 import com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE
 import com.criteo.publisher.StubConstants.STUB_NATIVE_JSON
+import com.criteo.publisher.TestAdUnits.ADMOB_MEDIATION_BANNER_ADUNIT_ID
+import com.criteo.publisher.TestAdUnits.ADMOB_MEDIATION_INTERSTITIAL_ADUNIT_ID
+import com.criteo.publisher.TestAdUnits.ADMOB_MEDIATION_NATIVE_ADUNIT_ID
 import com.criteo.publisher.TestAdUnits.BANNER_320_480
 import com.criteo.publisher.TestAdUnits.BANNER_320_50
+import com.criteo.publisher.TestAdUnits.BANNER_320_50_PREPROD
 import com.criteo.publisher.TestAdUnits.INTERSTITIAL
+import com.criteo.publisher.TestAdUnits.INTERSTITIAL_PREPROD
 import com.criteo.publisher.TestAdUnits.INTERSTITIAL_VIDEO
+import com.criteo.publisher.TestAdUnits.INTERSTITIAL_VIDEO_PREPROD
+import com.criteo.publisher.TestAdUnits.MOPUB_MEDIATION_BANNER_ADUNIT_ID
+import com.criteo.publisher.TestAdUnits.MOPUB_MEDIATION_INTERSTITIAL_ADUNIT_ID
+import com.criteo.publisher.TestAdUnits.MOPUB_MEDIATION_NATIVE_ADUNIT_ID
 import com.criteo.publisher.TestAdUnits.NATIVE
+import com.criteo.publisher.TestAdUnits.NATIVE_PREPROD
 import com.criteo.publisher.TestAdUnits.REWARDED
 import com.criteo.publisher.model.AdSize
 import com.criteo.publisher.model.BannerAdUnit
@@ -173,7 +183,14 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
       val rewardedAdUnit = RewardedAdUnit(placementId)
 
       return when {
-        bannerAdUnit == BANNER_320_50 || bannerAdUnit == BANNER_320_480 || interstitialAdUnit == INTERSTITIAL -> {
+        bannerAdUnit in listOf(BANNER_320_50, BANNER_320_480, BANNER_320_50_PREPROD) ||
+            interstitialAdUnit in listOf(INTERSTITIAL, INTERSTITIAL_PREPROD) ||
+            placementId in listOf(
+                MOPUB_MEDIATION_BANNER_ADUNIT_ID,
+                MOPUB_MEDIATION_INTERSTITIAL_ADUNIT_ID,
+                ADMOB_MEDIATION_BANNER_ADUNIT_ID,
+                ADMOB_MEDIATION_INTERSTITIAL_ADUNIT_ID)
+        -> {
           """
         {
           "impId": "$impressionId",
@@ -189,7 +206,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
         }
       """.trimIndent()
         }
-        interstitialAdUnit == INTERSTITIAL_VIDEO -> {
+        interstitialAdUnit in listOf(INTERSTITIAL_VIDEO, INTERSTITIAL_VIDEO_PREPROD) -> {
           """
         {
           "impId": "$impressionId",
@@ -224,7 +241,8 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
         }
       """.trimIndent()
         }
-        nativeAdUnit == NATIVE -> {
+        nativeAdUnit in listOf(NATIVE, NATIVE_PREPROD)
+            || placementId in listOf(MOPUB_MEDIATION_NATIVE_ADUNIT_ID, ADMOB_MEDIATION_NATIVE_ADUNIT_ID) -> {
           """
         {
           "impId": "$impressionId",
