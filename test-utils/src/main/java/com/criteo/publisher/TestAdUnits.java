@@ -45,6 +45,11 @@ public class TestAdUnits {
   public static final BannerAdUnit BANNER_DEMO = new BannerAdUnit("30s6zt3ayypfyemwjvmp",
       new AdSize(400, 500));
 
+  public static final BannerAdUnit BANNER_320_50_PREPROD = new BannerAdUnit(
+      "/140800857/Endeavour_320x50",
+      new AdSize(320, 50)
+  );
+
   public static final InterstitialAdUnit INTERSTITIAL = new InterstitialAdUnit(
       "test-PubSdk-Interstitial");
 
@@ -60,13 +65,31 @@ public class TestAdUnits {
   public static final InterstitialAdUnit INTERSTITIAL_VIDEO = new InterstitialAdUnit(
       "test-PubSdk-Video");
 
+  public static final InterstitialAdUnit INTERSTITIAL_PREPROD = new InterstitialAdUnit(
+      "/140800857/Endeavour_Interstitial_320x480"
+  );
+
+  public static final InterstitialAdUnit INTERSTITIAL_VIDEO_PREPROD = new InterstitialAdUnit(
+      "/140800857/Endeavour_InterstitialVideo_320x480"
+  );
+
   public static final NativeAdUnit NATIVE = new NativeAdUnit(
       "test-PubSdk-Native");
 
   public static final NativeAdUnit NATIVE_UNKNOWN = new NativeAdUnit(
       "test-PubSdk-Unknown");
 
+  public static final NativeAdUnit NATIVE_PREPROD = new NativeAdUnit(
+      "/140800857/Endeavour_Native");
+
   public static final RewardedAdUnit REWARDED = new RewardedAdUnit(
       "test-PubSdk-Rewarded");
 
+  public static final String MOPUB_MEDIATION_BANNER_ADUNIT_ID = "b5acf501d2354859941b13030d2d848a";
+  public static final String MOPUB_MEDIATION_INTERSTITIAL_ADUNIT_ID = "86c36b6223ce4730acf52323de3baa93";
+  public static final String MOPUB_MEDIATION_NATIVE_ADUNIT_ID = "a298abc2fdf744cf898791831509cc38";
+
+  public static final String ADMOB_MEDIATION_BANNER_ADUNIT_ID = "/140800857/Endeavour_320x50";
+  public static final String ADMOB_MEDIATION_INTERSTITIAL_ADUNIT_ID = "/140800857/Endeavour_320x480";
+  public static final String ADMOB_MEDIATION_NATIVE_ADUNIT_ID = "/140800857/Endeavour_Native";
 }

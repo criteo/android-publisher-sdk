@@ -16,12 +16,18 @@
 
 package com.criteo.testapp;
 
+import static com.criteo.publisher.TestAdUnits.MOPUB_MEDIATION_BANNER_ADUNIT_ID;
+import static com.criteo.publisher.TestAdUnits.MOPUB_MEDIATION_INTERSTITIAL_ADUNIT_ID;
+import static com.criteo.publisher.TestAdUnits.MOPUB_MEDIATION_NATIVE_ADUNIT_ID;
+
 import android.os.Handler;
 import android.os.StrictMode;
 import android.util.Log;
 import androidx.multidex.MultiDexApplication;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.Criteo.Builder;
+import com.criteo.publisher.DependencyProvider;
+import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.context.EmailHasher;
 import com.criteo.publisher.context.UserData;
@@ -30,6 +36,8 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.model.NativeAdUnit;
+import com.criteo.publisher.network.CdbMock;
+import com.criteo.publisher.util.BuildConfigWrapper;
 import java.util.ArrayList;
 import java.util.List;
 import leakcanary.LeakCanary;
@@ -37,29 +45,18 @@ import leakcanary.LeakCanary.Config;
 
 public class PubSdkDemoApplication extends MultiDexApplication {
 
+  /**
+   * Flag indicating if the test app should use the CdbMock or should target the default SDK preprod/prod URLs
+   */
+  private static final boolean USE_CDB_MOCK = true;
+
   private static final String TAG = PubSdkDemoApplication.class.getSimpleName();
-  public static final String MOPUB_BANNER_ADUNIT_ID = "b5acf501d2354859941b13030d2d848a";
-  public static final String MOPUB_INTERSTITIAL_ADUNIT_ID = "86c36b6223ce4730acf52323de3baa93";
-  public static final String MOPUB_NATIVE_ADUNIT_ID = "a298abc2fdf744cf898791831509cc38";
 
-  public static final InterstitialAdUnit INTERSTITIAL = new InterstitialAdUnit(
-      "/140800857/Endeavour_Interstitial_320x480"
-  );
-
-  public static final InterstitialAdUnit INTERSTITIAL_IBV_DEMO = new InterstitialAdUnit(
-      "mf2v6pikq5vqdjdtfo3j"
-  );
-
-  public static final InterstitialAdUnit INTERSTITIAL_VIDEO = new InterstitialAdUnit(
-      "/140800857/Endeavour_InterstitialVideo_320x480"
-  );
-
-  public static final NativeAdUnit NATIVE = new NativeAdUnit("/140800857/Endeavour_Native");
-
-  public static final BannerAdUnit BANNER = new BannerAdUnit(
-      "/140800857/Endeavour_320x50",
-      new AdSize(320, 50)
-  );
+  public static final InterstitialAdUnit INTERSTITIAL = TestAdUnits.INTERSTITIAL_PREPROD;
+  public static final InterstitialAdUnit INTERSTITIAL_IBV_DEMO = TestAdUnits.INTERSTITIAL_IBV_DEMO;
+  public static final InterstitialAdUnit INTERSTITIAL_VIDEO = TestAdUnits.INTERSTITIAL_VIDEO_PREPROD;
+  public static final NativeAdUnit NATIVE = TestAdUnits.NATIVE_PREPROD;
+  public static final BannerAdUnit BANNER = TestAdUnits.BANNER_320_50_PREPROD;
 
   public static final ContextData CONTEXT_DATA = new ContextData()
       .set(ContextData.CONTENT_URL, "https://dummy.content.url");
@@ -87,12 +84,18 @@ public class PubSdkDemoApplication extends MultiDexApplication {
       LeakCanary.setConfig(newConfig);
     });
 
+    if (USE_CDB_MOCK) {
+      CdbMock cdbMock = new CdbMock(DependencyProvider.getInstance().provideJsonSerializer());
+      cdbMock.start();
+      System.setProperty(BuildConfigWrapper.CDB_URL_PROP, cdbMock.getUrl());
+    }
+
     List<AdUnit> adUnits = new ArrayList<>();
     adUnits.add(BANNER);
     adUnits.add(INTERSTITIAL);
-    adUnits.add(new BannerAdUnit(MOPUB_BANNER_ADUNIT_ID, new AdSize(320, 50)));
-    adUnits.add(new InterstitialAdUnit(MOPUB_INTERSTITIAL_ADUNIT_ID));
-    adUnits.add(new NativeAdUnit(MOPUB_NATIVE_ADUNIT_ID));
+    adUnits.add(new BannerAdUnit(MOPUB_MEDIATION_BANNER_ADUNIT_ID, new AdSize(320, 50)));
+    adUnits.add(new InterstitialAdUnit(MOPUB_MEDIATION_INTERSTITIAL_ADUNIT_ID));
+    adUnits.add(new NativeAdUnit(MOPUB_MEDIATION_NATIVE_ADUNIT_ID));
     adUnits.add(INTERSTITIAL_IBV_DEMO);
     adUnits.add(INTERSTITIAL_VIDEO);
     adUnits.add(NATIVE);

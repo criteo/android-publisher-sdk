@@ -24,6 +24,8 @@ import com.criteo.publisher.BuildConfig;
  */
 public class BuildConfigWrapper {
 
+  public static final String CDB_URL_PROP = "com.criteo.publisher.config.cdbUrl";
+
   @NonNull
   public String getSdkVersion() {
     return BuildConfig.VERSION_NAME;
@@ -31,7 +33,11 @@ public class BuildConfigWrapper {
 
   @NonNull
   public String getCdbUrl() {
-    return BuildConfig.cdbUrl;
+    if (BuildConfig.DEBUG) {
+      return System.getProperty(CDB_URL_PROP, BuildConfig.cdbUrl);
+    } else {
+      return BuildConfig.cdbUrl;
+    }
   }
 
   @NonNull
