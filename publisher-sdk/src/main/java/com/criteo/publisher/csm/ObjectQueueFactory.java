@@ -69,7 +69,7 @@ public class ObjectQueueFactory<T> {
   }
 
   private ObjectQueue<T> createTapeObjectQueue(@NonNull File file) {
-    Exception exception;
+    Throwable exception;
     try {
       FileObjectQueue<T> queue = new FileObjectQueue<>(file, new AdapterConverter<>(
           jsonSerializer,
@@ -80,7 +80,7 @@ public class ObjectQueueFactory<T> {
       queue.peek();
 
       return queue;
-    } catch (Exception e) {
+    } catch (Exception | OutOfMemoryError e) {
       exception = e;
     }
 
