@@ -288,8 +288,34 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
           .setBody(response)
     }
 
+    @Suppress("MaxLineLength")
     private fun handleVastCasperRequest(): MockResponse {
-      val response = """TODO""".trimIndent() // TODO When it will be possible to have E2E tests with redirection handler
+      val response = """
+        <VAST version="3.0">
+          <Ad id="5d39aa72c61ec4c5d4b05267a94d0bc5">
+            <InLine>
+              <AdSystem>Criteo</AdSystem>
+              <AdTitle>Criteo Video Ad</AdTitle>
+              <Creatives>
+                <Creative id="10108474">
+                  <Linear>
+                    <Duration>00:00:20</Duration>
+                    <VideoClicks>
+                      <ClickThrough>
+                        <![CDATA[https://criteo.com]]>
+                      </ClickThrough>
+                    </VideoClicks>
+                    <MediaFiles>
+                      <MediaFile id="Criteo_mp4_ABC" delivery="progressive" width="1280" height="720" type="video/mp4" bitrate="1349" scalable="true" maintainAspectRatio="true">
+                        <![CDATA[https://publisherdirect.criteo.com/publishertag/preprodtest/creative-video.mp4]]>
+                      </MediaFile>
+                    </MediaFiles>
+                  </Linear>
+                </Creative>
+              </Creatives>
+            </InLine>
+          </Ad>
+        </VAST>""".trimIndent()
 
       return MockResponse()
           .setHeader(CONTENT_TYPE, "text/plain; charset=utf-8")
