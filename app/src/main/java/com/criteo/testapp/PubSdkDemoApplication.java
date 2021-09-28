@@ -48,7 +48,7 @@ public class PubSdkDemoApplication extends MultiDexApplication {
   /**
    * Flag indicating if the test app should use the CdbMock or should target the default SDK preprod/prod URLs
    */
-  private static final boolean USE_CDB_MOCK = true;
+  private static final boolean USE_CDB_MOCK = BuildConfig.DEBUG;
 
   private static final String TAG = PubSdkDemoApplication.class.getSimpleName();
 
