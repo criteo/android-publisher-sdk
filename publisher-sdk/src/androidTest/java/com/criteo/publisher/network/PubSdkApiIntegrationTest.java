@@ -41,7 +41,6 @@ import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.logging.LogMessage;
 import com.criteo.publisher.logging.RemoteLogRecords;
-import com.criteo.publisher.logging.RemoteLogRecords.RemoteLogLevel;
 import com.criteo.publisher.logging.RemoteLogRecordsFactory;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
@@ -51,6 +50,7 @@ import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.model.Config.DefaultConfig;
 import com.criteo.publisher.model.RemoteConfigRequest;
 import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.model.RemoteConfigResponse;
@@ -392,16 +392,16 @@ public class PubSdkApiIntegrationTest {
   @NonNull
   private RemoteConfigResponse defaultRemoteConfigResponse() {
     return RemoteConfigResponse.create(
-        false,
-        "%%displayUrl%%",
-        "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script src=\"%%displayUrl%%\"></script></body></html>",
-        "%%adTagData%%",
-        "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>",
-        true,
-        false,
-        1000,
-        true,
-        RemoteLogLevel.WARNING
+        DefaultConfig.KILL_SWITCH,
+        DefaultConfig.DISPLAY_URL_MACRO,
+        DefaultConfig.AD_TAG_URL_MODE,
+        DefaultConfig.AD_TAG_DATA_MACRO,
+        DefaultConfig.AD_TAG_DATA_MODE,
+        DefaultConfig.CSM_ENABLED,
+        DefaultConfig.LIVE_BIDDING_ENABLED,
+        DefaultConfig.LIVE_BIDDING_TIME_BUDGET_IN_MILLIS,
+        DefaultConfig.PREFETCH_ON_INIT_ENABLED,
+        DefaultConfig.REMOTE_LOG_LEVEL
     );
   }
 }

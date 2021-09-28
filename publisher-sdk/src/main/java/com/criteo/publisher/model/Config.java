@@ -40,18 +40,18 @@ public class Config {
    */
   private static final String CONFIG_STORAGE_KEY = "CriteoCachedConfig";
 
-  private static class DefaultConfig {
+  public static class DefaultConfig {
 
-    private static final boolean KILL_SWITCH = false;
-    private static final String DISPLAY_URL_MACRO = "%%displayUrl%%";
-    private static final String AD_TAG_URL_MODE = "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script src=\"%%displayUrl%%\"></script></body></html>";
-    private static final String AD_TAG_DATA_MACRO = "%%adTagData%%";
-    private static final String AD_TAG_DATA_MODE = "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>";
-    private static final boolean CSM_ENABLED = true;
-    private static final boolean LIVE_BIDDING_ENABLED = false;
-    private static final int LIVE_BIDDING_TIME_BUDGET_IN_MILLIS = 8_000;
-    private static final boolean PREFETCH_ON_INIT_ENABLED = true;
-    private static final RemoteLogLevel REMOTE_LOG_LEVEL = RemoteLogLevel.WARNING;
+    public static final boolean KILL_SWITCH = false;
+    public static final String DISPLAY_URL_MACRO = "%%displayUrl%%";
+    public static final String AD_TAG_URL_MODE = "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script src=\"%%displayUrl%%\"></script></body></html>";
+    public static final String AD_TAG_DATA_MACRO = "%%adTagData%%";
+    public static final String AD_TAG_DATA_MODE = "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>";
+    public static final boolean CSM_ENABLED = true;
+    public static final boolean LIVE_BIDDING_ENABLED = false;
+    public static final int LIVE_BIDDING_TIME_BUDGET_IN_MILLIS = 8_000;
+    public static final boolean PREFETCH_ON_INIT_ENABLED = true;
+    public static final RemoteLogLevel REMOTE_LOG_LEVEL = RemoteLogLevel.WARNING;
 
   }
 
