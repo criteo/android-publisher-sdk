@@ -113,6 +113,7 @@ dependencies {
     implementation(Deps.Square.Tape.Tape)
 
     compileOnly(Deps.Google.AdMob)
+    compileOnly(Deps.Google.AdsIdentifier)
 
     implementation(Deps.AutoValue.Annotation)
     annotationProcessor(Deps.AutoValue.AutoValue)
@@ -147,6 +148,7 @@ dependencies {
     androidTestImplementation(Deps.Square.Tape.Tape)
     androidTestImplementation(Deps.Square.OkHttp.MockWebServer)
     androidTestImplementation(Deps.Google.AdMob)
+    androidTestImplementation(Deps.Google.AdsIdentifier)
     androidTestImplementation(Deps.MoPub.Banner) { isTransitive = true }
     androidTestImplementation(Deps.MoPub.Interstitial) { isTransitive = true }
 
