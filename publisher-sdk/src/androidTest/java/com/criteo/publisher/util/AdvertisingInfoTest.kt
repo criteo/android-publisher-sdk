@@ -24,6 +24,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
@@ -54,10 +55,10 @@ class AdvertisingInfoTest {
   fun prefetchAsync_FromWorkerThread_DispatchAsync() {
     val initialThread = Thread.currentThread()
 
-    whenever(advertisingInfo.advertisingId).then {
+    doAnswer {
       assertThat(Thread.currentThread()).isNotEqualTo(initialThread)
       null
-    }
+    }.whenever(advertisingInfo).advertisingId
 
     advertisingInfo.prefetchAsync()
     mockedDependenciesRule.waitForIdleState()
@@ -69,10 +70,10 @@ class AdvertisingInfoTest {
   fun prefetchAsync_FromMainThread_DispatchAsync() {
     lateinit var initialThread: Thread
 
-    whenever(advertisingInfo.advertisingId).then {
+    doAnswer {
       assertThat(Thread.currentThread()).isNotEqualTo(initialThread)
       null
-    }
+    }.whenever(advertisingInfo).advertisingId
 
     runOnMainThreadAndWait {
       initialThread = Thread.currentThread()
