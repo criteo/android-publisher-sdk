@@ -49,14 +49,6 @@ public class AdvertisingInfo {
 
   public AdvertisingInfo(
       @NonNull Context context,
-      @NonNull Executor executor
-  ) {
-    this(context, executor, new SafeAdvertisingIdClient());
-  }
-
-  @VisibleForTesting
-  AdvertisingInfo(
-      @NonNull Context context,
       @NonNull Executor executor,
       @NonNull SafeAdvertisingIdClient advertisingIdClient
   ) {
@@ -140,10 +132,9 @@ public class AdvertisingInfo {
     resultRef.compareAndSet(null, advertisingIdResult);
   }
 
-  @VisibleForTesting
-  static class SafeAdvertisingIdClient {
+  public static class SafeAdvertisingIdClient {
     @WorkerThread // Google API throws when getting the advertising ID on main thread because of potential deadlock.
-    public AdvertisingIdResult getAdvertisingIdResult(@NonNull Context context) throws Exception {
+    AdvertisingIdResult getAdvertisingIdResult(@NonNull Context context) throws Exception {
       try {
         Info advertisingIdInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
         return new AdvertisingIdResult(advertisingIdInfo.getId(), advertisingIdInfo.isLimitAdTrackingEnabled());

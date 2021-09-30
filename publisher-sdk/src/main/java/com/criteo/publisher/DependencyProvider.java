@@ -92,6 +92,7 @@ import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.privacy.ConsentData;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AdvertisingInfo;
+import com.criteo.publisher.util.AdvertisingInfo.SafeAdvertisingIdClient;
 import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.AppLifecycleUtil;
 import com.criteo.publisher.util.BuildConfigWrapper;
@@ -203,8 +204,14 @@ public class DependencyProvider {
   public AdvertisingInfo provideAdvertisingInfo() {
     return getOrCreate(AdvertisingInfo.class, () -> new AdvertisingInfo(
         provideContext(),
-        provideThreadPoolExecutor()
+        provideThreadPoolExecutor(),
+        provideSafeAdvertisingIdClient()
     ));
+  }
+
+  @NonNull
+  public SafeAdvertisingIdClient provideSafeAdvertisingIdClient() {
+    return getOrCreate(SafeAdvertisingIdClient.class, SafeAdvertisingIdClient::new);
   }
 
   @NonNull
