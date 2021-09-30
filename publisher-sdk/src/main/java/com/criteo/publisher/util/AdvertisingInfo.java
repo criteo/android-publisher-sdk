@@ -134,7 +134,7 @@ public class AdvertisingInfo {
       logger.debug("Error getting advertising id", e);
     } catch (Exception e) {
       // Keep trying to get result on next try
-      logger.debug("Error getting advertising id", e);
+      PreconditionsUtil.throwOrLog(new AdvertisingInfoException(e));
       return;
     }
 
@@ -209,9 +209,14 @@ public class AdvertisingInfo {
   }
 
   static class MissingPlayServicesAdsIdentifierException extends Exception {
-
     MissingPlayServicesAdsIdentifierException(Throwable cause) {
       super("play-services-ads-identifier does not seems to be in the classpath", cause);
+    }
+  }
+
+  static class AdvertisingInfoException extends Exception {
+    AdvertisingInfoException(Throwable cause) {
+      super("Error getting advertising id", cause);
     }
   }
 }
