@@ -120,13 +120,12 @@ public class AdvertisingInfo {
     AdvertisingIdResult advertisingIdResult;
 
     try {
-      String id = advertisingIdClient.getId(context);
-      boolean limitAdTrackingEnabled = advertisingIdClient.isLimitAdTrackingEnabled(context);
+      advertisingIdResult = advertisingIdClient.getAdvertisingIdResult(context);
 
-      if (limitAdTrackingEnabled) {
+      if (advertisingIdResult.isLimitAdTrackingEnabled()) {
         advertisingIdResult = AdvertisingIdResult.limitedAdvertisingIdResult();
       } else {
-        advertisingIdResult = AdvertisingIdResult.unlimitedAdvertisingIdResult(id);
+        advertisingIdResult = AdvertisingIdResult.unlimitedAdvertisingIdResult(advertisingIdResult.getId());
       }
     } catch (MissingPlayServicesAdsIdentifierException e) {
       // This cannot be fixed during the runtime. Let's cache the failure.
@@ -143,29 +142,19 @@ public class AdvertisingInfo {
 
   @VisibleForTesting
   static class SafeAdvertisingIdClient {
-
     @WorkerThread // Google API throws when getting the advertising ID on main thread because of potential deadlock.
-    public String getId(@NonNull Context context) throws Exception {
+    public AdvertisingIdResult getAdvertisingIdResult(@NonNull Context context) throws Exception {
       try {
         Info advertisingIdInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
-        return advertisingIdInfo.getId();
-      } catch (LinkageError e) {
-        throw new MissingPlayServicesAdsIdentifierException(e);
-      }
-    }
-
-    @WorkerThread // Google API throws when getting the advertising ID on main thread because of potential deadlock.
-    public boolean isLimitAdTrackingEnabled(@NonNull Context context) throws Exception {
-      try {
-        Info advertisingIdInfo = AdvertisingIdClient.getAdvertisingIdInfo(context);
-        return advertisingIdInfo.isLimitAdTrackingEnabled();
+        return new AdvertisingIdResult(advertisingIdInfo.getId(), advertisingIdInfo.isLimitAdTrackingEnabled());
       } catch (LinkageError e) {
         throw new MissingPlayServicesAdsIdentifierException(e);
       }
     }
   }
 
-  private static class AdvertisingIdResult {
+  @VisibleForTesting
+  static class AdvertisingIdResult {
 
     private static final AdvertisingIdResult DEFAULT_INSTANCE = new AdvertisingIdResult(null, false);
     private static final AdvertisingIdResult LIMITED_INSTANCE = new AdvertisingIdResult(
@@ -178,7 +167,8 @@ public class AdvertisingInfo {
 
     private final boolean isLimitAdTrackingEnabled;
 
-    private AdvertisingIdResult(
+    @VisibleForTesting
+    AdvertisingIdResult(
         @Nullable String id,
         boolean isLimitAdTrackingEnabled
     ) {
@@ -186,7 +176,7 @@ public class AdvertisingInfo {
       this.isLimitAdTrackingEnabled = isLimitAdTrackingEnabled;
     }
 
-    static AdvertisingIdResult unlimitedAdvertisingIdResult(@NonNull String id) {
+    static AdvertisingIdResult unlimitedAdvertisingIdResult(String id) {
       return new AdvertisingIdResult(id, false);
     }
 
