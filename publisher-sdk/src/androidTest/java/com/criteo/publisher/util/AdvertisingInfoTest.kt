@@ -151,7 +151,7 @@ class AdvertisingInfoTest {
   @Test
   fun getAdvertisingId_GivenLimitedAdTracking_ReturnLimitedDeviceId() {
     val advertisingIdClient = spy(AdvertisingInfo.SafeAdvertisingIdClient()) {
-      doReturn(true).whenever(mock).isLimitAdTrackingEnabled(any())
+      doReturn(AdvertisingInfo.AdvertisingIdResult("something", true)).whenever(mock).getAdvertisingIdResult(any())
     }
     advertisingInfo = AdvertisingInfo(context, executor, advertisingIdClient)
 
