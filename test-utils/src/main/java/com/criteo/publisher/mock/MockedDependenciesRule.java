@@ -41,6 +41,7 @@ import com.criteo.publisher.mock.TestResource.CompositeTestResource;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.network.CdbMockResource;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.util.MockedAdvertiserIdClientResource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -80,6 +81,8 @@ public class MockedDependenciesRule implements MethodRule {
   private boolean injectCdbMockServer = true;
 
   private boolean injectSpiedLogger = false;
+
+  private boolean injectMockedAdvertisingIdClient = true;
 
   @NonNull
   private final DependencyProviderRef dependencyProviderRef;
@@ -137,6 +140,10 @@ public class MockedDependenciesRule implements MethodRule {
 
       if (injectSpiedLogger) {
         resources.add(new SpyLoggerResource(dependencyProviderRef));
+      }
+
+      if (injectMockedAdvertisingIdClient) {
+        resources.add(new MockedAdvertiserIdClientResource(dependencyProviderRef));
       }
 
       inMemoryResource = new CompositeTestResource(resources);
@@ -208,6 +215,22 @@ public class MockedDependenciesRule implements MethodRule {
    */
   public MockedDependenciesRule withSpiedLogger() {
     injectSpiedLogger = true;
+    clearInternalState();
+    return this;
+  }
+
+  /**
+   * Deactivate the mock of the AdvertiserIdClient
+   *
+   * By default, this client is mocked during test because Google Play Service might be slow and fail sometimes because
+   * of IOException.
+   *
+   * For tests that particularly tests this feature, then the mock can be deactivated.
+   *
+   * @return this for chaining calls
+   */
+  public MockedDependenciesRule withoutMockedAdvertiserIdClient() {
+    injectMockedAdvertisingIdClient = false;
     clearInternalState();
     return this;
   }

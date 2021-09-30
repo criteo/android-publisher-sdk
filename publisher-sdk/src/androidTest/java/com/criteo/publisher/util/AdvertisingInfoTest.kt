@@ -40,7 +40,7 @@ class AdvertisingInfoTest {
 
   @Rule
   @JvmField
-  val mockedDependenciesRule = MockedDependenciesRule()
+  val mockedDependenciesRule = MockedDependenciesRule().withoutMockedAdvertiserIdClient()
 
   @Inject
   private lateinit var context: Context

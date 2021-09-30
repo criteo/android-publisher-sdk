@@ -32,7 +32,7 @@ class AdvertisingInfoNoIdentifierTest {
 
   @Rule
   @JvmField
-  val mockedDependenciesRule = MockedDependenciesRule().withSpiedLogger()
+  val mockedDependenciesRule = MockedDependenciesRule().withSpiedLogger().withoutMockedAdvertiserIdClient()
 
   @SpyBean
   private lateinit var logger: Logger
