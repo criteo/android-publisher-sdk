@@ -15,29 +15,24 @@
  */
 package com.criteo.publisher
 
+import com.criteo.publisher.mock.MockBean
+import com.criteo.publisher.mock.MockedDependenciesRule
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.spy
 import org.mockito.kotlin.whenever
 
 class SessionTest {
 
-  @Before
-  fun setUp() {
-    MockableDependencyProvider.setInstance(null)
-    CriteoUtil.clearCriteo()
-  }
+  @Rule
+  @JvmField
+  var mockedDependenciesRule = MockedDependenciesRule()
+
+  @MockBean
+  private lateinit var clock: Clock
 
   @Test
   fun getDuration_GivenSdkInitialized_SessionDurationIsStarted() {
-    val clock = mock<Clock>()
-    val dependencyProvider = spy(DependencyProvider.getInstance())
-    doReturn(clock).whenever(dependencyProvider).provideClock()
-    MockableDependencyProvider.setInstance(dependencyProvider)
-
     whenever(clock.currentTimeInMillis).thenReturn(1337L)
 
     CriteoUtil.givenInitializedCriteo()
@@ -58,7 +53,7 @@ class SessionTest {
     val sessionId1 = session1.sessionId
     val sessionId2 = session1.sessionId
 
-    MockableDependencyProvider.setInstance(null)
+    mockedDependenciesRule.resetAllDependencies()
     CriteoUtil.givenInitializedCriteo()
 
     val session2 = DependencyProvider.getInstance().provideSession()
