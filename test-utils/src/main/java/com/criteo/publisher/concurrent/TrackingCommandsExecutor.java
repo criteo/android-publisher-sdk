@@ -37,9 +37,15 @@ public class TrackingCommandsExecutor implements Executor {
     CountDownLatch latch = new CountDownLatch(1);
     commandLatches.add(latch);
 
+    StackTraceElement[] localStackTrace = Thread.currentThread().getStackTrace();
+
     Runnable trackedCommand = () -> {
       try {
         command.run();
+      } catch(Throwable throwable) {
+        RuntimeException e = new RuntimeException(throwable);
+        e.setStackTrace(localStackTrace);
+        throw e;
       } finally {
         latch.countDown();
       }
