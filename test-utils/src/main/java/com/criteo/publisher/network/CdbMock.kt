@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.network
 
+import android.util.Log
 import com.criteo.publisher.StubConstants.STUB_CREATIVE_IMAGE
 import com.criteo.publisher.StubConstants.STUB_NATIVE_JSON
 import com.criteo.publisher.TestAdUnits.ADMOB_MEDIATION_BANNER_ADUNIT_ID
@@ -90,6 +91,8 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
 
   private inner class CdbMockHandler : Dispatcher() {
     override fun dispatch(request: RecordedRequest): MockResponse {
+      Log.i("CdbMock", request.toString())
+
       return when (request.requestUrl?.encodedPath) {
         "/csm" -> handleCsmRequest()
         "/config/app" -> handleConfigRequest()
@@ -98,11 +101,18 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
         "/delivery/ajs.php" -> handleCasperRequest(request)
         "/delivery/vast.php" -> handleVastCasperRequest()
         "/appevent/v1/2379" -> handleBearcatRequest()
+        "/pixel" -> handlePixel()
         else -> MockResponse().setResponseCode(HttpURLConnection.HTTP_NOT_FOUND)
       }.also {
         if (simulateSlowNetwork.compareAndSet(true, false)) {
           it.throttleBody(1, 1, TimeUnit.SECONDS)
         }
+
+        it.setHeader("access-control-allow-credentials", "true")
+        it.setHeader("access-control-allow-headers", "Origin, Content-Type, Accept, X-Requested-With")
+        it.setHeader("access-control-allow-methods", "GET, POST, OPTIONS")
+        it.setHeader("access-control-allow-origin", request.getHeader("origin") ?: "")
+        it.setHeader("access-control-max-age", "1000")
       }
     }
 
@@ -291,19 +301,28 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
     @Suppress("MaxLineLength")
     private fun handleVastCasperRequest(): MockResponse {
       val response = """
+        <?xml version="1.0" encoding="utf-8"?>
         <VAST version="3.0">
-          <Ad id="5d39aa72c61ec4c5d4b05267a94d0bc5">
+          <Ad id="38000">
             <InLine>
-              <AdSystem>Criteo</AdSystem>
+              <AdSystem version="1.0">Criteo</AdSystem>
               <AdTitle>Criteo Video Ad</AdTitle>
+              <Impression><![CDATA[$url/pixel?event=video_impression]]></Impression>
               <Creatives>
-                <Creative id="10108474">
+                <Creative sequence="1" id="1">
                   <Linear>
                     <Duration>00:00:20</Duration>
+                    <TrackingEvents>
+                      <Tracking event="start"><![CDATA[$url/pixel?event=video_start]]></Tracking>
+                      <Tracking event="firstQuartile"><![CDATA[$url/pixel?event=video_firstQuartile]]></Tracking>
+                      <Tracking event="midpoint"><![CDATA[$url/pixel?event=video_midpoint]]></Tracking>
+                      <Tracking event="thirdQuartile"><![CDATA[$url/pixel?event=video_thirdQuartile]]></Tracking>
+                      <Tracking event="complete"><![CDATA[$url/pixel?event=video_complete]]></Tracking>
+                    </TrackingEvents>
                     <VideoClicks>
-                      <ClickThrough>
-                        <![CDATA[https://criteo.com]]>
-                      </ClickThrough>
+                      <ClickThrough><![CDATA[https://criteo.com/]]></ClickThrough>
+                      <ClickTracking><![CDATA[$url/pixel?event=video_click_1]]></ClickTracking>
+                      <ClickTracking><![CDATA[$url/pixel?event=video_click_2]]></ClickTracking>
                     </VideoClicks>
                     <MediaFiles>
                       <MediaFile id="Criteo_mp4_ABC" delivery="progressive" width="1280" height="720" type="video/mp4" bitrate="1349" scalable="true" maintainAspectRatio="true">
@@ -311,6 +330,19 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
                       </MediaFile>
                     </MediaFiles>
                   </Linear>
+                </Creative>
+                <Creative sequence="1" id="2">
+                  <CompanionAds>
+                    <Companion id="endCard" width="320" height="480">
+                      <StaticResource creativeType="image/png"><![CDATA[$STUB_CREATIVE_IMAGE]]></StaticResource>
+                      <CompanionClickThrough><![CDATA[https://google.com/]]></CompanionClickThrough>
+                      <CompanionClickTracking><![CDATA[$url/pixel?event=companion_click_1]]></CompanionClickTracking>
+                      <CompanionClickTracking><![CDATA[$url/pixel?event=companion_click_2]]></CompanionClickTracking>
+                      <TrackingEvents>
+                        <Tracking event="creativeView"><![CDATA[$url/pixel?event=companion_creativeView]]></Tracking>
+                      </TrackingEvents>
+                    </Companion>
+                  </CompanionAds>
                 </Creative>
               </Creatives>
             </InLine>
@@ -320,6 +352,10 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
       return MockResponse()
           .setHeader(CONTENT_TYPE, "text/plain; charset=utf-8")
           .setBody(response)
+    }
+
+    private fun handlePixel(): MockResponse {
+      return MockResponse() // TODO?
     }
   }
 }
