@@ -4,6 +4,9 @@
     <trust-anchors>
       <!-- Trust user added CAs while debuggable only -->
       <certificates src="user"/>
+
+      <!-- Trust self-signed CAs of CDB mock -->
+      <certificates src="@raw/localhost"/>
     </trust-anchors>
   </debug-overrides>
 

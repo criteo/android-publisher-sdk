@@ -49,6 +49,7 @@ dependencies {
   implementation(Deps.AndroidX.MultiDex)
   implementation(Deps.JUnit.JUnit)
   implementation(Deps.Square.OkHttp.MockWebServer)
+  implementation(Deps.Square.OkHttp.OkHttpTls)
   compileOnly(Deps.AutoValue.GsonRuntime)
 
   compileOnly(Deps.Mockito.Core) {
