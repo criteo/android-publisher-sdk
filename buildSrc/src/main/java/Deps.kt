@@ -152,6 +152,7 @@ object Deps {
 
       const val MockWebServer = "com.squareup.okhttp3:mockwebserver:$version"
       const val OkHttp = "com.squareup.okhttp3:okhttp:$version"
+      const val OkHttpTls = "com.squareup.okhttp3:okhttp-tls:$version"
     }
 
     object Picasso {
