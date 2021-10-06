@@ -34,13 +34,18 @@ import com.criteo.publisher.Bid;
 import com.criteo.publisher.BidResponseListener;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.integration.Integration;
+import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.testapp.integration.MockedIntegrationRegistry;
 import com.criteo.testapp.listener.TestAppMoPubInterstitialAdListener;
+import com.criteo.testapp.listener.TestAppMoPubRewardedAdListener;
+import com.criteo.testapp.mock.NetworkUtil;
 import com.mopub.common.MoPub;
 import com.mopub.common.SdkConfiguration;
 import com.mopub.common.SdkInitializationListener;
 import com.mopub.mobileads.MoPubInterstitial;
+import com.mopub.mobileads.MoPubRewardedAdManager.RequestParameters;
+import com.mopub.mobileads.MoPubRewardedAds;
 import com.mopub.mobileads.MoPubView;
 import java.lang.ref.WeakReference;
 
@@ -51,6 +56,7 @@ public class MopubActivity extends AppCompatActivity {
   public static final String MOPUB_BANNER_ADUNIT_ID_HB = "d2f3ed80e5da4ae1acde0971eac30fa4";
   public static final String MOPUB_INTERSTITIAL_ADUNIT_ID_HB = "83a2996696284da881edaf1a480e5d7c";
   public static final String MOPUB_INTERSTITIAL_VIDEO_ADUNIT_ID_HB = "1654e4c6298741e98ad09743d9e6b630";
+  public static final String MOPUB_REWARDED_VIDEO_ADUNIT_ID_HB = "7d36d059d97649cb8ac3426a11636ab9";
 
   private MoPubView publisherAdView;
   private LinearLayout linearLayout;
@@ -69,6 +75,7 @@ public class MopubActivity extends AppCompatActivity {
     findViewById(R.id.buttonBanner).setOnClickListener((View v) -> onBannerClick());
     findViewById(R.id.buttonInterstitial).setOnClickListener((View v) -> onInterstitialClick());
     findViewById(R.id.buttonInterstitialVideo).setOnClickListener((View v) -> onInterstitialVideoClick());
+    findViewById(R.id.buttonRewardedVideo).setOnClickListener((View v) -> onRewardedVideoClick());
   }
 
   public static void initializeMoPubSdk(Context context) {
@@ -82,6 +89,7 @@ public class MopubActivity extends AppCompatActivity {
       @Override
       public void onInitializationFinished() {
         Log.d(TAG, "Mopub initialization completed");
+        MoPubRewardedAds.setRewardedAdListener(new TestAppMoPubRewardedAdListener());
       }
     });
   }
@@ -117,6 +125,19 @@ public class MopubActivity extends AppCompatActivity {
     criteo.loadBid(criteoAdUnit, CONTEXT_DATA, enrich((mThis, bid) -> {
       mThis.criteo.enrichAdObjectWithBid(mInterstitial, bid);
       mInterstitial.load();
+    }));
+  }
+
+  private void onRewardedVideoClick() {
+    NetworkUtil.logCasperRedirectionWarning(TAG);
+
+    AdUnit criteoAdUnit = INTERSTITIAL_VIDEO; // TODO
+    criteo.loadBid(criteoAdUnit, CONTEXT_DATA, enrich((mThis, bid) -> {
+      MoPubView dummyView = new MoPubView(mThis);
+      mThis.criteo.enrichAdObjectWithBid(dummyView, bid);
+
+      RequestParameters requestParameters = new RequestParameters(dummyView.getKeywords()); // TODO
+      MoPubRewardedAds.loadRewardedAd(MOPUB_REWARDED_VIDEO_ADUNIT_ID_HB, requestParameters);
     }));
   }
 
