@@ -18,8 +18,6 @@ package com.criteo.publisher.integration
 
 import android.content.SharedPreferences
 import com.criteo.publisher.CriteoUtil.givenInitializedCriteo
-import com.criteo.publisher.DependencyProvider
-import com.criteo.publisher.MockableDependencyProvider
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.util.BuildConfigWrapper
@@ -91,9 +89,8 @@ class IntegrationRegistryTest {
   fun integration_GivenPreviouslyDeclaredOneAndNewSession_ReturnDeclaredOne() {
     integrationRegistry.declare(Integration.IN_HOUSE)
 
-    MockableDependencyProvider.setInstance(null)
+    mockedDependenciesRule.resetAllDependencies()
     givenInitializedCriteo()
-    integrationRegistry = DependencyProvider.getInstance().provideIntegrationRegistry()
 
     val integration = integrationRegistry.readIntegration()
 
