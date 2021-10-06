@@ -40,4 +40,5 @@
   <string name="integration_bid_caching_warning">Note that because of bid caching, you may need to ask twice for a bid to have the correct profile ID.</string>
   <string name="integration_verbose">Display a toast on forced/detected integration</string>
   <string name="btn_integration_selector">Integration Selector</string>
+  <string name="btn_rewarded_video">Rewarded video</string>
 </resources>
