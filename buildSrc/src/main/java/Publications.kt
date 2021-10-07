@@ -142,7 +142,7 @@ class SdkPublication(
   private fun signPublication() {
     project.signing?.apply {
       val secretKey = System.getenv("MAVEN_SECRING_GPG_BASE64")
-      val password = System.getenv("SONATYPE_PASSWORD")
+      val password = System.getenv("MAVEN_SECRING_PASSWORD")
 
       if (secretKey != null && password != null) {
         useInMemoryPgpKeys(secretKey, password)
