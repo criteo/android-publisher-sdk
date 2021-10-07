@@ -58,7 +58,8 @@ sonarqube {
         "sonar.coverage.exclusions",
         listOf(
             "app/src/main/**/*",
-            "publisher-sdk-tests/src/main/**/*"
+            "publisher-sdk-tests/src/main/**/*",
+            "test-utils/src/main/**/*" // FIXME EE-1370 handle coverage of test-utils from the SDK tests
         )
     )
 
