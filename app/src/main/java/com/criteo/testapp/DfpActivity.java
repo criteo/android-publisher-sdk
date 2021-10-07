@@ -36,6 +36,8 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.testapp.integration.MockedIntegrationRegistry;
 import com.criteo.testapp.listener.TestAppDfpAdListener;
+import com.criteo.testapp.listener.TestAppDfpRewardedAdListener;
+import com.criteo.testapp.mock.NetworkUtil;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
@@ -44,9 +46,9 @@ import com.google.android.gms.ads.admanager.AdManagerAdRequest;
 import com.google.android.gms.ads.admanager.AdManagerAdView;
 import com.google.android.gms.ads.admanager.AdManagerInterstitialAd;
 import com.google.android.gms.ads.admanager.AdManagerInterstitialAdLoadCallback;
+import com.google.android.gms.ads.rewarded.RewardedAd;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
-import org.jetbrains.annotations.NotNull;
 
 public class DfpActivity extends AppCompatActivity {
 
@@ -55,6 +57,7 @@ public class DfpActivity extends AppCompatActivity {
   private static final String DFP_BANNER_ID = BANNER.getAdUnitId();
   private static final String DFP_NATIVE_ID = NATIVE.getAdUnitId();
   private static final String DFP_INTERSTITIAL_VIDEO_ID = INTERSTITIAL_VIDEO.getAdUnitId();
+  private static final String DFP_REWARDED_VIDEO_ID = DFP_INTERSTITIAL_VIDEO_ID; // TODO?
 
   private LinearLayout linearLayout;
   private Criteo criteo;
@@ -72,6 +75,7 @@ public class DfpActivity extends AppCompatActivity {
     findViewById(R.id.buttonInterstitial).setOnClickListener((View v) -> onInterstitialClick());
     findViewById(R.id.buttonInterstitialVideo).setOnClickListener((View v) -> onInterstitialVideoClick());
     findViewById(R.id.buttonCustomNative).setOnClickListener((View v) -> onNativeClick());
+    findViewById(R.id.buttonRewardedVideo).setOnClickListener((View v) -> onRewardedVideoClick());
 
     RequestConfiguration requestConfiguration = new RequestConfiguration.Builder().setTestDeviceIds(Collections.singletonList(AdRequest.DEVICE_ID_EMULATOR)).build();
     MobileAds.setRequestConfiguration(requestConfiguration);
@@ -137,10 +141,30 @@ public class DfpActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onAdFailedToLoad(@NotNull LoadAdError loadAdError) {
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
               Log.d(TAG, "Interstitial - called: onAdFailedToLoad");
             }
           }
+      );
+    }));
+  }
+
+  private void onRewardedVideoClick() {
+    NetworkUtil.logCasperRedirectionWarning(TAG);
+
+    AdManagerAdRequest.Builder builder = new AdManagerAdRequest.Builder();
+
+    AdUnit criteoAdUnit = INTERSTITIAL_VIDEO; // TODO
+    criteo.loadBid(criteoAdUnit, CONTEXT_DATA, enrich((mThis, bid) -> {
+          mThis.criteo.enrichAdObjectWithBid(builder, bid);
+
+      AdManagerAdRequest request = builder.build();
+
+      RewardedAd.load(
+          this.getApplicationContext(),
+          DFP_REWARDED_VIDEO_ID,
+          request,
+          new TestAppDfpRewardedAdListener(TAG, mThis)
       );
     }));
   }

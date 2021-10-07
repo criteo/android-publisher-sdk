@@ -66,6 +66,17 @@
           android:layout_marginLeft="5dp"
           android:background="#81C784"
           android:text="@string/btn_custom_native"/>
+
+        <Button
+          android:id="@+id/buttonRewardedVideo"
+          style="@style/Widget.AppCompat.Button.Colored"
+          android:layout_width="0dp"
+          android:layout_height="match_parent"
+          android:layout_weight="1"
+          android:layout_marginStart="5dp"
+          android:layout_marginLeft="5dp"
+          android:background="#81C784"
+          android:text="@string/btn_rewarded_video"/>
       </LinearLayout>
     </HorizontalScrollView>
 
