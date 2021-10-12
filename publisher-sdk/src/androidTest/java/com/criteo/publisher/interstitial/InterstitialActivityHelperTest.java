@@ -48,7 +48,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class InterstitialActivityHelperTest {
 
@@ -57,6 +58,9 @@ public class InterstitialActivityHelperTest {
 
   @Rule
   public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(DummyActivity.class);
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   private Context context;
 
@@ -72,8 +76,6 @@ public class InterstitialActivityHelperTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     context = activityRule.getActivity().getApplicationContext();
     topActivityFinder.registerActivityLifecycleFor(activityRule.getActivity().getApplication());
     helper = createHelper();

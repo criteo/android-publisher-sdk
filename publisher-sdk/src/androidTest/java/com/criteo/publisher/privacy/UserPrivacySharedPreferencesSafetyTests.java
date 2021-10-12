@@ -32,11 +32,15 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class UserPrivacySharedPreferencesSafetyTests {
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @Inject
   private Context context;
@@ -48,7 +52,6 @@ public class UserPrivacySharedPreferencesSafetyTests {
 
   @Before
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
     when(buildConfigWrapper.preconditionThrowsOnException()).thenReturn(false);
     doReturn(buildConfigWrapper).when(dependencyProvider).provideBuildConfigWrapper();

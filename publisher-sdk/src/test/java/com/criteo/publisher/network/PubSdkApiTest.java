@@ -52,7 +52,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class PubSdkApiTest {
 
@@ -61,6 +62,9 @@ public class PubSdkApiTest {
 
   @Rule
   public MockWebServer mockWebServer = new MockWebServer();
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @SpyBean
   private BuildConfigWrapper buildConfigWrapper;
@@ -77,8 +81,6 @@ public class PubSdkApiTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     serverUrl = new URL("http://localhost:" + mockWebServer.getPort());
 
     when(buildConfigWrapper.getCdbUrl()).thenReturn(serverUrl.toString());

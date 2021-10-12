@@ -40,13 +40,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @RunWith(Parameterized.class)
 public class BearcatPrivacyFunctionalTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @Parameterized.Parameters
   public static Collection consents() {
@@ -184,8 +188,6 @@ public class BearcatPrivacyFunctionalTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
   }
 

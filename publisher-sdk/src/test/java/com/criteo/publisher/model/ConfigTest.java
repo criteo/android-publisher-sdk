@@ -48,12 +48,16 @@ import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class ConfigTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @SpyBean
   private BuildConfigWrapper buildConfigWrapper;
@@ -68,8 +72,6 @@ public class ConfigTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     when(sharedPreferences.getString(any(), any()))
         .thenAnswer(invocation -> invocation.getArguments()[1]);
   }

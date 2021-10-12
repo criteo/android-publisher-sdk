@@ -30,7 +30,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
@@ -48,6 +48,10 @@ class ImpressionHelperTest {
     @JvmField
     val mockedDependenciesRule = MockedDependenciesRule()
 
+    @Rule
+    @JvmField
+    val mockitoRule = MockitoJUnit.rule()
+
     @MockBean
     private lateinit var api: PubSdkApi
 
@@ -63,8 +67,6 @@ class ImpressionHelperTest {
 
     @Before
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
-
         helper = ImpressionHelper(api, executor, runOnUiThreadExecutor)
     }
 

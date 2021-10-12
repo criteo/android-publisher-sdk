@@ -19,9 +19,10 @@ package com.criteo.publisher.csm
 import android.util.AtomicFile
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doThrow
@@ -31,6 +32,10 @@ import org.mockito.kotlin.spy
 import org.mockito.kotlin.whenever
 
 class SyncMetricFileTest {
+
+  @Rule
+  @JvmField
+  val mockitoRule = MockitoJUnit.rule()
 
   @Mock
   private lateinit var atomicFile: AtomicFile
@@ -42,8 +47,6 @@ class SyncMetricFileTest {
 
   @Before
   fun setUp() {
-    MockitoAnnotations.initMocks(this)
-
     metricFile = spy(SyncMetricFile("id", atomicFile, parser))
   }
 

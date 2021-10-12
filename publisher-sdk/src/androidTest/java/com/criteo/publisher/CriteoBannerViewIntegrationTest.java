@@ -32,12 +32,16 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class CriteoBannerViewIntegrationTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @Mock
   private CriteoBannerAdListener criteoBannerAdListener;
@@ -51,8 +55,6 @@ public class CriteoBannerViewIntegrationTest {
 
   @Before
   public void setup() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     runOnMainThreadAndWait(() -> {
       criteoBannerView = new CriteoBannerView(
           InstrumentationUtil.getApplication().getApplicationContext(),

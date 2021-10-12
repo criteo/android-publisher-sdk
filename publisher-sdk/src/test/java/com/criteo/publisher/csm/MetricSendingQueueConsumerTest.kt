@@ -27,7 +27,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.any
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doAnswer
@@ -48,6 +48,10 @@ class MetricSendingQueueConsumerTest {
   @JvmField
   val mockedDependenciesRule = MockedDependenciesRule()
 
+  @Rule
+  @JvmField
+  val mockitoRule = MockitoJUnit.rule()
+
   @Mock
   private lateinit var queue: MetricSendingQueue
 
@@ -66,8 +70,6 @@ class MetricSendingQueueConsumerTest {
 
   @Before
   fun setUp() {
-    MockitoAnnotations.initMocks(this)
-
     buildConfigWrapper.stub {
       on { preconditionThrowsOnException() } doReturn false
     }

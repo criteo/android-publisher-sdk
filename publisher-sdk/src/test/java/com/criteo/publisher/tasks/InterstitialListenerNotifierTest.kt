@@ -30,9 +30,10 @@ import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
@@ -42,6 +43,10 @@ import org.mockito.kotlin.whenever
 import java.lang.ref.Reference
 
 class InterstitialListenerNotifierTest {
+
+  @Rule
+  @JvmField
+  val mockitoRule = MockitoJUnit.rule()
 
   @Mock
   private lateinit var interstitial: CriteoInterstitial
@@ -58,8 +63,6 @@ class InterstitialListenerNotifierTest {
 
   @Before
   fun setUp() {
-    MockitoAnnotations.initMocks(this)
-
     setUpExpectingListenerToBeInvokedInExecutor()
 
     listenerNotifier = InterstitialListenerNotifier(

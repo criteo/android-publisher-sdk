@@ -27,11 +27,16 @@ import android.os.Handler;
 import com.criteo.publisher.CriteoListenerCode;
 import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class CriteoResultReceiverTest {
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   private CriteoResultReceiver criteoResultReceiver;
 
@@ -43,7 +48,6 @@ public class CriteoResultReceiverTest {
 
   @Before
   public void setup() {
-    MockitoAnnotations.initMocks(this);
     criteoResultReceiver = new CriteoResultReceiver(
         handler,
         listenerNotifier

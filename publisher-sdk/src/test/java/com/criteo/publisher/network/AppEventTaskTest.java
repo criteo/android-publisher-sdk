@@ -40,7 +40,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.mockito.stubbing.OngoingStubbing;
 
 public class AppEventTaskTest {
@@ -48,6 +49,9 @@ public class AppEventTaskTest {
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule()
       .withSpiedLogger();
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   private JSONObject json;
 
@@ -77,8 +81,6 @@ public class AppEventTaskTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     when(deviceInfo.getUserAgent()).thenReturn(completedFuture("myUserAgent"));
 
     json = new JSONObject();

@@ -34,9 +34,10 @@ import com.criteo.publisher.util.CompletableFuture.completedFuture
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
@@ -62,6 +63,10 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class BidRequestSenderTest {
 
+    @Rule
+    @JvmField
+    val mockitoRule = MockitoJUnit.rule()
+
     @Mock
     private lateinit var cdbRequestFactory: CdbRequestFactory
 
@@ -82,8 +87,6 @@ class BidRequestSenderTest {
 
     @Before
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
-
         whenever(cdbRequestFactory.userAgent).doReturn(completedFuture(""))
 
         givenNewSender()

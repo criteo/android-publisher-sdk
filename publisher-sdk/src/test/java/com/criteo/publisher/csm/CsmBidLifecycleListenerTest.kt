@@ -28,9 +28,10 @@ import com.criteo.publisher.privacy.ConsentData
 import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.check
@@ -50,6 +51,10 @@ import java.net.SocketTimeoutException
 import java.util.concurrent.Executor
 
 class CsmBidLifecycleListenerTest {
+
+  @Rule
+  @JvmField
+  val mockitoRule = MockitoJUnit.rule()
 
   @Mock
   private lateinit var repository: MetricRepository
@@ -72,8 +77,6 @@ class CsmBidLifecycleListenerTest {
 
   @Before
   fun setUp() {
-    MockitoAnnotations.initMocks(this)
-
     executor = Executor { it.run() }
 
     config.stub {

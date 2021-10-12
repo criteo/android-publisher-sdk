@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import com.criteo.publisher.DependencyProvider;
+import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.SafeSharedPreferences;
@@ -32,14 +33,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 public class Tcf1KeysSharedPreferencesSafetyTests {
+
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
-  @Mock
+  @MockBean
   private BuildConfigWrapper buildConfigWrapper;
 
   @Inject
@@ -52,7 +52,6 @@ public class Tcf1KeysSharedPreferencesSafetyTests {
 
   @Before
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
     sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
     DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();

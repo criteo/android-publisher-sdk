@@ -40,7 +40,8 @@ import com.criteo.publisher.util.AdvertisingInfo;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class BearcatFunctionalTest {
 
@@ -49,6 +50,9 @@ public class BearcatFunctionalTest {
 
   @Rule
   public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(DummyActivity.class);
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @SpyBean
   private PubSdkApi api;
@@ -60,7 +64,6 @@ public class BearcatFunctionalTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
     dependencyProvider = mockedDependenciesRule.getDependencyProvider();
   }
 

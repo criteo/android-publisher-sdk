@@ -34,12 +34,16 @@ import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.DeviceUtil;
 import java.util.function.Function;
 import org.junit.After;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class DependencyProviderTest {
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @Mock
   private DependencyProvider dependencyProvider;
@@ -49,11 +53,6 @@ public class DependencyProviderTest {
 
   @Mock
   private AdvertisingInfo advertisingInfo;
-
-  @Before
-  public void setUp() {
-    MockitoAnnotations.initMocks(this);
-  }
 
   @After
   public void tearDown() {

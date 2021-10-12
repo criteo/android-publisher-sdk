@@ -22,13 +22,18 @@ import com.criteo.publisher.util.AdvertisingInfo
 import com.criteo.publisher.util.BuildConfigWrapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.stub
 
 class RemoteConfigRequestFactoryTest {
+
+    @Rule
+    @JvmField
+    val mockitoRule = MockitoJUnit.rule()
 
     @Mock
     private lateinit var context: Context
@@ -46,7 +51,6 @@ class RemoteConfigRequestFactoryTest {
 
     @Before
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
         factory = RemoteConfigRequestFactory(
             context,
             "myCpId",

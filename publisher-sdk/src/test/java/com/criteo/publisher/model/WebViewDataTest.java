@@ -20,12 +20,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.criteo.publisher.network.PubSdkApi;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class WebViewDataTest {
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @Mock
   private Config config;
@@ -33,14 +38,8 @@ public class WebViewDataTest {
   @Mock
   private PubSdkApi api;
 
+  @InjectMocks
   private WebViewData webViewData;
-
-  @Before
-  public void setup() {
-    MockitoAnnotations.initMocks(this);
-
-    webViewData = new WebViewData(config, api);
-  }
 
   @Test
   public void setContent_GivenConfigMacro_ReplacePlaceholderByTagData() {

@@ -33,11 +33,16 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.WebViewData;
 import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class CriteoInterstitialEventControllerTest {
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @Mock
   private InterstitialListenerNotifier listenerNotifier;
@@ -58,8 +63,6 @@ public class CriteoInterstitialEventControllerTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     controller = spy(createController());
   }
 

@@ -42,13 +42,17 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class CriteoBannerViewTest {
 
   @Rule
   @JvmField
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @Mock
   private Context context;
@@ -74,8 +78,6 @@ public class CriteoBannerViewTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     bannerAdUnit = new BannerAdUnit("mock", new AdSize(320, 50));
 
     bannerView = spy(new CriteoBannerView(context, bannerAdUnit, criteo));

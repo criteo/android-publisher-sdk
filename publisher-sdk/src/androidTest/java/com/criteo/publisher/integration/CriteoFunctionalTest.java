@@ -55,10 +55,10 @@ import com.criteo.publisher.util.BuildConfigWrapper;
 import java.util.Collections;
 import java.util.List;
 import javax.inject.Inject;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class CriteoFunctionalTest {
 
@@ -71,6 +71,9 @@ public class CriteoFunctionalTest {
       false,
       false
   );
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   private final BannerAdUnit validBannerAdUnit = TestAdUnits.BANNER_320_50;
   private final InterstitialAdUnit validInterstitialAdUnit = TestAdUnits.INTERSTITIAL;
@@ -92,11 +95,6 @@ public class CriteoFunctionalTest {
 
   @SpyBean
   private Logger logger;
-
-  @Before
-  public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-  }
 
   @Test
   public void getVersion_GivenNotInitializedSdk_ReturnVersion() throws Exception {

@@ -27,11 +27,16 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import com.criteo.publisher.privacy.gdpr.GdprDataFetcher;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class UserPrivacyUtilTest {
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @Mock
   private SharedPreferences sharedPreferences;
@@ -46,7 +51,6 @@ public class UserPrivacyUtilTest {
 
   @Before
   public void setUp() {
-    MockitoAnnotations.initMocks(this);
     userPrivacyUtil = new UserPrivacyUtil(sharedPreferences, gdprDataFetcher);
   }
 

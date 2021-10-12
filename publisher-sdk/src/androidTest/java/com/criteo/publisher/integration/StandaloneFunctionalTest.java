@@ -82,7 +82,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class StandaloneFunctionalTest {
 
@@ -91,6 +92,9 @@ public class StandaloneFunctionalTest {
 
   @Rule
   public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(DummyActivity.class);
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   private final BannerAdUnit validBannerAdUnit = TestAdUnits.BANNER_320_50;
   private final BannerAdUnit invalidBannerAdUnit = TestAdUnits.BANNER_UNKNOWN;
@@ -120,8 +124,6 @@ public class StandaloneFunctionalTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     webViewLookup = new WebViewLookup();
 
     givenTimeBudgetRespectedWhenFetchingLiveBids();

@@ -21,24 +21,24 @@ import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.util.DisplayMetrics;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Answers;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class DeviceUtilTest {
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private Context context;
 
+  @InjectMocks
   private DeviceUtil deviceUtil;
-
-  @Before
-  public void setup() throws Exception {
-    MockitoAnnotations.initMocks(this);
-    deviceUtil = new DeviceUtil(context);
-  }
 
   @Test
   public void isTablet_GivenDeviceInPortraitAndWidthBelow600dp_ReturnFalse() throws Exception {

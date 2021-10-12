@@ -31,12 +31,16 @@ import com.criteo.publisher.test.activity.DummyActivity;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class VisibilityCheckerTest {
 
   @Rule
   public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(DummyActivity.class);
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   private UiHelper uiHelper;
 
@@ -44,8 +48,6 @@ public class VisibilityCheckerTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     uiHelper = new UiHelper(activityRule);
     checker = new VisibilityChecker();
   }

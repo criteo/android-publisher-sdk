@@ -35,12 +35,16 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class ConsumableBidLoaderDegradedTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @Mock
   private AdUnit adUnit;
@@ -61,8 +65,6 @@ public class ConsumableBidLoaderDegradedTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     when(deviceUtil.isVersionSupported()).thenReturn(false);
 
     criteo = givenInitializedCriteo();

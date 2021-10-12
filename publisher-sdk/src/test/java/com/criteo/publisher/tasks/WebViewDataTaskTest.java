@@ -37,7 +37,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class WebViewDataTaskTest {
 
@@ -46,6 +47,9 @@ public class WebViewDataTaskTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   private String displayUrl;
 
@@ -68,8 +72,6 @@ public class WebViewDataTaskTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     displayUrl = "http://localhost:" + mockWebServer.getPort() + "/path";
     when(deviceInfo.getUserAgent()).thenReturn(completedFuture(""));
 

@@ -25,23 +25,22 @@ import static org.mockito.Mockito.when;
 
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.nativeads.NativeAssets;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class BidTest {
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @Mock
   private CdbResponseSlot slot;
 
   @Mock
   private Clock clock;
-
-  @Before
-  public void setUp() {
-    MockitoAnnotations.initMocks(this);
-  }
 
   @Test
   public void getPrice_GivenSlot_ReturnItsPrice() {

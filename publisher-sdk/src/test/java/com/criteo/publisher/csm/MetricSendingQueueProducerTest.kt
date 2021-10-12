@@ -16,11 +16,12 @@
 
 package com.criteo.publisher.csm
 
-import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
 import org.mockito.invocation.InvocationOnMock
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
@@ -32,20 +33,18 @@ import org.mockito.kotlin.whenever
 
 class MetricSendingQueueProducerTest {
 
+  @Rule
+  @JvmField
+  val mockitoRule = MockitoJUnit.rule()
+
   @Mock
   private lateinit var repository: MetricRepository
 
   @Mock
   private lateinit var queue: MetricSendingQueue
 
+  @InjectMocks
   private lateinit var producer: MetricSendingQueueProducer
-
-  @Before
-  fun setUp() {
-    MockitoAnnotations.initMocks(this)
-
-    producer = MetricSendingQueueProducer(queue)
-  }
 
   @Test
   fun pushAllInQueue_GivenAnyMetric_PushAndMoveThem() {

@@ -52,12 +52,16 @@ import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class CriteoBannerEventControllerTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   private CriteoBannerEventController criteoBannerEventController;
 
@@ -81,8 +85,6 @@ public class CriteoBannerEventControllerTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     when(criteo.getConfig().getDisplayUrlMacro()).thenReturn("");
     when(criteo.getConfig().getAdTagUrlMode()).thenReturn("");
 

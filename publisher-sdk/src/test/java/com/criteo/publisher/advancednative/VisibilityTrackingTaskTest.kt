@@ -21,19 +21,24 @@ import android.view.ViewTreeObserver
 import com.criteo.publisher.advancednative.VisibilityTracker.VisibilityTrackingTask
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Answers
 import org.mockito.Mock
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.lang.ref.Reference
 
 class VisibilityTrackingTaskTest {
+
+    @Rule
+    @JvmField
+    val mockitoRule = MockitoJUnit.rule()
 
     @Mock
     private lateinit var viewRef: Reference<View>
@@ -43,8 +48,6 @@ class VisibilityTrackingTaskTest {
 
     @Before
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
-
         whenever(viewRef.get()).thenReturn(mock(defaultAnswer = Answers.RETURNS_DEEP_STUBS))
     }
 
