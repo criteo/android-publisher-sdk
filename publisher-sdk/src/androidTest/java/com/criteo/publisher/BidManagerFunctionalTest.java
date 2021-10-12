@@ -47,7 +47,6 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.cache.SdkCache;
-import com.criteo.publisher.concurrent.TrackingCommandsExecutorWithDelay;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.context.ContextProvider;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
@@ -1891,21 +1890,13 @@ public class BidManagerFunctionalTest {
   }
 
   private void givenTimeBudgetRespectedWhenFetchingLiveBids() {
-    when(config.getLiveBiddingTimeBudgetInMillis()).thenReturn(Integer.MAX_VALUE);
+    doNothing().when(liveBidRequestSender).scheduleTimeBudgetExceeded$publisher_sdk_debug(any());
   }
 
   private void givenTimeBudgetExceededWhenFetchingLiveBids() {
-    when(config.getLiveBiddingTimeBudgetInMillis()).thenReturn(1);
-    givenDelayWhenFetchingBids(1000);
-  }
-
-  private void givenDelayWhenFetchingBids(long delay) {
-    DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-    Executor oldExecutor = dependencyProvider.provideThreadPoolExecutor();
-    TrackingCommandsExecutorWithDelay trackingCommandsExecutorWithDelay = new TrackingCommandsExecutorWithDelay(
-        oldExecutor,
-        delay
-    );
-    doReturn(trackingCommandsExecutorWithDelay).when(dependencyProvider).provideThreadPoolExecutor();
+    doAnswer(invocation -> {
+      invocation.getArgument(0, LiveCdbCallListener.class).onTimeBudgetExceeded();
+      return null;
+    }).when(liveBidRequestSender).scheduleTimeBudgetExceeded$publisher_sdk_debug(any());
   }
 }
