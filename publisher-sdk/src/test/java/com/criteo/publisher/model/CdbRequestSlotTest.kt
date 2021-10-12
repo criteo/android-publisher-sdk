@@ -20,6 +20,7 @@ import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
 import com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE
 import com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL
+import com.criteo.publisher.util.AdUnitType.CRITEO_REWARDED
 import com.criteo.publisher.util.JsonSerializer
 import com.criteo.publisher.util.writeIntoString
 import org.assertj.core.api.Assertions.assertThat
@@ -44,6 +45,7 @@ class CdbRequestSlotTest {
     const val SIZES = "sizes"
     const val IS_INTERSTITIAL = "interstitial"
     const val IS_NATIVE = "isNative"
+    const val IS_REWARDED = "rewarded"
   }
 
   @Test
@@ -102,12 +104,32 @@ class CdbRequestSlotTest {
     )
   }
 
+  @Test
+  fun toJson_GivenRewardedAdUnit_ReturnJsonRepresentation() {
+    val slot = CdbRequestSlot.create(
+        "myImpRewarded",
+        "myRewarded",
+        CRITEO_REWARDED,
+        AdSize(1337, 42)
+    )
+
+    val json = slot.toJson()
+
+    json.assertPayloadMatch(
+        "myImpRewarded",
+        "myRewarded",
+        listOf("1337x42"),
+        expectedIsRewarded = true
+    )
+  }
+
   private fun JSONObject.assertPayloadMatch(
       expectedImpressionId: String,
       expectedPlacementId: String,
       expectedSizes: List<String>,
       expectedIsInterstitial: Boolean = false,
-      expectedIsNative: Boolean = false
+      expectedIsNative: Boolean = false,
+      expectedIsRewarded: Boolean = false
   ) {
     val expectedKeys = mutableListOf(
         IMPRESSION_ID,
@@ -120,6 +142,9 @@ class CdbRequestSlotTest {
     }
     if (expectedIsNative) {
       expectedKeys.add(IS_NATIVE)
+    }
+    if (expectedIsRewarded) {
+      expectedKeys.add(IS_REWARDED)
     }
 
     assertThat(keys()).toIterable().containsExactlyInAnyOrderElementsOf(expectedKeys)
@@ -134,6 +159,10 @@ class CdbRequestSlotTest {
 
     if (expectedIsInterstitial) {
       assertThat(this[IS_INTERSTITIAL]).isEqualTo(true)
+    }
+
+    if (expectedIsRewarded) {
+      assertThat(this[IS_REWARDED]).isEqualTo(true)
     }
   }
 

@@ -14,11 +14,13 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.util;
+package com.criteo.publisher.model
 
-public enum AdUnitType {
-  CRITEO_BANNER,
-  CRITEO_INTERSTITIAL,
-  CRITEO_CUSTOM_NATIVE,
-  CRITEO_REWARDED
+import androidx.annotation.Keep
+import com.criteo.publisher.util.AdUnitType
+
+@Keep
+class RewardedAdUnit(override val adUnitId: String) : AdUnit {
+  override val adUnitType: AdUnitType
+    get() = AdUnitType.CRITEO_REWARDED
 }
