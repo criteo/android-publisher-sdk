@@ -17,6 +17,7 @@
 package com.criteo.publisher
 
 import android.util.Log
+import com.criteo.publisher.integration.Integration
 import com.criteo.publisher.logging.LogMessage
 import com.criteo.publisher.model.AdUnit
 import com.criteo.publisher.model.CacheAdUnit
@@ -38,5 +39,12 @@ internal object BiddingLogMessage {
       level = Log.WARN,
       message = "Found an invalid AdUnit: $adUnit",
       logId = "onInvalidAdUnit"
+  )
+
+  @JvmStatic
+  fun onUnsupportedAdFormat(cacheAdUnit: CacheAdUnit, integration: Integration) = LogMessage(
+      level = Log.ERROR,
+      message = "$cacheAdUnit requested but it is not supported for $integration",
+      logId = "onUnsupportedAdFormat"
   )
 }

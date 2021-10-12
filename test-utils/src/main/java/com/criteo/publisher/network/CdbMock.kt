@@ -23,12 +23,14 @@ import com.criteo.publisher.TestAdUnits.BANNER_320_50
 import com.criteo.publisher.TestAdUnits.INTERSTITIAL
 import com.criteo.publisher.TestAdUnits.INTERSTITIAL_VIDEO
 import com.criteo.publisher.TestAdUnits.NATIVE
+import com.criteo.publisher.TestAdUnits.REWARDED
 import com.criteo.publisher.model.AdSize
 import com.criteo.publisher.model.BannerAdUnit
 import com.criteo.publisher.model.CdbRequest
 import com.criteo.publisher.model.CdbRequestSlot
 import com.criteo.publisher.model.InterstitialAdUnit
 import com.criteo.publisher.model.NativeAdUnit
+import com.criteo.publisher.model.RewardedAdUnit
 import com.criteo.publisher.util.JsonSerializer
 import okhttp3.mockwebserver.Dispatcher
 import okhttp3.mockwebserver.MockResponse
@@ -168,6 +170,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
       val bannerAdUnit = BannerAdUnit(placementId, size)
       val interstitialAdUnit = InterstitialAdUnit(placementId)
       val nativeAdUnit = NativeAdUnit(placementId)
+      val rewardedAdUnit = RewardedAdUnit(placementId)
 
       return when {
         bannerAdUnit == BANNER_320_50 || bannerAdUnit == BANNER_320_480 || interstitialAdUnit == INTERSTITIAL -> {
@@ -200,6 +203,24 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
           "ttl": $PREPROD_TTL,
           "displayUrl": "$url/delivery/vast.php",
           "isVideo": "true"
+        }
+      """.trimIndent()
+        }
+        rewardedAdUnit == REWARDED -> {
+          """
+        {
+          "impId": "$impressionId",
+          "placementId": "$placementId",
+          "arbitrageId": "arbitrage_id",
+          "zoneId": $PREPROD_ZONE_ID,
+          "cpm": "$PREPROD_CPM",
+          "currency": "$PREPROD_CURRENCY",
+          "width": $width,
+          "height": $height,
+          "ttl": $PREPROD_TTL,
+          "displayUrl": "$url/delivery/vast.php",
+          "isVideo": "true",
+          "isRewarded": "true"
         }
       """.trimIndent()
         }

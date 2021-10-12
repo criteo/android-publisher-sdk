@@ -17,7 +17,6 @@
 package com.criteo.publisher.integration
 
 import android.content.SharedPreferences
-import androidx.annotation.VisibleForTesting
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.util.PreconditionsUtil
 import com.criteo.publisher.util.SafeSharedPreferences
@@ -43,7 +42,6 @@ class IntegrationRegistry(
         .apply()
   }
 
-  @VisibleForTesting
   fun readIntegration(): Integration {
     detectMediationIntegration()?.let {
       return it
