@@ -34,11 +34,9 @@ import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.util.AdvertisingInfo;
 import javax.inject.Inject;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.MockitoAnnotations;
 
 /**
  * This test file is purposefully located within the <code>com.criteo.publisher.network</code>
@@ -61,11 +59,6 @@ public class AdvertisingInfoFunctionalTest {
 
   @Inject
   private Context context;
-
-  @Before
-  public void setUp() throws  Exception {
-    MockitoAnnotations.initMocks(this);
-  }
 
   @Test
   public void testBearcatCall_LimitedGAID() throws Exception {

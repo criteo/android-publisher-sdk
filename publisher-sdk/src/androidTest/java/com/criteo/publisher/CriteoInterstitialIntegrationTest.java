@@ -39,12 +39,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class CriteoInterstitialIntegrationTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @Mock
   private CriteoInterstitialAdListener listener;
@@ -57,8 +61,6 @@ public class CriteoInterstitialIntegrationTest {
 
   @Before
   public void setup() throws CriteoInitException {
-    MockitoAnnotations.initMocks(this);
-
     givenInitializedCriteo(interstitialAdUnit);
 
     interstitial = createInterstitial();

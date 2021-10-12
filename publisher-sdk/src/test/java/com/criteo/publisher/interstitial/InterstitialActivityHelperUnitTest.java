@@ -31,12 +31,17 @@ import android.content.pm.ResolveInfo;
 import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class InterstitialActivityHelperUnitTest {
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private Context context;
@@ -51,8 +56,6 @@ public class InterstitialActivityHelperUnitTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     helper = spy(new InterstitialActivityHelper(context, topActivityFinder));
   }
 

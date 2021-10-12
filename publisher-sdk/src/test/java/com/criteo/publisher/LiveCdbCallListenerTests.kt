@@ -22,11 +22,11 @@ import com.criteo.publisher.model.CdbRequest
 import com.criteo.publisher.model.CdbResponse
 import com.criteo.publisher.model.CdbResponseSlot
 import com.criteo.publisher.privacy.ConsentData
-import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.any
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -34,6 +34,11 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class LiveCdbCallListenerTests {
+
+  @Rule
+  @JvmField
+  val mockitoRule = MockitoJUnit.rule()
+
   @Mock
   private lateinit var bidListener: BidListener
 
@@ -63,11 +68,6 @@ class LiveCdbCallListenerTests {
 
   @Mock
   private lateinit var cachedCdbResponseSlot: CdbResponseSlot
-
-  @Before
-  fun setUp() {
-    MockitoAnnotations.initMocks(this)
-  }
 
   @Test
   fun onBidResponse_givenValidResponseServedWithinTimeBudget_ThenDontCache_AndPassTheResponseThrough() {

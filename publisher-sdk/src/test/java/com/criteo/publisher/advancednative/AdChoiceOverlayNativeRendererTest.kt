@@ -26,9 +26,10 @@ import com.criteo.publisher.MockableDependencyProvider
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -36,6 +37,10 @@ import org.mockito.kotlin.verifyZeroInteractions
 import org.mockito.kotlin.whenever
 
 class AdChoiceOverlayNativeRendererTest {
+
+  @Rule
+  @JvmField
+  val mockitoRule = MockitoJUnit.rule()
 
   @Mock
   private lateinit var delegate: CriteoNativeRenderer
@@ -47,8 +52,6 @@ class AdChoiceOverlayNativeRendererTest {
 
   @Before
   fun setUp() {
-    MockitoAnnotations.initMocks(this)
-
     renderer = AdChoiceOverlayNativeRenderer(delegate, adChoiceOverlay)
   }
 

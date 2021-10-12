@@ -93,7 +93,8 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class BidManagerFunctionalTest {
 
@@ -104,6 +105,9 @@ public class BidManagerFunctionalTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule().withSpiedLogger();
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   private DependencyProvider dependencyProvider;
 
@@ -161,8 +165,6 @@ public class BidManagerFunctionalTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     dependencyProvider = mockedDependenciesRule.getDependencyProvider();
 
     cache = spy(new SdkCache(dependencyProvider.provideDeviceUtil()));

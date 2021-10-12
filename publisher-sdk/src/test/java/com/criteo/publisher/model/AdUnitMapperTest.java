@@ -32,11 +32,16 @@ import static org.mockito.Mockito.when;
 import com.criteo.publisher.util.DeviceUtil;
 import java.util.List;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class AdUnitMapperTest {
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @Mock
   private DeviceUtil deviceUtil;
@@ -45,8 +50,6 @@ public class AdUnitMapperTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     mapper = new AdUnitMapper(deviceUtil);
   }
 

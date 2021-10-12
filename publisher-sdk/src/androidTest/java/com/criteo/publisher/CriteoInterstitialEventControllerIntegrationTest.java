@@ -56,7 +56,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.mockito.stubbing.Answer;
 
 public class CriteoInterstitialEventControllerIntegrationTest {
@@ -67,6 +68,9 @@ public class CriteoInterstitialEventControllerIntegrationTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   private CriteoInterstitialEventController criteoInterstitialEventController;
 
@@ -97,8 +101,6 @@ public class CriteoInterstitialEventControllerIntegrationTest {
 
   @Before
   public void setup() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     webViewData = new WebViewData(config, api);
 
     when(interstitialActivityHelper.isAvailable()).thenReturn(true);

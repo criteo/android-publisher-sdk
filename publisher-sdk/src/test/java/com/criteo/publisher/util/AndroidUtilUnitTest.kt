@@ -19,15 +19,20 @@ package com.criteo.publisher.util
 import android.content.Context
 import android.util.DisplayMetrics
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Answers
+import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.stub
 
 class AndroidUtilUnitTest {
+
+  @Rule
+  @JvmField
+  val mockitoRule = MockitoJUnit.rule()
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private lateinit var context: Context
@@ -35,14 +40,8 @@ class AndroidUtilUnitTest {
   @Mock
   private lateinit var deviceUtil: DeviceUtil
 
+  @InjectMocks
   private lateinit var androidUtil: AndroidUtil
-
-  @Before
-  fun setUp() {
-    MockitoAnnotations.initMocks(this)
-
-    androidUtil = AndroidUtil(context, deviceUtil)
-  }
 
   @Test
   fun dpToPixel_GivenIntegerDensity_ReturnsScaledValue() {

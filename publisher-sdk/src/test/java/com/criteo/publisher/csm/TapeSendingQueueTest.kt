@@ -37,7 +37,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.mockito.AdditionalAnswers.delegatesTo
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doNothing
@@ -69,6 +69,10 @@ class TapeSendingQueueTest(private val tapeImplementation: TapeImplementation) {
   @Rule
   @JvmField
   val tempFolder = TemporaryFolder()
+
+  @Rule
+  @JvmField
+  val mockitoRule = MockitoJUnit.rule()
 
   companion object {
     @JvmStatic
@@ -104,8 +108,6 @@ class TapeSendingQueueTest(private val tapeImplementation: TapeImplementation) {
 
   @Before
   fun setUp() {
-    MockitoAnnotations.initMocks(this)
-
     tapeQueue = spy(createObjectQueue())
     doReturn(tapeQueue).whenever(objectQueueFactory).create()
     queue = TapeSendingQueue(objectQueueFactory, sendingQueueConfiguration)

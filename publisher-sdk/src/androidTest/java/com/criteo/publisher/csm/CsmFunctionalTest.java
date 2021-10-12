@@ -60,13 +60,17 @@ import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 @FlakyTest(detail = "CSM are triggered concurrently of bid")
 public class CsmFunctionalTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @Inject
   private IntegrationRegistry integrationRegistry;
@@ -85,7 +89,6 @@ public class CsmFunctionalTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
     integrationRegistry.declare(Integration.IN_HOUSE);
     givenConsentGiven();
   }

@@ -21,10 +21,10 @@ import com.criteo.publisher.integration.Integration
 import com.criteo.publisher.integration.IntegrationRegistry
 import com.criteo.publisher.model.CdbResponseSlot
 import com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE
-import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
@@ -36,13 +36,12 @@ import org.mockito.kotlin.verifyZeroInteractions
 
 class HeaderBiddingTest {
 
+  @Rule
+  @JvmField
+  val mockitoRule = MockitoJUnit.rule()
+
   @Mock
   private lateinit var integrationRegistry: IntegrationRegistry
-
-  @Before
-  fun setUp() {
-    MockitoAnnotations.initMocks(this)
-  }
 
   @Test
   fun enrichBid_GivenNullAdObject_DoNothing() {

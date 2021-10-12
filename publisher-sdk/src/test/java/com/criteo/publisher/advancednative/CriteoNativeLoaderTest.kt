@@ -43,7 +43,7 @@ import org.junit.runners.Parameterized
 import org.mockito.AdditionalAnswers.delegatesTo
 import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
@@ -71,6 +71,10 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
   @Rule
   @JvmField
   val mockedDependenciesRule = MockedDependenciesRule()
+
+  @Rule
+  @JvmField
+  val mockitoRule = MockitoJUnit.rule()
 
   @SpyBean
   private lateinit var config: Config
@@ -115,8 +119,6 @@ class CriteoNativeLoaderTest(private val liveBiddingEnabled: Boolean) {
 
   @Before
   fun setUp() {
-    MockitoAnnotations.initMocks(this)
-
     doReturn(liveBiddingEnabled).whenever(config).isLiveBiddingEnabled
 
     runOnUiThreadExecutor = DirectMockRunOnUiThreadExecutor()

@@ -24,12 +24,12 @@ import com.criteo.publisher.model.CdbRequest
 import com.criteo.publisher.model.CdbRequestFactory
 import com.criteo.publisher.model.CdbResponse
 import com.criteo.publisher.model.Config
-import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.concurrent.Executor
@@ -37,6 +37,10 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
 class LiveBidRequestSenderTest {
+
+  @Rule
+  @JvmField
+  val mockitoRule = MockitoJUnit.rule()
 
   @Mock
   private lateinit var pubSdkApi: PubSdkApi
@@ -67,11 +71,6 @@ class LiveBidRequestSenderTest {
 
   @Mock
   private lateinit var clock: Clock
-
-  @Before
-  fun setUp() {
-    MockitoAnnotations.initMocks(this)
-  }
 
   @Test
   fun timeBudgetTimerKicksOff_ThenTimeBudgetExceededTrigger() {

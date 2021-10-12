@@ -22,9 +22,10 @@ import com.criteo.publisher.adview.Redirection
 import com.criteo.publisher.adview.RedirectionListener
 import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -35,6 +36,10 @@ import org.mockito.kotlin.verifyZeroInteractions
 import java.net.URI
 
 class ClickHelperTest {
+
+  @Rule
+  @JvmField
+  val mockitoRule = MockitoJUnit.rule()
 
   @Mock
   private lateinit var redirection: Redirection
@@ -48,8 +53,6 @@ class ClickHelperTest {
 
   @Before
   fun setUp() {
-    MockitoAnnotations.initMocks(this)
-
     runOnUiThreadExecutor = spy(DirectMockRunOnUiThreadExecutor())
     clickHelper = ClickHelper(redirection, topActivityFinder, runOnUiThreadExecutor)
   }

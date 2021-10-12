@@ -46,12 +46,16 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class StandaloneDegradedTest {
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   private final BannerAdUnit bannerAdUnit = new BannerAdUnit("banner", new AdSize(1, 2));
   private final InterstitialAdUnit interstitialAdUnit = new InterstitialAdUnit("interstitial");
@@ -67,8 +71,6 @@ public class StandaloneDegradedTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     when(deviceUtil.isVersionSupported()).thenReturn(false);
 
     givenInitializedCriteo();

@@ -27,12 +27,17 @@ import com.criteo.publisher.model.Config;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class CriteoBannerLoadTaskTest {
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private WebView webView;
@@ -47,8 +52,6 @@ public class CriteoBannerLoadTaskTest {
 
   @Before
   public void setup() {
-    MockitoAnnotations.initMocks(this);
-
     webViewRef = new WeakReference<>(webView);
   }
 

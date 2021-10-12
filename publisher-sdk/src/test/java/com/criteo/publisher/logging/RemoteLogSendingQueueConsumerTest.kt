@@ -27,7 +27,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
@@ -43,6 +43,10 @@ class RemoteLogSendingQueueConsumerTest {
   @Rule
   @JvmField
   val mockedDependenciesRule = MockedDependenciesRule()
+
+  @Rule
+  @JvmField
+  val mockitoRule = MockitoJUnit.rule()
 
   @Mock
   private lateinit var queue: ConcurrentSendingQueue<RemoteLogRecords>
@@ -62,8 +66,6 @@ class RemoteLogSendingQueueConsumerTest {
 
   @Before
   fun setUp() {
-    MockitoAnnotations.initMocks(this)
-
     doReturn(false).whenever(buildConfigWrapper).preconditionThrowsOnException()
 
     consumer = RemoteLogSendingQueueConsumer(

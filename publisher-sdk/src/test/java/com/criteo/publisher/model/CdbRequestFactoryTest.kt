@@ -30,9 +30,10 @@ import com.criteo.publisher.util.AdvertisingInfo
 import com.criteo.publisher.util.BuildConfigWrapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
@@ -41,6 +42,10 @@ import java.util.concurrent.Future
 import java.util.concurrent.atomic.AtomicInteger
 
 class CdbRequestFactoryTest {
+
+  @Rule
+  @JvmField
+  val mockitoRule = MockitoJUnit.rule()
 
   @Mock
   private lateinit var deviceInfo: DeviceInfo
@@ -76,8 +81,6 @@ class CdbRequestFactoryTest {
 
   @Before
   fun setUp() {
-    MockitoAnnotations.initMocks(this)
-
     whenever(userPrivacyUtil.mopubConsent).thenReturn("mopubConsent")
     whenever(userPrivacyUtil.iabUsPrivacyString).thenReturn("iabUsPrivacyString")
     whenever(userPrivacyUtil.usPrivacyOptout).thenReturn("usPrivacyoptout")

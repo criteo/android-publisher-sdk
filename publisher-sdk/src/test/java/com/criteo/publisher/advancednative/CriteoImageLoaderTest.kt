@@ -21,18 +21,23 @@ import android.widget.ImageView
 import com.criteo.publisher.concurrent.AsyncResources
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.RequestCreator
-import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.verify
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
 import java.net.URL
 
 class CriteoImageLoaderTest {
+
+    @Rule
+    @JvmField
+    val mockitoRule = MockitoJUnit.rule()
+
     @Mock
     private lateinit var picasso: Picasso
 
@@ -56,11 +61,6 @@ class CriteoImageLoaderTest {
 
     @Mock
     private lateinit var imageView: ImageView
-
-    @Before
-    fun setUp() {
-        MockitoAnnotations.initMocks(this)
-    }
 
     @Test
     fun loadImageInto(){

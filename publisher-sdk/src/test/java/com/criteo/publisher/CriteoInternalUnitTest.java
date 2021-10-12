@@ -44,13 +44,18 @@ import com.criteo.publisher.util.AppLifecycleUtil;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 public class CriteoInternalUnitTest {
+
+  @Rule
+  public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private Application application;
@@ -72,8 +77,6 @@ public class CriteoInternalUnitTest {
 
   @Before
   public void setUp() throws Exception {
-    MockitoAnnotations.initMocks(this);
-
     when(dependencyProvider.provideRunOnUiThreadExecutor())
         .thenReturn(new DirectMockRunOnUiThreadExecutor());
 

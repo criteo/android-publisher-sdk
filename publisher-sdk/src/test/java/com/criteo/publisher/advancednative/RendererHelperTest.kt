@@ -21,9 +21,10 @@ import android.widget.ImageView
 import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
@@ -35,6 +36,10 @@ import java.net.URI
 
 class RendererHelperTest {
 
+  @Rule
+  @JvmField
+  val mockitoRule = MockitoJUnit.rule()
+
   private val uiExecutor = DirectMockRunOnUiThreadExecutor()
 
   @Mock
@@ -44,7 +49,6 @@ class RendererHelperTest {
 
   @Before
   fun setUp() {
-    MockitoAnnotations.initMocks(this)
     helper = RendererHelper(ImageLoaderHolder(imageLoader), uiExecutor)
   }
 

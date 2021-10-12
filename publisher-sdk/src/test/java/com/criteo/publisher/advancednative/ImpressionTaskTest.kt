@@ -18,10 +18,11 @@ package com.criteo.publisher.advancednative
 
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.never
-import org.mockito.MockitoAnnotations
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
@@ -32,6 +33,10 @@ import java.lang.ref.Reference
 import java.net.URL
 
 class ImpressionTaskTest {
+
+    @Rule
+    @JvmField
+    val mockitoRule = MockitoJUnit.rule()
 
     @Mock
     private lateinit var impressionPixels: Iterable<URL>
@@ -46,8 +51,6 @@ class ImpressionTaskTest {
 
     @Before
     fun setUp() {
-        MockitoAnnotations.initMocks(this)
-
         task = ImpressionTask(impressionPixels, listenerRef, helper)
     }
 
