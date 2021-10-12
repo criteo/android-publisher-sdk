@@ -94,6 +94,7 @@ public class AdUnitMapper {
         BannerAdUnit bannerAdUnit = (BannerAdUnit) adUnit;
         return bannerAdUnit.getSize();
       case CRITEO_INTERSTITIAL:
+      case CRITEO_REWARDED:
         return deviceUtil.getCurrentScreenSize();
       case CRITEO_CUSTOM_NATIVE:
         return NATIVE_SIZE;

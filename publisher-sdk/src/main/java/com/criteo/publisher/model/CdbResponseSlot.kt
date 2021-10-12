@@ -38,6 +38,7 @@ data class CdbResponseSlot(
     @SerializedName("native") val nativeAssets: NativeAssets? = null,
     @SerializedName("ttl") var ttlInSeconds: Int = 0,
     @SerializedName("isVideo") var isVideo: Boolean = false,
+    @SerializedName("isRewarded") var isRewarded: Boolean = false,
 
     /**
      * The time of download in milliseconds for this bid response. This time represent a

@@ -19,6 +19,7 @@ package com.criteo.publisher.cache;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_REWARDED;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -63,6 +64,9 @@ public class SdkCache {
   private AdUnitType findAdUnitType(CdbResponseSlot slot) {
     if (slot.isNative()) {
       return CRITEO_CUSTOM_NATIVE;
+    }
+    if (slot.isRewarded()) {
+      return CRITEO_REWARDED;
     }
 
     AdSize currentScreenSize = deviceUtil.getCurrentScreenSize();

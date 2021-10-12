@@ -19,6 +19,7 @@ package com.criteo.publisher.cache;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_REWARDED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -298,6 +299,24 @@ public class SdkCacheTest {
     doReturn(new AdSize(size.getHeight(), size.getWidth())).when(deviceUtil).getCurrentScreenSize();
 
     CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_INTERSTITIAL);
+
+    cache.add(slot);
+    CdbResponseSlot adUnit = cache.peekAdUnit(expectedKey);
+
+    assertThat(adUnit).isSameAs(slot);
+  }
+
+  @Test
+  public void add_GivenValidRewardedSlot_AddItInCache() {
+    AdSize size = new AdSize(1, 2);
+
+    CdbResponseSlot slot = mock(CdbResponseSlot.class);
+    when(slot.getWidth()).thenReturn(size.getWidth());
+    when(slot.getHeight()).thenReturn(size.getHeight());
+    when(slot.getPlacementId()).thenReturn("myAdUnit");
+    when(slot.isRewarded()).thenReturn(true);
+
+    CacheAdUnit expectedKey = new CacheAdUnit(size, "myAdUnit", CRITEO_REWARDED);
 
     cache.add(slot);
     CdbResponseSlot adUnit = cache.peekAdUnit(expectedKey);

@@ -44,6 +44,7 @@ public abstract class CdbRequestSlot {
         placementId,
         adUnitType == AdUnitType.CRITEO_CUSTOM_NATIVE ? true : null,
         adUnitType == AdUnitType.CRITEO_INTERSTITIAL ? true : null,
+        adUnitType == AdUnitType.CRITEO_REWARDED ? true : null,
         formattedSizes
     );
   }
@@ -69,6 +70,10 @@ public abstract class CdbRequestSlot {
   @Nullable
   @SerializedName("interstitial")
   public abstract Boolean isInterstitial();
+
+  @Nullable
+  @SerializedName("rewarded")
+  public abstract Boolean isRewarded();
 
   @NonNull
   @SerializedName("sizes")

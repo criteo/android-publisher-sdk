@@ -20,6 +20,7 @@ import static com.criteo.publisher.model.AdUnitMapper.splitIntoChunks;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_REWARDED;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -101,6 +102,17 @@ public class AdUnitMapperTest {
   }
 
   @Test
+  public void convertValidAdUnits_GivenRewardedWithEmptyPlacementId_SkipIt() throws Exception {
+    when(deviceUtil.getCurrentScreenSize()).thenReturn(new AdSize(1, 2));
+
+    AdUnit adUnit = new RewardedAdUnit("");
+
+    List<List<CacheAdUnit>> validAdUnits = mapper.mapToChunks(singletonList(adUnit));
+
+    assertThat(validAdUnits).isEmpty();
+  }
+
+  @Test
   public void convertValidAdUnits_GivenValidBanner_MapIt() throws Exception {
     AdSize size = new AdSize(1, 1);
     AdUnit adUnit = new BannerAdUnit("adUnit", size);
@@ -150,6 +162,34 @@ public class AdUnitMapperTest {
 
     assertThat(validAdUnits).containsExactly(
         singletonList(new CacheAdUnit(landscapeSize, "adUnit", CRITEO_INTERSTITIAL)));
+  }
+
+  @Test
+  public void convertValidAdUnits_GivenValidRewardedAndDeviceInPortrait_MapItWithPortraitSize()
+      throws Exception {
+    AdSize portraitSize = new AdSize(10, 30);
+    when(deviceUtil.getCurrentScreenSize()).thenReturn(portraitSize);
+
+    AdUnit adUnit = new RewardedAdUnit("adUnit");
+
+    List<List<CacheAdUnit>> validAdUnits = mapper.mapToChunks(singletonList(adUnit));
+
+    assertThat(validAdUnits).containsExactly(
+        singletonList(new CacheAdUnit(portraitSize, "adUnit", CRITEO_REWARDED)));
+  }
+
+  @Test
+  public void convertValidAdUnits_GivenValidRewardedAndDeviceInLandscape_MapItWithLandscapeSize()
+      throws Exception {
+    AdSize landscapeSize = new AdSize(30, 10);
+    when(deviceUtil.getCurrentScreenSize()).thenReturn(landscapeSize);
+
+    AdUnit adUnit = new RewardedAdUnit("adUnit");
+
+    List<List<CacheAdUnit>> validAdUnits = mapper.mapToChunks(singletonList(adUnit));
+
+    assertThat(validAdUnits).containsExactly(
+        singletonList(new CacheAdUnit(landscapeSize, "adUnit", CRITEO_REWARDED)));
   }
 
   @Test
