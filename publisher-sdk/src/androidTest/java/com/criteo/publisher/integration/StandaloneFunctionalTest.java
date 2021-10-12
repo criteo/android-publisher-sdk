@@ -28,6 +28,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -52,9 +54,8 @@ import com.criteo.publisher.CriteoBannerView;
 import com.criteo.publisher.CriteoErrorCode;
 import com.criteo.publisher.CriteoInterstitial;
 import com.criteo.publisher.CriteoInterstitialAdListener;
-import com.criteo.publisher.DependencyProvider;
+import com.criteo.publisher.LiveCdbCallListener;
 import com.criteo.publisher.TestAdUnits;
-import com.criteo.publisher.concurrent.TrackingCommandsExecutorWithDelay;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
@@ -65,13 +66,13 @@ import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import com.criteo.publisher.network.LiveBidRequestSender;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.view.WebViewLookup;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
@@ -112,6 +113,9 @@ public class StandaloneFunctionalTest {
 
   @Inject
   private Context context;
+
+  @SpyBean
+  private LiveBidRequestSender liveBidRequestSender;
 
   @Captor
   private ArgumentCaptor<CdbRequest> requestCaptor;
@@ -506,23 +510,15 @@ public class StandaloneFunctionalTest {
     mockedDependenciesRule.waitForIdleState();
   }
 
-  private void givenTimeBudgetExceededWhenFetchingLiveBids() {
-    when(config.getLiveBiddingTimeBudgetInMillis()).thenReturn(1);
-    givenDelayWhenFetchingBids(1000);
-  }
-
-  private void givenDelayWhenFetchingBids(long delay) {
-    DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-    Executor oldExecutor = dependencyProvider.provideThreadPoolExecutor();
-    TrackingCommandsExecutorWithDelay trackingCommandsExecutorWithDelay = new TrackingCommandsExecutorWithDelay(
-        oldExecutor,
-        delay
-    );
-    doReturn(trackingCommandsExecutorWithDelay).when(dependencyProvider).provideThreadPoolExecutor();
-  }
-
   private void givenTimeBudgetRespectedWhenFetchingLiveBids() {
-    when(config.getLiveBiddingTimeBudgetInMillis()).thenReturn(Integer.MAX_VALUE);
+    doNothing().when(liveBidRequestSender).scheduleTimeBudgetExceeded$publisher_sdk_debug(any());
+  }
+
+  private void givenTimeBudgetExceededWhenFetchingLiveBids() {
+    doAnswer(invocation -> {
+      invocation.getArgument(0, LiveCdbCallListener.class).onTimeBudgetExceeded();
+      return null;
+    }).when(liveBidRequestSender).scheduleTimeBudgetExceeded$publisher_sdk_debug(any());
   }
 
   private void loadAdAndWait(CriteoBannerView bannerView) {
