@@ -17,14 +17,19 @@
 package com.criteo.publisher.model;
 
 import static com.criteo.publisher.BiddingLogMessage.onInvalidAdUnit;
+import static com.criteo.publisher.BiddingLogMessage.onUnsupportedAdFormat;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.integration.Integration;
+import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
+import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.DeviceUtil;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -52,14 +57,29 @@ public class AdUnitMapper {
    */
   private static final AdSize NATIVE_SIZE = new AdSize(2, 2);
 
+  /**
+   * Only MoPub/GAM AppBidding are supporting rewarded ads because they are handling the display themselves.
+   */
+  private static final Collection<Integration> SUPPORTED_INTEGRATION_FOR_REWARDED = Arrays.asList(
+      Integration.GAM_APP_BIDDING,
+      Integration.MOPUB_APP_BIDDING
+  );
+
   @NonNull
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @NonNull
   private final DeviceUtil deviceUtil;
 
-  public AdUnitMapper(@NonNull DeviceUtil deviceUtil) {
+  @NonNull
+  private final IntegrationRegistry integrationRegistry;
+
+  public AdUnitMapper(
+      @NonNull DeviceUtil deviceUtil,
+      @NonNull IntegrationRegistry integrationRegistry
+  ) {
     this.deviceUtil = deviceUtil;
+    this.integrationRegistry = integrationRegistry;
   }
 
   /**
@@ -132,6 +152,8 @@ public class AdUnitMapper {
   private List<CacheAdUnit> filterInvalidCacheAdUnits(Collection<CacheAdUnit> cacheAdUnits) {
     List<CacheAdUnit> validatedCacheAdUnits = new ArrayList<>();
 
+    Integration integration = integrationRegistry.readIntegration();
+
     for (CacheAdUnit cacheAdUnit : cacheAdUnits) {
       if (cacheAdUnit.getPlacementId().isEmpty()
           || cacheAdUnit.getSize().getWidth() <= 0
@@ -139,6 +161,12 @@ public class AdUnitMapper {
         logger.log(onInvalidAdUnit(cacheAdUnit));
         continue;
       }
+
+      if (cacheAdUnit.getAdUnitType() == AdUnitType.CRITEO_REWARDED && !SUPPORTED_INTEGRATION_FOR_REWARDED.contains(integration)) {
+        logger.log(onUnsupportedAdFormat(cacheAdUnit, integration));
+        continue;
+      }
+
       validatedCacheAdUnits.add(cacheAdUnit);
     }
 

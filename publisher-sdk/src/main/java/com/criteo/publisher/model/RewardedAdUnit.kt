@@ -20,7 +20,7 @@ import androidx.annotation.Keep
 import com.criteo.publisher.util.AdUnitType
 
 @Keep
-class RewardedAdUnit(override val adUnitId: String) : AdUnit {
+data class RewardedAdUnit(override val adUnitId: String) : AdUnit {
   override val adUnitType: AdUnitType
     get() = AdUnitType.CRITEO_REWARDED
 }

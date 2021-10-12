@@ -20,18 +20,22 @@ import static com.criteo.publisher.CriteoErrorCode.ERROR_CODE_NO_FILL;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static com.criteo.publisher.TestAdUnits.INTERSTITIAL_UNKNOWN;
 import static com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.Bid;
+import com.criteo.publisher.BiddingLogMessage;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoBannerAdListener;
 import com.criteo.publisher.CriteoBannerView;
@@ -41,13 +45,18 @@ import com.criteo.publisher.CriteoInterstitialAdListener;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
+import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.InterstitialAdUnit;
+import com.criteo.publisher.model.RewardedAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.util.DeviceUtil;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
@@ -64,13 +73,16 @@ import org.mockito.InOrder;
 public class InHouseFunctionalTest {
 
   @Rule
-  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule()
+      .withSpiedLogger();
 
   private final BannerAdUnit validBannerAdUnit = TestAdUnits.BANNER_320_50;
   private final BannerAdUnit invalidBannerAdUnit = TestAdUnits.BANNER_UNKNOWN;
 
   private final InterstitialAdUnit validInterstitialAdUnit = TestAdUnits.INTERSTITIAL;
   private final InterstitialAdUnit invalidInterstitialAdUnit = INTERSTITIAL_UNKNOWN;
+
+  private final RewardedAdUnit validRewardedAdUnit = TestAdUnits.REWARDED;
 
   @Parameters(name = "{0}")
   public static Iterable<?> data() {
@@ -92,9 +104,93 @@ public class InHouseFunctionalTest {
   @SpyBean
   private Config config;
 
+  @MockBean
+  private Logger logger;
+
+  @Inject
+  private IntegrationRegistry integrationRegistry;
+
+  @Inject
+  private DeviceUtil deviceUtil;
+
   @Before
   public void setUp() throws Exception {
     doReturn(isLiveBiddingEnabled).when(config).isLiveBiddingEnabled();
+  }
+
+  @Test
+  public void loadRewardedAd_GivenValidAdUnitAndAppBiddingPreviouslyUsed_ThenListenerIsNotifiedOfTheFailure() throws Exception {
+    integrationRegistry.declare(Integration.GAM_APP_BIDDING);
+
+    givenInitializedSdk(validRewardedAdUnit);
+    clearInvocations(api);
+
+    CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
+    CriteoBannerView bannerView = createBannerView();
+    bannerView.setCriteoBannerAdListener(listener);
+
+    Bid bid = loadBid(validRewardedAdUnit);
+    bannerView.loadAd(bid);
+    waitForIdleState();
+
+    assertThat(bid).isNotNull(); // the bid was originally done for app bidding, although there should be no display
+    verify(listener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
+
+    assertBidRequestHasGoodProfileId();
+  }
+
+  @Test
+  public void loadRewardedAd_GivenValidAdUnitAndInHouseNotUsed_ThenListenerIsNotifiedOfTheFailure() throws Exception {
+    givenInitializedSdk(validRewardedAdUnit);
+    clearInvocations(api, logger);
+
+    CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
+    CriteoBannerView bannerView = createBannerView();
+    bannerView.setCriteoBannerAdListener(listener);
+
+    Bid bid = loadBid(validRewardedAdUnit);
+    bannerView.loadAd(bid);
+    waitForIdleState();
+
+    assertThat(bid).isNull();
+    verify(listener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
+    verify(logger).log(BiddingLogMessage.onUnsupportedAdFormat(toCacheAdUnit(validRewardedAdUnit), Integration.FALLBACK));
+    verify(api, never()).loadCdb(any(), any());
+
+    assertBidRequestHasGoodProfileId();
+  }
+
+  @Test
+  public void loadRewardedAd_GivenValidAdUnitAndInHouseAlreadyUsed_ThenListenerIsNotifiedOfTheFailure() throws Exception {
+    integrationRegistry.declare(Integration.IN_HOUSE);
+
+    givenInitializedSdk(validRewardedAdUnit);
+    clearInvocations(api, logger);
+
+    CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
+    CriteoBannerView bannerView = createBannerView();
+    bannerView.setCriteoBannerAdListener(listener);
+    waitForIdleState();
+    clearInvocations(listener);
+
+    Bid bid = loadBid(validRewardedAdUnit);
+    bannerView.loadAd(bid);
+    waitForIdleState();
+
+    assertThat(bid).isNull();
+    verify(listener).onAdFailedToReceive(ERROR_CODE_NO_FILL);
+    verify(logger).log(BiddingLogMessage.onUnsupportedAdFormat(toCacheAdUnit(validRewardedAdUnit), Integration.IN_HOUSE));
+    verify(api, never()).loadCdb(any(), any());
+
+    assertBidRequestHasGoodProfileId();
+  }
+
+  private CacheAdUnit toCacheAdUnit(RewardedAdUnit adUnit) {
+    return new CacheAdUnit(
+        deviceUtil.getCurrentScreenSize(),
+        adUnit.getAdUnitId(),
+        adUnit.getAdUnitType()
+    );
   }
 
   @Test

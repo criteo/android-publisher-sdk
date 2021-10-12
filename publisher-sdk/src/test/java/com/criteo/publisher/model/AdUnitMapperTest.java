@@ -30,6 +30,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import com.criteo.publisher.integration.Integration;
+import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.util.DeviceUtil;
 import java.util.List;
 import org.junit.Before;
@@ -47,11 +49,16 @@ public class AdUnitMapperTest {
   @Mock
   private DeviceUtil deviceUtil;
 
+  @Mock
+  private IntegrationRegistry integrationRegistry;
+
   private AdUnitMapper mapper;
 
   @Before
   public void setUp() throws Exception {
-    mapper = new AdUnitMapper(deviceUtil);
+    when(integrationRegistry.readIntegration()).thenReturn(Integration.FALLBACK);
+
+    mapper = new AdUnitMapper(deviceUtil, integrationRegistry);
   }
 
   @Test
@@ -165,8 +172,24 @@ public class AdUnitMapperTest {
   }
 
   @Test
-  public void convertValidAdUnits_GivenValidRewardedAndDeviceInPortrait_MapItWithPortraitSize()
+  public void convertValidAdUnits_GivenValidRewarded_AndUnsupportedIntegration_FilterIt() throws Exception {
+    when(integrationRegistry.readIntegration()).thenReturn(Integration.IN_HOUSE);
+
+    AdSize portraitSize = new AdSize(10, 30);
+    when(deviceUtil.getCurrentScreenSize()).thenReturn(portraitSize);
+
+    AdUnit adUnit = new RewardedAdUnit("adUnit");
+
+    List<List<CacheAdUnit>> validAdUnits = mapper.mapToChunks(singletonList(adUnit));
+
+    assertThat(validAdUnits).isEmpty();
+  }
+
+  @Test
+  public void convertValidAdUnits_GivenValidRewardedAndDeviceInPortrait_AndSupportedIntegration_MapItWithPortraitSize()
       throws Exception {
+    when(integrationRegistry.readIntegration()).thenReturn(Integration.MOPUB_APP_BIDDING);
+
     AdSize portraitSize = new AdSize(10, 30);
     when(deviceUtil.getCurrentScreenSize()).thenReturn(portraitSize);
 
@@ -179,8 +202,10 @@ public class AdUnitMapperTest {
   }
 
   @Test
-  public void convertValidAdUnits_GivenValidRewardedAndDeviceInLandscape_MapItWithLandscapeSize()
+  public void convertValidAdUnits_GivenValidRewardedAndDeviceInLandscape_AndSupportedIntegration_MapItWithLandscapeSize()
       throws Exception {
+    when(integrationRegistry.readIntegration()).thenReturn(Integration.MOPUB_APP_BIDDING);
+
     AdSize landscapeSize = new AdSize(30, 10);
     when(deviceUtil.getCurrentScreenSize()).thenReturn(landscapeSize);
 

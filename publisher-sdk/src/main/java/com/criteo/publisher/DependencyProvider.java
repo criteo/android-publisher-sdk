@@ -291,7 +291,8 @@ public class DependencyProvider {
   @NonNull
   public AdUnitMapper provideAdUnitMapper() {
     return getOrCreate(AdUnitMapper.class, () -> new AdUnitMapper(
-        provideDeviceUtil()
+        provideDeviceUtil(),
+        provideIntegrationRegistry()
     ));
   }
 
