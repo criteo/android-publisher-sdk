@@ -20,6 +20,7 @@ import static com.criteo.publisher.ErrorLogMessage.onAssertFailed;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_CUSTOM_NATIVE;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_INTERSTITIAL;
+import static com.criteo.publisher.util.AdUnitType.CRITEO_REWARDED;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -47,6 +48,7 @@ import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.nativeads.NativeAssets;
 import com.criteo.publisher.model.nativeads.NativeProduct;
+import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.DeviceUtil;
@@ -83,10 +85,10 @@ public abstract class AbstractDfpHeaderBiddingTest {
   private static final String CRT_NATIVE_PIXEL_URL = "crtn_pixurl_";
   private static final String CRT_NATIVE_PIXEL_COUNT = "crtn_pixcount";
 
-  private static final String MOBILE_INTERSTITIAL_PORTRAIT_SIZE = "320x480";
-  private static final String MOBILE_INTERSTITIAL_LANDSCAPE_SIZE = "480x320";
-  private static final String TABLET_INTERSTITIAL_PORTRAIT_SIZE = "768x1024";
-  private static final String TABLET_INTERSTITIAL_LANDSCAPE_SIZE = "1024x768";
+  private static final String MOBILE_FULLSCREEN_PORTRAIT_SIZE = "320x480";
+  private static final String MOBILE_FULLSCREEN_LANDSCAPE_SIZE = "480x320";
+  private static final String TABLET_FULLSCREEN_PORTRAIT_SIZE = "768x1024";
+  private static final String TABLET_FULLSCREEN_LANDSCAPE_SIZE = "1024x768";
 
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule()
@@ -184,7 +186,7 @@ public abstract class AbstractDfpHeaderBiddingTest {
     when(deviceUtil.isTablet()).thenReturn(false);
     when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_PORTRAIT);
 
-    enrichBid_GivenInterstitialBidAvailable_EnrichBuilder(42, 1337, MOBILE_INTERSTITIAL_PORTRAIT_SIZE);
+    enrichBid_GivenInterstitialBidAvailable_EnrichBuilder(42, 1337, MOBILE_FULLSCREEN_PORTRAIT_SIZE);
   }
 
   @Test
@@ -192,7 +194,7 @@ public abstract class AbstractDfpHeaderBiddingTest {
     when(deviceUtil.isTablet()).thenReturn(false);
     when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_LANDSCAPE);
 
-    enrichBid_GivenInterstitialBidAvailable_EnrichBuilder(42, 1337, MOBILE_INTERSTITIAL_LANDSCAPE_SIZE);
+    enrichBid_GivenInterstitialBidAvailable_EnrichBuilder(42, 1337, MOBILE_FULLSCREEN_LANDSCAPE_SIZE);
   }
 
   @Test
@@ -200,7 +202,7 @@ public abstract class AbstractDfpHeaderBiddingTest {
     when(deviceUtil.isTablet()).thenReturn(true);
     when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_PORTRAIT);
 
-    enrichBid_GivenInterstitialBidAvailable_EnrichBuilder(767, 1023, MOBILE_INTERSTITIAL_PORTRAIT_SIZE);
+    enrichBid_GivenInterstitialBidAvailable_EnrichBuilder(767, 1023, MOBILE_FULLSCREEN_PORTRAIT_SIZE);
   }
 
   @Test
@@ -208,7 +210,7 @@ public abstract class AbstractDfpHeaderBiddingTest {
     when(deviceUtil.isTablet()).thenReturn(true);
     when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_LANDSCAPE);
 
-    enrichBid_GivenInterstitialBidAvailable_EnrichBuilder(1023, 767, MOBILE_INTERSTITIAL_LANDSCAPE_SIZE);
+    enrichBid_GivenInterstitialBidAvailable_EnrichBuilder(1023, 767, MOBILE_FULLSCREEN_LANDSCAPE_SIZE);
   }
 
   @Test
@@ -216,7 +218,7 @@ public abstract class AbstractDfpHeaderBiddingTest {
     when(deviceUtil.isTablet()).thenReturn(true);
     when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_PORTRAIT);
 
-    enrichBid_GivenInterstitialBidAvailable_EnrichBuilder(768, 1024, TABLET_INTERSTITIAL_PORTRAIT_SIZE);
+    enrichBid_GivenInterstitialBidAvailable_EnrichBuilder(768, 1024, TABLET_FULLSCREEN_PORTRAIT_SIZE);
   }
 
   @Test
@@ -224,10 +226,76 @@ public abstract class AbstractDfpHeaderBiddingTest {
     when(deviceUtil.isTablet()).thenReturn(true);
     when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_LANDSCAPE);
 
-    enrichBid_GivenInterstitialBidAvailable_EnrichBuilder(1024, 768, TABLET_INTERSTITIAL_LANDSCAPE_SIZE);
+    enrichBid_GivenInterstitialBidAvailable_EnrichBuilder(1024, 768, TABLET_FULLSCREEN_LANDSCAPE_SIZE);
   }
 
   private void enrichBid_GivenInterstitialBidAvailable_EnrichBuilder(int slotWidth, int slotHeight, String expectedInjectedSize) {
+    enrichBid_GivenFullScreenBidAvailable_EnrichBuilder(CRITEO_INTERSTITIAL, slotWidth, slotHeight, expectedInjectedSize);
+  }
+
+  @Test
+  public void enrichBid_GivenVideoInterstitialBidAvailable_EnrichBuilder() {
+    enrichBid_GivenVideoFullScreenBidAvailable_EnrichBuilder(CRITEO_INTERSTITIAL);
+  }
+
+  @Test
+  public void enrichBid_GivenRewardedBidAvailableOnMobileInPortrait_EnrichBuilder() throws Exception {
+    when(deviceUtil.isTablet()).thenReturn(false);
+    when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_PORTRAIT);
+
+    enrichBid_GivenRewardedBidAvailable_EnrichBuilder(42, 1337, MOBILE_FULLSCREEN_PORTRAIT_SIZE);
+  }
+
+  @Test
+  public void enrichBid_GivenRewardedBidAvailableOnMobileInLandscape_EnrichBuilder() throws Exception {
+    when(deviceUtil.isTablet()).thenReturn(false);
+    when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_LANDSCAPE);
+
+    enrichBid_GivenRewardedBidAvailable_EnrichBuilder(42, 1337, MOBILE_FULLSCREEN_LANDSCAPE_SIZE);
+  }
+
+  @Test
+  public void enrichBid_GivenRewardedBidAvailableOnSmallTabletInPortrait_EnrichBuilderAndFallbackOnMobileSize() throws Exception {
+    when(deviceUtil.isTablet()).thenReturn(true);
+    when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_PORTRAIT);
+
+    enrichBid_GivenRewardedBidAvailable_EnrichBuilder(767, 1023, MOBILE_FULLSCREEN_PORTRAIT_SIZE);
+  }
+
+  @Test
+  public void enrichBid_GivenRewardedBidAvailableOnSmallTabletInLandscape_EnrichBuilderAndFallbackOnMobileSize() throws Exception {
+    when(deviceUtil.isTablet()).thenReturn(true);
+    when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_LANDSCAPE);
+
+    enrichBid_GivenRewardedBidAvailable_EnrichBuilder(1023, 767, MOBILE_FULLSCREEN_LANDSCAPE_SIZE);
+  }
+
+  @Test
+  public void enrichBid_GivenRewardedBidAvailableOnBigTabletInPortrait_EnrichBuilder() throws Exception {
+    when(deviceUtil.isTablet()).thenReturn(true);
+    when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_PORTRAIT);
+
+    enrichBid_GivenRewardedBidAvailable_EnrichBuilder(768, 1024, TABLET_FULLSCREEN_PORTRAIT_SIZE);
+  }
+
+  @Test
+  public void enrichBid_GivenRewardedBidAvailableOnBigTabletInLandscape_EnrichBuilder() throws Exception {
+    when(deviceUtil.isTablet()).thenReturn(true);
+    when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_LANDSCAPE);
+
+    enrichBid_GivenRewardedBidAvailable_EnrichBuilder(1024, 768, TABLET_FULLSCREEN_LANDSCAPE_SIZE);
+  }
+
+  @Test
+  public void enrichBid_GivenVideoRewardedBidAvailable_EnrichBuilder() {
+    enrichBid_GivenVideoFullScreenBidAvailable_EnrichBuilder(CRITEO_REWARDED);
+  }
+
+  private void enrichBid_GivenRewardedBidAvailable_EnrichBuilder(int slotWidth, int slotHeight, String expectedInjectedSize) {
+    enrichBid_GivenFullScreenBidAvailable_EnrichBuilder(CRITEO_REWARDED, slotWidth, slotHeight, expectedInjectedSize);
+  }
+
+  private void enrichBid_GivenFullScreenBidAvailable_EnrichBuilder(AdUnitType adUnitType, int slotWidth, int slotHeight, String expectedInjectedSize) {
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
     when(slot.isNative()).thenReturn(false);
     when(slot.getCpm()).thenReturn("0.10");
@@ -235,7 +303,7 @@ public abstract class AbstractDfpHeaderBiddingTest {
     when(slot.getWidth()).thenReturn(slotWidth);
     when(slot.getHeight()).thenReturn(slotHeight);
 
-    Bundle customTargeting = customTargetingFrom(builder -> headerBidding.enrichBid(builder, CRITEO_INTERSTITIAL, slot));
+    Bundle customTargeting = customTargetingFrom(builder -> headerBidding.enrichBid(builder, adUnitType, slot));
 
     assertEquals(3, customTargeting.size());
     assertEquals("0.10", customTargeting.get(CRT_CPM));
@@ -252,8 +320,7 @@ public abstract class AbstractDfpHeaderBiddingTest {
     }));
   }
 
-  @Test
-  public void enrichBid_GivenVideoInterstitialBidAvailable_EnrichBuilder() {
+  private void enrichBid_GivenVideoFullScreenBidAvailable_EnrichBuilder(AdUnitType adUnitType) {
     when(deviceUtil.isTablet()).thenReturn(true);
     when(androidUtil.getOrientation()).thenReturn(Configuration.ORIENTATION_LANDSCAPE);
 
@@ -267,19 +334,19 @@ public abstract class AbstractDfpHeaderBiddingTest {
 
     String encodedDisplayUrl = "http%253A%252F%252Fdisplay.url";
 
-    Bundle customTargeting = customTargetingFrom(builder -> headerBidding.enrichBid(builder, CRITEO_INTERSTITIAL, slot));
+    Bundle customTargeting = customTargetingFrom(builder -> headerBidding.enrichBid(builder, adUnitType, slot));
 
     assertEquals(4, customTargeting.size());
     assertEquals("0.10", customTargeting.get(CRT_CPM));
     assertEquals(encodedDisplayUrl, customTargeting.get(CRT_DISPLAY_URL));
-    assertEquals(TABLET_INTERSTITIAL_LANDSCAPE_SIZE, customTargeting.get(CRT_SIZE));
+    assertEquals(TABLET_FULLSCREEN_LANDSCAPE_SIZE, customTargeting.get(CRT_SIZE));
     assertEquals("video", customTargeting.get(CRT_FORMAT));
     verify(logger).log(argThat(logMessage -> {
       assertThat(logMessage.getMessage()).contains(
           versionName() + ":"
               + CRT_CPM + "=0.10,"
               + CRT_DISPLAY_URL + "=" + encodedDisplayUrl + ","
-              + CRT_SIZE + "=" + TABLET_INTERSTITIAL_LANDSCAPE_SIZE + ","
+              + CRT_SIZE + "=" + TABLET_FULLSCREEN_LANDSCAPE_SIZE + ","
               + CRT_FORMAT + "=video"
       );
       return true;
