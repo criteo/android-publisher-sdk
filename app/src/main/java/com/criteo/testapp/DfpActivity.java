@@ -31,6 +31,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.criteo.publisher.Bid;
 import com.criteo.publisher.BidResponseListener;
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
@@ -154,9 +155,8 @@ public class DfpActivity extends AppCompatActivity {
 
     AdManagerAdRequest.Builder builder = new AdManagerAdRequest.Builder();
 
-    AdUnit criteoAdUnit = INTERSTITIAL_VIDEO; // TODO
-    criteo.loadBid(criteoAdUnit, CONTEXT_DATA, enrich((mThis, bid) -> {
-          mThis.criteo.enrichAdObjectWithBid(builder, bid);
+    criteo.loadBid(TestAdUnits.REWARDED, CONTEXT_DATA, enrich((mThis, bid) -> {
+      mThis.criteo.enrichAdObjectWithBid(builder, bid);
 
       AdManagerAdRequest request = builder.build();
 

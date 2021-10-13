@@ -33,8 +33,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.criteo.publisher.Bid;
 import com.criteo.publisher.BidResponseListener;
 import com.criteo.publisher.Criteo;
+import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.integration.Integration;
-import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.testapp.integration.MockedIntegrationRegistry;
 import com.criteo.testapp.listener.TestAppMoPubInterstitialAdListener;
@@ -131,12 +131,10 @@ public class MopubActivity extends AppCompatActivity {
   private void onRewardedVideoClick() {
     NetworkUtil.logCasperRedirectionWarning(TAG);
 
-    AdUnit criteoAdUnit = INTERSTITIAL_VIDEO; // TODO
-    criteo.loadBid(criteoAdUnit, CONTEXT_DATA, enrich((mThis, bid) -> {
-      MoPubView dummyView = new MoPubView(mThis);
-      mThis.criteo.enrichAdObjectWithBid(dummyView, bid);
+    criteo.loadBid(TestAdUnits.REWARDED, CONTEXT_DATA, enrich((mThis, bid) -> {
+      RequestParameters requestParameters = new RequestParameters(null);
+      mThis.criteo.enrichAdObjectWithBid(requestParameters, bid);
 
-      RequestParameters requestParameters = new RequestParameters(dummyView.getKeywords()); // TODO
       MoPubRewardedAds.loadRewardedAd(MOPUB_REWARDED_VIDEO_ADUNIT_ID_HB, requestParameters);
     }));
   }
