@@ -121,8 +121,9 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
         builder.addCustomTargeting(CRT_SIZE, slot.getWidth() + "x" + slot.getHeight());
         break;
       case CRITEO_INTERSTITIAL:
+      case CRITEO_REWARDED:
         addEncodedDisplayUrl(builder, slot);
-        builder.addCustomTargeting(CRT_SIZE, getDfpSizeForInterstitial(slot));
+        builder.addCustomTargeting(CRT_SIZE, getDfpSizeForFullScreen(slot));
         break;
       case CRITEO_CUSTOM_NATIVE:
         enrichNativeRequest(builder, slot);
@@ -168,7 +169,7 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
    * Those sizes are constant because they have a meaning in DFP.
    */
   @NonNull
-  private String getDfpSizeForInterstitial(@NonNull CdbResponseSlot slot) {
+  private String getDfpSizeForFullScreen(@NonNull CdbResponseSlot slot) {
     boolean isPortrait = androidUtil.getOrientation() == Configuration.ORIENTATION_PORTRAIT;
 
     if (deviceUtil.isTablet()) {

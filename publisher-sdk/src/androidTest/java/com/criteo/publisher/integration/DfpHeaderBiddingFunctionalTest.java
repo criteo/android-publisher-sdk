@@ -200,6 +200,18 @@ public class DfpHeaderBiddingFunctionalTest {
     whenGettingBid_GivenValidCpIdAndValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(TestAdUnits.INTERSTITIAL_VIDEO, true);
   }
 
+  @Test
+  public void whenGettingBid_GivenValidCpIdAndPrefetchValidRewardedVideoId_CriteoMacroAreInjectedInDfpBuilder()
+      throws Exception {
+    givenInitializedCriteo();
+
+    // this request is ignored because current detected integration (fallback) is not supporting rewarded video
+    loadBidAndWait(TestAdUnits.REWARDED, new Builder());
+    // now, as a GAM builder was given, then the detected integration is GAM AppBidding and next request will work.
+
+    whenGettingBid_GivenValidCpIdAndValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(TestAdUnits.REWARDED, true);
+  }
+
   private void whenGettingBid_GivenValidCpIdAndValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(AdUnit adUnit, boolean isVideo) throws Exception {
     givenInitializedCriteo(adUnit);
 
