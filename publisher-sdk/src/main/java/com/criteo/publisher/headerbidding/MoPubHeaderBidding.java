@@ -37,6 +37,7 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler {
 
   private static final String MOPUB_ADVIEW_CLASS = "com.mopub.mobileads.MoPubView";
   private static final String MOPUB_INTERSTITIAL_CLASS = "com.mopub.mobileads.MoPubInterstitial";
+  private static final String MOPUB_REWARDED_CLASS = "com.mopub.mobileads.MoPubRewardedAdManager$RequestParameters";
 
   private static final String CRT_CPM = "crt_cpm";
   private static final String CRT_DISPLAY_URL = "crt_displayUrl";
@@ -55,7 +56,8 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler {
 
   public boolean canHandle(@NonNull Object object) {
     return isInstanceOf(object, MOPUB_ADVIEW_CLASS)
-        || isInstanceOf(object, MOPUB_INTERSTITIAL_CLASS);
+        || isInstanceOf(object, MOPUB_INTERSTITIAL_CLASS)
+        || isInstanceOf(object, MOPUB_REWARDED_CLASS);
   }
 
   @NonNull
@@ -70,13 +72,13 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler {
       return;
     }
 
-    String keywords = (String) ReflectionUtil.callMethodOnObject(object, "getKeywords");
+    String keywords = getKeywords(object);
     if (keywords == null) {
       return;
     }
 
     String cleanedKeywords = removeCriteoKeywords(keywords);
-    ReflectionUtil.callMethodOnObject(object, "setKeywords", cleanedKeywords);
+    setKeywords(object, cleanedKeywords);
   }
 
   @NonNull
@@ -138,7 +140,7 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler {
       keywords.append(VIDEO);
     }
 
-    Object existingKeywords = ReflectionUtil.callMethodOnObject(object, "getKeywords");
+    String existingKeywords = getKeywords(object);
     String newKeywords;
     if (existingKeywords != null) {
       newKeywords = existingKeywords + "," + keywords;
@@ -146,7 +148,7 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler {
       newKeywords = keywords.toString();
     }
 
-    ReflectionUtil.callMethodOnObject(object, "setKeywords", newKeywords);
+    setKeywords(object, newKeywords);
 
     logger.log(AppBiddingLogMessage.onAdObjectEnrichedSuccessfully(getIntegration(), keywords.toString()));
   }
@@ -162,6 +164,27 @@ public class MoPubHeaderBidding implements HeaderBiddingHandler {
     } catch (UnsupportedEncodingException e) {
       PreconditionsUtil.throwOrLog(e);
       return null;
+    }
+  }
+
+  @Nullable
+  private String getKeywords(@NonNull Object object) {
+    if (isInstanceOf(object, MOPUB_ADVIEW_CLASS) || isInstanceOf(object, MOPUB_INTERSTITIAL_CLASS)) {
+      return (String) ReflectionUtil.callMethodOnObject(object, "getKeywords");
+    } else if (isInstanceOf(object, MOPUB_REWARDED_CLASS)) {
+      return (String) ReflectionUtil.getPublicFieldValue(object, "mKeywords");
+    } else {
+      throw new UnsupportedOperationException("Unsupported object " + object);
+    }
+  }
+
+  private void setKeywords(@NonNull Object object, @Nullable String newKeywords) {
+    if (isInstanceOf(object, MOPUB_ADVIEW_CLASS) || isInstanceOf(object, MOPUB_INTERSTITIAL_CLASS)) {
+      ReflectionUtil.callMethodOnObject(object, "setKeywords", newKeywords);
+    } else if (isInstanceOf(object, MOPUB_REWARDED_CLASS)) {
+      ReflectionUtil.setPublicFinalFieldValue(object, "mKeywords", newKeywords);
+    } else {
+      throw new UnsupportedOperationException("Unsupported object " + object);
     }
   }
 

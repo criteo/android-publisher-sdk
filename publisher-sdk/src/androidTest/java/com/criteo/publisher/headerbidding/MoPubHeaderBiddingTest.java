@@ -27,11 +27,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import androidx.annotation.Nullable;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.mopub.mobileads.MoPubInterstitial;
+import com.mopub.mobileads.MoPubRewardedAdManager;
 import com.mopub.mobileads.MoPubView;
 import org.junit.Rule;
 import org.junit.Test;
@@ -90,6 +92,15 @@ public class MoPubHeaderBiddingTest {
     MoPubInterstitial moPub = callOnMainThreadAndWait(() ->
         new MoPubInterstitial(activityRule.getActivity(), "adUnit") {
         });
+
+    boolean handling = headerBidding.canHandle(moPub);
+
+    assertTrue(handling);
+  }
+
+  @Test
+  public void canHandle_GivenMoPubRewarded_ReturnTrue() throws Exception {
+    MoPubRewardedAdManager.RequestParameters moPub = givenMoPubRewarded(null);
 
     boolean handling = headerBidding.canHandle(moPub);
 
@@ -218,6 +229,30 @@ public class MoPubHeaderBiddingTest {
   }
 
   @Test
+  public void cleanPreviousBid_GivenMoPubRewardedWithPreviousCriteoData_RemoveOnlyCriteoData()
+      throws Exception {
+    MoPubRewardedAdManager.RequestParameters moPub = givenMoPubRewarded("previousData,that:\"shouldn't be cleaned\",crt_cpm:0.10,crt_displayUrl:http://url,crt_size:42x1337,crt_cpm_notcriteo,this:\"one neither\"");
+
+    headerBidding.cleanPreviousBid(moPub);
+    String keywords = moPub.mKeywords;
+
+    assertThat(keywords)
+        .isEqualTo(
+            "previousData,that:\"shouldn't be cleaned\",crt_cpm_notcriteo,this:\"one neither\"");
+  }
+
+  @Test
+  public void cleanPreviousBid_GivenMoPubRewardedWithoutKeyword_LeftItUnchanged()
+      throws Exception {
+    MoPubRewardedAdManager.RequestParameters moPub = givenMoPubRewarded(null);
+
+    headerBidding.cleanPreviousBid(moPub);
+    String keywords = moPub.mKeywords;
+
+    assertThat(keywords).isNull();
+  }
+
+  @Test
   public void enrichBid_GivenNotHandledObject_DoNothing() throws Exception {
     Object builder = mock(Object.class);
 
@@ -271,6 +306,33 @@ public class MoPubHeaderBiddingTest {
     assertEquals("previousData,crt_cpm:0.10,crt_displayUrl:http%3A%2F%2Fdisplay.url,crt_format:video", keywords);
   }
 
+  @Test
+  public void enrichBid_GivenMoPubRewardedAndBidAvailable_EnrichBuilder() throws Exception {
+    CdbResponseSlot slot = mock(CdbResponseSlot.class);
+    when(slot.getCpm()).thenReturn("0.10");
+    when(slot.getDisplayUrl()).thenReturn("http://display.url");
+
+    MoPubRewardedAdManager.RequestParameters moPub = givenMoPubRewarded("previousData");
+    headerBidding.enrichBid(moPub, CRITEO_INTERSTITIAL, slot);
+    String keywords = moPub.mKeywords;
+
+    assertEquals("previousData,crt_cpm:0.10,crt_displayUrl:http://display.url", keywords);
+  }
+
+  @Test
+  public void enrichBid_GivenMoPubRewardedAndVideoBidAvailable_EnrichBuilder() throws Exception {
+    CdbResponseSlot slot = mock(CdbResponseSlot.class);
+    when(slot.getCpm()).thenReturn("0.10");
+    when(slot.getDisplayUrl()).thenReturn("http://display.url");
+    when(slot.isVideo()).thenReturn(true);
+
+    MoPubRewardedAdManager.RequestParameters moPub = givenMoPubRewarded("previousData");
+    headerBidding.enrichBid(moPub, CRITEO_INTERSTITIAL, slot);
+    String keywords = moPub.mKeywords;
+
+    assertEquals("previousData,crt_cpm:0.10,crt_displayUrl:http%3A%2F%2Fdisplay.url,crt_format:video", keywords);
+  }
+
   private MoPubView givenMoPubView() {
     return callOnMainThreadAndWait(() -> new MoPubView(activityRule.getActivity()));
   }
@@ -278,6 +340,10 @@ public class MoPubHeaderBiddingTest {
   private MoPubInterstitial givenMoPubInterstitial() {
     return callOnMainThreadAndWait(() ->
         new MoPubInterstitial(activityRule.getActivity(), "adUnit"));
+  }
+
+  private MoPubRewardedAdManager.RequestParameters givenMoPubRewarded(@Nullable String keywords) {
+    return new MoPubRewardedAdManager.RequestParameters(keywords);
   }
 
 }
