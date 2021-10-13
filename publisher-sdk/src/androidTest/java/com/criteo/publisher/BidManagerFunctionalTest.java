@@ -51,6 +51,7 @@ import com.criteo.publisher.concurrent.TrackingCommandsExecutorWithDelay;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.context.ContextProvider;
 import com.criteo.publisher.csm.MetricSendingQueueConsumer;
+import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.RemoteLogSendingQueueConsumer;
@@ -60,6 +61,7 @@ import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
+import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestSlot;
@@ -69,6 +71,7 @@ import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.model.Publisher;
 import com.criteo.publisher.model.RemoteConfigResponse;
+import com.criteo.publisher.model.RewardedAdUnit;
 import com.criteo.publisher.model.User;
 import com.criteo.publisher.network.LiveBidRequestSender;
 import com.criteo.publisher.network.PubSdkApi;
@@ -77,6 +80,7 @@ import com.criteo.publisher.privacy.gdpr.GdprData;
 import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.BuildConfigWrapper;
+import com.criteo.publisher.util.DeviceUtil;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -147,6 +151,9 @@ public class BidManagerFunctionalTest {
   private DeviceInfo deviceInfo;
 
   @SpyBean
+  private DeviceUtil deviceUtil;
+
+  @SpyBean
   private Context context;
 
   @Inject
@@ -158,7 +165,7 @@ public class BidManagerFunctionalTest {
   @MockBean
   private ContextProvider contextProvider;
 
-  @SpyBean
+  @Inject
   private Logger logger;
 
   private int adUnitId = 0;
@@ -183,6 +190,123 @@ public class BidManagerFunctionalTest {
     givenExpiredSilentModeBidCached(sampleAdUnit());
     givenNoLastBid(sampleAdUnit());
     givenTimeBudgetRespectedWhenFetchingLiveBids();
+  }
+
+  @Test
+  public void unsupportedAdFormat_prefetch_GivenUnsupportedAdFormatForAnIntegration_ShouldFilterUnsupportedAdUnits() throws Exception {
+    doReturn(Integration.FALLBACK).when(integrationRegistry).readIntegration();
+
+    BannerAdUnit notFiltered = new BannerAdUnit("not_filtered", new AdSize(1, 2));
+    RewardedAdUnit filtered1 = new RewardedAdUnit("filtered1");
+    RewardedAdUnit filtered2 = new RewardedAdUnit("filtered2");
+    List<AdUnit> prefetchAdUnits = Arrays.asList(notFiltered, filtered1, filtered2);
+
+    CdbResponseSlot slot = givenMockedCdbRespondingSlot();
+
+    BidManager bidManager = createBidManager();
+    bidManager.prefetch(prefetchAdUnits);
+    waitForIdleState();
+
+    CacheAdUnit expected = new CacheAdUnit(
+        notFiltered.getSize(),
+        notFiltered.getAdUnitId(),
+        notFiltered.getAdUnitType()
+    );
+
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(expected), slot);
+    verify(logger).log(BiddingLogMessage.onUnsupportedAdFormat(toCacheAdUnit(filtered1), Integration.FALLBACK));
+    verify(logger).log(BiddingLogMessage.onUnsupportedAdFormat(toCacheAdUnit(filtered2), Integration.FALLBACK));
+  }
+
+  @Test
+  public void unsupportedAdFormat_prefetch_GivenSupportedAdFormatForAnIntegration_ShouldNotFilterIt() throws Exception {
+    doReturn(Integration.MOPUB_APP_BIDDING).when(integrationRegistry).readIntegration();
+
+    RewardedAdUnit notFiltered = new RewardedAdUnit("not_filtered");
+    List<AdUnit> prefetchAdUnits = singletonList(notFiltered);
+
+    CdbResponseSlot slot = givenMockedCdbRespondingSlot();
+
+    BidManager bidManager = createBidManager();
+    bidManager.prefetch(prefetchAdUnits);
+    waitForIdleState();
+
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(toCacheAdUnit(notFiltered)), slot);
+  }
+
+  @Test
+  public void unsupportedAdFormat_fetchForLiveBidRequest_GivenUnsupportedAdFormatForAnIntegration_ShouldFilterIt() throws Exception {
+    doReturn(Integration.FALLBACK).when(integrationRegistry).readIntegration();
+
+    RewardedAdUnit adUnit = new RewardedAdUnit("filtered");
+
+    BidListener bidListener = mock(BidListener.class);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
+    waitForIdleState();
+
+    verify(bidListener).onNoBid();
+    assertNoLiveBidIsCached();
+    assertNoLiveBidIsConsumedFromCache();
+    assertShouldNotCallCdbAndNotPopulateCache();
+    verify(logger).log(BiddingLogMessage.onUnsupportedAdFormat(toCacheAdUnit(adUnit), Integration.FALLBACK));
+  }
+
+  @Test
+  public void unsupportedAdFormat_fetchForLiveBidRequest_GivenSupportedAdFormatForAnIntegration_ShouldHandleIt() throws Exception {
+    givenMockedClockSetTo(42);
+    givenTimeBudgetRespectedWhenFetchingLiveBids();
+
+    doReturn(Integration.MOPUB_APP_BIDDING).when(integrationRegistry).readIntegration();
+
+    RewardedAdUnit adUnit = new RewardedAdUnit("not_filtered");
+
+    CdbResponseSlot slot = givenMockedCdbRespondingSlot();
+    when(slot.getCpmAsNumber()).thenReturn(1.);
+    when(slot.getTtlInSeconds()).thenReturn(0);
+
+    BidListener bidListener = mock(BidListener.class);
+
+    BidManager bidManager = createBidManager();
+    bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
+    waitForIdleState();
+
+    InOrder inOrder = inOrder(bidListener, slot);
+    inOrder.verify(slot).setTimeOfDownload(42);
+    inOrder.verify(bidListener).onBidResponse(slot);
+    assertLiveBidIsConsumedDirectly(toCacheAdUnit(adUnit), slot);
+    assertNoLiveBidIsCached();
+  }
+
+  @Test
+  public void unsupportedAdFormat_getBidForAdUnitAndPrefetch_GivenUnsupportedAdFormatForAnIntegration_ShouldFilterIt() throws Exception {
+    doReturn(Integration.FALLBACK).when(integrationRegistry).readIntegration();
+
+    RewardedAdUnit adUnit = new RewardedAdUnit("filtered");
+
+    BidManager bidManager = createBidManager();
+    CdbResponseSlot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
+    waitForIdleState();
+
+    assertThat(slot).isNull();
+    assertShouldNotCallCdbAndNotPopulateCache();
+    verify(logger).log(BiddingLogMessage.onUnsupportedAdFormat(toCacheAdUnit(adUnit), Integration.FALLBACK));
+  }
+
+  @Test
+  public void unsupportedAdFormat_getBidForAdUnitAndPrefetch_GivenSupportedAdFormatForAnIntegration_ShouldHandleIt() throws Exception {
+    doReturn(Integration.MOPUB_APP_BIDDING).when(integrationRegistry).readIntegration();
+
+    RewardedAdUnit adUnit = new RewardedAdUnit("filtered");
+
+    CdbResponseSlot slot = givenMockedCdbRespondingSlot();
+
+    BidManager bidManager = createBidManager();
+    bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
+    waitForIdleState();
+
+    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(toCacheAdUnit(adUnit)), slot);
   }
 
   @Test
@@ -1736,9 +1860,19 @@ public class BidManagerFunctionalTest {
       adUnitType = AdUnitType.CRITEO_INTERSTITIAL;
     } else if (slot.isNativeAd() == Boolean.TRUE) {
       adUnitType = AdUnitType.CRITEO_CUSTOM_NATIVE;
+    } else if (slot.isRewarded() == Boolean.TRUE) {
+      adUnitType = AdUnitType.CRITEO_REWARDED;
     }
 
     return new CacheAdUnit(size, slot.getPlacementId(), adUnitType);
+  }
+
+  private CacheAdUnit toCacheAdUnit(RewardedAdUnit adUnit) {
+    return new CacheAdUnit(
+        deviceUtil.getCurrentScreenSize(),
+        adUnit.getAdUnitId(),
+        adUnit.getAdUnitType()
+    );
   }
 
   private BidManager createBidManager() {
