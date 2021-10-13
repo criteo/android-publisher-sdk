@@ -63,6 +63,7 @@ import com.mopub.mobileads.DefaultBannerAdListener;
 import com.mopub.mobileads.MoPubErrorCode;
 import com.mopub.mobileads.MoPubInterstitial;
 import com.mopub.mobileads.MoPubInterstitial.InterstitialAdListener;
+import com.mopub.mobileads.MoPubRewardedAdManager;
 import com.mopub.mobileads.MoPubView;
 import java.util.Arrays;
 import java.util.List;
@@ -265,6 +266,25 @@ public class MoPubHeaderBiddingFunctionalTest {
     loadAdAndWait(interstitialAdUnit, moPubInterstitial);
 
     assertCriteoKeywordsAreInjectedInMoPubView(moPubInterstitial.getKeywords(), interstitialAdUnit, isVideo);
+    assertBidRequestHasGoodProfileId();
+  }
+
+  @Test
+  public void whenGettingBid_GivenValidCpIdAndPrefetchValidRewardedVideoId_CriteoKeywordsAreInjectedInMoPub()
+      throws Exception {
+    givenInitializedCriteo();
+
+    MoPubRewardedAdManager.RequestParameters moPubParams = new MoPubRewardedAdManager.RequestParameters(null);
+
+    // this request is ignored because current detected integration (fallback) is not supporting rewarded video
+    loadAdAndWait(TestAdUnits.REWARDED, moPubParams);
+    // now, as a GAM builder was given, then the detected integration is GAM AppBidding and next request will work.
+
+    givenInitializedCriteo(TestAdUnits.REWARDED);
+
+    loadAdAndWait(TestAdUnits.REWARDED, moPubParams);
+
+    assertCriteoKeywordsAreInjectedInMoPubView(moPubParams.mKeywords, TestAdUnits.REWARDED, true);
     assertBidRequestHasGoodProfileId();
   }
 

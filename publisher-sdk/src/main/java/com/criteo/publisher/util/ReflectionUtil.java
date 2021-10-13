@@ -20,8 +20,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 public class ReflectionUtil {
 
@@ -56,6 +58,43 @@ public class ReflectionUtil {
     } catch (NullPointerException | NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
       logger.debug("Failed to call " + methodName, e);
       return null;
+    }
+  }
+
+  @Nullable
+  public static Object getPublicFieldValue(@NonNull Object object, @NonNull String fieldName) {
+    try {
+      Field field = object.getClass().getField(fieldName);
+      return field.get(object);
+    } catch (Exception e) {
+      logger.debug("Failed to get field " + fieldName, e);
+      return null;
+    }
+  }
+
+  public static void setPublicFinalFieldValue(@NonNull Object object, @NonNull String fieldName, @Nullable Object value) {
+    Field field = null;
+    Field accessFlagsField = null;
+
+    try {
+      field = object.getClass().getField(fieldName);
+
+      accessFlagsField = field.getClass().getDeclaredField("accessFlags"); // Android-changed: modifiers is renamed to accessFlags
+      accessFlagsField.setAccessible(true);
+      accessFlagsField.set(field, field.getModifiers() & ~Modifier.FINAL);
+
+      field.set(object, value);
+    } catch (Exception e) {
+      logger.debug("Failed to set field " + fieldName, e);
+    } finally {
+      if (field != null && accessFlagsField != null) {
+        try {
+          accessFlagsField.set(field, field.getModifiers() | Modifier.FINAL);
+          accessFlagsField.setAccessible(false);
+        } catch (Exception e) {
+          logger.debug("Failed to reset field to private final " + fieldName, e);
+        }
+      }
     }
   }
 
