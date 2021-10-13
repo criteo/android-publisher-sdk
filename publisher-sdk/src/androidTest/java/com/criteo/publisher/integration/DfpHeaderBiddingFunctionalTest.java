@@ -641,11 +641,8 @@ public class DfpHeaderBiddingFunctionalTest {
   }
 
   private void assertBidRequestHasGoodProfileId() throws Exception {
-    if (config.isLiveBiddingEnabled()) {
-      // With live bidding, AppBidding declaration is delayed when bid is consumed. So the declaration is only visible
-      // from the next bid.
-      loadBidAndWait(invalidBannerAdUnit, new AdManagerAdRequest.Builder());
-    }
+    // AppBidding declaration is delayed when bid is consumed. So the declaration is only visible from the next bid.
+    loadBidAndWait(invalidBannerAdUnit, new AdManagerAdRequest.Builder());
 
     verify(api, atLeastOnce()).loadCdb(
         argThat(request -> request.getProfileId() == Integration.GAM_APP_BIDDING.getProfileId()),
