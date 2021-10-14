@@ -33,6 +33,10 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: ${{ runner.os }}-gradle-
 
+      - name: Disable TCP/UDP Offloading (Linux)
+        shell: bash
+        run: sudo ethtool -K eth0 tx off rx off
+
       - name: Set up Android SDK
         uses: malinskiy/action-android/install-sdk@release/0.1.2
 
@@ -90,6 +94,12 @@ jobs:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: ${{ runner.os }}-gradle-
+
+      - name: Disable TCP/UDP Offloading (macOS)
+        shell: bash
+        run: |
+          sudo sysctl -w net.link.generic.system.hwcksum_tx=0
+          sudo sysctl -w net.link.generic.system.hwcksum_rx=0
 
       - name: Set up Android SDK
         uses: malinskiy/action-android/install-sdk@release/0.1.2
@@ -211,6 +221,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      - name: Disable TCP/UDP Offloading (Linux)
+        shell: bash
+        run: sudo ethtool -K eth0 tx off rx off
 
       - name: Set up Android SDK
         uses: malinskiy/action-android/install-sdk@release/0.1.2
