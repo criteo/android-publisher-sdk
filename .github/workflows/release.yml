@@ -12,6 +12,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Disable TCP/UDP Offloading (Linux)
+        shell: bash
+        run: sudo ethtool -K eth0 tx off rx off
+
       - name: Set up Android SDK
         uses: malinskiy/action-android/install-sdk@release/0.1.2
 
