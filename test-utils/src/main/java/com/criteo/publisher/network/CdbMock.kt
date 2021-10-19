@@ -67,6 +67,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
     private const val PREPROD_CURRENCY = "EUR"
 
     private const val CONTENT_TYPE = "content-type"
+    private const val TEXT_PLAIN = "text/plain; charset=utf-8"
   }
 
   private val mockWebServer = MockWebServer()
@@ -152,7 +153,8 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
         "/inapp/v2" -> handleBidRequest(request.body)
         "/inapp/logs" -> handleLogsRequest()
         "/delivery/ajs.php" -> handleCasperRequest(request)
-        "/delivery/vast.php" -> handleVastCasperRequest()
+        "/delivery/vast.php" -> handleWrappingVastCasperRequest(request)
+        "/dsp/delivery/vast_wrapped.php" -> handleWrappedVastDspRequest(request)
         "/appevent/v1/2379" -> handleBearcatRequest()
         "/pixel" -> handlePixel()
         else -> MockResponse().setResponseCode(HttpURLConnection.HTTP_NOT_FOUND)
@@ -298,7 +300,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
           "width": $width,
           "height": $height,
           "ttl": $PREPROD_TTL,
-          "displayUrl": "$url/delivery/vast.php",
+          "displayUrl": "$url/delivery/vast.php?rewarded=1",
           "isVideo": "true",
           "isRewarded": "true"
         }
@@ -347,12 +349,80 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
     """.trimIndent()
 
       return MockResponse()
-          .setHeader(CONTENT_TYPE, "text/plain; charset=utf-8")
+          .setHeader(CONTENT_TYPE, TEXT_PLAIN)
           .setBody(response)
     }
 
+    /**
+     * Returns a VAST wrapper which is wrapping the (mocked) DSP's VAST.
+     * This wrapper is expected to be served by Casper.
+     */
     @Suppress("MaxLineLength")
-    private fun handleVastCasperRequest(): MockResponse {
+    private fun handleWrappingVastCasperRequest(request: RecordedRequest): MockResponse {
+      val response = """
+        <?xml version="1.0" encoding="utf-8"?>
+        <VAST version="3.0">
+          <Ad>
+            <Wrapper>
+              <VASTAdTagURI>
+                <![CDATA[$url/dsp/delivery/vast_wrapped.php?rewarded=${request.requestUrl!!.queryParameter("rewarded")}]]>
+              </VASTAdTagURI>
+              <Impression>
+                <![CDATA[$url/pixel?event=wrapper_video_impression]]>
+              </Impression>
+              <Creatives>
+                <Creative>
+                  <Linear>
+                    <TrackingEvents>
+                        <Tracking event="start"> <![CDATA[$url/pixel?event=wrapper_video_start]]> </Tracking>
+                        <Tracking event="firstQuartile"> <![CDATA[$url/pixel?event=wrapper_video_firstQuartile]]> </Tracking>
+                        <Tracking event="midpoint"> <![CDATA[$url/pixel?event=wrapper_video_midpoint]]> </Tracking>
+                        <Tracking event="thirdQuartile"> <![CDATA[$url/pixel?event=wrapper_video_thirdQuartile]]> </Tracking>
+                        <Tracking event="complete"> <![CDATA[$url/pixel?event=wrapper_video_complete]]> </Tracking>
+                    </TrackingEvents>
+                  </Linear>
+                </Creative>
+                <Creative>
+                  <CompanionAds>
+                    <Companion>
+                      <TrackingEvents>
+                        <Tracking event="creativeView"><![CDATA[$url/pixel?event=wrapper_companion_creativeView]]></Tracking>
+                      </TrackingEvents>
+                    </Companion>
+                  </CompanionAds>
+                </Creative>
+              </Creatives>
+            </Wrapper>
+          </Ad>
+        </VAST>""".trimIndent()
+
+      return MockResponse()
+          .setHeader(CONTENT_TYPE, TEXT_PLAIN)
+          .setBody(response)
+    }
+
+    /**
+     * Returns a VAST creative which is expected to be served by DSPs.
+     */
+    @Suppress("MaxLineLength")
+    private fun handleWrappedVastDspRequest(request: RecordedRequest): MockResponse {
+      val isRewarded = request.requestUrl!!.queryParameter("rewarded") == "1"
+
+      val companionAd = if (isRewarded) """
+        <Creative sequence="1" id="2">
+          <CompanionAds>
+            <Companion id="endCard" width="320" height="480">
+              <StaticResource creativeType="image/png"><![CDATA[$STUB_CREATIVE_IMAGE]]></StaticResource>
+              <CompanionClickThrough><![CDATA[https://google.com/]]></CompanionClickThrough>
+              <CompanionClickTracking><![CDATA[$url/pixel?event=companion_click_1]]></CompanionClickTracking>
+              <CompanionClickTracking><![CDATA[$url/pixel?event=companion_click_2]]></CompanionClickTracking>
+              <TrackingEvents>
+                <Tracking event="creativeView"><![CDATA[$url/pixel?event=companion_creativeView]]></Tracking>
+              </TrackingEvents>
+            </Companion>
+          </CompanionAds>
+        </Creative>""".trimIndent() else ""
+
       val response = """
         <?xml version="1.0" encoding="utf-8"?>
         <VAST version="3.0">
@@ -384,26 +454,14 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
                     </MediaFiles>
                   </Linear>
                 </Creative>
-                <Creative sequence="1" id="2">
-                  <CompanionAds>
-                    <Companion id="endCard" width="320" height="480">
-                      <StaticResource creativeType="image/png"><![CDATA[$STUB_CREATIVE_IMAGE]]></StaticResource>
-                      <CompanionClickThrough><![CDATA[https://google.com/]]></CompanionClickThrough>
-                      <CompanionClickTracking><![CDATA[$url/pixel?event=companion_click_1]]></CompanionClickTracking>
-                      <CompanionClickTracking><![CDATA[$url/pixel?event=companion_click_2]]></CompanionClickTracking>
-                      <TrackingEvents>
-                        <Tracking event="creativeView"><![CDATA[$url/pixel?event=companion_creativeView]]></Tracking>
-                      </TrackingEvents>
-                    </Companion>
-                  </CompanionAds>
-                </Creative>
+                $companionAd
               </Creatives>
             </InLine>
           </Ad>
         </VAST>""".trimIndent()
 
       return MockResponse()
-          .setHeader(CONTENT_TYPE, "text/plain; charset=utf-8")
+          .setHeader(CONTENT_TYPE, TEXT_PLAIN)
           .setBody(response)
     }
 
