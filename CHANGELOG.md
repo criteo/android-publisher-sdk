@@ -1,5 +1,11 @@
 # Next Version
 
+# Version 4.6.0
+
+- Features
+  - MoPub AppBidding: Add support for VAST Rewarded video ads
+  - GAM AppBidding: Add support for VAST Rewarded video ads
+
 # Version 4.5.0
 - Features
   - MoPub AppBidding: Add support for VAST Video ads
