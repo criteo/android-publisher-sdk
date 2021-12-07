@@ -29,9 +29,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.criteo.publisher.CriteoBannerView
 import com.criteo.publisher.advancednative.CriteoNativeAd
 import com.criteo.publisher.advancednative.CriteoNativeLoader
-import com.criteo.testapp.PubSdkDemoApplication.BANNER
-import com.criteo.testapp.PubSdkDemoApplication.CONTEXT_DATA
-import com.criteo.testapp.PubSdkDemoApplication.NATIVE
+import com.criteo.testapp.PubSdkDemoApplication.Companion.BANNER
+import com.criteo.testapp.PubSdkDemoApplication.Companion.CONTEXT_DATA
+import com.criteo.testapp.PubSdkDemoApplication.Companion.NATIVE
 import com.criteo.testapp.listener.TestAppBannerAdListener
 import com.criteo.testapp.listener.TestAppNativeAdListener
 import com.squareup.picasso.Picasso
