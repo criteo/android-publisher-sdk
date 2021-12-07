@@ -45,11 +45,6 @@ import leakcanary.LeakCanary.Config;
 
 public class PubSdkDemoApplication extends MultiDexApplication {
 
-  /**
-   * Flag indicating if the test app should use the CdbMock or should target the default SDK preprod/prod URLs
-   */
-  private static final boolean USE_CDB_MOCK = BuildConfig.DEBUG;
-
   private static final String TAG = PubSdkDemoApplication.class.getSimpleName();
 
   public static final InterstitialAdUnit INTERSTITIAL = TestAdUnits.INTERSTITIAL_PREPROD;
@@ -84,7 +79,7 @@ public class PubSdkDemoApplication extends MultiDexApplication {
       LeakCanary.setConfig(newConfig);
     });
 
-    if (USE_CDB_MOCK) {
+    if (BuildConfig.useCdbMock) {
       CdbMock cdbMock = new CdbMock(DependencyProvider.getInstance().provideJsonSerializer());
       cdbMock.start();
       System.setProperty(BuildConfigWrapper.CDB_URL_PROP, cdbMock.getUrl());
