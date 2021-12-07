@@ -26,7 +26,9 @@ plugins {
     id("io.gitlab.arturbosch.detekt")
 }
 
-androidAppModule("com.criteo.pubsdk_android")
+androidAppModule("com.criteo.pubsdk_android") {
+    addBuildConfigField<Boolean>("useCdbMock")
+}
 
 android {
     flavorDimensions("mode")
