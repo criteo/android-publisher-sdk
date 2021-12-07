@@ -131,7 +131,7 @@ public class MopubActivity extends AppCompatActivity {
   private void onRewardedVideoClick() {
     NetworkUtil.logCasperRedirectionWarning(TAG);
 
-    criteo.loadBid(TestAdUnits.REWARDED, CONTEXT_DATA, enrich((mThis, bid) -> {
+    criteo.loadBid(TestAdUnits.REWARDED_PREPROD, CONTEXT_DATA, enrich((mThis, bid) -> {
       RequestParameters requestParameters = new RequestParameters(null);
       mThis.criteo.enrichAdObjectWithBid(requestParameters, bid);
 
