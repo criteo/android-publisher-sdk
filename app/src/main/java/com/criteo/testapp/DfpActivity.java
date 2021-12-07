@@ -155,7 +155,7 @@ public class DfpActivity extends AppCompatActivity {
 
     AdManagerAdRequest.Builder builder = new AdManagerAdRequest.Builder();
 
-    criteo.loadBid(TestAdUnits.REWARDED, CONTEXT_DATA, enrich((mThis, bid) -> {
+    criteo.loadBid(TestAdUnits.REWARDED_PREPROD, CONTEXT_DATA, enrich((mThis, bid) -> {
       mThis.criteo.enrichAdObjectWithBid(builder, bid);
 
       AdManagerAdRequest request = builder.build();

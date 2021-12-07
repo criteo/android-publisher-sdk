@@ -35,6 +35,7 @@ import com.criteo.publisher.TestAdUnits.MOPUB_MEDIATION_NATIVE_ADUNIT_ID
 import com.criteo.publisher.TestAdUnits.NATIVE
 import com.criteo.publisher.TestAdUnits.NATIVE_PREPROD
 import com.criteo.publisher.TestAdUnits.REWARDED
+import com.criteo.publisher.TestAdUnits.REWARDED_PREPROD
 import com.criteo.publisher.model.AdSize
 import com.criteo.publisher.model.BannerAdUnit
 import com.criteo.publisher.model.CdbRequest
@@ -288,7 +289,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
         }
       """.trimIndent()
         }
-        rewardedAdUnit == REWARDED -> {
+        rewardedAdUnit in listOf(REWARDED, REWARDED_PREPROD) -> {
           """
         {
           "impId": "$impressionId",
