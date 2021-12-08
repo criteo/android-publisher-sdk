@@ -63,6 +63,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.check
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
@@ -497,8 +498,8 @@ class DebugLoggingFunctionalTest {
     givenInitializedCriteo(true)
     mockedDependenciesRule.waitForIdleState()
 
-    // Only [SdkLogMessage.onSdkInitialized] is expected
-    verify(consoleHandler, times(1)).println(eq(Log.INFO), any(), any())
+    // [SdkLogMessage.onSdkInitialized, IntegrationLogMessage.onNoDeclaredIntegration] are expected
+    verify(consoleHandler, atLeastOnce()).println(eq(Log.INFO), any(), any())
   }
 
   @Test

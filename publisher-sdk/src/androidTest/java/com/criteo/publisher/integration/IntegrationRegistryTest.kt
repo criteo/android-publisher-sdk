@@ -18,13 +18,17 @@ package com.criteo.publisher.integration
 
 import android.content.SharedPreferences
 import com.criteo.publisher.CriteoUtil.givenInitializedCriteo
+import com.criteo.publisher.logging.Logger
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.util.BuildConfigWrapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.inOrder
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import javax.inject.Inject
 
@@ -36,7 +40,7 @@ class IntegrationRegistryTest {
 
   @Rule
   @JvmField
-  val mockedDependenciesRule = MockedDependenciesRule()
+  val mockedDependenciesRule = MockedDependenciesRule().withSpiedLogger()
 
   @SpyBean
   private lateinit var buildConfigWrapper: BuildConfigWrapper
@@ -47,6 +51,9 @@ class IntegrationRegistryTest {
   @SpyBean
   private lateinit var integrationDetector: IntegrationDetector
 
+  @SpyBean
+  private lateinit var logger: Logger
+
   @Inject
   private lateinit var integrationRegistry: IntegrationRegistry
 
@@ -55,6 +62,7 @@ class IntegrationRegistryTest {
     val integration = integrationRegistry.readIntegration()
 
     assertThat(integration).isEqualTo(Integration.FALLBACK)
+    verify(logger).log(IntegrationLogMessage.onNoDeclaredIntegration())
   }
 
   @Test
@@ -65,6 +73,7 @@ class IntegrationRegistryTest {
     val integration = integrationRegistry.readIntegration()
 
     assertThat(integration).isEqualTo(Integration.FALLBACK)
+    verify(logger).log(IntegrationLogMessage.onNoDeclaredIntegration())
   }
 
   @Test
@@ -75,6 +84,7 @@ class IntegrationRegistryTest {
     val integration = integrationRegistry.readIntegration()
 
     assertThat(integration).isEqualTo(Integration.FALLBACK)
+    verify(logger).log(IntegrationLogMessage.onUnknownIntegrationName("unknown"))
   }
 
   @Test
@@ -83,6 +93,10 @@ class IntegrationRegistryTest {
     val integration = integrationRegistry.readIntegration()
 
     assertThat(integration).isEqualTo(Integration.IN_HOUSE)
+    logger.inOrder {
+      verify().log(IntegrationLogMessage.onIntegrationDeclared(Integration.IN_HOUSE))
+      verify().log(IntegrationLogMessage.onDeclaredIntegrationRead(Integration.IN_HOUSE))
+    }
   }
 
   @Test
@@ -92,9 +106,14 @@ class IntegrationRegistryTest {
     mockedDependenciesRule.resetAllDependencies()
     givenInitializedCriteo()
 
+    // Logger get called during init phase. Let's wait and clear unwanted invocations
+    mockedDependenciesRule.waitForIdleState()
+    clearInvocations(logger)
+
     val integration = integrationRegistry.readIntegration()
 
     assertThat(integration).isEqualTo(Integration.IN_HOUSE)
+    verify(logger).log(IntegrationLogMessage.onDeclaredIntegrationRead(Integration.IN_HOUSE))
   }
 
   @Test
@@ -105,6 +124,10 @@ class IntegrationRegistryTest {
     val integration = integrationRegistry.readIntegration()
 
     assertThat(integration).isEqualTo(Integration.MOPUB_MEDIATION)
+    logger.inOrder {
+      verify().log(IntegrationLogMessage.onIntegrationDeclared(Integration.STANDALONE))
+      verify().log(IntegrationLogMessage.onMediationAdapterDetected("MoPub"))
+    }
   }
 
   @Test
@@ -115,6 +138,10 @@ class IntegrationRegistryTest {
     val integration = integrationRegistry.readIntegration()
 
     assertThat(integration).isEqualTo(Integration.ADMOB_MEDIATION)
+    logger.inOrder {
+      verify().log(IntegrationLogMessage.onIntegrationDeclared(Integration.STANDALONE))
+      verify().log(IntegrationLogMessage.onMediationAdapterDetected("AdMob"))
+    }
   }
 
   @Test
@@ -125,6 +152,9 @@ class IntegrationRegistryTest {
     val integration = integrationRegistry.readIntegration()
 
     assertThat(integration).isEqualTo(Integration.FALLBACK)
+    logger.inOrder {
+      verify().log(IntegrationLogMessage.onMultipleMediationAdaptersDetected())
+    }
   }
 
 }
