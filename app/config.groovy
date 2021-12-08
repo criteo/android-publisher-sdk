@@ -19,6 +19,12 @@
  */
 useCdbMock = false
 
+/**
+ * Indicate that the integration detector should ignore the mediation adapter. Hence, when used each integrations can be
+ * detected correctly.
+ */
+doNotDetectMediationAdapter = true
+
 environments {
     debug {
         useCdbMock = true

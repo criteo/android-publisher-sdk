@@ -28,6 +28,7 @@ plugins {
 
 androidAppModule("com.criteo.pubsdk_android") {
     addBuildConfigField<Boolean>("useCdbMock")
+    addBuildConfigField<Boolean>("doNotDetectMediationAdapter")
 }
 
 android {

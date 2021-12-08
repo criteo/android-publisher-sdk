@@ -30,6 +30,9 @@ import com.criteo.publisher.model.InterstitialAdUnit
 import com.criteo.publisher.model.NativeAdUnit
 import com.criteo.publisher.network.CdbMock
 import com.criteo.publisher.util.BuildConfigWrapper
+import com.criteo.testapp.integration.IntegrationSelectionMode
+import com.criteo.testapp.integration.IntegrationSelectorActivity.Companion.mockIntegrationRegistry
+import com.criteo.testapp.mock.MockedDependencyProvider
 import leakcanary.LeakCanary.config
 
 class PubSdkDemoApplication : MultiDexApplication() {
@@ -69,6 +72,16 @@ class PubSdkDemoApplication : MultiDexApplication() {
       val cdbMock = CdbMock(DependencyProvider.getInstance().provideJsonSerializer())
       cdbMock.start()
       System.setProperty(BuildConfigWrapper.CDB_URL_PROP, cdbMock.url)
+    }
+
+    MockedDependencyProvider.prepareMock(this)
+    MockedDependencyProvider.startMocking {
+      val mode = if (BuildConfig.doNotDetectMediationAdapter) {
+        IntegrationSelectionMode.NoMediation
+      } else {
+        IntegrationSelectionMode.NoMock
+      }
+      mockIntegrationRegistry(mode, true)
     }
 
     val adUnits = listOf(

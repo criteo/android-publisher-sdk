@@ -21,10 +21,30 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.RadioButton
 import androidx.appcompat.app.AppCompatActivity
-import com.criteo.publisher.DependencyProvider
 import com.criteo.publisher.integration.IntegrationDetector
 import com.criteo.testapp.R
 import com.criteo.testapp.mock.MockedDependencyProvider
+import com.criteo.testapp.mock.MockedDependencyProvider.MockInjection
+import com.criteo.testapp.mock.MockedDependencyProvider.resetCriteo
+
+enum class IntegrationSelectionMode {
+  /**
+   * Nothing is mocked, but mediation adapters are both present and have a higher precedence, so SDK is using the
+   * fallback profile ID.
+   */
+  NoMock,
+
+  /**
+   * Integration are detected normally without considering mediation adapters.
+   */
+  NoMediation,
+
+  /**
+   * Integrations are forced by the Activities that represent them.
+   * Like when going on the InHouse activity, then integration is directly declared as InHouse.
+   */
+  AllMocked,
+}
 
 class IntegrationSelectorActivity : AppCompatActivity() {
 
@@ -43,29 +63,42 @@ class IntegrationSelectorActivity : AppCompatActivity() {
     val allMocked = findViewById<RadioButton>(R.id.radioAllMocked).isChecked
     val noMediation = findViewById<RadioButton>(R.id.radioNoMediation).isChecked
 
-    if (!verbose && noMock) {
-      MockedDependencyProvider.stopMocking()
-    } else {
-      val sharedPreferences = DependencyProvider.getInstance().provideSharedPreferences()
+    val mode = when {
+      noMock -> IntegrationSelectionMode.NoMock
+      allMocked -> IntegrationSelectionMode.AllMocked
+      noMediation -> IntegrationSelectionMode.NoMediation
+      else -> throw UnsupportedOperationException()
+    }
 
+    resetCriteo {
       MockedDependencyProvider.startMocking {
-        val integrationDetector = if (noMediation) {
-          NoIntegrationDetector()
-        } else {
-          IntegrationDetector()
-        }
-
-        val integrationRegistry = MockedIntegrationRegistry(
-            sharedPreferences,
-            integrationDetector,
-            baseContext,
-            allMocked,
-            verbose
-        )
-
-        inject(integrationDetector)
-        inject(integrationRegistry)
+        mockIntegrationRegistry(mode, verbose)
       }
+    }
+  }
+
+  companion object {
+    internal fun MockInjection.mockIntegrationRegistry(mode: IntegrationSelectionMode, verbose: Boolean) {
+      if (mode == IntegrationSelectionMode.NoMock && !verbose) {
+        return
+      }
+
+      val integrationDetector = if (mode == IntegrationSelectionMode.NoMediation) {
+        NoIntegrationDetector()
+      } else {
+        IntegrationDetector()
+      }
+
+      val integrationRegistry = MockedIntegrationRegistry(
+          oldDependencyProvider.provideSharedPreferences(),
+          integrationDetector,
+          oldDependencyProvider.provideContext(),
+          mode == IntegrationSelectionMode.AllMocked,
+          verbose
+      )
+
+      inject(integrationDetector)
+      inject(integrationRegistry)
     }
   }
 }
