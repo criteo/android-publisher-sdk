@@ -533,7 +533,7 @@ public class BidManagerFunctionalTest {
     when(userPrivacyUtil.getMopubConsent()).thenReturn("");
 
     when(buildConfigWrapper.getSdkVersion()).thenReturn("1.2.3");
-    when(integrationRegistry.getProfileId()).thenReturn(42);
+    doReturn(42).when(integrationRegistry).getProfileId();
     when(contextProvider.fetchUserContext()).thenReturn(new HashMap<>());
 
     CacheAdUnit cacheAdUnit = sampleAdUnit();
