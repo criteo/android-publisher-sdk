@@ -395,7 +395,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
               </Creatives>
             </Wrapper>
           </Ad>
-        </VAST>""".trimIndent()
+        </VAST>""".trimAllIndents()
 
       return MockResponse()
           .setHeader(CONTENT_TYPE, TEXT_PLAIN)
@@ -459,7 +459,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
               </Creatives>
             </InLine>
           </Ad>
-        </VAST>""".trimIndent()
+        </VAST>""".trimAllIndents()
 
       return MockResponse()
           .setHeader(CONTENT_TYPE, TEXT_PLAIN)
@@ -467,7 +467,11 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
     }
 
     private fun handlePixel(): MockResponse {
-      return MockResponse() // TODO?
+      return MockResponse().setResponseCode(HttpURLConnection.HTTP_OK)
+    }
+
+    private fun String.trimAllIndents(): String {
+      return lineSequence().map { it.trim() }.joinToString("")
     }
   }
 }
