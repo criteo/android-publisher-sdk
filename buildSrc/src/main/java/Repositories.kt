@@ -31,11 +31,6 @@ fun ScriptHandler.addDefaultInputRepository() {
 internal fun RepositoryHandler.addDefaultInputRepository() {
   google()
   mavenCentral()
-  jcenter {
-    content {
-      includeModule("org.jetbrains.trove4j", "trove4j") // https://youtrack.jetbrains.com/issue/IDEA-261387#focus=Comments-27-4726891.0-0
-    }
-  }
   maven {
     setUrl("https://jitpack.io")
   }
