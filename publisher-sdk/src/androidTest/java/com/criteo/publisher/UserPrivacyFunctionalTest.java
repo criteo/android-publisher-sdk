@@ -19,8 +19,8 @@ package com.criteo.publisher;
 import static com.criteo.publisher.CriteoUtil.clearCriteo;
 import static com.criteo.publisher.CriteoUtil.getCriteoBuilder;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
-import static junit.framework.Assert.assertNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -37,7 +37,6 @@ import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.network.PubSdkApi;
 import javax.inject.Inject;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -96,7 +95,7 @@ public class UserPrivacyFunctionalTest {
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
     CdbRequest cdb = cdbArgumentCaptor.getValue();
-    Assert.assertNull(cdb.getUser().uspIab());
+    assertNull(cdb.getUser().uspIab());
   }
 
   @Test

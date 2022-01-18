@@ -17,13 +17,12 @@
 package com.criteo.publisher.privacy;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import com.criteo.publisher.DependencyProvider;
+import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import javax.inject.Inject;
@@ -31,7 +30,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -45,17 +43,15 @@ public class UserPrivacySharedPreferencesSafetyTests {
   @Inject
   private Context context;
 
-  @Mock
+  @MockBean
   private BuildConfigWrapper buildConfigWrapper;
 
+  @Inject
   private UserPrivacyUtil userPrivacyUtil;
 
   @Before
   public void setUp() {
-    DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
     when(buildConfigWrapper.preconditionThrowsOnException()).thenReturn(false);
-    doReturn(buildConfigWrapper).when(dependencyProvider).provideBuildConfigWrapper();
-    userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil();
   }
 
   @After
