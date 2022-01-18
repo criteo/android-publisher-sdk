@@ -25,7 +25,7 @@ object NetworkUtil {
           Casper redirection handler only works on *.criteo.com URL.
           To make it works with other URL, you must add this snippet in OnBeforeResponse method of Fiddler Script:
 
-              if (oSession.uriContains("ads.criteo.com/redirect?url=")) {
+              if (oSession.uriContains("ssp-ads.criteo.com/delivery/redirect?url=")) {
                 var indexOf = oSession.fullUrl.IndexOf('=');
                 var encodedRedirect = oSession.fullUrl.Substring(indexOf + 1);
                 var redirect = Uri.UnescapeDataString(encodedRedirect);
