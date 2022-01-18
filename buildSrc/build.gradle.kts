@@ -21,11 +21,6 @@ plugins {
 repositories {
   google()
   mavenCentral()
-  jcenter {
-    content {
-      includeGroup("org.jetbrains.kotlinx") // https://github.com/Kotlin/kotlinx.html/issues/173
-    }
-  }
   gradlePluginPortal()
   maven("https://www.jitpack.io")
 }
@@ -35,6 +30,6 @@ dependencies {
   implementation("com.android.tools.build:gradle:3.6.1")
   implementation("gradle.plugin.fr.pturpin.slackpublish:slack-publish:0.2.0")
   implementation("com.banno.gordon:gordon-plugin:1.4.2")
-  implementation("io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.10.0")
+  implementation("io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.19.0")
   implementation("io.github.gradle-nexus:publish-plugin:1.0.0")
 }
