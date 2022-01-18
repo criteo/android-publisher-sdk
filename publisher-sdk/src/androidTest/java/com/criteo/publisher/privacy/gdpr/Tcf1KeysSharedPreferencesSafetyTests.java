@@ -17,19 +17,15 @@
 package com.criteo.publisher.privacy.gdpr;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.SafeSharedPreferences;
+import com.criteo.publisher.util.SharedPreferencesFactory;
 import javax.inject.Inject;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,7 +39,7 @@ public class Tcf1KeysSharedPreferencesSafetyTests {
   private BuildConfigWrapper buildConfigWrapper;
 
   @Inject
-  private Context context;
+  private SharedPreferencesFactory sharedPreferencesFactory;
 
   private Tcf1GdprStrategy tcf1GdprStrategy;
   private Tcf2GdprStrategy tcf2GdprStrategy;
@@ -52,24 +48,11 @@ public class Tcf1KeysSharedPreferencesSafetyTests {
 
   @Before
   public void setUp() {
-    sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-
-    DependencyProvider dependencyProvider = mockedDependenciesRule.getDependencyProvider();
+    sharedPreferences = sharedPreferencesFactory.getApplication();
     when(buildConfigWrapper.preconditionThrowsOnException()).thenReturn(false);
-    doReturn(buildConfigWrapper).when(dependencyProvider).provideBuildConfigWrapper();
 
     tcf1GdprStrategy = new Tcf1GdprStrategy(new SafeSharedPreferences(sharedPreferences));
     tcf2GdprStrategy = new Tcf2GdprStrategy(new SafeSharedPreferences(sharedPreferences));
-  }
-
-  @After
-  public void tearDown() {
-    SharedPreferences.Editor editor = sharedPreferences.edit();
-    editor.remove(Tcf1GdprStrategy.IAB_CONSENT_STRING_KEY);
-    editor.remove(Tcf1GdprStrategy.IAB_SUBJECT_TO_GDPR_KEY);
-    editor.remove(Tcf2GdprStrategy.IAB_TCString_Key);
-    editor.remove(Tcf2GdprStrategy.IAB_GDPR_APPLIES_KEY);
-    editor.apply();
   }
 
   @Test

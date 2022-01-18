@@ -16,10 +16,8 @@
 
 package com.criteo.publisher.privacy;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.preference.PreferenceManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
@@ -65,15 +63,7 @@ public class UserPrivacyUtil {
 
   private final GdprDataFetcher gdprDataFetcher;
 
-  public UserPrivacyUtil(@NonNull Context context) {
-    this(
-        PreferenceManager.getDefaultSharedPreferences(context),
-        new GdprDataFetcher(context)
-    );
-  }
-
-  @VisibleForTesting
-  UserPrivacyUtil(
+  public UserPrivacyUtil(
       @NonNull SharedPreferences sharedPreferences,
       @NonNull GdprDataFetcher gdprDataFetcher
   ) {

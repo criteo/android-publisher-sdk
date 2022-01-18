@@ -19,14 +19,12 @@ package com.criteo.publisher.privacy;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.util.BuildConfigWrapper;
+import com.criteo.publisher.util.SharedPreferencesFactory;
 import javax.inject.Inject;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,32 +38,23 @@ public class UserPrivacySharedPreferencesSafetyTests {
   @Rule
   public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-  @Inject
-  private Context context;
-
   @MockBean
   private BuildConfigWrapper buildConfigWrapper;
 
   @Inject
   private UserPrivacyUtil userPrivacyUtil;
 
+  @Inject
+  private SharedPreferencesFactory sharedPreferencesFactory;
+
   @Before
   public void setUp() {
     when(buildConfigWrapper.preconditionThrowsOnException()).thenReturn(false);
   }
 
-  @After
-  public void tearDown() {
-    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-    editor.remove(UserPrivacyUtil.IAB_USPRIVACY_SHARED_PREFS_KEY);
-    editor.remove(UserPrivacyUtil.MOPUB_CONSENT_SHARED_PREFS_KEY);
-    editor.remove(UserPrivacyUtil.OPTOUT_USPRIVACY_SHARED_PREFS_KEY);
-    editor.apply();
-  }
-
   @Test
   public void testRobustnessWhenAllKeysHaveBadType() {
-    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+    SharedPreferences.Editor editor = sharedPreferencesFactory.getApplication().edit();
     editor.putInt(UserPrivacyUtil.IAB_USPRIVACY_SHARED_PREFS_KEY, 1);
     editor.putInt(UserPrivacyUtil.MOPUB_CONSENT_SHARED_PREFS_KEY, 1);
     editor.putInt(UserPrivacyUtil.OPTOUT_USPRIVACY_SHARED_PREFS_KEY, 1);

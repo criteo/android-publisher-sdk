@@ -90,7 +90,7 @@ class IntegrationSelectorActivity : AppCompatActivity() {
       }
 
       val integrationRegistry = MockedIntegrationRegistry(
-          oldDependencyProvider.provideSharedPreferences(),
+          oldDependencyProvider.provideSharedPreferencesFactory().internal,
           integrationDetector,
           oldDependencyProvider.provideContext(),
           mode == IntegrationSelectionMode.AllMocked,

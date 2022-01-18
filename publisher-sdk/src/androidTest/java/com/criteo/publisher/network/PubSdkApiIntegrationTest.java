@@ -33,7 +33,6 @@ import static org.mockito.Mockito.when;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.StubConstants;
@@ -54,12 +53,11 @@ import com.criteo.publisher.model.Config.DefaultConfig;
 import com.criteo.publisher.model.RemoteConfigRequest;
 import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.model.RemoteConfigResponse;
-import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.DeviceUtil;
+import com.criteo.publisher.util.SharedPreferencesFactory;
 import java.util.List;
 import javax.inject.Inject;
 import org.json.JSONObject;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -91,13 +89,13 @@ public class PubSdkApiIntegrationTest {
   private PubSdkApi api;
 
   @Inject
-  private UserPrivacyUtil userPrivacyUtil;
-
-  @Inject
   private RemoteConfigRequestFactory remoteConfigRequestFactory;
 
   @Inject
   private RemoteLogRecordsFactory remoteLogRecordsFactory;
+
+  @Inject
+  private SharedPreferencesFactory sharedPreferencesFactory;
 
   @Before
   public void setup() {
@@ -106,12 +104,6 @@ public class PubSdkApiIntegrationTest {
     limitedAdTracking = 0;
     gaid = "021a86de-ef82-4f69-867b-61ca66688c9c";
     eventType = "Launch";
-  }
-
-  @After
-  public void tearDown() {
-    cleanupTcf1();
-    cleanupTcf2();
   }
 
   @Test
@@ -362,30 +354,16 @@ public class PubSdkApiIntegrationTest {
   }
 
   private void setupGdprDataWithTcf1(String gdprApplies, String tcString) {
-    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+    SharedPreferences.Editor editor = sharedPreferencesFactory.getApplication().edit();
     editor.putString("IABConsent_SubjectToGDPR", gdprApplies);
     editor.putString("IABConsent_ConsentString", tcString);
     editor.apply();
   }
 
   private void setupGdprDataWithTcf2(String subjectToGdpr, String consentString) {
-    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-    editor.putInt("IABTCF_gdprApplies", Integer.valueOf(subjectToGdpr));
+    SharedPreferences.Editor editor = sharedPreferencesFactory.getApplication().edit();
+    editor.putInt("IABTCF_gdprApplies", Integer.parseInt(subjectToGdpr));
     editor.putString("IABTCF_TCString", consentString);
-    editor.apply();
-  }
-
-  private void cleanupTcf1() {
-    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-    editor.remove("IABConsent_ConsentString");
-    editor.remove("IABConsent_SubjectToGDPR");
-    editor.apply();
-  }
-
-  private void cleanupTcf2() {
-    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-    editor.remove("IABTCF_gdprApplies");
-    editor.remove("IABTCF_TCString");
     editor.apply();
   }
 
