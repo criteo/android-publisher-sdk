@@ -45,6 +45,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito.verifyNoInteractions
 import org.mockito.kotlin.KStubbing
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -52,7 +53,6 @@ import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.stub
-import org.mockito.kotlin.verifyZeroInteractions
 import org.mockito.kotlin.whenever
 
 @Suppress("DEPRECATION")
@@ -253,7 +253,7 @@ class ConnectionTypeFetcherTest {
     val connectionType = connectionTypeFetcher.fetchNewCellularConnectionType(telephonyManager)
 
     assertThat(connectionType).isEqualTo(CELLULAR_UNKNOWN)
-    verifyZeroInteractions(telephonyManager)
+    verifyNoInteractions(telephonyManager)
   }
 
   @Test

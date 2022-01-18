@@ -19,7 +19,6 @@ package com.criteo.publisher.privacy;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import androidx.test.runner.AndroidJUnit4;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.privacy.gdpr.GdprData;
 import javax.inject.Inject;
@@ -28,9 +27,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-@RunWith(AndroidJUnit4.class)
 public class GdprUnitTest {
 
   @Rule

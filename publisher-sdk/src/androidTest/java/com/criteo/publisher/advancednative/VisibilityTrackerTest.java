@@ -20,7 +20,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import android.view.View;
@@ -88,7 +88,7 @@ public class VisibilityTrackerTest {
     tracker.watch(view, listener);
 
     verify(listener, never()).onVisible();
-    verifyZeroInteractions(visibilityChecker);
+    verifyNoInteractions(visibilityChecker);
   }
 
   @Test

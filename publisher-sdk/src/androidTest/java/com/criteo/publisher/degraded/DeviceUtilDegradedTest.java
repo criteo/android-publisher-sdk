@@ -16,7 +16,7 @@
 
 package com.criteo.publisher.degraded;
 
-import static junit.framework.Assert.assertFalse;
+import static org.junit.Assert.assertFalse;
 
 import android.os.Build.VERSION;
 import com.criteo.publisher.mock.MockedDependenciesRule;
