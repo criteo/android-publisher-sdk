@@ -33,7 +33,6 @@ internal fun RepositoryHandler.addDefaultInputRepository() {
   mavenCentral()
   jcenter {
     content {
-      includeGroup("com.mopub") // https://github.com/mopub/mopub-android-sdk/issues/455
       includeModule("org.jetbrains.trove4j", "trove4j") // https://youtrack.jetbrains.com/issue/IDEA-261387#focus=Comments-27-4726891.0-0
     }
   }

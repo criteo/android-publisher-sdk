@@ -3,6 +3,13 @@
   xmlns:tools="http://schemas.android.com/tools"
   package="com.criteo.publisher">
 
+  <!--
+  MoPub requires minSdk=19, while the SDK had minSdk=16
+  See https://developer.android.com/studio/build/manifest-merge#override_uses-sdk_for_imported_libraries
+  -->
+  <uses-sdk tools:overrideLibrary="com.mopub.mobileads.networking,
+    com.mopub.mobileads.utils" />
+
   <application
     android:networkSecurityConfig="@xml/network_security_config"
     tools:ignore="UnusedAttribute">
