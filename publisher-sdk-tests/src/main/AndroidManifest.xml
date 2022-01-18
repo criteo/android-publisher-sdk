@@ -12,6 +12,8 @@
       com.mopub.mobileads.banner,
       com.mopub.mobileads.interstitial,
       com.mopub.mobileads.native_static,
+      com.mopub.mobileads.networking,
+      com.mopub.mobileads.utils,
       androidx.media2.common,
       androidx.media2.player,
       androidx.media2.session,

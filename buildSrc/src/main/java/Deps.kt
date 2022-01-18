@@ -133,7 +133,7 @@ object Deps {
   }
 
   object MoPub {
-    private const val version = "5.16.4"
+    private const val version = "5.17.0"
 
     const val Banner = "com.mopub:mopub-sdk-banner:$version@aar"
     const val Interstitial = "com.mopub:mopub-sdk-fullscreen:$version@aar"
