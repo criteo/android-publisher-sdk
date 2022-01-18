@@ -26,18 +26,14 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.preference.PreferenceManager;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.util.SharedPreferencesFactory;
 import javax.inject.Inject;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -56,19 +52,7 @@ public class UserPrivacyFunctionalTest {
   private PubSdkApi pubSdkApi;
 
   @Inject
-  private Context context;
-
-  private SharedPreferences defaultSharedPreferences;
-
-  @Before
-  public void setUp() throws Exception {
-    defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-  }
-
-  @After
-  public void after() {
-    defaultSharedPreferences.edit().clear().commit();
-  }
+  private SharedPreferencesFactory sharedPreferencesFactory;
 
   @Test
   public void whenCriteoInit_GivenUspIabNotEmpty_VerifyItIsPassedToCdb() throws Exception {
@@ -223,7 +207,7 @@ public class UserPrivacyFunctionalTest {
   }
 
   private void writeIntoDefaultSharedPrefs(String key, String value) {
-    Editor edit = defaultSharedPreferences.edit();
+    Editor edit = sharedPreferencesFactory.getApplication().edit();
     edit.putString(key, value);
     edit.commit();
   }

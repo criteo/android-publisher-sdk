@@ -300,7 +300,8 @@ public class MockedDependenciesRule implements MethodRule {
     DependencyProvider dependencyProvider = dependencyProviderRef.get();
 
     // Clear all states retained in shared preferences used by the SDK.
-    dependencyProvider.provideSharedPreferences().edit().clear().apply();
+    dependencyProvider.provideSharedPreferencesFactory().getInternal().edit().clear().apply();
+    dependencyProvider.provideSharedPreferencesFactory().getApplication().edit().clear().apply();
 
     // Clear CSM
     MetricHelper.cleanState(dependencyProvider);

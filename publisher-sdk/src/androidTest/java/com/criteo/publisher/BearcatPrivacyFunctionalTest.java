@@ -21,20 +21,16 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.preference.PreferenceManager;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.util.SharedPreferencesFactory;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
 import javax.inject.Inject;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -176,25 +172,13 @@ public class BearcatPrivacyFunctionalTest {
   public boolean callBearcat;
 
   @Inject
-  private Context context;
-
-  @Inject
   private AppEvents appEvents;
 
   @SpyBean
   private PubSdkApi pubSdkApi;
 
-  private SharedPreferences defaultSharedPreferences;
-
-  @Before
-  public void setUp() throws Exception {
-    defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-  }
-
-  @After
-  public void after() {
-    defaultSharedPreferences.edit().clear().apply();
-  }
+  @Inject
+  private SharedPreferencesFactory sharedPreferencesFactory;
 
   @Test
   public void whenCriteoInit_GivenPrivacyStrings_VerifyIfBearcatShouldBeCalled() throws Exception {
@@ -235,7 +219,7 @@ public class BearcatPrivacyFunctionalTest {
   }
 
   private void writeIntoDefaultSharedPrefs(String key, String value) {
-    Editor edit = defaultSharedPreferences.edit();
+    Editor edit = sharedPreferencesFactory.getApplication().edit();
     edit.putString(key, value);
     edit.apply();
   }

@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.mock
 
+import android.content.SharedPreferences
 import com.criteo.publisher.DependencyProvider
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.logging.Logger
@@ -30,5 +31,19 @@ class TestDependencyProvider : DependencyProvider() {
 
   fun provideCdbMock(): CdbMock {
     throw UnsupportedOperationException("CdbMock is not provided")
+  }
+
+  @Deprecated(message = "Some tests were already build with injected shared preferences. But the SDK is dealing with" +
+      "2 kinds of shared prefs: internal and app. This one refers to the internal one and you should explicit it in" +
+      "the test.",
+      replaceWith = ReplaceWith(
+          "provideSharedPreferencesFactory().internal",
+          "android.content.SharedPreferences"
+      )
+  )
+  fun provideInternalSharedPreferences(): SharedPreferences {
+    return getOrCreate(SharedPreferences::class.java) {
+      provideSharedPreferencesFactory().internal
+    }
   }
 }

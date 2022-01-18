@@ -16,13 +16,11 @@
 
 package com.criteo.publisher.privacy;
 
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.privacy.gdpr.GdprData;
+import com.criteo.publisher.util.SharedPreferencesFactory;
 import javax.inject.Inject;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,25 +31,17 @@ public class GdprUnitTest {
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
-  @Inject
-  private Context context;
-
   private SharedPreferences.Editor editor;
 
   @Inject
   private UserPrivacyUtil userPrivacyUtil;
 
+  @Inject
+  private SharedPreferencesFactory sharedPreferencesFactory;
+
   @Before
   public void setup() {
-    editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
-  }
-
-  @After
-  public void tearDown() {
-    // Remove all properties to make sure every test case starts with its own properties
-    editor.remove("IABConsent_SubjectToGDPR");
-    editor.remove("IABConsent_ConsentString");
-    editor.apply();
+    editor = sharedPreferencesFactory.getApplication().edit();
   }
 
   private void initializeGdprParameters(String subjectToGdpr, String consentData) {

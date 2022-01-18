@@ -20,7 +20,6 @@ import static java.util.Arrays.asList;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Build.VERSION_CODES;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -91,6 +90,8 @@ import com.criteo.publisher.network.LiveBidRequestSender;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.privacy.ConsentData;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
+import com.criteo.publisher.privacy.gdpr.GdprDataFetcher;
+import com.criteo.publisher.privacy.gdpr.TcfStrategyResolver;
 import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.AdvertisingInfo.SafeAdvertisingIdClient;
 import com.criteo.publisher.util.AndroidUtil;
@@ -100,6 +101,8 @@ import com.criteo.publisher.util.CustomAdapterFactory;
 import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.util.JsonSerializer;
 import com.criteo.publisher.util.MapUtilKt;
+import com.criteo.publisher.util.SafeSharedPreferences;
+import com.criteo.publisher.util.SharedPreferencesFactory;
 import com.criteo.publisher.util.TextUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -247,7 +250,7 @@ public class DependencyProvider {
   @NonNull
   public Config provideConfig() {
     return getOrCreate(Config.class, () -> new Config(
-        provideSharedPreferences(),
+        provideSharedPreferencesFactory().getInternal(),
         provideJsonSerializer()
     ));
   }
@@ -260,7 +263,9 @@ public class DependencyProvider {
   @NonNull
   public UserPrivacyUtil provideUserPrivacyUtil() {
     return getOrCreate(UserPrivacyUtil.class, () -> new UserPrivacyUtil(
-        provideContext()
+        provideSharedPreferencesFactory().getApplication(),
+        new GdprDataFetcher(new TcfStrategyResolver(new SafeSharedPreferences(
+            provideSharedPreferencesFactory().getApplication())))
     ));
   }
 
@@ -479,17 +484,14 @@ public class DependencyProvider {
   }
 
   @NonNull
-  public SharedPreferences provideSharedPreferences() {
-    return getOrCreate(SharedPreferences.class, () -> provideContext().getSharedPreferences(
-        BuildConfig.pubSdkSharedPreferences,
-        Context.MODE_PRIVATE
-    ));
+  public SharedPreferencesFactory provideSharedPreferencesFactory() {
+    return getOrCreate(SharedPreferencesFactory.class, () -> new SharedPreferencesFactory(provideContext()));
   }
 
   @NonNull
   public IntegrationRegistry provideIntegrationRegistry() {
     return getOrCreate(IntegrationRegistry.class, () -> new IntegrationRegistry(
-        provideSharedPreferences(),
+        provideSharedPreferencesFactory().getInternal(),
         provideIntegrationDetector()
     ));
   }
@@ -719,7 +721,7 @@ public class DependencyProvider {
 
   @NonNull
   public ConsentData provideConsentData() {
-    return getOrCreate(ConsentData.class, () -> new ConsentData(provideSharedPreferences()));
+    return getOrCreate(ConsentData.class, () -> new ConsentData(provideSharedPreferencesFactory().getInternal()));
   }
 
   public interface Factory<T> {
