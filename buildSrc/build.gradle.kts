@@ -27,7 +27,7 @@ repositories {
 
 dependencies {
   implementation(gradleApi())
-  implementation("com.android.tools.build:gradle:3.6.1")
+  implementation("com.android.tools.build:gradle:4.2.0")
   implementation("gradle.plugin.fr.pturpin.slackpublish:slack-publish:0.2.0")
   implementation("com.banno.gordon:gordon-plugin:1.4.2")
   implementation("io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.19.0")

@@ -27,11 +27,6 @@ android {
   defaultConfig {
     multiDexEnabled = true
   }
-
-  packagingOptions {
-    // Both AssertJ and ByteBuddy (via Mockito) bring this and the duplication yields an error
-    exclude("META-INF/licenses/ASM")
-  }
 }
 
 
