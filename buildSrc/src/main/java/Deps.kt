@@ -17,8 +17,7 @@
 object Deps {
 
   object Android {
-
-    private const val agpVersion = "3.6.1"
+    private const val agpVersion = "4.2.0"
     const val GradlePlugin = "com.android.tools.build:gradle:$agpVersion"
   }
 
