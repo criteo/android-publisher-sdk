@@ -166,7 +166,7 @@ class CsmBidLifecycleListenerTest {
 
     verifyFeatureIsDeactivated()
   }
-  
+
   @Test
   fun onCdbCallFinished_GivenOnlyNoBid_PushReadyToSendInQueue() {
     val request = givenCdbRequestWithSlots("id")
@@ -333,7 +333,6 @@ class CsmBidLifecycleListenerTest {
 
     verifyFeatureIsDeactivated()
   }
-
 
   @Test
   fun onBidConsumed_GivenNotExpiredBid_SetElapsedTimeAndReadyToSend() {

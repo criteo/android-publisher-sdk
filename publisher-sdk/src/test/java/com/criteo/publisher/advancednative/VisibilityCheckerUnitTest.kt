@@ -108,5 +108,4 @@ class VisibilityCheckerUnitTest {
             on { getGlobalVisibleRect(any()) } doReturn true
         }
     }
-
 }

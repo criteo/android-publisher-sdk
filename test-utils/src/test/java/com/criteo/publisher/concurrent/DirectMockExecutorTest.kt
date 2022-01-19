@@ -99,5 +99,4 @@ class DirectMockExecutorTest {
       executor.verifyExpectations()
     }.isNotNull()
   }
-
 }

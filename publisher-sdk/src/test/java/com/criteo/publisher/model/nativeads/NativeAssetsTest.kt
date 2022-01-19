@@ -41,7 +41,6 @@ class NativeAssetsTest {
     val productJson = getProductJson()
     val advertiserJson = getAdvertiserJson()
     val privacyJson = getPrivacyJson()
-    val impressionPixelJson = getImpressionPixelJson()
 
     val json = """{
       |  "products": [
@@ -66,7 +65,6 @@ class NativeAssetsTest {
   fun fromJson_GivenSampleDataWithoutAnyProduct_ThrowException() {
     val advertiserJson = getAdvertiserJson()
     val privacyJson = getPrivacyJson()
-    val impressionPixelJson = getImpressionPixelJson()
 
     val json = """{
       |  "products": [],
@@ -115,9 +113,7 @@ class NativeAssetsTest {
         |    }""".trimMargin()
   }
 
-  private fun getImpressionPixelJson(): String {
-    return """{"url": "http://pixel.url"}"""
-  }
+  private val impressionPixelJson = """{"url": "http://pixel.url"}"""
 
   private fun getPrivacyJson(): String {
     return """{
@@ -141,5 +137,4 @@ class NativeAssetsTest {
   private inline fun <reified T : Any> read(json: String, klass: KClass<T> = T::class): T {
     return jsonSerializer.read(klass.java, ByteArrayInputStream(json.toByteArray()))
   }
-
 }

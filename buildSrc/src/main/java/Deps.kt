@@ -116,7 +116,7 @@ object Deps {
   }
 
   object Kotlin {
-    private const val version = "1.3.72"
+    private const val version = "1.5.31"
 
     const val GradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
     const val AllOpenPlugin = "org.jetbrains.kotlin:kotlin-allopen:$version"

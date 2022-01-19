@@ -38,5 +38,4 @@ class IntegrationDetectorTest {
 
     assertThat(isPresent).isFalse()
   }
-
 }

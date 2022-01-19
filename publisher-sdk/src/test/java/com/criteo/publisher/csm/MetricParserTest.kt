@@ -145,10 +145,10 @@ class MetricParserTest {
   fun write_GivenStreamThatThrowsWhenWriting_ThrowIoException() {
     val metric = Metric.builder("id").build()
     val stream = mock<OutputStream> {
-      on { write(any<Int>()) } doThrow(IOException::class)
-      on { write(any<ByteArray>()) } doThrow(IOException::class)
-      on { write(any(), any(), any()) } doThrow(IOException::class)
-      on { flush() } doThrow(IOException::class)
+      on { write(any<Int>()) } doThrow IOException::class
+      on { write(any<ByteArray>()) } doThrow IOException::class
+      on { write(any(), any(), any()) } doThrow IOException::class
+      on { flush() } doThrow IOException::class
     }
 
     assertThatCode {
@@ -176,5 +176,4 @@ class MetricParserTest {
       return String(toByteArray(), Charsets.UTF_8)
     }
   }
-
 }

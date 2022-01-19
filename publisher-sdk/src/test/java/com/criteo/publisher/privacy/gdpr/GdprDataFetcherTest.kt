@@ -25,9 +25,9 @@ import kotlin.test.assertEquals
 
 @RunWith(Parameterized::class)
 class GdprDataFetcherTest(
-        private val gdprApplies: String,
-        /** interpretation of gdprApplies as Boolean according to expected GdprDataFetcher#fetch logic */
-        private val assertGdprApplies: Boolean
+    private val gdprApplies: String,
+    /** interpretation of gdprApplies as Boolean according to expected GdprDataFetcher#fetch logic */
+    private val assertGdprApplies: Boolean
 ) {
 
     companion object {

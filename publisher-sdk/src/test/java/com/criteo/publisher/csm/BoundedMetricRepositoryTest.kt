@@ -143,5 +143,4 @@ class BoundedMetricRepositoryTest {
 
     verify(delegate, never()).addOrUpdateById("id", updater)
   }
-
 }

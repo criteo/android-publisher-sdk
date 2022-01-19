@@ -245,5 +245,4 @@ class MetricSendingQueueConsumerTest {
     verify(api).postCsm(any())
     executor.verifyExpectations()
   }
-
 }

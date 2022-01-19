@@ -114,5 +114,4 @@ class VisibilityTrackingTaskTest {
     private fun createTask(): VisibilityTrackingTask {
         return VisibilityTrackingTask(viewRef, visibilityChecker)
     }
-
 }

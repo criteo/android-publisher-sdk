@@ -72,5 +72,4 @@ class MapUtilTest {
 
     assertThat(map["hello"]).isSameAs(concurrent).isSameAs(value)
   }
-
 }

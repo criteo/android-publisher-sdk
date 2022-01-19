@@ -26,5 +26,4 @@ class InstrumentationUtilJavaTest {
   fun isRunningInInstrumentationTest_GivenJavaTest_ReturnTrue() {
     assertThat(InstrumentationUtil.isRunningInInstrumentationTest()).isFalse()
   }
-
 }

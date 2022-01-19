@@ -16,15 +16,11 @@
 
 package com.criteo.publisher.csm
 
-import android.content.Context
-import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
-import com.criteo.publisher.util.BuildConfigWrapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.InjectMocks
-import org.mockito.Mock
 import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
@@ -45,15 +41,6 @@ class MetricDirectoryUnitTest {
   @JvmField
   val mockedDependenciesRule = MockedDependenciesRule()
 
-  @MockBean
-  private lateinit var buildConfigWrapper: BuildConfigWrapper
-
-  @Mock
-  private lateinit var context: Context
-
-  @Mock
-  private lateinit var parser: MetricParser
-
   @InjectMocks
   private lateinit var directory: MetricDirectory
 
@@ -71,5 +58,4 @@ class MetricDirectoryUnitTest {
 
     assertThat(files).isEmpty()
   }
-
 }

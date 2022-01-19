@@ -105,5 +105,4 @@ class LiveBidRequestSenderTest {
       }
 
   private fun getScheduledExecutorService() = Executors.newSingleThreadScheduledExecutor()
-
 }

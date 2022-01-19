@@ -176,7 +176,6 @@ class TcfStrategyResolvedTests {
         }
     }
 
-
     @Test
     fun testResolveTcfStrategy_WhenNoConsentStringIsProvided_StrategyIsNull() {
         // Given

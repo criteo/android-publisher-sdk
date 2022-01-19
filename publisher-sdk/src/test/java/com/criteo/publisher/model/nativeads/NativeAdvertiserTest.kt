@@ -75,5 +75,4 @@ class NativeAdvertiserTest {
   private fun read(json: String): NativeAdvertiser {
     return jsonSerializer.read(NativeAdvertiser::class.java, ByteArrayInputStream(json.toByteArray()))
   }
-
 }

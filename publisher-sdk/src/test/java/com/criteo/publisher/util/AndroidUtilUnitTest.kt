@@ -37,9 +37,6 @@ class AndroidUtilUnitTest {
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private lateinit var context: Context
 
-  @Mock
-  private lateinit var deviceUtil: DeviceUtil
-
   @InjectMocks
   private lateinit var androidUtil: AndroidUtil
 

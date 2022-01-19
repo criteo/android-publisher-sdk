@@ -104,5 +104,4 @@ class MetricSendingQueueProducerTest {
       verify(queue, never()).offer(it)
     }
   }
-
 }

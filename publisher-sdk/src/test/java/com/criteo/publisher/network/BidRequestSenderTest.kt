@@ -129,7 +129,7 @@ class BidRequestSenderTest {
     @Test
     fun sendRemoteConfigRequest_GivenExecutor_IsWorkingInExecutor() {
         val executor = DirectMockExecutor()
-        givenNewSender(executor=executor)
+        givenNewSender(executor = executor)
 
         doAnswer {
             executor.expectIsRunningInExecutor()
@@ -174,7 +174,7 @@ class BidRequestSenderTest {
         val listener: CdbCallListener = mock()
         val request: CdbRequest = mock()
         val userAgent = "myUserAgent"
-        val exception = IOException()
+        val exception = IOException("")
 
         cdbRequestFactory.stub {
             on { createRequest(adUnits, contextData) } doReturn request
@@ -194,7 +194,7 @@ class BidRequestSenderTest {
     @Test
     fun sendBidRequest_GivenExecutor_IsWorkingInExecutor() {
         val executor = DirectMockExecutor()
-        givenNewSender(executor=executor)
+        givenNewSender(executor = executor)
 
         doAnswer {
             executor.expectIsRunningInExecutor()

@@ -79,7 +79,7 @@ class ImpressionTaskTest {
 
         task.onVisible()
 
-        verify(helper).notifyImpression(listener);
+        verify(helper).notifyImpression(listener)
     }
 
     @Test
@@ -92,5 +92,4 @@ class ImpressionTaskTest {
         verify(helper, times(1)).firePixels(any())
         verify(helper, times(1)).notifyImpression(any())
     }
-
 }

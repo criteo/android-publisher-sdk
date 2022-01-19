@@ -34,6 +34,7 @@ class CdbRequestTest {
   private lateinit var serializer: JsonSerializer
 
   @Test
+  @Suppress("LongMethod")
   fun toJson_GivenAllInformation_MapThemToJson() {
     val request = CdbRequest.create(
         "myRequestId",

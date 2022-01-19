@@ -42,6 +42,10 @@ class CriteoImageLoaderTest {
     private lateinit var picasso: Picasso
 
     @Mock
+    @Suppress("UnusedPrivateMember")
+    private lateinit var asyncResources: AsyncResources
+
+    @Mock
     private lateinit var requestCreatorAfterLoad: RequestCreator
 
     @Mock
@@ -49,9 +53,6 @@ class CriteoImageLoaderTest {
 
     @Mock
     private lateinit var requestCreatorAfterFetch: RequestCreator
-
-    @Mock
-    private lateinit var asyncResources: AsyncResources
 
     @InjectMocks
     private lateinit var criteoImageLoader: CriteoImageLoader
@@ -63,7 +64,7 @@ class CriteoImageLoaderTest {
     private lateinit var imageView: ImageView
 
     @Test
-    fun loadImageInto(){
+    fun loadImageInto() {
         // given
         whenever(picasso.load("http://fake_url")).thenReturn(requestCreatorAfterLoad)
         whenever(requestCreatorAfterLoad.placeholder(placeholder)).thenReturn(requestCreatorAfterPlaceholder)
@@ -78,7 +79,7 @@ class CriteoImageLoaderTest {
     }
 
     @Test
-    fun preload(){
+    fun preload() {
         // given
         whenever(picasso.load("http://fake_url")).thenReturn(requestCreatorAfterLoad)
         whenever(requestCreatorAfterLoad.placeholder(placeholder)).thenReturn(requestCreatorAfterFetch)

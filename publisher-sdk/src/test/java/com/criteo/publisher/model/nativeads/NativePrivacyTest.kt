@@ -67,5 +67,4 @@ class NativePrivacyTest {
   private fun read(json: String): NativePrivacy {
     return jsonSerializer.read(NativePrivacy::class.java, ByteArrayInputStream(json.toByteArray()))
   }
-
 }

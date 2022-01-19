@@ -307,8 +307,8 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
         }
       """.trimIndent()
         }
-        nativeAdUnit in listOf(NATIVE, NATIVE_PREPROD)
-            || placementId in listOf(MOPUB_MEDIATION_NATIVE_ADUNIT_ID, ADMOB_MEDIATION_NATIVE_ADUNIT_ID) -> {
+        nativeAdUnit in listOf(NATIVE, NATIVE_PREPROD) ||
+            placementId in listOf(MOPUB_MEDIATION_NATIVE_ADUNIT_ID, ADMOB_MEDIATION_NATIVE_ADUNIT_ID) -> {
           """
         {
           "impId": "$impressionId",
@@ -405,24 +405,28 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
     /**
      * Returns a VAST creative which is expected to be served by DSPs.
      */
-    @Suppress("MaxLineLength")
+    @Suppress("MaxLineLength", "LongMethod")
     private fun handleWrappedVastDspRequest(request: RecordedRequest): MockResponse {
       val isRewarded = request.requestUrl!!.queryParameter("rewarded") == "1"
 
-      val companionAd = if (isRewarded) """
-        <Creative sequence="1" id="2">
-          <CompanionAds>
-            <Companion id="endCard" width="320" height="480">
-              <StaticResource creativeType="image/png"><![CDATA[$STUB_CREATIVE_IMAGE]]></StaticResource>
-              <CompanionClickThrough><![CDATA[https://google.com/]]></CompanionClickThrough>
-              <CompanionClickTracking><![CDATA[$url/pixel?event=companion_click_1]]></CompanionClickTracking>
-              <CompanionClickTracking><![CDATA[$url/pixel?event=companion_click_2]]></CompanionClickTracking>
-              <TrackingEvents>
-                <Tracking event="creativeView"><![CDATA[$url/pixel?event=companion_creativeView]]></Tracking>
-              </TrackingEvents>
-            </Companion>
-          </CompanionAds>
-        </Creative>""".trimIndent() else ""
+      val companionAd = if (isRewarded) {
+        """
+              <Creative sequence="1" id="2">
+                <CompanionAds>
+                  <Companion id="endCard" width="320" height="480">
+                    <StaticResource creativeType="image/png"><![CDATA[$STUB_CREATIVE_IMAGE]]></StaticResource>
+                    <CompanionClickThrough><![CDATA[https://google.com/]]></CompanionClickThrough>
+                    <CompanionClickTracking><![CDATA[$url/pixel?event=companion_click_1]]></CompanionClickTracking>
+                    <CompanionClickTracking><![CDATA[$url/pixel?event=companion_click_2]]></CompanionClickTracking>
+                    <TrackingEvents>
+                      <Tracking event="creativeView"><![CDATA[$url/pixel?event=companion_creativeView]]></Tracking>
+                    </TrackingEvents>
+                  </Companion>
+                </CompanionAds>
+              </Creative>""".trimIndent()
+      } else {
+        ""
+      }
 
       val response = """
         <?xml version="1.0" encoding="utf-8"?>
