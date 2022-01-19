@@ -19,12 +19,12 @@ package com.criteo.testapp;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 import com.criteo.publisher.Criteo;
 
 public class PrivacyConsentSelectorActivity extends AppCompatActivity {

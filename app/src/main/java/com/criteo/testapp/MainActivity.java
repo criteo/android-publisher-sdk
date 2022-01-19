@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import androidx.appcompat.app.AppCompatActivity;
 import com.criteo.testapp.integration.IntegrationSelectorActivity;
 import java.util.Calendar;
@@ -35,8 +34,7 @@ public class MainActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-    this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-        WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
     setContentView(R.layout.activity_main);
     findViewById(R.id.buttonDfpCall).setOnClickListener((View v) -> {
       Intent intent = new Intent(getApplicationContext(), DfpActivity.class);

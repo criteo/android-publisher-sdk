@@ -43,6 +43,7 @@ public class AdWebViewClient extends WebViewClient {
     this.redirection = DependencyProvider.getInstance().provideRedirection();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public boolean shouldOverrideUrlLoading(WebView view, String url) {
     redirection.redirect(url, hostActivityName, listener);

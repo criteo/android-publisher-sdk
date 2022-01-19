@@ -109,6 +109,7 @@ dependencies {
     implementation(Deps.AndroidX.AppCompat)
     implementation(Deps.AndroidX.Constraint.ConstraintLayout)
     implementation(Deps.AndroidX.MaterialComponents)
+    implementation(Deps.AndroidX.Preferences)
     implementation(Deps.Square.Picasso.Picasso)
     implementation(Deps.Mockito.Android)
     implementation(Deps.Mockito.Kotlin)

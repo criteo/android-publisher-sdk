@@ -31,7 +31,7 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.annotation.RequiresApi;
-import androidx.test.InstrumentationRegistry;
+import androidx.test.core.app.ApplicationProvider;
 import com.criteo.publisher.util.CompletableFuture;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -114,8 +114,7 @@ public class WebViewLookup {
     ActivityLifecycleCallbacks lifecycleCallbacks = mock(ActivityLifecycleCallbacks.class);
     doAnswer(answerVoid(activityFuture::complete)).when(lifecycleCallbacks).onActivityResumed(any());
 
-    Application application = (Application) InstrumentationRegistry.getTargetContext()
-        .getApplicationContext();
+    Application application = ApplicationProvider.getApplicationContext();
     application.registerActivityLifecycleCallbacks(lifecycleCallbacks);
 
     executor.submit(() -> {
@@ -184,7 +183,7 @@ public class WebViewLookup {
     };
 
     runOnMainThreadAndWait(() -> {
-      WebView webView = new WebView(InstrumentationRegistry.getContext());
+      WebView webView = new WebView(ApplicationProvider.getApplicationContext());
       webView.clearCache(true);
       webView.setWebViewClient(client);
       webView.getSettings().setJavaScriptEnabled(true);

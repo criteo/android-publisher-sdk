@@ -197,6 +197,7 @@ public class CdbRequestFactory {
    * @param flattenMaps maps to merge into a nested structure
    * @return nested structure
    */
+  @SuppressWarnings({"SuspiciousMethodCalls", "ConstantConditions", "unchecked"})
   @NonNull
   @SafeVarargs
   @VisibleForTesting
@@ -221,7 +222,7 @@ public class CdbRequestFactory {
             Object nestedValue = node.get(pathPart);
             if (subNodes.contains(nestedValue)) {
               // It's a sub node, go deeper
-              //noinspection unchecked - safe because only Map<String, Object> are put in subNodes
+              // safe because only Map<String, Object> are put in subNodes
               node = (Map<String, Object>) nestedValue;
             } else {
               // It's a leaf, abort

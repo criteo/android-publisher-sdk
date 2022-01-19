@@ -138,11 +138,11 @@ public class TestNativeActivity extends Activity {
     return defaultDrawable;
   }
 
+  @SuppressWarnings("deprecation")
   private void initDefaultDrawable() {
     if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
       defaultDrawable = getResources().getDrawable(R.drawable.closebtn, getTheme());
     } else {
-      //noinspection deprecation
       defaultDrawable = getResources().getDrawable(R.drawable.closebtn);
     }
   }
