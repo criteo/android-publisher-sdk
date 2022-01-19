@@ -95,7 +95,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -112,8 +111,7 @@ public class BidManagerFunctionalTest {
   @Rule
   public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-  private DependencyProvider dependencyProvider;
-
+  @SpyBean
   private SdkCache cache;
 
   @MockBean
@@ -164,19 +162,23 @@ public class BidManagerFunctionalTest {
   @MockBean
   private ContextProvider contextProvider;
 
+  @SpyBean
+  private AdUnitMapper adUnitMapper;
+
+  @SpyBean
+  private Executor executor;
+
   @Inject
   private Logger logger;
+
+  @Inject
+  private BidManager bidManager;
 
   private int adUnitId = 0;
 
   @Before
   public void setUp() throws Exception {
-    dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-
-    cache = spy(new SdkCache(dependencyProvider.provideDeviceUtil()));
-
     when(context.getPackageName()).thenReturn("bundle.id");
-    dependencyProvider.setCriteoPublisherId("cpId");
     when(config.isPrefetchOnInitEnabled()).thenReturn(true);
 
     // Should be set to at least 1 because user-level silent mode is set the 0 included
@@ -202,7 +204,6 @@ public class BidManagerFunctionalTest {
 
     CdbResponseSlot slot = givenMockedCdbRespondingSlot();
 
-    BidManager bidManager = createBidManager();
     bidManager.prefetch(prefetchAdUnits);
     waitForIdleState();
 
@@ -226,7 +227,6 @@ public class BidManagerFunctionalTest {
 
     CdbResponseSlot slot = givenMockedCdbRespondingSlot();
 
-    BidManager bidManager = createBidManager();
     bidManager.prefetch(prefetchAdUnits);
     waitForIdleState();
 
@@ -241,7 +241,6 @@ public class BidManagerFunctionalTest {
 
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
@@ -267,7 +266,6 @@ public class BidManagerFunctionalTest {
 
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
@@ -284,7 +282,6 @@ public class BidManagerFunctionalTest {
 
     RewardedAdUnit adUnit = new RewardedAdUnit("filtered");
 
-    BidManager bidManager = createBidManager();
     CdbResponseSlot slot = bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     waitForIdleState();
 
@@ -301,7 +298,6 @@ public class BidManagerFunctionalTest {
 
     CdbResponseSlot slot = givenMockedCdbRespondingSlot();
 
-    BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     waitForIdleState();
 
@@ -321,20 +317,16 @@ public class BidManagerFunctionalTest {
         mock(AdUnit.class)
     );
 
-    AdUnitMapper mapper = givenMockedAdUnitMapper();
-
-    BidManager bidManager = createBidManager();
     bidManager.prefetch(prefetchAdUnits);
     waitForIdleState();
 
-    verifyNoInteractions(mapper);
+    verifyNoInteractions(adUnitMapper);
     assertShouldNotCallCdbAndNotPopulateCache();
     verify(config).refreshConfig(response);
   }
 
   @Test
   public void prefetch_GivenNoAdUnit_ShouldNotCallCdbAndPopulateCache() throws Exception {
-    BidManager bidManager = createBidManager();
     bidManager.prefetch(emptyList());
     waitForIdleState();
 
@@ -346,7 +338,6 @@ public class BidManagerFunctionalTest {
     RemoteConfigResponse response = mock(RemoteConfigResponse.class);
     when(api.loadConfig(any())).thenReturn(response);
 
-    BidManager bidManager = spy(createBidManager());
     bidManager.prefetch(emptyList());
     waitForIdleState();
 
@@ -367,13 +358,10 @@ public class BidManagerFunctionalTest {
         sampleAdUnit()
     ));
 
-    AdUnitMapper mapper = givenMockedAdUnitMapper();
-
     CdbResponseSlot slot = givenMockedCdbRespondingSlot();
 
-    when(mapper.mapToChunks(prefetchAdUnits)).thenReturn(mappedAdUnitsChunks);
+    doReturn(mappedAdUnitsChunks).when(adUnitMapper).mapToChunks(prefetchAdUnits);
 
-    BidManager bidManager = createBidManager();
     bidManager.prefetch(prefetchAdUnits);
     waitForIdleState();
 
@@ -386,10 +374,10 @@ public class BidManagerFunctionalTest {
     // Remove concurrency. This would make this test really hard to follow.
     // We should wait for idle state of main thread every time because the async task post execution
     // is running on it.
-    when(dependencyProvider.provideThreadPoolExecutor()).thenReturn(runnable -> {
+    doAnswer(answerVoid((Runnable runnable) -> {
       runnable.run();
       waitForMessageQueueToBeIdle();
-    });
+    })).when(executor).execute(any());
 
     // Deactivate logging as it interferes with verification
     doNothing().when(logger).log(any());
@@ -409,8 +397,7 @@ public class BidManagerFunctionalTest {
         requestedAdUnits3
     );
 
-    AdUnitMapper mapper = givenMockedAdUnitMapper();
-    when(mapper.mapToChunks(prefetchAdUnits)).thenReturn(mappedAdUnitsChunks);
+    doReturn(mappedAdUnitsChunks).when(adUnitMapper).mapToChunks(prefetchAdUnits);
 
     CdbResponse response1 = givenMockedCdbResponseWithValidSlot(1);
     CdbResponse response3 = givenMockedCdbResponseWithValidSlot(3);
@@ -422,7 +409,7 @@ public class BidManagerFunctionalTest {
         .thenReturn(response3);
     when(api.loadConfig(any())).thenReturn(remoteConfigResponse);
 
-    BidManager bidManager = spy(createBidManager());
+    bidManager = spy(bidManager);
     bidManager.prefetch(prefetchAdUnits);
     waitForIdleState();
 
@@ -469,7 +456,6 @@ public class BidManagerFunctionalTest {
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenKillSwitchIs(true);
 
-    BidManager bidManager = createBidManager();
     bidManager.prefetch(singletonList(adUnit));
     waitForIdleState();
 
@@ -489,7 +475,6 @@ public class BidManagerFunctionalTest {
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenRemoteConfigWithKillSwitchEnabled();
 
-    BidManager bidManager = createBidManager();
     bidManager.prefetch(singletonList(adUnit));
     waitForIdleState();
 
@@ -507,7 +492,6 @@ public class BidManagerFunctionalTest {
   public void prefetch_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo()
       throws Exception {
     callingCdb_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo(adUnit -> {
-      BidManager bidManager = createBidManager();
       bidManager.prefetch(singletonList(adUnit));
     });
   }
@@ -516,7 +500,6 @@ public class BidManagerFunctionalTest {
   public void getBidForAdUnitAndPrefetch_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo()
       throws Exception {
     callingCdb_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo(adUnit -> {
-      BidManager bidManager = createBidManager();
       bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     });
   }
@@ -573,7 +556,6 @@ public class BidManagerFunctionalTest {
       throws Exception {
     AdUnit adUnit = givenMockedAdUnitMappingTo(null);
 
-    BidManager bidManager = createBidManager();
     CdbResponseSlot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     waitForIdleState();
 
@@ -584,7 +566,6 @@ public class BidManagerFunctionalTest {
   @Test
   public void getBidForAdUnitAndPrefetch_GivenNullAdUnit_ReturnNullAndDoNotCallCdb()
       throws Exception {
-    BidManager bidManager = createBidManager();
     CdbResponseSlot bid = bidManager.getBidForAdUnitAndPrefetch(null, contextData);
     waitForIdleState();
 
@@ -599,7 +580,6 @@ public class BidManagerFunctionalTest {
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     CdbResponseSlot slot = givenNotExpiredValidCachedBid(cacheAdUnit);
 
-    BidManager bidManager = createBidManager();
     CdbResponseSlot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
 
     assertEquals(slot, bid);
@@ -615,7 +595,6 @@ public class BidManagerFunctionalTest {
     givenNotExpiredValidCachedBid(cacheAdUnit);
     CdbResponseSlot slot = givenMockedCdbRespondingSlot();
 
-    BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     waitForIdleState();
 
@@ -645,7 +624,7 @@ public class BidManagerFunctionalTest {
       return response;
     });
 
-    BidManager bidManager = spy(createBidManager());
+    bidManager = spy(bidManager);
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     cdbRequestHasStarted.await();
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
@@ -677,7 +656,7 @@ public class BidManagerFunctionalTest {
     // We force the CDB call to be after the second bid manager call to make the test deterministic.
     CountDownLatch bidManagerIsCalledASecondTime = givenExecutorWaitingOn();
 
-    BidManager bidManager = spy(createBidManager());
+    bidManager = spy(bidManager);
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     bidManagerIsCalledASecondTime.countDown();
@@ -705,7 +684,6 @@ public class BidManagerFunctionalTest {
 
     givenNoLastBid(cacheAdUnit);
 
-    BidManager bidManager = createBidManager();
     CdbResponseSlot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
 
     assertNull(bid);
@@ -721,7 +699,6 @@ public class BidManagerFunctionalTest {
 
     givenNoLastBid(cacheAdUnit);
 
-    BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     waitForIdleState();
 
@@ -738,7 +715,6 @@ public class BidManagerFunctionalTest {
 
     when(api.loadCdb(any(), any())).thenThrow(IOException.class);
 
-    BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     waitForIdleState();
 
@@ -754,7 +730,6 @@ public class BidManagerFunctionalTest {
     CdbResponseSlot slot = givenMockedCdbRespondingSlot();
     givenMockedClockSetTo(42);
 
-    BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     waitForIdleState();
 
@@ -769,7 +744,6 @@ public class BidManagerFunctionalTest {
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     CdbResponseSlot internalBid = givenExpiredValidCachedBid(cacheAdUnit);
 
-    BidManager bidManager = createBidManager();
     CdbResponseSlot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
 
     assertNull(bid);
@@ -784,7 +758,6 @@ public class BidManagerFunctionalTest {
     givenExpiredValidCachedBid(cacheAdUnit);
     CdbResponseSlot slot = givenMockedCdbRespondingSlot();
 
-    BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     waitForIdleState();
 
@@ -799,7 +772,6 @@ public class BidManagerFunctionalTest {
     when(slot.getCpmAsNumber()).thenReturn(0.);
     when(slot.getTtlInSeconds()).thenReturn(0);
 
-    BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     waitForIdleState();
 
@@ -812,7 +784,6 @@ public class BidManagerFunctionalTest {
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     CdbResponseSlot slot = givenSilentBidFetched();
 
-    BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     waitForIdleState();
 
@@ -826,7 +797,6 @@ public class BidManagerFunctionalTest {
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenNotExpiredSilentModeBidCached(cacheAdUnit);
 
-    BidManager bidManager = createBidManager();
     CdbResponseSlot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
 
     assertNull(bid);
@@ -841,7 +811,6 @@ public class BidManagerFunctionalTest {
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenNotExpiredSilentModeBidCached(cacheAdUnit);
 
-    BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     waitForIdleState();
 
@@ -855,7 +824,6 @@ public class BidManagerFunctionalTest {
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     CdbResponseSlot internalBid = givenExpiredSilentModeBidCached(cacheAdUnit);
 
-    BidManager bidManager = createBidManager();
     CdbResponseSlot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
 
     assertNull(bid);
@@ -870,7 +838,6 @@ public class BidManagerFunctionalTest {
     givenExpiredSilentModeBidCached(cacheAdUnit);
     CdbResponseSlot slot = givenMockedCdbRespondingSlot();
 
-    BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     waitForIdleState();
 
@@ -883,7 +850,6 @@ public class BidManagerFunctionalTest {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
 
-    BidManager bidManager = createBidManager();
     givenMockedClockSetTo(0);
     bidManager.setTimeToNextCall(60); // Silent until 60_000 excluded
     givenMockedClockSetTo(60_000 - 1);
@@ -900,7 +866,6 @@ public class BidManagerFunctionalTest {
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     CdbResponseSlot slot = givenMockedCdbRespondingSlot();
 
-    BidManager bidManager = createBidManager();
     givenMockedClockSetTo(0);
     bidManager.setTimeToNextCall(60); // Silent until 60_000 included
     givenMockedClockSetTo(60_001);
@@ -919,7 +884,7 @@ public class BidManagerFunctionalTest {
 
     when(cdbResponse.getTimeToNextCall()).thenReturn(1337);
 
-    BidManager bidManager = spy(createBidManager());
+    bidManager = spy(bidManager);
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     waitForIdleState();
 
@@ -932,8 +897,6 @@ public class BidManagerFunctionalTest {
       throws Exception {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-
-    BidManager bidManager = createBidManager();
 
     // Given first CDB call without user-level silence
     CdbResponse cdbResponse = givenMockedCdbResponse();
@@ -967,7 +930,6 @@ public class BidManagerFunctionalTest {
     when(slot.getCpmAsNumber()).thenReturn(1.);
     when(slot.getTtlInSeconds()).thenReturn(0);
 
-    BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     waitForIdleState();
 
@@ -984,7 +946,6 @@ public class BidManagerFunctionalTest {
 
     when(slot.isValid()).thenReturn(false);
 
-    BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     waitForIdleState();
 
@@ -998,7 +959,6 @@ public class BidManagerFunctionalTest {
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenKillSwitchIs(true);
 
-    BidManager bidManager = createBidManager();
     bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     waitForIdleState();
 
@@ -1013,7 +973,6 @@ public class BidManagerFunctionalTest {
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenMockedCdbRespondingSlot();
 
-    BidManager bidManager = createBidManager();
     BidListener bidListener = mock(BidListener.class);
 
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
@@ -1032,13 +991,12 @@ public class BidManagerFunctionalTest {
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     givenMockedCdbRespondingSlot();
 
-    BidManager bidManager = createBidManager();
-    BidManager bidManagerSpy = Mockito.spy(bidManager);
-    doReturn(null).when(bidManagerSpy).mapToCacheAdUnit(adUnit);
+    bidManager = spy(bidManager);
+    doReturn(null).when(bidManager).mapToCacheAdUnit(adUnit);
 
     BidListener bidListener = mock(BidListener.class);
 
-    bidManagerSpy.getLiveBidForAdUnit(adUnit, contextData, bidListener);
+    bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
     verify(bidListener).onNoBid();
@@ -1151,7 +1109,6 @@ public class BidManagerFunctionalTest {
     CdbResponse cdbResponse = givenMockedCdbResponse();
     when(cdbResponse.getTimeToNextCall()).thenReturn(10);
 
-    BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
@@ -1170,7 +1127,6 @@ public class BidManagerFunctionalTest {
     CdbResponse cdbResponse = givenMockedCdbResponse();
     when(cdbResponse.getTimeToNextCall()).thenReturn(10);
 
-    BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
@@ -1187,8 +1143,6 @@ public class BidManagerFunctionalTest {
 
     CdbResponse cdbResponse = givenMockedCdbResponse();
     when(cdbResponse.getTimeToNextCall()).thenReturn(0);
-
-    BidManager bidManager = createBidManager();
 
     givenDuringLiveBidCall(() -> bidManager.setTimeToNextCall(42));
 
@@ -1209,8 +1163,6 @@ public class BidManagerFunctionalTest {
 
     CdbResponse cdbResponse = givenMockedCdbResponse();
     when(cdbResponse.getTimeToNextCall()).thenReturn(0);
-
-    BidManager bidManager = createBidManager();
 
     givenDuringLiveBidCall(() -> bidManager.setTimeToNextCall(42));
 
@@ -1236,7 +1188,6 @@ public class BidManagerFunctionalTest {
 
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
@@ -1257,7 +1208,6 @@ public class BidManagerFunctionalTest {
     CdbResponseSlot slot = givenNotExpiredValidCachedBid(cacheAdUnit);
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
@@ -1277,7 +1227,6 @@ public class BidManagerFunctionalTest {
     CdbResponseSlot newSlot = givenMockedCdbRespondingSlot();
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
@@ -1300,7 +1249,6 @@ public class BidManagerFunctionalTest {
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
@@ -1319,7 +1267,6 @@ public class BidManagerFunctionalTest {
     CdbResponseSlot newSlot = givenMockedCdbRespondingSlot();
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
@@ -1338,7 +1285,6 @@ public class BidManagerFunctionalTest {
     CdbResponseSlot cachedSlot = givenExpiredValidCachedBid(cacheAdUnit);
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
@@ -1358,7 +1304,6 @@ public class BidManagerFunctionalTest {
     CdbResponseSlot newSlot = givenMockedCdbRespondingSlot();
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
@@ -1379,7 +1324,6 @@ public class BidManagerFunctionalTest {
 
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
@@ -1402,7 +1346,6 @@ public class BidManagerFunctionalTest {
 
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
@@ -1420,7 +1363,6 @@ public class BidManagerFunctionalTest {
 
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
@@ -1439,7 +1381,6 @@ public class BidManagerFunctionalTest {
 
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
@@ -1458,7 +1399,6 @@ public class BidManagerFunctionalTest {
 
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
@@ -1477,7 +1417,6 @@ public class BidManagerFunctionalTest {
 
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
@@ -1501,7 +1440,6 @@ public class BidManagerFunctionalTest {
 
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
@@ -1526,7 +1464,6 @@ public class BidManagerFunctionalTest {
 
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManager = createBidManager();
     bidManager.getLiveBidForAdUnit(adUnit, contextData, bidListener);
     waitForIdleState();
 
@@ -1557,8 +1494,6 @@ public class BidManagerFunctionalTest {
       secondSlotIsReceived.countDown();
     })).when(bidListener).onBidResponse(newSlot2);
 
-    BidManager bidManager = createBidManager();
-
     doAnswer(invocation -> {
       // Fetch a second bid and wait until it is received by listener
       // Situation is unblocked only if multiple concurrent calls are possible
@@ -1584,7 +1519,6 @@ public class BidManagerFunctionalTest {
   public void setCacheAdUnits_GivenValidCdbResponseSlot_ShouldTriggerBidCached() {
     CdbResponseSlot cdbResponseSlot = givenValidCdbResponseSlot();
 
-    BidManager bidManager = createBidManager();
     bidManager.setCacheAdUnits(singletonList(cdbResponseSlot));
 
     verify(bidLifecycleListener).onBidCached(cdbResponseSlot);
@@ -1600,7 +1534,6 @@ public class BidManagerFunctionalTest {
         invalidCdbResponseSlot
     );
 
-    BidManager bidManager = createBidManager();
     bidManager.setCacheAdUnits(cdbResponseSlots);
 
     verify(bidLifecycleListener).onBidCached(validCdbResponseSlot);
@@ -1615,14 +1548,13 @@ public class BidManagerFunctionalTest {
         invalidCdbResponseSlot
     );
 
-    BidManager bidManager = createBidManager();
     bidManager.setCacheAdUnits(cdbResponseSlots);
 
     verify(bidLifecycleListener, never()).onBidCached(any());
   }
 
   private BidManager givenGlobalSilenceMode(boolean enabled) {
-    BidManager bidManagerSpy = spy(createBidManager());
+    BidManager bidManagerSpy = spy(bidManager);
     doReturn(enabled).when(bidManagerSpy).isGlobalSilenceEnabled();
     return bidManagerSpy;
   }
@@ -1758,22 +1690,31 @@ public class BidManagerFunctionalTest {
   private CountDownLatch givenExecutorWaitingOn() {
     CountDownLatch waitingLatch = new CountDownLatch(1);
 
-    Executor executor = dependencyProvider.provideThreadPoolExecutor();
-    when(dependencyProvider.provideThreadPoolExecutor())
-        .thenAnswer(invocation -> (Executor) command -> {
-          Runnable waitingCommand = () -> {
-            try {
-              waitingLatch.await();
-            } catch (InterruptedException e) {
-              throw new RuntimeException(e);
-            }
-            command.run();
-          };
-
-          executor.execute(waitingCommand);
-        });
+    doAnswer(answerVoid((Runnable command) -> {
+      executor.execute(new WaitingOnRunnable(command, waitingLatch));
+    })).when(executor).execute(argThat(command -> !(command instanceof WaitingOnRunnable)));
 
     return waitingLatch;
+  }
+
+  private static class WaitingOnRunnable implements Runnable {
+    private final Runnable command;
+    private final CountDownLatch waitingLatch;
+
+    WaitingOnRunnable(Runnable command, CountDownLatch waitingLatch) {
+      this.command = command;
+      this.waitingLatch = waitingLatch;
+    }
+
+    @Override
+    public void run() {
+      try {
+        waitingLatch.await();
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+      command.run();
+    }
   }
 
   private void givenDuringLiveBidCall(@NonNull Runnable action) {
@@ -1808,19 +1749,11 @@ public class BidManagerFunctionalTest {
     return response;
   }
 
-  private AdUnitMapper givenMockedAdUnitMapper() {
-    AdUnitMapper mapper = mock(AdUnitMapper.class);
-    doReturn(mapper).when(dependencyProvider).provideAdUnitMapper();
-    return mapper;
-  }
-
   private AdUnit givenMockedAdUnitMappingTo(CacheAdUnit toAdUnit) {
     AdUnit fromAdUnit = mock(AdUnit.class);
 
-    AdUnitMapper adUnitMapper = givenMockedAdUnitMapper();
-    when(adUnitMapper.map(fromAdUnit)).thenReturn(toAdUnit);
-    when(adUnitMapper.mapToChunks(singletonList(fromAdUnit)))
-        .thenReturn(singletonList(singletonList(toAdUnit)));
+    doReturn(toAdUnit).when(adUnitMapper).map(fromAdUnit);
+    doReturn(singletonList(singletonList(toAdUnit))).when(adUnitMapper).mapToChunks(singletonList(fromAdUnit));
 
     return fromAdUnit;
   }
@@ -1871,21 +1804,6 @@ public class BidManagerFunctionalTest {
         deviceUtil.getCurrentScreenSize(),
         adUnit.getAdUnitId(),
         adUnit.getAdUnitType()
-    );
-  }
-
-  private BidManager createBidManager() {
-    return new BidManager(
-        cache,
-        dependencyProvider.provideConfig(),
-        dependencyProvider.provideClock(),
-        dependencyProvider.provideAdUnitMapper(),
-        dependencyProvider.provideBidRequestSender(),
-        dependencyProvider.provideLiveBidRequestSender(),
-        dependencyProvider.provideBidLifecycleListener(),
-        dependencyProvider.provideMetricSendingQueueConsumer(),
-        remoteLogSendingQueueConsumer,
-        dependencyProvider.provideConsentData()
     );
   }
 
