@@ -1,4 +1,5 @@
 # Next Version
+- Bump AGP, Gradle and Kotlin version
 
 # Version 4.6.0
 
