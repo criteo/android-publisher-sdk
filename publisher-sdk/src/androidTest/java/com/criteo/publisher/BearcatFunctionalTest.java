@@ -22,8 +22,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,7 +35,6 @@ import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.util.AdvertisingInfo;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
@@ -60,20 +57,17 @@ public class BearcatFunctionalTest {
   @MockBean
   private UserPrivacyUtil userPrivacyUtil;
 
-  private DependencyProvider dependencyProvider;
+  @SpyBean
+  private DeviceInfo deviceInfo;
 
-  @Before
-  public void setUp() throws Exception {
-    dependencyProvider = mockedDependenciesRule.getDependencyProvider();
-  }
+  @SpyBean
+  private AdvertisingInfo advertisingInfo;
 
   @Test
   public void init_GivenUserAgentAndLaunchedActivity_SendInitEventWithUserAgent() throws Exception {
     givenAppEventsCanBeCalled();
     when(userPrivacyUtil.getGdprConsentData()).thenReturn("fakeConsentData");
 
-    DeviceInfo deviceInfo = spy(dependencyProvider.provideDeviceInfo());
-    doReturn(deviceInfo).when(dependencyProvider).provideDeviceInfo();
     doReturn(completedFuture("expectedUserAgent")).when(deviceInfo).getUserAgent();
 
     givenInitializedCriteo();
@@ -90,11 +84,8 @@ public class BearcatFunctionalTest {
     givenAppEventsCanBeCalled();
     when(userPrivacyUtil.getGdprConsentData()).thenReturn("fakeConsentData");
 
-    AdvertisingInfo advertisingInfo = mock(AdvertisingInfo.class);
-    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(false);
-    when(advertisingInfo.getAdvertisingId()).thenReturn("myAdvertisingId");
-
-    doReturn(advertisingInfo).when(dependencyProvider).provideAdvertisingInfo();
+    doReturn(false).when(advertisingInfo).isLimitAdTrackingEnabled();
+    doReturn("myAdvertisingId").when(advertisingInfo).getAdvertisingId();
 
     givenInitializedCriteo();
     activityRule.launchActivity(new Intent());
@@ -117,11 +108,8 @@ public class BearcatFunctionalTest {
     givenAppEventsCanBeCalled();
     when(userPrivacyUtil.getGdprConsentData()).thenReturn("fakeConsentData");
 
-    AdvertisingInfo advertisingInfo = mock(AdvertisingInfo.class);
-    when(advertisingInfo.isLimitAdTrackingEnabled()).thenReturn(true);
-    when(advertisingInfo.getAdvertisingId()).thenReturn("myAdvertisingId");
-
-    doReturn(advertisingInfo).when(dependencyProvider).provideAdvertisingInfo();
+    doReturn(true).when(advertisingInfo).isLimitAdTrackingEnabled();
+    doReturn("myAdvertisingId").when(advertisingInfo).getAdvertisingId();
 
     givenInitializedCriteo();
     activityRule.launchActivity(new Intent());

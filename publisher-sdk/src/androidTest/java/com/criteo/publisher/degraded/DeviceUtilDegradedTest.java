@@ -21,6 +21,7 @@ import static org.junit.Assert.assertFalse;
 import android.os.Build.VERSION;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.util.DeviceUtil;
+import javax.inject.Inject;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,6 +32,9 @@ public class DeviceUtilDegradedTest {
   @Rule
   public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
+  @Inject
+  private DeviceUtil deviceUtil;
+
   @Before
   public void setUp() throws Exception {
     assumeIsDegraded();
@@ -38,7 +42,6 @@ public class DeviceUtilDegradedTest {
 
   @Test
   public void isVersionSupported_GivenDegradedFunctionality_ReturnsFalse() throws Exception {
-    DeviceUtil deviceUtil = mockedDependenciesRule.getDependencyProvider().provideDeviceUtil();
     boolean versionSupported = deviceUtil.isVersionSupported();
     assertFalse(versionSupported);
   }
