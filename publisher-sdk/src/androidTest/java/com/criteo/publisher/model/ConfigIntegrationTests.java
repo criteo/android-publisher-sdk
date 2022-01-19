@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -71,6 +72,12 @@ public class ConfigIntegrationTests {
   @SpyBean
   private BuildConfigWrapper buildConfigWrapper;
 
+  @SpyBean
+  private PubSdkApi api;
+
+  @SpyBean
+  private Config config;
+
   @Before
   public void setup() throws Exception {
     givenEmptyLocalStorage();
@@ -85,11 +92,11 @@ public class ConfigIntegrationTests {
   public void isKillSwitchEnabled_GivenEmptyLocalStorageAndNoRemoteConfig_KillSwitchIsDisabledByDefault()
       throws Exception {
     givenEmptyLocalStorage();
+    mockedDependenciesRule.resetAllDependencies();
     givenRemoteConfigInError();
 
     givenInitializedCriteo();
     waitForIdleState();
-    Config config = getConfig();
 
     assertFalse(config.isKillSwitchEnabled());
   }
@@ -111,11 +118,11 @@ public class ConfigIntegrationTests {
   private void isKillSwitchEnabled_GivenKillSwitchInLocalStorageAndNoRemoteConfig_ReturnsLocalStorageValue(
       boolean isEnabled) throws Exception {
     givenKillSwitchInLocalStorage(isEnabled);
+    mockedDependenciesRule.resetAllDependencies();
     givenRemoteConfigInError();
 
     givenInitializedCriteo();
     waitForIdleState();
-    Config config = getConfig();
 
     assertEquals(isEnabled, config.isKillSwitchEnabled());
   }
@@ -168,9 +175,6 @@ public class ConfigIntegrationTests {
 
   @Test
   public void refreshConfig_GivenRemoteConfigInError_DoesNotUpdateConfig() throws Exception {
-    Config config = mock(Config.class);
-    doReturn(config).when(mockedDependenciesRule.getDependencyProvider()).provideConfig();
-
     givenRemoteConfigInError();
 
     givenInitializedCriteo();
@@ -181,9 +185,7 @@ public class ConfigIntegrationTests {
 
   @Test
   public void refreshConfig_GivenRemoteConfigWithGoodResponse_UpdateConfig() throws Exception {
-    Config config = mock(Config.class);
     when(config.isKillSwitchEnabled()).thenReturn(false);
-    doReturn(config).when(mockedDependenciesRule.getDependencyProvider()).provideConfig();
 
     RemoteConfigResponse response = mock(RemoteConfigResponse.class);
     givenRemoteConfigWithResponse(response);
@@ -197,9 +199,7 @@ public class ConfigIntegrationTests {
   @Test
   public void refreshConfig_GivenRemoteConfigWithGoodResponseAndKillSwitchIsEnabled_UpdateConfig()
       throws Exception {
-    Config config = mock(Config.class);
     when(config.isKillSwitchEnabled()).thenReturn(true);
-    doReturn(config).when(mockedDependenciesRule.getDependencyProvider()).provideConfig();
 
     RemoteConfigResponse response = mock(RemoteConfigResponse.class);
     givenRemoteConfigWithResponse(response);
@@ -380,18 +380,13 @@ public class ConfigIntegrationTests {
     assertEquals(expectedRemoteConfig, getRemoteConfigInLocalStorage());
   }
 
-  private Config getConfig() {
-    return mockedDependenciesRule.getDependencyProvider().provideConfig();
-  }
-
   private RemoteConfigResponse createRemoteConfigWithKillSwitch(Boolean isEnabled) {
     return RemoteConfigResponse.createEmpty().withKillSwitch(isEnabled);
   }
 
   private void givenRemoteConfigInError() throws IOException {
     doReturn(false).when(buildConfigWrapper).preconditionThrowsOnException();
-    PubSdkApi api = givenMockedRemoteConfig();
-    when(api.loadConfig(any())).thenThrow(IOException.class);
+    doThrow(IOException.class).when(api).loadConfig(any());
   }
 
   private void givenRemoteConfigResponseWithKillSwitch(Boolean isEnabled) throws Exception {
@@ -400,14 +395,7 @@ public class ConfigIntegrationTests {
   }
 
   private void givenRemoteConfigWithResponse(RemoteConfigResponse response) throws IOException {
-    PubSdkApi api = givenMockedRemoteConfig();
-    when(api.loadConfig(any())).thenReturn(response);
-  }
-
-  private PubSdkApi givenMockedRemoteConfig() {
-    PubSdkApi api = mock(PubSdkApi.class);
-    when(mockedDependenciesRule.getDependencyProvider().providePubSdkApi()).thenReturn(api);
-    return api;
+    doReturn(response).when(api).loadConfig(any());
   }
 
   @Nullable
