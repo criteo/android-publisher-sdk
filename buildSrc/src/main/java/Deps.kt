@@ -26,6 +26,7 @@ object Deps {
     const val Annotations = "androidx.annotation:annotation:1.0.0"
     const val MaterialComponents = "com.google.android.material:material:1.3.0"
     const val MultiDex = "androidx.multidex:multidex:2.0.1"
+    const val Preferences = "androidx.preference:preference:1.1.1"
     const val RecyclerView = "androidx.recyclerview:recyclerview:1.2.0"
     const val SupportCoreUtils = "androidx.legacy:legacy-support-core-utils:1.0.0"
 

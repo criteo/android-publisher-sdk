@@ -87,20 +87,13 @@ public class UiHelper {
   }
 
   public void drawViews(View... views) {
-    View contentView;
-
-    if (views.length > 1 || true) {
-      FrameLayout layout = new FrameLayout(activityRule.getActivity());
-      for (View view : views) {
-        layout.addView(view);
-      }
-      contentView = layout;
-    } else {
-      contentView = views[0];
+    FrameLayout layout = new FrameLayout(activityRule.getActivity());
+    for (View view : views) {
+      layout.addView(view);
     }
 
     runOnMainThreadAndWait(() -> {
-      activityRule.getActivity().setContentView(contentView);
+      activityRule.getActivity().setContentView(layout);
     });
 
     waitForUiReady();

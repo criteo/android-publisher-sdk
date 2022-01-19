@@ -128,10 +128,10 @@ class AdMobMediationActivity : AppCompatActivity() {
     nativeView.findViewById<TextView>(R.id.ad_call_to_action).text = callToAction
     nativeView.findViewById<TextView>(R.id.ad_advertiser).text = advertiser
     nativeView.findViewById<TextView>(R.id.ad_store).text = extras["crtn_advdomain"] as String?
-    nativeView.findViewById<ImageView>(R.id.ad_app_icon).setImageDrawable(icon.drawable)
+    nativeView.findViewById<ImageView>(R.id.ad_app_icon).setImageDrawable(icon?.drawable)
 
     nativeView.mediaView = nativeView.findViewById(R.id.ad_media)
-    nativeView.mediaView.setMediaContent(mediaContent)
+    mediaContent?.let { nativeView.mediaView?.setMediaContent(it) }
 
     nativeView.setNativeAd(this)
   }

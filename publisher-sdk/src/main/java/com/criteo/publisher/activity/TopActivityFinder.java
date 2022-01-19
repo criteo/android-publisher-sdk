@@ -42,6 +42,7 @@ public class TopActivityFinder {
     this.context = context;
   }
 
+  @SuppressWarnings("deprecation")
   @Nullable
   public ComponentName getTopActivityName() {
     Activity topActivity = topActivityRef.get();
@@ -59,7 +60,6 @@ public class TopActivityFinder {
 
     List<RunningTaskInfo> taskInfo;
     try {
-      //noinspection deprecation
       taskInfo = am.getRunningTasks(1);
     } catch (SecurityException e) {
       PreconditionsUtil.throwOrLog(e);

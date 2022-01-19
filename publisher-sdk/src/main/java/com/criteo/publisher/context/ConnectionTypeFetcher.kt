@@ -98,6 +98,7 @@ internal class ConnectionTypeFetcher(
   }
 
   // The SDK won't ask for the permission. It uses it only if publisher's app already got granted for it.
+  @Suppress("DEPRECATION")
   @SuppressLint("MissingPermission")
   @VisibleForTesting
   internal fun fetchNewCellularConnectionType(telephonyManager: TelephonyManager?): ConnectionType {

@@ -19,11 +19,10 @@ package com.criteo.testapp;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import com.criteo.publisher.util.BuildConfigWrapper;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -33,15 +32,11 @@ public class SplashActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-    this.getWindow().setFlags(
-        WindowManager.LayoutParams.FLAG_FULLSCREEN,
-        WindowManager.LayoutParams.FLAG_FULLSCREEN
-    );
     setContentView(R.layout.activity_splash);
 
     TextView labelSdkVersion = findViewById(R.id.labelSdkVersion);
     labelSdkVersion.setText(String.format(getString(R.string.sdk_version_label), BuildConfig.VERSION_NAME));
-    new Handler().postDelayed(() -> {
+    new Handler(Looper.getMainLooper()).postDelayed(() -> {
       Intent intent = new Intent(SplashActivity.this, MainActivity.class);
       startActivity(intent);
     }, SPLASH_TIME);

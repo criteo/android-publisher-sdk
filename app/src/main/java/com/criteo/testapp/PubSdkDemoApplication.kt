@@ -16,6 +16,7 @@
 package com.criteo.testapp
 
 import android.os.Handler
+import android.os.Looper
 import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
 import androidx.multidex.MultiDexApplication
@@ -64,7 +65,7 @@ class PubSdkDemoApplication : MultiDexApplication() {
     // JUnit is in the classpath through the test-utils module. So LeakCanary is deactivated automatically just after
     // the Application#onCreate.
     // Then we need to re-enable it explicitly.
-    Handler().post {
+    Handler(Looper.getMainLooper()).post {
       config = config.copy(dumpHeap = true)
     }
 

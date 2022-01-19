@@ -18,10 +18,10 @@ package com.criteo.testapp
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
 
 class GdprActivity : AppCompatActivity() {
 
