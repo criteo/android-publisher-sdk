@@ -113,7 +113,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
 import kotlin.jvm.functions.Function0;
 
 /**
@@ -123,7 +122,7 @@ public class DependencyProvider {
 
   protected static DependencyProvider instance;
 
-  private final ConcurrentMap<Class<?>, Object> services = new ConcurrentHashMap<>();
+  protected final ConcurrentMap<Class<?>, Object> services = new ConcurrentHashMap<>();
 
   private Application application;
   private String criteoPublisherId;
@@ -234,7 +233,7 @@ public class DependencyProvider {
 
   @NonNull
   public Executor provideThreadPoolExecutor() {
-    return getOrCreate(ThreadPoolExecutor.class, new ThreadPoolExecutorFactory());
+    return getOrCreate(Executor.class, new ThreadPoolExecutorFactory());
   }
 
   @NonNull
@@ -272,7 +271,7 @@ public class DependencyProvider {
   @NonNull
   public BidManager provideBidManager() {
     return getOrCreate(BidManager.class, () -> new BidManager(
-        new SdkCache(provideDeviceUtil()),
+        provideSdkCache(),
         provideConfig(),
         provideClock(),
         provideAdUnitMapper(),
@@ -282,6 +281,13 @@ public class DependencyProvider {
         provideMetricSendingQueueConsumer(),
         provideRemoteLogSendingQueueConsumer(),
         provideConsentData()
+    ));
+  }
+
+  @NonNull
+  public SdkCache provideSdkCache() {
+    return getOrCreate(SdkCache.class, () -> new SdkCache(
+        provideDeviceUtil()
     ));
   }
 
@@ -502,7 +508,7 @@ public class DependencyProvider {
   }
 
   @SuppressWarnings("unchecked")
-  protected <T> T getOrCreate(Class<T> klass, Factory<T> factory) {
+  protected <T> T getOrCreate(Class<T> klass, Factory<? extends T> factory) {
     Object service = MapUtilKt.getOrCompute(services, klass, (Function0<T>) factory::create);
 
     // safe because the services map is only filled there by typed factory

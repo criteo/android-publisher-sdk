@@ -16,15 +16,13 @@
 
 package com.criteo.publisher.concurrent;
 
-import static org.mockito.Mockito.doReturn;
-
 import android.annotation.SuppressLint;
 import android.os.Build.VERSION_CODES;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.mock.DependencyProviderRef;
+import com.criteo.publisher.mock.TestDependencyProvider;
 import com.criteo.publisher.mock.TestResource;
 import java.util.concurrent.Executor;
 
@@ -49,12 +47,13 @@ public class MultiThreadResource implements TestResource {
 
   @Override
   public void setUp() {
-    DependencyProvider dependencyProvider = dependencyProviderRef.get();
+    TestDependencyProvider dependencyProvider = dependencyProviderRef.get();
     Executor oldExecutor = dependencyProvider.provideThreadPoolExecutor();
 
     trackingCommandsExecutor = new TrackingCommandsExecutor(oldExecutor);
-    doReturn(trackingCommandsExecutor).when(dependencyProvider).provideThreadPoolExecutor();
-    doReturn(trackingCommandsExecutor.asAsyncResources()).when(dependencyProvider).provideAsyncResources();
+
+    dependencyProvider.inject(Executor.class, trackingCommandsExecutor);
+    dependencyProvider.inject(AsyncResources.class, trackingCommandsExecutor.asAsyncResources());
   }
 
   @Override

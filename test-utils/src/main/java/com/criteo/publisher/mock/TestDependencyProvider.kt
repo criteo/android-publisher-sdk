@@ -25,6 +25,10 @@ import com.criteo.publisher.network.CdbMock
 @OpenForTesting
 class TestDependencyProvider : DependencyProvider() {
 
+  fun <T : Any> inject(klass: Class<T>, value: T) {
+    services[klass] = value
+  }
+
   fun provideLogger(): Logger {
     throw UnsupportedOperationException("Logger is not provided")
   }
