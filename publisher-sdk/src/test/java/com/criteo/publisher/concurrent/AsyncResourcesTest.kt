@@ -44,8 +44,7 @@ class AsyncResourcesTest {
   }
 
   private open class TestAsyncResources : AsyncResources() {
-    public override fun onNewAsyncResource() {}
-    public override fun onReleasedAsyncResource() {}
+    public override fun onNewAsyncResource() { /* no-op */ }
+    public override fun onReleasedAsyncResource() { /* no-op */ }
   }
-
 }

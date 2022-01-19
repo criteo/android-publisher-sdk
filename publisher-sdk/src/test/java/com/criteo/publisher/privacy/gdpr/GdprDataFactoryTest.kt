@@ -27,7 +27,6 @@ import org.junit.Test
 import javax.inject.Inject
 import kotlin.test.assertEquals
 
-
 class GdprDataFactoryTest {
 
     @Rule

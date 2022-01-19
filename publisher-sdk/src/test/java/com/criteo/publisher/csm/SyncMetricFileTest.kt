@@ -108,5 +108,4 @@ class SyncMetricFileTest {
     inOrder.verify(metricFile).write(metric)
     inOrder.verifyNoMoreInteractions()
   }
-
 }

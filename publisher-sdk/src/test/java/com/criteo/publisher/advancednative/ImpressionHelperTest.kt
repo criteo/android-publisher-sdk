@@ -136,5 +136,4 @@ class ImpressionHelperTest {
 
         verify(listener).onAdImpression()
     }
-
 }

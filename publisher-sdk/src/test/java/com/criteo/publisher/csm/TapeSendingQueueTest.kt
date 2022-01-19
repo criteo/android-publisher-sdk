@@ -58,7 +58,6 @@ import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
-
 @RunWith(Parameterized::class)
 class TapeSendingQueueTest(private val tapeImplementation: TapeImplementation) {
 
@@ -313,7 +312,7 @@ class TapeSendingQueueTest(private val tapeImplementation: TapeImplementation) {
     val allAreReadyToWork = CyclicBarrier(nbWorkers)
     val allAreDone = CountDownLatch(nbWorkers)
 
-    for (i in 0 until nbWorkers) {
+    (0 until nbWorkers).forEach {
       executor.execute {
         allAreReadyToWork.await()
         val metrics = queue.poll(100)

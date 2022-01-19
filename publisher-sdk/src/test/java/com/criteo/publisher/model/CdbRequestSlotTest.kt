@@ -123,6 +123,7 @@ class CdbRequestSlotTest {
     )
   }
 
+  @Suppress("LongParameterList")
   private fun JSONObject.assertPayloadMatch(
       expectedImpressionId: String,
       expectedPlacementId: String,
@@ -175,5 +176,4 @@ class CdbRequestSlotTest {
   }
 
   private fun CdbRequestSlot.toJson(): JSONObject = JSONObject(serializer.writeIntoString(this))
-
 }

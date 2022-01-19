@@ -206,6 +206,7 @@ class DependenciesAnnotationInjectionTest {
   open class InjectedDummyDependency(val transitiveDependency: TransitivelyProvidedDummyDependency)
   open class TransitivelyProvidedDummyDependency
 
+  @Suppress("UnnecessaryAbstractClass")
   abstract class SuperDummyDependencyProvider {
     open fun provideSuperDummyDependency() = SuperDummyDependency(
         provideMockDummyDependency(1),
@@ -219,6 +220,7 @@ class DependenciesAnnotationInjectionTest {
     open fun provideTransitiveSpyDummyDependency() = TransitiveSpyDummyDependency()
   }
 
+  @Suppress("UnusedPrivateMember")
   open class DummyDependencyProvider : SuperDummyDependencyProvider() {
     private fun ignoredDummyDependency() = DummyDependency(
         provideMockDummyDependency(2),

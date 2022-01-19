@@ -83,5 +83,4 @@ class NativeProductTest {
   private fun read(json: String): NativeProduct {
     return jsonSerializer.read(NativeProduct::class.java, ByteArrayInputStream(json.toByteArray()))
   }
-
 }

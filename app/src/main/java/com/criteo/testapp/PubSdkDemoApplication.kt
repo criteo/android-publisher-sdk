@@ -38,13 +38,23 @@ import leakcanary.LeakCanary.config
 
 class PubSdkDemoApplication : MultiDexApplication() {
   companion object {
-    @JvmField val INTERSTITIAL = TestAdUnits.INTERSTITIAL_PREPROD
-    @JvmField val INTERSTITIAL_IBV_DEMO = TestAdUnits.INTERSTITIAL_IBV_DEMO
-    @JvmField val INTERSTITIAL_VIDEO = TestAdUnits.INTERSTITIAL_VIDEO_PREPROD
-    @JvmField val NATIVE = TestAdUnits.NATIVE_PREPROD
-    @JvmField val BANNER = TestAdUnits.BANNER_320_50_PREPROD
-    @JvmField val CONTEXT_DATA = ContextData()
-        .set(ContextData.CONTENT_URL, "https://dummy.content.url")
+    @JvmField
+    val INTERSTITIAL = TestAdUnits.INTERSTITIAL_PREPROD
+
+    @JvmField
+    val INTERSTITIAL_IBV_DEMO = TestAdUnits.INTERSTITIAL_IBV_DEMO
+
+    @JvmField
+    val INTERSTITIAL_VIDEO = TestAdUnits.INTERSTITIAL_VIDEO_PREPROD
+
+    @JvmField
+    val NATIVE = TestAdUnits.NATIVE_PREPROD
+
+    @JvmField
+    val BANNER = TestAdUnits.BANNER_320_50_PREPROD
+
+    @JvmField
+    val CONTEXT_DATA = ContextData().set(ContextData.CONTENT_URL, "https://dummy.content.url")
   }
 
   override fun onCreate() {

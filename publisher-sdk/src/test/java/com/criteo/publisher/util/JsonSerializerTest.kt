@@ -42,10 +42,10 @@ class JsonSerializerTest {
   fun write_GivenStreamThatThrowsWhenWriting_ThrowIoException() {
     val value = Dummy()
     val stream = mock<OutputStream> {
-      on { write(any<Int>()) } doThrow(IOException::class)
-      on { write(any<ByteArray>()) } doThrow(IOException::class)
-      on { write(any(), any(), any()) } doThrow(IOException::class)
-      on { flush() } doThrow(IOException::class)
+      on { write(any<Int>()) } doThrow IOException::class
+      on { write(any<ByteArray>()) } doThrow IOException::class
+      on { write(any(), any(), any()) } doThrow IOException::class
+      on { flush() } doThrow IOException::class
     }
 
     assertThatCode {
@@ -73,6 +73,6 @@ class JsonSerializerTest {
     verify(stream, never()).close()
   }
 
+  @Suppress("UnusedPrivateMember")
   private data class Dummy(private val dummy: String = "")
-
 }

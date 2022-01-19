@@ -126,12 +126,12 @@ class NativeAdMapperTest {
   }
 
   @Test
-  fun watchForImpression_GivenVisibilityTriggeredManyTimesOnDifferentViews_NotifyListenerOnceForImpressionAndFirePixels() {
+  fun watchForImpression_GivenVisibilityTriggeredManyTimesOnManyViews_NotifyListenerOnceForImpressionAndFirePixels() {
     val listener = mock<CriteoNativeAdListener>()
 
     val pixel1 = URI.create("http://pixel1.url").toURL()
     val pixel2 = URI.create("http://pixel2.url").toURL()
-    val assets = mock<NativeAssets>(defaultAnswer=Answers.RETURNS_DEEP_STUBS) {
+    val assets = mock<NativeAssets>(defaultAnswer = Answers.RETURNS_DEEP_STUBS) {
       on { impressionPixels } doReturn listOf(pixel1, pixel2)
     }
 
@@ -140,7 +140,7 @@ class NativeAdMapperTest {
 
     givenDirectUiExecutor()
 
-    //when
+    // when
     val nativeAd = mapper.map(assets, WeakReference(listener), mock())
 
     nativeAd.watchForImpression(view1)
@@ -187,7 +187,7 @@ class NativeAdMapperTest {
 
     givenDirectUiExecutor()
 
-    //when
+    // when
     val nativeAd = mapper.map(assets, WeakReference(listener), mock())
     nativeAd.setProductClickableView(view1)
     nativeAd.setProductClickableView(view2)
@@ -210,7 +210,7 @@ class NativeAdMapperTest {
   fun setPrivacyOptOutClickableView_GivenDifferentViewsClickedManyTimes_NotifyListenerForClicksAndRedirectUser() {
     val listener = mock<CriteoNativeAdListener>()
 
-    val assets = mock<NativeAssets>(defaultAnswer=Answers.RETURNS_DEEP_STUBS) {
+    val assets = mock<NativeAssets>(defaultAnswer = Answers.RETURNS_DEEP_STUBS) {
       on { privacyOptOutClickUrl } doReturn URI.create("privacy://criteo")
     }
 
@@ -224,7 +224,7 @@ class NativeAdMapperTest {
 
     givenDirectUiExecutor()
 
-    //when
+    // when
     val nativeAd = mapper.map(assets, WeakReference(listener), mock())
     nativeAd.setAdChoiceClickableView(view1)
     nativeAd.setAdChoiceClickableView(view2)
@@ -262,7 +262,7 @@ class NativeAdMapperTest {
   fun createRenderedNativeView_GivenRenderer_InflateThenRenderAndSetupInternals() {
     val listener = mock<CriteoNativeAdListener>()
     val renderer = mock<CriteoNativeRenderer>()
-    val assets = mock<NativeAssets>(defaultAnswer=Answers.RETURNS_DEEP_STUBS)
+    val assets = mock<NativeAssets>(defaultAnswer = Answers.RETURNS_DEEP_STUBS)
     val context = mock<Context>()
     val parent = mock<ViewGroup>()
     val nativeView = mock<ViewGroup>()
@@ -292,5 +292,4 @@ class NativeAdMapperTest {
       }
     }
   }
-
 }

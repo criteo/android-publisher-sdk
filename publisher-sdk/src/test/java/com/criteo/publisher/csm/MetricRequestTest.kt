@@ -94,7 +94,9 @@ class MetricRequestTest {
     assertThat(request.wrapperVersion).isEqualTo("1.2.3")
     assertThat(request.profileId).isEqualTo(456)
 
-    assertThat(serializer.writeIntoString(request)).isEqualToIgnoringWhitespace(expectedSingleJson(requestGroupId = null))
+    val actualJson = serializer.writeIntoString(request)
+    val expectedJson = expectedSingleJson(requestGroupId = null)
+    assertThat(actualJson).isEqualToIgnoringWhitespace(expectedJson)
   }
 
   @Test
@@ -259,6 +261,7 @@ class MetricRequestTest {
     }
   }
 
+  @Suppress("LongParameterList")
   private fun ObjectAssert<MetricRequest.MetricRequestFeedback>.matchConsumedBidMetric(
       impressionId: String,
       requestGroupId: String = "requestId",
@@ -281,9 +284,10 @@ class MetricRequestTest {
     }
   }
 
-  private fun expectedEmptyJson(wrapperVersion: String = "1.2.3", profileId: Int = 456)
-      = expectedMultipleJson(wrapperVersion = wrapperVersion, profileId = profileId)
+  private fun expectedEmptyJson(wrapperVersion: String = "1.2.3", profileId: Int = 456) =
+      expectedMultipleJson(wrapperVersion = wrapperVersion, profileId = profileId)
 
+  @Suppress("LongParameterList")
   private fun expectedSingleJson(
       impressionId: String = "id",
       requestGroupId: String? = "requestId",
@@ -323,6 +327,7 @@ class MetricRequestTest {
       """.trimIndent()
   }
 
+  @Suppress("LongParameterList")
   private fun feedbackJson(
       impressionId: String = "id",
       requestGroupId: String? = "requestId",
@@ -345,5 +350,4 @@ class MetricRequestTest {
       ${requestGroupId?.let { ",\"requestGroupId\": \"$it\"" } ?: ""}
     }""".trimIndent()
   }
-
 }

@@ -51,5 +51,4 @@ class AdViewClickHandlerTest {
       verify(helper).notifyUserIsBackToApplicationAsync(listener)
     }
   }
-
 }

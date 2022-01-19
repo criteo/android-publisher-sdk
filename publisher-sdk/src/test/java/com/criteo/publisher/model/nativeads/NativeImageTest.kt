@@ -66,5 +66,4 @@ class NativeImageTest {
   private fun read(json: String): NativeImage {
     return jsonSerializer.read(NativeImage::class.java, ByteArrayInputStream(json.toByteArray()))
   }
-
 }

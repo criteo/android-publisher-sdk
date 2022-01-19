@@ -115,5 +115,4 @@ class AdChoiceOverlayNativeRendererTest {
 
     verifyZeroInteractions(delegate)
   }
-
 }

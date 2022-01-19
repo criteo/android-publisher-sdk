@@ -42,6 +42,7 @@ class TrackingCommandsExecutorTest {
   }
 
   @Test(timeout = 1000)
+  @Suppress("TooGenericExceptionThrown")
   fun waitCommands_GivenAsyncTaskThrowing_StopWaiting() {
     val executor = newSingleThreadExecutor()
     val testAndTackAreReady = CyclicBarrier(2)

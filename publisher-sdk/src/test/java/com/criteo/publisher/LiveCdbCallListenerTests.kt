@@ -66,9 +66,6 @@ class LiveCdbCallListenerTests {
   @Mock
   private lateinit var freshCdbResponseSlot: CdbResponseSlot
 
-  @Mock
-  private lateinit var cachedCdbResponseSlot: CdbResponseSlot
-
   @Test
   fun onBidResponse_givenValidResponseServedWithinTimeBudget_ThenDontCache_AndPassTheResponseThrough() {
     whenever(freshCdbResponseSlot.isValid()).thenReturn(true)

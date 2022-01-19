@@ -66,5 +66,4 @@ class NativeImpressionPixelTest {
   private fun read(json: String): NativeImpressionPixel {
     return jsonSerializer.read(NativeImpressionPixel::class.java, ByteArrayInputStream(json.toByteArray()))
   }
-
 }

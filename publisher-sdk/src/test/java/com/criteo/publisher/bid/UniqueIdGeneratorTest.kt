@@ -36,7 +36,7 @@ class UniqueIdGeneratorTest {
     val generator = UniqueIdGenerator(mock())
     val id = generator.generateId(uuid, timestamp)
 
-    assertThat(id).isEqualTo("499602d2ce73cc4267a133c2fff509e4");
+    assertThat(id).isEqualTo("499602d2ce73cc4267a133c2fff509e4")
   }
 
   @Test
@@ -53,5 +53,4 @@ class UniqueIdGeneratorTest {
       assertThat(ids).hasSize(expectedSize)
     }
   }
-
 }
