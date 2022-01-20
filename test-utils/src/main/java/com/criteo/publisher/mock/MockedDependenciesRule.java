@@ -28,6 +28,7 @@ import androidx.annotation.RequiresApi;
 import com.criteo.publisher.CriteoUtil;
 import com.criteo.publisher.DependencyProvider;
 import com.criteo.publisher.MockableDependencyProvider;
+import com.criteo.publisher.SharedPreferencesResource;
 import com.criteo.publisher.application.ApplicationResource;
 import com.criteo.publisher.application.InstrumentationUtil;
 import com.criteo.publisher.concurrent.MultiThreadResource;
@@ -125,12 +126,13 @@ public class MockedDependenciesRule implements MethodRule {
       resources.add(new DependencyProviderResource(dependencyProviderRef));
       resources.add(getMultiThreadResource());
       resources.add(new ApplicationResource(dependencyProviderRef));
+      resources.add(new SharedPreferencesResource(dependencyProviderRef));
 
       if (InstrumentationUtil.isRunningInInstrumentationTest()) {
         // Only add this on instrumentation test because when running unit test, Android API are returning null
         // and so NPE are thrown for no real reason.
         // Also unit tests are more focused and less hard to debug than instrumentation tests. On the other hand,
-        // instrumentatin tests are really hard to debug and need such help when debugging.
+        // instrumentation tests are really hard to debug and need such help when debugging.
         resources.add(new UncaughtThreadResource());
       }
 

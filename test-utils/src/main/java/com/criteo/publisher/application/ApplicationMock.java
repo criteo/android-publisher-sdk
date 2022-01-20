@@ -16,18 +16,12 @@
 
 package com.criteo.publisher.application;
 
-import static org.mockito.AdditionalAnswers.returnsArgAt;
 import static org.mockito.Answers.RETURNS_DEEP_STUBS;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -37,19 +31,6 @@ public class ApplicationMock {
 
   @SuppressLint({"CommitPrefEdits", "NewApi"})
   public static Application newMock() {
-    // Explicitly mock shared preferences because it is a pain to handle them in unit tests.
-    // This is more true for the getString one, because, since String class is final, it is
-    // returning null, and provoke unexpected NPE.
-    // Here we consider that all shared preferences are empty. We can still mock them if we want to
-    // test scenarios where data is stored.
-    SharedPreferences sharedPreferences = mock(SharedPreferences.class);
-    when(sharedPreferences.getInt(any(), anyInt())).thenAnswer(returnsArgAt(1));
-    when(sharedPreferences.getBoolean(any(), anyBoolean())).thenAnswer(returnsArgAt(1));
-    when(sharedPreferences.getString(any(), any())).thenAnswer(returnsArgAt(1));
-
-    Editor editor = mock(Editor.class, RETURNS_DEEP_STUBS);
-    when(sharedPreferences.edit()).thenReturn(editor);
-
     // Used by CSM to store metric on filesystem
     File filesDir;
     try {
@@ -59,8 +40,6 @@ public class ApplicationMock {
     }
 
     Application application = mock(Application.class, RETURNS_DEEP_STUBS);
-    when(application.getApplicationContext().getSharedPreferences(any(), anyInt()))
-        .thenReturn(sharedPreferences);
     when(application.getApplicationContext().getFilesDir()).thenReturn(filesDir);
     when(application.getApplicationContext().getPackageName()).thenReturn("com.criteo.dummy.bundle");
     return application;

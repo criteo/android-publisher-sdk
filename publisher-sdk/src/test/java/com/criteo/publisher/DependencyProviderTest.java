@@ -179,6 +179,8 @@ public class DependencyProviderTest {
     instance.setApplication(ApplicationMock.newMock());
     instance.setCriteoPublisherId(CriteoUtil.TEST_CP_ID);
 
+    doReturn(SharedPreferencesResource.newMock()).when(instance).provideSharedPreferencesFactory();
+
     T bean1 = providing.apply(instance);
     T bean2 = providing.apply(instance);
 
