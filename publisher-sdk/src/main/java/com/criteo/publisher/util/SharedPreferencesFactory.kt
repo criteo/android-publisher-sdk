@@ -20,7 +20,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import com.criteo.publisher.BuildConfig
+import com.criteo.publisher.annotation.OpenForTesting
 
+@OpenForTesting
 class SharedPreferencesFactory(private val context: Context) {
   val application: SharedPreferences by lazy {
     PreferenceManager.getDefaultSharedPreferences(context)
