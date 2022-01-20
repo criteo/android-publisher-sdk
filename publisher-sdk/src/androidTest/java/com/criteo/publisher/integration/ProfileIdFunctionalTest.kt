@@ -180,7 +180,13 @@ class ProfileIdFunctionalTest {
     givenConsentGiven()
 
     bidStandaloneInterstitial()
-    bidOtherAdServer()
+
+    // Force changing to other ad server profile ID
+    Criteo.getInstance().enrichAdObjectWithBid(mutableMapOf<Any, Any>(), null)
+
+    // Fetch a bid which emit a CSM
+    Criteo.getInstance().loadBid(BANNER_320_480, ContextData()) { /* no-op */ }
+    mockedDependenciesRule.waitForIdleState()
 
     doCallRealMethod().whenever(metricSendingQueueConsumer).sendMetricBatch()
     triggerMetricRequest()
