@@ -16,6 +16,7 @@
 package com.criteo.publisher.util
 
 import android.content.Context
+import androidx.test.filters.FlakyTest
 import com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait
 import com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait
 import com.criteo.publisher.mock.MockedDependenciesRule
@@ -85,6 +86,7 @@ class AdvertisingInfoTest {
   }
 
   @Test
+  @FlakyTest(detail="Fetching the advertising info can yield TimeoutException on flaky network")
   fun getAdvertisingId_GivenPlayServiceAdsIdentifierInClasspath_ReturnNonNull() {
     // Assume that the advertising ID is available, this is a case on new clean emulators/devices
 
@@ -105,6 +107,7 @@ class AdvertisingInfoTest {
   }
 
   @Test
+  @FlakyTest(detail="Fetching the advertising info can yield TimeoutException on flaky network")
   fun getAdvertisingId_CalledFromUiThreadAfterBeingCalledOnWorkerThread_ReturnNonNull() {
     // Assume that the advertising ID is available, this is a case on new clean emulators/devices
 
@@ -119,6 +122,7 @@ class AdvertisingInfoTest {
   }
 
   @Test
+  @FlakyTest(detail="Fetching the advertising info can yield TimeoutException on flaky network")
   fun getAdvertisingId_CalledFromUiThreadAfterAFinishedPrefetch_ReturnNonNull() {
     // Assume that the advertising ID is available, this is a case on new clean emulators/devices
 
@@ -133,6 +137,7 @@ class AdvertisingInfoTest {
   }
 
   @Test
+  @FlakyTest(detail="Fetching the advertising info can yield TimeoutException on flaky network")
   fun getAdvertisingId_CalledFromUiThreadAfterAFinishedPrefetchFromMainThread_ReturnNonNull() {
     // Assume that the advertising ID is available, this is a case on new clean emulators/devices
 
@@ -161,6 +166,7 @@ class AdvertisingInfoTest {
   }
 
   @Test
+  @FlakyTest(detail="Fetching the advertising info can yield TimeoutException on flaky network")
   fun isLimitAdTrackingEnabled_GivenPlayServiceAdsIdentifierInClasspath_ReturnFalse() {
     // Assume that the advertising ID is available, this is a case on new clean emulators/devices
 
