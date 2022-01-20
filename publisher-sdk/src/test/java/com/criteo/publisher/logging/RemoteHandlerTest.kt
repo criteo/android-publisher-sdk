@@ -135,7 +135,7 @@ class RemoteHandlerTest {
     val logRecords = mock<RemoteLogRecords>()
     whenever(remoteLogRecordsFactory.createLogRecords(any())).thenReturn(logRecords)
 
-    val logger = Logger("tag", listOf(LazyDependency { remoteHandler as LogHandler }))
+    val logger = Logger("tag", listOf(LazyDependency { remoteHandler }))
 
     doAnswer {
       logger.debug("dummy")

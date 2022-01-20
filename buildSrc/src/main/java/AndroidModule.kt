@@ -33,7 +33,7 @@ class AndroidModule(private val project: Project) {
     }
   }
 
-  inline fun <T : Any> addBuildConfigField(name: String, value: T) {
+  fun <T : Any> addBuildConfigField(name: String, value: T) {
     addBuildConfigField(name) { value }
   }
 
@@ -64,7 +64,7 @@ class AndroidModule(private val project: Project) {
     return configByName.computeIfAbsent(name) {
       val configFile = project.file("config.groovy")
       if (configFile.exists()) {
-        ConfigSlurper(it).parse(configFile.toURL())
+        ConfigSlurper(it).parse(configFile.toURI().toURL())
       } else {
         throw UnsupportedOperationException("Missing config.groovy file")
       }

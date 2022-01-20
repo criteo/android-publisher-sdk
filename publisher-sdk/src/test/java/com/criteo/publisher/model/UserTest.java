@@ -16,8 +16,8 @@
 
 package com.criteo.publisher.model;
 
-import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.util.JsonSerializer;

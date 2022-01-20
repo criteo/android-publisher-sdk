@@ -72,9 +72,9 @@ class MetricRequestTest {
             feedbackJson(impressionId = "id1", requestGroupId = null),
             feedbackJson(
                 impressionId = "id2",
-                cdbCallEndElapsed = 43 - 1,
+                cdbCallEndElapsed = 43L - 1,
                 cachedBidUsed = true,
-                elapsed = 1338 - 1,
+                elapsed = 1338L - 1,
                 zoneId = 1339
             )
         )
@@ -171,14 +171,14 @@ class MetricRequestTest {
       assertThat(it.elapsed).isNull()
       assertThat(it.isTimeout).isFalse()
       assertThat(it.cdbCallStartElapsed).isEqualTo(0L)
-      assertThat(it.cdbCallEndElapsed).isEqualTo(1337 - 42)
+      assertThat(it.cdbCallEndElapsed).isEqualTo(1337L - 42)
       assertThat(it.requestGroupId).isEqualTo("requestId")
     }
     assertThat(request.wrapperVersion).isEqualTo("1.2.3")
     assertThat(request.profileId).isEqualTo(456)
 
     assertThat(serializer.writeIntoString(request)).isEqualToIgnoringWhitespace(expectedSingleJson(
-        cdbCallEndElapsed = 1337 - 42))
+        cdbCallEndElapsed = 1337L - 42))
   }
 
   @Test
@@ -200,7 +200,7 @@ class MetricRequestTest {
       assertThat(it.elapsed).isNull()
       assertThat(it.isTimeout).isFalse()
       assertThat(it.cdbCallStartElapsed).isEqualTo(0L)
-      assertThat(it.cdbCallEndElapsed).isEqualTo(43 - 1)
+      assertThat(it.cdbCallEndElapsed).isEqualTo(43L - 1)
       assertThat(it.requestGroupId).isEqualTo("requestId")
     }
     assertThat(request.wrapperVersion).isEqualTo("1.2.3")
@@ -208,7 +208,7 @@ class MetricRequestTest {
 
     assertThat(serializer.writeIntoString(request)).isEqualToIgnoringWhitespace(expectedSingleJson(
         impressionId = "impId",
-        cdbCallEndElapsed = 43 - 1,
+        cdbCallEndElapsed = 43L - 1,
         cachedBidUsed = true))
   }
 
@@ -234,9 +234,9 @@ class MetricRequestTest {
     assertThat(serializer.writeIntoString(request)).isEqualToIgnoringWhitespace(
         expectedSingleJson(
             impressionId = "impId",
-            cdbCallEndElapsed = 43 - 1,
+            cdbCallEndElapsed = 43L - 1,
             cachedBidUsed = true,
-            elapsed = 1338 - 1,
+            elapsed = 1338L - 1,
             wrapperVersion = "3.2.1",
             profileId = 654,
             zoneId = 1339

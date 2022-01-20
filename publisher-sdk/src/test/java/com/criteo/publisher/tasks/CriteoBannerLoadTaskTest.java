@@ -17,7 +17,7 @@
 package com.criteo.publisher.tasks;
 
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import android.webkit.WebView;
@@ -83,7 +83,7 @@ public class CriteoBannerLoadTaskTest {
     CriteoBannerLoadTask criteoBannerLoadTask = createTask("anything");
     criteoBannerLoadTask.run();
 
-    verifyZeroInteractions(config);
+    verifyNoInteractions(config);
   }
 
   @NonNull
