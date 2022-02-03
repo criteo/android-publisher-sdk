@@ -1,5 +1,6 @@
 # Next Version
 - Bump AGP, Gradle and Kotlin version
+- Bump Java Compiler version to 11
 
 # Version 4.6.0
 
