@@ -77,6 +77,11 @@ jobs:
 
   android-tests:
     runs-on: macos-latest
+    strategy:
+        fail-fast: false
+        matrix:
+          include:
+            - api: '29'
     steps:
       - name: Checkout (latest)
         uses: actions/checkout@v2
@@ -106,7 +111,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         if: github.event_name == 'push'
         with:
-          api-level: 29
+          api-level: ${{ matrix.api }}
           target: google_apis
           force-avd-creation: false
           # Use a medium size skin rather than default size. Some tests need to have a decent size.
@@ -123,7 +128,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         if: github.event_name != 'push'
         with:
-          api-level: 29
+          api-level: ${{ matrix.api }}
           target: google_apis
           force-avd-creation: false
           # Use a medium size skin rather than default size. Some tests need to have a decent size.
@@ -139,7 +144,7 @@ jobs:
         uses: actions/upload-artifact@v2
         if: failure()
         with:
-          name: logcat
+          name: logcat-${{ matrix.api }}
           path: artifacts/logcat.log
 
       - name: Junit Report to Annotations
@@ -147,17 +152,18 @@ jobs:
         if: failure()
         with:
           access-token: ${{ secrets.GITHUB_TOKEN }}
-          name: "Android JUnit Report"
+          name: "Android JUnit Report (API ${{ matrix.api }})"
 
       - name: Upload all human readable reports (JUnit+Jacoco)
         uses: actions/upload-artifact@v2
         if: failure()
         with:
-          name: junit-report
+          name: junit-report-${{ matrix.api }}
           path: "**/build/reports"
 
       - name: Upload XML reports for quality-tests
         uses: actions/upload-artifact@v2
+        if: matrix.api == '29' # Only report latest supported version
         with:
           name: android-quality-reports
           path: |
