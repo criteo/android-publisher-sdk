@@ -35,11 +35,10 @@ object Deps {
     }
 
     object Test {
-      private const val version = "1.3.0"
-      const val Core = "androidx.test:core:$version"
-      const val Monitor = "androidx.test:monitor:$version"
-      const val Runner = "androidx.test:runner:$version"
-      const val Rules = "androidx.test:rules:$version"
+      const val Core = "androidx.test:core:1.4.0"
+      const val Monitor = "androidx.test:monitor:1.5.0"
+      const val Runner = "androidx.test:runner:1.3.0"
+      const val Rules = "androidx.test:rules:1.3.0"
     }
   }
 
