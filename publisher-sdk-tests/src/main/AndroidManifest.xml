@@ -23,7 +23,7 @@
     <activity android:name="com.criteo.publisher.test.activity.DummyActivity"/>
     <activity android:name="com.criteo.publisher.activity.TestNativeActivity"/>
 
-    <activity android:name="com.criteo.publisher.activity.DummyAdActivity">
+    <activity android:name="com.criteo.publisher.activity.DummyAdActivity" android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.VIEW"/>
 
