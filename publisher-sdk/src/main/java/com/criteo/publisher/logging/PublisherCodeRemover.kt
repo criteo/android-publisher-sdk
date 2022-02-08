@@ -17,6 +17,7 @@
 package com.criteo.publisher.logging
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import com.criteo.publisher.annotation.OpenForTesting
 import java.lang.reflect.Field
@@ -191,15 +192,9 @@ internal class PublisherCodeRemover {
 
   object ThrowableInternal {
 
-    private val causeField: Field = getField("cause")
-    private val suppressedField: Field = getField("suppressedExceptions")
-    private val detailMessageField: Field = getField("detailMessage")
-
-    private fun getField(name: String): Field {
-      val field = java.lang.Throwable::class.java.getDeclaredField(name)
-      field.isAccessible = true
-      return field
-    }
+    private val causeField = SafeField("cause")
+    private val suppressedField = SafeField("suppressedExceptions")
+    private val detailMessageField = SafeField("detailMessage")
 
     var Throwable.internalCause: Throwable?
       get() = causeField.get(this) as Throwable?
@@ -213,6 +208,49 @@ internal class PublisherCodeRemover {
     var Throwable.internalDetailMessage: String?
       get() = detailMessageField.get(this) as String?
       set(value) = detailMessageField.set(this, value)
+
+    // Accessing fields that are missing from the classpath can throw ReflectiveOperationException or LinkageError or
+    // other throwable depending of the JVM. In this case it is safer to just catch everything.
+    @Suppress("TooGenericExceptionCaught")
+    private class SafeField(private val name: String) {
+
+      private val field: Field?
+
+      init {
+        this.field = try {
+          val field = java.lang.Throwable::class.java.getDeclaredField(name)
+          field.isAccessible = true
+          field
+        } catch (e: Throwable) {
+          log("Field `$name` not present in Throwable class", e)
+          null
+        }
+      }
+
+      fun get(throwable: Throwable): Any? {
+        return try {
+          field?.get(throwable)
+        } catch (e: Throwable) {
+          log("Impossible to read from field `$name`", e)
+          null
+        }
+      }
+
+      fun set(throwable: Throwable, value: Any?) {
+        try {
+          field?.set(throwable, value)
+        } catch (e: Throwable) {
+          log("Impossible to set field `$name`", e)
+        }
+      }
+
+      private fun log(message: String, throwable: Throwable) {
+        // Use Android logger directly because this class is used while handling remote log.
+        // We should not take the risk to generate logs while handling some.
+        // It could generate an infinite loop.
+        Log.d(LogTag.with("ThrowableInternal"), message, throwable)
+      }
+    }
   }
 
   class PublisherException : RuntimeException {

@@ -16,10 +16,12 @@
 
 package com.criteo.publisher.logging
 
+import android.os.Build
 import com.criteo.publisher.util.printStacktraceToString
 import com.dummypublisher.DummyPublisherCode
 import org.assertj.core.api.AbstractThrowableAssert
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -41,6 +43,90 @@ class PublisherCodeRemoverTest {
   @Before
   fun setUp() {
     remover = PublisherCodeRemover()
+  }
+
+  @Test
+  fun throwableInternalCause_GivenThrowable_AccessInternal() {
+    val cause1 = Exception()
+    val cause2 = Exception()
+    val exception = Exception(cause1)
+
+    with(PublisherCodeRemover.ThrowableInternal) {
+      assertThat(exception.internalCause).isEqualTo(cause1)
+      assertThat(cause1.internalCause).isEqualTo(cause1) // by default an exception is caused by itself
+
+      exception.internalCause = cause2
+
+      assertThat(exception.internalCause).isEqualTo(cause2)
+    }
+  }
+
+  @Test
+  fun throwableInternalDetailedMessage_GivenThrowable_AccessInternal() {
+    val exception1 = Exception("message1")
+    val exception2 = Exception()
+
+    with(PublisherCodeRemover.ThrowableInternal) {
+      assertThat(exception1.internalDetailMessage).isEqualTo("message1")
+      assertThat(exception2.internalDetailMessage).isNull()
+
+      exception1.internalDetailMessage = "message2"
+
+      assertThat(exception1.internalDetailMessage).isEqualTo("message2")
+    }
+  }
+
+  @Test
+  fun throwableInternalSuppressedException_Supported_GivenThrowable_AccessInternal() {
+    assumeSuppressedExceptionIsSupported(true)
+
+    val suppressed1 = Exception()
+    val suppressed2 = Exception()
+    val suppressed3 = Exception()
+    val exception = Exception()
+    exception.addSuppressed(suppressed1)
+    exception.addSuppressed(suppressed2)
+
+    with(PublisherCodeRemover.ThrowableInternal) {
+      assertThat(exception.internalSuppressedExceptions).containsExactlyInAnyOrder(suppressed1, suppressed2)
+      assertThat(suppressed1.internalSuppressedExceptions).isEmpty()
+
+      exception.internalSuppressedExceptions = listOf(suppressed3)
+
+      assertThat(exception.internalSuppressedExceptions).containsExactlyInAnyOrder(suppressed3)
+    }
+  }
+
+  @Test
+  fun throwableInternalSuppressedException_NotSupported_GivenThrowable_FallbackWithoutCrashing() {
+    assumeSuppressedExceptionIsSupported(false)
+
+    val suppressed = Exception()
+    val exception = Exception()
+    exception.addSuppressed(suppressed)
+
+    with(PublisherCodeRemover.ThrowableInternal) {
+      assertThat(exception.internalSuppressedExceptions).isNull()
+      assertThat(suppressed.internalSuppressedExceptions).isNull()
+
+      exception.internalSuppressedExceptions = listOf(Exception())
+
+      assertThat(exception.internalSuppressedExceptions).isNull()
+    }
+  }
+
+  private fun assumeSuppressedExceptionIsSupported(needSupport: Boolean) {
+    val api = Build.VERSION.SDK_INT
+    val isSupported = api < 31
+
+    assumeTrue("The Android compiler already does some shady stuff on suppressed\n" +
+        "exceptions. For instance on API below 19, it removes the\n" +
+        "suppressedExceptions field from Throwable.\n" +
+        "From API 31, getting this field fails again. Not sure why.\n" +
+        "\n" +
+        "Even if the field appears in the java.lang.Throwable class from\n" +
+        "the Android SDK, it is the D8 or DX compiler that remove the\n" +
+        "field at compile time.", isSupported == needSupport)
   }
 
   @Test
