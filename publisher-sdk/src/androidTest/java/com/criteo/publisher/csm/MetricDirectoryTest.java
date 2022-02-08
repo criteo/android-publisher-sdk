@@ -17,15 +17,18 @@
 package com.criteo.publisher.csm;
 
 import static com.criteo.publisher.csm.MetricDirectoryHelper.clear;
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
+import android.os.Build.VERSION;
 import android.util.AtomicFile;
+import com.criteo.publisher.csm.Metric.Builder;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collection;
 import javax.inject.Inject;
 import org.junit.After;
@@ -73,15 +76,25 @@ public class MetricDirectoryTest {
   }
 
   @Test
-  public void listFiles_WhileAnAtomicFileIsBeingWritten_IgnoreBackupFile() throws Exception {
-    File file = directory.createMetricFile("impId");
-    AtomicFile atomicFile = new AtomicFile(file);
+  public void listFiles_WhileAnAtomicFileIsBeingWritten_IgnoreTemporaryFile() throws Exception {
+    File committedFile = directory.createMetricFile("committed");
+    directory.createSyncMetricFile(committedFile).update(Builder::build);
+
+    File pendingFile = directory.createMetricFile("pending");
+    AtomicFile atomicFile = new AtomicFile(pendingFile);
     atomicFile.startWrite();
+
+    // Until API 29 included, AtomicFile writes into the base file and store a backup file in case of revert. So the
+    // base file is existing during a first write.
+    // After API 29, AtomicFile writes into a new file and new file is renamed into the base file in case of commit. So
+    // the base file is not existing yet during a first write.
+    Collection<File> expected = VERSION.SDK_INT <= 29
+        ? Arrays.asList(committedFile, pendingFile)
+        : Arrays.asList(committedFile);
 
     Collection<File> files = directory.listFiles();
 
-    assertEquals(1, files.size());
-    assertTrue(files.contains(file));
+    assertThat(files).containsExactlyInAnyOrderElementsOf(expected);
   }
 
   @Test
