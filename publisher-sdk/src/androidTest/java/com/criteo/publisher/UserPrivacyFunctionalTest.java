@@ -111,22 +111,6 @@ public class UserPrivacyFunctionalTest {
   }
 
   @Test
-  public void whenCriteoInit_GivenUspOptoutTrue_ThenChangedToFalse_VerifyFalseIsPassedToCdb()
-      throws Exception {
-    Criteo.Builder builder = getCriteoBuilder(TestAdUnits.BANNER_320_50);
-    Criteo criteo = builder.usPrivacyOptOut(true).init();
-    criteo.setUsPrivacyOptOut(false);
-
-    waitForIdleState();
-
-    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
-    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
-
-    CdbRequest cdb = cdbArgumentCaptor.getValue();
-    assertEquals("false", cdb.getUser().uspOptout());
-  }
-
-  @Test
   public void whenCriteoInit_GivenUspOptoutTrue_ThenChangedToFalseAfterFirstCall_VerifyFalseIsPassedToCdbOnTheSecondCall()
       throws Exception {
     Criteo.Builder builder = getCriteoBuilder(TestAdUnits.BANNER_320_50);
