@@ -1,4 +1,7 @@
 # Next Version
+
+# Version 4.6.1
+
 - Bump AGP, Gradle and Kotlin version
 - Bump Java Compiler version to 11
 - Continuously test support of Android 11 (API level 30)
