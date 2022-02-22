@@ -23,7 +23,6 @@ import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWa
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.clearInvocations;
@@ -187,17 +186,6 @@ public class CriteoInterstitialActivityTest {
     inOrder.verify(listener).onAdLeftApplication();
     inOrder.verify(listener).onAdClosed();
     verifyNoMoreInteractions(listener);
-  }
-
-  @Test
-  public void testAppearAndDoNotDismiss() throws Exception {
-    Activity activity = givenOpenedInterstitialActivity("");
-
-    assertTrue(getActivitiesInStage(RESUMED).contains(activity));
-
-    Thread.sleep(2000);
-
-    assertTrue(getActivitiesInStage(RESUMED).contains(activity));
   }
 
   private CriteoInterstitialActivity whenUserClickOnAd(String url) throws Exception {
