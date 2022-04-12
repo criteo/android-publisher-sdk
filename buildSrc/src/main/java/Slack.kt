@@ -35,7 +35,7 @@ fun Project.addSlackDeploymentMessages() {
 
 private fun Project.addSlackDeploymentMessage(publication: MavenPublication, repository: MavenArtifactRepository) {
   val webHookUrl = System.getenv("SLACK_WEBHOOK") ?: return
-  val teamChannel = "#pub-sdk-private"
+  val teamChannel = "#direct-pub-data-releases"
   val rcChannel = "#pub-sdk-release-candidates"
   val confluenceSpaceUrl = "https://go.crto.in/publisher-sdk-bugfest"
 
