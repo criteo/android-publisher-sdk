@@ -90,11 +90,6 @@ public class DummyCriteo extends Criteo {
   }
 
   @Override
-  public void setMopubConsent(String mopubConsent) {
-    // do nothing
-  }
-
-  @Override
   public void setUserData(@NonNull UserData userData) {
     // do nothing
   }

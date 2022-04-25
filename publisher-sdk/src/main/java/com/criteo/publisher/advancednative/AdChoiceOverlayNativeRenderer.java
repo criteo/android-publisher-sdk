@@ -17,7 +17,6 @@
 package com.criteo.publisher.advancednative;
 
 import static com.criteo.publisher.annotation.Internal.ADMOB_ADAPTER;
-import static com.criteo.publisher.annotation.Internal.MOPUB_ADAPTER;
 
 import android.content.Context;
 import android.view.View;
@@ -44,7 +43,7 @@ class AdChoiceOverlayNativeRenderer implements CriteoNativeRenderer {
    * the publisher did not call the SDK initialisation (but with a fancy message indicating how to
    * fix the issue).
    */
-  @Internal({MOPUB_ADAPTER, ADMOB_ADAPTER})
+  @Internal({ADMOB_ADAPTER})
   AdChoiceOverlayNativeRenderer(@NonNull CriteoNativeRenderer delegate) {
     this(delegate, DependencyProvider.getInstance().provideAdChoiceOverlay());
   }

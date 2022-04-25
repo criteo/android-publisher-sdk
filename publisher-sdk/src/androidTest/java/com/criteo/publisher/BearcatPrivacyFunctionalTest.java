@@ -27,8 +27,11 @@ import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.util.SharedPreferencesFactory;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import javax.inject.Inject;
 import org.junit.Rule;
@@ -48,115 +51,35 @@ public class BearcatPrivacyFunctionalTest {
   @Rule
   public MockitoRule mockitoRule = MockitoJUnit.rule();
 
+  private static Collection<Object[]> consents(List<String> iabValues, List<String> binaryValues, boolean expected) {
+    List<Object[]> results = new ArrayList<>();
+    for (String iab : iabValues) {
+      for (String binary : binaryValues) {
+        results.add(new Object[]{ iab, binary, expected });
+      }
+    }
+    return results;
+  }
+
   @Parameterized.Parameters
   public static Collection consents() {
-    return Arrays.asList(new Object[][]{
-        /** IAB: OK, Binary: OK, MOPUB: OK */
-        {"1YNN", "false", "EXPLICIT_YES", true},
-        {"1YNY", "false", "EXPLICIT_YES", true},
-        {"1---", "false", "EXPLICIT_YES", true},
-        {"1YN-", "false", "EXPLICIT_YES", true},
-        {"1-N-", "false", "EXPLICIT_YES", true},
-        {"", "false", "EXPLICIT_YES", true},
+    List<String> iabOk = Arrays.asList("1YNN", "1YNY", "1---", "1YN-", "1-N-");
+    List<String> iabNotOk = Arrays.asList("1NNY", "1NYN");
+    List<String> iabInvalid = Arrays.asList("", null);
 
-        {"1YNN", "false", "UNKNOWN", true},
-        {"1YNY", "false", "UNKNOWN", true},
-        {"1---", "false", "UNKNOWN", true},
-        {"1YN-", "false", "UNKNOWN", true},
-        {"1-N-", "false", "UNKNOWN", true},
-        {"", "false", "UNKNOWN", true},
+    List<String> binaryOk = Collections.singletonList("false");
+    List<String> binaryNotOk = Collections.singletonList("true");
+    List<String> binaryInvalid = Arrays.asList("", "tr", null);
 
-        {"", "", "", true},
-        {null, null, null, true},
-        {null, "", "", true},
-        {"", "tr", "", true},
-        {null, "tr", "", true},
-
-        /** IAB: NOK, Binary: OK, MOPUB: OK */
-        {"1NNY", "false", "EXPLICIT_YES", false},
-        {"1NYN", "false", "EXPLICIT_YES", false},
-
-        {"1NNY", "false", "UNKNOWN", false},
-        {"1NYN", "false", "UNKNOWN", false},
-
-        /** IAB: OK, Binary: NOK, Mopub: OK (IAB has precedence over binary) */
-        {"1YNN", "true", "EXPLICIT_YES", true},
-        {"1YNY", "true", "EXPLICIT_YES", true},
-        {"1---", "true", "EXPLICIT_YES", true},
-        {"1YN-", "true", "EXPLICIT_YES", true},
-        {"1-N- ", "true", "EXPLICIT_YES", true},
-
-        {"1YNN", "true", "UNKNOWN", true},
-        {"1YNY", "true", "UNKNOWN", true},
-        {"1---", "true", "UNKNOWN", true},
-        {"1YN-", "true", "UNKNOWN", true},
-        {"1-N- ", "true", "UNKNOWN", true},
-
-        /** IAB: OK, Binary: OK, Mopub: NOK **/
-        {"1YNN", "false", "POTENTIAL_WHITELIST", false},
-        {"1YNY", "false", "POTENTIAL_WHITELIST", false},
-        {"1---", "false", "POTENTIAL_WHITELIST", false},
-        {"1YN-", "false", "POTENTIAL_WHITELIST", false},
-        {"1-N- ", "false", "POTENTIAL_WHITELIST", false},
-
-        {"1YNN", "false", "EXPLICIT_NO", false},
-        {"1YNY", "false", "EXPLICIT_NO", false},
-        {"1---", "false", "EXPLICIT_NO", false},
-        {"1YN-", "false", "EXPLICIT_NO", false},
-        {"1-N- ", "false", "EXPLICIT_NO", false},
-
-        {"1YNN", "false", "DNT", false},
-        {"1YNY", "false", "DNT", false},
-        {"1---", "false", "DNT", false},
-        {"1YN-", "false", "DNT", false},
-        {"1-N- ", "false", "DNT", false},
-
-        /** IAB: NOK, Binary: NOK, Mopub: OK */
-        {"1NNY", "true", "EXPLICIT_YES", false},
-        {"1NYN", "true", "EXPLICIT_YES", false},
-
-        {"1NNY", "true", "UNKNOWN", false},
-        {"1NYN", "true", "UNKNOWN", false},
-
-        /** IAB: NOK, Binary: OK, Mopub: NOK */
-        {"1NNY", "false", "EXPLICIT_NO", false},
-        {"1NYN", "false", "EXPLICIT_NO", false},
-
-        {"1NNY", "false", "DNT", false},
-        {"1NNY", "false", "DNT", false},
-
-        {"1NNY", "false", "POTENTIAL_WHITELIST", false},
-        {"1NNY", "false", "POTENTIAL_WHITELIST", false},
-
-        /** IAB: OK, Binary: NOK, Mopub: NOK */
-        {"1YNN", "true", "EXPLICIT_NO", false},
-        {"1YNY", "true", "EXPLICIT_NO", false},
-        {"1---", "true", "EXPLICIT_NO", false},
-        {"1YN-", "true", "EXPLICIT_NO", false},
-        {"1-N- ", "true", "EXPLICIT_NO", false},
-
-        {"1YNN", "true", "POTENTIAL_WHITELIST", false},
-        {"1YNY", "true", "POTENTIAL_WHITELIST", false},
-        {"1---", "true", "POTENTIAL_WHITELIST", false},
-        {"1YN-", "true", "POTENTIAL_WHITELIST", false},
-        {"1-N- ", "true", "POTENTIAL_WHITELIST", false},
-
-        {"1YNN", "true", "DNT", false},
-        {"1YNY", "true", "DNT", false},
-        {"1---", "true", "DNT", false},
-        {"1YN-", "true", "DNT", false},
-        {"1-N- ", "true", "DNT", false},
-
-        /** IAB: NOK, Binary: NOK, Mopub: NOK */
-        {"1NNY", "true", "EXPLICIT_NO", false},
-        {"1NYN", "true", "EXPLICIT_NO", false},
-
-        {"1NNY", "true", "POTENTIAL_WHITELIST", false},
-        {"1NYN", "true", "POTENTIAL_WHITELIST", false},
-
-        {"1NNY", "true", "DNT", false},
-        {"1NYN", "true", "DNT", false},
-    });
+    List<Object[]> results = new ArrayList<>();
+    results.addAll(consents(iabOk, binaryOk, true));
+    results.addAll(consents(iabInvalid, binaryInvalid, true));
+    results.addAll(consents(iabInvalid, binaryOk, true));
+    results.addAll(consents(iabOk, binaryInvalid, true));
+    results.addAll(consents(iabOk, binaryNotOk, true)); // (IAB has precedence over binary)
+    results.addAll(consents(iabNotOk, binaryNotOk, false));
+    results.addAll(consents(iabNotOk, binaryOk, false));
+    return results;
   }
 
   @Parameter(0)
@@ -166,9 +89,6 @@ public class BearcatPrivacyFunctionalTest {
   public String binaryOptout;
 
   @Parameter(2)
-  public String mopubConsentString;
-
-  @Parameter(3)
   public boolean callBearcat;
 
   @Inject
@@ -182,23 +102,20 @@ public class BearcatPrivacyFunctionalTest {
 
   @Test
   public void whenCriteoInit_GivenPrivacyStrings_VerifyIfBearcatShouldBeCalled() throws Exception {
-    runTest(iabUsPrivacyString, mopubConsentString);
+    runTest(iabUsPrivacyString);
   }
 
   @Test
   public void whenCriteoInit_GivenPrivacyStringsInLowercase_VerifyIfBearcatShouldBeCalled()
       throws Exception {
-    runTest(iabUsPrivacyString != null ? iabUsPrivacyString.toLowerCase(Locale.ROOT) : null,
-        mopubConsentString != null ? mopubConsentString.toLowerCase(Locale.ROOT) : null);
+    runTest(iabUsPrivacyString != null ? iabUsPrivacyString.toLowerCase(Locale.ROOT) : null);
   }
 
   private void runTest(
-      String usPrivacyString,
-      String mopubConsentString
+      String usPrivacyString
   ) throws Exception {
     writeIntoDefaultSharedPrefs("IABUSPrivacy_String", usPrivacyString);
     writeIntoDefaultSharedPrefs("USPrivacy_Optout", binaryOptout);
-    writeIntoDefaultSharedPrefs("MoPubConsent_String", mopubConsentString);
 
     givenInitializedCriteo(TestAdUnits.BANNER_320_50);
 

@@ -117,20 +117,6 @@ class IntegrationRegistryTest {
   }
 
   @Test
-  fun integration_GivenStandaloneDeclaredButMoPubMediationIsDetected_ReturnMoPubMediation() {
-    whenever(integrationDetector.isMoPubMediationPresent()).doReturn(true)
-
-    integrationRegistry.declare(Integration.STANDALONE)
-    val integration = integrationRegistry.readIntegration()
-
-    assertThat(integration).isEqualTo(Integration.MOPUB_MEDIATION)
-    logger.inOrder {
-      verify().log(IntegrationLogMessage.onIntegrationDeclared(Integration.STANDALONE))
-      verify().log(IntegrationLogMessage.onMediationAdapterDetected("MoPub"))
-    }
-  }
-
-  @Test
   fun integration_GivenStandaloneDeclaredButAdMobMediationIsDetected_ReturnAdMobMediation() {
     whenever(integrationDetector.isAdMobMediationPresent()).doReturn(true)
 
@@ -141,19 +127,6 @@ class IntegrationRegistryTest {
     logger.inOrder {
       verify().log(IntegrationLogMessage.onIntegrationDeclared(Integration.STANDALONE))
       verify().log(IntegrationLogMessage.onMediationAdapterDetected("AdMob"))
-    }
-  }
-
-  @Test
-  fun integration_GivenBothMediationAdaptersDetected_ReturnFallback() {
-    whenever(integrationDetector.isMoPubMediationPresent()).doReturn(true)
-    whenever(integrationDetector.isAdMobMediationPresent()).doReturn(true)
-
-    val integration = integrationRegistry.readIntegration()
-
-    assertThat(integration).isEqualTo(Integration.FALLBACK)
-    logger.inOrder {
-      verify().log(IntegrationLogMessage.onMultipleMediationAdaptersDetected())
     }
   }
 

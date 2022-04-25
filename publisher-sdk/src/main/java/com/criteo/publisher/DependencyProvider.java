@@ -66,7 +66,6 @@ import com.criteo.publisher.csm.SendingQueueFactory;
 import com.criteo.publisher.dependency.LazyDependency;
 import com.criteo.publisher.headerbidding.DfpHeaderBidding;
 import com.criteo.publisher.headerbidding.HeaderBidding;
-import com.criteo.publisher.headerbidding.MoPubHeaderBidding;
 import com.criteo.publisher.headerbidding.OtherAdServersHeaderBidding;
 import com.criteo.publisher.integration.IntegrationDetector;
 import com.criteo.publisher.integration.IntegrationRegistry;
@@ -528,7 +527,6 @@ public class DependencyProvider {
   public HeaderBidding provideHeaderBidding() {
     return getOrCreate(HeaderBidding.class, () -> new HeaderBidding(
         asList(
-            new MoPubHeaderBidding(),
             new DfpHeaderBidding(provideAndroidUtil(), provideDeviceUtil()),
             new OtherAdServersHeaderBidding()
         ),

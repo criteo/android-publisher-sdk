@@ -144,8 +144,6 @@ dependencies {
     androidTestImplementation(Deps.Square.OkHttp.MockWebServer)
     androidTestImplementation(Deps.Google.AdMob)
     androidTestImplementation(Deps.Google.AdsIdentifier)
-    androidTestImplementation(Deps.MoPub.Banner) { isTransitive = true }
-    androidTestImplementation(Deps.MoPub.Interstitial) { isTransitive = true }
 
     detektPlugins(Deps.Detekt.DetektFormatting)
 }

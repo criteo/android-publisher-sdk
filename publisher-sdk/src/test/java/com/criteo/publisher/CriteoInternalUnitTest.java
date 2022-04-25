@@ -64,8 +64,6 @@ public class CriteoInternalUnitTest {
 
   private Boolean usPrivacyOptout = false;
 
-  private String mopubConsentValue;
-
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private DependencyProvider dependencyProvider;
 
@@ -275,28 +273,6 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void whenCreatingNewCriteo_GivenNonNullMopubConsent_ShouldCallStoreMethod()
-      throws Exception {
-    when(dependencyProvider.provideUserPrivacyUtil()).thenReturn(userPrivacyUtil);
-    mopubConsentValue = "fake_mopub_consent_value";
-
-    createCriteo();
-
-    verify(userPrivacyUtil).storeMopubConsent("fake_mopub_consent_value");
-  }
-
-  @Test
-  public void whenCreatingNewCriteo_GivenNullMopubConsent_ShouldNotCallStoreMethod()
-      throws Exception {
-    when(dependencyProvider.provideUserPrivacyUtil()).thenReturn(userPrivacyUtil);
-    mopubConsentValue = null;
-
-    createCriteo();
-
-    verify(userPrivacyUtil, never()).storeMopubConsent("fake_mopub_consent_value");
-  }
-
-  @Test
   public void setBidsForAdUnit_GivenHeaderBiddingThrowing_DoNotThrow() throws Exception {
     HeaderBidding headerBidding = givenMockedHeaderBidding();
     doThrow(RuntimeException.class).when(headerBidding).enrichBid(any(), any());
@@ -372,8 +348,6 @@ public class CriteoInternalUnitTest {
   }
 
   private CriteoInternal createCriteo() {
-    return new CriteoInternal(application, adUnits, usPrivacyOptout,
-        mopubConsentValue, dependencyProvider
-    );
+    return new CriteoInternal(application, adUnits, usPrivacyOptout, dependencyProvider);
   }
 }

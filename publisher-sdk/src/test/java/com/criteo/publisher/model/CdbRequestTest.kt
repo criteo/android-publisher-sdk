@@ -55,7 +55,6 @@ class CdbRequestTest {
             null,
             null,
             null,
-            null,
             mapOf(
                 "data" to mapOf(
                     "a" to listOf(1, 2),
@@ -124,7 +123,7 @@ class CdbRequestTest {
     val request = CdbRequest.create(
         "myRequestId",
         Publisher.create("myBundleId", "myCpId", mapOf()),
-        User.create(null, null, null, null, mapOf()),
+        User.create(null, null, null, mapOf()),
         "1.2.3",
         456,
         null,

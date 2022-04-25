@@ -24,11 +24,11 @@ enum class Integration(val profileId: Int) {
   IN_HOUSE(296),
 
   // Mediation
-  MOPUB_MEDIATION(297),
+  // MOPUB_MEDIATION(297),
   ADMOB_MEDIATION(298),
 
   // AppBidding
-  MOPUB_APP_BIDDING(299),
+  // MOPUB_APP_BIDDING(299),
   GAM_APP_BIDDING(300),
   CUSTOM_APP_BIDDING(301)
 }

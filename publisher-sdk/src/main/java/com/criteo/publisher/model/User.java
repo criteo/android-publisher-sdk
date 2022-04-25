@@ -28,7 +28,6 @@ public abstract class User {
 
   public static User create(
       @Nullable String deviceId,
-      @Nullable String mopubConsent,
       @Nullable String uspIab,
       @Nullable String uspOptout,
       @NonNull Map<String, Object> ext
@@ -37,7 +36,6 @@ public abstract class User {
         deviceId,
         "gaid",
         "android",
-        mopubConsent,
         uspIab,
         uspOptout,
         ext
@@ -56,9 +54,6 @@ public abstract class User {
 
   @NonNull
   public abstract String deviceOs();
-
-  @Nullable
-  public abstract String mopubConsent();
 
   /**
    * US Privacy consent IAB format (for CCPA)

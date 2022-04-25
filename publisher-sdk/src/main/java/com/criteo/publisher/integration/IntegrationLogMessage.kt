@@ -44,13 +44,6 @@ internal object IntegrationLogMessage {
   )
 
   @JvmStatic
-  fun onMultipleMediationAdaptersDetected() = LogMessage(
-      level = Log.WARN,
-      logId = "onMultipleMediationAdaptersDetected",
-      message = "Multiple mediation adapters were detected, fallbacking on default integration"
-  )
-
-  @JvmStatic
   fun onMediationAdapterDetected(name: String) = LogMessage(message =
       "Mediation adapter `$name` is detected, using it and ignoring the declared one"
   )

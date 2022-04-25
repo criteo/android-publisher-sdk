@@ -1,4 +1,5 @@
 # Next Version
+- Deprecate API related to MoPub and stop supporting MoPub App Bidding
 
 # Version 4.6.1
 

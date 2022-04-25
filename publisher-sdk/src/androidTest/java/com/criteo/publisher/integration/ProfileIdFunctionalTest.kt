@@ -37,8 +37,6 @@ import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.network.PubSdkApi
 import com.criteo.publisher.privacy.ConsentData
 import com.google.android.gms.ads.admanager.AdManagerAdRequest
-import com.mopub.mobileads.MoPubInterstitial
-import com.mopub.mobileads.MoPubView
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -327,50 +325,6 @@ class ProfileIdFunctionalTest {
     loadBid()
 
     verifyCdbIsCalledWith(Integration.GAM_APP_BIDDING)
-  }
-
-  @Test
-  fun bidMoPubAppBiddingBanner_GivenAnyPreviousIntegration_UseMoPubAppBiddingProfileId() {
-    val mopubView = callOnMainThreadAndWait { MoPubView(context) }
-
-    fun loadBid() {
-      Criteo.getInstance().loadBid(BANNER_320_480, ContextData()) {
-        Criteo.getInstance().enrichAdObjectWithBid(mopubView, it)
-      }
-      mockedDependenciesRule.waitForIdleState()
-    }
-    givenPreviousInHouseIntegrationWithResetDependencies()
-
-    givenInitializedCriteo()
-
-    // Need 2 bids: AppBidding integration is detected after bid request when enrich method is invoked.
-    loadBid()
-    loadBid()
-
-    verifyCdbIsCalledWith(Integration.MOPUB_APP_BIDDING)
-  }
-
-  @Test
-  fun bidMoPubAppBiddingInterstitial_GivenAnyPreviousIntegration_UseMoPubAppBiddingProfileId() {
-    val moPubInterstitial = callOnMainThreadAndWait {
-      MoPubInterstitial(mock(), "adUnit")
-    }
-
-    fun loadBid() {
-      Criteo.getInstance().loadBid(BANNER_320_480, ContextData()) {
-        Criteo.getInstance().enrichAdObjectWithBid(moPubInterstitial, it)
-      }
-      mockedDependenciesRule.waitForIdleState()
-    }
-    givenPreviousInHouseIntegrationWithResetDependencies()
-
-    givenInitializedCriteo()
-
-    // Need 2 bids: AppBidding integration is detected after bid request when enrich method is invoked.
-    loadBid()
-    loadBid()
-
-    verifyCdbIsCalledWith(Integration.MOPUB_APP_BIDDING)
   }
 
   private fun givenPreviousInHouseIntegrationWithResetDependencies() {

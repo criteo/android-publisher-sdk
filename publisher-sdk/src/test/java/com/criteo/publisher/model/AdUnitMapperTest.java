@@ -188,7 +188,7 @@ public class AdUnitMapperTest {
   @Test
   public void convertValidAdUnits_GivenValidRewardedAndDeviceInPortrait_AndSupportedIntegration_MapItWithPortraitSize()
       throws Exception {
-    when(integrationRegistry.readIntegration()).thenReturn(Integration.MOPUB_APP_BIDDING);
+    when(integrationRegistry.readIntegration()).thenReturn(Integration.GAM_APP_BIDDING);
 
     AdSize portraitSize = new AdSize(10, 30);
     when(deviceUtil.getCurrentScreenSize()).thenReturn(portraitSize);
@@ -204,7 +204,7 @@ public class AdUnitMapperTest {
   @Test
   public void convertValidAdUnits_GivenValidRewardedAndDeviceInLandscape_AndSupportedIntegration_MapItWithLandscapeSize()
       throws Exception {
-    when(integrationRegistry.readIntegration()).thenReturn(Integration.MOPUB_APP_BIDDING);
+    when(integrationRegistry.readIntegration()).thenReturn(Integration.GAM_APP_BIDDING);
 
     AdSize landscapeSize = new AdSize(30, 10);
     when(deviceUtil.getCurrentScreenSize()).thenReturn(landscapeSize);

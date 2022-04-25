@@ -22,15 +22,6 @@ import org.junit.Test
 class IntegrationDetectorTest {
 
   @Test
-  fun isMoPubMediationPresent_GivenNoAdapterInClassPath_ReturnFalse() {
-    // Assume that no adapters are present in this class path
-
-    val isPresent = IntegrationDetector().isMoPubMediationPresent()
-
-    assertThat(isPresent).isFalse()
-  }
-
-  @Test
   fun isAdMobMediationPresent_GivenNoAdapterInClassPath_ReturnFalse() {
     // Assume that no adapters are present in this class path
 

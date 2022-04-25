@@ -17,7 +17,6 @@
 package com.criteo.publisher.advancednative;
 
 import static com.criteo.publisher.annotation.Internal.ADMOB_ADAPTER;
-import static com.criteo.publisher.annotation.Internal.MOPUB_ADAPTER;
 
 import android.content.Context;
 import android.view.View;
@@ -177,7 +176,7 @@ public class CriteoNativeAd {
     }
   }
 
-  @Internal({MOPUB_ADAPTER, ADMOB_ADAPTER})
+  @Internal({ADMOB_ADAPTER})
   void setRenderer(@NonNull CriteoNativeRenderer renderer) {
     this.renderer = renderer;
   }

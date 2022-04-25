@@ -152,44 +152,6 @@ public class UserPrivacyUtilTest {
   }
 
   @Test
-  public void testSetMopubConsentValue() {
-    when(sharedPreferences.edit()).thenReturn(editor);
-
-    userPrivacyUtil.storeMopubConsent("fake_mopub_consent_value");
-
-    verify(editor, timeout(1)).putString("MoPubConsent_String", "fake_mopub_consent_value");
-  }
-
-  @Test
-  public void testGetMopubConsentValue() {
-    when(sharedPreferences.getString("MoPubConsent_String", ""))
-        .thenReturn("fake_mopub_consent_value");
-
-    String mopubConsent = userPrivacyUtil.getMopubConsent();
-
-    assertEquals("fake_mopub_consent_value", mopubConsent);
-  }
-
-  @Test
-  public void testIsMopubConsentGiven_True() {
-    assertMopubConsentGiven("EXPLICIT_YES", true);
-    assertMopubConsentGiven("UNKNOWN", true);
-    assertMopubConsentGiven("", true);
-  }
-
-  @Test
-  public void testIsMopubConsentGiven_False() {
-    assertMopubConsentGiven("EXPLICIT_NO", false);
-    assertMopubConsentGiven("POTENTIAL_WHITELIST", false);
-    assertMopubConsentGiven("DNT", false);
-  }
-
-  private void assertMopubConsentGiven(String mopubConsentString, boolean consentGiven) {
-    when(sharedPreferences.getString("MoPubConsent_String", "")).thenReturn(mopubConsentString);
-    assertEquals(consentGiven, userPrivacyUtil.isMopubConsentGivenOrNotApplicable());
-  }
-
-  @Test
   public void testIsCCPAConsentGiven_True() {
     assertCCPAConsentGiven("1YNN", "true", true);
     assertCCPAConsentGiven("1YNY", "true", true);

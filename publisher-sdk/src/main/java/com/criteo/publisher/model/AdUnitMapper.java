@@ -58,11 +58,10 @@ public class AdUnitMapper {
   private static final AdSize NATIVE_SIZE = new AdSize(2, 2);
 
   /**
-   * Only MoPub/GAM AppBidding are supporting rewarded ads because they are handling the display themselves.
+   * Only GAM AppBidding is supporting rewarded ads because they are handling the display themselves.
    */
   private static final Collection<Integration> SUPPORTED_INTEGRATION_FOR_REWARDED = Arrays.asList(
-      Integration.GAM_APP_BIDDING,
-      Integration.MOPUB_APP_BIDDING
+      Integration.GAM_APP_BIDDING
   );
 
   @NonNull

@@ -35,7 +35,6 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.CONSTRUCTOR, ElementType.METHOD, ElementType.FIELD})
 public @interface Internal {
 
-  String MOPUB_ADAPTER = "MoPub Adapter";
   String ADMOB_ADAPTER = "AdMob Adapter";
   String IN_HOUSE = "InHouse";
 

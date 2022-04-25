@@ -132,6 +132,5 @@ public class BearcatFunctionalTest {
 
   private void givenAppEventsCanBeCalled() {
     when(userPrivacyUtil.isCCPAConsentGivenOrNotApplicable()).thenReturn(true);
-    when(userPrivacyUtil.isMopubConsentGivenOrNotApplicable()).thenReturn(true);
   }
 }

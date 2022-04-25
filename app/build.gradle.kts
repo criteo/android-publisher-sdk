@@ -15,7 +15,6 @@
  */
 
 import Deps.Criteo.Mediation.AdMob
-import Deps.Criteo.Mediation.MoPub
 
 plugins {
     id("com.android.application")
@@ -78,19 +77,6 @@ dependencies {
     implementation(project(":publisher-sdk"))
     implementation(project(":test-utils"))
 
-    implementation(MoPub("(,${sdkVersion()}.99)")) {
-        exclude(group = Deps.Criteo.PublisherSdk.group)
-        isChanging = true
-        because(
-            """
-            Select the biggest available version up to the current SDK version.
-            This allows bumping the SDK version without having trouble even if this adapter is not
-            yet upgraded.
-            The .99 is needed because Gradle range does not support + syntax in the range syntax
-            """.trimIndent()
-        )
-    }
-
     implementation(AdMob("(,${sdkVersion()}.99)")) {
         exclude(group = Deps.Criteo.PublisherSdk.group)
         isChanging = true
@@ -115,18 +101,6 @@ dependencies {
     implementation(Deps.Mockito.Kotlin)
 
     implementation(Deps.Google.AdMob)
-
-    implementation(Deps.MoPub.Banner) {
-        isTransitive = true
-    }
-
-    implementation(Deps.MoPub.Interstitial) {
-        isTransitive = true
-    }
-
-    implementation(Deps.MoPub.Native) {
-        isTransitive = true
-    }
 
     "memoryLeaksHuntImplementation"(Deps.Square.LeakCanary.LeakCanary)
     detektPlugins(Deps.Detekt.DetektFormatting)

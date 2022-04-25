@@ -29,10 +29,5 @@ dependencies {
   implementation(Deps.AndroidX.Annotations)
   implementation(Deps.AndroidX.RecyclerView)
 
-  // Needed because MoPub need some activities to be declare in the AndroidManifest.xml
-  implementation(Deps.MoPub.Interstitial) {
-    isTransitive = true
-  }
-
   detektPlugins(Deps.Detekt.DetektFormatting)
 }

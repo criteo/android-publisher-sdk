@@ -42,7 +42,6 @@ public class UserTest {
   public void testToJson_AllFieldsProvided() throws Exception {
     User user = User.create(
         "deviceId",
-        "fake_mopub_consent",
         "fake_usp_iab",
         "true" /* uspOptout */,
         new HashMap<>()
@@ -55,14 +54,12 @@ public class UserTest {
     assertEquals("android", jsonObject.get("deviceOs"));
     assertEquals("fake_usp_iab", jsonObject.get("uspIab"));
     assertEquals("true", jsonObject.get("uspOptout"));
-    assertEquals("fake_mopub_consent", jsonObject.get("mopubConsent"));
   }
 
   @Test
   public void testToJson_UspValuesNotProvided() throws Exception {
     User user = User.create(
         "deviceId",
-        null,
         null,
         null,
         new HashMap<>()
@@ -72,7 +69,6 @@ public class UserTest {
 
     assertFalse(jsonObject.has("uspIab"));
     assertFalse(jsonObject.has("uspOptout"));
-    assertFalse(jsonObject.has("mopubConsent"));
   }
 
   private JSONObject toJson(User user) throws IOException, JSONException {
