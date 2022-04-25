@@ -111,7 +111,6 @@ public class AppEvents implements AppEventResponseListener, ApplicationStoppedLi
   }
 
   private boolean shouldCallBearcat() {
-    return userPrivacyUtil.isCCPAConsentGivenOrNotApplicable() && userPrivacyUtil
-        .isMopubConsentGivenOrNotApplicable();
+    return userPrivacyUtil.isCCPAConsentGivenOrNotApplicable();
   }
 }

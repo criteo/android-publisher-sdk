@@ -41,7 +41,6 @@ import com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait
 import com.criteo.publisher.headerbidding.AppBiddingLogMessage
 import com.criteo.publisher.integration.Integration.CUSTOM_APP_BIDDING
 import com.criteo.publisher.integration.Integration.GAM_APP_BIDDING
-import com.criteo.publisher.integration.Integration.MOPUB_APP_BIDDING
 import com.criteo.publisher.interstitial.InterstitialLogMessage
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
@@ -57,7 +56,6 @@ import com.criteo.publisher.util.BuildConfigWrapper
 import com.criteo.publisher.util.JsonSerializer
 import com.criteo.publisher.util.writeIntoString
 import com.google.android.gms.ads.admanager.AdManagerAdRequest
-import com.mopub.mobileads.MoPubView
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -134,14 +132,12 @@ class DebugLoggingFunctionalTest {
 
     Criteo.getInstance().loadBid(BANNER_UNKNOWN) {
       Criteo.getInstance().enrichAdObjectWithBid(AdManagerAdRequest.Builder(), it)
-      Criteo.getInstance().enrichAdObjectWithBid(MoPubView(context), it)
       Criteo.getInstance().enrichAdObjectWithBid(HashMap<String, String>(), it)
     }
     mockedDependenciesRule.waitForIdleState()
 
-    verify(logger, times(3)).log(AppBiddingLogMessage.onTryingToEnrichAdObjectFromBid(null))
+    verify(logger, times(2)).log(AppBiddingLogMessage.onTryingToEnrichAdObjectFromBid(null))
     verify(logger).log(AppBiddingLogMessage.onAdObjectEnrichedWithNoBid(GAM_APP_BIDDING))
-    verify(logger).log(AppBiddingLogMessage.onAdObjectEnrichedWithNoBid(MOPUB_APP_BIDDING))
     verify(logger).log(AppBiddingLogMessage.onAdObjectEnrichedWithNoBid(CUSTOM_APP_BIDDING))
   }
 
@@ -160,24 +156,6 @@ class DebugLoggingFunctionalTest {
     verify(logger).log(AppBiddingLogMessage.onTryingToEnrichAdObjectFromBid(bid))
     verify(logger).log(check {
       assertThat(it.message).contains(GAM_APP_BIDDING.toString()).contains("crt_cpm")
-    })
-  }
-
-  @Test
-  fun whenEnrichingMoPub_BannerBid_LogSuccess() {
-    lateinit var bid: Bid
-    givenInitializedCriteo(BANNER_320_50)
-    mockedDependenciesRule.waitForIdleState()
-
-    Criteo.getInstance().loadBid(BANNER_320_50) {
-      Criteo.getInstance().enrichAdObjectWithBid(MoPubView(context), it)
-      bid = it!!
-    }
-    mockedDependenciesRule.waitForIdleState()
-
-    verify(logger).log(AppBiddingLogMessage.onTryingToEnrichAdObjectFromBid(bid))
-    verify(logger).log(check {
-      assertThat(it.message).contains(MOPUB_APP_BIDDING.toString()).contains("crt_cpm")
     })
   }
 
@@ -469,13 +447,11 @@ class DebugLoggingFunctionalTest {
   @Test
   fun whenSettingConsentDuringInit_LogThatConsentIsSet() {
     Criteo.Builder(application, "any")
-        .mopubConsent("myMoPubConsent")
         .usPrivacyOptOut(true)
         .init()
 
     mockedDependenciesRule.waitForIdleState()
 
-    verify(logger).log(PrivacyLogMessage.onMoPubConsentSet("myMoPubConsent"))
     verify(logger).log(PrivacyLogMessage.onUsPrivacyOptOutSet(true))
   }
 
@@ -484,10 +460,8 @@ class DebugLoggingFunctionalTest {
     givenInitializedCriteo()
     mockedDependenciesRule.waitForIdleState()
 
-    Criteo.getInstance().setMopubConsent("myMoPubConsent")
     Criteo.getInstance().setUsPrivacyOptOut(true)
 
-    verify(logger).log(PrivacyLogMessage.onMoPubConsentSet("myMoPubConsent"))
     verify(logger).log(PrivacyLogMessage.onUsPrivacyOptOutSet(true))
   }
 

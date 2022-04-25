@@ -76,7 +76,6 @@ public class ConsumableBidLoader {
         logger.log(BiddingLogMessage.onConsumableBidLoaded(adUnit, bid));
 
         // The bid object is used for AppBidding and InHouse.
-        // For MoPub AppBidding, it is mandatory to be on the main thread.
         // For InHouse, it is preferable.
         runOnUiThreadExecutor.executeAsync(() -> bidResponseListener.onResponse(bid));
       }

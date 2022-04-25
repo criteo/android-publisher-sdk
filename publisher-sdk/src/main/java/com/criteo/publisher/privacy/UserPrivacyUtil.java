@@ -41,9 +41,6 @@ public class UserPrivacyUtil {
   private static final List<String> IAB_USPRIVACY_WITH_CONSENT = Arrays
       .asList("1ynn", "1yny", "1---", "", "1yn-", "1-n-");
 
-  private static final List<String> MOPUB_CONSENT_DECLINED_STRINGS = Arrays
-      .asList("explicit_no", "potential_whitelist", "dnt");
-
   // Key provided by the IAB CCPA Compliance Framework
   @VisibleForTesting
   static final String IAB_USPRIVACY_SHARED_PREFS_KEY = "IABUSPrivacy_String";
@@ -51,9 +48,6 @@ public class UserPrivacyUtil {
   // Storage key for the binary optout (for CCPA)
   @VisibleForTesting
   static final String OPTOUT_USPRIVACY_SHARED_PREFS_KEY = "USPrivacy_Optout";
-
-  @VisibleForTesting
-  static final String MOPUB_CONSENT_SHARED_PREFS_KEY = "MoPubConsent_String";
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -135,22 +129,5 @@ public class UserPrivacyUtil {
 
     return !IAB_USPRIVACY_PATTERN.matcher(iabUsPrivacy).matches() ||
         IAB_USPRIVACY_WITH_CONSENT.contains(iabUsPrivacy.toLowerCase(Locale.ROOT));
-  }
-
-  public boolean isMopubConsentGivenOrNotApplicable() {
-    String mopubConsent = getMopubConsent();
-    return !MOPUB_CONSENT_DECLINED_STRINGS.contains(mopubConsent.toLowerCase(Locale.ROOT));
-  }
-
-  public void storeMopubConsent(@Nullable String mopubConsent) {
-    Editor edit = sharedPreferences.edit();
-    edit.putString(MOPUB_CONSENT_SHARED_PREFS_KEY, mopubConsent);
-    edit.apply();
-    logger.log(PrivacyLogMessage.onMoPubConsentSet(mopubConsent));
-  }
-
-  @NonNull
-  public String getMopubConsent() {
-    return safeSharedPreferences.getString(MOPUB_CONSENT_SHARED_PREFS_KEY, "");
   }
 }

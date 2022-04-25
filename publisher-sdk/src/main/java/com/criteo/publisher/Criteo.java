@@ -60,9 +60,6 @@ public abstract class Criteo {
     @Nullable
     private Boolean usPrivacyOptOut;
 
-    @Nullable
-    private String mopubConsent;
-
     private boolean isDebugLogsEnabled = false;
 
     public Builder(@NonNull Application application, @NonNull String criteoPublisherId) {
@@ -84,8 +81,10 @@ public abstract class Criteo {
       return this;
     }
 
-    public Builder mopubConsent(@Nullable String mopubConsent) {
-      this.mopubConsent = mopubConsent;
+    @Deprecated(forRemoval = true, since = "MoPub sunset")
+    public Builder mopubConsent(@Nullable String ignored) {
+      // do nothing
+      // TODO log usage of deprecated API
       return this;
     }
 
@@ -119,7 +118,6 @@ public abstract class Criteo {
                 builder.application,
                 builder.adUnits,
                 builder.usPrivacyOptOut,
-                builder.mopubConsent,
                 dependencyProvider
             );
 
@@ -209,7 +207,11 @@ public abstract class Criteo {
 
   public abstract void setUsPrivacyOptOut(boolean usPrivacyOptOut);
 
-  public abstract void setMopubConsent(@Nullable String mopubConsent);
+  @Deprecated
+  public void setMopubConsent(@Nullable String ignored) {
+    // do nothing
+    // TODO log usage of deprecated API
+  }
 
   public abstract void setUserData(@NonNull UserData userData);
 

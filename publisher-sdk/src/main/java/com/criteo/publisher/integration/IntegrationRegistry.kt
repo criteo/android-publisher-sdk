@@ -21,7 +21,6 @@ import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.integration.IntegrationLogMessage.onDeclaredIntegrationRead
 import com.criteo.publisher.integration.IntegrationLogMessage.onIntegrationDeclared
 import com.criteo.publisher.integration.IntegrationLogMessage.onMediationAdapterDetected
-import com.criteo.publisher.integration.IntegrationLogMessage.onMultipleMediationAdaptersDetected
 import com.criteo.publisher.integration.IntegrationLogMessage.onNoDeclaredIntegration
 import com.criteo.publisher.integration.IntegrationLogMessage.onUnknownIntegrationName
 import com.criteo.publisher.logging.LoggerFactory
@@ -78,16 +77,9 @@ class IntegrationRegistry(
   }
 
   private fun detectMediationIntegration(): Integration? {
-    val moPubMediationPresent = integrationDetector.isMoPubMediationPresent()
     val adMobMediationPresent = integrationDetector.isAdMobMediationPresent()
 
-    return if (moPubMediationPresent && adMobMediationPresent) {
-      logger.log(onMultipleMediationAdaptersDetected())
-      Integration.FALLBACK
-    } else if (moPubMediationPresent) {
-      logger.log(onMediationAdapterDetected("MoPub"))
-      Integration.MOPUB_MEDIATION
-    } else if (adMobMediationPresent) {
+    return if (adMobMediationPresent) {
       logger.log(onMediationAdapterDetected("AdMob"))
       Integration.ADMOB_MEDIATION
     } else {

@@ -21,8 +21,6 @@ import com.criteo.publisher.annotation.OpenForTesting
 @OpenForTesting
 class IntegrationDetector {
 
-  fun isMoPubMediationPresent(): Boolean = MoPubMediationBannerAdapterClass.isClassPresent()
-
   fun isAdMobMediationPresent(): Boolean = AdMobMediationAdapterClass.isClassPresent()
 
   private fun String.isClassPresent(): Boolean {
@@ -42,9 +40,8 @@ class IntegrationDetector {
   }
 
   private companion object {
-    // Those class name are stable: they are used in publisher configuration on MoPub/AdMob servers.
+    // Those class name are stable: they are used in publisher configuration on AdMob servers.
     // So renaming is clearly not expected.
-    const val MoPubMediationBannerAdapterClass = "com.criteo.mediation.mopub.CriteoBannerAdapter"
     const val AdMobMediationAdapterClass = "com.criteo.mediation.google.CriteoAdapter"
   }
 }

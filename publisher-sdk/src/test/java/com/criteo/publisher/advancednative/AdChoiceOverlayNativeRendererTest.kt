@@ -56,7 +56,7 @@ class AdChoiceOverlayNativeRendererTest {
   }
 
   @Test
-  fun moPubAdapterConstructor_GivenSdkNotInitialized_ThrowException() {
+  fun mediationAdapterConstructor_GivenSdkNotInitialized_ThrowException() {
     clearCriteo()
     MockableDependencyProvider.setInstance(null)
 
@@ -66,7 +66,7 @@ class AdChoiceOverlayNativeRendererTest {
   }
 
   @Test
-  fun moPubAdapterConstructor_GivenSdkInitialized_DoNotThrowException() {
+  fun mediationAdapterConstructor_GivenSdkInitialized_DoNotThrowException() {
     givenInitializedCriteo()
 
     assertThatCode {

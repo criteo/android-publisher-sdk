@@ -81,7 +81,6 @@ class CdbRequestFactoryTest {
 
   @Before
   fun setUp() {
-    whenever(userPrivacyUtil.mopubConsent).thenReturn("mopubConsent")
     whenever(userPrivacyUtil.iabUsPrivacyString).thenReturn("iabUsPrivacyString")
     whenever(userPrivacyUtil.usPrivacyOptout).thenReturn("usPrivacyoptout")
 
@@ -197,7 +196,6 @@ class CdbRequestFactoryTest {
       on { gdprData } doReturn expectedGdpr
       on { usPrivacyOptout } doReturn "usPrivacyOptout"
       on { iabUsPrivacyString } doReturn "iabUsPrivacyString"
-      on { mopubConsent } doReturn "mopubConsent"
     }
 
     whenever(context.packageName).thenReturn("bundle.id")
@@ -215,21 +213,18 @@ class CdbRequestFactoryTest {
     assertThat(request.gdprData).isEqualTo(expectedGdpr)
     assertThat(request.user.uspIab()).isEqualTo("iabUsPrivacyString")
     assertThat(request.user.uspOptout()).isEqualTo("usPrivacyOptout")
-    assertThat(request.user.mopubConsent()).isEqualTo("mopubConsent")
     assertThat(request.slots).containsExactlyInAnyOrder(expectedSlot)
 
     // request 2
     userPrivacyUtil.stub {
       on { usPrivacyOptout } doReturn ""
       on { iabUsPrivacyString } doReturn ""
-      on { mopubConsent } doReturn ""
     }
 
     request = factory.createRequest(adUnits, contextData)
 
     assertThat(request.user.uspIab()).isNull()
     assertThat(request.user.uspOptout()).isNull()
-    assertThat(request.user.mopubConsent()).isNull()
   }
 
   @Test

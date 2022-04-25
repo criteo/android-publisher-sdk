@@ -21,11 +21,6 @@ import com.criteo.publisher.logging.LogMessage
 internal object PrivacyLogMessage {
 
   @JvmStatic
-  fun onMoPubConsentSet(mopubConsent: String?) = LogMessage(message =
-    "MoPub consent set: $mopubConsent"
-  )
-
-  @JvmStatic
   fun onUsPrivacyOptOutSet(optOut: Boolean) = LogMessage(message =
     "CCPA opt-out set: $optOut"
   )

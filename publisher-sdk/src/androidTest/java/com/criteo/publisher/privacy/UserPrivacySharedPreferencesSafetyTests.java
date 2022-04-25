@@ -56,12 +56,10 @@ public class UserPrivacySharedPreferencesSafetyTests {
   public void testRobustnessWhenAllKeysHaveBadType() {
     SharedPreferences.Editor editor = sharedPreferencesFactory.getApplication().edit();
     editor.putInt(UserPrivacyUtil.IAB_USPRIVACY_SHARED_PREFS_KEY, 1);
-    editor.putInt(UserPrivacyUtil.MOPUB_CONSENT_SHARED_PREFS_KEY, 1);
     editor.putInt(UserPrivacyUtil.OPTOUT_USPRIVACY_SHARED_PREFS_KEY, 1);
     editor.apply();
 
     assertEquals("", userPrivacyUtil.getIabUsPrivacyString());
-    assertEquals("", userPrivacyUtil.getMopubConsent());
     assertEquals("", userPrivacyUtil.getUsPrivacyOptout());
   }
 }

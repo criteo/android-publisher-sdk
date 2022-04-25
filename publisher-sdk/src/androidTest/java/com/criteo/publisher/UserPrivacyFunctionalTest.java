@@ -16,7 +16,6 @@
 
 package com.criteo.publisher;
 
-import static com.criteo.publisher.CriteoUtil.clearCriteo;
 import static com.criteo.publisher.CriteoUtil.getCriteoBuilder;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static org.junit.Assert.assertEquals;
@@ -128,66 +127,6 @@ public class UserPrivacyFunctionalTest {
 
     CdbRequest cdb = cdbArgumentCaptor.getValue();
     assertEquals("false", cdb.getUser().uspOptout());
-  }
-
-  @Test
-  public void whenCriteoInit_GivenMopubConsentNotEmpty_VerifyItIsPassedToCdb() throws Exception {
-    Criteo.Builder builder = getCriteoBuilder(TestAdUnits.BANNER_320_50);
-    builder.mopubConsent("fake_mopub_consent").init();
-
-    waitForIdleState();
-
-    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
-    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
-
-    CdbRequest cdb = cdbArgumentCaptor.getValue();
-    assertEquals("fake_mopub_consent", cdb.getUser().mopubConsent());
-  }
-
-  @Test
-  public void whenCriteoInit_GivenMopubConsentNotProvided_ThenProvidedAfterFirstCall_VerifyItIsPassedToCdbOnTheSecondCall()
-      throws Exception {
-    Criteo.Builder builder = getCriteoBuilder(TestAdUnits.BANNER_320_50);
-    Criteo criteo = builder.init();
-
-    waitForIdleState();
-
-    criteo.setMopubConsent("fake_mopub_consent");
-    criteo.getBidForAdUnit(TestAdUnits.BANNER_320_480, mock(ContextData.class), mock(BidListener.class));
-
-    waitForIdleState();
-
-    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
-    verify(pubSdkApi, times(2)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
-
-    CdbRequest cdb = cdbArgumentCaptor.getValue();
-    assertEquals("fake_mopub_consent", cdb.getUser().mopubConsent());
-  }
-
-  @Test
-  public void whenCriteoInit_GivenMopubConsentThroughSetter_ThenCriteoCleared_ThenVerifyItIsStillPassedToCdb()
-      throws Exception {
-    // given
-    Criteo.Builder builder = getCriteoBuilder(TestAdUnits.BANNER_320_50);
-    Criteo criteo = builder.init();
-
-    waitForIdleState();
-
-    criteo.setMopubConsent("fake_mopub_consent");
-
-    // when
-    clearCriteo();
-
-    // then
-    Criteo.Builder builder2 = getCriteoBuilder(TestAdUnits.BANNER_320_50);
-    Criteo criteo2 = builder2.init();
-    criteo2.getBidForAdUnit(TestAdUnits.BANNER_320_480, mock(ContextData.class), mock(BidListener.class));
-    waitForIdleState();
-    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
-    verify(pubSdkApi, times(3)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
-
-    CdbRequest cdb = cdbArgumentCaptor.getValue();
-    assertEquals("fake_mopub_consent", cdb.getUser().mopubConsent());
   }
 
   private void writeIntoDefaultSharedPrefs(String key, String value) {

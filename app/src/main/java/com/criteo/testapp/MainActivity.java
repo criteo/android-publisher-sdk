@@ -52,15 +52,6 @@ public class MainActivity extends AppCompatActivity {
       Intent intent = new Intent(getApplicationContext(), InHouseActivity.class);
       startActivity(intent);
     });
-    findViewById(R.id.buttonMopubCall).setOnClickListener((View v) -> {
-      Intent intent = new Intent(getApplicationContext(), MopubActivity.class);
-      startActivity(intent);
-    });
-
-    findViewById(R.id.buttonMopubMediation).setOnClickListener((View v) -> {
-      Intent intent = new Intent(getApplicationContext(), MopubMediationActivity.class);
-      startActivity(intent);
-    });
 
     findViewById(R.id.buttonAdMobMediation).setOnClickListener((View v) -> {
       Intent intent = new Intent(getApplicationContext(), AdMobMediationActivity.class);

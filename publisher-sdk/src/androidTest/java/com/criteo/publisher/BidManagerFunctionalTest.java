@@ -220,7 +220,7 @@ public class BidManagerFunctionalTest {
 
   @Test
   public void unsupportedAdFormat_prefetch_GivenSupportedAdFormatForAnIntegration_ShouldNotFilterIt() throws Exception {
-    doReturn(Integration.MOPUB_APP_BIDDING).when(integrationRegistry).readIntegration();
+    doReturn(Integration.GAM_APP_BIDDING).when(integrationRegistry).readIntegration();
 
     RewardedAdUnit notFiltered = new RewardedAdUnit("not_filtered");
     List<AdUnit> prefetchAdUnits = singletonList(notFiltered);
@@ -256,7 +256,7 @@ public class BidManagerFunctionalTest {
     givenMockedClockSetTo(42);
     givenTimeBudgetRespectedWhenFetchingLiveBids();
 
-    doReturn(Integration.MOPUB_APP_BIDDING).when(integrationRegistry).readIntegration();
+    doReturn(Integration.GAM_APP_BIDDING).when(integrationRegistry).readIntegration();
 
     RewardedAdUnit adUnit = new RewardedAdUnit("not_filtered");
 
@@ -292,7 +292,7 @@ public class BidManagerFunctionalTest {
 
   @Test
   public void unsupportedAdFormat_getBidForAdUnitAndPrefetch_GivenSupportedAdFormatForAnIntegration_ShouldHandleIt() throws Exception {
-    doReturn(Integration.MOPUB_APP_BIDDING).when(integrationRegistry).readIntegration();
+    doReturn(Integration.GAM_APP_BIDDING).when(integrationRegistry).readIntegration();
 
     RewardedAdUnit adUnit = new RewardedAdUnit("filtered");
 
@@ -513,7 +513,6 @@ public class BidManagerFunctionalTest {
     when(userPrivacyUtil.getGdprData()).thenReturn(expectedGdpr);
     when(userPrivacyUtil.getUsPrivacyOptout()).thenReturn("");
     when(userPrivacyUtil.getIabUsPrivacyString()).thenReturn("");
-    when(userPrivacyUtil.getMopubConsent()).thenReturn("");
 
     when(buildConfigWrapper.getSdkVersion()).thenReturn("1.2.3");
     doReturn(42).when(integrationRegistry).getProfileId();
@@ -533,7 +532,6 @@ public class BidManagerFunctionalTest {
 
     User expectedUser = User.create(
         advertisingInfo.getAdvertisingId(),
-        null,
         null,
         null,
         new HashMap<>()

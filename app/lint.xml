@@ -25,7 +25,6 @@
     <ignore path="src/main/res/layout/activity_in_house.xml"/>
     <ignore path="src/main/res/layout/activity_main.xml"/>
     <ignore path="src/main/res/layout/activity_mediation.xml"/>
-    <ignore path="src/main/res/layout/activity_mopub_mediation.xml"/>
     <ignore path="src/main/res/layout/activity_stand_alone.xml"/>
     <ignore path="src/main/res/layout/content_dfp.xml"/>
   </issue>

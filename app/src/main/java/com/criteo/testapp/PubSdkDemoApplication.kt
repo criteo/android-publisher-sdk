@@ -26,9 +26,6 @@ import com.criteo.publisher.TestAdUnits
 import com.criteo.publisher.context.ContextData
 import com.criteo.publisher.context.EmailHasher.hash
 import com.criteo.publisher.context.UserData
-import com.criteo.publisher.model.BannerAdUnit
-import com.criteo.publisher.model.InterstitialAdUnit
-import com.criteo.publisher.model.NativeAdUnit
 import com.criteo.publisher.network.CdbMock
 import com.criteo.publisher.util.BuildConfigWrapper
 import com.criteo.testapp.integration.IntegrationSelectionMode
@@ -98,9 +95,6 @@ class PubSdkDemoApplication : MultiDexApplication() {
     val adUnits = listOf(
         BANNER,
         INTERSTITIAL,
-        BannerAdUnit(TestAdUnits.MOPUB_MEDIATION_BANNER_ADUNIT_ID, BANNER.size),
-        InterstitialAdUnit(TestAdUnits.MOPUB_MEDIATION_INTERSTITIAL_ADUNIT_ID),
-        NativeAdUnit(TestAdUnits.MOPUB_MEDIATION_NATIVE_ADUNIT_ID),
         INTERSTITIAL_IBV_DEMO,
         INTERSTITIAL_VIDEO,
         NATIVE

@@ -52,7 +52,6 @@ internal class PublisherCodeRemover {
       // Mediation Libs: The SDK is coupled to these libraries through the mediation adapters.
       // This will indicate if an exception happens during mediation.
       "com.google",
-      "com.mopub",
 
       // Libs used by the SDK: exception might come from them
       "org.json",

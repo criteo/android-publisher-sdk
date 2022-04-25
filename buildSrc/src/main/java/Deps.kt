@@ -65,7 +65,6 @@ object Deps {
     }
 
     object Mediation {
-      fun MoPub(version: String) = "com.criteo.mediation.mopub:criteo-adapter-development:$version"
       fun AdMob(version: String) = "com.criteo.mediation.google:criteo-adapter-development:$version"
     }
   }
@@ -127,14 +126,6 @@ object Deps {
     const val Android = "org.mockito:mockito-android:$version"
     const val Core = "org.mockito:mockito-core:$version"
     const val Kotlin = "org.mockito.kotlin:mockito-kotlin:3.2.0"
-  }
-
-  object MoPub {
-    private const val version = "5.17.0"
-
-    const val Banner = "com.mopub:mopub-sdk-banner:$version@aar"
-    const val Interstitial = "com.mopub:mopub-sdk-fullscreen:$version@aar"
-    const val Native = "com.mopub:mopub-sdk-native-static:$version@aar"
   }
 
   object Square {

@@ -20,5 +20,4 @@ import com.criteo.publisher.integration.IntegrationDetector
 
 internal class NoIntegrationDetector : IntegrationDetector() {
   override fun isAdMobMediationPresent() = false
-  override fun isMoPubMediationPresent() = false
 }
