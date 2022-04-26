@@ -10,7 +10,9 @@
     android:layout_height="wrap_content"
     android:padding="8dp"
     android:layout_margin="16dp"
-    android:hint="@string/hint_ccpa_iab"/>
+    android:hint="@string/hint_ccpa_iab"
+    android:inputType="text"
+    android:importantForAutofill="no"/>
 
   <CheckBox
     android:id="@+id/checkboxCcpaBinary"
