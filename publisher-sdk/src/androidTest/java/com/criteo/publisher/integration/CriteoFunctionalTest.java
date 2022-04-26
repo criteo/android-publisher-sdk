@@ -18,6 +18,7 @@ package com.criteo.publisher.integration;
 
 import static com.criteo.publisher.CriteoUtil.TEST_CP_ID;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
+import static com.criteo.publisher.logging.DeprecationLogMessage.onDeprecatedMethodCalled;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -36,6 +37,7 @@ import static org.mockito.Mockito.when;
 import android.app.Application;
 import android.content.Intent;
 import android.os.Looper;
+import android.util.Log;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.BidManager;
 import com.criteo.publisher.Criteo;
@@ -95,6 +97,24 @@ public class CriteoFunctionalTest {
 
   @SpyBean
   private Logger logger;
+
+  @Test
+  @SuppressWarnings("deprecation")
+  public void setMoPubConsent_LogThatDeprecatedMethodIsCalled() throws Exception {
+    givenInitializedCriteo().setMopubConsent("dummy");
+
+    verify(logger).log(argThat(logMessage ->
+        logMessage.getLevel() == Log.WARN && logMessage.getMessage().contains("Criteo#setMopubConsent")));
+  }
+
+  @Test
+  @SuppressWarnings("deprecation")
+  public void moPubConsent_LogThatDeprecatedMethodIsCalled() throws Exception {
+    new Criteo.Builder(application, "dummy").mopubConsent("dummy");
+
+    verify(logger).log(argThat(logMessage ->
+        logMessage.getLevel() == Log.WARN && logMessage.getMessage().contains("Criteo$Builder#mopubConsent")));
+  }
 
   @Test
   public void getVersion_GivenNotInitializedSdk_ReturnVersion() throws Exception {
