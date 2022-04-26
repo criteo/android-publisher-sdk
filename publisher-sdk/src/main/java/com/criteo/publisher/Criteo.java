@@ -17,6 +17,7 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.ErrorLogMessage.onUncaughtErrorAtPublicApi;
+import static com.criteo.publisher.logging.DeprecationLogMessage.onDeprecatedMethodCalled;
 import static com.criteo.publisher.SdkInitLogMessage.onDummySdkInitialized;
 import static com.criteo.publisher.SdkInitLogMessage.onErrorDuringSdkInitialization;
 import static com.criteo.publisher.SdkInitLogMessage.onSdkInitialized;
@@ -81,10 +82,10 @@ public abstract class Criteo {
       return this;
     }
 
-    @Deprecated(forRemoval = true, since = "MoPub sunset")
+    @Deprecated
     public Builder mopubConsent(@Nullable String ignored) {
-      // do nothing
-      // TODO log usage of deprecated API
+      Logger logger = LoggerFactory.getLogger(Builder.class);
+      logger.log(onDeprecatedMethodCalled());
       return this;
     }
 
@@ -209,8 +210,8 @@ public abstract class Criteo {
 
   @Deprecated
   public void setMopubConsent(@Nullable String ignored) {
-    // do nothing
-    // TODO log usage of deprecated API
+    Logger logger = LoggerFactory.getLogger(Criteo.class);
+    logger.log(onDeprecatedMethodCalled());
   }
 
   public abstract void setUserData(@NonNull UserData userData);
