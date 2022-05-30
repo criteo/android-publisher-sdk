@@ -338,6 +338,7 @@ public class ConfigTest {
     assertTrue(config.isCsmEnabled());
     assertTrue(config.isLiveBiddingEnabled());
     assertEquals(8000, config.getLiveBiddingTimeBudgetInMillis());
+    assertFalse(config.isPrefetchOnInitEnabled());
   }
 
 }

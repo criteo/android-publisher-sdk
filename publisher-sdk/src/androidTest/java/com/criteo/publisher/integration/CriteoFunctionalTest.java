@@ -147,45 +147,7 @@ public class CriteoFunctionalTest {
   }
 
   @Test
-  public void init_GivenPrefetchCachedBannerAndReInitWithSameBanner_CdbIsNotCallTheSecondTime()
-      throws Exception {
-    init_GivenPrefetchCachedAdAndReInitWithSameAdUnit_CdbIsNotCallTheSecondTime(validBannerAdUnit);
-  }
-
-  @Test
-  public void init_GivenPrefetchCachedInterstitialAndReInitWithSameInterstitial_CdbIsNotCallTheSecondTime()
-      throws Exception {
-    init_GivenPrefetchCachedAdAndReInitWithSameAdUnit_CdbIsNotCallTheSecondTime(
-        validInterstitialAdUnit);
-  }
-
-  private void init_GivenPrefetchCachedAdAndReInitWithSameAdUnit_CdbIsNotCallTheSecondTime(
-      AdUnit adUnit)
-      throws Exception {
-    int dayTtl = 3600 * 24;
-
-    doAnswer(invocation -> {
-      Object response = invocation.callRealMethod();
-      CdbResponse cdbResponse = (CdbResponse) response;
-      cdbResponse.getSlots().forEach(slot -> {
-        slot.setTtlInSeconds(dayTtl);
-      });
-      return cdbResponse;
-    }).when(api).loadCdb(any(), any());
-
-    givenInitializedCriteo(adUnit);
-    waitForBids();
-
-    new Criteo.Builder(application, TEST_CP_ID)
-        .adUnits(Collections.singletonList(adUnit))
-        .init();
-    waitForBids();
-
-    verify(api, times(1)).loadCdb(any(), any());
-  }
-
-  @Test
-  public void init_GivenPrefetchAdUnitAndLaunchedActivity_CallConfigAndCdbAndBearcat()
+  public void init_GivenLaunchedActivity_CallConfigAndBearcat()
       throws Exception {
     givenInitializedCriteo(validBannerAdUnit);
 
@@ -193,7 +155,6 @@ public class CriteoFunctionalTest {
 
     waitForBids();
 
-    verify(api).loadCdb(any(), any());
     verify(api).loadConfig(any());
     verify(api).postAppEvent(anyInt(), any(), any(), eq("Launch"), anyInt(), any(), any());
     verify(api).postAppEvent(anyInt(), any(), any(), eq("Active"), anyInt(), any(), any());

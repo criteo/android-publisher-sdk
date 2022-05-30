@@ -50,7 +50,7 @@ public class Config {
     public static final boolean CSM_ENABLED = true;
     public static final boolean LIVE_BIDDING_ENABLED = true;
     public static final int LIVE_BIDDING_TIME_BUDGET_IN_MILLIS = 8_000;
-    public static final boolean PREFETCH_ON_INIT_ENABLED = true;
+    public static final boolean PREFETCH_ON_INIT_ENABLED = false;
     public static final RemoteLogLevel REMOTE_LOG_LEVEL = RemoteLogLevel.WARNING;
 
   }

@@ -57,7 +57,7 @@ public class UserPrivacyFunctionalTest {
   public void whenCriteoInit_GivenUspIabNotEmpty_VerifyItIsPassedToCdb() throws Exception {
     writeIntoDefaultSharedPrefs("IABUSPrivacy_String", "fake_iab_usp");
 
-    givenInitializedCriteo(TestAdUnits.BANNER_320_50);
+    givenInitializedCriteo().loadBid(TestAdUnits.BANNER_320_50, mock(ContextData.class), mock(BidResponseListener.class));
     waitForIdleState();
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
@@ -71,7 +71,7 @@ public class UserPrivacyFunctionalTest {
   public void whenCriteoInit_GivenUspIabEmpty_VerifyItIsNotPassedToCdb() throws Exception {
     writeIntoDefaultSharedPrefs("IABUSPrivacy_String", null);
 
-    givenInitializedCriteo(TestAdUnits.BANNER_320_50);
+    givenInitializedCriteo().loadBid(TestAdUnits.BANNER_320_50, mock(ContextData.class), mock(BidResponseListener.class));
     waitForIdleState();
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
@@ -83,8 +83,10 @@ public class UserPrivacyFunctionalTest {
 
   @Test
   public void whenCriteoInit_GivenUspOptoutNotEmpty_VerifyItIsPassedToCdb() throws Exception {
-    Criteo.Builder builder = getCriteoBuilder(TestAdUnits.BANNER_320_50);
-    builder.usPrivacyOptOut(true).init();
+    getCriteoBuilder()
+        .usPrivacyOptOut(true)
+        .init()
+        .loadBid(TestAdUnits.BANNER_320_50, mock(ContextData.class), mock(BidResponseListener.class));
 
     waitForIdleState();
 
@@ -97,8 +99,9 @@ public class UserPrivacyFunctionalTest {
 
   @Test
   public void whenCriteoInit_GivenUspOptoutEmpty_VerifyItIsPassedToCdb() throws Exception {
-    Criteo.Builder builder = getCriteoBuilder(TestAdUnits.BANNER_320_50);
-    builder.init();
+    getCriteoBuilder()
+        .init()
+        .loadBid(TestAdUnits.BANNER_320_50, mock(ContextData.class), mock(BidResponseListener.class));
 
     waitForIdleState();
 
@@ -112,18 +115,17 @@ public class UserPrivacyFunctionalTest {
   @Test
   public void whenCriteoInit_GivenUspOptoutTrue_ThenChangedToFalseAfterFirstCall_VerifyFalseIsPassedToCdbOnTheSecondCall()
       throws Exception {
-    Criteo.Builder builder = getCriteoBuilder(TestAdUnits.BANNER_320_50);
-    Criteo criteo = builder.usPrivacyOptOut(true).init();
+    Criteo criteo = getCriteoBuilder().usPrivacyOptOut(true).init();
 
     waitForIdleState();
 
     criteo.setUsPrivacyOptOut(false);
-    criteo.getBidForAdUnit(TestAdUnits.BANNER_320_480, mock(ContextData.class), mock(BidListener.class));
+    criteo.loadBid(TestAdUnits.BANNER_320_480, mock(ContextData.class), mock(BidResponseListener.class));
 
     waitForIdleState();
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
-    verify(pubSdkApi, times(2)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
+    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
     CdbRequest cdb = cdbArgumentCaptor.getValue();
     assertEquals("false", cdb.getUser().uspOptout());
