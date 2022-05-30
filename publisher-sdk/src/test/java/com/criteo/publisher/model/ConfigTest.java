@@ -336,7 +336,7 @@ public class ConfigTest {
         "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>",
         config.getAdTagDataMode());
     assertTrue(config.isCsmEnabled());
-    assertFalse(config.isLiveBiddingEnabled());
+    assertTrue(config.isLiveBiddingEnabled());
     assertEquals(8000, config.getLiveBiddingTimeBudgetInMillis());
   }
 

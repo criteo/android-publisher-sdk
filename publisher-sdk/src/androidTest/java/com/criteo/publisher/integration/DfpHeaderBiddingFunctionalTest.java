@@ -679,10 +679,6 @@ public class DfpHeaderBiddingFunctionalTest {
     waitForBids();
   }
 
-  private void givenLiveBiddingEnabled() {
-    when(config.isLiveBiddingEnabled()).thenReturn(true);
-  }
-
   static final class DfpSync {
 
     private final CountDownLatch isLoaded = new CountDownLatch(1);
