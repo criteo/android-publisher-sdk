@@ -28,7 +28,6 @@ import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.CdbResponseSlot;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.privacy.ConsentData;
-
 import java.io.InterruptedIOException;
 import java.util.concurrent.Executor;
 
@@ -47,6 +46,9 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
   private final MetricSendingQueueProducer sendingQueueProducer;
 
   @NonNull
+  private final MetricSendingQueueConsumer sendingQueueConsumer;
+
+  @NonNull
   private final Clock clock;
 
   @NonNull
@@ -61,6 +63,7 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
   public CsmBidLifecycleListener(
       @NonNull MetricRepository repository,
       @NonNull MetricSendingQueueProducer sendingQueueProducer,
+      @NonNull MetricSendingQueueConsumer sendingQueueConsumer,
       @NonNull Clock clock,
       @NonNull Config config,
       @NonNull ConsentData consentData,
@@ -68,6 +71,7 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
   ) {
     this.repository = repository;
     this.sendingQueueProducer = sendingQueueProducer;
+    this.sendingQueueConsumer = sendingQueueConsumer;
     this.clock = clock;
     this.config = config;
     this.consentData = consentData;
@@ -78,7 +82,7 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
    * SDK initialization is caused either by a fresh or restart of the application. As a consequence,
    * the in-memory bid-cache is lost and the metrics associated to the previously cached bids will
    * never be updated again. In this case, all previously stored metrics are moved to the sending
-   * queue.
+   * queue and posted to backend.
    */
   @Override
   public void onSdkInitialized() {
@@ -90,6 +94,7 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
       @Override
       public void runSafely() {
         sendingQueueProducer.pushAllInQueue(repository);
+        sendingQueueConsumer.sendMetricBatch();
       }
     });
   }

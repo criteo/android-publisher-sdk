@@ -399,6 +399,7 @@ public class DependencyProvider {
         listener.add(new CsmBidLifecycleListener(
             provideMetricRepository(),
             provideMetricSendingQueueProducer(),
+            provideMetricSendingQueueConsumer(),
             provideClock(),
             provideConfig(),
             provideConsentData(),

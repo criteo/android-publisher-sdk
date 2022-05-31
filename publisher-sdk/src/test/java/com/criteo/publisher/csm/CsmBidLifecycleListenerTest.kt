@@ -37,6 +37,7 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.check
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
@@ -61,6 +62,9 @@ class CsmBidLifecycleListenerTest {
 
   @Mock
   private lateinit var sendingQueueProducer: MetricSendingQueueProducer
+
+  @Mock
+  private lateinit var sendingQueueConsumer: MetricSendingQueueConsumer
 
   @Mock
   private lateinit var clock: Clock
@@ -88,6 +92,7 @@ class CsmBidLifecycleListenerTest {
     listener = CsmBidLifecycleListener(
         repository,
         sendingQueueProducer,
+        sendingQueueConsumer,
         clock,
         config,
         consentData,
@@ -96,10 +101,13 @@ class CsmBidLifecycleListenerTest {
   }
 
   @Test
-  fun onSdkInitialized_PushAllMetricsInQueue() {
+  fun onSdkInitialized_PushAllMetricsInQueueAndSendBatch() {
     listener.onSdkInitialized()
 
-    verify(sendingQueueProducer).pushAllInQueue(repository)
+    inOrder(sendingQueueConsumer, sendingQueueProducer) {
+      verify(sendingQueueProducer).pushAllInQueue(repository)
+      verify(sendingQueueConsumer).sendMetricBatch()
+    }
   }
 
   @Test
@@ -526,5 +534,6 @@ class CsmBidLifecycleListenerTest {
     verifyZeroInteractions(repository)
     verifyZeroInteractions(clock)
     verifyZeroInteractions(sendingQueueProducer)
+    verifyZeroInteractions(sendingQueueConsumer)
   }
 }
