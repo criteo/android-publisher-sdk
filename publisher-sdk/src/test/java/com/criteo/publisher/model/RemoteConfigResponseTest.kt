@@ -51,7 +51,6 @@ class RemoteConfigResponseTest {
     assertThat(response.csmEnabled).isNull()
     assertThat(response.liveBiddingEnabled).isNull()
     assertThat(response.liveBiddingTimeBudgetInMillis).isNull()
-    assertThat(response.prefetchOnInitEnabled).isNull()
   }
 
   @Test
@@ -70,7 +69,6 @@ class RemoteConfigResponseTest {
     assertThat(response.csmEnabled).isNull()
     assertThat(response.liveBiddingEnabled).isNull()
     assertThat(response.liveBiddingTimeBudgetInMillis).isNull()
-    assertThat(response.prefetchOnInitEnabled).isNull()
     assertThat(response.remoteLogLevel).isNull()
   }
 
@@ -85,7 +83,6 @@ class RemoteConfigResponseTest {
       "csmEnabled": true,
       "liveBiddingEnabled": true,
       "liveBiddingTimeBudgetInMillis": 42,
-      "prefetchOnInitEnabled": true,
       "remoteLogLevel": "Warning"
     }""".trimIndent()
 
@@ -99,7 +96,6 @@ class RemoteConfigResponseTest {
     assertThat(response.csmEnabled).isTrue()
     assertThat(response.liveBiddingEnabled).isTrue()
     assertThat(response.liveBiddingTimeBudgetInMillis).isEqualTo(42)
-    assertThat(response.prefetchOnInitEnabled).isTrue()
     assertThat(response.remoteLogLevel).isEqualTo(RemoteLogLevel.WARNING)
   }
 

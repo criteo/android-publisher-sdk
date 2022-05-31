@@ -50,7 +50,6 @@ public class Config {
     public static final boolean CSM_ENABLED = true;
     public static final boolean LIVE_BIDDING_ENABLED = true;
     public static final int LIVE_BIDDING_TIME_BUDGET_IN_MILLIS = 8_000;
-    public static final boolean PREFETCH_ON_INIT_ENABLED = false;
     public static final RemoteLogLevel REMOTE_LOG_LEVEL = RemoteLogLevel.WARNING;
 
   }
@@ -150,10 +149,6 @@ public class Config {
             baseRemoteConfig.getLiveBiddingTimeBudgetInMillis()
         ),
         getOrElse(
-            overrideRemoteConfig.getPrefetchOnInitEnabled(),
-            baseRemoteConfig.getPrefetchOnInitEnabled()
-        ),
-        getOrElse(
             overrideRemoteConfig.getRemoteLogLevel(),
             baseRemoteConfig.getRemoteLogLevel()
         )
@@ -226,16 +221,6 @@ public class Config {
     return getOrElse(
         cachedRemoteConfig.getLiveBiddingTimeBudgetInMillis(),
         DefaultConfig.LIVE_BIDDING_TIME_BUDGET_IN_MILLIS
-    );
-  }
-
-  /**
-   * Return <code>true</code> to indicate if the prefetch is enabled, <code>false</code> otherwise.
-   */
-  public boolean isPrefetchOnInitEnabled() {
-    return getOrElse(
-        cachedRemoteConfig.getPrefetchOnInitEnabled(),
-        DefaultConfig.PREFETCH_ON_INIT_ENABLED
     );
   }
 

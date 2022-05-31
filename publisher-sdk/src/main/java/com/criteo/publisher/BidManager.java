@@ -370,21 +370,6 @@ public class BidManager implements ApplicationStoppedListener {
     bidRequestSender.cancelAllPendingTasks();
   }
 
-  /**
-   * This method is called back after the "useragent" is fetched
-   *
-   * @param adUnits list of ad units to prefetch
-   */
-  public void prefetch(@NonNull List<AdUnit> adUnits) {
-    if (config.isPrefetchOnInitEnabled()) {
-      List<List<CacheAdUnit>> requestedAdUnitsChunks = adUnitMapper.mapToChunks(adUnits);
-
-      for (List<CacheAdUnit> requestedAdUnits : requestedAdUnitsChunks) {
-        sendBidRequest(requestedAdUnits, new ContextData());
-      }
-    }
-  }
-
   private boolean killSwitchEngaged() {
     return config.isKillSwitchEnabled();
   }

@@ -195,16 +195,6 @@ public class ConfigTest {
   }
 
   @Test
-  public void refreshConfig_GivenMissingPrefetchOnInitEnabled_ItIsUnchanged() throws Exception {
-    givenNewConfig();
-
-    RemoteConfigResponse newConfig = givenFullNewPayload(config);
-    when(newConfig.getPrefetchOnInitEnabled()).thenReturn(null);
-
-    refreshConfig_assertItIsUnchanged(newConfig, Config::isPrefetchOnInitEnabled);
-  }
-
-  @Test
   public void refreshConfig_GivenMissingRemoteLogLevel_ItIsUnchanged() throws Exception {
     givenNewConfig();
 
@@ -241,7 +231,6 @@ public class ConfigTest {
         false,
         false,
         42,
-        false,
         RemoteLogLevel.ERROR
     );
 
@@ -314,7 +303,6 @@ public class ConfigTest {
     when(response.getCsmEnabled()).thenReturn(!config.isCsmEnabled());
     when(response.getLiveBiddingEnabled()).thenReturn(!config.isLiveBiddingEnabled());
     when(response.getLiveBiddingTimeBudgetInMillis()).thenReturn(1 + config.getLiveBiddingTimeBudgetInMillis());
-    when(response.getPrefetchOnInitEnabled()).thenReturn(!config.isPrefetchOnInitEnabled());
 
     // Get any value that is not the one set in the given config
     RemoteLogLevel otherLogLevel = Arrays.stream(RemoteLogLevel.values())
@@ -338,7 +326,6 @@ public class ConfigTest {
     assertTrue(config.isCsmEnabled());
     assertTrue(config.isLiveBiddingEnabled());
     assertEquals(8000, config.getLiveBiddingTimeBudgetInMillis());
-    assertFalse(config.isPrefetchOnInitEnabled());
   }
 
 }
