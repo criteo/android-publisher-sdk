@@ -76,7 +76,7 @@ class LiveBidRequestSenderTest {
   fun timeBudgetTimerKicksOff_ThenTimeBudgetExceededTrigger() {
     whenever(cdbRequestFactory.userAgent).thenReturn(userAgentFuture)
     whenever(userAgentFuture.get()).thenReturn("fake_user_agent")
-    whenever(cdbRequestFactory.createRequest(eq(listOf(cacheAdUnit)), eq(contextData))).thenReturn(cdbRequest)
+    whenever(cdbRequestFactory.createRequest(eq(cacheAdUnit), eq(contextData))).thenReturn(cdbRequest)
     whenever(pubSdkApi.loadCdb(eq(cdbRequest), any())).thenReturn(cdbResponse)
     whenever(config.liveBiddingTimeBudgetInMillis).thenReturn(1)
 

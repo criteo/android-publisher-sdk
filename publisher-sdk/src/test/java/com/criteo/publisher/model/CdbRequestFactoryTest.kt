@@ -111,7 +111,6 @@ class CdbRequestFactoryTest {
   @Test
   fun createRequest_GivenInput_BuildRequest() {
     val adUnit = createAdUnit()
-    val adUnits: List<CacheAdUnit> = listOf(adUnit)
     val contextData: ContextData = ContextData().set("a.a", "foo").set("b", "bar")
     val expectedGdpr: GdprData = mock()
 
@@ -162,7 +161,7 @@ class CdbRequestFactoryTest {
         )
     )
 
-    val request = factory.createRequest(adUnits, contextData)
+    val request = factory.createRequest(adUnit, contextData)
 
     assertThat(request.id).isEqualTo("myRequestId")
     assertThat(request.publisher).isEqualTo(expectedPublisher)
@@ -177,7 +176,6 @@ class CdbRequestFactoryTest {
   fun givenOneRequestWithNonEmptyPrivacyValue_AndOneRequestWithEmptyPrivacyValues_VerifyRequestsAreDifferent() {
     // request 1
     val adUnit = createAdUnit()
-    val adUnits: List<CacheAdUnit> = listOf(adUnit)
     val contextData = ContextData()
     val expectedGdpr: GdprData = mock()
 
@@ -204,7 +202,7 @@ class CdbRequestFactoryTest {
         .thenReturn("myRequestId")
         .thenReturn("impId")
 
-    var request = factory.createRequest(adUnits, contextData)
+    var request = factory.createRequest(adUnit, contextData)
 
     assertThat(request.id).isEqualTo("myRequestId")
     assertThat(request.publisher).isEqualTo(Publisher.create("bundle.id", "myCpId", mapOf()))
@@ -221,7 +219,7 @@ class CdbRequestFactoryTest {
       on { iabUsPrivacyString } doReturn ""
     }
 
-    request = factory.createRequest(adUnits, contextData)
+    request = factory.createRequest(adUnit, contextData)
 
     assertThat(request.user.uspIab()).isNull()
     assertThat(request.user.uspOptout()).isNull()
@@ -231,7 +229,6 @@ class CdbRequestFactoryTest {
   fun createRequest_GivenAdUnits_MapThemToRequestSlotWithImpressionId() {
     val adUnit1 = createAdUnit()
     val adUnit2 = createAdUnit()
-    val adUnits: List<CacheAdUnit> = listOf(adUnit1, adUnit2)
     val contextData: ContextData = mock()
 
     val expectedSlot1 = CdbRequestSlot.create(
@@ -249,7 +246,7 @@ class CdbRequestFactoryTest {
     )
 
     uniqueIdGenerator.stub {
-      on { generateId() }.doReturn("myRequestId", "impId1", "impId2")
+      on { generateId() }.doReturn("myRequestId1", "impId1", "myRequestId2", "impId2")
     }
 
     buildConfigWrapper.stub {
@@ -259,9 +256,11 @@ class CdbRequestFactoryTest {
     whenever(context.packageName).thenReturn("bundle.id")
     whenever(integrationRegistry.profileId).thenReturn(1337)
 
-    val request = factory.createRequest(adUnits, contextData)
+    val request1 = factory.createRequest(adUnit1, contextData)
+    val request2 = factory.createRequest(adUnit2, contextData)
 
-    assertThat(request.slots).containsExactlyInAnyOrder(expectedSlot1, expectedSlot2)
+    assertThat(request1.slots).containsExactlyInAnyOrder(expectedSlot1)
+    assertThat(request2.slots).containsExactlyInAnyOrder(expectedSlot2)
   }
 
   @Test

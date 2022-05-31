@@ -30,11 +30,9 @@ import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.BuildConfigWrapper;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -98,7 +96,7 @@ public class CdbRequestFactory {
 
   @NonNull
   public CdbRequest createRequest(
-      @NonNull List<CacheAdUnit> requestedAdUnits,
+      @NonNull CacheAdUnit requestedAdUnit,
       @NonNull ContextData contextData
   ) {
     Map<String, Object> publisherExt = mergeToNestedMap(toMap(contextData));
@@ -128,17 +126,8 @@ public class CdbRequestFactory {
         buildConfigWrapper.getSdkVersion(),
         integrationRegistry.getProfileId(),
         userPrivacyUtil.getGdprData(),
-        createRequestSlots(requestedAdUnits)
+        Collections.singletonList(createRequestSlot(requestedAdUnit))
     );
-  }
-
-  @NonNull
-  private List<CdbRequestSlot> createRequestSlots(List<CacheAdUnit> requestedAdUnits) {
-    List<CdbRequestSlot> slots = new ArrayList<>();
-    for (CacheAdUnit requestedAdUnit : requestedAdUnits) {
-      slots.add(createRequestSlot(requestedAdUnit));
-    }
-    return slots;
   }
 
   @NonNull

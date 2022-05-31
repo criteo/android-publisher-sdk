@@ -38,7 +38,6 @@ import com.criteo.publisher.network.BidRequestSender;
 import com.criteo.publisher.network.LiveBidRequestSender;
 import com.criteo.publisher.privacy.ConsentData;
 import com.criteo.publisher.util.ApplicationStoppedListener;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -251,7 +250,7 @@ public class BidManager implements ApplicationStoppedListener {
    * load data for next time
    */
   private void fetchForCache(@NonNull CacheAdUnit cacheAdUnit, @NonNull ContextData contextData) {
-    sendBidRequest(Collections.singletonList(cacheAdUnit), contextData);
+    sendBidRequest(cacheAdUnit, contextData);
   }
 
   @VisibleForTesting
@@ -296,7 +295,7 @@ public class BidManager implements ApplicationStoppedListener {
   }
 
   private void sendBidRequest(
-      @NonNull List<CacheAdUnit> prefetchCacheAdUnits,
+      @NonNull CacheAdUnit cacheAdUnit,
       @NonNull ContextData contextData
   ) {
     if (killSwitchEngaged()) {
@@ -304,7 +303,7 @@ public class BidManager implements ApplicationStoppedListener {
     }
 
     bidRequestSender.sendBidRequest(
-        prefetchCacheAdUnits,
+        cacheAdUnit,
         contextData,
         new CacheOnlyCdbCallListener()
     );
