@@ -16,10 +16,8 @@
 
 package com.criteo.publisher;
 
-import static com.criteo.publisher.concurrent.ThreadingUtil.waitForMessageQueueToBeIdle;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static com.criteo.publisher.util.CompletableFuture.completedFuture;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -40,7 +38,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
@@ -60,7 +57,6 @@ import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
-import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestSlot;
@@ -88,7 +84,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Rule;
@@ -1520,7 +1515,6 @@ public class BidManagerFunctionalTest {
     AdUnit fromAdUnit = mock(AdUnit.class);
 
     doReturn(toAdUnit).when(adUnitMapper).map(fromAdUnit);
-    doReturn(singletonList(singletonList(toAdUnit))).when(adUnitMapper).mapToChunks(singletonList(fromAdUnit));
 
     return fromAdUnit;
   }
