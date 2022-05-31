@@ -102,19 +102,12 @@ class DebugLoggingFunctionalTest {
   private lateinit var logger: Logger
 
   @Test
-  fun whenCriteoInitIsCalled_LogCpIdAndAdUnits() {
+  fun whenCriteoInitIsCalled_LogCpId() {
     whenever(buildConfigWrapper.sdkVersion).doReturn("1.2.3")
-    val adUnits = listOf(
-        BannerAdUnit("bannerAdUnit", AdSize(42, 1337)),
-        InterstitialAdUnit("interstitialAdUnit"),
-        NativeAdUnit("nativeAdUnit")
-    )
 
-    Criteo.Builder(application, "B-123456")
-        .adUnits(adUnits)
-        .init()
+    Criteo.Builder(application, "B-123456").init()
 
-    verify(logger).log(SdkInitLogMessage.onSdkInitialized("B-123456", adUnits, "1.2.3"))
+    verify(logger).log(SdkInitLogMessage.onSdkInitialized("B-123456", "1.2.3"))
   }
 
   @Test

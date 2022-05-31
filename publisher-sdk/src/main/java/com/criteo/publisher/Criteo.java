@@ -55,9 +55,6 @@ public abstract class Criteo {
     @NonNull
     private final Application application;
 
-    @NonNull
-    private List<AdUnit> adUnits = new ArrayList<>();
-
     @Nullable
     private Boolean usPrivacyOptOut;
 
@@ -68,12 +65,10 @@ public abstract class Criteo {
       this.criteoPublisherId = criteoPublisherId;
     }
 
+    @Deprecated
     public Builder adUnits(@Nullable List<AdUnit> adUnits) {
-      if (adUnits == null) {
-        this.adUnits = new ArrayList<>();
-      } else {
-        this.adUnits = adUnits;
-      }
+      Logger logger = LoggerFactory.getLogger(Builder.class);
+      logger.log(onDeprecatedMethodCalled());
       return this;
     }
 
@@ -117,12 +112,11 @@ public abstract class Criteo {
           if (deviceUtil.isVersionSupported()) {
             criteo = new CriteoInternal(
                 builder.application,
-                builder.adUnits,
                 builder.usPrivacyOptOut,
                 dependencyProvider
             );
 
-            logger.log(onSdkInitialized(builder.criteoPublisherId, builder.adUnits, getVersion()));
+            logger.log(onSdkInitialized(builder.criteoPublisherId, getVersion()));
           } else {
             criteo = new DummyCriteo();
 

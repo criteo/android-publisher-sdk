@@ -305,11 +305,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void prefetch_GivenAdUnitsAndPrefetchDisabled_ShouldCallRemoteConfigButNotCdb() throws Exception {
+  public void prefetch_GivenAdUnitsAndPrefetchDisabled_ShouldNotCallCdb() throws Exception {
     when(config.isPrefetchOnInitEnabled()).thenReturn(false);
-
-    RemoteConfigResponse response = mock(RemoteConfigResponse.class);
-    when(api.loadConfig(any())).thenReturn(response);
 
     List<AdUnit> prefetchAdUnits = Arrays.asList(
         mock(AdUnit.class),
@@ -322,7 +319,6 @@ public class BidManagerFunctionalTest {
 
     verifyNoInteractions(adUnitMapper);
     assertShouldNotCallCdbAndNotPopulateCache();
-    verify(config).refreshConfig(response);
   }
 
   @Test
@@ -331,18 +327,6 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     assertShouldNotCallCdbAndNotPopulateCache();
-  }
-
-  @Test
-  public void prefetch_GivenNoAdUnit_ShouldUpdateConfig() throws Exception {
-    RemoteConfigResponse response = mock(RemoteConfigResponse.class);
-    when(api.loadConfig(any())).thenReturn(response);
-
-    bidManager.prefetch(emptyList());
-    waitForIdleState();
-
-    verify(config).refreshConfig(response);
-    verify(api, never()).loadCdb(any(), any());
   }
 
   @Test
@@ -401,13 +385,11 @@ public class BidManagerFunctionalTest {
 
     CdbResponse response1 = givenMockedCdbResponseWithValidSlot(1);
     CdbResponse response3 = givenMockedCdbResponseWithValidSlot(3);
-    RemoteConfigResponse remoteConfigResponse = mock(RemoteConfigResponse.class);
 
     when(api.loadCdb(any(), any()))
         .thenReturn(response1)
         .thenThrow(IOException.class)
         .thenReturn(response3);
-    when(api.loadConfig(any())).thenReturn(remoteConfigResponse);
 
     bidManager = spy(bidManager);
     bidManager.prefetch(prefetchAdUnits);
@@ -415,11 +397,7 @@ public class BidManagerFunctionalTest {
 
     InOrder inOrder = inOrder(bidManager, cache, api, config);
 
-    // First call with only config call
-    inOrder.verify(config).refreshConfig(remoteConfigResponse);
-
     // First call to CDB
-    inOrder.verify(config, never()).refreshConfig(any());
     inOrder.verify(api)
         .loadCdb(argThat(cdb -> requestedAdUnits1.equals(getRequestedAdUnits(cdb))), any());
     response1.getSlots().forEach(inOrder.verify(cache)::add);
@@ -429,8 +407,7 @@ public class BidManagerFunctionalTest {
     inOrder.verify(api)
         .loadCdb(argThat(cdb -> requestedAdUnits2.equals(getRequestedAdUnits(cdb))), any());
 
-    // Third call in success but without the config call
-    inOrder.verify(config, never()).refreshConfig(any());
+    // Third call in success
     inOrder.verify(api)
         .loadCdb(argThat(cdb -> requestedAdUnits3.equals(getRequestedAdUnits(cdb))), any());
     response3.getSlots().forEach(inOrder.verify(cache)::add);
@@ -460,32 +437,6 @@ public class BidManagerFunctionalTest {
     waitForIdleState();
 
     assertShouldNotCallCdbAndNotPopulateCache();
-  }
-
-  @Test
-  public void prefetch_GivenRemoteConfigWithKillSwitchEnabled_WhenGettingBidShouldNotCallCdbAndNotPopulateCacheAndReturnNull()
-      throws Exception {
-    givenKillSwitchIs(false);
-    doAnswer(answerVoid((RemoteConfigResponse response) -> {
-      Boolean killSwitch = response.getKillSwitch();
-      when(config.isKillSwitchEnabled()).thenReturn(killSwitch);
-    })).when(config).refreshConfig(any());
-
-    CacheAdUnit cacheAdUnit = sampleAdUnit();
-    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    givenRemoteConfigWithKillSwitchEnabled();
-
-    bidManager.prefetch(singletonList(adUnit));
-    waitForIdleState();
-
-    clearInvocations(cache);
-    clearInvocations(api);
-    clearInvocations(bidLifecycleListener);
-
-    CdbResponseSlot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
-
-    assertShouldNotCallCdbAndNotPopulateCache();
-    assertNull(bid);
   }
 
   @Test

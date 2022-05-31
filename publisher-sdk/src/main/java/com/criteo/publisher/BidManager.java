@@ -376,8 +376,6 @@ public class BidManager implements ApplicationStoppedListener {
    * @param adUnits list of ad units to prefetch
    */
   public void prefetch(@NonNull List<AdUnit> adUnits) {
-    bidRequestSender.sendRemoteConfigRequest(config);
-
     if (config.isPrefetchOnInitEnabled()) {
       List<List<CacheAdUnit>> requestedAdUnitsChunks = adUnitMapper.mapToChunks(adUnits);
 

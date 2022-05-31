@@ -18,7 +18,6 @@ package com.criteo.publisher.integration;
 
 import static com.criteo.publisher.CriteoUtil.TEST_CP_ID;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
-import static com.criteo.publisher.logging.DeprecationLogMessage.onDeprecatedMethodCalled;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -30,7 +29,6 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,20 +39,16 @@ import android.util.Log;
 import androidx.test.rule.ActivityTestRule;
 import com.criteo.publisher.BidManager;
 import com.criteo.publisher.Criteo;
-import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.context.UserData;
 import com.criteo.publisher.context.UserDataHolder;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
-import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.BannerAdUnit;
-import com.criteo.publisher.model.CdbResponse;
-import com.criteo.publisher.model.InterstitialAdUnit;
+import com.criteo.publisher.model.Config;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
 import com.criteo.publisher.util.BuildConfigWrapper;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 import org.junit.Rule;
@@ -77,14 +71,14 @@ public class CriteoFunctionalTest {
   @Rule
   public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-  private final BannerAdUnit validBannerAdUnit = TestAdUnits.BANNER_320_50;
-  private final InterstitialAdUnit validInterstitialAdUnit = TestAdUnits.INTERSTITIAL;
-
   @Inject
   private Application application;
 
   @SpyBean
   private PubSdkApi api;
+
+  @SpyBean
+  private Config config;
 
   @SpyBean
   private BuildConfigWrapper buildConfigWrapper;
@@ -114,6 +108,15 @@ public class CriteoFunctionalTest {
 
     verify(logger).log(argThat(logMessage ->
         logMessage.getLevel() == Log.WARN && logMessage.getMessage().contains("Criteo$Builder#mopubConsent")));
+  }
+
+  @Test
+  @SuppressWarnings("deprecation")
+  public void adUnits_LogThatDeprecatedMethodIsCalled() throws Exception {
+    new Criteo.Builder(application, "dummy").adUnits(new ArrayList<>());
+
+    verify(logger).log(argThat(logMessage ->
+        logMessage.getLevel() == Log.WARN && logMessage.getMessage().contains("Criteo$Builder#adUnits")));
   }
 
   @Test
@@ -149,28 +152,17 @@ public class CriteoFunctionalTest {
   @Test
   public void init_GivenLaunchedActivity_CallConfigAndBearcat()
       throws Exception {
-    givenInitializedCriteo(validBannerAdUnit);
+    givenInitializedCriteo();
 
     activityRule.launchActivity(new Intent());
 
     waitForBids();
 
     verify(api).loadConfig(any());
+    verify(config).refreshConfig(any());
+
     verify(api).postAppEvent(anyInt(), any(), any(), eq("Launch"), anyInt(), any(), any());
     verify(api).postAppEvent(anyInt(), any(), any(), eq("Active"), anyInt(), any(), any());
-  }
-
-  @Test
-  public void init_WaitingForIdleState_BidManagerIsPrefetchOnMainThread() throws Exception {
-    doAnswer(answerVoid((List<AdUnit> adUnits) -> {
-      assertTrue(adUnits.isEmpty());
-      assertSame(Thread.currentThread(), Looper.getMainLooper().getThread());
-    })).when(bidManager).prefetch(any());
-
-    givenInitializedCriteo();
-    waitForBids();
-
-    verify(bidManager).prefetch(any());
   }
 
   @Test

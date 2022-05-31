@@ -28,15 +28,8 @@ public class CriteoUtil {
   public static final String PROD_CP_ID = "B-056946";
   public static final String PROD_CDB_URL = "https://bidder.criteo.com";
 
-  public static Criteo givenInitializedCriteo(AdUnit... preloadedAdUnits)
-      throws CriteoInitException {
-    Application app = InstrumentationUtil.getApplication();
-
-    clearCriteo();
-
-    return new Criteo.Builder(app, TEST_CP_ID)
-        .adUnits(Arrays.asList(preloadedAdUnits))
-        .init();
+  public static Criteo givenInitializedCriteo(AdUnit... preloadedAdUnits) throws CriteoInitException {
+    return getCriteoBuilder(preloadedAdUnits).init();
   }
 
   /**
@@ -50,7 +43,7 @@ public class CriteoUtil {
     Application app = InstrumentationUtil.getApplication();
 
     // clears any side effects from previous calls
-    Criteo.setInstance(null);
+    clearCriteo();
 
     List<AdUnit> adUnits = Arrays.asList(preloadedAdUnits);
     return new Criteo.Builder(app, TEST_CP_ID).adUnits(adUnits);
