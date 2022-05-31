@@ -32,6 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -42,6 +43,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.test.filters.FlakyTest;
 import androidx.test.rule.ActivityTestRule;
+import com.criteo.publisher.BidResponseListener;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.CriteoUtil;
@@ -203,7 +205,7 @@ public class DfpHeaderBiddingFunctionalTest {
   @Test
   public void whenGettingBid_GivenValidCpIdAndPrefetchValidRewardedVideoId_CriteoMacroAreInjectedInDfpBuilder()
       throws Exception {
-    givenInitializedCriteo();
+    givenInitializedCriteo(TestAdUnits.REWARDED);
 
     // this request is ignored because current detected integration (fallback) is not supporting rewarded video
     loadBidAndWait(TestAdUnits.REWARDED, new Builder());
@@ -669,13 +671,15 @@ public class DfpHeaderBiddingFunctionalTest {
         PROD_CP_ID);
   }
 
-  private void givenInitializedCriteo(@NonNull AdUnit... adUnits) throws CriteoInitException {
-    if (config.isLiveBiddingEnabled()) {
-      // Empty it to show that prefetch has no influence
-      adUnits = new AdUnit[]{};
+  private void givenInitializedCriteo(@NonNull AdUnit adUnit) throws CriteoInitException {
+    Criteo criteo = CriteoUtil.givenInitializedCriteo();
+
+    if (!config.isLiveBiddingEnabled()) {
+      // Simulate prefetch of ad unit
+      // TODO: remove once bid caching is removed
+      criteo.loadBid(adUnit, mock(ContextData.class), mock(BidResponseListener.class));
     }
 
-    CriteoUtil.givenInitializedCriteo(adUnits);
     waitForBids();
   }
 

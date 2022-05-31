@@ -100,7 +100,7 @@ public class AdvancedNativeFunctionalTest {
   @Test
   public void loadStandaloneAdInAdLayout_GivenValidBid_DisplayAllInformationInViews()
       throws Exception {
-    givenInitializedCriteo(NATIVE);
+    givenInitializedCriteo();
     mockedDependenciesRule.waitForIdleState();
 
     TestNativeActivity activity = activityRule.getActivity();
@@ -124,7 +124,7 @@ public class AdvancedNativeFunctionalTest {
 
   @Test
   public void loadInHouseAdInAdLayout_GivenValidBid_DisplayAllInformationInViews() throws Exception {
-    givenInitializedCriteo(NATIVE);
+    givenInitializedCriteo();
     mockedDependenciesRule.waitForIdleState();
 
     TestNativeActivity activity = activityRule.getActivity();
@@ -152,7 +152,7 @@ public class AdvancedNativeFunctionalTest {
 
   @Test
   public void loadStandaloneAdInRecyclerView_GivenValidBid_DisplayAllInformationInViews() throws Exception {
-    givenInitializedCriteo(NATIVE);
+    givenInitializedCriteo();
     mockedDependenciesRule.waitForIdleState();
 
     TestNativeActivity activity = activityRule.getActivity();
@@ -172,7 +172,7 @@ public class AdvancedNativeFunctionalTest {
 
   @Test
   public void loadInHouseAdInRecyclerView_GivenValidBid_DisplayAllInformationInViews() throws Exception {
-    givenInitializedCriteo(NATIVE);
+    givenInitializedCriteo();
     mockedDependenciesRule.waitForIdleState();
 
     TestNativeActivity activity = activityRule.getActivity();

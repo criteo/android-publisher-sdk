@@ -26,7 +26,6 @@ import com.criteo.publisher.Criteo
 import com.criteo.publisher.CriteoBannerView
 import com.criteo.publisher.CriteoInterstitial
 import com.criteo.publisher.CriteoUtil
-import com.criteo.publisher.CriteoUtil.givenInitializedCriteo
 import com.criteo.publisher.SdkInitLogMessage
 import com.criteo.publisher.StubConstants
 import com.criteo.publisher.TestAdUnits.BANNER_320_50
@@ -44,11 +43,7 @@ import com.criteo.publisher.integration.Integration.GAM_APP_BIDDING
 import com.criteo.publisher.interstitial.InterstitialLogMessage
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
-import com.criteo.publisher.model.AdSize
-import com.criteo.publisher.model.BannerAdUnit
 import com.criteo.publisher.model.CdbRequest
-import com.criteo.publisher.model.InterstitialAdUnit
-import com.criteo.publisher.model.NativeAdUnit
 import com.criteo.publisher.network.NetworkLogMessage
 import com.criteo.publisher.network.PubSdkApi
 import com.criteo.publisher.privacy.PrivacyLogMessage
@@ -137,7 +132,7 @@ class DebugLoggingFunctionalTest {
   @Test
   fun whenEnrichingAdMob_BannerBid_LogSuccess() {
     lateinit var bid: Bid
-    givenInitializedCriteo(BANNER_320_50)
+    givenInitializedCriteo()
     mockedDependenciesRule.waitForIdleState()
 
     Criteo.getInstance().loadBid(BANNER_320_50) {
@@ -155,7 +150,7 @@ class DebugLoggingFunctionalTest {
   @Test
   fun whenEnrichingCustom_BannerBid_LogSuccess() {
     lateinit var bid: Bid
-    givenInitializedCriteo(BANNER_320_50)
+    givenInitializedCriteo()
     mockedDependenciesRule.waitForIdleState()
 
     Criteo.getInstance().loadBid(BANNER_320_50) {
@@ -173,7 +168,7 @@ class DebugLoggingFunctionalTest {
   @Test
   fun whenEnrichingUnknown_LogError() {
     lateinit var bid: Bid
-    givenInitializedCriteo(BANNER_320_50)
+    givenInitializedCriteo()
     mockedDependenciesRule.waitForIdleState()
 
     Criteo.getInstance().loadBid(BANNER_320_50) {
@@ -188,7 +183,7 @@ class DebugLoggingFunctionalTest {
 
   @Test
   fun whenEnrichingNull_LogError() {
-    givenInitializedCriteo(BANNER_320_50)
+    givenInitializedCriteo()
     mockedDependenciesRule.waitForIdleState()
 
     Criteo.getInstance().loadBid(BANNER_320_50) {
@@ -214,7 +209,7 @@ class DebugLoggingFunctionalTest {
 
   @Test
   fun whenLoadingBid_ValidBid_LogSuccess() {
-    givenInitializedCriteo(BANNER_320_50)
+    givenInitializedCriteo()
     mockedDependenciesRule.waitForIdleState()
 
     val bidRef = AtomicReference<Bid>()
@@ -227,7 +222,7 @@ class DebugLoggingFunctionalTest {
 
   @Test
   fun whenLoadingBannerForStandalone_ValidBid_LogSuccess() {
-    givenInitializedCriteo(BANNER_320_50)
+    givenInitializedCriteo()
     mockedDependenciesRule.waitForIdleState()
 
     val bannerView = callOnMainThreadAndWait { CriteoBannerView(context, BANNER_320_50) }
@@ -256,7 +251,7 @@ class DebugLoggingFunctionalTest {
   @Test
   fun whenLoadingBannerForInHouse_ValidBid_LogSuccess() {
     lateinit var bid: Bid
-    givenInitializedCriteo(BANNER_320_50)
+    givenInitializedCriteo()
     mockedDependenciesRule.waitForIdleState()
 
     val bannerView = callOnMainThreadAndWait { CriteoBannerView(context) }
@@ -287,7 +282,7 @@ class DebugLoggingFunctionalTest {
 
   @Test
   fun whenLoadingInterstitialForStandalone_ValidBid_LogSuccess() {
-    givenInitializedCriteo(INTERSTITIAL)
+    givenInitializedCriteo()
     mockedDependenciesRule.waitForIdleState()
 
     val interstitial = CriteoInterstitial(INTERSTITIAL)
@@ -307,7 +302,7 @@ class DebugLoggingFunctionalTest {
 
   @Test
   fun whenLoadingInterstitialForStandalone_NoBid_LogFailure() {
-    givenInitializedCriteo(INTERSTITIAL_UNKNOWN)
+    givenInitializedCriteo()
     mockedDependenciesRule.waitForIdleState()
 
     val interstitial = CriteoInterstitial(INTERSTITIAL_UNKNOWN)
@@ -327,7 +322,7 @@ class DebugLoggingFunctionalTest {
   @Test
   fun whenLoadingInterstitialForInHouse_ValidBid_LogSuccess() {
     lateinit var bid: Bid
-    givenInitializedCriteo(INTERSTITIAL)
+    givenInitializedCriteo()
     mockedDependenciesRule.waitForIdleState()
 
     val interstitial = CriteoInterstitial()
@@ -344,7 +339,7 @@ class DebugLoggingFunctionalTest {
 
   @Test
   fun whenLoadingInterstitialForInHouse_NoBid_LogFailure() {
-    givenInitializedCriteo(INTERSTITIAL_UNKNOWN)
+    givenInitializedCriteo()
     mockedDependenciesRule.waitForIdleState()
 
     val interstitial = CriteoInterstitial()
@@ -358,7 +353,7 @@ class DebugLoggingFunctionalTest {
 
   @Test
   fun whenLoadingNativeForStandalone_ValidBid_LogSuccess() {
-    givenInitializedCriteo(NATIVE)
+    givenInitializedCriteo()
     mockedDependenciesRule.waitForIdleState()
 
     val nativeLoader = CriteoNativeLoader(NATIVE, mock(), mock())
@@ -387,7 +382,7 @@ class DebugLoggingFunctionalTest {
   @Test
   fun whenLoadingNativeForInHouse_ValidBid_LogSuccess() {
     lateinit var bid: Bid
-    givenInitializedCriteo(NATIVE)
+    givenInitializedCriteo()
     mockedDependenciesRule.waitForIdleState()
 
     val nativeLoader = CriteoNativeLoader(mock(), mock())

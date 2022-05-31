@@ -61,7 +61,6 @@ import com.criteo.publisher.mock.MockBean;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdSize;
-import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.Config;
@@ -136,7 +135,7 @@ public class StandaloneFunctionalTest {
   @Test
   public void whenLoadingABanner_GivenBidAvailable_DisplayUrlIsProperlyLoadedInBannerView()
       throws Exception {
-    givenInitializedSdk(validBannerAdUnit);
+    givenInitializedSdk();
 
     CriteoBannerView bannerView = whenLoadingABanner(validBannerAdUnit);
     String html = webViewLookup.lookForHtmlContent(bannerView).get();
@@ -162,7 +161,7 @@ public class StandaloneFunctionalTest {
 
   private void whenLoadingAnInterstitial_GivenBidAvailable_DisplayUrlIsProperlyLoadedInInterstitialActivity()
       throws Exception {
-    givenInitializedSdk(validInterstitialAdUnit);
+    givenInitializedSdk();
 
     CriteoInterstitial interstitial = createInterstitial(validInterstitialAdUnit);
     CriteoSync sync = new CriteoSync(interstitial);
@@ -177,7 +176,7 @@ public class StandaloneFunctionalTest {
   @FlakyTest
   public void whenLoadingAnInterstitial_GivenBidAvailableTwice_DisplayUrlIsProperlyLoadedInInterstitialActivityTwice()
       throws Exception {
-    givenInitializedSdk(validInterstitialAdUnit);
+    givenInitializedSdk();
 
     CriteoInterstitial interstitial = createInterstitial(validInterstitialAdUnit);
     CriteoSync sync = new CriteoSync(interstitial);
@@ -206,7 +205,7 @@ public class StandaloneFunctionalTest {
   @Test
   public void whenLoadingABanner_GivenNoBidAvailable_NothingIsLoadedInBannerView()
       throws Exception {
-    givenInitializedSdk(invalidBannerAdUnit);
+    givenInitializedSdk();
 
     CriteoBannerView bannerView = whenLoadingABanner(invalidBannerAdUnit);
 
@@ -222,7 +221,7 @@ public class StandaloneFunctionalTest {
   @Test
   public void whenLoadingAnInterstitial_GivenNoBidAvailable_InterstitialIsNotLoadedAndCannotBeShown()
       throws Exception {
-    givenInitializedSdk(invalidInterstitialAdUnit);
+    givenInitializedSdk();
 
     CriteoInterstitial interstitial = whenLoadingAnInterstitial(invalidInterstitialAdUnit);
 
@@ -291,7 +290,7 @@ public class StandaloneFunctionalTest {
   @Test
   public void whenLoadingABanner_GivenListenerAndBidAvailable_OnAdReceivedIsCalled()
       throws Exception {
-    givenInitializedSdk(validBannerAdUnit);
+    givenInitializedSdk();
 
     CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
     CriteoBannerView bannerView = createBanner(validBannerAdUnit, listener);
@@ -309,7 +308,7 @@ public class StandaloneFunctionalTest {
   @Test
   public void whenLoadingABanner_GivenListenerAndNoBidAvailable_OnAdFailedToReceivedIsCalledWithNoFill()
       throws Exception {
-    givenInitializedSdk(invalidBannerAdUnit);
+    givenInitializedSdk();
 
     CriteoBannerAdListener listener = mock(CriteoBannerAdListener.class);
     CriteoBannerView bannerView = createBanner(invalidBannerAdUnit, listener);
@@ -323,7 +322,7 @@ public class StandaloneFunctionalTest {
   @Test
   public void whenLoadingAnInterstitial_GivenListenerAndNoBidAvailable_OnAdFailedToReceivedIsCalledWithNoFill()
       throws Exception {
-    givenInitializedSdk(invalidInterstitialAdUnit);
+    givenInitializedSdk();
 
     CriteoInterstitialAdListener listener = mock(CriteoInterstitialAdListener.class);
     CriteoInterstitial interstitial = createInterstitial(invalidInterstitialAdUnit, listener);
@@ -503,8 +502,8 @@ public class StandaloneFunctionalTest {
     when(deviceUtil.getCurrentScreenSize()).thenReturn(landscapeScreenSize);
   }
 
-  private void givenInitializedSdk(AdUnit... preloadedAdUnits) throws Exception {
-    givenInitializedCriteo(preloadedAdUnits);
+  private void givenInitializedSdk() throws Exception {
+    givenInitializedCriteo();
     waitForBids();
   }
 

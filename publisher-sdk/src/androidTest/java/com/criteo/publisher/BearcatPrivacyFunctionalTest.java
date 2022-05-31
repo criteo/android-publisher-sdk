@@ -117,7 +117,7 @@ public class BearcatPrivacyFunctionalTest {
     writeIntoDefaultSharedPrefs("IABUSPrivacy_String", usPrivacyString);
     writeIntoDefaultSharedPrefs("USPrivacy_Optout", binaryOptout);
 
-    givenInitializedCriteo(TestAdUnits.BANNER_320_50);
+    givenInitializedCriteo();
 
     appEvents.sendLaunchEvent();
 

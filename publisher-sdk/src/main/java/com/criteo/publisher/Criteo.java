@@ -17,11 +17,11 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.ErrorLogMessage.onUncaughtErrorAtPublicApi;
-import static com.criteo.publisher.logging.DeprecationLogMessage.onDeprecatedMethodCalled;
 import static com.criteo.publisher.SdkInitLogMessage.onDummySdkInitialized;
 import static com.criteo.publisher.SdkInitLogMessage.onErrorDuringSdkInitialization;
 import static com.criteo.publisher.SdkInitLogMessage.onSdkInitialized;
 import static com.criteo.publisher.SdkInitLogMessage.onSdkInitializedMoreThanOnce;
+import static com.criteo.publisher.logging.DeprecationLogMessage.onDeprecatedMethodCalled;
 
 import android.app.Application;
 import android.util.Log;
@@ -38,7 +38,6 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.util.DeviceUtil;
-import java.util.ArrayList;
 import java.util.List;
 
 @Keep
@@ -66,7 +65,7 @@ public abstract class Criteo {
     }
 
     @Deprecated
-    public Builder adUnits(@Nullable List<AdUnit> adUnits) {
+    public Builder adUnits(@Nullable List<AdUnit> ignored) {
       Logger logger = LoggerFactory.getLogger(Builder.class);
       logger.log(onDeprecatedMethodCalled());
       return this;

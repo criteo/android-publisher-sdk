@@ -37,7 +37,6 @@ import androidx.core.util.Consumer;
 import androidx.test.filters.FlakyTest;
 import com.criteo.publisher.Clock;
 import com.criteo.publisher.Criteo;
-import com.criteo.publisher.CriteoInitException;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.csm.MetricRequest.MetricRequestFeedback;
@@ -48,6 +47,7 @@ import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.network.CdbMock;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.privacy.ConsentData;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -87,15 +87,18 @@ public class CsmFunctionalTest {
   @Inject
   private CdbMock cdbMock;
 
+  @Inject
+  private ConsentData consentData;
+
   @Before
   public void setUp() throws Exception {
     integrationRegistry.declare(Integration.IN_HOUSE);
-    givenConsentGiven();
+    consentData.setConsentGiven(true);
   }
 
   @Test
-  public void givenPrefetchAdUnitsWithBidsThenConsumption_CallApiWithCsmOfConsumedBid() throws Exception {
-    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+  public void givenBidsThenConsumption_CallApiWithCsmOfConsumedBid() throws Exception {
+    givenInitializedCriteo();
     waitForIdleState();
 
     loadBid(TestAdUnits.BANNER_320_50);
@@ -144,20 +147,10 @@ public class CsmFunctionalTest {
     }));
   }
 
-  /**
-   * Consent status is updated after the first response from CDB. Therefore, a first bid-request
-   * is made here to get the wanted side-effect.
-   */
-  private void givenConsentGiven() throws CriteoInitException {
-    givenInitializedCriteo(TestAdUnits.BANNER_320_480);
-    waitForIdleState();
-    MetricHelper.cleanState(mockedDependenciesRule.getDependencyProvider());
-  }
-
   @Test
   public void givenConsumedExpiredBid_CallApiWithCsmOfConsumedExpiredBid() throws Exception {
     when(clock.getCurrentTimeInMillis()).thenReturn(0L);
-    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+    givenInitializedCriteo();
     waitForIdleState();
 
     when(clock.getCurrentTimeInMillis()).thenReturn(Long.MAX_VALUE);
@@ -185,7 +178,7 @@ public class CsmFunctionalTest {
 
   @Test
   public void givenNoBidFromCdb_CallApiWithCsmOfNoBid() throws Exception {
-    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL_UNKNOWN);
+    givenInitializedCriteo();
     waitForIdleState();
 
     loadBid(TestAdUnits.INTERSTITIAL_UNKNOWN);
@@ -206,7 +199,7 @@ public class CsmFunctionalTest {
   public void givenNetworkErrorFromCdb_CallApiWithCsmOfNetworkError() throws Exception {
     doThrow(IOException.class).when(api).loadCdb(any(), any());
 
-    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+    givenInitializedCriteo();
     waitForIdleState();
 
     loadBid(TestAdUnits.INTERSTITIAL_UNKNOWN);
@@ -236,7 +229,7 @@ public class CsmFunctionalTest {
   public void givenTimeoutErrorFromCdb_CallApiWithCsmOfTimeoutError() throws Exception {
     when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenReturn(1);
 
-    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+    givenInitializedCriteo();
     waitForIdleState();
 
     when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenCallRealMethod();
@@ -270,7 +263,7 @@ public class CsmFunctionalTest {
     doThrow(IOException.class).when(api).postCsm(any());
 
     when(clock.getCurrentTimeInMillis()).thenReturn(0L);
-    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+    givenInitializedCriteo();
     waitForIdleState();
 
     // Consumed and not expired

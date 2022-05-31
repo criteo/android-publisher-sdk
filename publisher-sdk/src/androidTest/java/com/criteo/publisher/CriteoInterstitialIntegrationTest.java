@@ -61,7 +61,7 @@ public class CriteoInterstitialIntegrationTest {
 
   @Before
   public void setup() throws CriteoInitException {
-    givenInitializedCriteo(interstitialAdUnit);
+    givenInitializedCriteo();
 
     interstitial = createInterstitial();
     interstitial.setCriteoInterstitialAdListener(listener);
@@ -69,7 +69,7 @@ public class CriteoInterstitialIntegrationTest {
 
   @Test
   public void loadAdInHouse_GivenSelfMadeToken_NotifyListenerForFailure() throws Exception {
-    givenInitializedCriteo(interstitialAdUnit);
+    givenInitializedCriteo();
     waitForIdleState();
 
     // This should not be possible since BidResponse constructor is not part of the public API.

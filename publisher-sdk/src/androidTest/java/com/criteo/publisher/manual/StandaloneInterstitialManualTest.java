@@ -91,7 +91,7 @@ public class StandaloneInterstitialManualTest {
   }
 
   private void showingAnInterstitialAd(InterstitialAdUnit adUnit) throws Exception {
-    givenInitializedCriteo(adUnit);
+    givenInitializedCriteo();
     waitForBids();
 
     runOnMainThreadAndWait(() -> {

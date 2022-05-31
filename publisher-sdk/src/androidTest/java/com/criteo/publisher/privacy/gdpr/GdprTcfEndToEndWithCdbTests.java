@@ -30,7 +30,6 @@ import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.ResultCaptor;
 import com.criteo.publisher.mock.SpyBean;
-import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
@@ -229,8 +228,8 @@ public class GdprTcfEndToEndWithCdbTests {
     assertEquals(0, lastCaptureValue.getSlots().size());
   }
 
-  private void givenInitializedSdk(AdUnit... preloadedAdUnits) throws Exception {
-    givenInitializedCriteo(preloadedAdUnits);
+  private void givenInitializedSdk() throws Exception {
+    givenInitializedCriteo();
     waitForBids();
   }
 

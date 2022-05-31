@@ -92,16 +92,7 @@ class PubSdkDemoApplication : MultiDexApplication() {
       mockIntegrationRegistry(mode, true)
     }
 
-    val adUnits = listOf(
-        BANNER,
-        INTERSTITIAL,
-        INTERSTITIAL_IBV_DEMO,
-        INTERSTITIAL_VIDEO,
-        NATIVE
-    )
-
     val builder = Criteo.Builder(this, "B-056946")
-        .adUnits(adUnits)
 
     if ("release" == BuildConfig.BUILD_TYPE) {
       // Enable debug logs only on release build.
