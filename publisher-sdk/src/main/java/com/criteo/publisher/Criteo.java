@@ -29,13 +29,13 @@ import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.config.Config;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.context.UserData;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.util.DeviceUtil;
 import java.util.List;
@@ -102,6 +102,7 @@ public abstract class Criteo {
           DependencyProvider dependencyProvider = DependencyProvider.getInstance();
           dependencyProvider.setApplication(builder.application);
           dependencyProvider.setCriteoPublisherId(builder.criteoPublisherId);
+          dependencyProvider.setInputUsPrivacyOptOut(builder.usPrivacyOptOut);
 
           if (builder.isDebugLogsEnabled) {
             dependencyProvider.provideConsoleHandler().setMinLogLevel(Log.INFO);
@@ -109,11 +110,7 @@ public abstract class Criteo {
 
           DeviceUtil deviceUtil = dependencyProvider.provideDeviceUtil();
           if (deviceUtil.isVersionSupported()) {
-            criteo = new CriteoInternal(
-                builder.application,
-                builder.usPrivacyOptOut,
-                dependencyProvider
-            );
+            criteo = new CriteoInternal(dependencyProvider);
 
             logger.log(onSdkInitialized(builder.criteoPublisherId, getVersion()));
           } else {

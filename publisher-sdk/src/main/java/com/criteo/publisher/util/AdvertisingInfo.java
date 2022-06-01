@@ -23,14 +23,17 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.annotation.WorkerThread;
 import com.criteo.publisher.SafeRunnable;
+import com.criteo.publisher.dependency.SdkInput;
+import com.criteo.publisher.dependency.SdkServiceLifecycle;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient.Info;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
+import org.jetbrains.annotations.NotNull;
 
-public class AdvertisingInfo {
+public class AdvertisingInfo implements SdkServiceLifecycle {
 
   @NonNull
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -57,6 +60,12 @@ public class AdvertisingInfo {
     this.advertisingIdClient = advertisingIdClient;
   }
 
+  @Override
+  public void onSdkInitialized(@NotNull SdkInput sdkInput) {
+    prefetchAsync();
+  }
+
+  @VisibleForTesting
   public void prefetchAsync() {
     executor.execute(new SafeRunnable() {
       @Override

@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.bid
 
+import com.criteo.publisher.dependency.SdkInput
 import com.criteo.publisher.model.AdSize
 import com.criteo.publisher.model.CacheAdUnit
 import com.criteo.publisher.model.CdbRequest
@@ -55,10 +56,12 @@ class CompositeBidLifecycleListenerTest {
 
   @Test
   fun onSdkInitialized_GivenDelegates_DelegateToThem() {
-    listener.onSdkInitialized()
+    val sdkInput = SdkInput()
 
-    verify(listener1).onSdkInitialized()
-    verify(listener2).onSdkInitialized()
+    listener.onSdkInitialized(sdkInput)
+
+    verify(listener1).onSdkInitialized(sdkInput)
+    verify(listener2).onSdkInitialized(sdkInput)
   }
 
   @Test

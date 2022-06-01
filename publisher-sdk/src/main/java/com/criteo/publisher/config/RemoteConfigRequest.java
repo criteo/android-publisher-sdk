@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.model;
+package com.criteo.publisher.config;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

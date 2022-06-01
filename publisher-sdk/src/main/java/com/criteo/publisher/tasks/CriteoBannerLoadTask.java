@@ -20,7 +20,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.SafeRunnable;
-import com.criteo.publisher.model.Config;
+import com.criteo.publisher.config.Config;
 import java.lang.ref.Reference;
 
 public class CriteoBannerLoadTask extends SafeRunnable {

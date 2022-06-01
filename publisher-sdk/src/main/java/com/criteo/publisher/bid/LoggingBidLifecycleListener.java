@@ -17,6 +17,7 @@
 package com.criteo.publisher.bid;
 
 import androidx.annotation.NonNull;
+import com.criteo.publisher.dependency.SdkInput;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.logging.RemoteLogSendingQueueConsumer;
@@ -40,7 +41,7 @@ public class LoggingBidLifecycleListener implements BidLifecycleListener {
   }
 
   @Override
-  public void onSdkInitialized() {
+  public void onSdkInitialized(@NonNull SdkInput sdkInput) {
     logger.debug("onSdkInitialized");
     remoteLogSendingQueueConsumer.sendRemoteLogBatch();
   }

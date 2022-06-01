@@ -22,8 +22,11 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.BidManager;
+import com.criteo.publisher.dependency.SdkInput;
+import com.criteo.publisher.dependency.SdkServiceLifecycle;
+import org.jetbrains.annotations.NotNull;
 
-public class AppLifecycleUtil implements Application.ActivityLifecycleCallbacks {
+public class AppLifecycleUtil implements SdkServiceLifecycle, Application.ActivityLifecycleCallbacks {
 
   private final AppEvents appEvents;
   private final BidManager bidManager;
@@ -39,6 +42,11 @@ public class AppLifecycleUtil implements Application.ActivityLifecycleCallbacks 
     resumed = 0;
     transitionPossible = false;
     created = false;
+  }
+
+  @Override
+  public void onSdkInitialized(@NotNull SdkInput sdkInput) {
+    sdkInput.getApplication().get().registerActivityLifecycleCallbacks(this);
   }
 
   @Override

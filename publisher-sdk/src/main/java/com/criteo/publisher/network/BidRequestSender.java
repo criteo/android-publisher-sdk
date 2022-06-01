@@ -21,15 +21,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.CdbCallListener;
 import com.criteo.publisher.Clock;
-import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequestFactory;
-import com.criteo.publisher.model.Config;
-import com.criteo.publisher.model.RemoteConfigRequest;
-import com.criteo.publisher.model.RemoteConfigRequestFactory;
-import com.criteo.publisher.model.RemoteConfigResponse;
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,9 +35,6 @@ public class BidRequestSender {
 
   @NonNull
   private final CdbRequestFactory cdbRequestFactory;
-
-  @NonNull
-  private final RemoteConfigRequestFactory remoteConfigRequestFactory;
 
   @NonNull
   private final Clock clock;
@@ -61,13 +52,11 @@ public class BidRequestSender {
 
   public BidRequestSender(
       @NonNull CdbRequestFactory cdbRequestFactory,
-      @NonNull RemoteConfigRequestFactory remoteConfigRequestFactory,
       @NonNull Clock clock,
       @NonNull PubSdkApi api,
       @NonNull Executor executor
   ) {
     this.cdbRequestFactory = cdbRequestFactory;
-    this.remoteConfigRequestFactory = remoteConfigRequestFactory;
     this.clock = clock;
     this.api = api;
     this.executor = executor;
@@ -77,18 +66,6 @@ public class BidRequestSender {
   @VisibleForTesting
   Set<CacheAdUnit> getPendingTaskAdUnits() {
     return pendingTasks.keySet();
-  }
-
-  /**
-   * Asynchronously send a remote config request and update the given config.
-   * <p>
-   * If no error occurs during the request, the given configuration is updated. Else, it is left
-   * unchanged.
-   *
-   * @param configToUpdate configuration to update after request
-   */
-  public void sendRemoteConfigRequest(@NonNull Config configToUpdate) {
-    executor.execute(new RemoteConfigCall(configToUpdate));
   }
 
   /**
@@ -140,14 +117,11 @@ public class BidRequestSender {
   ) {
     CdbCall task = new CdbCall(api, cdbRequestFactory, clock, requestedAdUnit, contextData, listener);
 
-    Runnable withRemovedPendingTasksAfterExecution = new Runnable() {
-      @Override
-      public void run() {
-        try {
-          task.run();
-        } finally {
-          removePendingTasksWithAdUnit(requestedAdUnit);
-        }
+    Runnable withRemovedPendingTasksAfterExecution = () -> {
+      try {
+        task.run();
+      } finally {
+        removePendingTasksWithAdUnit(requestedAdUnit);
       }
     };
 
@@ -169,23 +143,6 @@ public class BidRequestSender {
         task.cancel(true);
       }
       pendingTasks.clear();
-    }
-  }
-
-  private class RemoteConfigCall extends SafeRunnable {
-
-    @NonNull
-    private final Config configToUpdate;
-
-    private RemoteConfigCall(@NonNull Config configToUpdate) {
-      this.configToUpdate = configToUpdate;
-    }
-
-    @Override
-    public void runSafely() throws IOException {
-      RemoteConfigRequest request = remoteConfigRequestFactory.createRequest();
-      RemoteConfigResponse response = api.loadConfig(request);
-      configToUpdate.refreshConfig(response);
     }
   }
 }

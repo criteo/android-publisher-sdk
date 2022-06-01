@@ -20,9 +20,9 @@ import android.os.Looper
 import androidx.annotation.VisibleForTesting
 import com.criteo.publisher.SafeRunnable
 import com.criteo.publisher.annotation.OpenForTesting
+import com.criteo.publisher.config.Config
 import com.criteo.publisher.csm.ConcurrentSendingQueue
 import com.criteo.publisher.logging.RemoteLogRecords.RemoteLogLevel.Companion.fromAndroidLogLevel
-import com.criteo.publisher.model.Config
 import com.criteo.publisher.privacy.ConsentData
 import java.util.concurrent.Executor
 

@@ -47,6 +47,9 @@ import com.criteo.publisher.concurrent.AsyncResources;
 import com.criteo.publisher.concurrent.NoOpAsyncResources;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.concurrent.ThreadPoolExecutorFactory;
+import com.criteo.publisher.config.Config;
+import com.criteo.publisher.config.ConfigManager;
+import com.criteo.publisher.config.RemoteConfigRequestFactory;
 import com.criteo.publisher.context.ConnectionTypeFetcher;
 import com.criteo.publisher.context.ContextProvider;
 import com.criteo.publisher.context.UserDataHolder;
@@ -64,6 +67,8 @@ import com.criteo.publisher.csm.ObjectQueueFactory;
 import com.criteo.publisher.csm.SendingQueueConfiguration;
 import com.criteo.publisher.csm.SendingQueueFactory;
 import com.criteo.publisher.dependency.LazyDependency;
+import com.criteo.publisher.dependency.SdkInput;
+import com.criteo.publisher.dependency.SdkServiceLifecycleManager;
 import com.criteo.publisher.headerbidding.DfpHeaderBidding;
 import com.criteo.publisher.headerbidding.HeaderBidding;
 import com.criteo.publisher.headerbidding.OtherAdServersHeaderBidding;
@@ -81,9 +86,7 @@ import com.criteo.publisher.logging.RemoteLogSendingQueueConfiguration;
 import com.criteo.publisher.logging.RemoteLogSendingQueueConsumer;
 import com.criteo.publisher.model.AdUnitMapper;
 import com.criteo.publisher.model.CdbRequestFactory;
-import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
-import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.network.BidRequestSender;
 import com.criteo.publisher.network.LiveBidRequestSender;
 import com.criteo.publisher.network.PubSdkApi;
@@ -102,7 +105,6 @@ import com.criteo.publisher.util.JsonSerializer;
 import com.criteo.publisher.util.MapUtilKt;
 import com.criteo.publisher.util.SafeSharedPreferences;
 import com.criteo.publisher.util.SharedPreferencesFactory;
-import com.criteo.publisher.util.TextUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
@@ -122,9 +124,7 @@ public class DependencyProvider {
   protected static DependencyProvider instance;
 
   protected final ConcurrentMap<Class<?>, Object> services = new ConcurrentHashMap<>();
-
-  private Application application;
-  private String criteoPublisherId;
+  private SdkInput sdkInput = new SdkInput();
 
   protected DependencyProvider() {
   }
@@ -146,40 +146,36 @@ public class DependencyProvider {
   }
 
   public void setApplication(@NonNull Application application) {
-    this.application = application;
-    checkApplicationIsSet();
+    sdkInput = sdkInput.withApplication(application);
+    sdkInput.getApplication().get(); // Fail-fast
   }
 
   public void setCriteoPublisherId(@NonNull String criteoPublisherId) {
-    this.criteoPublisherId = criteoPublisherId;
-    checkCriteoPublisherIdIsSet();
+    sdkInput = sdkInput.withCriteoPublisherId(criteoPublisherId);
+    sdkInput.getCriteoPublisherId().get(); // Fail-fast
+  }
+
+  public void setInputUsPrivacyOptOut(@Nullable Boolean usPrivacyOptOut) {
+    sdkInput = sdkInput.withUsPrivacyOptOut(usPrivacyOptOut);
   }
 
   boolean isApplicationSet() {
     try {
-      DependencyProvider.getInstance().checkApplicationIsSet();
+      sdkInput.getApplication().get();
     } catch (Exception e) {
       return false;
     }
     return true;
   }
 
-  private void checkApplicationIsSet() {
-    if (application == null) {
-      throw new CriteoNotInitializedException("Application reference is required");
-    }
-  }
-
-  private void checkCriteoPublisherIdIsSet() {
-    if (TextUtils.isEmpty(criteoPublisherId)) {
-      throw new CriteoNotInitializedException("Criteo Publisher Id is required");
-    }
+  @NonNull
+  public SdkInput provideSdkInput() {
+    return sdkInput;
   }
 
   @NonNull
   public Application provideApplication() {
-    checkApplicationIsSet();
-    return application;
+    return sdkInput.getApplication().get();
   }
 
   @NonNull
@@ -189,8 +185,7 @@ public class DependencyProvider {
 
   @NonNull
   public String provideCriteoPublisherId() {
-    checkCriteoPublisherIdIsSet();
-    return criteoPublisherId;
+    return sdkInput.getCriteoPublisherId().get();
   }
 
   @NonNull
@@ -370,7 +365,6 @@ public class DependencyProvider {
   public BidRequestSender provideBidRequestSender() {
     return getOrCreate(BidRequestSender.class, () -> new BidRequestSender(
         provideCdbRequestFactory(),
-        provideRemoteConfigRequestFactory(),
         provideClock(),
         providePubSdkApi(),
         provideThreadPoolExecutor()
@@ -409,6 +403,30 @@ public class DependencyProvider {
 
       return listener;
     });
+  }
+
+  @NonNull
+  public SdkServiceLifecycleManager provideSdkServiceLifecycleManager() {
+    return getOrCreate(SdkServiceLifecycleManager.class, () -> new SdkServiceLifecycleManager(Arrays.asList(
+        provideSession(),
+        provideUserPrivacyUtil(),
+        provideBidLifecycleListener(),
+        provideAppLifecycleUtil(),
+        provideAdvertisingInfo(),
+        provideDeviceInfo(),
+        provideConfigManager(),
+        provideTopActivityFinder()
+    )));
+  }
+
+  @NonNull
+  public ConfigManager provideConfigManager() {
+    return getOrCreate(ConfigManager.class, () -> new ConfigManager(
+        provideConfig(),
+        provideRemoteConfigRequestFactory(),
+        providePubSdkApi(),
+        provideThreadPoolExecutor()
+    ));
   }
 
   @NonNull

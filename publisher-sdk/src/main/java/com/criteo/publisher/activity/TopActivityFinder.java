@@ -26,11 +26,14 @@ import android.content.ComponentName;
 import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.criteo.publisher.dependency.SdkInput;
+import com.criteo.publisher.dependency.SdkServiceLifecycle;
 import com.criteo.publisher.util.PreconditionsUtil;
 import java.lang.ref.WeakReference;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
-public class TopActivityFinder {
+public class TopActivityFinder implements SdkServiceLifecycle {
 
   @NonNull
   private final Context context;
@@ -79,6 +82,11 @@ public class TopActivityFinder {
     }
 
     return null;
+  }
+
+  @Override
+  public void onSdkInitialized(@NotNull SdkInput sdkInput) {
+    registerActivityLifecycleFor(sdkInput.getApplication().get());
   }
 
   public void registerActivityLifecycleFor(@NonNull Application application) {

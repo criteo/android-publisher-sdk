@@ -17,6 +17,7 @@
 package com.criteo.publisher.bid;
 
 import androidx.annotation.NonNull;
+import com.criteo.publisher.dependency.SdkServiceLifecycle;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
@@ -28,12 +29,7 @@ import com.criteo.publisher.model.CdbResponseSlot;
  * There is no strong guarantee on the order of execution, also those callbacks may be invoked on
  * different threads.
  */
-public interface BidLifecycleListener {
-
-  /**
-   * Callback invoked when the SDK is initialized.
-   */
-  void onSdkInitialized();
+public interface BidLifecycleListener extends SdkServiceLifecycle {
 
   /**
    * Callback invoked when a CDB call is about to start.

@@ -18,23 +18,31 @@ package com.criteo.publisher
 
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.bid.UniqueIdGenerator
+import com.criteo.publisher.dependency.SdkInput
+import com.criteo.publisher.dependency.SdkServiceLifecycle
 
 @OpenForTesting
 internal class Session(
     private val clock: Clock,
     private val uniqueIdGenerator: UniqueIdGenerator
-) {
+) : SdkServiceLifecycle {
   companion object {
     const val MILLIS_IN_SECOND = 1000
   }
 
-  private val startingTime = clock.currentTimeInMillis
+  private val startingTime: Long by lazy {
+    clock.currentTimeInMillis
+  }
 
   /**
    * Return a unique ID for this session.
    */
   val sessionId: String by lazy {
     uniqueIdGenerator.generateId()
+  }
+
+  override fun onSdkInitialized(sdkInput: SdkInput) {
+    startingTime.run { toLong() } // Eagerly evaluate the lazy value
   }
 
   /**

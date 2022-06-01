@@ -20,10 +20,10 @@ import androidx.annotation.VisibleForTesting
 import com.criteo.publisher.Clock
 import com.criteo.publisher.LiveCdbCallListener
 import com.criteo.publisher.annotation.OpenForTesting
+import com.criteo.publisher.config.Config
 import com.criteo.publisher.context.ContextData
 import com.criteo.publisher.model.CacheAdUnit
 import com.criteo.publisher.model.CdbRequestFactory
-import com.criteo.publisher.model.Config
 import java.util.concurrent.Executor
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit

@@ -25,10 +25,6 @@ import com.criteo.publisher.model.CacheAdUnit
 import com.criteo.publisher.model.CdbRequest
 import com.criteo.publisher.model.CdbRequestFactory
 import com.criteo.publisher.model.CdbResponse
-import com.criteo.publisher.model.Config
-import com.criteo.publisher.model.RemoteConfigRequest
-import com.criteo.publisher.model.RemoteConfigRequestFactory
-import com.criteo.publisher.model.RemoteConfigResponse
 import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
 import com.criteo.publisher.util.CompletableFuture.completedFuture
 import org.assertj.core.api.Assertions.assertThat
@@ -70,9 +66,6 @@ class BidRequestSenderTest {
     private lateinit var cdbRequestFactory: CdbRequestFactory
 
     @Mock
-    private lateinit var remoteConfigRequestFactory: RemoteConfigRequestFactory
-
-    @Mock
     private lateinit var clock: Clock
 
     @Mock
@@ -94,50 +87,10 @@ class BidRequestSenderTest {
     private fun givenNewSender(executor: Executor = this.executor) {
         sender = BidRequestSender(
             cdbRequestFactory,
-            remoteConfigRequestFactory,
             clock,
             api,
             executor
         )
-    }
-
-    @Test
-    fun sendRemoteConfigRequest_GivenSuccessfulResponse_RefreshConfig() {
-        val configToUpdate: Config = mock()
-        val request: RemoteConfigRequest = mock()
-        val response: RemoteConfigResponse = mock()
-
-        whenever(remoteConfigRequestFactory.createRequest()).doReturn(request)
-        whenever(api.loadConfig(request)).doReturn(response)
-
-        sender.sendRemoteConfigRequest(configToUpdate)
-
-        verify(configToUpdate).refreshConfig(response)
-    }
-
-    @Test
-    fun sendRemoteConfigRequest_GivenException_DoNotThrow() {
-        val configToUpdate: Config = mock()
-        whenever(api.loadConfig(any())).doThrow(IOException::class)
-
-        assertThatCode {
-            sender.sendRemoteConfigRequest(configToUpdate)
-        }.doesNotThrowAnyException()
-    }
-
-    @Test
-    fun sendRemoteConfigRequest_GivenExecutor_IsWorkingInExecutor() {
-        val executor = DirectMockExecutor()
-        givenNewSender(executor = executor)
-
-        doAnswer {
-            executor.expectIsRunningInExecutor()
-            null
-        }.whenever(api).loadConfig(anyOrNull())
-
-        sender.sendRemoteConfigRequest(mock())
-
-        executor.verifyExpectations()
     }
 
     @Test

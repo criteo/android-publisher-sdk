@@ -18,10 +18,9 @@ package com.criteo.publisher;
 
 import static com.criteo.publisher.ErrorLogMessage.onUncaughtErrorAtPublicApi;
 
-import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.criteo.publisher.bid.BidLifecycleListener;
+import com.criteo.publisher.config.Config;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.context.UserData;
 import com.criteo.publisher.headerbidding.HeaderBidding;
@@ -29,7 +28,6 @@ import com.criteo.publisher.interstitial.InterstitialActivityHelper;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 
@@ -62,41 +60,18 @@ class CriteoInternal extends Criteo {
   @NonNull
   private final InterstitialActivityHelper interstitialActivityHelper;
 
-  CriteoInternal(
-      Application application,
-      @Nullable Boolean usPrivacyOptout,
-      @NonNull DependencyProvider dependencyProvider
-  ) {
+  CriteoInternal(@NonNull DependencyProvider dependencyProvider) {
     this.dependencyProvider = dependencyProvider;
 
-    dependencyProvider.provideSession();
+    dependencyProvider.provideSdkServiceLifecycleManager().onSdkInitialized(dependencyProvider.provideSdkInput());
 
     deviceInfo = dependencyProvider.provideDeviceInfo();
-    deviceInfo.initialize();
-
-    dependencyProvider.provideAdvertisingInfo().prefetchAsync();
-
     config = dependencyProvider.provideConfig();
-
     bidManager = dependencyProvider.provideBidManager();
     consumableBidLoader = dependencyProvider.provideConsumableBidLoader();
     headerBidding = dependencyProvider.provideHeaderBidding();
-
     interstitialActivityHelper = dependencyProvider.provideInterstitialActivityHelper();
-
     userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil();
-    if (usPrivacyOptout != null) {
-      userPrivacyUtil.storeUsPrivacyOptout(usPrivacyOptout);
-    }
-
-    application.registerActivityLifecycleCallbacks(dependencyProvider.provideAppLifecycleUtil());
-
-    dependencyProvider.provideTopActivityFinder().registerActivityLifecycleFor(application);
-
-    BidLifecycleListener bidLifecycleListener = dependencyProvider.provideBidLifecycleListener();
-    bidLifecycleListener.onSdkInitialized();
-
-    dependencyProvider.provideBidRequestSender().sendRemoteConfigRequest(config);
   }
 
   @Override

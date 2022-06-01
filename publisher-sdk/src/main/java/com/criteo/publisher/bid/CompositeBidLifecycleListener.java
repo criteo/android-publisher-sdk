@@ -17,6 +17,7 @@
 package com.criteo.publisher.bid;
 
 import androidx.annotation.NonNull;
+import com.criteo.publisher.dependency.SdkInput;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
@@ -34,9 +35,9 @@ public class CompositeBidLifecycleListener implements BidLifecycleListener {
   }
 
   @Override
-  public void onSdkInitialized() {
+  public void onSdkInitialized(@NonNull SdkInput sdkInput) {
     for (BidLifecycleListener delegate : delegates) {
-      delegate.onSdkInitialized();
+      delegate.onSdkInitialized(sdkInput);
     }
   }
 

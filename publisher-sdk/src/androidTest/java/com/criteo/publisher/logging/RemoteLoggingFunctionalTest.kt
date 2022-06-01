@@ -21,9 +21,9 @@ import com.criteo.publisher.CriteoUtil.givenInitializedCriteo
 import com.criteo.publisher.SafeRunnable
 import com.criteo.publisher.TestAdUnits
 import com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait
+import com.criteo.publisher.config.Config
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
-import com.criteo.publisher.model.Config
 import com.criteo.publisher.network.PubSdkApi
 import com.criteo.publisher.privacy.ConsentData
 import com.criteo.publisher.util.BuildConfigWrapper

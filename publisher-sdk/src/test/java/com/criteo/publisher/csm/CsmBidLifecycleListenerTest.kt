@@ -17,13 +17,14 @@
 package com.criteo.publisher.csm
 
 import com.criteo.publisher.Clock
+import com.criteo.publisher.config.Config
+import com.criteo.publisher.dependency.SdkInput
 import com.criteo.publisher.model.AdSize
 import com.criteo.publisher.model.CacheAdUnit
 import com.criteo.publisher.model.CdbRequest
 import com.criteo.publisher.model.CdbRequestSlot
 import com.criteo.publisher.model.CdbResponse
 import com.criteo.publisher.model.CdbResponseSlot
-import com.criteo.publisher.model.Config
 import com.criteo.publisher.privacy.ConsentData
 import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
 import org.assertj.core.api.Assertions.assertThat
@@ -102,7 +103,7 @@ class CsmBidLifecycleListenerTest {
 
   @Test
   fun onSdkInitialized_PushAllMetricsInQueueAndSendBatch() {
-    listener.onSdkInitialized()
+    listener.onSdkInitialized(SdkInput())
 
     inOrder(sendingQueueConsumer, sendingQueueProducer) {
       verify(sendingQueueProducer).pushAllInQueue(repository)
@@ -114,7 +115,7 @@ class CsmBidLifecycleListenerTest {
   fun onSdkInitialized_GivenDeactivatedFeature_DoNothing() {
     givenDeactivatedFeature()
 
-    listener.onSdkInitialized()
+    listener.onSdkInitialized(SdkInput())
 
     verifyFeatureIsDeactivated()
   }
@@ -123,7 +124,7 @@ class CsmBidLifecycleListenerTest {
   fun onSdkInitialized_GivenConsentNotGiven_DoNothing() {
     givenConsentNotGiven()
 
-    listener.onSdkInitialized()
+    listener.onSdkInitialized(SdkInput())
 
     verifyFeatureIsDeactivated()
   }

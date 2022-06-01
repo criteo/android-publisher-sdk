@@ -42,6 +42,7 @@ import com.criteo.publisher.mock.TestResource.CompositeTestResource;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.network.CdbMockResource;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.util.DeviceUtilResource;
 import com.criteo.publisher.util.MockedAdvertiserIdClientResource;
 import java.util.ArrayList;
 import java.util.List;
@@ -127,6 +128,7 @@ public class MockedDependenciesRule implements MethodRule {
       resources.add(getMultiThreadResource());
       resources.add(new ApplicationResource(dependencyProviderRef));
       resources.add(new SharedPreferencesResource(dependencyProviderRef));
+      resources.add(new DeviceUtilResource(dependencyProviderRef));
 
       if (InstrumentationUtil.isRunningInInstrumentationTest()) {
         // Only add this on instrumentation test because when running unit test, Android API are returning null

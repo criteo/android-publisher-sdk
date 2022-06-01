@@ -20,9 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -30,13 +28,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import android.app.Application;
+import androidx.annotation.Nullable;
 import com.criteo.publisher.activity.TopActivityFinder;
-import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.headerbidding.HeaderBidding;
+import com.criteo.publisher.mock.MockBean;
+import com.criteo.publisher.mock.MockedDependenciesRule;
+import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdUnit;
-import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AdvertisingInfo;
@@ -44,53 +44,49 @@ import com.criteo.publisher.util.AppLifecycleUtil;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Answers;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 
 public class CriteoInternalUnitTest {
 
   @Rule
-  public MockitoRule mockitoRule = MockitoJUnit.rule();
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
 
-  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+  @SpyBean
   private Application application;
 
-  private Boolean usPrivacyOptout = false;
-
-  @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private DependencyProvider dependencyProvider;
 
-  @Mock
+  @SpyBean
   private UserPrivacyUtil userPrivacyUtil;
 
-  @Mock
-  private Config config;
+  @SpyBean
+  private TopActivityFinder topActivityFinder;
+
+  @MockBean
+  private BidManager bidManager;
+
+  @MockBean
+  private HeaderBidding headerBidding;
+
+  @SpyBean
+  private ConsumableBidLoader consumableBidLoader;
+
+  @SpyBean
+  private DeviceInfo deviceInfo;
+
+  @SpyBean
+  private AdvertisingInfo advertisingInfo;
 
   @Before
   public void setUp() throws Exception {
+    dependencyProvider = mockedDependenciesRule.getDependencyProvider();
+
     when(dependencyProvider.provideRunOnUiThreadExecutor())
         .thenReturn(new DirectMockRunOnUiThreadExecutor());
-
-    when(dependencyProvider.provideConfig()).thenReturn(config);
-  }
-
-  @Test
-  public void whenCreatingNewCriteo_GivenBidLifecycleListener_ShouldCallListener()
-      throws Exception {
-    BidLifecycleListener listener = givenMockedBidLifecycleListener();
-
-    createCriteo();
-
-    verify(listener).onSdkInitialized();
   }
 
   @Test
   public void whenCreatingNewCriteo_GivenTrueUsOptOut_ShouldStoreTrueValue() throws Exception {
-    givenMockedUserPrivacyUtil();
-    usPrivacyOptout = true;
+    givenUsOptOut(true);
 
     createCriteo();
 
@@ -100,8 +96,7 @@ public class CriteoInternalUnitTest {
   @Test
   public void whenCreatingNewCriteo_GivenTrueUsOptOut_ThenSetToFalse_ShouldStoreTrueThenFalseValue()
       throws Exception {
-    givenMockedUserPrivacyUtil();
-    usPrivacyOptout = true;
+    givenUsOptOut(true);
 
     CriteoInternal criteoInternal = createCriteo();
     verify(userPrivacyUtil).storeUsPrivacyOptout(true);
@@ -112,8 +107,7 @@ public class CriteoInternalUnitTest {
 
   @Test
   public void whenCreatingNewCriteo_GivenFalseUsOptOut_ShouldStoreFalseValue() throws Exception {
-    givenMockedUserPrivacyUtil();
-    usPrivacyOptout = false;
+    givenUsOptOut(false);
 
     createCriteo();
 
@@ -123,8 +117,7 @@ public class CriteoInternalUnitTest {
   @Test
   public void whenCreatingNewCriteo_GivenFalseUsOptOut_ThenSetToTrue_ShouldFalseThenTrue()
       throws Exception {
-    givenMockedUserPrivacyUtil();
-    usPrivacyOptout = false;
+    givenUsOptOut(false);
 
     CriteoInternal criteoInternal = createCriteo();
     verify(userPrivacyUtil).storeUsPrivacyOptout(false);
@@ -135,8 +128,7 @@ public class CriteoInternalUnitTest {
 
   @Test
   public void whenCreatingNewCriteo_GivenNullUsOptOut_ShouldNotStoreIt() throws Exception {
-    givenMockedUserPrivacyUtil();
-    usPrivacyOptout = null;
+    givenUsOptOut(null);
 
     createCriteo();
 
@@ -146,8 +138,7 @@ public class CriteoInternalUnitTest {
   @Test
   public void whenCreatingNewCriteo_GivenNullUsOptOut_ThenSetToTrue_ShouldStoreTrueValue()
       throws Exception {
-    givenMockedUserPrivacyUtil();
-    usPrivacyOptout = null;
+    givenUsOptOut(null);
 
     CriteoInternal criteoInternal = createCriteo();
     criteoInternal.setUsPrivacyOptOut(true);
@@ -158,8 +149,7 @@ public class CriteoInternalUnitTest {
   @Test
   public void whenCreatingNewCriteo_GivenNullUsOptOut_ThenSetToFalse_ShouldStoreFalseValue()
       throws Exception {
-    givenMockedUserPrivacyUtil();
-    usPrivacyOptout = null;
+    givenUsOptOut(null);
 
     CriteoInternal criteoInternal = createCriteo();
     criteoInternal.setUsPrivacyOptOut(false);
@@ -169,9 +159,6 @@ public class CriteoInternalUnitTest {
 
   @Test
   public void whenCreatingNewCriteo_GivenDeviceInfo_InitializeIt() throws Exception {
-    DeviceInfo deviceInfo = mock(DeviceInfo.class);
-    doReturn(deviceInfo).when(dependencyProvider).provideDeviceInfo();
-
     createCriteo();
 
     verify(deviceInfo).initialize();
@@ -179,9 +166,6 @@ public class CriteoInternalUnitTest {
 
   @Test
   public void whenCreatingNewCriteo_GivenAdvertisingInfo_PrefetchIt() throws Exception {
-    AdvertisingInfo advertisingInfo = mock(AdvertisingInfo.class);
-    doReturn(advertisingInfo).when(dependencyProvider).provideAdvertisingInfo();
-
     createCriteo();
 
     verify(advertisingInfo).prefetchAsync();
@@ -200,7 +184,6 @@ public class CriteoInternalUnitTest {
       throws Exception {
     createCriteo();
 
-    TopActivityFinder topActivityFinder = dependencyProvider.provideTopActivityFinder();
     verify(topActivityFinder).registerActivityLifecycleFor(application);
   }
 
@@ -222,7 +205,6 @@ public class CriteoInternalUnitTest {
     BidResponseListener listener = mock(BidResponseListener.class);
     ContextData contextData = mock(ContextData.class);
 
-    ConsumableBidLoader consumableBidLoader = givenMockedConsumableBidLoader();
     doAnswer(invocation -> {
       throw new RuntimeException();
     }).when(consumableBidLoader).loadBid(adUnit, contextData, listener);
@@ -240,7 +222,6 @@ public class CriteoInternalUnitTest {
     ContextData contextData = mock(ContextData.class);
     Bid expectedBid = mock(Bid.class);
 
-    ConsumableBidLoader consumableBidLoader = givenMockedConsumableBidLoader();
     doAnswer(invocation -> {
       invocation.<BidResponseListener>getArgument(2).onResponse(expectedBid);
       return null;
@@ -254,7 +235,6 @@ public class CriteoInternalUnitTest {
 
   @Test
   public void setBidsForAdUnit_GivenHeaderBiddingThrowing_DoNotThrow() throws Exception {
-    HeaderBidding headerBidding = givenMockedHeaderBidding();
     doThrow(RuntimeException.class).when(headerBidding).enrichBid(any(), any());
 
     CriteoInternal criteo = createCriteo();
@@ -266,8 +246,6 @@ public class CriteoInternalUnitTest {
 
   @Test
   public void setBidsForAdUnit_GivenHeaderBidding_DelegateToIt() throws Exception {
-    HeaderBidding headerBidding = givenMockedHeaderBidding();
-
     Object object = mock(Object.class);
     Bid bid = mock(Bid.class);
 
@@ -283,51 +261,17 @@ public class CriteoInternalUnitTest {
     ContextData contextData = mock(ContextData.class);
     BidListener bidListener = mock(BidListener.class);
 
-    BidManager bidManager = givenMockedBidManager();
-
     CriteoInternal criteo = createCriteo();
     criteo.getBidForAdUnit(adUnit, contextData, bidListener);
 
     verify(bidManager).getBidForAdUnit(adUnit, contextData, bidListener);
   }
 
-  private void givenMockedUserPrivacyUtil() {
-    when(dependencyProvider.provideUserPrivacyUtil()).thenReturn(userPrivacyUtil);
-  }
-
-  private BidLifecycleListener givenMockedBidLifecycleListener() {
-    BidLifecycleListener listener = mock(BidLifecycleListener.class);
-
-    when(dependencyProvider.provideBidLifecycleListener()).thenReturn(listener);
-
-    return listener;
-  }
-
-  private BidManager givenMockedBidManager() {
-    BidManager bidManager = mock(BidManager.class);
-
-    when(dependencyProvider.provideBidManager()).thenReturn(bidManager);
-
-    return bidManager;
-  }
-
-  private HeaderBidding givenMockedHeaderBidding() {
-    HeaderBidding headerBidding = mock(HeaderBidding.class);
-
-    when(dependencyProvider.provideHeaderBidding()).thenReturn(headerBidding);
-
-    return headerBidding;
-  }
-
-  private ConsumableBidLoader givenMockedConsumableBidLoader() {
-    ConsumableBidLoader consumableBidLoader = mock(ConsumableBidLoader.class);
-
-    when(dependencyProvider.provideConsumableBidLoader()).thenReturn(consumableBidLoader);
-
-    return consumableBidLoader;
-  }
-
   private CriteoInternal createCriteo() {
-    return new CriteoInternal(application, usPrivacyOptout, dependencyProvider);
+    return new CriteoInternal(dependencyProvider);
+  }
+
+  private void givenUsOptOut(@Nullable Boolean usPrivacyOptOut) {
+    dependencyProvider.setInputUsPrivacyOptOut(usPrivacyOptOut);
   }
 }

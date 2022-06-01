@@ -17,7 +17,7 @@
 package com.criteo.publisher.csm;
 
 import androidx.annotation.NonNull;
-import com.criteo.publisher.model.Config;
+import com.criteo.publisher.config.Config;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import java.util.concurrent.Executor;

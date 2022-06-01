@@ -24,14 +24,17 @@ import androidx.annotation.UiThread;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
+import com.criteo.publisher.dependency.SdkInput;
+import com.criteo.publisher.dependency.SdkServiceLifecycle;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.util.CompletableFuture;
 import com.criteo.publisher.util.PreconditionsUtil;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.jetbrains.annotations.NotNull;
 
-public class DeviceInfo {
+public class DeviceInfo implements SdkServiceLifecycle {
 
   @NonNull
   private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -53,6 +56,12 @@ public class DeviceInfo {
     this.runOnUiThreadExecutor = runOnUiThreadExecutor;
   }
 
+  @Override
+  public void onSdkInitialized(@NotNull SdkInput sdkInput) {
+    initialize();
+  }
+
+  @VisibleForTesting
   public void initialize() {
     // This needs to be run on UI thread because a WebView is used to fetch the user-agent
     runOnUiThread(new Runnable() {
