@@ -35,6 +35,7 @@ import static org.mockito.Mockito.when;
 import android.content.Context;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.Bid;
+import com.criteo.publisher.BidResponseListener;
 import com.criteo.publisher.BiddingLogMessage;
 import com.criteo.publisher.Criteo;
 import com.criteo.publisher.CriteoBannerAdListener;
@@ -334,13 +335,14 @@ public class InHouseFunctionalTest {
     mockedDependenciesRule.waitForIdleState();
   }
 
-  private void givenInitializedSdk(AdUnit... adUnits) throws CriteoInitException {
-    if (config.isLiveBiddingEnabled()) {
-      // Empty it to show that prefetch has no influence
-      adUnits = new AdUnit[]{};
-    }
+  private void givenInitializedSdk(AdUnit adUnit) throws CriteoInitException {
+    Criteo criteo = givenInitializedCriteo();
 
-    givenInitializedCriteo(adUnits);
+    if (!config.isLiveBiddingEnabled()) {
+      // Simulate prefetch of ad unit
+      // TODO: remove once bid caching is removed
+      criteo.loadBid(adUnit, mock(ContextData.class), mock(BidResponseListener.class));
+    }
 
     waitForIdleState();
   }

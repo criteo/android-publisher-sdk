@@ -16,10 +16,8 @@
 
 package com.criteo.publisher;
 
-import static com.criteo.publisher.concurrent.ThreadingUtil.waitForMessageQueueToBeIdle;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static com.criteo.publisher.util.CompletableFuture.completedFuture;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -40,7 +38,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import android.content.Context;
@@ -60,7 +57,6 @@ import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdSize;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.AdUnitMapper;
-import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestSlot;
@@ -88,7 +84,6 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Rule;
@@ -179,7 +174,6 @@ public class BidManagerFunctionalTest {
   @Before
   public void setUp() throws Exception {
     when(context.getPackageName()).thenReturn("bundle.id");
-    when(config.isPrefetchOnInitEnabled()).thenReturn(true);
 
     // Should be set to at least 1 because user-level silent mode is set the 0 included
     givenMockedClockSetTo(1);
@@ -191,46 +185,6 @@ public class BidManagerFunctionalTest {
     givenExpiredSilentModeBidCached(sampleAdUnit());
     givenNoLastBid(sampleAdUnit());
     givenTimeBudgetRespectedWhenFetchingLiveBids();
-  }
-
-  @Test
-  public void unsupportedAdFormat_prefetch_GivenUnsupportedAdFormatForAnIntegration_ShouldFilterUnsupportedAdUnits() throws Exception {
-    doReturn(Integration.FALLBACK).when(integrationRegistry).readIntegration();
-
-    BannerAdUnit notFiltered = new BannerAdUnit("not_filtered", new AdSize(1, 2));
-    RewardedAdUnit filtered1 = new RewardedAdUnit("filtered1");
-    RewardedAdUnit filtered2 = new RewardedAdUnit("filtered2");
-    List<AdUnit> prefetchAdUnits = Arrays.asList(notFiltered, filtered1, filtered2);
-
-    CdbResponseSlot slot = givenMockedCdbRespondingSlot();
-
-    bidManager.prefetch(prefetchAdUnits);
-    waitForIdleState();
-
-    CacheAdUnit expected = new CacheAdUnit(
-        notFiltered.getSize(),
-        notFiltered.getAdUnitId(),
-        notFiltered.getAdUnitType()
-    );
-
-    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(expected), slot);
-    verify(logger).log(BiddingLogMessage.onUnsupportedAdFormat(toCacheAdUnit(filtered1), Integration.FALLBACK));
-    verify(logger).log(BiddingLogMessage.onUnsupportedAdFormat(toCacheAdUnit(filtered2), Integration.FALLBACK));
-  }
-
-  @Test
-  public void unsupportedAdFormat_prefetch_GivenSupportedAdFormatForAnIntegration_ShouldNotFilterIt() throws Exception {
-    doReturn(Integration.GAM_APP_BIDDING).when(integrationRegistry).readIntegration();
-
-    RewardedAdUnit notFiltered = new RewardedAdUnit("not_filtered");
-    List<AdUnit> prefetchAdUnits = singletonList(notFiltered);
-
-    CdbResponseSlot slot = givenMockedCdbRespondingSlot();
-
-    bidManager.prefetch(prefetchAdUnits);
-    waitForIdleState();
-
-    assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(toCacheAdUnit(notFiltered)), slot);
   }
 
   @Test
@@ -304,141 +258,6 @@ public class BidManagerFunctionalTest {
     assertShouldCallCdbAndPopulateCacheOnlyOnce(singletonList(toCacheAdUnit(adUnit)), slot);
   }
 
-  @Test
-  public void prefetch_GivenAdUnitsAndPrefetchDisabled_ShouldCallRemoteConfigButNotCdb() throws Exception {
-    when(config.isPrefetchOnInitEnabled()).thenReturn(false);
-
-    RemoteConfigResponse response = mock(RemoteConfigResponse.class);
-    when(api.loadConfig(any())).thenReturn(response);
-
-    List<AdUnit> prefetchAdUnits = Arrays.asList(
-        mock(AdUnit.class),
-        mock(AdUnit.class),
-        mock(AdUnit.class)
-    );
-
-    bidManager.prefetch(prefetchAdUnits);
-    waitForIdleState();
-
-    verifyNoInteractions(adUnitMapper);
-    assertShouldNotCallCdbAndNotPopulateCache();
-    verify(config).refreshConfig(response);
-  }
-
-  @Test
-  public void prefetch_GivenNoAdUnit_ShouldNotCallCdbAndPopulateCache() throws Exception {
-    bidManager.prefetch(emptyList());
-    waitForIdleState();
-
-    assertShouldNotCallCdbAndNotPopulateCache();
-  }
-
-  @Test
-  public void prefetch_GivenNoAdUnit_ShouldUpdateConfig() throws Exception {
-    RemoteConfigResponse response = mock(RemoteConfigResponse.class);
-    when(api.loadConfig(any())).thenReturn(response);
-
-    bidManager.prefetch(emptyList());
-    waitForIdleState();
-
-    verify(config).refreshConfig(response);
-    verify(api, never()).loadCdb(any(), any());
-  }
-
-  @Test
-  public void prefetch_GivenAdUnits_ShouldCallCdbAndPopulateCache() throws Exception {
-    List<AdUnit> prefetchAdUnits = Arrays.asList(
-        mock(AdUnit.class),
-        mock(AdUnit.class),
-        mock(AdUnit.class)
-    );
-
-    List<List<CacheAdUnit>> mappedAdUnitsChunks = singletonList(Arrays.asList(
-        sampleAdUnit(),
-        sampleAdUnit()
-    ));
-
-    CdbResponseSlot slot = givenMockedCdbRespondingSlot();
-
-    doReturn(mappedAdUnitsChunks).when(adUnitMapper).mapToChunks(prefetchAdUnits);
-
-    bidManager.prefetch(prefetchAdUnits);
-    waitForIdleState();
-
-    assertShouldCallCdbAndPopulateCacheOnlyOnce(mappedAdUnitsChunks.get(0), slot);
-  }
-
-  @Test
-  public void prefetch_GivenMapperSplittingIntoChunks_ExecuteChunksIndependently()
-      throws Exception {
-    // Remove concurrency. This would make this test really hard to follow.
-    // We should wait for idle state of main thread every time because the async task post execution
-    // is running on it.
-    doAnswer(answerVoid((Runnable runnable) -> {
-      runnable.run();
-      waitForMessageQueueToBeIdle();
-    })).when(executor).execute(any());
-
-    // Deactivate logging as it interferes with verification
-    doNothing().when(logger).log(any());
-
-    List<AdUnit> prefetchAdUnits = Arrays.asList(
-        mock(AdUnit.class),
-        mock(AdUnit.class),
-        mock(AdUnit.class)
-    );
-
-    List<CacheAdUnit> requestedAdUnits1 = singletonList(sampleAdUnit());
-    List<CacheAdUnit> requestedAdUnits2 = singletonList(sampleAdUnit());
-    List<CacheAdUnit> requestedAdUnits3 = singletonList(sampleAdUnit());
-    List<List<CacheAdUnit>> mappedAdUnitsChunks = Arrays.asList(
-        requestedAdUnits1,
-        requestedAdUnits2,
-        requestedAdUnits3
-    );
-
-    doReturn(mappedAdUnitsChunks).when(adUnitMapper).mapToChunks(prefetchAdUnits);
-
-    CdbResponse response1 = givenMockedCdbResponseWithValidSlot(1);
-    CdbResponse response3 = givenMockedCdbResponseWithValidSlot(3);
-    RemoteConfigResponse remoteConfigResponse = mock(RemoteConfigResponse.class);
-
-    when(api.loadCdb(any(), any()))
-        .thenReturn(response1)
-        .thenThrow(IOException.class)
-        .thenReturn(response3);
-    when(api.loadConfig(any())).thenReturn(remoteConfigResponse);
-
-    bidManager = spy(bidManager);
-    bidManager.prefetch(prefetchAdUnits);
-    waitForIdleState();
-
-    InOrder inOrder = inOrder(bidManager, cache, api, config);
-
-    // First call with only config call
-    inOrder.verify(config).refreshConfig(remoteConfigResponse);
-
-    // First call to CDB
-    inOrder.verify(config, never()).refreshConfig(any());
-    inOrder.verify(api)
-        .loadCdb(argThat(cdb -> requestedAdUnits1.equals(getRequestedAdUnits(cdb))), any());
-    response1.getSlots().forEach(inOrder.verify(cache)::add);
-    inOrder.verify(bidManager).setTimeToNextCall(1);
-
-    // Second call with error
-    inOrder.verify(api)
-        .loadCdb(argThat(cdb -> requestedAdUnits2.equals(getRequestedAdUnits(cdb))), any());
-
-    // Third call in success but without the config call
-    inOrder.verify(config, never()).refreshConfig(any());
-    inOrder.verify(api)
-        .loadCdb(argThat(cdb -> requestedAdUnits3.equals(getRequestedAdUnits(cdb))), any());
-    response3.getSlots().forEach(inOrder.verify(cache)::add);
-    inOrder.verify(bidManager).setTimeToNextCall(3);
-
-    inOrder.verifyNoMoreInteractions();
-  }
-
   private CdbResponse givenMockedCdbResponseWithValidSlot(int timeToNextCall) {
     CdbResponseSlot slot = mock(CdbResponseSlot.class);
     when(slot.isValid()).thenReturn(true);
@@ -450,63 +269,8 @@ public class BidManagerFunctionalTest {
   }
 
   @Test
-  public void prefetch_GivenKillSwitchIsEnabled_ShouldNotCallCdbAndNotPopulateCache()
-      throws Exception {
-    CacheAdUnit cacheAdUnit = sampleAdUnit();
-    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    givenKillSwitchIs(true);
-
-    bidManager.prefetch(singletonList(adUnit));
-    waitForIdleState();
-
-    assertShouldNotCallCdbAndNotPopulateCache();
-  }
-
-  @Test
-  public void prefetch_GivenRemoteConfigWithKillSwitchEnabled_WhenGettingBidShouldNotCallCdbAndNotPopulateCacheAndReturnNull()
-      throws Exception {
-    givenKillSwitchIs(false);
-    doAnswer(answerVoid((RemoteConfigResponse response) -> {
-      Boolean killSwitch = response.getKillSwitch();
-      when(config.isKillSwitchEnabled()).thenReturn(killSwitch);
-    })).when(config).refreshConfig(any());
-
-    CacheAdUnit cacheAdUnit = sampleAdUnit();
-    AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
-    givenRemoteConfigWithKillSwitchEnabled();
-
-    bidManager.prefetch(singletonList(adUnit));
-    waitForIdleState();
-
-    clearInvocations(cache);
-    clearInvocations(api);
-    clearInvocations(bidLifecycleListener);
-
-    CdbResponseSlot bid = bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
-
-    assertShouldNotCallCdbAndNotPopulateCache();
-    assertNull(bid);
-  }
-
-  @Test
-  public void prefetch_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo()
-      throws Exception {
-    callingCdb_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo(adUnit -> {
-      bidManager.prefetch(singletonList(adUnit));
-    });
-  }
-
-  @Test
   public void getBidForAdUnitAndPrefetch_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo()
       throws Exception {
-    callingCdb_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo(adUnit -> {
-      bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
-    });
-  }
-
-  private void callingCdb_GivenAdUnitAndGlobalInformation_ShouldCallCdbWithExpectedInfo(
-      Consumer<AdUnit> callingCdb
-  ) throws Exception {
     doReturn(completedFuture("expectedUserAgent")).when(deviceInfo).getUserAgent();
 
     GdprData expectedGdpr = mock(GdprData.class);
@@ -521,7 +285,7 @@ public class BidManagerFunctionalTest {
     CacheAdUnit cacheAdUnit = sampleAdUnit();
     AdUnit adUnit = givenMockedAdUnitMappingTo(cacheAdUnit);
 
-    callingCdb.accept(adUnit);
+    bidManager.getBidForAdUnitAndPrefetch(adUnit, contextData);
     waitForIdleState();
 
     Publisher expectedPublisher = Publisher.create(
@@ -1751,7 +1515,6 @@ public class BidManagerFunctionalTest {
     AdUnit fromAdUnit = mock(AdUnit.class);
 
     doReturn(toAdUnit).when(adUnitMapper).map(fromAdUnit);
-    doReturn(singletonList(singletonList(toAdUnit))).when(adUnitMapper).mapToChunks(singletonList(fromAdUnit));
 
     return fromAdUnit;
   }

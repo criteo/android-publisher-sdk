@@ -32,8 +32,6 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
-import java.util.List;
-import java.util.concurrent.Executor;
 
 class CriteoInternal extends Criteo {
 
@@ -66,7 +64,6 @@ class CriteoInternal extends Criteo {
 
   CriteoInternal(
       Application application,
-      @NonNull List<AdUnit> adUnits,
       @Nullable Boolean usPrivacyOptout,
       @NonNull DependencyProvider dependencyProvider
   ) {
@@ -99,16 +96,7 @@ class CriteoInternal extends Criteo {
     BidLifecycleListener bidLifecycleListener = dependencyProvider.provideBidLifecycleListener();
     bidLifecycleListener.onSdkInitialized();
 
-    prefetchAdUnits(dependencyProvider.provideRunOnUiThreadExecutor(), adUnits);
-  }
-
-  private void prefetchAdUnits(Executor executor, List<AdUnit> adUnits) {
-    executor.execute(new SafeRunnable() {
-      @Override
-      public void runSafely() {
-        bidManager.prefetch(adUnits);
-      }
-    });
+    dependencyProvider.provideBidRequestSender().sendRemoteConfigRequest(config);
   }
 
   @Override

@@ -26,7 +26,6 @@ import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestFactory;
 import com.criteo.publisher.model.CdbResponse;
 import com.criteo.publisher.model.CdbResponseSlot;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 class CdbCall extends SafeRunnable {
@@ -41,7 +40,7 @@ class CdbCall extends SafeRunnable {
   private final Clock clock;
 
   @NonNull
-  private final List<CacheAdUnit> requestedAdUnits;
+  private final CacheAdUnit requestedAdUnit;
 
   @NonNull
   private final ContextData contextData;
@@ -53,21 +52,21 @@ class CdbCall extends SafeRunnable {
       @NonNull PubSdkApi pubSdkApi,
       @NonNull CdbRequestFactory cdbRequestFactory,
       @NonNull Clock clock,
-      @NonNull List<CacheAdUnit> requestedAdUnits,
+      @NonNull CacheAdUnit requestedAdUnit,
       @NonNull ContextData contextData,
       @NonNull CdbCallListener listener
   ) {
     this.pubSdkApi = pubSdkApi;
     this.cdbRequestFactory = cdbRequestFactory;
     this.clock = clock;
-    this.requestedAdUnits = requestedAdUnits;
+    this.requestedAdUnit = requestedAdUnit;
     this.contextData = contextData;
     this.listener = listener;
   }
 
   @Override
   public void runSafely() throws ExecutionException, InterruptedException {
-    CdbRequest cdbRequest = cdbRequestFactory.createRequest(requestedAdUnits, contextData);
+    CdbRequest cdbRequest = cdbRequestFactory.createRequest(requestedAdUnit, contextData);
     String userAgent = cdbRequestFactory.getUserAgent().get();
 
     listener.onCdbRequest(cdbRequest);

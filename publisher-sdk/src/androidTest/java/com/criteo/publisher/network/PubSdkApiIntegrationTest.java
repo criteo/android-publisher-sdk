@@ -19,13 +19,10 @@ package com.criteo.publisher.network;
 import static com.criteo.publisher.TestAdUnits.BANNER_320_50;
 import static com.criteo.publisher.TestAdUnits.BANNER_UNKNOWN;
 import static com.criteo.publisher.TestAdUnits.INTERSTITIAL;
-import static com.criteo.publisher.TestAdUnits.INTERSTITIAL_UNKNOWN;
 import static com.criteo.publisher.TestAdUnits.INTERSTITIAL_VIDEO;
 import static com.criteo.publisher.TestAdUnits.NATIVE;
-import static com.criteo.publisher.TestAdUnits.NATIVE_UNKNOWN;
 import static com.criteo.publisher.util.AdUnitType.CRITEO_BANNER;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -55,7 +52,6 @@ import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.model.RemoteConfigResponse;
 import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.util.SharedPreferencesFactory;
-import java.util.List;
 import javax.inject.Inject;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -182,7 +178,7 @@ public class PubSdkApiIntegrationTest {
   public void loadCdb_GivenGeneratedRequest_ReturnInSuccess() throws Exception {
     CacheAdUnit adUnit = new CacheAdUnit(new AdSize(1, 2), "ad1", CRITEO_BANNER);
 
-    CdbRequest request = cdbRequestFactory.createRequest(singletonList(adUnit), new ContextData());
+    CdbRequest request = cdbRequestFactory.createRequest(adUnit, new ContextData());
 
     CdbResponse response = api.loadCdb(request, "myUserAgent");
 
@@ -192,7 +188,7 @@ public class PubSdkApiIntegrationTest {
   @Test
   public void loadCdb_GivenValidBannerAdUnit_ReturnBid() throws Exception {
     CacheAdUnit validAdUnit = adUnitMapper.map(BANNER_320_50);
-    CdbRequest request = cdbRequestFactory.createRequest(singletonList(validAdUnit), new ContextData());
+    CdbRequest request = cdbRequestFactory.createRequest(validAdUnit, new ContextData());
 
     CdbResponse response = api.loadCdb(request, "myUserAgent");
 
@@ -218,7 +214,7 @@ public class PubSdkApiIntegrationTest {
     when(deviceUtil.getCurrentScreenSize()).thenReturn(new AdSize(42, 1337));
 
     CacheAdUnit validAdUnit = adUnitMapper.map(INTERSTITIAL);
-    CdbRequest request = cdbRequestFactory.createRequest(singletonList(validAdUnit), new ContextData());
+    CdbRequest request = cdbRequestFactory.createRequest(validAdUnit, new ContextData());
 
     CdbResponse response = api.loadCdb(request, "myUserAgent");
 
@@ -245,7 +241,7 @@ public class PubSdkApiIntegrationTest {
     when(deviceUtil.getCurrentScreenSize()).thenReturn(new AdSize(42, 1337));
 
     CacheAdUnit validAdUnit = adUnitMapper.map(INTERSTITIAL_VIDEO);
-    CdbRequest request = cdbRequestFactory.createRequest(singletonList(validAdUnit), new ContextData());
+    CdbRequest request = cdbRequestFactory.createRequest(validAdUnit, new ContextData());
 
     CdbResponse response = api.loadCdb(request, "myUserAgent");
 
@@ -270,7 +266,7 @@ public class PubSdkApiIntegrationTest {
   @Test
   public void loadCdb_GivenValidNativeAdUnit_ReturnBid() throws Exception {
     CacheAdUnit validAdUnit = adUnitMapper.map(NATIVE);
-    CdbRequest request = cdbRequestFactory.createRequest(singletonList(validAdUnit), new ContextData());
+    CdbRequest request = cdbRequestFactory.createRequest(validAdUnit, new ContextData());
 
     CdbResponse response = api.loadCdb(request, "myUserAgent");
 
@@ -292,36 +288,15 @@ public class PubSdkApiIntegrationTest {
   }
 
   @Test
-  public void loadCdb_GivenMultipleValidAdUnits_ReturnBids() throws Exception {
+  public void loadCdb_GivenInvalidAdUnit_ReturnNoBid() throws Exception {
     when(deviceUtil.getCurrentScreenSize()).thenReturn(new AdSize(42, 1337));
 
-    List<CacheAdUnit> validAdUnits = adUnitMapper.mapToChunks(asList(
-        BANNER_320_50,
-        INTERSTITIAL,
-        NATIVE
-    )).get(0);
+    CacheAdUnit validAdUnit = adUnitMapper.map(BANNER_UNKNOWN);
 
-    CdbRequest request = cdbRequestFactory.createRequest(validAdUnits, new ContextData());
+    CdbRequest request = cdbRequestFactory.createRequest(validAdUnit, new ContextData());
     CdbResponse response = api.loadCdb(request, "myUserAgent");
 
-    assertThat(validAdUnits).hasSize(3);
-    assertThat(response.getSlots()).hasSize(3);
-  }
-
-  @Test
-  public void loadCdb_GivenMultipleInvalidAdUnits_ReturnNoBids() throws Exception {
-    when(deviceUtil.getCurrentScreenSize()).thenReturn(new AdSize(42, 1337));
-
-    List<CacheAdUnit> validAdUnits = adUnitMapper.mapToChunks(asList(
-        BANNER_UNKNOWN,
-        INTERSTITIAL_UNKNOWN,
-        NATIVE_UNKNOWN
-    )).get(0);
-
-    CdbRequest request = cdbRequestFactory.createRequest(validAdUnits, new ContextData());
-    CdbResponse response = api.loadCdb(request, "myUserAgent");
-
-    assertThat(validAdUnits).hasSize(3);
+    assertThat(validAdUnit).isNotNull();
     assertThat(response.getSlots()).hasSize(0);
   }
 
@@ -378,7 +353,6 @@ public class PubSdkApiIntegrationTest {
         DefaultConfig.CSM_ENABLED,
         DefaultConfig.LIVE_BIDDING_ENABLED,
         DefaultConfig.LIVE_BIDDING_TIME_BUDGET_IN_MILLIS,
-        DefaultConfig.PREFETCH_ON_INIT_ENABLED,
         DefaultConfig.REMOTE_LOG_LEVEL
     );
   }

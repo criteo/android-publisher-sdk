@@ -76,24 +76,6 @@ class ProfileIdFunctionalTest {
   private lateinit var consentData: ConsentData
 
   @Test
-  fun prefetch_GivenSdkUsedForTheFirstTime_UseFallbackProfileId() {
-    givenInitializedCriteo(BANNER_320_480)
-    mockedDependenciesRule.waitForIdleState()
-
-    verifyCdbIsCalledWith(Integration.FALLBACK)
-  }
-
-  @Test
-  fun prefetch_GivenUsedSdk_UseLatestProfileId() {
-    givenPreviousInHouseIntegrationWithResetDependencies()
-
-    givenInitializedCriteo(BANNER_320_480)
-    mockedDependenciesRule.waitForIdleState()
-
-    verifyCdbIsCalledWith(Integration.IN_HOUSE)
-  }
-
-  @Test
   fun remoteConfig_GivenSdkUsedForTheFirstTime_UseFallbackProfileId() {
     givenInitializedCriteo()
     mockedDependenciesRule.waitForIdleState()
@@ -112,43 +94,6 @@ class ProfileIdFunctionalTest {
 
     verify(api).loadConfig(check {
       assertThat(it.profileId).isEqualTo(Integration.IN_HOUSE.profileId)
-    })
-  }
-
-  @Test
-  fun csm_GivenPrefetchWithSdkUsedForTheFirstTime_UseFallbackProfileId() {
-    givenInitializedCriteo(BANNER_320_480)
-    mockedDependenciesRule.waitForIdleState()
-
-    triggerMetricRequest()
-
-    verify(api).postCsm(check {
-      with(MetricHelper) {
-        assertThat(it.internalProfileId).isEqualTo(Integration.FALLBACK.profileId)
-      }
-    })
-  }
-
-  @Test
-  fun csm_GivenPrefetchWithUsedSdk_UseLatestProfileId() {
-    givenPreviousInHouseIntegrationWithResetDependencies()
-
-    givenConsentGiven()
-
-    // Clean the metrics generated from the above InHouse bidding, to avoid interference
-    triggerMetricRequest()
-    clearInvocations(api)
-
-    givenInitializedCriteo(BANNER_320_480)
-    mockedDependenciesRule.waitForIdleState()
-
-    triggerMetricRequest()
-
-    verify(api).postCsm(check {
-      with(MetricHelper) {
-        assertThat(it.internalProfileId).isEqualTo(Integration.IN_HOUSE.profileId)
-        assertThat(it.internalFeedbacks).hasSize(1)
-      }
     })
   }
 

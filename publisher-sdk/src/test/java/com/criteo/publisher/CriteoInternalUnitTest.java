@@ -41,8 +41,6 @@ import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.privacy.UserPrivacyUtil;
 import com.criteo.publisher.util.AdvertisingInfo;
 import com.criteo.publisher.util.AppLifecycleUtil;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,8 +57,6 @@ public class CriteoInternalUnitTest {
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private Application application;
-
-  private List<AdUnit> adUnits;
 
   private Boolean usPrivacyOptout = false;
 
@@ -79,32 +75,16 @@ public class CriteoInternalUnitTest {
         .thenReturn(new DirectMockRunOnUiThreadExecutor());
 
     when(dependencyProvider.provideConfig()).thenReturn(config);
-
-    adUnits = new ArrayList<>();
   }
 
   @Test
-  public void whenCreatingNewCriteo_GivenBidManagerAndBidLifecycleListener_ShouldCallListenerBeforePrefetch()
+  public void whenCreatingNewCriteo_GivenBidLifecycleListener_ShouldCallListener()
       throws Exception {
     BidLifecycleListener listener = givenMockedBidLifecycleListener();
-    BidManager bidManager = givenMockedBidManager();
 
     createCriteo();
 
-    InOrder inOrder = inOrder(listener, bidManager);
-    inOrder.verify(listener).onSdkInitialized();
-    inOrder.verify(bidManager).prefetch(any());
-  }
-
-  @Test
-  public void whenCreatingNewCriteo_GivenBidManagerAndAdUnits_ShouldCallPrefetchWithAdUnits()
-      throws Exception {
-    BidManager bidManager = givenMockedBidManager();
-    adUnits = mock(List.class);
-
-    createCriteo();
-
-    verify(bidManager).prefetch(adUnits);
+    verify(listener).onSdkInitialized();
   }
 
   @Test
@@ -348,6 +328,6 @@ public class CriteoInternalUnitTest {
   }
 
   private CriteoInternal createCriteo() {
-    return new CriteoInternal(application, adUnits, usPrivacyOptout, dependencyProvider);
+    return new CriteoInternal(application, usPrivacyOptout, dependencyProvider);
   }
 }

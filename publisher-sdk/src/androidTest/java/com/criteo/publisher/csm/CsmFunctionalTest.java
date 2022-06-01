@@ -27,7 +27,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.clearInvocations;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,7 +39,7 @@ import androidx.core.util.Consumer;
 import androidx.test.filters.FlakyTest;
 import com.criteo.publisher.Clock;
 import com.criteo.publisher.Criteo;
-import com.criteo.publisher.CriteoInitException;
+import com.criteo.publisher.LiveCdbCallListener;
 import com.criteo.publisher.TestAdUnits;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.csm.MetricRequest.MetricRequestFeedback;
@@ -47,7 +49,9 @@ import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.network.CdbMock;
+import com.criteo.publisher.network.LiveBidRequestSender;
 import com.criteo.publisher.network.PubSdkApi;
+import com.criteo.publisher.privacy.ConsentData;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -87,30 +91,33 @@ public class CsmFunctionalTest {
   @Inject
   private CdbMock cdbMock;
 
+  @Inject
+  private ConsentData consentData;
+
+  @Inject
+  private MetricSendingQueueConsumer metricSendingQueueConsumer;
+
+  @SpyBean
+  private LiveBidRequestSender liveBidRequestSender;
+
   @Before
   public void setUp() throws Exception {
     integrationRegistry.declare(Integration.IN_HOUSE);
-    givenConsentGiven();
+    consentData.setConsentGiven(true);
   }
 
   @Test
-  public void givenPrefetchAdUnitsWithBidsThenConsumption_CallApiWithCsmOfConsumedBid() throws Exception {
-    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+  public void givenConsumedLiveBids_CallApiWithCsmOfConsumedBid() throws Exception {
+    givenInitializedCriteo();
     waitForIdleState();
 
     loadBid(TestAdUnits.BANNER_320_50);
     waitForIdleState();
 
+    sendMetricBatch();
+
     AtomicReference<String> firstImpressionId = new AtomicReference<>();
     AtomicReference<String> firstRequestGroupId = new AtomicReference<>();
-
-    // A third call is needed to trigger the sending of metrics to CSM. This is because,
-    // the execution of onBidConsumed() callback happens after the second call to CDB.
-    // An INTERSTITIAL AdUnit is set here on purpose to verify that the metric that is sent
-    // to CSM relates to BANNER_320_50, which is the one that was consumed and whose metric
-    // was pushed to the sending queue.
-    loadBid(TestAdUnits.INTERSTITIAL);
-    waitForIdleState();
 
     verify(api).postCsm(argThat(request -> {
       assertRequestHeaderIsExpected(request);
@@ -118,7 +125,7 @@ public class CsmFunctionalTest {
       // There is only one expected because the second one was not ready when sending was triggered.
       assertEquals(1, request.getFeedbacks().size());
       MetricRequestFeedback feedback = request.getFeedbacks().get(0);
-      assertItRepresentsConsumedBid(feedback);
+      assertItRepresentsConsumedLiveBid(feedback);
       firstImpressionId.set(feedback.getSlots().get(0).getImpressionId());
       firstRequestGroupId.set(feedback.getRequestGroupId());
 
@@ -129,55 +136,45 @@ public class CsmFunctionalTest {
     loadBid(TestAdUnits.BANNER_320_50);
     waitForIdleState();
 
+    sendMetricBatch();
+
     verify(api).postCsm(argThat(request -> {
       assertRequestHeaderIsExpected(request);
 
       assertEquals(1, request.getFeedbacks().size());
       MetricRequestFeedback feedback = request.getFeedbacks().get(0);
-      assertItRepresentsConsumedBid(feedback);
+      assertItRepresentsConsumedLiveBid(feedback);
       assertNotEquals(firstImpressionId.get(), feedback.getSlots().get(0).getImpressionId());
 
-      // This two metrics come from the same CDB request (prefetch) and should have the same ID
-      assertEquals(firstRequestGroupId.get(), feedback.getRequestGroupId());
+      // This two metrics come from the different CDB requests and should have the different ID
+      assertNotEquals(firstRequestGroupId.get(), feedback.getRequestGroupId());
 
       return true;
     }));
   }
 
-  /**
-   * Consent status is updated after the first response from CDB. Therefore, a first bid-request
-   * is made here to get the wanted side-effect.
-   */
-  private void givenConsentGiven() throws CriteoInitException {
-    givenInitializedCriteo(TestAdUnits.BANNER_320_480);
-    waitForIdleState();
-    MetricHelper.cleanState(mockedDependenciesRule.getDependencyProvider());
-  }
-
   @Test
   public void givenConsumedExpiredBid_CallApiWithCsmOfConsumedExpiredBid() throws Exception {
+    givenTimeBudgetExceededWhenFetchingLiveBids();
+    givenInitializedCriteo();
+    waitForIdleState();
+
     when(clock.getCurrentTimeInMillis()).thenReturn(0L);
-    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+    loadBid(TestAdUnits.INTERSTITIAL); // fetched but not consumed
     waitForIdleState();
 
-    when(clock.getCurrentTimeInMillis()).thenReturn(Long.MAX_VALUE);
-    loadBid(TestAdUnits.INTERSTITIAL);
+    when(clock.getCurrentTimeInMillis()).thenReturn(Long.MAX_VALUE); // bid is expired
+    loadBid(TestAdUnits.INTERSTITIAL); // consumed but expired
     waitForIdleState();
 
-    // A third call is needed to trigger the sending of metrics to CSM. This is because,
-    // the execution of onBidConsumed() callback happens after the second call to CDB.
-    // An BANNER_320_50 AdUnit is set here on purpose to verify that the metric that is sent
-    // to CSM relates to INTERSTITIAL, which is the one that was consumed and whose metric
-    // was pushed to the sending queue.
-    loadBid(TestAdUnits.BANNER_320_50);
-    waitForIdleState();
+    sendMetricBatch();
 
     verify(api).postCsm(argThat(request -> {
       assertRequestHeaderIsExpected(request);
 
       assertEquals(1, request.getFeedbacks().size());
       MetricRequestFeedback feedback = request.getFeedbacks().get(0);
-      assertItRepresentsExpiredConsumedBid(feedback);
+      assertItRepresentsExpiredConsumedLiveBid(feedback);
 
       return true;
     }));
@@ -185,11 +182,13 @@ public class CsmFunctionalTest {
 
   @Test
   public void givenNoBidFromCdb_CallApiWithCsmOfNoBid() throws Exception {
-    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL_UNKNOWN);
+    givenInitializedCriteo();
     waitForIdleState();
 
     loadBid(TestAdUnits.INTERSTITIAL_UNKNOWN);
     waitForIdleState();
+
+    sendMetricBatch();
 
     verify(api).postCsm(argThat(request -> {
       assertRequestHeaderIsExpected(request);
@@ -206,27 +205,20 @@ public class CsmFunctionalTest {
   public void givenNetworkErrorFromCdb_CallApiWithCsmOfNetworkError() throws Exception {
     doThrow(IOException.class).when(api).loadCdb(any(), any());
 
-    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+    givenInitializedCriteo();
     waitForIdleState();
 
     loadBid(TestAdUnits.INTERSTITIAL_UNKNOWN);
     waitForIdleState();
 
+    sendMetricBatch();
+
     verify(api).postCsm(argThat(request -> {
       assertRequestHeaderIsExpected(request);
 
-      assertEquals(2, request.getFeedbacks().size());
-      MetricRequestFeedback feedback1 = request.getFeedbacks().get(0);
-      MetricRequestFeedback feedback2 = request.getFeedbacks().get(1);
-      assertItRepresentsNetworkError(feedback1);
-      assertItRepresentsNetworkError(feedback2);
-
-      assertNotEquals(
-          feedback1.getSlots().get(0).getImpressionId(),
-          feedback2.getSlots().get(0).getImpressionId()
-      );
-
-      assertEquals(feedback1.getRequestGroupId(), feedback2.getRequestGroupId());
+      assertEquals(1, request.getFeedbacks().size());
+      MetricRequestFeedback feedback = request.getFeedbacks().get(0);
+      assertItRepresentsNetworkError(feedback);
 
       return true;
     }));
@@ -234,15 +226,17 @@ public class CsmFunctionalTest {
 
   @Test
   public void givenTimeoutErrorFromCdb_CallApiWithCsmOfTimeoutError() throws Exception {
+    givenInitializedCriteo();
+    waitForIdleState();
+
     when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenReturn(1);
 
-    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+    loadBid(TestAdUnits.INTERSTITIAL_UNKNOWN);
+    loadBid(TestAdUnits.BANNER_320_480);
     waitForIdleState();
 
     when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenCallRealMethod();
-
-    loadBid(TestAdUnits.INTERSTITIAL_UNKNOWN);
-    waitForIdleState();
+    sendMetricBatch();
 
     verify(api).postCsm(argThat(request -> {
       assertRequestHeaderIsExpected(request);
@@ -258,7 +252,7 @@ public class CsmFunctionalTest {
           feedback2.getSlots().get(0).getImpressionId()
       );
 
-      assertEquals(feedback1.getRequestGroupId(), feedback2.getRequestGroupId());
+      assertNotEquals(feedback1.getRequestGroupId(), feedback2.getRequestGroupId());
 
       return true;
     }));
@@ -270,49 +264,60 @@ public class CsmFunctionalTest {
     doThrow(IOException.class).when(api).postCsm(any());
 
     when(clock.getCurrentTimeInMillis()).thenReturn(0L);
-    givenInitializedCriteo(TestAdUnits.BANNER_320_50, TestAdUnits.INTERSTITIAL);
+    givenInitializedCriteo();
     waitForIdleState();
 
-    // Consumed and not expired
+    // Consumed and not expired -> CSM
+    loadBid(TestAdUnits.BANNER_320_50);
+    waitForIdleState();
+
+    // No bid consumed, and bid (1) is cached -> no CSM
+    givenTimeBudgetExceededWhenFetchingLiveBids();
     loadBid(TestAdUnits.INTERSTITIAL);
     waitForIdleState();
 
-    // Consumed but expired
-    // There is also a bid request here and consumed at timeout step
+    // Consumed and not expired -> CSM
+    givenTimeBudgetRespectedWhenFetchingLiveBids();
+    loadBid(TestAdUnits.INTERSTITIAL);
+    waitForIdleState();
+
+    // Bid (1) is consumed but expired -> CSM of (1)
+    // a bid (2) is cached but never consumed -> no CSM
     when(clock.getCurrentTimeInMillis()).thenCallRealMethod();
+    givenTimeBudgetExceededWhenFetchingLiveBids();
     loadBid(TestAdUnits.INTERSTITIAL);
     waitForIdleState();
 
-    // No bid
+    // No bid -> CSM
+    givenTimeBudgetRespectedWhenFetchingLiveBids();
     loadBid(TestAdUnits.INTERSTITIAL_UNKNOWN);
     waitForIdleState();
 
-    // Timeout
+    // Timeout -> CSM
     cdbMock.simulatorSlowNetworkOnNextRequest();
     when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenReturn(1);
-    loadBid(TestAdUnits.INTERSTITIAL);
+    loadBid(TestAdUnits.BANNER_320_50);
     waitForIdleState();
     when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenCallRealMethod();
 
-    // Network error
+    // Network error -> CSM
     doThrow(IOException.class).when(api).loadCdb(any(), any());
-    loadBid(TestAdUnits.INTERSTITIAL);
+    loadBid(TestAdUnits.BANNER_320_50);
     waitForIdleState();
     doCallRealMethod().when(api).loadCdb(any(), any());
 
-    // CSM endpoint works again: on next bid request, there should metrics for all previous bids.
+    // CSM endpoint works again
     clearInvocations(api);
     doCallRealMethod().when(api).postCsm(any());
-    loadBid(TestAdUnits.BANNER_UNKNOWN);
-    waitForIdleState();
+    sendMetricBatch();
 
     verify(api).postCsm(argThat(request -> {
       assertRequestHeaderIsExpected(request);
 
       List<MetricRequestFeedback> feedbacks = request.getFeedbacks();
       assertEquals(6, feedbacks.size());
-      assertOnlyNSatisfy(feedbacks, 2, this::assertItRepresentsConsumedBid);
-      assertOnlyNSatisfy(feedbacks, 1, this::assertItRepresentsExpiredConsumedBid);
+      assertOnlyNSatisfy(feedbacks, 2, this::assertItRepresentsConsumedLiveBid);
+      assertOnlyNSatisfy(feedbacks, 1, this::assertItRepresentsExpiredConsumedLiveBid);
       assertOnlyNSatisfy(feedbacks, 1, this::assertItRepresentsNoBid);
       assertOnlyNSatisfy(feedbacks, 1, this::assertItRepresentsTimeoutError);
       assertOnlyNSatisfy(feedbacks, 1, this::assertItRepresentsNetworkError);
@@ -357,18 +362,18 @@ public class CsmFunctionalTest {
     assertEquals(buildConfigWrapper.getSdkVersion(), request.getWrapperVersion());
   }
 
-  private void assertItRepresentsConsumedBid(MetricRequestFeedback feedback) {
+  private void assertItRepresentsConsumedLiveBid(MetricRequestFeedback feedback) {
     assertEquals(0, feedback.getCdbCallStartElapsed());
     assertNotNull(feedback.getCdbCallEndElapsed());
     assertNotNull(feedback.getElapsed());
     assertFalse(feedback.isTimeout());
     assertNotNull(feedback.getRequestGroupId());
     assertEquals(1, feedback.getSlots().size());
-    assertTrue(feedback.getSlots().get(0).getCachedBidUsed());
+    assertFalse(feedback.getSlots().get(0).getCachedBidUsed());
     assertNotNull(feedback.getSlots().get(0).getZoneId());
   }
 
-  private void assertItRepresentsExpiredConsumedBid(MetricRequestFeedback feedback) {
+  private void assertItRepresentsExpiredConsumedLiveBid(MetricRequestFeedback feedback) {
     assertEquals(0, feedback.getCdbCallStartElapsed());
     assertNotNull(feedback.getCdbCallEndElapsed());
     assertNull(feedback.getElapsed());
@@ -418,5 +423,21 @@ public class CsmFunctionalTest {
 
   private void loadBid(@NonNull AdUnit adUnit) {
     Criteo.getInstance().loadBid(adUnit, new ContextData(), ignored -> { /* no op */ });
+  }
+
+  private void sendMetricBatch() {
+    metricSendingQueueConsumer.sendMetricBatch();
+    waitForIdleState();
+  }
+
+  private void givenTimeBudgetRespectedWhenFetchingLiveBids() {
+    doNothing().when(liveBidRequestSender).scheduleTimeBudgetExceeded$publisher_sdk_debug(any());
+  }
+
+  private void givenTimeBudgetExceededWhenFetchingLiveBids() {
+    doAnswer(invocation -> {
+      invocation.getArgument(0, LiveCdbCallListener.class).onTimeBudgetExceeded();
+      return null;
+    }).when(liveBidRequestSender).scheduleTimeBudgetExceeded$publisher_sdk_debug(any());
   }
 }

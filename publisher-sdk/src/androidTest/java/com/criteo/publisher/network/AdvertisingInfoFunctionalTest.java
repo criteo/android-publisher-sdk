@@ -61,36 +61,6 @@ public class AdvertisingInfoFunctionalTest {
   private Context context;
 
   @Test
-  public void testBearcatCall_LimitedGAID() throws Exception {
-    when(advertisingInfo.getAdvertisingId()).thenReturn(DEVICE_ID_LIMITED);
-
-    givenInitializedCriteo(bannerAdUnit);
-    waitForIdleState();
-
-    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
-
-    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
-    CdbRequest cdb = cdbArgumentCaptor.getValue();
-
-    assertEquals(DEVICE_ID_LIMITED, fetchDeviceIdSentInCdbRequest(cdb));
-  }
-
-  @Test
-  public void testBearcatCall_NotEmptyGAID() throws Exception {
-    when(advertisingInfo.getAdvertisingId()).thenReturn(FAKE_DEVICE_ID);
-
-    givenInitializedCriteo(bannerAdUnit);
-    waitForIdleState();
-
-    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
-
-    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
-    CdbRequest cdb = cdbArgumentCaptor.getValue();
-
-    assertEquals(FAKE_DEVICE_ID, fetchDeviceIdSentInCdbRequest(cdb));
-  }
-
-  @Test
   public void testStandaloneBannerRequest_LimitedGAID() throws Exception {
     when(advertisingInfo.getAdvertisingId()).thenReturn(DEVICE_ID_LIMITED);
 

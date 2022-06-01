@@ -21,36 +21,16 @@ import static com.criteo.publisher.BiddingLogMessage.onUnsupportedAdFormat;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.util.AdUnitType;
 import com.criteo.publisher.util.DeviceUtil;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class AdUnitMapper {
-
-  /**
-   * Ad units are grouped into chunks so bid request size stay reasonable and this may improve the
-   * situation in case of flaky network.
-   * <p>
-   * This constant is set given a CDB suggestion:
-   * <ul>
-   *   <li>RTB does not handle too many slots</li>
-   *   <li>Arbitrage is optimized to process 8 slots in parallel</li>
-   * </ul>
-   * <p>
-   * Although, the reason may change over time and it would require a proper study.
-   */
-  private static final int CHUNK_SIZE = 8;
 
   /**
    * Special size representing a native ad.
@@ -82,28 +62,31 @@ public class AdUnitMapper {
   }
 
   /**
-   * Transform the given valid {@link AdUnit} into internal {@link CacheAdUnit}.
+   * Transform the given {@link AdUnit} into an internal {@link CacheAdUnit} if valid
    * <p>
-   * Valid ad units are transformed and collected while invalid ad units are ignored. See {@link
-   * #map(AdUnit)} for validity rules.
+   * The given ad unit is considered valid if all those conditions are met:
+   * <ul>
+   *   <li>not null</li>
+   *   <li>placement ID is not empty nor null</li>
+   *   <li>width is strictly positive</li>
+   *   <li>height is strictly positive</li>
+   * </ul>
    * <p>
-   * Collected ad units are then grouped into chunks to load.
+   * If the ad unit is not valid, then <code>null</code> is returned instead.
    *
-   * @param adUnits to transform
-   * @return chunks of internal ad unit representations
+   * @param adUnit to transform
+   * @return internal ad unit representation or <code>null</code> if given ad unit is invalid
    */
-  public List<List<CacheAdUnit>> mapToChunks(@NonNull List<AdUnit> adUnits) {
-    Set<CacheAdUnit> cacheAdUnits = new HashSet<>();
-    for (AdUnit adUnit : adUnits) {
-      if (adUnit == null) {
-        continue;
-      }
-
-      AdSize size = getSize(adUnit);
-      CacheAdUnit cacheAdUnit = new CacheAdUnit(size, adUnit.getAdUnitId(), adUnit.getAdUnitType());
-      cacheAdUnits.add(cacheAdUnit);
+  @Nullable
+  public CacheAdUnit map(@Nullable AdUnit adUnit) {
+    if (adUnit == null) {
+      return null;
     }
-    return splitIntoChunks(filterInvalidCacheAdUnits(cacheAdUnits), CHUNK_SIZE);
+
+    AdSize size = getSize(adUnit);
+    CacheAdUnit cacheAdUnit = new CacheAdUnit(size, adUnit.getAdUnitId(), adUnit.getAdUnitType());
+
+    return filterInvalidCacheAdUnits(cacheAdUnit);
   }
 
   @NonNull
@@ -122,81 +105,23 @@ public class AdUnitMapper {
     }
   }
 
-  /**
-   * Transform the given {@link AdUnit} into an internal {@link CacheAdUnit} if valid
-   * <p>
-   * The given ad unit is considered valid if all those conditions are met:
-   * <ul>
-   *   <li>not null</li>
-   *   <li>placement ID is not empty nor null</li>
-   *   <li>width is strictly positive</li>
-   *   <li>height is strictly positive</li>
-   * </ul>
-   * <p>
-   * If the ad unit is not valid, then <code>null</code> is returned instead.
-   *
-   * @param adUnit to transform
-   * @return internal ad unit representation or <code>null</code> if given ad unit is invalid
-   */
   @Nullable
-  public CacheAdUnit map(@Nullable AdUnit adUnit) {
-    List<List<CacheAdUnit>> validAdUnits = mapToChunks(Collections.singletonList(adUnit));
-    if (validAdUnits.isEmpty() || validAdUnits.get(0).isEmpty()) {
-      return null;
-    } else {
-      return validAdUnits.get(0).get(0);
-    }
-  }
-
-  private List<CacheAdUnit> filterInvalidCacheAdUnits(Collection<CacheAdUnit> cacheAdUnits) {
-    List<CacheAdUnit> validatedCacheAdUnits = new ArrayList<>();
-
+  private CacheAdUnit filterInvalidCacheAdUnits(@NonNull CacheAdUnit cacheAdUnit) {
     Integration integration = integrationRegistry.readIntegration();
 
-    for (CacheAdUnit cacheAdUnit : cacheAdUnits) {
-      if (cacheAdUnit.getPlacementId().isEmpty()
-          || cacheAdUnit.getSize().getWidth() <= 0
-          || cacheAdUnit.getSize().getHeight() <= 0) {
-        logger.log(onInvalidAdUnit(cacheAdUnit));
-        continue;
-      }
-
-      if (cacheAdUnit.getAdUnitType() == AdUnitType.CRITEO_REWARDED && !SUPPORTED_INTEGRATION_FOR_REWARDED.contains(integration)) {
-        logger.log(onUnsupportedAdFormat(cacheAdUnit, integration));
-        continue;
-      }
-
-      validatedCacheAdUnits.add(cacheAdUnit);
+    if (cacheAdUnit.getPlacementId().isEmpty()
+        || cacheAdUnit.getSize().getWidth() <= 0
+        || cacheAdUnit.getSize().getHeight() <= 0) {
+      logger.log(onInvalidAdUnit(cacheAdUnit));
+      return null;
     }
 
-    return validatedCacheAdUnits;
-  }
-
-  /**
-   * Returns consecutive {@linkplain List#subList(int, int) sub-lists} of given list, each of the
-   * same size (the last list may be smaller).
-   * <p>
-   * For example, splitting a list containing <code>[a, b, c, d, e]</code> with a chunk size of 3
-   * yields <code>[[a, b, c], [d, e]]]</code>.
-   *
-   * @param elements  the list to return consecutive sub-lists of
-   * @param chunkSize the desired size of each sub-lists (the last may be smaller)
-   * @return a list of consecutive sub-lists
-   */
-  @VisibleForTesting
-  static <T> List<List<T>> splitIntoChunks(List<T> elements, int chunkSize) {
-    if (elements.isEmpty()) {
-      return Collections.emptyList();
+    if (cacheAdUnit.getAdUnitType() == AdUnitType.CRITEO_REWARDED && !SUPPORTED_INTEGRATION_FOR_REWARDED.contains(integration)) {
+      logger.log(onUnsupportedAdFormat(cacheAdUnit, integration));
+      return null;
     }
 
-    List<List<T>> chunks = new ArrayList<>();
-
-    for (int from = 0; from < elements.size(); from += chunkSize) {
-      int to = Math.min(from + chunkSize, elements.size());
-      chunks.add(elements.subList(from, to));
-    }
-
-    return chunks;
+    return cacheAdUnit;
   }
 
 }

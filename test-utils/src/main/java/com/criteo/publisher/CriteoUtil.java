@@ -18,9 +18,6 @@ package com.criteo.publisher;
 
 import android.app.Application;
 import com.criteo.publisher.application.InstrumentationUtil;
-import com.criteo.publisher.model.AdUnit;
-import java.util.Arrays;
-import java.util.List;
 
 public class CriteoUtil {
 
@@ -28,15 +25,8 @@ public class CriteoUtil {
   public static final String PROD_CP_ID = "B-056946";
   public static final String PROD_CDB_URL = "https://bidder.criteo.com";
 
-  public static Criteo givenInitializedCriteo(AdUnit... preloadedAdUnits)
-      throws CriteoInitException {
-    Application app = InstrumentationUtil.getApplication();
-
-    clearCriteo();
-
-    return new Criteo.Builder(app, TEST_CP_ID)
-        .adUnits(Arrays.asList(preloadedAdUnits))
-        .init();
+  public static Criteo givenInitializedCriteo() throws CriteoInitException {
+    return getCriteoBuilder().init();
   }
 
   /**
@@ -46,14 +36,13 @@ public class CriteoUtil {
     Criteo.setInstance(null);
   }
 
-  public static Criteo.Builder getCriteoBuilder(AdUnit... preloadedAdUnits) {
+  public static Criteo.Builder getCriteoBuilder() {
     Application app = InstrumentationUtil.getApplication();
 
     // clears any side effects from previous calls
-    Criteo.setInstance(null);
+    clearCriteo();
 
-    List<AdUnit> adUnits = Arrays.asList(preloadedAdUnits);
-    return new Criteo.Builder(app, TEST_CP_ID).adUnits(adUnits);
+    return new Criteo.Builder(app, TEST_CP_ID);
   }
 
 }

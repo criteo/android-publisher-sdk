@@ -18,7 +18,6 @@ package com.criteo.publisher
 
 import android.util.Log
 import com.criteo.publisher.logging.LogMessage
-import com.criteo.publisher.model.AdUnit
 
 internal object SdkInitLogMessage {
 
@@ -30,11 +29,9 @@ internal object SdkInitLogMessage {
   @JvmStatic
   fun onSdkInitialized(
       cpId: String,
-      adUnits: List<AdUnit>,
       version: String
   ) = LogMessage(message =
-    """Criteo SDK version $version is initialized with Publisher ID $cpId and ${adUnits.size} ad units:
-${adUnits.joinToString("\n") { "- $it" }}"""
+    """Criteo SDK version $version is initialized with Publisher ID $cpId."""
   )
 
   @JvmStatic

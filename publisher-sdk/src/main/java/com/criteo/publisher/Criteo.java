@@ -17,11 +17,11 @@
 package com.criteo.publisher;
 
 import static com.criteo.publisher.ErrorLogMessage.onUncaughtErrorAtPublicApi;
-import static com.criteo.publisher.logging.DeprecationLogMessage.onDeprecatedMethodCalled;
 import static com.criteo.publisher.SdkInitLogMessage.onDummySdkInitialized;
 import static com.criteo.publisher.SdkInitLogMessage.onErrorDuringSdkInitialization;
 import static com.criteo.publisher.SdkInitLogMessage.onSdkInitialized;
 import static com.criteo.publisher.SdkInitLogMessage.onSdkInitializedMoreThanOnce;
+import static com.criteo.publisher.logging.DeprecationLogMessage.onDeprecatedMethodCalled;
 
 import android.app.Application;
 import android.util.Log;
@@ -38,7 +38,6 @@ import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.DeviceInfo;
 import com.criteo.publisher.util.DeviceUtil;
-import java.util.ArrayList;
 import java.util.List;
 
 @Keep
@@ -55,9 +54,6 @@ public abstract class Criteo {
     @NonNull
     private final Application application;
 
-    @NonNull
-    private List<AdUnit> adUnits = new ArrayList<>();
-
     @Nullable
     private Boolean usPrivacyOptOut;
 
@@ -68,12 +64,10 @@ public abstract class Criteo {
       this.criteoPublisherId = criteoPublisherId;
     }
 
-    public Builder adUnits(@Nullable List<AdUnit> adUnits) {
-      if (adUnits == null) {
-        this.adUnits = new ArrayList<>();
-      } else {
-        this.adUnits = adUnits;
-      }
+    @Deprecated
+    public Builder adUnits(@Nullable List<AdUnit> ignored) {
+      Logger logger = LoggerFactory.getLogger(Builder.class);
+      logger.log(onDeprecatedMethodCalled());
       return this;
     }
 
@@ -117,12 +111,11 @@ public abstract class Criteo {
           if (deviceUtil.isVersionSupported()) {
             criteo = new CriteoInternal(
                 builder.application,
-                builder.adUnits,
                 builder.usPrivacyOptOut,
                 dependencyProvider
             );
 
-            logger.log(onSdkInitialized(builder.criteoPublisherId, builder.adUnits, getVersion()));
+            logger.log(onSdkInitialized(builder.criteoPublisherId, getVersion()));
           } else {
             criteo = new DummyCriteo();
 

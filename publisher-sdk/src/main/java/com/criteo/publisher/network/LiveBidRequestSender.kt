@@ -50,7 +50,7 @@ class LiveBidRequestSender(
             pubSdkApi,
             cdbRequestFactory,
             clock,
-            listOf(cacheAdUnit),
+            cacheAdUnit,
             contextData,
             liveCdbCallListener
         )

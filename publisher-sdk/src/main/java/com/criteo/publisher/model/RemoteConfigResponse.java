@@ -37,7 +37,6 @@ public abstract class RemoteConfigResponse {
       @Nullable Boolean csmEnabled,
       @Nullable Boolean liveBiddingEnabled,
       @Nullable Integer liveBiddingTimeBudgetInMillis,
-      @Nullable Boolean prefetchOnInitEnabled,
       @Nullable RemoteLogLevel remoteLogLevel
   ) {
     return new AutoValue_RemoteConfigResponse(
@@ -49,7 +48,6 @@ public abstract class RemoteConfigResponse {
         csmEnabled,
         liveBiddingEnabled,
         liveBiddingTimeBudgetInMillis,
-        prefetchOnInitEnabled,
         remoteLogLevel
     );
   }
@@ -57,7 +55,6 @@ public abstract class RemoteConfigResponse {
   @NonNull
   public static RemoteConfigResponse createEmpty() {
     return create(
-        null,
         null,
         null,
         null,
@@ -81,7 +78,6 @@ public abstract class RemoteConfigResponse {
         getCsmEnabled(),
         getLiveBiddingEnabled(),
         getLiveBiddingTimeBudgetInMillis(),
-        getPrefetchOnInitEnabled(),
         getRemoteLogLevel()
     );
   }
@@ -178,15 +174,6 @@ public abstract class RemoteConfigResponse {
    */
   @Nullable
   public abstract Integer getLiveBiddingTimeBudgetInMillis();
-
-  /**
-   * Feature flag for activating/deactivating the prefetch during initialization. If set to <code>true</code>, then the
-   * feature is activated. If <code>false</code>, then it is deactivated. If the flag is not present (i.e. equals to
-   * <code>null</code>), then the previous persisted value of this flag is taken. If there is no previous value, this
-   * means that this is a fresh start of a new application, then a default value is taken.
-   */
-  @Nullable
-  public abstract Boolean getPrefetchOnInitEnabled();
 
   /**
    * Desired level of logs to get from the remote logs handler.

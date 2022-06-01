@@ -74,7 +74,7 @@ public class CriteoBannerViewIntegrationTest {
 
   @Test
   public void loadAdInHouse_GivenSelfMadeToken_NotifyListenerForFailure() throws Exception {
-    givenInitializedCriteo(bannerAdUnit);
+    givenInitializedCriteo();
     waitForIdleState();
 
     // This should not be possible since BidResponse constructor is not part of the public API.

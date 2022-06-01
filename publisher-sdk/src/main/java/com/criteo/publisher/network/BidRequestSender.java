@@ -30,8 +30,6 @@ import com.criteo.publisher.model.RemoteConfigRequest;
 import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.model.RemoteConfigResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -103,28 +101,23 @@ public class BidRequestSender {
    * ones, some are pending, they will be ignored from the request. If all given ad units are
    * pending, then no call is done and listener is not notified.
    *
-   * @param adUnits ad units to request
+   * @param adUnit ad unit to request
    * @param listener listener to notify
    */
   public void sendBidRequest(
-      @NonNull List<CacheAdUnit> adUnits,
+      @NonNull CacheAdUnit adUnit,
       @NonNull ContextData contextData,
       @NonNull CdbCallListener listener
   ) {
-    List<CacheAdUnit> requestedAdUnits = new ArrayList<>(adUnits);
     FutureTask<Void> task;
 
     synchronized (pendingTasksLock) {
-      requestedAdUnits.removeAll(pendingTasks.keySet());
-      if (requestedAdUnits.isEmpty()) {
+      if (pendingTasks.containsKey(adUnit)) {
         return;
       }
 
-      task = createCdbCallTask(requestedAdUnits, contextData, listener);
-
-      for (CacheAdUnit requestedAdUnit : requestedAdUnits) {
-        pendingTasks.put(requestedAdUnit, task);
-      }
+      task = createCdbCallTask(adUnit, contextData, listener);
+      pendingTasks.put(adUnit, task);
     }
 
     try {
@@ -134,18 +127,18 @@ public class BidRequestSender {
       if (task != null) {
         // If an exception was thrown when scheduling the task, then we remove the ad unit from the
         // pending tasks.
-        removePendingTasksWithAdUnits(requestedAdUnits);
+        removePendingTasksWithAdUnit(adUnit);
       }
     }
   }
 
   @NonNull
   private FutureTask<Void> createCdbCallTask(
-      @NonNull List<CacheAdUnit> requestedAdUnits,
+      @NonNull CacheAdUnit requestedAdUnit,
       @NonNull ContextData contextData,
       @NonNull CdbCallListener listener
   ) {
-    CdbCall task = new CdbCall(api, cdbRequestFactory, clock, requestedAdUnits, contextData, listener);
+    CdbCall task = new CdbCall(api, cdbRequestFactory, clock, requestedAdUnit, contextData, listener);
 
     Runnable withRemovedPendingTasksAfterExecution = new Runnable() {
       @Override
@@ -153,7 +146,7 @@ public class BidRequestSender {
         try {
           task.run();
         } finally {
-          removePendingTasksWithAdUnits(requestedAdUnits);
+          removePendingTasksWithAdUnit(requestedAdUnit);
         }
       }
     };
@@ -161,9 +154,9 @@ public class BidRequestSender {
     return new FutureTask<>(withRemovedPendingTasksAfterExecution, null);
   }
 
-  private void removePendingTasksWithAdUnits(List<CacheAdUnit> adUnits) {
+  private void removePendingTasksWithAdUnit(CacheAdUnit adUnit) {
     synchronized (pendingTasksLock) {
-      pendingTasks.keySet().removeAll(adUnits);
+      pendingTasks.keySet().remove(adUnit);
     }
   }
 
