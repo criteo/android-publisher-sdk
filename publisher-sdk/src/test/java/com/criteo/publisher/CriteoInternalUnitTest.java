@@ -22,7 +22,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -31,7 +30,6 @@ import static org.mockito.Mockito.when;
 
 import android.app.Application;
 import com.criteo.publisher.activity.TopActivityFinder;
-import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.headerbidding.HeaderBidding;
@@ -45,7 +43,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Answers;
-import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -75,16 +72,8 @@ public class CriteoInternalUnitTest {
         .thenReturn(new DirectMockRunOnUiThreadExecutor());
 
     when(dependencyProvider.provideConfig()).thenReturn(config);
-  }
-
-  @Test
-  public void whenCreatingNewCriteo_GivenBidLifecycleListener_ShouldCallListener()
-      throws Exception {
-    BidLifecycleListener listener = givenMockedBidLifecycleListener();
-
-    createCriteo();
-
-    verify(listener).onSdkInitialized();
+    when(dependencyProvider.provideApplication()).thenReturn(application);
+    when(dependencyProvider.provideInputUsPrivacyOptOut()).thenAnswer(invocation -> usPrivacyOptout);
   }
 
   @Test
@@ -295,14 +284,6 @@ public class CriteoInternalUnitTest {
     when(dependencyProvider.provideUserPrivacyUtil()).thenReturn(userPrivacyUtil);
   }
 
-  private BidLifecycleListener givenMockedBidLifecycleListener() {
-    BidLifecycleListener listener = mock(BidLifecycleListener.class);
-
-    when(dependencyProvider.provideBidLifecycleListener()).thenReturn(listener);
-
-    return listener;
-  }
-
   private BidManager givenMockedBidManager() {
     BidManager bidManager = mock(BidManager.class);
 
@@ -328,6 +309,6 @@ public class CriteoInternalUnitTest {
   }
 
   private CriteoInternal createCriteo() {
-    return new CriteoInternal(application, usPrivacyOptout, dependencyProvider);
+    return new CriteoInternal(dependencyProvider);
   }
 }

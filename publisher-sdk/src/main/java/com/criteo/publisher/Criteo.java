@@ -102,6 +102,7 @@ public abstract class Criteo {
           DependencyProvider dependencyProvider = DependencyProvider.getInstance();
           dependencyProvider.setApplication(builder.application);
           dependencyProvider.setCriteoPublisherId(builder.criteoPublisherId);
+          dependencyProvider.setInputUsPrivacyOptOut(builder.usPrivacyOptOut);
 
           if (builder.isDebugLogsEnabled) {
             dependencyProvider.provideConsoleHandler().setMinLogLevel(Log.INFO);
@@ -109,11 +110,7 @@ public abstract class Criteo {
 
           DeviceUtil deviceUtil = dependencyProvider.provideDeviceUtil();
           if (deviceUtil.isVersionSupported()) {
-            criteo = new CriteoInternal(
-                builder.application,
-                builder.usPrivacyOptOut,
-                dependencyProvider
-            );
+            criteo = new CriteoInternal(dependencyProvider);
 
             logger.log(onSdkInitialized(builder.criteoPublisherId, getVersion()));
           } else {

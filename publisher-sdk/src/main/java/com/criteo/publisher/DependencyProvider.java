@@ -64,6 +64,7 @@ import com.criteo.publisher.csm.ObjectQueueFactory;
 import com.criteo.publisher.csm.SendingQueueConfiguration;
 import com.criteo.publisher.csm.SendingQueueFactory;
 import com.criteo.publisher.dependency.LazyDependency;
+import com.criteo.publisher.dependency.SdkServiceLifecycleManager;
 import com.criteo.publisher.headerbidding.DfpHeaderBidding;
 import com.criteo.publisher.headerbidding.HeaderBidding;
 import com.criteo.publisher.headerbidding.OtherAdServersHeaderBidding;
@@ -125,6 +126,7 @@ public class DependencyProvider {
 
   private Application application;
   private String criteoPublisherId;
+  private Boolean inputUsPrivacyOptOut;
 
   protected DependencyProvider() {
   }
@@ -153,6 +155,10 @@ public class DependencyProvider {
   public void setCriteoPublisherId(@NonNull String criteoPublisherId) {
     this.criteoPublisherId = criteoPublisherId;
     checkCriteoPublisherIdIsSet();
+  }
+
+  public void setInputUsPrivacyOptOut(@Nullable Boolean usPrivacyOptOut) {
+    this.inputUsPrivacyOptOut = usPrivacyOptOut;
   }
 
   boolean isApplicationSet() {
@@ -191,6 +197,11 @@ public class DependencyProvider {
   public String provideCriteoPublisherId() {
     checkCriteoPublisherIdIsSet();
     return criteoPublisherId;
+  }
+
+  @Nullable
+  public Boolean provideInputUsPrivacyOptOut() {
+    return inputUsPrivacyOptOut;
   }
 
   @NonNull
@@ -409,6 +420,13 @@ public class DependencyProvider {
 
       return listener;
     });
+  }
+
+  @NonNull
+  public SdkServiceLifecycleManager provideSdkServiceLifecycleManager() {
+    return getOrCreate(SdkServiceLifecycleManager.class, () -> new SdkServiceLifecycleManager(Arrays.asList(
+        provideBidLifecycleListener()
+    )));
   }
 
   @NonNull

@@ -21,7 +21,6 @@ import static com.criteo.publisher.ErrorLogMessage.onUncaughtErrorAtPublicApi;
 import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.context.UserData;
 import com.criteo.publisher.headerbidding.HeaderBidding;
@@ -62,11 +61,7 @@ class CriteoInternal extends Criteo {
   @NonNull
   private final InterstitialActivityHelper interstitialActivityHelper;
 
-  CriteoInternal(
-      Application application,
-      @Nullable Boolean usPrivacyOptout,
-      @NonNull DependencyProvider dependencyProvider
-  ) {
+  CriteoInternal(@NonNull DependencyProvider dependencyProvider) {
     this.dependencyProvider = dependencyProvider;
 
     dependencyProvider.provideSession();
@@ -84,17 +79,18 @@ class CriteoInternal extends Criteo {
 
     interstitialActivityHelper = dependencyProvider.provideInterstitialActivityHelper();
 
+    Boolean usPrivacyOptOut = dependencyProvider.provideInputUsPrivacyOptOut();
     userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil();
-    if (usPrivacyOptout != null) {
-      userPrivacyUtil.storeUsPrivacyOptout(usPrivacyOptout);
+    if (usPrivacyOptOut != null) {
+      userPrivacyUtil.storeUsPrivacyOptout(usPrivacyOptOut);
     }
 
+    Application application = dependencyProvider.provideApplication();
     application.registerActivityLifecycleCallbacks(dependencyProvider.provideAppLifecycleUtil());
 
     dependencyProvider.provideTopActivityFinder().registerActivityLifecycleFor(application);
 
-    BidLifecycleListener bidLifecycleListener = dependencyProvider.provideBidLifecycleListener();
-    bidLifecycleListener.onSdkInitialized();
+    dependencyProvider.provideSdkServiceLifecycleManager().onSdkInitialized();
 
     dependencyProvider.provideBidRequestSender().sendRemoteConfigRequest(config);
   }
