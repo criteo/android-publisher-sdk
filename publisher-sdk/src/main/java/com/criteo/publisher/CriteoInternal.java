@@ -91,8 +91,6 @@ class CriteoInternal extends Criteo {
     dependencyProvider.provideTopActivityFinder().registerActivityLifecycleFor(application);
 
     dependencyProvider.provideSdkServiceLifecycleManager().onSdkInitialized();
-
-    dependencyProvider.provideBidRequestSender().sendRemoteConfigRequest(config);
   }
 
   @Override

@@ -48,6 +48,7 @@ import com.criteo.publisher.concurrent.NoOpAsyncResources;
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
 import com.criteo.publisher.concurrent.ThreadPoolExecutorFactory;
 import com.criteo.publisher.config.Config;
+import com.criteo.publisher.config.ConfigManager;
 import com.criteo.publisher.config.RemoteConfigRequestFactory;
 import com.criteo.publisher.context.ConnectionTypeFetcher;
 import com.criteo.publisher.context.ContextProvider;
@@ -381,7 +382,6 @@ public class DependencyProvider {
   public BidRequestSender provideBidRequestSender() {
     return getOrCreate(BidRequestSender.class, () -> new BidRequestSender(
         provideCdbRequestFactory(),
-        provideRemoteConfigRequestFactory(),
         provideClock(),
         providePubSdkApi(),
         provideThreadPoolExecutor()
@@ -425,8 +425,19 @@ public class DependencyProvider {
   @NonNull
   public SdkServiceLifecycleManager provideSdkServiceLifecycleManager() {
     return getOrCreate(SdkServiceLifecycleManager.class, () -> new SdkServiceLifecycleManager(Arrays.asList(
-        provideBidLifecycleListener()
+        provideBidLifecycleListener(),
+        provideConfigManager()
     )));
+  }
+
+  @NonNull
+  public ConfigManager provideConfigManager() {
+    return getOrCreate(ConfigManager.class, () -> new ConfigManager(
+        provideConfig(),
+        provideRemoteConfigRequestFactory(),
+        providePubSdkApi(),
+        provideThreadPoolExecutor()
+    ));
   }
 
   @NonNull
