@@ -17,6 +17,7 @@
 package com.criteo.publisher.config
 
 import com.criteo.publisher.SafeRunnable
+import com.criteo.publisher.dependency.SdkInput
 import com.criteo.publisher.dependency.SdkServiceLifecycle
 import com.criteo.publisher.network.PubSdkApi
 import java.util.concurrent.Executor
@@ -34,7 +35,7 @@ class ConfigManager(
    * If no error occurs during the request, the given configuration is updated. Else, it is left
    * unchanged.
    */
-  override fun onSdkInitialized() {
+  override fun onSdkInitialized(sdkInput: SdkInput) {
     executor.execute(RemoteConfigCall())
   }
 

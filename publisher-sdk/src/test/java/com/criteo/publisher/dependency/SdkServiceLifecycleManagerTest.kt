@@ -23,6 +23,7 @@ import com.criteo.publisher.mock.SpyBean
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
@@ -53,18 +54,19 @@ class SdkServiceLifecycleManagerTest {
   fun onSdkInitialized_GivenMultipleServices_AllGetInvoked() {
     val service1 = mock<SdkServiceLifecycle>()
     val service2 = mock<SdkServiceLifecycle>()
+    val sdkInput = SdkInput()
 
     sdkServiceLifecycleManager = SdkServiceLifecycleManager(listOf(service1, service2))
-    sdkServiceLifecycleManager.onSdkInitialized()
+    sdkServiceLifecycleManager.onSdkInitialized(sdkInput)
 
-    verify(service1).onSdkInitialized()
-    verify(service2).onSdkInitialized()
+    verify(service1).onSdkInitialized(sdkInput)
+    verify(service2).onSdkInitialized(sdkInput)
   }
 
   @Test
   fun onSdkInitialized_GivenCriteoInitialization_ManagerGetInvoked() {
     givenInitializedCriteo()
 
-    verify(sdkServiceLifecycleManager).onSdkInitialized()
+    verify(sdkServiceLifecycleManager).onSdkInitialized(any())
   }
 }

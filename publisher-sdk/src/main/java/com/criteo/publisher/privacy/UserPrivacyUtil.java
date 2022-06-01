@@ -21,6 +21,8 @@ import android.content.SharedPreferences.Editor;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.dependency.SdkInput;
+import com.criteo.publisher.dependency.SdkServiceLifecycle;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.privacy.gdpr.GdprData;
@@ -30,8 +32,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
+import org.jetbrains.annotations.NotNull;
 
-public class UserPrivacyUtil {
+public class UserPrivacyUtil implements SdkServiceLifecycle {
 
   // Regex according to the CCPA IAB String format defined in
   // https://iabtechlab.com/wp-content/uploads/2019/11/U.S.-Privacy-String-v1.0-IAB-Tech-Lab.pdf
@@ -64,6 +67,13 @@ public class UserPrivacyUtil {
     this.sharedPreferences = sharedPreferences;
     this.safeSharedPreferences = new SafeSharedPreferences(sharedPreferences);
     this.gdprDataFetcher = gdprDataFetcher;
+  }
+
+  @Override
+  public void onSdkInitialized(@NotNull SdkInput sdkInput) {
+    if (sdkInput.getUsPrivacyOptOut() != null) {
+      storeUsPrivacyOptout(sdkInput.getUsPrivacyOptOut());
+    }
   }
 
   @Nullable

@@ -22,6 +22,7 @@ import com.criteo.publisher.SafeRunnable;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.config.Config;
 import com.criteo.publisher.csm.MetricRepository.MetricUpdater;
+import com.criteo.publisher.dependency.SdkInput;
 import com.criteo.publisher.model.CacheAdUnit;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbRequestSlot;
@@ -85,7 +86,7 @@ public class CsmBidLifecycleListener implements BidLifecycleListener {
    * queue and posted to backend.
    */
   @Override
-  public void onSdkInitialized() {
+  public void onSdkInitialized(@NonNull SdkInput sdkInput) {
     if (isCsmDisabled()) {
       return;
     }

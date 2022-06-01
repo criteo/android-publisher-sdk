@@ -18,7 +18,6 @@ package com.criteo.publisher;
 
 import static com.criteo.publisher.ErrorLogMessage.onUncaughtErrorAtPublicApi;
 
-import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.config.Config;
@@ -64,33 +63,15 @@ class CriteoInternal extends Criteo {
   CriteoInternal(@NonNull DependencyProvider dependencyProvider) {
     this.dependencyProvider = dependencyProvider;
 
-    dependencyProvider.provideSession();
+    dependencyProvider.provideSdkServiceLifecycleManager().onSdkInitialized(dependencyProvider.provideSdkInput());
 
     deviceInfo = dependencyProvider.provideDeviceInfo();
-    deviceInfo.initialize();
-
-    dependencyProvider.provideAdvertisingInfo().prefetchAsync();
-
     config = dependencyProvider.provideConfig();
-
     bidManager = dependencyProvider.provideBidManager();
     consumableBidLoader = dependencyProvider.provideConsumableBidLoader();
     headerBidding = dependencyProvider.provideHeaderBidding();
-
     interstitialActivityHelper = dependencyProvider.provideInterstitialActivityHelper();
-
-    Boolean usPrivacyOptOut = dependencyProvider.provideInputUsPrivacyOptOut();
     userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil();
-    if (usPrivacyOptOut != null) {
-      userPrivacyUtil.storeUsPrivacyOptout(usPrivacyOptOut);
-    }
-
-    Application application = dependencyProvider.provideApplication();
-    application.registerActivityLifecycleCallbacks(dependencyProvider.provideAppLifecycleUtil());
-
-    dependencyProvider.provideTopActivityFinder().registerActivityLifecycleFor(application);
-
-    dependencyProvider.provideSdkServiceLifecycleManager().onSdkInitialized();
   }
 
   @Override

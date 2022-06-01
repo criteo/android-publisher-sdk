@@ -17,6 +17,7 @@
 package com.criteo.publisher.config
 
 import com.criteo.publisher.concurrent.DirectMockExecutor
+import com.criteo.publisher.dependency.SdkInput
 import com.criteo.publisher.network.PubSdkApi
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
@@ -65,7 +66,7 @@ class ConfigManagerTest {
 
     whenever(api.loadConfig(request)).doReturn(response)
 
-    manager.onSdkInitialized()
+    manager.onSdkInitialized(SdkInput())
 
     verify(config).refreshConfig(response)
   }
@@ -76,7 +77,7 @@ class ConfigManagerTest {
     whenever(api.loadConfig(any())).doThrow(IOException::class)
 
     assertThatCode {
-      manager.onSdkInitialized()
+      manager.onSdkInitialized(SdkInput())
     }.doesNotThrowAnyException()
   }
 
@@ -92,7 +93,7 @@ class ConfigManagerTest {
       mock<RemoteConfigResponse>()
     }.whenever(api).loadConfig(any())
 
-    manager.onSdkInitialized()
+    manager.onSdkInitialized(SdkInput())
 
     executor.verifyExpectations()
   }

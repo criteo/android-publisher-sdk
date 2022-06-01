@@ -67,6 +67,7 @@ import com.criteo.publisher.csm.ObjectQueueFactory;
 import com.criteo.publisher.csm.SendingQueueConfiguration;
 import com.criteo.publisher.csm.SendingQueueFactory;
 import com.criteo.publisher.dependency.LazyDependency;
+import com.criteo.publisher.dependency.SdkInput;
 import com.criteo.publisher.dependency.SdkServiceLifecycleManager;
 import com.criteo.publisher.headerbidding.DfpHeaderBidding;
 import com.criteo.publisher.headerbidding.HeaderBidding;
@@ -104,7 +105,6 @@ import com.criteo.publisher.util.JsonSerializer;
 import com.criteo.publisher.util.MapUtilKt;
 import com.criteo.publisher.util.SafeSharedPreferences;
 import com.criteo.publisher.util.SharedPreferencesFactory;
-import com.criteo.publisher.util.TextUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.picasso.Picasso;
@@ -124,10 +124,7 @@ public class DependencyProvider {
   protected static DependencyProvider instance;
 
   protected final ConcurrentMap<Class<?>, Object> services = new ConcurrentHashMap<>();
-
-  private Application application;
-  private String criteoPublisherId;
-  private Boolean inputUsPrivacyOptOut;
+  private SdkInput sdkInput = new SdkInput();
 
   protected DependencyProvider() {
   }
@@ -149,44 +146,36 @@ public class DependencyProvider {
   }
 
   public void setApplication(@NonNull Application application) {
-    this.application = application;
-    checkApplicationIsSet();
+    sdkInput = sdkInput.withApplication(application);
+    sdkInput.getApplication().get(); // Fail-fast
   }
 
   public void setCriteoPublisherId(@NonNull String criteoPublisherId) {
-    this.criteoPublisherId = criteoPublisherId;
-    checkCriteoPublisherIdIsSet();
+    sdkInput = sdkInput.withCriteoPublisherId(criteoPublisherId);
+    sdkInput.getCriteoPublisherId().get(); // Fail-fast
   }
 
   public void setInputUsPrivacyOptOut(@Nullable Boolean usPrivacyOptOut) {
-    this.inputUsPrivacyOptOut = usPrivacyOptOut;
+    sdkInput = sdkInput.withUsPrivacyOptOut(usPrivacyOptOut);
   }
 
   boolean isApplicationSet() {
     try {
-      DependencyProvider.getInstance().checkApplicationIsSet();
+      sdkInput.getApplication().get();
     } catch (Exception e) {
       return false;
     }
     return true;
   }
 
-  private void checkApplicationIsSet() {
-    if (application == null) {
-      throw new CriteoNotInitializedException("Application reference is required");
-    }
-  }
-
-  private void checkCriteoPublisherIdIsSet() {
-    if (TextUtils.isEmpty(criteoPublisherId)) {
-      throw new CriteoNotInitializedException("Criteo Publisher Id is required");
-    }
+  @NonNull
+  public SdkInput provideSdkInput() {
+    return sdkInput;
   }
 
   @NonNull
   public Application provideApplication() {
-    checkApplicationIsSet();
-    return application;
+    return sdkInput.getApplication().get();
   }
 
   @NonNull
@@ -196,13 +185,7 @@ public class DependencyProvider {
 
   @NonNull
   public String provideCriteoPublisherId() {
-    checkCriteoPublisherIdIsSet();
-    return criteoPublisherId;
-  }
-
-  @Nullable
-  public Boolean provideInputUsPrivacyOptOut() {
-    return inputUsPrivacyOptOut;
+    return sdkInput.getCriteoPublisherId().get();
   }
 
   @NonNull
@@ -425,8 +408,14 @@ public class DependencyProvider {
   @NonNull
   public SdkServiceLifecycleManager provideSdkServiceLifecycleManager() {
     return getOrCreate(SdkServiceLifecycleManager.class, () -> new SdkServiceLifecycleManager(Arrays.asList(
+        provideSession(),
+        provideUserPrivacyUtil(),
         provideBidLifecycleListener(),
-        provideConfigManager()
+        provideAppLifecycleUtil(),
+        provideAdvertisingInfo(),
+        provideDeviceInfo(),
+        provideConfigManager(),
+        provideTopActivityFinder()
     )));
   }
 

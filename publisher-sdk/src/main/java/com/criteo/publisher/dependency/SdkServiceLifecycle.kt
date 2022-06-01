@@ -24,14 +24,14 @@ interface SdkServiceLifecycle {
   /**
    * Callback invoked when the SDK is initialized.
    */
-  fun onSdkInitialized()
+  fun onSdkInitialized(sdkInput: SdkInput)
 }
 
 @OpenForTesting
 class SdkServiceLifecycleManager(@VisibleForTesting internal val services: List<SdkServiceLifecycle>) {
-  fun onSdkInitialized() {
+  fun onSdkInitialized(sdkInput: SdkInput) {
     services.forEach {
-      it.onSdkInitialized()
+      it.onSdkInitialized(sdkInput)
     }
   }
 }
