@@ -17,11 +17,11 @@
 package com.criteo.publisher.logging
 
 import android.util.Log
+import com.criteo.publisher.config.Config
 import com.criteo.publisher.dependency.LazyDependency
 import com.criteo.publisher.logging.RemoteLogRecords.RemoteLogLevel
 import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
-import com.criteo.publisher.model.Config
 import com.criteo.publisher.privacy.ConsentData
 import org.junit.Before
 import org.junit.Rule

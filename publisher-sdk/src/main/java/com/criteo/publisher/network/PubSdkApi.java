@@ -18,14 +18,14 @@ package com.criteo.publisher.network;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.criteo.publisher.config.RemoteConfigRequest;
+import com.criteo.publisher.config.RemoteConfigResponse;
 import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.logging.RemoteLogRecords;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
-import com.criteo.publisher.model.RemoteConfigRequest;
-import com.criteo.publisher.model.RemoteConfigResponse;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.JsonSerializer;
 import com.criteo.publisher.util.StreamUtil;

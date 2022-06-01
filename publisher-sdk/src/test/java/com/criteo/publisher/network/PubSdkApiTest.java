@@ -26,13 +26,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import androidx.annotation.NonNull;
+import com.criteo.publisher.config.RemoteConfigRequest;
 import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.logging.RemoteLogRecords;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.CdbRequest;
 import com.criteo.publisher.model.CdbResponse;
-import com.criteo.publisher.model.RemoteConfigRequest;
 import com.criteo.publisher.privacy.gdpr.GdprData;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.JsonSerializer;

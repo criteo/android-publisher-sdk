@@ -17,10 +17,10 @@
 package com.criteo.publisher.csm
 
 import com.criteo.publisher.concurrent.DirectMockExecutor
+import com.criteo.publisher.config.Config
 import com.criteo.publisher.integration.Integration.FALLBACK
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
-import com.criteo.publisher.model.Config
 import com.criteo.publisher.network.PubSdkApi
 import com.criteo.publisher.util.BuildConfigWrapper
 import org.junit.Before

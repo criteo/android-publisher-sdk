@@ -17,13 +17,13 @@
 package com.criteo.publisher.csm
 
 import com.criteo.publisher.Clock
+import com.criteo.publisher.config.Config
 import com.criteo.publisher.model.AdSize
 import com.criteo.publisher.model.CacheAdUnit
 import com.criteo.publisher.model.CdbRequest
 import com.criteo.publisher.model.CdbRequestSlot
 import com.criteo.publisher.model.CdbResponse
 import com.criteo.publisher.model.CdbResponseSlot
-import com.criteo.publisher.model.Config
 import com.criteo.publisher.privacy.ConsentData
 import com.criteo.publisher.util.AdUnitType.CRITEO_BANNER
 import org.assertj.core.api.Assertions.assertThat

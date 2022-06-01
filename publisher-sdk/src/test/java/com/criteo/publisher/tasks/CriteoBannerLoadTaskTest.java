@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
-import com.criteo.publisher.model.Config;
+import com.criteo.publisher.config.Config;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import org.junit.Before;

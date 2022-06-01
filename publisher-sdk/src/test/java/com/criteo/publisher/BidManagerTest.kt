@@ -16,12 +16,12 @@
 
 package com.criteo.publisher
 
+import com.criteo.publisher.config.Config
 import com.criteo.publisher.context.ContextData
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.model.AdUnit
 import com.criteo.publisher.model.CdbResponseSlot
-import com.criteo.publisher.model.Config
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doAnswer

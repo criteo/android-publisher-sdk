@@ -18,12 +18,12 @@ package com.criteo.publisher.network
 
 import com.criteo.publisher.Clock
 import com.criteo.publisher.LiveCdbCallListener
+import com.criteo.publisher.config.Config
 import com.criteo.publisher.context.ContextData
 import com.criteo.publisher.model.CacheAdUnit
 import com.criteo.publisher.model.CdbRequest
 import com.criteo.publisher.model.CdbRequestFactory
 import com.criteo.publisher.model.CdbResponse
-import com.criteo.publisher.model.Config
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any

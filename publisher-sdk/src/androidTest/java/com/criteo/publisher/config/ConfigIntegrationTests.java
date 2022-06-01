@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.model;
+package com.criteo.publisher.config;
 
 import static com.criteo.publisher.CriteoUtil.clearCriteo;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;

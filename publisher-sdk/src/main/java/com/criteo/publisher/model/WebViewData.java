@@ -18,6 +18,7 @@ package com.criteo.publisher.model;
 
 import androidx.annotation.NonNull;
 import com.criteo.publisher.DependencyProvider;
+import com.criteo.publisher.config.Config;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.tasks.InterstitialListenerNotifier;
 import com.criteo.publisher.tasks.WebViewDataTask;

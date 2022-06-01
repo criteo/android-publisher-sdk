@@ -19,6 +19,7 @@ package com.criteo.publisher.model;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import com.criteo.publisher.config.Config;
 import com.criteo.publisher.network.PubSdkApi;
 import org.junit.Rule;
 import org.junit.Test;

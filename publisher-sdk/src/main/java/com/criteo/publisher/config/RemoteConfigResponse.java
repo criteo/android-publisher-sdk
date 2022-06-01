@@ -14,11 +14,12 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.model;
+package com.criteo.publisher.config;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.logging.RemoteLogRecords.RemoteLogLevel;
+import com.criteo.publisher.model.CdbResponseSlot;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
