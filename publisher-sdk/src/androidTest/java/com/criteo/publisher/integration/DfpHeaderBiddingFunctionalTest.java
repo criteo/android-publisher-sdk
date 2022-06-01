@@ -185,25 +185,25 @@ public class DfpHeaderBiddingFunctionalTest {
   }
 
   @Test
-  public void whenGettingBid_GivenValidCpIdAndPrefetchValidBannerId_CriteoMacroAreInjectedInDfpBuilder()
+  public void whenGettingBid_GivenValidCpIdAndValidBannerId_CriteoMacroAreInjectedInDfpBuilder()
       throws Exception {
     whenGettingBid_GivenValidCpIdAndValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(validBannerAdUnit, false);
   }
 
   @Test
-  public void whenGettingBid_GivenValidCpIdAndPrefetchValidInterstitialId_CriteoMacroAreInjectedInDfpBuilder()
+  public void whenGettingBid_GivenValidCpIdAndValidInterstitialId_CriteoMacroAreInjectedInDfpBuilder()
       throws Exception {
     whenGettingBid_GivenValidCpIdAndValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(validInterstitialAdUnit, false);
   }
 
   @Test
-  public void whenGettingBid_GivenValidCpIdAndPrefetchValidInterstitialVideoId_CriteoMacroAreInjectedInDfpBuilder()
+  public void whenGettingBid_GivenValidCpIdAndValidInterstitialVideoId_CriteoMacroAreInjectedInDfpBuilder()
       throws Exception {
     whenGettingBid_GivenValidCpIdAndValidAdUnit_CriteoMacroAreInjectedInDfpBuilder(TestAdUnits.INTERSTITIAL_VIDEO, true);
   }
 
   @Test
-  public void whenGettingBid_GivenValidCpIdAndPrefetchValidRewardedVideoId_CriteoMacroAreInjectedInDfpBuilder()
+  public void whenGettingBid_GivenValidCpIdAndValidRewardedVideoId_CriteoMacroAreInjectedInDfpBuilder()
       throws Exception {
     givenInitializedCriteo(TestAdUnits.REWARDED);
 
@@ -226,7 +226,7 @@ public class DfpHeaderBiddingFunctionalTest {
   }
 
   @Test
-  public void whenGettingBid_GivenValidCpIdAndPrefetchValidNativeId_CriteoNativeMacroAreInjectedInDfpBuilder()
+  public void whenGettingBid_GivenValidCpIdAndValidNativeId_CriteoNativeMacroAreInjectedInDfpBuilder()
       throws Exception {
     givenInitializedCriteo(validNativeAdUnit);
 
@@ -261,27 +261,24 @@ public class DfpHeaderBiddingFunctionalTest {
   }
 
   @Test
-  public void whenGettingBid_GivenValidCpIdAndPrefetchInvalidBannerId_CriteoMacroAreNotInjectedInDfpBuilder()
+  public void whenGettingBid_GivenValidCpIdAndInvalidBannerId_CriteoMacroAreNotInjectedInDfpBuilder()
       throws Exception {
-    whenGettingBid_GivenValidCpIdAndPrefetchInvalidAdUnit_CriteoMacroAreNotInjectedInDfpBuilder(
-        invalidBannerAdUnit);
+    whenGettingBid_GivenValidCpIdAndInvalidAdUnit_CriteoMacroAreNotInjectedInDfpBuilder(invalidBannerAdUnit);
   }
 
   @Test
-  public void whenGettingBid_GivenValidCpIdAndPrefetchInvalidInterstitialId_CriteoMacroAreNotInjectedInDfpBuilder()
+  public void whenGettingBid_GivenValidCpIdAndInvalidInterstitialId_CriteoMacroAreNotInjectedInDfpBuilder()
       throws Exception {
-    whenGettingBid_GivenValidCpIdAndPrefetchInvalidAdUnit_CriteoMacroAreNotInjectedInDfpBuilder(
-        invalidInterstitialAdUnit);
+    whenGettingBid_GivenValidCpIdAndInvalidAdUnit_CriteoMacroAreNotInjectedInDfpBuilder(invalidInterstitialAdUnit);
   }
 
   @Test
-  public void whenGettingBid_GivenValidCpIdAndPrefetchInvalidNativeId_CriteoMacroAreNotInjectedInDfpBuilder()
+  public void whenGettingBid_GivenValidCpIdAndInvalidNativeId_CriteoMacroAreNotInjectedInDfpBuilder()
       throws Exception {
-    whenGettingBid_GivenValidCpIdAndPrefetchInvalidAdUnit_CriteoMacroAreNotInjectedInDfpBuilder(
-        invalidNativeAdUnit);
+    whenGettingBid_GivenValidCpIdAndInvalidAdUnit_CriteoMacroAreNotInjectedInDfpBuilder(invalidNativeAdUnit);
   }
 
-  private void whenGettingBid_GivenValidCpIdAndPrefetchInvalidAdUnit_CriteoMacroAreNotInjectedInDfpBuilder(
+  private void whenGettingBid_GivenValidCpIdAndInvalidAdUnit_CriteoMacroAreNotInjectedInDfpBuilder(
       AdUnit adUnit)
       throws Exception {
     givenInitializedCriteo(adUnit);
@@ -314,22 +311,20 @@ public class DfpHeaderBiddingFunctionalTest {
   }
 
   @Test
-  public void whenGettingTestBid_GivenValidCpIdAndPrefetchDemoBannerId_CriteoMacroAreInjectedInDfpBuilder()
+  public void whenGettingTestBid_GivenValidCpIdAndDemoBannerId_CriteoMacroAreInjectedInDfpBuilder()
       throws Exception {
     givenUsingCdbProd();
-    whenGettingTestBid_GivenValidCpIdAndPrefetchDemoAdUnit_CriteoMacroAreInjectedInDfpBuilder(
-        demoBannerAdUnit);
+    whenGettingTestBid_GivenValidCpIdAndDemoAdUnit_CriteoMacroAreInjectedInDfpBuilder(demoBannerAdUnit);
   }
 
   @Test
-  public void whenGettingTestBid_GivenValidCpIdAndPrefetchDemoInterstitialId_CriteoMacroAreInjectedInDfpBuilder()
+  public void whenGettingTestBid_GivenValidCpIdAndDemoInterstitialId_CriteoMacroAreInjectedInDfpBuilder()
       throws Exception {
     givenUsingCdbProd();
-    whenGettingTestBid_GivenValidCpIdAndPrefetchDemoAdUnit_CriteoMacroAreInjectedInDfpBuilder(
-        demoInterstitialAdUnit);
+    whenGettingTestBid_GivenValidCpIdAndDemoAdUnit_CriteoMacroAreInjectedInDfpBuilder(demoInterstitialAdUnit);
   }
 
-  private void whenGettingTestBid_GivenValidCpIdAndPrefetchDemoAdUnit_CriteoMacroAreInjectedInDfpBuilder(
+  private void whenGettingTestBid_GivenValidCpIdAndDemoAdUnit_CriteoMacroAreInjectedInDfpBuilder(
       AdUnit adUnit)
       throws Exception {
     givenInitializedCriteo(adUnit);
@@ -346,20 +341,18 @@ public class DfpHeaderBiddingFunctionalTest {
   }
 
   @Test
-  public void whenEnrichingDisplayUrl_GivenValidCpIdAndPrefetchBannerId_DisplayUrlIsEncodedInASpecificManner()
+  public void whenEnrichingDisplayUrl_GivenValidCpIdAndBannerId_DisplayUrlIsEncodedInASpecificManner()
       throws Exception {
-    whenEnrichingDisplayUrl_GivenValidCpIdAndPrefetchAdUnit_DisplayUrlIsEncodedInASpecificManner(
-        validBannerAdUnit);
+    whenEnrichingDisplayUrl_GivenValidCpIdAndAdUnit_DisplayUrlIsEncodedInASpecificManner(validBannerAdUnit);
   }
 
   @Test
-  public void whenEnrichingDisplayUrl_GivenValidCpIdAndPrefetchInterstitialId_DisplayUrlIsEncodedInASpecificManner()
+  public void whenEnrichingDisplayUrl_GivenValidCpIdAndInterstitialId_DisplayUrlIsEncodedInASpecificManner()
       throws Exception {
-    whenEnrichingDisplayUrl_GivenValidCpIdAndPrefetchAdUnit_DisplayUrlIsEncodedInASpecificManner(
-        validInterstitialAdUnit);
+    whenEnrichingDisplayUrl_GivenValidCpIdAndAdUnit_DisplayUrlIsEncodedInASpecificManner(validInterstitialAdUnit);
   }
 
-  private void whenEnrichingDisplayUrl_GivenValidCpIdAndPrefetchAdUnit_DisplayUrlIsEncodedInASpecificManner(
+  private void whenEnrichingDisplayUrl_GivenValidCpIdAndAdUnit_DisplayUrlIsEncodedInASpecificManner(
       AdUnit adUnit)
       throws Exception {
     givenInitializedCriteo(adUnit);
@@ -375,7 +368,7 @@ public class DfpHeaderBiddingFunctionalTest {
   }
 
   @Test
-  public void whenEnrichingNativePayload_GivenValidCpIdAndPrefetchNative_PayloadIsEncodedInASpecificManner()
+  public void whenEnrichingNativePayload_GivenValidCpIdAndNative_PayloadIsEncodedInASpecificManner()
       throws Exception {
     NativeAssets expectedAssets = STUB_NATIVE_ASSETS;
     NativeProduct expectedProduct = expectedAssets.getProduct();

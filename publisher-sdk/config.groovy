@@ -55,9 +55,7 @@ csmDirectoryName = 'criteo_metrics'
 csmQueueFilename = 'criteo_metrics_queue'
 
 // The batch size of metric files sent, at most, in each CSM requests.
-// Bid requests are only bulked during the prefetch phase and CDB requests are split into chunks of,
-// at most, 8 slots. This means that while CSM requests are emitted without issues, there should be,
-// at most, 8 stored metrics. A batch size of 24 handles potential network issues and keeps the
+// A batch size of 24 handles potential network issues and keeps the
 // requests' size small (around 4KB given below estimation).
 csmBatchSize = 24
 

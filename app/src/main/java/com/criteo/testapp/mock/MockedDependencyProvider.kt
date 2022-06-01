@@ -40,7 +40,7 @@ internal object MockedDependencyProvider {
    * This method can be called many times. Old mocks are erased and a new fresh dependency provider
    * is setup.
    *
-   * The Criteo SDK is not reinitialized (without any prefetched bids) so, you should reset it if already setup to not
+   * The Criteo SDK is not reinitialized so, you should reset it if already setup to not
    * have issues in the dependency graph.
    */
   @JvmStatic
