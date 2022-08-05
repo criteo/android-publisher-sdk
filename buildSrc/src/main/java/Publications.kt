@@ -123,7 +123,7 @@ class SdkPublication(
         // We rely on Git to recognize contributors
         developer {
           name.set("R&D Direct")
-          email.set("rnd-direct@criteo.com")
+          email.set("pubsdk-owner@criteo.com")
           organization.set("Criteo")
           organizationUrl.set("https://www.criteo.com/")
         }
