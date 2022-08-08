@@ -14,26 +14,21 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.advancednative;
+package com.criteo.publisher.advancednative
 
-import static com.criteo.publisher.annotation.Internal.ADMOB_ADAPTER;
+import androidx.annotation.Keep
+import com.criteo.publisher.annotation.Internal
+import com.criteo.publisher.annotation.Internal.ADMOB_ADAPTER
+import com.criteo.publisher.annotation.OpenForTesting
+import java.net.URL
 
-import androidx.annotation.Keep;
-import androidx.annotation.NonNull;
-import com.criteo.publisher.annotation.Internal;
-import com.google.auto.value.AutoValue;
-import java.net.URL;
-
-@AutoValue
+@OpenForTesting
 @Keep
-public abstract class CriteoMedia {
-
-  static CriteoMedia create(@NonNull URL imageUrl) {
-    return new AutoValue_CriteoMedia(imageUrl);
+data class CriteoMedia private constructor(@Internal(ADMOB_ADAPTER) val imageUrl: URL) {
+  companion object {
+    @JvmStatic
+    fun create(imageUrl: URL): CriteoMedia {
+      return CriteoMedia(imageUrl)
+    }
   }
-
-  @NonNull
-  @Internal(ADMOB_ADAPTER)
-  abstract URL getImageUrl();
-
 }
