@@ -402,8 +402,7 @@ public class PubSdkApiTest {
         "myAppId",
         "myVersion",
         456,
-        "myDeviceId",
-        "android"
+        "myDeviceId"
     );
 
     String expectedJson = ""

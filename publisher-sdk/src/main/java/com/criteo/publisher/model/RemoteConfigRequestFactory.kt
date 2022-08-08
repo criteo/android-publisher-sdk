@@ -35,8 +35,7 @@ class RemoteConfigRequestFactory(
         context.packageName,
         buildConfigWrapper.sdkVersion,
         integrationRegistry.profileId,
-        advertisingInfo.advertisingId,
-        "android"
+        advertisingInfo.advertisingId
     )
   }
 }

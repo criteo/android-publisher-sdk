@@ -42,8 +42,6 @@ public class UserTest {
   public void testToJson_AllFieldsProvided() throws Exception {
     User user = new User(
         "deviceId",
-        "gaid",
-        "android",
         "fake_usp_iab",
         "true" /* uspOptout */,
         new HashMap<>()
@@ -62,8 +60,6 @@ public class UserTest {
   public void testToJson_UspValuesNotProvided() throws Exception {
     User user = new User(
         "deviceId",
-        "gaid",
-        "android",
         null,
         null,
         new HashMap<>()

@@ -116,8 +116,6 @@ public class CdbRequestFactory {
 
     User user = new User(
         advertisingInfo.getAdvertisingId(),
-        "gaid",
-        "android",
         getNotEmptyOrNullValue(userPrivacyUtil.getIabUsPrivacyString()),
         getNotEmptyOrNullValue(userPrivacyUtil.getUsPrivacyOptout()),
         userExt

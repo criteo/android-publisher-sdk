@@ -21,8 +21,6 @@ import com.criteo.publisher.annotation.OpenForTesting
 @OpenForTesting
 data class User(
     val deviceId: String?,
-    val deviceIdType: String,
-    val deviceOs: String,
 
     /**
      * US Privacy consent IAB format (for CCPA)
@@ -34,4 +32,7 @@ data class User(
      */
     val uspOptout: String?,
     val ext: Map<String, Any>
-)
+){
+    val deviceIdType: String = "gaid"
+    val deviceOs: String = "android"
+}
