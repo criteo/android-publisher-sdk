@@ -397,12 +397,13 @@ public class PubSdkApiTest {
 
   @Test
   public void loadConfig_GivenInput_SendGetRequestWithQueryParameters() throws Exception {
-    RemoteConfigRequest request = RemoteConfigRequest.create(
+    RemoteConfigRequest request = new RemoteConfigRequest(
         "myCpId",
         "myAppId",
         "myVersion",
         456,
-        "myDeviceId"
+        "myDeviceId",
+        "android"
     );
 
     String expectedJson = ""

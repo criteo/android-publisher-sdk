@@ -13,54 +13,30 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.criteo.publisher.model
 
-package com.criteo.publisher.model;
+import android.content.Context
+import com.criteo.publisher.annotation.OpenForTesting
+import com.criteo.publisher.integration.IntegrationRegistry
+import com.criteo.publisher.util.AdvertisingInfo
+import com.criteo.publisher.util.BuildConfigWrapper
 
-import android.content.Context;
-import androidx.annotation.NonNull;
-import com.criteo.publisher.integration.IntegrationRegistry;
-import com.criteo.publisher.util.AdvertisingInfo;
-import com.criteo.publisher.util.BuildConfigWrapper;
-
-public class RemoteConfigRequestFactory {
-
-  @NonNull
-  private final Context context;
-
-  @NonNull
-  private final String criteoPublisherId;
-
-  @NonNull
-  private final BuildConfigWrapper buildConfigWrapper;
-
-  @NonNull
-  private final IntegrationRegistry integrationRegistry;
-
-  @NonNull
-  private final AdvertisingInfo advertisingInfo;
-
-  public RemoteConfigRequestFactory(
-      @NonNull Context context,
-      @NonNull String criteoPublisherId,
-      @NonNull BuildConfigWrapper buildConfigWrapper,
-      @NonNull IntegrationRegistry integrationRegistry,
-      @NonNull AdvertisingInfo advertisingInfo
-  ) {
-    this.context = context;
-    this.criteoPublisherId = criteoPublisherId;
-    this.buildConfigWrapper = buildConfigWrapper;
-    this.integrationRegistry = integrationRegistry;
-    this.advertisingInfo = advertisingInfo;
-  }
-
-  @NonNull
-  public RemoteConfigRequest createRequest() {
-    return RemoteConfigRequest.create(
+@OpenForTesting
+class RemoteConfigRequestFactory(
+    private val context: Context,
+    private val criteoPublisherId: String,
+    private val buildConfigWrapper: BuildConfigWrapper,
+    private val integrationRegistry: IntegrationRegistry,
+    private val advertisingInfo: AdvertisingInfo
+) {
+  fun createRequest(): RemoteConfigRequest {
+    return RemoteConfigRequest(
         criteoPublisherId,
-        context.getPackageName(),
-        buildConfigWrapper.getSdkVersion(),
-        integrationRegistry.getProfileId(),
-        advertisingInfo.getAdvertisingId()
-    );
+        context.packageName,
+        buildConfigWrapper.sdkVersion,
+        integrationRegistry.profileId,
+        advertisingInfo.advertisingId,
+        "android"
+    )
   }
 }

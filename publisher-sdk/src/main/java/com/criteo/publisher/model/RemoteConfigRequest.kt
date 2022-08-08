@@ -13,54 +13,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.criteo.publisher.model
 
-package com.criteo.publisher.model;
+import com.criteo.publisher.annotation.OpenForTesting
+import com.google.gson.annotations.SerializedName
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.auto.value.AutoValue;
-import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
-import com.google.gson.annotations.SerializedName;
-
-@AutoValue
-public abstract class RemoteConfigRequest {
-
-  @NonNull
-  public static RemoteConfigRequest create(
-      @NonNull String criteoPublisherId,
-      @NonNull String bundleId,
-      @NonNull String sdkVersion,
-      int profileId,
-      @Nullable String deviceId
-  ) {
-    return new AutoValue_RemoteConfigRequest(criteoPublisherId, bundleId, sdkVersion, profileId, deviceId, "android");
-  }
-
-  public static TypeAdapter<RemoteConfigRequest> typeAdapter(Gson gson) {
-    return new AutoValue_RemoteConfigRequest.GsonTypeAdapter(gson);
-  }
-
-  @NonNull
-  @SerializedName("cpId")
-  public abstract String getCriteoPublisherId();
-
-  @NonNull
-  public abstract String getBundleId();
-
-  @NonNull
-  public abstract String getSdkVersion();
-
-  @SerializedName("rtbProfileId")
-  public abstract int getProfileId();
-
-  /**
-   * Field used by the remote config to A/B test some configurations.
-   */
-  @Nullable
-  public abstract String getDeviceId();
-
-  @NonNull
-  public abstract String getDeviceOs();
-
-}
+@OpenForTesting
+data class RemoteConfigRequest(
+    @SerializedName("cpId")
+    val criteoPublisherId: String,
+    val bundleId: String,
+    val sdkVersion: String,
+    @SerializedName("rtbProfileId")
+    val profileId: Int,
+    /**
+     * Field used by the remote config to A/B test some configurations.
+     */
+    val deviceId: String?,
+    val deviceOs: String,
+)
