@@ -35,12 +35,13 @@ class RemoteConfigRequestTest {
 
   @Test
   fun write_GivenData_ReturnSerializedJson() {
-    val request = RemoteConfigRequest.create(
+    val request = RemoteConfigRequest(
         "myCpId",
         "my.bundle.id",
         "1.2.3",
         456,
-        "myDeviceId"
+        "myDeviceId",
+        "android"
     )
 
     val json = serializer.writeIntoString(request)
