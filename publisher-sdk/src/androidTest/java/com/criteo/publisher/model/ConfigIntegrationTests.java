@@ -303,7 +303,7 @@ public class ConfigIntegrationTests {
 
   @Test
   public void refreshConfig_GivenNotEmptyLocalStorageAndEmptyRemoteConfig_KeepPreviousValuesAndDoNotPersistEmptyValues() throws Exception {
-    RemoteConfigResponse persistedConfig = RemoteConfigResponse.create(
+    RemoteConfigResponse persistedConfig = new RemoteConfigResponse(
         true,
         "macro1",
         "mode1",
@@ -330,7 +330,7 @@ public class ConfigIntegrationTests {
 
   @Test
   public void refreshConfig_GivenNotEmptyLocalStorageAndPartialRemoteConfig_OverrideNewNonNullValuesPersistMergedConfig() throws Exception {
-    RemoteConfigResponse oldPersistedConfig = RemoteConfigResponse.create(
+    RemoteConfigResponse oldPersistedConfig = new RemoteConfigResponse(
         true,
         null,
         "mode1",
@@ -343,7 +343,7 @@ public class ConfigIntegrationTests {
         null
     );
 
-    RemoteConfigResponse remoteConfig = RemoteConfigResponse.create(
+    RemoteConfigResponse remoteConfig = new RemoteConfigResponse(
         null,
         null,
         "overriddenMode1",
@@ -356,7 +356,7 @@ public class ConfigIntegrationTests {
         RemoteLogLevel.INFO
     );
 
-    RemoteConfigResponse expectedRemoteConfig = RemoteConfigResponse.create(
+    RemoteConfigResponse expectedRemoteConfig = new RemoteConfigResponse(
         true,
         null,
         "overriddenMode1",
