@@ -116,7 +116,7 @@ public class Config {
       @NonNull RemoteConfigResponse baseRemoteConfig,
       @NonNull RemoteConfigResponse overrideRemoteConfig
   ) {
-    return RemoteConfigResponse.create(
+    return new RemoteConfigResponse(
         getOrElse(
             overrideRemoteConfig.getKillSwitch(),
             baseRemoteConfig.getKillSwitch()

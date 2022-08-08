@@ -232,7 +232,7 @@ public class ConfigTest {
 
     givenNewConfig();
 
-    RemoteConfigResponse newConfig = RemoteConfigResponse.create(
+    RemoteConfigResponse newConfig = new RemoteConfigResponse(
         true,
         "urlMacro",
         null,

@@ -369,7 +369,7 @@ public class PubSdkApiIntegrationTest {
 
   @NonNull
   private RemoteConfigResponse defaultRemoteConfigResponse() {
-    return RemoteConfigResponse.create(
+    return new RemoteConfigResponse(
         DefaultConfig.KILL_SWITCH,
         DefaultConfig.DISPLAY_URL_MACRO,
         DefaultConfig.AD_TAG_URL_MODE,
