@@ -532,8 +532,6 @@ public class BidManagerFunctionalTest {
 
     User expectedUser = new User(
         advertisingInfo.getAdvertisingId(),
-        "gaid",
-        "android",
         null,
         null,
         new HashMap<>()

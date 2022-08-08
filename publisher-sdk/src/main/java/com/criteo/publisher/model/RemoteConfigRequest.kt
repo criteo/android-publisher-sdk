@@ -30,5 +30,6 @@ data class RemoteConfigRequest(
      * Field used by the remote config to A/B test some configurations.
      */
     val deviceId: String?,
-    val deviceOs: String,
-)
+) {
+  val deviceOs: String = "android"
+}

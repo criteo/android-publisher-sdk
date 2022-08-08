@@ -53,8 +53,6 @@ class CdbRequestTest {
         ),
         User(
             null,
-            "gaid",
-            "android",
             null,
             null,
             mapOf(
@@ -94,8 +92,6 @@ class CdbRequestTest {
           }
         },
         "user": {
-          "deviceIdType": "gaid",
-          "deviceOs": "android",
           "ext": {
             "data": {
               "a": [1, 2],
@@ -105,7 +101,9 @@ class CdbRequestTest {
               "make": "Manufacturer",
               "model": "DummyModel"
             }
-          }
+          },
+          "deviceIdType": "gaid",
+          "deviceOs": "android"
         },
         "sdkVersion": "1.2.3",
         "profileId": 456,
@@ -125,7 +123,7 @@ class CdbRequestTest {
     val request = CdbRequest(
         "myRequestId",
         Publisher("myBundleId", "myCpId", mapOf()),
-        User(null, "gaid", "android", null, null, mapOf()),
+        User(null, null, null, mapOf()),
         "1.2.3",
         456,
         null,

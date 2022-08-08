@@ -40,8 +40,7 @@ class RemoteConfigRequestTest {
         "my.bundle.id",
         "1.2.3",
         456,
-        "myDeviceId",
-        "android"
+        "myDeviceId"
     )
 
     val json = serializer.writeIntoString(request)
