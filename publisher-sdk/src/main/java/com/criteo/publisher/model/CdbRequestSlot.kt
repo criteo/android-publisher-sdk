@@ -14,69 +14,35 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.model;
+package com.criteo.publisher.model
 
-import static java.util.Collections.singletonList;
+import com.criteo.publisher.annotation.OpenForTesting
+import com.criteo.publisher.util.AdUnitType
+import com.google.gson.annotations.SerializedName
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.criteo.publisher.util.AdUnitType;
-import com.google.auto.value.AutoValue;
-import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
-import com.google.gson.annotations.SerializedName;
-import java.util.Collection;
-import java.util.List;
+@OpenForTesting
+data class CdbRequestSlot private constructor(
+    @SerializedName("impId")
+    val impressionId: String,
+    @SerializedName("placementId")
+    val placementId: String,
+    @SerializedName("isNative")
+    val isNativeAd: Boolean?,
+    @SerializedName("interstitial")
+    val isInterstitial: Boolean?,
+    @SerializedName("rewarded")
+    val isRewarded: Boolean?,
+    @SerializedName("sizes")
+    val sizes: Collection<String>
+) {
 
-@AutoValue
-public abstract class CdbRequestSlot {
-
-  public static CdbRequestSlot create(
-      @NonNull String impressionId,
-      @NonNull String placementId,
-      @NonNull AdUnitType adUnitType,
-      @NonNull AdSize size
-  ) {
-    List<String> formattedSizes = singletonList(size.getFormattedSize());
-
-    return new AutoValue_CdbRequestSlot(
-        impressionId,
-        placementId,
-        adUnitType == AdUnitType.CRITEO_CUSTOM_NATIVE ? true : null,
-        adUnitType == AdUnitType.CRITEO_INTERSTITIAL ? true : null,
-        adUnitType == AdUnitType.CRITEO_REWARDED ? true : null,
-        formattedSizes
-    );
-  }
-
-  public static TypeAdapter<CdbRequestSlot> typeAdapter(Gson gson) {
-    return new AutoValue_CdbRequestSlot.GsonTypeAdapter(gson);
-  }
-
-  @NonNull
-  @SerializedName("impId")
-  public abstract String getImpressionId();
-
-  @NonNull
-  @SerializedName("placementId")
-  public abstract String getPlacementId();
-
-  // isNative is not accepted by AutoValue because this generates a field called native which is a
-  // reserved keyword.
-  @Nullable
-  @SerializedName("isNative")
-  public abstract Boolean isNativeAd();
-
-  @Nullable
-  @SerializedName("interstitial")
-  public abstract Boolean isInterstitial();
-
-  @Nullable
-  @SerializedName("rewarded")
-  public abstract Boolean isRewarded();
-
-  @NonNull
-  @SerializedName("sizes")
-  public abstract Collection<String> getSizes();
-
+  constructor(impressionId: String, placementId: String, adUnitType: AdUnitType, size: AdSize) :
+      this(
+          impressionId,
+          placementId,
+          if (adUnitType == AdUnitType.CRITEO_CUSTOM_NATIVE) true else null,
+          if (adUnitType == AdUnitType.CRITEO_INTERSTITIAL) true else null,
+          if (adUnitType == AdUnitType.CRITEO_REWARDED) true else null,
+          listOf(size.formattedSize)
+      )
 }

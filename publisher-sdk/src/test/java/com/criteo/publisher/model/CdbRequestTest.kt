@@ -36,9 +36,9 @@ class CdbRequestTest {
   @Test
   @Suppress("LongMethod")
   fun toJson_GivenAllInformation_MapThemToJson() {
-    val request = CdbRequest.create(
+    val request = CdbRequest(
         "myRequestId",
-        Publisher.create(
+        Publisher(
             "myBundleId",
             "myCpId",
             mapOf(
@@ -51,8 +51,10 @@ class CdbRequestTest {
                 )
             )
         ),
-        User.create(
+        User(
             null,
+            "gaid",
+            "android",
             null,
             null,
             mapOf(
@@ -68,7 +70,7 @@ class CdbRequestTest {
         ),
         "1.2.3",
         456,
-        GdprData.create("consent", true, 42),
+        GdprData("consent", true, 42),
         listOf()
     )
 
@@ -120,10 +122,10 @@ class CdbRequestTest {
 
   @Test
   fun toJson_GivenNoGdpr_DoesNotMapIt() {
-    val request = CdbRequest.create(
+    val request = CdbRequest(
         "myRequestId",
-        Publisher.create("myBundleId", "myCpId", mapOf()),
-        User.create(null, null, null, mapOf()),
+        Publisher("myBundleId", "myCpId", mapOf()),
+        User(null, "gaid", "android", null, null, mapOf()),
         "1.2.3",
         456,
         null,

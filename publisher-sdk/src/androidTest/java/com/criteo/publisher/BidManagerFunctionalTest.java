@@ -524,14 +524,16 @@ public class BidManagerFunctionalTest {
     callingCdb.accept(adUnit);
     waitForIdleState();
 
-    Publisher expectedPublisher = Publisher.create(
+    Publisher expectedPublisher = new Publisher(
         "bundle.id",
         CriteoUtil.TEST_CP_ID,
         new HashMap<>()
     );
 
-    User expectedUser = User.create(
+    User expectedUser = new User(
         advertisingInfo.getAdvertisingId(),
+        "gaid",
+        "android",
         null,
         null,
         new HashMap<>()

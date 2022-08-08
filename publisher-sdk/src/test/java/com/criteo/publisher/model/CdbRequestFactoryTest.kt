@@ -115,7 +115,7 @@ class CdbRequestFactoryTest {
     val contextData: ContextData = ContextData().set("a.a", "foo").set("b", "bar")
     val expectedGdpr: GdprData = mock()
 
-    val expectedSlot = CdbRequestSlot.create(
+    val expectedSlot = CdbRequestSlot(
         "impId",
         adUnit.placementId,
         adUnit.adUnitType,
@@ -145,7 +145,7 @@ class CdbRequestFactoryTest {
             .set("b.b", "3")
     )
 
-    val expectedPublisher = Publisher.create(
+    val expectedPublisher = Publisher(
         "bundle.id",
         "myCpId",
         mapOf(
@@ -166,7 +166,7 @@ class CdbRequestFactoryTest {
 
     assertThat(request.id).isEqualTo("myRequestId")
     assertThat(request.publisher).isEqualTo(expectedPublisher)
-    assertThat(request.user.ext()).isEqualTo(expectedUserExt)
+    assertThat(request.user.ext).isEqualTo(expectedUserExt)
     assertThat(request.sdkVersion).isEqualTo("1.2.3")
     assertThat(request.profileId).isEqualTo(42)
     assertThat(request.gdprData).isEqualTo(expectedGdpr)
@@ -181,7 +181,7 @@ class CdbRequestFactoryTest {
     val contextData = ContextData()
     val expectedGdpr: GdprData = mock()
 
-    val expectedSlot = CdbRequestSlot.create(
+    val expectedSlot = CdbRequestSlot(
         "impId",
         adUnit.placementId,
         adUnit.adUnitType,
@@ -207,12 +207,12 @@ class CdbRequestFactoryTest {
     var request = factory.createRequest(adUnits, contextData)
 
     assertThat(request.id).isEqualTo("myRequestId")
-    assertThat(request.publisher).isEqualTo(Publisher.create("bundle.id", "myCpId", mapOf()))
+    assertThat(request.publisher).isEqualTo(Publisher("bundle.id", "myCpId", mapOf()))
     assertThat(request.sdkVersion).isEqualTo("1.2.3")
     assertThat(request.profileId).isEqualTo(1337)
     assertThat(request.gdprData).isEqualTo(expectedGdpr)
-    assertThat(request.user.uspIab()).isEqualTo("iabUsPrivacyString")
-    assertThat(request.user.uspOptout()).isEqualTo("usPrivacyOptout")
+    assertThat(request.user.uspIab).isEqualTo("iabUsPrivacyString")
+    assertThat(request.user.uspOptout).isEqualTo("usPrivacyOptout")
     assertThat(request.slots).containsExactlyInAnyOrder(expectedSlot)
 
     // request 2
@@ -223,8 +223,8 @@ class CdbRequestFactoryTest {
 
     request = factory.createRequest(adUnits, contextData)
 
-    assertThat(request.user.uspIab()).isNull()
-    assertThat(request.user.uspOptout()).isNull()
+    assertThat(request.user.uspIab).isNull()
+    assertThat(request.user.uspOptout).isNull()
   }
 
   @Test
@@ -234,14 +234,14 @@ class CdbRequestFactoryTest {
     val adUnits: List<CacheAdUnit> = listOf(adUnit1, adUnit2)
     val contextData: ContextData = mock()
 
-    val expectedSlot1 = CdbRequestSlot.create(
+    val expectedSlot1 = CdbRequestSlot(
         "impId1",
         adUnit1.placementId,
         adUnit1.adUnitType,
         adUnit1.size
     )
 
-    val expectedSlot2 = CdbRequestSlot.create(
+    val expectedSlot2 = CdbRequestSlot(
         "impId2",
         adUnit2.placementId,
         adUnit2.adUnitType,

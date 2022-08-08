@@ -13,65 +13,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.criteo.publisher.model
 
-package com.criteo.publisher.model;
+import com.criteo.publisher.annotation.OpenForTesting
+import com.criteo.publisher.privacy.gdpr.GdprData
+import com.google.gson.annotations.SerializedName
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.criteo.publisher.privacy.gdpr.GdprData;
-import com.google.auto.value.AutoValue;
-import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
-import com.google.gson.annotations.SerializedName;
-import java.util.List;
-
-@AutoValue
-public abstract class CdbRequest {
-
-  @NonNull
-  public static CdbRequest create(
-      @NonNull String id,
-      @NonNull Publisher publisher,
-      @NonNull User user,
-      @NonNull String sdkVersion,
-      int profileId,
-      @Nullable GdprData gdprData,
-      @NonNull List<CdbRequestSlot> slots
-  ) {
-    return new AutoValue_CdbRequest(
-        id,
-        publisher,
-        user,
-        sdkVersion,
-        profileId,
-        gdprData,
-        slots
-    );
-  }
-
-  public static TypeAdapter<CdbRequest> typeAdapter(Gson gson) {
-    return new AutoValue_CdbRequest.GsonTypeAdapter(gson);
-  }
-
-  @NonNull
-  public abstract String getId();
-
-  @NonNull
-  public abstract Publisher getPublisher();
-
-  @NonNull
-  public abstract User getUser();
-
-  @NonNull
-  public abstract String getSdkVersion();
-
-  public abstract int getProfileId();
-
-  @Nullable
-  @SerializedName("gdprConsent")
-  public abstract GdprData getGdprData();
-
-  @NonNull
-  public abstract List<CdbRequestSlot> getSlots();
-
-}
+@OpenForTesting
+data class CdbRequest(
+    val id: String,
+    val publisher: Publisher,
+    val user: User,
+    val sdkVersion: String,
+    val profileId: Int,
+    @SerializedName("gdprConsent") val gdprData: GdprData?,
+    val slots: List<CdbRequestSlot>
+)

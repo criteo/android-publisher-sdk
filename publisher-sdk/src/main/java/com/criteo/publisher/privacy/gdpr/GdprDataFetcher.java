@@ -39,7 +39,7 @@ public class GdprDataFetcher {
     String subjectToGdpr = tcfStrategy.getSubjectToGdpr();
     String consentString = tcfStrategy.getConsentString();
 
-    return GdprData.create(
+    return new GdprData(
         consentString,
         subjectToGdpr.isEmpty() ? null : "1".equals(subjectToGdpr),
         tcfStrategy.getVersion()

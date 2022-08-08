@@ -14,33 +14,13 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.privacy.gdpr;
+package com.criteo.publisher.privacy.gdpr
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.auto.value.AutoValue;
-import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
+import com.criteo.publisher.annotation.OpenForTesting
 
-@AutoValue
-public abstract class GdprData {
-
-  public static GdprData create(
-      @NonNull String consentData,
-      @Nullable Boolean gdprApplies,
-      @NonNull Integer version
-  ) {
-    return new AutoValue_GdprData(consentData, gdprApplies, version);
-  }
-
-  public static TypeAdapter<GdprData> typeAdapter(Gson gson) {
-    return new AutoValue_GdprData.GsonTypeAdapter(gson);
-  }
-
-  public abstract String consentData();
-
-  @Nullable
-  public abstract Boolean gdprApplies();
-
-  public abstract Integer version();
-}
+@OpenForTesting
+data class GdprData(
+    val consentData: String,
+    val gdprApplies: Boolean?,
+    val version: Int
+)

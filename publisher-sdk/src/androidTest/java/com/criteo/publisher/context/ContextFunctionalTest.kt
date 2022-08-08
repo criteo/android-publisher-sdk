@@ -112,7 +112,7 @@ class ContextFunctionalTest(private val integration: TestedIntegration) {
     integration.bid(this, ContextData())
 
     verify(api).loadCdb(check {
-      assertThat(it.user.ext()).isEqualTo(
+      assertThat(it.user.ext).isEqualTo(
           mapOf(
               "device" to mapOf(
                   "make" to "Apple",
