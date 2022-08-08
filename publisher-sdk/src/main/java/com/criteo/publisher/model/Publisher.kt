@@ -21,8 +21,10 @@ import com.google.gson.annotations.SerializedName
 
 @OpenForTesting
 data class Publisher(
+    @SerializedName("bundleId")
     val bundleId: String,
     @SerializedName("cpId")
     val criteoPublisherId: String,
+    @SerializedName("ext")
     val ext: Map<String, Any>
 )

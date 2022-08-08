@@ -28,6 +28,7 @@ data class RemoteConfigResponse(
      * that will happen only the first time the app is started after the kill switch is set, because
      * the switch value is persisted (SharedPreferences for Android, UserDefaults for iOS).
      */
+    @SerializedName("killSwitch")
     val killSwitch: Boolean? = null,
 
     /**
@@ -85,6 +86,7 @@ data class RemoteConfigResponse(
      * there is no previous value, this means that this is a fresh start of a new application, then a
      * default value is taken.
      */
+    @SerializedName("csmEnabled")
     val csmEnabled: Boolean? = null,
 
     /**
@@ -94,6 +96,7 @@ data class RemoteConfigResponse(
      * is taken. If there is no previous value, this means that this is a fresh start of a new
      * application, then a default value is taken.
      */
+    @SerializedName("liveBiddingEnabled")
     val liveBiddingEnabled: Boolean? = null,
 
     /**
@@ -101,6 +104,7 @@ data class RemoteConfigResponse(
      * within this time budget, SDK returns it directly. Else, cached bid is used (if present) and CDB response
      * is cached for later.
      */
+    @SerializedName("liveBiddingTimeBudgetInMillis")
     val liveBiddingTimeBudgetInMillis: Int? = null,
 
     /**
@@ -109,6 +113,7 @@ data class RemoteConfigResponse(
      * `null`), then the previous persisted value of this flag is taken. If there is no previous value, this
      * means that this is a fresh start of a new application, then a default value is taken.
      */
+    @SerializedName("prefetchOnInitEnabled")
     val prefetchOnInitEnabled: Boolean? = null,
 
     /**
@@ -128,6 +133,7 @@ data class RemoteConfigResponse(
      * If this value is `null`, then the previous persisted value is taken. If there is no previous value, this
      * means that this is a fresh start of a new application, then a default value is taken.
      */
+    @SerializedName("remoteLogLevel")
     val remoteLogLevel: RemoteLogLevel? = null
 ) {
 

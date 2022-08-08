@@ -22,14 +22,18 @@ import com.google.gson.annotations.SerializedName
 data class RemoteConfigRequest(
     @SerializedName("cpId")
     val criteoPublisherId: String,
+    @SerializedName("bundleId")
     val bundleId: String,
+    @SerializedName("sdkVersion")
     val sdkVersion: String,
     @SerializedName("rtbProfileId")
     val profileId: Int,
     /**
      * Field used by the remote config to A/B test some configurations.
      */
+    @SerializedName("deviceId")
     val deviceId: String?,
 ) {
+  @SerializedName("deviceOs")
   val deviceOs: String = "android"
 }

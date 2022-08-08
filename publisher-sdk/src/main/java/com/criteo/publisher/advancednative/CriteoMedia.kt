@@ -20,11 +20,16 @@ import androidx.annotation.Keep
 import com.criteo.publisher.annotation.Internal
 import com.criteo.publisher.annotation.Internal.ADMOB_ADAPTER
 import com.criteo.publisher.annotation.OpenForTesting
+import com.google.gson.annotations.SerializedName
 import java.net.URL
 
 @OpenForTesting
 @Keep
-data class CriteoMedia private constructor(@Internal(ADMOB_ADAPTER) val imageUrl: URL) {
+data class CriteoMedia private constructor(
+    @SerializedName("imageUrl")
+    @Internal(ADMOB_ADAPTER)
+    val imageUrl: URL
+) {
   companion object {
     @JvmStatic
     fun create(imageUrl: URL): CriteoMedia {
