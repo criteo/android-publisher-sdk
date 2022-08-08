@@ -50,7 +50,7 @@ class CdbRequestSlotTest {
 
   @Test
   fun toJson_GivenBannerAdUnit_ReturnJsonRepresentation() {
-    val slot = CdbRequestSlot.create(
+    val slot = CdbRequestSlot(
         "myImpBanner",
         "myBanner",
         CRITEO_BANNER,
@@ -68,7 +68,7 @@ class CdbRequestSlotTest {
 
   @Test
   fun toJson_GivenInterstitialAdUnit_ReturnJsonRepresentation() {
-    val slot = CdbRequestSlot.create(
+    val slot = CdbRequestSlot(
         "myImpInterstitial",
         "myInterstitial",
         CRITEO_INTERSTITIAL,
@@ -87,7 +87,7 @@ class CdbRequestSlotTest {
 
   @Test
   fun toJson_GivenNativeAdUnit_ReturnJsonRepresentation() {
-    val slot = CdbRequestSlot.create(
+    val slot = CdbRequestSlot(
         "myImpNative",
         "myNative",
         CRITEO_CUSTOM_NATIVE,
@@ -106,7 +106,7 @@ class CdbRequestSlotTest {
 
   @Test
   fun toJson_GivenRewardedAdUnit_ReturnJsonRepresentation() {
-    val slot = CdbRequestSlot.create(
+    val slot = CdbRequestSlot(
         "myImpRewarded",
         "myRewarded",
         CRITEO_REWARDED,

@@ -59,8 +59,8 @@ public class GdprUnitTest {
 
     initializeGdprParameters(subjectToGdpr, consentData);
     GdprData gdprData = userPrivacyUtil.getGdprData();
-    Assert.assertEquals(consentData, gdprData.consentData());
-    Assert.assertEquals(true, gdprData.gdprApplies());
+    Assert.assertEquals(consentData, gdprData.getConsentData());
+    Assert.assertEquals(true, gdprData.getGdprApplies());
   }
 
   @Test
@@ -71,8 +71,8 @@ public class GdprUnitTest {
 
     GdprData gdprData = userPrivacyUtil.getGdprData();
 
-    Assert.assertEquals(consentData, gdprData.consentData());
-    Assert.assertEquals(true, gdprData.gdprApplies());
+    Assert.assertEquals(consentData, gdprData.getConsentData());
+    Assert.assertEquals(true, gdprData.getGdprApplies());
   }
 
   @Test
@@ -83,8 +83,8 @@ public class GdprUnitTest {
 
     GdprData gdprData = userPrivacyUtil.getGdprData();
 
-    Assert.assertEquals(consentData, gdprData.consentData());
-    Assert.assertEquals(true, gdprData.gdprApplies());
+    Assert.assertEquals(consentData, gdprData.getConsentData());
+    Assert.assertEquals(true, gdprData.getGdprApplies());
   }
 
   @Test
@@ -95,8 +95,8 @@ public class GdprUnitTest {
 
     GdprData gdprData = userPrivacyUtil.getGdprData();
 
-    Assert.assertEquals(consentData, gdprData.consentData());
-    Assert.assertEquals(true, gdprData.gdprApplies());
+    Assert.assertEquals(consentData, gdprData.getConsentData());
+    Assert.assertEquals(true, gdprData.getGdprApplies());
   }
 
   @Test

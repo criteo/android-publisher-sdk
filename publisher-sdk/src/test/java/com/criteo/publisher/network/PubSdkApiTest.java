@@ -86,9 +86,9 @@ public class PubSdkApiTest {
     when(buildConfigWrapper.getCdbUrl()).thenReturn(serverUrl.toString());
     when(buildConfigWrapper.getEventUrl()).thenReturn(serverUrl.toString());
 
-    when(gdprData.consentData()).thenReturn("fake_consent_data");
-    when(gdprData.gdprApplies()).thenReturn(false);
-    when(gdprData.version()).thenReturn(1);
+    when(gdprData.getConsentData()).thenReturn("fake_consent_data");
+    when(gdprData.getGdprApplies()).thenReturn(false);
+    when(gdprData.getVersion()).thenReturn(1);
 
     api = new PubSdkApi(buildConfigWrapper, serializer);
   }
@@ -221,7 +221,7 @@ public class PubSdkApiTest {
   public void postAppEvent_GivenNoGaid_IsNotPutInQueryString() throws Exception {
     mockWebServer.enqueue(new MockResponse());
 
-    api.postAppEvent(42, "", null, "", 0, "", gdprData.consentData());
+    api.postAppEvent(42, "", null, "", 0, "", gdprData.getConsentData());
 
     RecordedRequest request = mockWebServer.takeRequest();
     assertThat(request.getRequestUrl().queryParameter("gaid")).isNull();
@@ -259,7 +259,7 @@ public class PubSdkApiTest {
   public void postAppEvent_GivenHttpError_ThrowException() throws Exception {
     mockWebServer.enqueue(new MockResponse().setResponseCode(400));
 
-    assertThatCode(() -> api.postAppEvent(42, "", null, "", 0, "myUserAgent", gdprData.consentData()))
+    assertThatCode(() -> api.postAppEvent(42, "", null, "", 0, "myUserAgent", gdprData.getConsentData()))
         .isInstanceOf(IOException.class);
   }
 

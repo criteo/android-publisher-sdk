@@ -55,7 +55,8 @@ data class RemoteConfigResponse(
     val androidAdTagUrlMode: String? = null,
 
     /**
-     * e.g. %%adTagData%%, replaced by the contents of [ displayUrl][CdbResponseSlot.getDisplayUrl], meaning the JavaScript code to display the ad.
+     * e.g. %%adTagData%%, replaced by the contents of [ displayUrl][CdbResponseSlot.getDisplayUrl],
+     * meaning the JavaScript code to display the ad.
      */
     @SerializedName("AndroidAdTagDataMacro")
     val androidAdTagDataMacro: String? = null,
@@ -97,8 +98,8 @@ data class RemoteConfigResponse(
 
     /**
      * Amount of time (in milliseconds) given to the SDK to serve a bid to the publisher. If the SDK get a CDB response
-     * within this time budget, SDK returns it directly. Else, cached bid is used (if present) and CDB response is cached
-     * for later.
+     * within this time budget, SDK returns it directly. Else, cached bid is used (if present) and CDB response
+     * is cached for later.
      */
     val liveBiddingTimeBudgetInMillis: Int? = null,
 

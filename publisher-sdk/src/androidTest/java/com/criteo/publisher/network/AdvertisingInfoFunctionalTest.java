@@ -131,7 +131,7 @@ public class AdvertisingInfoFunctionalTest {
   }
 
   private String fetchDeviceIdSentInCdbRequest(CdbRequest cdb) {
-    return cdb.getUser().deviceId();
+    return cdb.getUser().getDeviceId();
   }
 
   private void waitForIdleState() {

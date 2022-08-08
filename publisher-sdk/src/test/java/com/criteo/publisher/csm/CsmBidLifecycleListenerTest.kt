@@ -438,12 +438,12 @@ class CsmBidLifecycleListenerTest {
   private fun givenCdbRequestWithSlots(vararg impressionIds: String): CdbRequest {
     val slots = impressionIds.map { impressionId ->
       mock<CdbRequestSlot> {
-        on { getImpressionId() } doReturn impressionId
+        on { this.impressionId } doReturn impressionId
       }
     }.toList()
 
     return mock {
-      on { getSlots() } doReturn slots
+      on { this.slots } doReturn slots
     }
   }
 

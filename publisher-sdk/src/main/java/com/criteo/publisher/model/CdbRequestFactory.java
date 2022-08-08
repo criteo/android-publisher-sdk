@@ -103,7 +103,7 @@ public class CdbRequestFactory {
   ) {
     Map<String, Object> publisherExt = mergeToNestedMap(toMap(contextData));
 
-    Publisher publisher = Publisher.create(
+    Publisher publisher = new Publisher(
         context.getPackageName(),
         criteoPublisherId,
         publisherExt
@@ -114,14 +114,16 @@ public class CdbRequestFactory {
         toMap(userDataHolder.get())
     );
 
-    User user = User.create(
+    User user = new User(
         advertisingInfo.getAdvertisingId(),
+        "gaid",
+        "android",
         getNotEmptyOrNullValue(userPrivacyUtil.getIabUsPrivacyString()),
         getNotEmptyOrNullValue(userPrivacyUtil.getUsPrivacyOptout()),
         userExt
     );
 
-    return CdbRequest.create(
+    return new CdbRequest(
         uniqueIdGenerator.generateId(),
         publisher,
         user,
@@ -143,7 +145,7 @@ public class CdbRequestFactory {
 
   @NonNull
   private CdbRequestSlot createRequestSlot(CacheAdUnit requestedAdUnit) {
-    return CdbRequestSlot.create(
+    return new CdbRequestSlot(
         uniqueIdGenerator.generateId(),
         requestedAdUnit.getPlacementId(),
         requestedAdUnit.getAdUnitType(),

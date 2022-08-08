@@ -59,7 +59,7 @@ class GdprDataFetcherTest(
         val gdprData = gdprDataFetcher.fetch()
 
         // Then
-        assertEquals(assertGdprApplies, gdprData!!.gdprApplies())
-        assertEquals("fake_consent_string", gdprData.consentData())
+        assertEquals(assertGdprApplies, gdprData!!.gdprApplies)
+        assertEquals("fake_consent_string", gdprData.consentData)
     }
 }

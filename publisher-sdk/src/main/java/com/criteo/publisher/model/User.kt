@@ -14,59 +14,24 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.model;
+package com.criteo.publisher.model
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.auto.value.AutoValue;
-import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
-import java.util.Map;
+import com.criteo.publisher.annotation.OpenForTesting
 
-@AutoValue
-public abstract class User {
+@OpenForTesting
+data class User(
+    val deviceId: String?,
+    val deviceIdType: String,
+    val deviceOs: String,
 
-  public static User create(
-      @Nullable String deviceId,
-      @Nullable String uspIab,
-      @Nullable String uspOptout,
-      @NonNull Map<String, Object> ext
-  ) {
-    return new AutoValue_User(
-        deviceId,
-        "gaid",
-        "android",
-        uspIab,
-        uspOptout,
-        ext
-    );
-  }
+    /**
+     * US Privacy consent IAB format (for CCPA)
+     */
+    val uspIab: String?,
 
-  public static TypeAdapter<User> typeAdapter(Gson gson) {
-    return new AutoValue_User.GsonTypeAdapter(gson);
-  }
-
-  @Nullable
-  public abstract String deviceId();
-
-  @NonNull
-  public abstract String deviceIdType();
-
-  @NonNull
-  public abstract String deviceOs();
-
-  /**
-   * US Privacy consent IAB format (for CCPA)
-   */
-  @Nullable
-  public abstract String uspIab();
-
-  /**
-   * US Privacy optout in binary format (for CCPA)
-   */
-  @Nullable
-  public abstract String uspOptout();
-
-  @NonNull
-  public abstract Map<String, Object> ext();
-}
+    /**
+     * US Privacy optout in binary format (for CCPA)
+     */
+    val uspOptout: String?,
+    val ext: Map<String, Any>
+)

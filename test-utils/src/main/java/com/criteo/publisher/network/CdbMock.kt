@@ -216,7 +216,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
         return MockResponse().setResponseCode(HttpURLConnection.HTTP_NO_CONTENT)
       }
 
-      val responseSlots = cdbRequest.slots.mapNotNull { it.toResponseSlot() }.joinToString()
+      val responseSlots = cdbRequest.slots.map { it.toResponseSlot() }.joinToString()
 
       val cdbResponse = """
       {
@@ -232,7 +232,7 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
     }
 
     private fun shouldNotBid(cdbRequest: CdbRequest) =
-        cdbRequest.gdprData?.consentData() in setOf(TCF1_CONSENT_NOT_GIVEN, TCF2_CONSENT_NOT_GIVEN)
+        cdbRequest.gdprData?.consentData in setOf(TCF1_CONSENT_NOT_GIVEN, TCF2_CONSENT_NOT_GIVEN)
 
     @Suppress("LongMethod")
     private fun CdbRequestSlot.toResponseSlot(): String? {

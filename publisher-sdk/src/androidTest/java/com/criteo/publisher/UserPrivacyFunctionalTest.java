@@ -64,7 +64,7 @@ public class UserPrivacyFunctionalTest {
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
     CdbRequest cdb = cdbArgumentCaptor.getValue();
-    assertEquals("fake_iab_usp", cdb.getUser().uspIab());
+    assertEquals("fake_iab_usp", cdb.getUser().getUspIab());
   }
 
   @Test
@@ -78,7 +78,7 @@ public class UserPrivacyFunctionalTest {
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
     CdbRequest cdb = cdbArgumentCaptor.getValue();
-    assertNull(cdb.getUser().uspIab());
+    assertNull(cdb.getUser().getUspIab());
   }
 
   @Test
@@ -92,7 +92,7 @@ public class UserPrivacyFunctionalTest {
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
     CdbRequest cdb = cdbArgumentCaptor.getValue();
-    assertEquals("true", cdb.getUser().uspOptout());
+    assertEquals("true", cdb.getUser().getUspOptout());
   }
 
   @Test
@@ -106,7 +106,7 @@ public class UserPrivacyFunctionalTest {
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
     CdbRequest cdb = cdbArgumentCaptor.getValue();
-    assertNull(cdb.getUser().uspOptout());
+    assertNull(cdb.getUser().getUspOptout());
   }
 
   @Test
@@ -126,7 +126,7 @@ public class UserPrivacyFunctionalTest {
     verify(pubSdkApi, times(2)).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
     CdbRequest cdb = cdbArgumentCaptor.getValue();
-    assertEquals("false", cdb.getUser().uspOptout());
+    assertEquals("false", cdb.getUser().getUspOptout());
   }
 
   private void writeIntoDefaultSharedPrefs(String key, String value) {

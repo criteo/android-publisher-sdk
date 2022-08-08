@@ -77,7 +77,7 @@ public class UserPrivacyUtil {
     if (gdprData == null) {
       return null;
     }
-    return gdprData.consentData();
+    return gdprData.getConsentData();
   }
 
   @NonNull
