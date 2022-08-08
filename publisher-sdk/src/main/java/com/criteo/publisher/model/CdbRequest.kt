@@ -21,11 +21,18 @@ import com.google.gson.annotations.SerializedName
 
 @OpenForTesting
 data class CdbRequest(
+    @SerializedName("id")
     val id: String,
+    @SerializedName("publisher")
     val publisher: Publisher,
+    @SerializedName("user")
     val user: User,
+    @SerializedName("sdkVersion")
     val sdkVersion: String,
+    @SerializedName("profileId")
     val profileId: Int,
-    @SerializedName("gdprConsent") val gdprData: GdprData?,
+    @SerializedName("gdprConsent")
+    val gdprData: GdprData?,
+    @SerializedName("slots")
     val slots: List<CdbRequestSlot>
 )

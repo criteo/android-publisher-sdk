@@ -17,22 +17,30 @@
 package com.criteo.publisher.model
 
 import com.criteo.publisher.annotation.OpenForTesting
+import com.google.gson.annotations.SerializedName
 
 @OpenForTesting
 data class User(
+    @SerializedName("deviceId")
     val deviceId: String?,
 
     /**
      * US Privacy consent IAB format (for CCPA)
      */
+    @SerializedName("uspIab")
     val uspIab: String?,
 
     /**
      * US Privacy optout in binary format (for CCPA)
      */
+    @SerializedName("uspOptout")
     val uspOptout: String?,
+    @SerializedName("ext")
     val ext: Map<String, Any>
-){
-    val deviceIdType: String = "gaid"
-    val deviceOs: String = "android"
+) {
+  @SerializedName("deviceIdType")
+  val deviceIdType: String = "gaid"
+
+  @SerializedName("deviceOs")
+  val deviceOs: String = "android"
 }

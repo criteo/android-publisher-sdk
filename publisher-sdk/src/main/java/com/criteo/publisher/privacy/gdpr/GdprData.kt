@@ -17,10 +17,14 @@
 package com.criteo.publisher.privacy.gdpr
 
 import com.criteo.publisher.annotation.OpenForTesting
+import com.google.gson.annotations.SerializedName
 
 @OpenForTesting
 data class GdprData(
+    @SerializedName("consentData")
     val consentData: String,
+    @SerializedName("gdprApplies")
     val gdprApplies: Boolean?,
+    @SerializedName("version")
     val version: Int
 )
