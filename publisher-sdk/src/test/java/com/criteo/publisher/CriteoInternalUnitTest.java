@@ -64,6 +64,8 @@ public class CriteoInternalUnitTest {
 
   private Boolean usPrivacyOptout = false;
 
+  private Boolean tagForChildDirectedTreatment = false;
+
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private DependencyProvider dependencyProvider;
 
@@ -185,6 +187,82 @@ public class CriteoInternalUnitTest {
     criteoInternal.setUsPrivacyOptOut(false);
 
     verify(userPrivacyUtil).storeUsPrivacyOptout(false);
+  }
+
+  @Test
+  public void whenCreatingNewCriteo_GivenTagForChildDirectedTreatment_ShouldStoreTrueValue() {
+    givenMockedUserPrivacyUtil();
+    tagForChildDirectedTreatment = true;
+
+    createCriteo();
+
+    verify(userPrivacyUtil).storeTagForChildDirectedTreatment(true);
+  }
+
+  @Test
+  public void whenCreatingNewCriteo_GivenTrueTagForChildDirectedTreatment_ThenSetToFalse_ShouldStoreTrueThenFalseValue() {
+    givenMockedUserPrivacyUtil();
+    tagForChildDirectedTreatment = true;
+
+    CriteoInternal criteoInternal = createCriteo();
+    verify(userPrivacyUtil).storeTagForChildDirectedTreatment(true);
+
+    criteoInternal.setTagForChildDirectedTreatment(false);
+    verify(userPrivacyUtil).storeTagForChildDirectedTreatment(false);
+  }
+
+  @Test
+  public void whenCreatingNewCriteo_GivenFalseTagForChildDirectedTreatment_ShouldStoreFalseValue() {
+    givenMockedUserPrivacyUtil();
+    tagForChildDirectedTreatment = false;
+
+    createCriteo();
+
+    verify(userPrivacyUtil).storeTagForChildDirectedTreatment(false);
+  }
+
+  @Test
+  public void whenCreatingNewCriteo_GivenFalseTagForChildDirectedTreatment_ThenSetToTrue_ShouldFalseThenTrue() {
+    givenMockedUserPrivacyUtil();
+    tagForChildDirectedTreatment = false;
+
+    CriteoInternal criteoInternal = createCriteo();
+    verify(userPrivacyUtil).storeTagForChildDirectedTreatment(false);
+
+    criteoInternal.setTagForChildDirectedTreatment(true);
+    verify(userPrivacyUtil).storeTagForChildDirectedTreatment(true);
+  }
+
+  @Test
+  public void whenCreatingNewCriteo_GivenNullTagForChildDirectedTreatment_ShouldNotStoreIt() {
+    givenMockedUserPrivacyUtil();
+    tagForChildDirectedTreatment = null;
+
+    createCriteo();
+
+    verify(userPrivacyUtil, never()).storeTagForChildDirectedTreatment(any(Boolean.class));
+  }
+
+  @Test
+  public void whenCreatingNewCriteo_GivenNullTagForChildDirectedTreatment_ThenSetToTrue_ShouldStoreTrueValue() {
+    givenMockedUserPrivacyUtil();
+    tagForChildDirectedTreatment = null;
+
+    CriteoInternal criteoInternal = createCriteo();
+    criteoInternal.setTagForChildDirectedTreatment(true);
+
+    verify(userPrivacyUtil).storeTagForChildDirectedTreatment(true);
+  }
+
+  @Test
+  public void whenCreatingNewCriteo_GivenNullTagForChildDirectedTreatment_ThenSetToFalse_ShouldStoreFalseValue() {
+    givenMockedUserPrivacyUtil();
+    tagForChildDirectedTreatment = null;
+
+    CriteoInternal criteoInternal = createCriteo();
+    criteoInternal.setTagForChildDirectedTreatment(false);
+
+    verify(userPrivacyUtil).storeTagForChildDirectedTreatment(false);
   }
 
   @Test
@@ -348,6 +426,6 @@ public class CriteoInternalUnitTest {
   }
 
   private CriteoInternal createCriteo() {
-    return new CriteoInternal(application, adUnits, usPrivacyOptout, dependencyProvider);
+    return new CriteoInternal(application, adUnits, usPrivacyOptout, tagForChildDirectedTreatment, dependencyProvider);
   }
 }

@@ -94,6 +94,11 @@ public class DummyCriteo extends Criteo {
     // do nothing
   }
 
+  @Override
+  public void setTagForChildDirectedTreatment(boolean flag) {
+    // do nothing
+  }
+
   private static class DummyDeviceInfo extends DeviceInfo {
 
     private DummyDeviceInfo() {
