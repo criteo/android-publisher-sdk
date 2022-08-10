@@ -95,7 +95,7 @@ public class DummyCriteo extends Criteo {
   }
 
   @Override
-  public void setTagForChildDirectedTreatment(boolean flag) {
+  public void setTagForChildDirectedTreatment(@Nullable Boolean flag) {
     // do nothing
   }
 

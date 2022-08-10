@@ -132,7 +132,7 @@ public class UserPrivacyUtil {
     return tagForChildDirectedTreatment;
   }
 
-  public void storeTagForChildDirectedTreatment(boolean flag) {
+  public void storeTagForChildDirectedTreatment(@Nullable Boolean flag) {
     tagForChildDirectedTreatment = flag;
   }
 

@@ -92,9 +92,7 @@ class CriteoInternal extends Criteo {
     if (usPrivacyOptout != null) {
       userPrivacyUtil.storeUsPrivacyOptout(usPrivacyOptout);
     }
-    if (tagForChildDirectedTreatment != null) {
-      userPrivacyUtil.storeTagForChildDirectedTreatment(tagForChildDirectedTreatment);
-    }
+    userPrivacyUtil.storeTagForChildDirectedTreatment(tagForChildDirectedTreatment);
 
     application.registerActivityLifecycleCallbacks(dependencyProvider.provideAppLifecycleUtil());
 
@@ -190,7 +188,7 @@ class CriteoInternal extends Criteo {
   }
 
   @Override
-  public void setTagForChildDirectedTreatment(boolean flag) {
+  public void setTagForChildDirectedTreatment(@Nullable Boolean flag) {
       dependencyProvider.provideUserPrivacyUtil().storeTagForChildDirectedTreatment(flag);
   }
 }
