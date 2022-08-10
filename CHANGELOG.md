@@ -1,5 +1,6 @@
 # Next Version
 - Deprecate API related to MoPub and stop supporting MoPub App Bidding
+- Add ability to set Children’s Online Privacy Protection Act (“COPPA”) flag
 
 # Version 4.6.1
 
