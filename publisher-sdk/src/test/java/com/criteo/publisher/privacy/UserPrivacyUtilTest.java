@@ -18,6 +18,7 @@ package com.criteo.publisher.privacy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -174,6 +175,25 @@ public class UserPrivacyUtilTest {
     assertCCPAConsentGiven("1nny", "", false);
     assertCCPAConsentGiven("1nyn", "", false);
     assertCCPAConsentGiven("", "true", false);
+  }
+
+  @Test
+  public void whenTagForChildDirectedTreatmentIsNotSet_shouldReturnNull() {
+    assertNull(userPrivacyUtil.getTagForChildDirectedTreatment());
+  }
+
+  @Test
+  public void whenTagForChildDirectedTreatmentIsSetToTrue_shouldReturnTrue() {
+    userPrivacyUtil.storeTagForChildDirectedTreatment(true);
+
+    assertEquals(true, userPrivacyUtil.getTagForChildDirectedTreatment());
+  }
+
+  @Test
+  public void whenTagForChildDirectedTreatmentIsSetToFalse_shouldReturnTrue() {
+    userPrivacyUtil.storeTagForChildDirectedTreatment(false);
+
+    assertEquals(false, userPrivacyUtil.getTagForChildDirectedTreatment());
   }
 
   private void assertCCPAConsentGiven(
