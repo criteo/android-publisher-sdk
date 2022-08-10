@@ -13,28 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package com.criteo.publisher.model
 
 import com.criteo.publisher.annotation.OpenForTesting
-import com.criteo.publisher.privacy.gdpr.GdprData
 import com.google.gson.annotations.SerializedName
 
 @OpenForTesting
-data class CdbRequest @JvmOverloads constructor(
-    @SerializedName("id")
-    val id: String,
-    @SerializedName("publisher")
-    val publisher: Publisher,
-    @SerializedName("user")
-    val user: User,
-    @SerializedName("sdkVersion")
-    val sdkVersion: String,
-    @SerializedName("profileId")
-    val profileId: Int,
-    @SerializedName("gdprConsent")
-    val gdprData: GdprData?,
-    @SerializedName("slots")
-    val slots: List<CdbRequestSlot>,
-    @SerializedName("regs")
-    val regs: CdbRegs? = null,
-)
+data class CdbRegs(@SerializedName("coppa") val tagForChildDirectedTreatment: Boolean)

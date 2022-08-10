@@ -69,7 +69,8 @@ class CdbRequestTest {
         "1.2.3",
         456,
         GdprData("consent", true, 42),
-        listOf()
+        listOf(),
+        CdbRegs(true)
     )
 
     val json = serializer.writeIntoString(request)
@@ -112,7 +113,10 @@ class CdbRequestTest {
           "gdprApplies": true,
           "version": 42
         },
-        "slots": []
+        "slots": [],
+        "regs": {
+          "coppa": true
+        }
       }
     """.trimIndent()
     )
@@ -133,5 +137,23 @@ class CdbRequestTest {
     val json = serializer.writeIntoString(request)
 
     assertThat(json).doesNotContain("gdprConsent")
+  }
+
+  @Test
+  fun toJson_GivenCdbRegsObjectIsNull_DoesNotMapIt() {
+    val request = CdbRequest(
+        "myRequestId",
+        Publisher("myBundleId", "myCpId", mapOf()),
+        User(null, null, null, mapOf()),
+        "1.2.3",
+        456,
+        null,
+        listOf(),
+        null
+    )
+
+    val json = serializer.writeIntoString(request)
+
+    assertThat(json).doesNotContain("regs")
   }
 }

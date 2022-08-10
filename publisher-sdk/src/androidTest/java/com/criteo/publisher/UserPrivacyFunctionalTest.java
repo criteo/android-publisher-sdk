@@ -19,7 +19,9 @@ package com.criteo.publisher;
 import static com.criteo.publisher.CriteoUtil.getCriteoBuilder;
 import static com.criteo.publisher.CriteoUtil.givenInitializedCriteo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -127,6 +129,36 @@ public class UserPrivacyFunctionalTest {
 
     CdbRequest cdb = cdbArgumentCaptor.getValue();
     assertEquals("false", cdb.getUser().getUspOptout());
+  }
+
+  @Test
+  public void whenCriteoInit_GivenTagForChildDirectedTreatmentIsNull_VerifyItNullRegsIsPassedToCdb() throws Exception {
+    Criteo.Builder builder = getCriteoBuilder(TestAdUnits.BANNER_320_50);
+    builder.init();
+
+    waitForIdleState();
+
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
+    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
+
+    CdbRequest cdb = cdbArgumentCaptor.getValue();
+    assertNull(cdb.getRegs());
+  }
+
+  @Test
+  public void whenCriteoInit_GivenTagForChildDirectedTreatmentIsTrue_VerifyRegsWithTrueFlagArePassedToCdb() throws Exception {
+    Criteo.Builder builder = getCriteoBuilder(TestAdUnits.BANNER_320_50);
+    builder.tagForChildDirectedTreatment(true);
+    builder.init();
+
+    waitForIdleState();
+
+    ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
+    verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
+
+    CdbRequest cdb = cdbArgumentCaptor.getValue();
+    assertNotNull(cdb.getRegs());
+    assertTrue(cdb.getRegs().getTagForChildDirectedTreatment());
   }
 
   private void writeIntoDefaultSharedPrefs(String key, String value) {
