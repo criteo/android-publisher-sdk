@@ -57,6 +57,9 @@ public class UserPrivacyUtil {
 
   private final GdprDataFetcher gdprDataFetcher;
 
+  @Nullable
+  private Boolean tagForChildDirectedTreatment = null;
+
   public UserPrivacyUtil(
       @NonNull SharedPreferences sharedPreferences,
       @NonNull GdprDataFetcher gdprDataFetcher
@@ -117,6 +120,20 @@ public class UserPrivacyUtil {
       return isBinaryConsentGiven();
     }
     return isIABConsentGiven();
+  }
+
+  /**
+   * Children’s Online Privacy Protection Act (“COPPA”) flag
+   *
+   * @return tag set for COPPA or {@code null} if it was never set
+   */
+  @Nullable
+  public Boolean getTagForChildDirectedTreatment() {
+    return tagForChildDirectedTreatment;
+  }
+
+  public void storeTagForChildDirectedTreatment(boolean flag) {
+    tagForChildDirectedTreatment = flag;
   }
 
   private boolean isBinaryConsentGiven() {
