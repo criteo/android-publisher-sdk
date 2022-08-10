@@ -196,6 +196,13 @@ public class UserPrivacyUtilTest {
     assertEquals(false, userPrivacyUtil.getTagForChildDirectedTreatment());
   }
 
+  @Test
+  public void whenTagForChildDirectedTreatmentIsSetNull_shouldReturnNull() {
+    userPrivacyUtil.storeTagForChildDirectedTreatment(null);
+
+    assertNull(userPrivacyUtil.getTagForChildDirectedTreatment());
+  }
+
   private void assertCCPAConsentGiven(
       String iabUsPrivacyString, String usPrivacyOptout,
       boolean consentGiven

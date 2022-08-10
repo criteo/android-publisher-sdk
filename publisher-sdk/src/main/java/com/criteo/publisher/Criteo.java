@@ -97,7 +97,7 @@ public abstract class Criteo {
       return this;
     }
 
-    public Builder tagForChildDirectedTreatment(boolean tagForChildDirectedTreatment){
+    public Builder tagForChildDirectedTreatment(@Nullable Boolean tagForChildDirectedTreatment) {
       this.tagForChildDirectedTreatment = tagForChildDirectedTreatment;
       return this;
     }
@@ -225,6 +225,6 @@ public abstract class Criteo {
 
   public abstract void setUserData(@NonNull UserData userData);
 
-  public abstract void setTagForChildDirectedTreatment(boolean flag);
+  public abstract void setTagForChildDirectedTreatment(@Nullable Boolean flag);
 
 }

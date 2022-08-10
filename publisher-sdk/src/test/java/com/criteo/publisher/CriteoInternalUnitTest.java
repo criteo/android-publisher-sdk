@@ -190,7 +190,7 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void whenCreatingNewCriteo_GivenTagForChildDirectedTreatment_ShouldStoreTrueValue() {
+  public void whenCreatingNewCriteo_GivenTrueTagForChildDirectedTreatment_ShouldStoreTrueValue() {
     givenMockedUserPrivacyUtil();
     tagForChildDirectedTreatment = true;
 
@@ -234,13 +234,13 @@ public class CriteoInternalUnitTest {
   }
 
   @Test
-  public void whenCreatingNewCriteo_GivenNullTagForChildDirectedTreatment_ShouldNotStoreIt() {
+  public void whenCreatingNewCriteo_GivenNullTagForChildDirectedTreatment_ShouldStoreNullValue() {
     givenMockedUserPrivacyUtil();
     tagForChildDirectedTreatment = null;
 
     createCriteo();
 
-    verify(userPrivacyUtil, never()).storeTagForChildDirectedTreatment(any(Boolean.class));
+    verify(userPrivacyUtil).storeTagForChildDirectedTreatment(null);
   }
 
   @Test
