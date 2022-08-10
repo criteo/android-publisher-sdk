@@ -68,6 +68,7 @@ class CriteoInternal extends Criteo {
       Application application,
       @NonNull List<AdUnit> adUnits,
       @Nullable Boolean usPrivacyOptout,
+      @Nullable Boolean tagForChildDirectedTreatment,
       @NonNull DependencyProvider dependencyProvider
   ) {
     this.dependencyProvider = dependencyProvider;
@@ -90,6 +91,9 @@ class CriteoInternal extends Criteo {
     userPrivacyUtil = dependencyProvider.provideUserPrivacyUtil();
     if (usPrivacyOptout != null) {
       userPrivacyUtil.storeUsPrivacyOptout(usPrivacyOptout);
+    }
+    if (tagForChildDirectedTreatment != null) {
+      userPrivacyUtil.storeTagForChildDirectedTreatment(tagForChildDirectedTreatment);
     }
 
     application.registerActivityLifecycleCallbacks(dependencyProvider.provideAppLifecycleUtil());
@@ -183,5 +187,10 @@ class CriteoInternal extends Criteo {
   @Override
   public void setUserData(@NonNull UserData userData) {
     dependencyProvider.provideUserDataHolder().set(userData);
+  }
+
+  @Override
+  public void setTagForChildDirectedTreatment(boolean flag) {
+      dependencyProvider.provideUserPrivacyUtil().storeTagForChildDirectedTreatment(flag);
   }
 }

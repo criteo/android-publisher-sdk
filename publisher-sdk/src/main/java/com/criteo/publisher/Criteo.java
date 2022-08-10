@@ -63,6 +63,9 @@ public abstract class Criteo {
 
     private boolean isDebugLogsEnabled = false;
 
+    @Nullable
+    private Boolean tagForChildDirectedTreatment = null;
+
     public Builder(@NonNull Application application, @NonNull String criteoPublisherId) {
       this.application = application;
       this.criteoPublisherId = criteoPublisherId;
@@ -94,6 +97,11 @@ public abstract class Criteo {
       return this;
     }
 
+    public Builder tagForChildDirectedTreatment(boolean tagForChildDirectedTreatment){
+      this.tagForChildDirectedTreatment = tagForChildDirectedTreatment;
+      return this;
+    }
+
     public Criteo init() throws CriteoInitException {
       return Criteo.init(this);
     }
@@ -119,6 +127,7 @@ public abstract class Criteo {
                 builder.application,
                 builder.adUnits,
                 builder.usPrivacyOptOut,
+                builder.tagForChildDirectedTreatment,
                 dependencyProvider
             );
 
@@ -215,5 +224,7 @@ public abstract class Criteo {
   }
 
   public abstract void setUserData(@NonNull UserData userData);
+
+  public abstract void setTagForChildDirectedTreatment(boolean flag);
 
 }
