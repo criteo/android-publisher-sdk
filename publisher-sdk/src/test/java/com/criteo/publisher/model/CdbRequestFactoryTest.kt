@@ -40,6 +40,8 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 import java.util.concurrent.Future
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class CdbRequestFactoryTest {
 
@@ -309,6 +311,50 @@ class CdbRequestFactoryTest {
     val nestedMap = factory.mergeToNestedMap(map1, map2)
 
     assertThat(nestedMap).isEqualTo(expectedMap)
+  }
+
+  @Test
+  fun createRequest_GivenNotNullTagForChildDirectedTreatment_CreateRequestWithNullCdbRegs() {
+    whenever(userPrivacyUtil.tagForChildDirectedTreatment).thenReturn(null)
+    whenever(context.packageName).thenReturn("bundle.id")
+    whenever(integrationRegistry.profileId).thenReturn(42)
+    whenever(uniqueIdGenerator.generateId())
+        .thenReturn("myRequestId")
+    whenever(buildConfigWrapper.sdkVersion).thenReturn("1.1.1")
+
+    val request = factory.createRequest(emptyList(), ContextData())
+
+    assertEquals(null, request.regs)
+  }
+
+  @Test
+  fun createRequest_GivenTrueTagForChildDirectedTreatment_CreateRequestWithCdbRegsWithTrueTagForChildTreatment() {
+    whenever(userPrivacyUtil.tagForChildDirectedTreatment).thenReturn(true)
+    whenever(context.packageName).thenReturn("bundle.id")
+    whenever(integrationRegistry.profileId).thenReturn(42)
+    whenever(uniqueIdGenerator.generateId())
+        .thenReturn("myRequestId")
+    whenever(buildConfigWrapper.sdkVersion).thenReturn("1.1.1")
+
+    val request = factory.createRequest(emptyList(), ContextData())
+
+    assertNotNull(request.regs)
+    assertEquals(true, request.regs!!.tagForChildDirectedTreatment)
+  }
+
+  @Test
+  fun createRequest_GivenTrueTagForChildDirectedTreatment_CreateRequestWithCdbRegsWithFalseTagForChildTreatment() {
+    whenever(userPrivacyUtil.tagForChildDirectedTreatment).thenReturn(false)
+    whenever(context.packageName).thenReturn("bundle.id")
+    whenever(integrationRegistry.profileId).thenReturn(42)
+    whenever(uniqueIdGenerator.generateId())
+        .thenReturn("myRequestId")
+    whenever(buildConfigWrapper.sdkVersion).thenReturn("1.1.1")
+
+    val request = factory.createRequest(emptyList(), ContextData())
+
+    assertNotNull(request.regs)
+    assertEquals(false, request.regs!!.tagForChildDirectedTreatment)
   }
 
   private fun createAdUnit(): CacheAdUnit {

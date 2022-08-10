@@ -21,6 +21,7 @@ import static com.criteo.publisher.util.TextUtils.getNotEmptyOrNullValue;
 
 import android.content.Context;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.bid.UniqueIdGenerator;
 import com.criteo.publisher.context.ContextData;
@@ -128,7 +129,8 @@ public class CdbRequestFactory {
         buildConfigWrapper.getSdkVersion(),
         integrationRegistry.getProfileId(),
         userPrivacyUtil.getGdprData(),
-        createRequestSlots(requestedAdUnits)
+        createRequestSlots(requestedAdUnits),
+        createRegs()
     );
   }
 
@@ -255,5 +257,11 @@ public class CdbRequestFactory {
       }
     }
     return false;
+  }
+
+  @Nullable
+  private CdbRegs createRegs() {
+    Boolean tagForChildTreatment = userPrivacyUtil.getTagForChildDirectedTreatment();
+    return tagForChildTreatment == null ? null : new CdbRegs(tagForChildTreatment);
   }
 }
