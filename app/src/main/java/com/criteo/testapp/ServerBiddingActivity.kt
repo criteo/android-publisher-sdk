@@ -19,11 +19,10 @@ package com.criteo.testapp
 import android.os.Bundle
 import android.widget.Button
 import android.widget.LinearLayout
-import androidx.appcompat.app.AppCompatActivity
 import com.criteo.publisher.CriteoBannerView
 import com.criteo.publisher.CriteoInterstitial
 
-class ServerBiddingActivity : AppCompatActivity() {
+class ServerBiddingActivity : BaseActivity() {
 
   private lateinit var criteoBannerView: CriteoBannerView
 

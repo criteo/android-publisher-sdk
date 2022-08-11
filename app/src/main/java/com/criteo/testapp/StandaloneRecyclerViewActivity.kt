@@ -23,7 +23,6 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.criteo.publisher.CriteoBannerView
@@ -37,7 +36,7 @@ import com.criteo.testapp.listener.TestAppNativeAdListener
 import com.squareup.picasso.Picasso
 import kotlin.random.Random
 
-class StandaloneRecyclerViewActivity : AppCompatActivity() {
+class StandaloneRecyclerViewActivity : BaseActivity() {
 
   private lateinit var nativeLoader: CriteoNativeLoader
   private lateinit var viewAdapter: Adapter
