@@ -40,8 +40,6 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.whenever
 import java.util.concurrent.Future
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 
 class CdbRequestFactoryTest {
 
@@ -314,7 +312,7 @@ class CdbRequestFactoryTest {
   }
 
   @Test
-  fun createRequest_GivenNotNullTagForChildDirectedTreatment_CreateRequestWithNullCdbRegs() {
+  fun createRequest_GivenNullTagForChildDirectedTreatment_CreateRequestWithNullCdbRegs() {
     whenever(userPrivacyUtil.tagForChildDirectedTreatment).thenReturn(null)
     whenever(context.packageName).thenReturn("bundle.id")
     whenever(integrationRegistry.profileId).thenReturn(42)
@@ -324,7 +322,7 @@ class CdbRequestFactoryTest {
 
     val request = factory.createRequest(emptyList(), ContextData())
 
-    assertEquals(null, request.regs)
+    assertThat(request.regs).isNull()
   }
 
   @Test
@@ -338,8 +336,8 @@ class CdbRequestFactoryTest {
 
     val request = factory.createRequest(emptyList(), ContextData())
 
-    assertNotNull(request.regs)
-    assertEquals(true, request.regs!!.tagForChildDirectedTreatment)
+    assertThat(request.regs).isNotNull
+    assertThat(request.regs!!.tagForChildDirectedTreatment).isTrue
   }
 
   @Test
@@ -353,8 +351,8 @@ class CdbRequestFactoryTest {
 
     val request = factory.createRequest(emptyList(), ContextData())
 
-    assertNotNull(request.regs)
-    assertEquals(false, request.regs!!.tagForChildDirectedTreatment)
+    assertThat(request.regs).isNotNull
+    assertThat(request.regs!!.tagForChildDirectedTreatment).isFalse
   }
 
   private fun createAdUnit(): CacheAdUnit {

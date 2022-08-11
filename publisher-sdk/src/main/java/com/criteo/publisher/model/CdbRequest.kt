@@ -20,7 +20,7 @@ import com.criteo.publisher.privacy.gdpr.GdprData
 import com.google.gson.annotations.SerializedName
 
 @OpenForTesting
-data class CdbRequest @JvmOverloads constructor(
+data class CdbRequest(
     @SerializedName("id")
     val id: String,
     @SerializedName("publisher")
@@ -36,5 +36,5 @@ data class CdbRequest @JvmOverloads constructor(
     @SerializedName("slots")
     val slots: List<CdbRequestSlot>,
     @SerializedName("regs")
-    val regs: CdbRegs? = null,
+    val regs: CdbRegs?
 )

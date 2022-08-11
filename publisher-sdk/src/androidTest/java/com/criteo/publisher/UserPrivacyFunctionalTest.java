@@ -132,33 +132,40 @@ public class UserPrivacyFunctionalTest {
   }
 
   @Test
-  public void whenCriteoInit_GivenTagForChildDirectedTreatmentIsNull_VerifyItNullRegsIsPassedToCdb() throws Exception {
-    Criteo.Builder builder = getCriteoBuilder(TestAdUnits.BANNER_320_50);
-    builder.init();
+  public void whenCriteoInitAndLoadBid_GivenTagForChildDirectedTreatmentIsNotSet_VerifyNullRegsIsPassedToCdb()
+      throws Exception {
+    getCriteoBuilder().init().loadBid(
+        TestAdUnits.BANNER_320_50,
+        mock(ContextData.class),
+        mock(BidResponseListener.class)
+    );
 
     waitForIdleState();
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
-    CdbRequest cdb = cdbArgumentCaptor.getValue();
-    assertNull(cdb.getRegs());
+    CdbRequest cdbRequest = cdbArgumentCaptor.getValue();
+    assertNull(cdbRequest.getRegs());
   }
 
   @Test
-  public void whenCriteoInit_GivenTagForChildDirectedTreatmentIsTrue_VerifyRegsWithTrueFlagArePassedToCdb() throws Exception {
-    Criteo.Builder builder = getCriteoBuilder(TestAdUnits.BANNER_320_50);
-    builder.tagForChildDirectedTreatment(true);
-    builder.init();
+  public void whenCriteoInitAndLoadBid_GivenTagForChildDirectedTreatmentIsTrue_VerifyRegsWithTrueFlagArePassedToCdb()
+      throws Exception {
+    getCriteoBuilder().tagForChildDirectedTreatment(true).init().loadBid(
+        TestAdUnits.BANNER_320_50,
+        mock(ContextData.class),
+        mock(BidResponseListener.class)
+    );
 
     waitForIdleState();
 
     ArgumentCaptor<CdbRequest> cdbArgumentCaptor = ArgumentCaptor.forClass(CdbRequest.class);
     verify(pubSdkApi).loadCdb(cdbArgumentCaptor.capture(), any(String.class));
 
-    CdbRequest cdb = cdbArgumentCaptor.getValue();
-    assertNotNull(cdb.getRegs());
-    assertTrue(cdb.getRegs().getTagForChildDirectedTreatment());
+    CdbRequest cdbRequest = cdbArgumentCaptor.getValue();
+    assertNotNull(cdbRequest.getRegs());
+    assertTrue(cdbRequest.getRegs().getTagForChildDirectedTreatment());
   }
 
   private void writeIntoDefaultSharedPrefs(String key, String value) {

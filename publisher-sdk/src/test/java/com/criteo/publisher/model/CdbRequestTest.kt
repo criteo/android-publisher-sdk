@@ -131,7 +131,8 @@ class CdbRequestTest {
         "1.2.3",
         456,
         null,
-        listOf()
+        listOf(),
+        null
     )
 
     val json = serializer.writeIntoString(request)
