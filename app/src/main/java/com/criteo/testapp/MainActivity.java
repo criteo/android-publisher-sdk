@@ -79,6 +79,11 @@ public class MainActivity extends AppCompatActivity {
       startActivity(intent);
     });
 
+    findViewById(R.id.buttonCoppaSelector).setOnClickListener((View v) -> {
+      Intent intent = new Intent(getApplicationContext(), CoppaActivity.class);
+      startActivity(intent);
+    });
+
     Log.d(TAG, "onCreate:" + calendar.getTimeInMillis());
 
   }

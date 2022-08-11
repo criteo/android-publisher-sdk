@@ -7,6 +7,7 @@
   <string name="title_activity_splash">PubSDK</string>
   <string name="title_activity_dfp">Google DFP</string>
   <string name="title_activity_server_bidding">Server Bidding</string>
+  <string name="title_activity_coppa_selector">COPPA Flag Selector</string>
 
   <string name="btn_interstitial">Interstitial</string>
   <string name="btn_interstitial_ibv">Interstitial IBV</string>
@@ -20,6 +21,7 @@
   <string name="btn_server_bidding">Server Bidding</string>
   <string name="btn_ccpa_consent_selector">CCPA Consent Selector</string>
   <string name="btn_tcf_consent_selector">TCF Consent Selector</string>
+  <string name="btn_coppa_selector">COPPA Flag Selector</string>
   <string name="hint_ccpa_iab">CCPA IAB String</string>
   <string name="ccpa_binary_value">CCPA Binary Value</string>
 

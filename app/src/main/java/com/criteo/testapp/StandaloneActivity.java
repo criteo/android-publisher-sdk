@@ -36,7 +36,7 @@ import com.criteo.testapp.listener.TestAppInterstitialAdListener;
 import com.criteo.testapp.listener.TestAppNativeAdListener;
 
 
-public class StandaloneActivity extends AppCompatActivity {
+public class StandaloneActivity extends BaseActivity {
 
   private static final String TAG = StandaloneActivity.class.getSimpleName();
 

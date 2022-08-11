@@ -94,6 +94,15 @@
         android:background="#81D4FA"
         android:text="@string/btn_integration_selector"/>
 
+      <Button
+        android:id="@+id/buttonCoppaSelector"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="#81D4FA"
+        android:text="@string/btn_coppa_selector"/>
+
     </LinearLayout>
 
   </ScrollView>
