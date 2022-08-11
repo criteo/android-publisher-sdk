@@ -41,7 +41,7 @@ import com.criteo.testapp.listener.TestAppInterstitialAdListener;
 import com.criteo.testapp.listener.TestAppNativeAdListener;
 import java.lang.ref.WeakReference;
 
-public class InHouseActivity extends BaseActivity {
+public class InHouseActivity extends AppCompatActivity {
 
   private static final String TAG = InHouseActivity.class.getSimpleName();
 

@@ -51,7 +51,7 @@ import com.google.android.gms.ads.rewarded.RewardedAd;
 import java.lang.ref.WeakReference;
 import java.util.Collections;
 
-public class DfpActivity extends BaseActivity {
+public class DfpActivity extends AppCompatActivity {
 
   private static final String TAG = DfpActivity.class.getSimpleName();
   private static final String DFP_INTERSTITIAL_ID = INTERSTITIAL.getAdUnitId();

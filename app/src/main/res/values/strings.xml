@@ -39,4 +39,5 @@
   <string name="integration_verbose">Display a toast on forced/detected integration</string>
   <string name="btn_integration_selector">Integration Selector</string>
   <string name="btn_rewarded_video">Rewarded video</string>
+  <string name="toast_saved">Saved</string>
 </resources>

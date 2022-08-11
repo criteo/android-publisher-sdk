@@ -20,7 +20,9 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.criteo.publisher.Criteo
 
 class CoppaActivity : AppCompatActivity() {
 
@@ -37,11 +39,21 @@ class CoppaActivity : AppCompatActivity() {
         R.layout.support_simple_spinner_dropdown_item,
         coppaOptions
     )
-    spinner.setSelection(CoppaFlagHolder.coppaFlag?.toString()?.let { coppaOptions.indexOf(it) }
+    spinner.setSelection(currentCoppaFlag?.toString()?.let { coppaOptions.indexOf(it) }
         ?: 0)
 
     findViewById<Button>(R.id.buttonSaveCoppaFlag).setOnClickListener {
-      CoppaFlagHolder.coppaFlag = spinner.selectedItem.let { (it as String).toBooleanStrictOrNull() }
+      currentCoppaFlag = spinner.selectedItem.let { (it as String).toBooleanStrictOrNull() }
+      Toast.makeText(this, R.string.toast_saved, Toast.LENGTH_SHORT).show()
+      finish()
     }
+  }
+
+  companion object {
+    var currentCoppaFlag: Boolean? = null
+      private set(value) {
+        field = value
+        Criteo.getInstance().setTagForChildDirectedTreatment(currentCoppaFlag)
+      }
   }
 }
