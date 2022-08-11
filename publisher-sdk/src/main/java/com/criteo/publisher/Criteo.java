@@ -225,6 +225,6 @@ public abstract class Criteo {
 
   public abstract void setUserData(@NonNull UserData userData);
 
-  public abstract void setTagForChildDirectedTreatment(@Nullable Boolean flag);
+  public abstract void setTagForChildDirectedTreatment(@Nullable Boolean tagForChildDirectedTreatment);
 
 }

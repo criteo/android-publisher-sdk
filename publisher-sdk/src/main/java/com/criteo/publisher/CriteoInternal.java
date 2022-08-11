@@ -188,7 +188,12 @@ class CriteoInternal extends Criteo {
   }
 
   @Override
-  public void setTagForChildDirectedTreatment(@Nullable Boolean flag) {
-      dependencyProvider.provideUserPrivacyUtil().storeTagForChildDirectedTreatment(flag);
+  public void setTagForChildDirectedTreatment(@Nullable Boolean tagForChildDirectedTreatment) {
+    try {
+      dependencyProvider.provideUserPrivacyUtil().storeTagForChildDirectedTreatment(
+          tagForChildDirectedTreatment);
+    } catch (Throwable t) {
+      logger.log(onUncaughtErrorAtPublicApi(t));
+    }
   }
 }
