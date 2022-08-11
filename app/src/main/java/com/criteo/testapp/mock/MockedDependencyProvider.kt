@@ -23,6 +23,7 @@ import com.criteo.publisher.DependencyProvider
 import com.criteo.publisher.MockableDependencyProvider
 import com.criteo.publisher.integration.IntegrationDetector
 import com.criteo.publisher.integration.IntegrationRegistry
+import com.criteo.testapp.CoppaActivity
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.whenever
@@ -67,7 +68,9 @@ internal object MockedDependencyProvider {
     action()
 
     CriteoUtil.clearCriteo()
-    Criteo.Builder(application, criteoPublisherId).init()
+    Criteo.Builder(application, criteoPublisherId)
+        .tagForChildDirectedTreatment(CoppaActivity.currentCoppaFlag)
+        .init()
   }
 
   internal class MockInjection(

@@ -22,6 +22,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.criteo.publisher.integration.Integration
 import com.criteo.testapp.integration.MockedIntegrationRegistry
 import com.criteo.testapp.listener.TestAppDfpAdListener
@@ -36,7 +37,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 
-class AdMobMediationActivity : BaseActivity() {
+class AdMobMediationActivity : AppCompatActivity() {
 
   private companion object {
     /** This AdMob AdUnit is mapped to this Criteo AdUnit: /140800857/Endeavour_320x50 */
