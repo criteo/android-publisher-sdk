@@ -97,6 +97,9 @@ public abstract class Criteo {
       return this;
     }
 
+    /**
+     * @see Criteo#setTagForChildDirectedTreatment(Boolean)
+     */
     public Builder tagForChildDirectedTreatment(@Nullable Boolean tagForChildDirectedTreatment) {
       this.tagForChildDirectedTreatment = tagForChildDirectedTreatment;
       return this;
@@ -225,6 +228,19 @@ public abstract class Criteo {
 
   public abstract void setUserData(@NonNull UserData userData);
 
+  /**
+   * Sets COPPA tag to be sent with bid requests.
+   * Refer to <a href="https://www.ftc.gov/business-guidance/privacy-security/childrens-privacy">gov website</a>
+   * for more information about regulation.
+   *
+   * @param tagForChildDirectedTreatment
+   * Pass {@code true} to indicate that your content is intended for children.
+   * Pass {@code false} to indicate that it should not be treated as child-directed.
+   * Pass {@code null} if you don't want to indicate how it should be treated.
+   * If nothing is set it defaults to null.
+   *
+   * @see Criteo.Builder#tagForChildDirectedTreatment(Boolean) Set tag using Criteo Builder
+   */
   public abstract void setTagForChildDirectedTreatment(@Nullable Boolean tagForChildDirectedTreatment);
 
 }
