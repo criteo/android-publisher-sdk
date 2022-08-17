@@ -17,14 +17,17 @@
 package com.criteo.publisher.model;
 
 import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import android.content.Context;
-import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import com.criteo.publisher.mock.MockedDependenciesRule;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
@@ -40,17 +43,17 @@ public class DeviceInfoIntegrationTest {
   @Inject
   private Context context;
 
-  private RunOnUiThreadExecutor runOnUiThreadExecutor;
+  private Executor executor;
 
   @Before
   public void setUp() throws Exception {
-    runOnUiThreadExecutor = mockedDependenciesRule.getDependencyProvider()
-        .provideRunOnUiThreadExecutor();
+    executor = mockedDependenciesRule.getDependencyProvider()
+        .provideThreadPoolExecutor();
   }
 
   @Test
   public void initialize_GivenPreviouslyFetchedUserAgent_RetrieveUserAgentOnce() throws Exception {
-    DeviceInfo deviceInfo = spy(new DeviceInfo(context, runOnUiThreadExecutor));
+    DeviceInfo deviceInfo = spy(new DeviceInfo(context, executor));
 
     deviceInfo.getUserAgent().get();
     waitForIdleState();
@@ -63,7 +66,7 @@ public class DeviceInfoIntegrationTest {
 
   @Test
   public void getUserAgent_GivenInitializedDeviceInfo_ReturnsCompletedFuture() throws Exception {
-    DeviceInfo deviceInfo = new DeviceInfo(context, runOnUiThreadExecutor);
+    DeviceInfo deviceInfo = new DeviceInfo(context, executor);
 
     deviceInfo.initialize();
     Future<String> userAgent = deviceInfo.getUserAgent();
@@ -74,7 +77,7 @@ public class DeviceInfoIntegrationTest {
   @Test
   public void getUserAgent_GivenUninitializedDeviceInfoAndWaitForIdleState_ReturnsCompletedFuture()
       throws Exception {
-    DeviceInfo deviceInfo = new DeviceInfo(context, runOnUiThreadExecutor);
+    DeviceInfo deviceInfo = new DeviceInfo(context, executor);
 
     Future<String> userAgent = deviceInfo.getUserAgent();
     waitForIdleState();
@@ -85,7 +88,7 @@ public class DeviceInfoIntegrationTest {
   @Test
   public void getUserAgent_WhenOnMainThreadAndWaitForIdleState_RunAsyncAndReturnUncompletedFuture()
       throws Exception {
-    DeviceInfo deviceInfo = new DeviceInfo(context, runOnUiThreadExecutor);
+    DeviceInfo deviceInfo = new DeviceInfo(context, executor);
     AtomicReference<Future<String>> userAgentAsyncRef = new AtomicReference<>();
 
     runOnMainThreadAndWait(() -> {
@@ -93,6 +96,19 @@ public class DeviceInfoIntegrationTest {
     });
 
     assertNotNull(userAgentAsyncRef.get().get());
+  }
+
+  @Test
+  public void getUserAgentFromWebViewAndWebSettings_WhenCompare_ShouldBeTheSame() {
+    runOnMainThreadAndWait(() -> {
+      WebView webView = new WebView(context);
+
+      String webViewUa = webView.getSettings().getUserAgentString();
+      String webSettingsUa = WebSettings.getDefaultUserAgent(context);
+
+      assertEquals(webViewUa, webSettingsUa);
+      webView.destroy();
+    });
   }
 
   private void waitForIdleState() {

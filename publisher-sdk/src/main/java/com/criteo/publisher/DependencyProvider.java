@@ -294,7 +294,7 @@ public class DependencyProvider {
   public DeviceInfo provideDeviceInfo() {
     return getOrCreate(DeviceInfo.class, () -> new DeviceInfo(
         provideContext(),
-        provideRunOnUiThreadExecutor()
+        provideThreadPoolExecutor()
     ));
   }
 
