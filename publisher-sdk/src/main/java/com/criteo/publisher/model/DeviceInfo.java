@@ -16,14 +16,18 @@
 
 package com.criteo.publisher.model;
 
+import static com.criteo.publisher.model.DeviceInfoLogMessage.onErrorDuringWebViewUserAgentGet;
+
 import android.content.Context;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.webkit.WebSettings;
 import androidx.annotation.NonNull;
-import androidx.annotation.UiThread;
 import androidx.annotation.VisibleForTesting;
+import androidx.annotation.WorkerThread;
 import com.criteo.publisher.SafeRunnable;
+import com.criteo.publisher.logging.Logger;
+import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.util.CompletableFuture;
 import com.criteo.publisher.util.PreconditionsUtil;
 import java.util.concurrent.Executor;
@@ -31,6 +35,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DeviceInfo {
+
+  @NonNull
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @NonNull
   private final Context context;
@@ -50,6 +57,10 @@ public class DeviceInfo {
   }
 
   public void initialize() {
+    if (isInitialized.get()) {
+      return;
+    }
+
     runSafely(() -> {
       if (isInitialized.compareAndSet(false, true)) {
         String userAgent = resolveUserAgent();
@@ -79,21 +90,22 @@ public class DeviceInfo {
 
   @VisibleForTesting
   @NonNull
-  @UiThread
+  @WorkerThread
   String resolveUserAgent() {
     try {
       return getWebViewUserAgent();
     } catch (Throwable t) {
+      logger.log(onErrorDuringWebViewUserAgentGet(t));
       return getDefaultUserAgent();
     }
   }
 
-  @UiThread
+  @WorkerThread
   private String getWebViewUserAgent() {
     if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN_MR1) {
       return WebSettings.getDefaultUserAgent(context);
     } else {
-      throw new RuntimeException(
+      throw new UnsupportedOperationException(
           "WebSettings.getDefaultUserAgent() is not supported on this API level");
     }
   }
