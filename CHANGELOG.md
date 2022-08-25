@@ -1,4 +1,6 @@
 # Next Version
+
+# Version 4.7.0
 - Deprecate API related to MoPub and stop supporting MoPub App Bidding
 - Add ability to set Children’s Online Privacy Protection Act (“COPPA”) flag
 - Fix ANR when fetching User Agent from WebView
