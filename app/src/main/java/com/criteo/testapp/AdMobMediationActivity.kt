@@ -71,12 +71,13 @@ class AdMobMediationActivity : AppCompatActivity() {
     // Always declare this device as a test one. This is not necessary for emulator, but it is for
     // real device.
     val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
-    MobileAds.initialize(this)
     MobileAds.setRequestConfiguration(
         RequestConfiguration.Builder()
             .setTestDeviceIds(listOf(deviceId))
+            .setTagForChildDirectedTreatment(CoppaActivity.currentCoppaFlag.toGoogleCoppaFlag())
             .build()
     )
+    MobileAds.initialize(this)
   }
 
   private fun loadBanner() {
@@ -134,5 +135,13 @@ class AdMobMediationActivity : AppCompatActivity() {
     mediaContent?.let { nativeView.mediaView?.setMediaContent(it) }
 
     nativeView.setNativeAd(this)
+  }
+
+  private fun Boolean?.toGoogleCoppaFlag(): Int {
+    return when (this) {
+      true -> RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE
+      false -> RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE
+      else -> RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_UNSPECIFIED
+    }
   }
 }
