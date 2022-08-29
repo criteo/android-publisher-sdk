@@ -36,6 +36,8 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
+import java.security.MessageDigest
+import java.util.Locale
 
 class AdMobMediationActivity : AppCompatActivity() {
 
@@ -70,7 +72,10 @@ class AdMobMediationActivity : AppCompatActivity() {
   private fun initializeAdMobSdk() {
     // Always declare this device as a test one. This is not necessary for emulator, but it is for
     // real device.
+    // Google requires hashed(MD5) DEVICE_ID
     val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+        .toMD5()
+        .toUpperCase(Locale.ROOT)
     MobileAds.setRequestConfiguration(
         RequestConfiguration.Builder()
             .setTestDeviceIds(listOf(deviceId))
@@ -142,6 +147,16 @@ class AdMobMediationActivity : AppCompatActivity() {
       true -> RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE
       false -> RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE
       else -> RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_UNSPECIFIED
+    }
+  }
+
+  private fun String.toMD5(): String {
+    return trim().run {
+      MessageDigest.getInstance("MD5")
+          .digest(toByteArray())
+          .joinToString("") {
+            "%02x".format(it)
+          }
     }
   }
 }
