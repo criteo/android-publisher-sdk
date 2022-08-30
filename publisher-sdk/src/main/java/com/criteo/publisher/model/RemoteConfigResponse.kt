@@ -17,9 +17,11 @@ package com.criteo.publisher.model
 
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.logging.RemoteLogRecords.RemoteLogLevel
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 @OpenForTesting
+@JsonClass(generateAdapter = true)
 data class RemoteConfigResponse(
     /**
      * The kill switch applies to both the iOS and Android SDKs, and tells the SDK to stop getting
@@ -28,14 +30,14 @@ data class RemoteConfigResponse(
      * that will happen only the first time the app is started after the kill switch is set, because
      * the switch value is persisted (SharedPreferences for Android, UserDefaults for iOS).
      */
-    @SerializedName("killSwitch")
+    @Json(name = "killSwitch")
     val killSwitch: Boolean? = null,
 
     /**
      * e.g. %%displayUrl%%, replaced by the [displayUrl][CdbResponseSlot.getDisplayUrl]
      * provided by CDB, in the wrapper HTML that is loaded in a [android.webkit.WebView].
      */
-    @SerializedName("AndroidDisplayUrlMacro")
+    @Json(name = "AndroidDisplayUrlMacro")
     val androidDisplayUrlMacro: String? = null,
     /**
      * Wrapper HTML that will contain the displayUrl, e.g. :
@@ -52,14 +54,14 @@ data class RemoteConfigResponse(
      * In this example [%%displayURL%%][.getAndroidDisplayUrlMacro] is replaced by the
      * display url value.
      */
-    @SerializedName("AndroidAdTagUrlMode")
+    @Json(name = "AndroidAdTagUrlMode")
     val androidAdTagUrlMode: String? = null,
 
     /**
      * e.g. %%adTagData%%, replaced by the contents of [ displayUrl][CdbResponseSlot.getDisplayUrl],
      * meaning the JavaScript code to display the ad.
      */
-    @SerializedName("AndroidAdTagDataMacro")
+    @Json(name = "AndroidAdTagDataMacro")
     val androidAdTagDataMacro: String? = null,
 
     /**
@@ -76,7 +78,7 @@ data class RemoteConfigResponse(
      * In this example [%%adTagData%%][.getAndroidAdTagDataMacro] is replaced by the
      * JavaScript code provided by display url.
      */
-    @SerializedName("AndroidAdTagDataMode")
+    @Json(name = "AndroidAdTagDataMode")
     val androidAdTagDataMode: String? = null,
 
     /**
@@ -86,7 +88,7 @@ data class RemoteConfigResponse(
      * there is no previous value, this means that this is a fresh start of a new application, then a
      * default value is taken.
      */
-    @SerializedName("csmEnabled")
+    @Json(name = "csmEnabled")
     val csmEnabled: Boolean? = null,
 
     /**
@@ -96,7 +98,7 @@ data class RemoteConfigResponse(
      * is taken. If there is no previous value, this means that this is a fresh start of a new
      * application, then a default value is taken.
      */
-    @SerializedName("liveBiddingEnabled")
+    @Json(name = "liveBiddingEnabled")
     val liveBiddingEnabled: Boolean? = null,
 
     /**
@@ -104,7 +106,7 @@ data class RemoteConfigResponse(
      * within this time budget, SDK returns it directly. Else, cached bid is used (if present) and CDB response
      * is cached for later.
      */
-    @SerializedName("liveBiddingTimeBudgetInMillis")
+    @Json(name = "liveBiddingTimeBudgetInMillis")
     val liveBiddingTimeBudgetInMillis: Int? = null,
 
     /**
@@ -113,7 +115,7 @@ data class RemoteConfigResponse(
      * `null`), then the previous persisted value of this flag is taken. If there is no previous value, this
      * means that this is a fresh start of a new application, then a default value is taken.
      */
-    @SerializedName("prefetchOnInitEnabled")
+    @Json(name = "prefetchOnInitEnabled")
     val prefetchOnInitEnabled: Boolean? = null,
 
     /**
@@ -133,7 +135,7 @@ data class RemoteConfigResponse(
      * If this value is `null`, then the previous persisted value is taken. If there is no previous value, this
      * means that this is a fresh start of a new application, then a default value is taken.
      */
-    @SerializedName("remoteLogLevel")
+    @Json(name = "remoteLogLevel")
     val remoteLogLevel: RemoteLogLevel? = null
 ) {
 

@@ -210,10 +210,9 @@ public class CdbResponseSlotTest {
         "    }]\n" +
         "}";
 
-    NativeAssets expectedNativeAssets = DependencyProvider.getInstance().provideGson().fromJson(
-        nativeJson,
+    NativeAssets expectedNativeAssets = DependencyProvider.getInstance().provideMoshi().adapter(
         NativeAssets.class
-    );
+    ).fromJson(nativeJson);
 
     JSONObject cdbResponse = new JSONObject(cdbStringResponse);
     JSONObject cdbSlot = cdbResponse.getJSONArray("slots").getJSONObject(0);

@@ -17,25 +17,24 @@
 package com.criteo.publisher.util;
 
 import androidx.annotation.NonNull;
-import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonParseException;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.JsonDataException;
+import com.squareup.moshi.Moshi;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.nio.charset.Charset;
+import java.util.List;
+import okio.BufferedSink;
+import okio.Okio;
 
 public class JsonSerializer {
 
   @NonNull
-  private final Gson gson;
+  private final Moshi moshi;
 
-  public JsonSerializer(@NonNull Gson gson) {
-    this.gson = gson;
+  public JsonSerializer(@NonNull Moshi moshi) {
+    this.moshi = moshi;
   }
 
   /**
@@ -50,19 +49,28 @@ public class JsonSerializer {
    * @param outputStream output where to write in
    * @throws IOException if any error occurs
    */
-  public void write(
-      @NonNull Object object,
+  public <T> void write(
+      @NonNull T object,
       @NonNull OutputStream outputStream
   ) throws IOException {
-    OutputStreamWriter writer = new OutputStreamWriter(outputStream, Charset.forName("UTF-8"));
-
     try {
-      gson.toJson(object, writer);
-    } catch (JsonIOException e) {
+      BufferedSink out = Okio.buffer(Okio.sink(outputStream));
+      JsonAdapter adapter;
+
+      // At runtime we will have specific implementation of list (e.g. ArrayList)
+      // Moshi does not support serialization of specific list subtypes out of the box
+      // If we receive such instance just create JsonAdapter for List
+      if (object instanceof List) {
+        adapter = moshi.adapter(List.class);
+      } else {
+        adapter = moshi.adapter((Class<T>) object.getClass());
+      }
+
+      adapter.toJson(out, object);
+      out.flush();
+    } catch (JsonDataException e) {
       throw new IOException(e);
     }
-
-    writer.flush();
   }
 
   /**
@@ -83,12 +91,10 @@ public class JsonSerializer {
       @NonNull Class<T> expectedClass,
       @NonNull InputStream inputStream
   ) throws IOException {
-    Reader reader = new InputStreamReader(inputStream, Charset.forName("UTF-8"));
-
     T object;
     try {
-      object = gson.fromJson(reader, expectedClass);
-    } catch (JsonParseException e) {
+      object = moshi.adapter(expectedClass).fromJson(Okio.buffer(Okio.source(inputStream)));
+    } catch (JsonDataException e) {
       throw new IOException(e);
     }
 

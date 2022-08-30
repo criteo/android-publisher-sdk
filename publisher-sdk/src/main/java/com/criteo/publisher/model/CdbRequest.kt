@@ -17,24 +17,26 @@ package com.criteo.publisher.model
 
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.privacy.gdpr.GdprData
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 @OpenForTesting
+@JsonClass(generateAdapter = true)
 data class CdbRequest(
-    @SerializedName("id")
+    @Json(name = "id")
     val id: String,
-    @SerializedName("publisher")
+    @Json(name = "publisher")
     val publisher: Publisher,
-    @SerializedName("user")
+    @Json(name = "user")
     val user: User,
-    @SerializedName("sdkVersion")
+    @Json(name = "sdkVersion")
     val sdkVersion: String,
-    @SerializedName("profileId")
+    @Json(name = "profileId")
     val profileId: Int,
-    @SerializedName("gdprConsent")
+    @Json(name = "gdprConsent")
     val gdprData: GdprData?,
-    @SerializedName("slots")
+    @Json(name = "slots")
     val slots: List<CdbRequestSlot>,
-    @SerializedName("regs")
+    @Json(name = "regs")
     val regs: CdbRegs?
 )

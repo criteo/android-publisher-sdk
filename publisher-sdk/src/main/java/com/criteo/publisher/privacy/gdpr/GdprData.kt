@@ -17,14 +17,16 @@
 package com.criteo.publisher.privacy.gdpr
 
 import com.criteo.publisher.annotation.OpenForTesting
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 @OpenForTesting
+@JsonClass(generateAdapter = true)
 data class GdprData(
-    @SerializedName("consentData")
+    @Json(name = "consentData")
     val consentData: String,
-    @SerializedName("gdprApplies")
+    @Json(name = "gdprApplies")
     val gdprApplies: Boolean?,
-    @SerializedName("version")
+    @Json(name = "version")
     val version: Int
 )

@@ -17,6 +17,7 @@
 package com.criteo.publisher;
 
 import com.criteo.publisher.model.nativeads.NativeAssets;
+import java.io.IOException;
 import java.util.regex.Pattern;
 
 public class StubConstants {
@@ -82,8 +83,17 @@ public class StubConstants {
   /**
    * Native assets that are always returned by CDB stub. See {@link #STUB_NATIVE_JSON}.
    */
-  public static final NativeAssets STUB_NATIVE_ASSETS = DependencyProvider.getInstance()
-      .provideGson()
-      .fromJson(STUB_NATIVE_JSON, NativeAssets.class);
+  public static final NativeAssets STUB_NATIVE_ASSETS;
+
+  static {
+    try {
+      STUB_NATIVE_ASSETS = DependencyProvider.getInstance()
+          .provideMoshi()
+          .adapter(NativeAssets.class)
+          .fromJson(STUB_NATIVE_JSON);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
 }

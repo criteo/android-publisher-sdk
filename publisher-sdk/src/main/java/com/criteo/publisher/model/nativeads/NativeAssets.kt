@@ -14,32 +14,36 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.model.nativeads;
+package com.criteo.publisher.model.nativeads
 
-import androidx.annotation.NonNull;
-import com.google.auto.value.AutoValue;
-import com.google.gson.Gson;
-import com.google.gson.JsonParseException;
-import com.google.gson.TypeAdapter;
-import com.google.gson.annotations.SerializedName;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import com.criteo.publisher.annotation.OpenForTesting
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
+import java.io.IOException
+import java.net.URI
+import java.net.URL
 
-@AutoValue
-public abstract class NativeAssets {
-
-  public static TypeAdapter<NativeAssets> typeAdapter(Gson gson) {
-    return new AutoValue_NativeAssets.GsonTypeAdapter(gson);
+@OpenForTesting
+@JsonClass(generateAdapter = true)
+data class NativeAssets(
+    /**
+     * Always returns at least one product
+     */
+    @Json(name = "products")
+    val nativeProducts: List<NativeProduct>,
+    val advertiser: NativeAdvertiser,
+    val privacy: NativePrivacy,
+    @Json(name = "impressionPixels")
+    val pixels: List<NativeImpressionPixel>
+) {
+  init {
+    if (nativeProducts.isEmpty()) {
+      throw IOException("Expect that native payload has, at least, one product.")
+    }
+    if (pixels.isEmpty()) {
+      throw IOException("Expect that native payload has, at least, one impression pixel.")
+    }
   }
-
-  /**
-   * Always returns at least one product
-   */
-  @NonNull
-  @SerializedName("products")
-  abstract List<NativeProduct> getNativeProducts();
 
   /**
    * Return the first product in the payload.
@@ -49,90 +53,13 @@ public abstract class NativeAssets {
    *
    * @return first product in this native asset
    */
-  @NonNull
-  public NativeProduct getProduct() {
-    return getNativeProducts().iterator().next();
-  }
-
-  @NonNull
-  abstract NativeAdvertiser getAdvertiser();
-
-  @NonNull
-  public String getAdvertiserDescription() {
-    return getAdvertiser().getDescription();
-  }
-
-  @NonNull
-  public String getAdvertiserDomain() {
-    return getAdvertiser().getDomain();
-  }
-
-  @NonNull
-  public URL getAdvertiserLogoUrl() {
-    return getAdvertiser().getLogo().getUrl();
-  }
-
-  @NonNull
-  public URI getAdvertiserLogoClickUrl() {
-    return getAdvertiser().getLogoClickUrl();
-  }
-
-  @NonNull
-  abstract NativePrivacy getPrivacy();
-
-  @NonNull
-  public URI getPrivacyOptOutClickUrl() {
-    return getPrivacy().getClickUrl();
-  }
-
-  @NonNull
-  public URL getPrivacyOptOutImageUrl() {
-    return getPrivacy().getImageUrl();
-  }
-
-  @NonNull
-  public String getPrivacyLongLegalText() {
-    return getPrivacy().getLegalText();
-  }
-
-  @NonNull
-  @SerializedName("impressionPixels")
-  abstract List<NativeImpressionPixel> getPixels();
-
-  @NonNull
-  public List<URL> getImpressionPixels() {
-    List<URL> pixels = new ArrayList<>();
-    for (NativeImpressionPixel pixel : getPixels()) {
-      pixels.add(pixel.getUrl());
-    }
-    return pixels;
-  }
-
-  public static Builder builder() {
-    return new AutoValue_NativeAssets.Builder();
-  }
-
-  @AutoValue.Builder
-  abstract static class Builder {
-
-    abstract Builder setNativeProducts(List<NativeProduct> newNativeProducts);
-    abstract Builder setAdvertiser(NativeAdvertiser newAdvertiser);
-    abstract Builder setPrivacy(NativePrivacy newPrivacy);
-    abstract Builder setPixels(List<NativeImpressionPixel> newPixels);
-
-    NativeAssets build() {
-      if (getNativeProducts().isEmpty()) {
-        throw new JsonParseException("Expect that native payload has, at least, one product.");
-      }
-      if (getPixels().isEmpty()) {
-        throw new JsonParseException("Expect that native payload has, at least, one impression pixel.");
-      }
-      return autoBuild();
-    }
-
-    abstract List<NativeProduct> getNativeProducts();
-    abstract List<NativeImpressionPixel> getPixels();
-    abstract NativeAssets autoBuild();
-
-  }
+  val product: NativeProduct get() = nativeProducts.iterator().next()
+  val advertiserDescription: String get() = advertiser.description
+  val advertiserDomain: String get() = advertiser.domain
+  val advertiserLogoUrl: URL get() = advertiser.logo.url
+  val advertiserLogoClickUrl: URI get() = advertiser.logoClickUrl
+  val privacyOptOutClickUrl: URI get() = privacy.clickUrl
+  val privacyOptOutImageUrl: URL get() = privacy.imageUrl
+  val privacyLongLegalText: String get() = privacy.legalText
+  val impressionPixels: List<URL> get() = pixels.map { it.url }
 }

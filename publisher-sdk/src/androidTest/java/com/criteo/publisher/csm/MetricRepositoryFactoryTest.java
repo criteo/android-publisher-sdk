@@ -24,6 +24,7 @@ import android.content.Context;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.util.BuildConfigWrapper;
+import com.criteo.publisher.util.JsonSerializer;
 import javax.inject.Inject;
 import org.junit.After;
 import org.junit.Before;
@@ -39,7 +40,7 @@ public class MetricRepositoryFactoryTest {
   private Context context;
 
   @Inject
-  private MetricParser parser;
+  private JsonSerializer jsonSerializer;
 
   @SpyBean
   private BuildConfigWrapper buildConfigWrapper;
@@ -52,14 +53,14 @@ public class MetricRepositoryFactoryTest {
 
     factory = new MetricRepositoryFactory(
         context,
-        parser,
+        jsonSerializer,
         buildConfigWrapper
     );
   }
 
   @After
   public void tearDown() throws Exception {
-    MetricDirectoryHelper.clear(new MetricDirectory(context, buildConfigWrapper, parser));
+    MetricDirectoryHelper.clear(new MetricDirectory(context, buildConfigWrapper, jsonSerializer));
   }
 
   @Test

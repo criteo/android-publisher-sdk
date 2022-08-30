@@ -16,24 +16,25 @@
 package com.criteo.publisher.model
 
 import com.criteo.publisher.annotation.OpenForTesting
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 @OpenForTesting
-data class RemoteConfigRequest(
-    @SerializedName("cpId")
+@JsonClass(generateAdapter = true)
+data class RemoteConfigRequest @JvmOverloads constructor(
+    @Json(name = "cpId")
     val criteoPublisherId: String,
-    @SerializedName("bundleId")
+    @Json(name = "bundleId")
     val bundleId: String,
-    @SerializedName("sdkVersion")
+    @Json(name = "sdkVersion")
     val sdkVersion: String,
-    @SerializedName("rtbProfileId")
+    @Json(name = "rtbProfileId")
     val profileId: Int,
     /**
      * Field used by the remote config to A/B test some configurations.
      */
-    @SerializedName("deviceId")
+    @Json(name = "deviceId")
     val deviceId: String?,
-) {
-  @SerializedName("deviceOs")
-  val deviceOs: String = "android"
-}
+    @Json(name = "deviceOs")
+    val deviceOs: String = "android"
+)

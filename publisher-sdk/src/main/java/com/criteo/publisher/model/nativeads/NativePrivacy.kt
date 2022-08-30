@@ -14,36 +14,24 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.model.nativeads;
+package com.criteo.publisher.model.nativeads
 
-import androidx.annotation.NonNull;
-import com.google.auto.value.AutoValue;
-import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
-import com.google.gson.annotations.SerializedName;
-import java.net.URI;
-import java.net.URL;
+import com.criteo.publisher.annotation.OpenForTesting
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
+import java.net.URI
+import java.net.URL
 
-@AutoValue
-public abstract class NativePrivacy {
-
-  public static TypeAdapter<NativePrivacy> typeAdapter(Gson gson) {
-    return new AutoValue_NativePrivacy.GsonTypeAdapter(gson);
-  }
-
-  /**
-   * This is an {@link URI} and not an {@link URL}, because deeplinks are acceptable.
-   */
-  @NonNull
-  @SerializedName("optoutClickUrl")
-  abstract URI getClickUrl();
-
-  @NonNull
-  @SerializedName("optoutImageUrl")
-  abstract URL getImageUrl();
-
-  @NonNull
-  @SerializedName("longLegalText")
-  abstract String getLegalText();
-
-}
+@OpenForTesting
+@JsonClass(generateAdapter = true)
+data class NativePrivacy(
+    /**
+     * This is an {@link URI} and not an {@link URL}, because deeplinks are acceptable.
+     */
+    @Json(name = "optoutClickUrl")
+    val clickUrl: URI,
+    @Json(name = "optoutImageUrl")
+    val imageUrl: URL,
+    @Json(name = "longLegalText")
+    val legalText: String
+)

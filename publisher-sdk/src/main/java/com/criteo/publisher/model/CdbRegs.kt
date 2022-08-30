@@ -17,7 +17,9 @@
 package com.criteo.publisher.model
 
 import com.criteo.publisher.annotation.OpenForTesting
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 @OpenForTesting
-data class CdbRegs(@SerializedName("coppa") val tagForChildDirectedTreatment: Boolean)
+@JsonClass(generateAdapter = true)
+data class CdbRegs(@Json(name = "coppa") val tagForChildDirectedTreatment: Boolean)

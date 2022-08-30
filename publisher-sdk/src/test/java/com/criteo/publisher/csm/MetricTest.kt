@@ -17,57 +17,39 @@
 package com.criteo.publisher.csm
 
 import com.criteo.publisher.mock.MockedDependenciesRule
+import com.criteo.publisher.util.JsonSerializer
+import com.criteo.publisher.util.writeIntoString
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doThrow
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
 import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.EOFException
 import java.io.IOException
 import java.io.InputStream
-import java.io.OutputStream
 import javax.inject.Inject
 
-class MetricParserTest {
+class MetricTest {
 
   @Rule
   @JvmField
   val mockedDependenciesRule = MockedDependenciesRule()
 
   @Inject
-  private lateinit var parser: MetricParser
-
-  @Test
-  fun read_GivenEmptyInputStream_ThrowEOF() {
-     assertThatCode {
-       parser.read("".toInputStream())
-     }.isInstanceOf(EOFException::class.java)
-  }
-
-  @Test
-  fun read_GivenIllFormedJson_ThrowIOException() {
-    assertThatCode {
-      parser.read("{".toInputStream())
-    }.isInstanceOf(IOException::class.java)
-  }
+  private lateinit var jsonSerializer: JsonSerializer
 
   @Test
   fun read_GivenJsonWithoutImpressionId_ThrowIOException() {
     assertThatCode {
-      parser.read("{}".toInputStream())
+      jsonSerializer.read(Metric::class.java, "{}".toInputStream())
     }.isInstanceOf(IOException::class.java)
   }
 
   @Test
   fun read_GivenJsonNotMatchingMetric_IgnoreThem() {
-    val metric = parser.read("""{
+    val metric = jsonSerializer.read(Metric::class.java, """{
       "impressionId": "id",
       "unknownKey": {}
     }""".trimIndent().toInputStream())
@@ -81,8 +63,8 @@ class MetricParserTest {
         .setCdbCallStartTimestamp(42L)
         .build()
 
-    val json = parser.writeIntoString(expectedMetric)
-    val readMetric = parser.read(json.toInputStream())
+    val json = jsonSerializer.writeIntoString(expectedMetric)
+    val readMetric = jsonSerializer.read(Metric::class.java, json.toInputStream())
 
     assertThat(readMetric).isEqualTo(expectedMetric)
   }
@@ -91,7 +73,7 @@ class MetricParserTest {
   fun read_GivenStream_DoNotCloseIt() {
     val stream = spy("""{"impressionId": "id"}""".toInputStream())
 
-    parser.read(stream)
+    jsonSerializer.read(Metric::class.java, stream)
 
     verify(stream, never()).close()
   }
@@ -110,7 +92,7 @@ class MetricParserTest {
         .setZoneId(4)
         .build()
 
-    val json = parser.writeIntoString(metric)
+    val json = jsonSerializer.writeIntoString(metric)
 
     assertThat(json).isEqualToIgnoringWhitespace(
         """{
@@ -131,7 +113,7 @@ class MetricParserTest {
   fun write_GivenEmptyObject_ReturnEmptyJson() {
     val metric = Metric.builder("impId").build()
 
-    val json = parser.writeIntoString(metric)
+    val json = jsonSerializer.writeIntoString(metric)
 
     assertThat(json).isEqualToIgnoringWhitespace("""{
       "cdbCallTimeout": false,
@@ -141,39 +123,7 @@ class MetricParserTest {
     }""".trimIndent())
   }
 
-  @Test
-  fun write_GivenStreamThatThrowsWhenWriting_ThrowIoException() {
-    val metric = Metric.builder("id").build()
-    val stream = mock<OutputStream> {
-      on { write(any<Int>()) } doThrow IOException::class
-      on { write(any<ByteArray>()) } doThrow IOException::class
-      on { write(any(), any(), any()) } doThrow IOException::class
-      on { flush() } doThrow IOException::class
-    }
-
-    assertThatCode {
-      parser.write(metric, stream)
-    }.isInstanceOf(IOException::class.java)
-  }
-
-  @Test
-  fun write_GivenStream_DoNotCloseIt() {
-    val metric = Metric.builder("id").build()
-    val stream = mock<OutputStream>()
-
-    parser.write(metric, stream)
-
-    verify(stream, never()).close()
-  }
-
   private fun String.toInputStream(): InputStream {
     return ByteArrayInputStream(toByteArray(Charsets.UTF_8))
-  }
-
-  private fun MetricParser.writeIntoString(metric: Metric): String {
-    with(ByteArrayOutputStream()) {
-      this@writeIntoString.write(metric, this)
-      return String(toByteArray(), Charsets.UTF_8)
-    }
   }
 }

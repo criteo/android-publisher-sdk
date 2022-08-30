@@ -37,6 +37,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.StubConstants;
 import com.criteo.publisher.context.ContextData;
+import com.criteo.publisher.csm.Metric;
 import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.logging.LogMessage;
 import com.criteo.publisher.logging.RemoteLogRecords;
@@ -55,6 +56,7 @@ import com.criteo.publisher.model.RemoteConfigRequestFactory;
 import com.criteo.publisher.model.RemoteConfigResponse;
 import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.util.SharedPreferencesFactory;
+import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 import org.json.JSONObject;
@@ -139,7 +141,7 @@ public class PubSdkApiIntegrationTest {
 
   @Test
   public void postCsm_GivenMetric_ReturnInSuccess() throws Exception {
-    MetricRequest request = mock(MetricRequest.class);
+    MetricRequest request = new MetricRequest(new ArrayList<Metric>(), "1.2.3", 88);
 
     api.postCsm(request);
 

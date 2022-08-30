@@ -17,6 +17,7 @@
 package com.criteo.publisher.csm
 
 import android.util.AtomicFile
+import com.criteo.publisher.util.JsonSerializer
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
 import org.junit.Rule
@@ -41,13 +42,13 @@ class SyncMetricFileTest {
   private lateinit var atomicFile: AtomicFile
 
   @Mock
-  private lateinit var parser: MetricParser
+  private lateinit var jsonSerializer: JsonSerializer
 
   private lateinit var metricFile: SyncMetricFile
 
   @Before
   fun setUp() {
-    metricFile = spy(SyncMetricFile("id", atomicFile, parser))
+    metricFile = spy(SyncMetricFile("id", atomicFile, jsonSerializer))
   }
 
   @Test

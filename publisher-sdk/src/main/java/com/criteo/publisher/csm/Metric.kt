@@ -14,118 +14,160 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.csm;
+package com.criteo.publisher.csm
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.criteo.publisher.integration.Integration;
-import com.google.auto.value.AutoValue;
-import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
+import com.criteo.publisher.annotation.OpenForTesting
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-@AutoValue
-public abstract class Metric {
-
-  @NonNull
-  public static Metric.Builder builder(String impressionId) {
-    return builder().setImpressionId(impressionId);
-  }
-
-  public static TypeAdapter<Metric> typeAdapter(Gson gson) {
-    return new AutoValue_Metric.GsonTypeAdapter(gson);
-  }
-
-  @Nullable
-  abstract Long getCdbCallStartTimestamp();
-
-  @Nullable
-  abstract Long getCdbCallEndTimestamp();
-
-  abstract boolean isCdbCallTimeout();
-
-  abstract boolean isCachedBidUsed();
-
-  @Nullable
-  abstract Long getElapsedTimestamp();
-
-  /**
-   * Uniquely identifies a slot from a CDB request.
-   * <p>
-   * This ID is generated on client side so we can track the life of this slot during a CDB call.
-   * For CSM, this allows studies at slot level.
-   */
-  @NonNull
-  abstract String getImpressionId();
-
-  /**
-   * Uniquely identifies a CDB bid request.
-   * <p>
-   * This ID is generated on client side so we can track the life of a request even after a CDB
-   * call. All metrics coming from the same request should have the same request group ID. For CSM,
-   * this allows studies at request level (for instance to determine the timeout rate vs the number
-   * of slots in the same request).
-   */
-  @Nullable
-  abstract String getRequestGroupId();
-
-  /**
-   * Zone ID that was mapped during bidding to the CDB slot response.
-   * <p>
-   * This should be present in case of valid bid.
-   */
-  @Nullable
-  abstract Integer getZoneId();
-
-  /**
-   * Indicate from which integration comes this metric.
-   *
-   * @see Integration#getProfileId()
-   */
-  @Nullable // For retro-compat
-  abstract Integer getProfileId();
-
-  abstract boolean isReadyToSend();
-
-  @NonNull
-  @SuppressWarnings("NullableProblems") // AutoValue do not add @NonNull on generated method
-  abstract Metric.Builder toBuilder();
-
-  @AutoValue.Builder
-  abstract static class Builder {
-
-    abstract Builder setCdbCallStartTimestamp(Long absoluteTimeInMillis);
-    abstract Builder setCdbCallEndTimestamp(Long absoluteTimeInMillis);
-    abstract Builder setCdbCallTimeout(boolean isTimeout);
-    abstract Builder setCachedBidUsed(boolean isCachedBidUsed);
-    abstract Builder setElapsedTimestamp(Long absoluteTimeInMillis);
-    abstract Builder setRequestGroupId(String requestGroupId);
-    abstract Builder setReadyToSend(boolean isReadyToSend);
-
-    abstract Builder setProfileId(Integer profileId);
-
-    abstract Builder setZoneId(Integer zoneId);
-
-    abstract Metric build();
+@OpenForTesting
+@JsonClass(generateAdapter = true)
+data class Metric(
+    val cdbCallStartTimestamp: Long? = null,
+    val cdbCallEndTimestamp: Long? = null,
+    @Json(name = "cdbCallTimeout")
+    val isCdbCallTimeout: Boolean = false,
+    @Json(name = "cachedBidUsed")
+    val isCachedBidUsed: Boolean = false,
+    val elapsedTimestamp: Long? = null,
+    /**
+     * Uniquely identifies a slot from a CDB request.
+     * <p>
+     * This ID is generated on client side so we can track the life of this slot during a CDB call.
+     * For CSM, this allows studies at slot level.
+     */
+    val impressionId: String,
+    /**
+     * Uniquely identifies a CDB bid request.
+     * <p>
+     * This ID is generated on client side so we can track the life of a request even after a CDB
+     * call. All metrics coming from the same request should have the same request group ID. For CSM,
+     * this allows studies at request level (for instance to determine the timeout rate vs the number
+     * of slots in the same request).
+     */
+    val requestGroupId: String? = null,
 
     /**
-     * @hidden
-     * @deprecated this should only be used for deserialization
+     * Zone ID that was mapped during bidding to the CDB slot response.
+     * <p>
+     * This should be present in case of valid bid.
      */
-    @Deprecated
-    abstract Builder setImpressionId(String impressionId);
+    val zoneId: Int? = null,
+
+    /**
+     * Indicate from which integration comes this metric.
+     *
+     * @see Integration#getProfileId()
+     */
+    val profileId: Int? = null,
+    @Json(name = "readyToSend")
+    val isReadyToSend: Boolean = false
+) {
+
+  fun toBuilder(): Builder = Builder(this)
+
+  @OpenForTesting
+  @Suppress("TooManyFunctions")
+  class Builder {
+    private var impressionId: String? = null
+    private var cdbCallStartTimestamp: Long? = null
+    private var cdbCallEndTimestamp: Long? = null
+    private var elapsedTimestamp: Long? = null
+    private var requestGroupId: String? = null
+    private var zoneId: Int? = null
+    private var profileId: Int? = null
+    private var isCachedBidUsed: Boolean = false
+    private var isCdbCallTimeout: Boolean = false
+    private var isReadyToSend: Boolean = false
+
+    constructor()
+
+    constructor(source: Metric) {
+      this.cdbCallStartTimestamp = source.cdbCallStartTimestamp
+      this.cdbCallEndTimestamp = source.cdbCallEndTimestamp
+      this.isCdbCallTimeout = source.isCdbCallTimeout
+      this.isCachedBidUsed = source.isCachedBidUsed
+      this.elapsedTimestamp = source.elapsedTimestamp
+      this.impressionId = source.impressionId
+      this.requestGroupId = source.requestGroupId
+      this.zoneId = source.zoneId
+      this.profileId = source.profileId
+      this.isReadyToSend = source.isReadyToSend
+    }
+
+    fun setCdbCallStartTimestamp(cdbCallStartTimestamp: Long?): Builder {
+      this.cdbCallStartTimestamp = cdbCallStartTimestamp
+      return this
+    }
+
+    fun setCdbCallEndTimestamp(cdbCallEndTimestamp: Long?): Builder {
+      this.cdbCallEndTimestamp = cdbCallEndTimestamp
+      return this
+    }
+
+    fun setCdbCallTimeout(cdbCallTimeout: Boolean): Builder {
+      this.isCdbCallTimeout = cdbCallTimeout
+      return this
+    }
+
+    fun setCachedBidUsed(cachedBidUsed: Boolean): Builder {
+      this.isCachedBidUsed = cachedBidUsed
+      return this
+    }
+
+    fun setElapsedTimestamp(elapsedTimestamp: Long?): Builder {
+      this.elapsedTimestamp = elapsedTimestamp
+      return this
+    }
+
+    fun setImpressionId(impressionId: String): Builder {
+      this.impressionId = impressionId
+      return this
+    }
+
+    fun setRequestGroupId(requestGroupId: String?): Builder {
+      this.requestGroupId = requestGroupId
+      return this
+    }
+
+    fun setZoneId(zoneId: Int?): Builder {
+      this.zoneId = zoneId
+      return this
+    }
+
+    fun setProfileId(profileId: Int?): Builder {
+      this.profileId = profileId
+      return this
+    }
+
+    fun setReadyToSend(readyToSend: Boolean): Builder {
+      this.isReadyToSend = readyToSend
+      return this
+    }
+
+    fun build(): Metric {
+      check(this.impressionId != null) { "Missing required properties: impressionId" }
+
+      return Metric(
+          impressionId = impressionId!!,
+          cdbCallStartTimestamp = cdbCallStartTimestamp,
+          cdbCallEndTimestamp = cdbCallEndTimestamp,
+          elapsedTimestamp = elapsedTimestamp,
+          requestGroupId = requestGroupId,
+          zoneId = zoneId,
+          profileId = profileId,
+          isCachedBidUsed = isCachedBidUsed,
+          isCdbCallTimeout = isCdbCallTimeout,
+          isReadyToSend = isReadyToSend,
+      )
+    }
   }
 
-  /**
-   * @hidden
-   * @deprecated this should only be used for deserialization
-   */
-  @Deprecated
-  @NonNull
-  public static Metric.Builder builder() {
-    return new AutoValue_Metric.Builder()
-        .setReadyToSend(false)
-        .setCdbCallTimeout(false)
-        .setCachedBidUsed(false);
-  }
+  companion object {
+    @JvmStatic
+    fun builder(): Builder = Builder()
 
+    @JvmStatic
+    fun builder(impressionId: String): Builder = builder().setImpressionId(impressionId)
+  }
 }
