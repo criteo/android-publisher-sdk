@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import com.criteo.publisher.DependencyProvider.Factory;
 import com.criteo.publisher.util.BuildConfigWrapper;
+import com.criteo.publisher.util.JsonSerializer;
 
 @RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)
 public class MetricRepositoryFactory implements Factory<MetricRepository> {
@@ -30,25 +31,25 @@ public class MetricRepositoryFactory implements Factory<MetricRepository> {
   private final Context context;
 
   @NonNull
-  private final MetricParser metricParser;
+  private final JsonSerializer jsonSerializer;
 
   @NonNull
   private final BuildConfigWrapper buildConfigWrapper;
 
   public MetricRepositoryFactory(
       @NonNull Context context,
-      @NonNull MetricParser metricParser,
+      @NonNull JsonSerializer jsonSerializer,
       @NonNull BuildConfigWrapper buildConfigWrapper
   ) {
     this.context = context;
-    this.metricParser = metricParser;
+    this.jsonSerializer = jsonSerializer;
     this.buildConfigWrapper = buildConfigWrapper;
   }
 
   @NonNull
   @Override
   public MetricRepository create() {
-    MetricDirectory directory = new MetricDirectory(context, buildConfigWrapper, metricParser);
+    MetricDirectory directory = new MetricDirectory(context, buildConfigWrapper, jsonSerializer);
     MetricRepository fileMetricRepository = new FileMetricRepository(directory);
     return new BoundedMetricRepository(fileMetricRepository, buildConfigWrapper);
   }

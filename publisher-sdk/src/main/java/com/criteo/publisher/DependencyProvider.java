@@ -52,7 +52,6 @@ import com.criteo.publisher.context.ContextProvider;
 import com.criteo.publisher.context.UserDataHolder;
 import com.criteo.publisher.csm.ConcurrentSendingQueue;
 import com.criteo.publisher.csm.CsmBidLifecycleListener;
-import com.criteo.publisher.csm.MetricParser;
 import com.criteo.publisher.csm.MetricRepository;
 import com.criteo.publisher.csm.MetricRepositoryFactory;
 import com.criteo.publisher.csm.MetricSendingQueue;
@@ -74,6 +73,7 @@ import com.criteo.publisher.logging.ConsoleHandler;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.logging.PublisherCodeRemover;
 import com.criteo.publisher.logging.RemoteHandler;
+import com.criteo.publisher.logging.RemoteLogRecords.RemoteLogLevel;
 import com.criteo.publisher.logging.RemoteLogRecordsFactory;
 import com.criteo.publisher.logging.RemoteLogSendingQueue;
 import com.criteo.publisher.logging.RemoteLogSendingQueue.AdapterRemoteLogSendingQueue;
@@ -96,16 +96,20 @@ import com.criteo.publisher.util.AdvertisingInfo.SafeAdvertisingIdClient;
 import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.AppLifecycleUtil;
 import com.criteo.publisher.util.BuildConfigWrapper;
-import com.criteo.publisher.util.CustomAdapterFactory;
 import com.criteo.publisher.util.DeviceUtil;
 import com.criteo.publisher.util.JsonSerializer;
 import com.criteo.publisher.util.MapUtilKt;
 import com.criteo.publisher.util.SafeSharedPreferences;
 import com.criteo.publisher.util.SharedPreferencesFactory;
 import com.criteo.publisher.util.TextUtils;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.criteo.publisher.util.jsonadapter.BooleanJsonAdapter;
+import com.criteo.publisher.util.jsonadapter.URIAdapter;
+import com.criteo.publisher.util.jsonadapter.URLAdapter;
+import com.squareup.moshi.Moshi;
+import com.squareup.moshi.adapters.EnumJsonAdapter;
 import com.squareup.picasso.Picasso;
+import java.net.URI;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -598,30 +602,33 @@ public class DependencyProvider {
   public MetricRepository provideMetricRepository() {
     return getOrCreate(MetricRepository.class, new MetricRepositoryFactory(
         provideContext(),
-        provideMetricParser(),
+        provideJsonSerializer(),
         provideBuildConfigWrapper()
-    ));
-  }
-
-  @NonNull
-  public MetricParser provideMetricParser() {
-    return getOrCreate(MetricParser.class, () -> new MetricParser(
-        provideJsonSerializer()
     ));
   }
 
   @NonNull
   public JsonSerializer provideJsonSerializer() {
     return getOrCreate(JsonSerializer.class, () -> new JsonSerializer(
-        provideGson()
+        provideMoshi()
     ));
   }
 
   @NonNull
-  public Gson provideGson() {
-    return getOrCreate(Gson.class, () -> new GsonBuilder()
-        .registerTypeAdapterFactory(CustomAdapterFactory.create())
-        .create());
+  public Moshi provideMoshi() {
+    return getOrCreate(Moshi.class, () -> new Moshi.Builder()
+        .add(
+            RemoteLogLevel.class,
+            EnumJsonAdapter.create(RemoteLogLevel.class).withUnknownFallback(null).nullSafe()
+        )
+        // lenient() to properly parse malformed json url
+        .add(URI.class, new URIAdapter().lenient())
+        .add(URL.class, new URLAdapter().lenient())
+        // TODO: there are some tests that are parsing from Boolean value and some that are parsing from String value
+        //  investigate if we can remove this adapters and always parse value from Boolean
+        .add(Boolean.class, new BooleanJsonAdapter().nullSafe())
+        .add(boolean.class, new BooleanJsonAdapter().nullSafe())
+        .build());
   }
 
   @NonNull

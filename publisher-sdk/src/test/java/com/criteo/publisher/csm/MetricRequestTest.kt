@@ -36,7 +36,7 @@ class MetricRequestTest {
 
   @Test
   fun create_GivenNoMetric_ReturnEmptyRequest() {
-    val request = MetricRequest.create(emptyList(), "1.2.3", 456)
+    val request = MetricRequest(emptyList<Metric>(), "1.2.3", 456)
 
     assertThat(request.feedbacks).isEmpty()
     assertThat(request.wrapperVersion).isEqualTo("1.2.3")
@@ -59,7 +59,7 @@ class MetricRequestTest {
         .setZoneId(1339)
         .build()
 
-    val request = MetricRequest.create(listOf(metric1, metric2), "1.2.3", 456)
+    val request = MetricRequest(listOf(metric1, metric2), "1.2.3", 456)
 
     assertThat(request.feedbacks).hasSize(2)
     assertThat(request.feedbacks[0]).matchEmptyMetric("id1")
@@ -86,7 +86,7 @@ class MetricRequestTest {
     val metric = Metric.builder("id")
         .build()
 
-    val request = MetricRequest.create(listOf(metric), "1.2.3", 456)
+    val request = MetricRequest(listOf(metric), "1.2.3", 456)
 
     assertThat(request.feedbacks).hasSize(1).allSatisfy {
       assertThat(it).matchEmptyMetric("id")
@@ -106,7 +106,7 @@ class MetricRequestTest {
         .setCdbCallStartTimestamp(42L)
         .build()
 
-    val request = MetricRequest.create(listOf(metric), "1.2.3", 456)
+    val request = MetricRequest(listOf(metric), "1.2.3", 456)
 
     assertThat(request.feedbacks).hasSize(1).allSatisfy {
       assertThat(it.slots).hasSize(1).allSatisfy {
@@ -133,7 +133,7 @@ class MetricRequestTest {
         .setCdbCallTimeout(true)
         .build()
 
-    val request = MetricRequest.create(listOf(metric), "1.2.3", 456)
+    val request = MetricRequest(listOf(metric), "1.2.3", 456)
 
     assertThat(request.feedbacks).hasSize(1).allSatisfy {
       assertThat(it.slots).hasSize(1).allSatisfy {
@@ -161,7 +161,7 @@ class MetricRequestTest {
         .setCdbCallEndTimestamp(1337L)
         .build()
 
-    val request = MetricRequest.create(listOf(metric), "1.2.3", 456)
+    val request = MetricRequest(listOf(metric), "1.2.3", 456)
 
     assertThat(request.feedbacks).hasSize(1).allSatisfy {
       assertThat(it.slots).hasSize(1).allSatisfy {
@@ -190,7 +190,7 @@ class MetricRequestTest {
         .setCachedBidUsed(true)
         .build()
 
-    val request = MetricRequest.create(listOf(metric), "1.2.3", 456)
+    val request = MetricRequest(listOf(metric), "1.2.3", 456)
 
     assertThat(request.feedbacks).hasSize(1).allSatisfy {
       assertThat(it.slots).hasSize(1).allSatisfy {
@@ -223,7 +223,7 @@ class MetricRequestTest {
         .setZoneId(1339)
         .build()
 
-    val request = MetricRequest.create(listOf(metric), "3.2.1", 654)
+    val request = MetricRequest(listOf(metric), "3.2.1", 654)
 
     assertThat(request.feedbacks).hasSize(1).allSatisfy {
       assertThat(it).matchConsumedBidMetric("impId")

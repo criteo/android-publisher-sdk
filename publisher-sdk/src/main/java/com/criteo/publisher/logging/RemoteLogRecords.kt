@@ -17,47 +17,49 @@
 package com.criteo.publisher.logging
 
 import android.util.Log
-import androidx.annotation.Keep
 import com.criteo.publisher.annotation.OpenForTesting
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 @OpenForTesting
+@JsonClass(generateAdapter = true)
 data class RemoteLogRecords(
-    @SerializedName("context") val context: RemoteLogContext,
-    @SerializedName("errors") val logRecords: List<RemoteLogRecord>
+    @Json(name = "context") val context: RemoteLogContext,
+    @Json(name = "errors") val logRecords: List<RemoteLogRecord>
 ) {
+  @JsonClass(generateAdapter = true)
   data class RemoteLogRecord(
-      @SerializedName("errorType") val level: RemoteLogLevel,
-      @SerializedName("messages") val messages: List<String>
+      @Json(name = "errorType") val level: RemoteLogLevel,
+      @Json(name = "messages") val messages: List<String>
   )
 
   @OpenForTesting
+  @JsonClass(generateAdapter = true)
   data class RemoteLogContext(
-      @SerializedName("version") val version: String,
-      @SerializedName("bundleId") val bundleId: String,
-      @SerializedName("deviceId") var deviceId: String?,
-      @SerializedName("sessionId") val sessionId: String,
-      @SerializedName("profileId") val profileId: Int,
-      @SerializedName("exception") val exceptionType: String?,
-      @SerializedName("logId") val logId: String?,
-      @SerializedName("deviceOs") val deviceOs: String?
+      @Json(name = "version") val version: String,
+      @Json(name = "bundleId") val bundleId: String,
+      @Json(name = "deviceId") var deviceId: String?,
+      @Json(name = "sessionId") val sessionId: String,
+      @Json(name = "profileId") val profileId: Int,
+      @Json(name = "exception") val exceptionType: String?,
+      @Json(name = "logId") val logId: String?,
+      @Json(name = "deviceOs") val deviceOs: String?
   )
 
-  @Keep // for serialization
   enum class RemoteLogLevel {
-    @SerializedName("Debug")
+    @Json(name = "Debug")
     DEBUG,
 
-    @SerializedName("Info")
+    @Json(name = "Info")
     INFO,
 
-    @SerializedName("Warning")
+    @Json(name = "Warning")
     WARNING,
 
-    @SerializedName("Error")
+    @Json(name = "Error")
     ERROR,
 
-    @SerializedName("None")
+    @Json(name = "None")
     NONE;
 
     companion object {

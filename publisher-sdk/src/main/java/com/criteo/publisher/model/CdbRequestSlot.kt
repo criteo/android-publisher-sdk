@@ -18,21 +18,23 @@ package com.criteo.publisher.model
 
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.util.AdUnitType
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 @OpenForTesting
-data class CdbRequestSlot private constructor(
-    @SerializedName("impId")
+@JsonClass(generateAdapter = true)
+data class CdbRequestSlot internal constructor(
+    @Json(name = "impId")
     val impressionId: String,
-    @SerializedName("placementId")
+    @Json(name = "placementId")
     val placementId: String,
-    @SerializedName("isNative")
+    @Json(name = "isNative")
     val isNativeAd: Boolean?,
-    @SerializedName("interstitial")
+    @Json(name = "interstitial")
     val isInterstitial: Boolean?,
-    @SerializedName("rewarded")
+    @Json(name = "rewarded")
     val isRewarded: Boolean?,
-    @SerializedName("sizes")
+    @Json(name = "sizes")
     val sizes: Collection<String>
 ) {
 

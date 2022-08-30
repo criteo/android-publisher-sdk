@@ -20,13 +20,15 @@ import androidx.annotation.Keep
 import com.criteo.publisher.annotation.Internal
 import com.criteo.publisher.annotation.Internal.ADMOB_ADAPTER
 import com.criteo.publisher.annotation.OpenForTesting
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import java.net.URL
 
 @OpenForTesting
 @Keep
-data class CriteoMedia private constructor(
-    @SerializedName("imageUrl")
+@JsonClass(generateAdapter = true)
+data class CriteoMedia internal constructor(
+    @Json(name = "imageUrl")
     @Internal(ADMOB_ADAPTER)
     val imageUrl: URL
 ) {

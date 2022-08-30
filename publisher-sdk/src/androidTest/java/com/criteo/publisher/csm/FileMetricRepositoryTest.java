@@ -34,6 +34,7 @@ import android.content.Context;
 import com.criteo.publisher.csm.MetricRepository.MetricUpdater;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.util.BuildConfigWrapper;
+import com.criteo.publisher.util.JsonSerializer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,7 +65,7 @@ public class FileMetricRepositoryTest {
   private BuildConfigWrapper buildConfigWrapper;
 
   @Inject
-  private MetricParser parser;
+  private JsonSerializer jsonSerializer;
 
   private FileMetricRepository repository;
 
@@ -442,7 +443,7 @@ public class FileMetricRepositoryTest {
 
   @Test
   public void getAllStoredMetrics_GivenAnIoExceptionDuringOneRead_IgnoreIt() throws Exception {
-    parser = spy(parser);
+    jsonSerializer = spy(jsonSerializer);
 
     repository.addOrUpdateById("id1", builder -> { });
     repository.addOrUpdateById("id2", builder -> { });
@@ -451,8 +452,8 @@ public class FileMetricRepositoryTest {
 
     doThrow(IOException.class)
         .doCallRealMethod()
-        .when(parser)
-        .read(any());
+        .when(jsonSerializer)
+        .read(any(), any());
 
     Collection<Metric> metrics = repository.getAllStoredMetrics();
 
@@ -461,13 +462,13 @@ public class FileMetricRepositoryTest {
 
   @Test
   public void updateById_GivenIoExceptionDuringReadOfExistingMetric_DoNotUpdateMetric() throws Exception {
-    parser = spy(parser);
+    jsonSerializer = spy(jsonSerializer);
 
     repository.addOrUpdateById("id1", builder -> { });
 
     givenNewRepository();
 
-    doThrow(IOException.class).when(parser).read(any());
+    doThrow(IOException.class).when(jsonSerializer).read(any(), any());
 
     MetricUpdater updater = mock(MetricUpdater.class);
     repository.addOrUpdateById("id1", updater);
@@ -477,10 +478,10 @@ public class FileMetricRepositoryTest {
 
   @Test
   public void updateById_GivenIoExceptionDuringWriteOfNewMetric_DoNotCreateMetric() throws Exception {
-    parser = spy(parser);
+    jsonSerializer = spy(jsonSerializer);
     givenNewRepository();
 
-    doThrow(IOException.class).when(parser).write(any(), any());
+    doThrow(IOException.class).when(jsonSerializer).write(any(), any());
 
     repository.addOrUpdateById("id1", builder -> { });
 
@@ -495,12 +496,12 @@ public class FileMetricRepositoryTest {
         .setCdbCallStartTimestamp(42L)
         .build();
 
-    parser = spy(parser);
+    jsonSerializer = spy(jsonSerializer);
     givenNewRepository();
 
     doThrow(IOException.class)
         .doCallRealMethod()
-        .when(parser)
+        .when(jsonSerializer)
         .write(any(), any());
 
     repository.addOrUpdateById("id1", builder -> {
@@ -522,12 +523,12 @@ public class FileMetricRepositoryTest {
   public void updateById_GivenIoExceptionDuringWriteOfOldMetric_DoNotUpdateMetric() throws Exception {
     Metric expectedMetric = Metric.builder("id1").build();
 
-    parser = spy(parser);
+    jsonSerializer = spy(jsonSerializer);
     givenNewRepository();
 
     repository.addOrUpdateById("id1", builder -> { });
 
-    doThrow(IOException.class).when(parser).write(any(), any());
+    doThrow(IOException.class).when(jsonSerializer).write(any(), any());
 
     repository.addOrUpdateById("id1", builder -> {
       builder.setCdbCallStartTimestamp(42L);
@@ -545,14 +546,14 @@ public class FileMetricRepositoryTest {
         .setCdbCallStartTimestamp(42L)
         .build();
 
-    parser = spy(parser);
+    jsonSerializer = spy(jsonSerializer);
     givenNewRepository();
 
     repository.addOrUpdateById("id1", builder -> { });
 
     doThrow(IOException.class)
         .doCallRealMethod()
-        .when(parser)
+        .when(jsonSerializer)
         .write(any(), any());
 
     repository.addOrUpdateById("id1", builder -> {
@@ -622,14 +623,14 @@ public class FileMetricRepositoryTest {
     MetricMover mover = mock(MetricMover.class);
     when(mover.offerToDestination(any())).thenReturn(true);
 
-    parser = spy(parser);
+    jsonSerializer = spy(jsonSerializer);
 
     repository.addOrUpdateById("id", builder -> {});
     givenNewRepository();
 
     doThrow(IOException.class)
         .doCallRealMethod()
-        .when(parser).read(any());
+        .when(jsonSerializer).read(any(), any());
 
     repository.moveById("id", mover);
 
@@ -650,7 +651,7 @@ public class FileMetricRepositoryTest {
   }
 
   private void givenNewRepository() {
-    directory = new MetricDirectory(context, buildConfigWrapper, parser);
+    directory = new MetricDirectory(context, buildConfigWrapper, jsonSerializer);
     repository = new FileMetricRepository(directory);
   }
 

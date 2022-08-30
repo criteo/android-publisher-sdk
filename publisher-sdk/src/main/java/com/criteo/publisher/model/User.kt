@@ -17,30 +17,30 @@
 package com.criteo.publisher.model
 
 import com.criteo.publisher.annotation.OpenForTesting
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 @OpenForTesting
-data class User(
-    @SerializedName("deviceId")
+@JsonClass(generateAdapter = true)
+data class User @JvmOverloads constructor(
+    @Json(name = "deviceId")
     val deviceId: String?,
 
     /**
      * US Privacy consent IAB format (for CCPA)
      */
-    @SerializedName("uspIab")
+    @Json(name = "uspIab")
     val uspIab: String?,
 
     /**
      * US Privacy optout in binary format (for CCPA)
      */
-    @SerializedName("uspOptout")
+    @Json(name = "uspOptout")
     val uspOptout: String?,
-    @SerializedName("ext")
-    val ext: Map<String, Any>
-) {
-  @SerializedName("deviceIdType")
-  val deviceIdType: String = "gaid"
-
-  @SerializedName("deviceOs")
-  val deviceOs: String = "android"
-}
+    @Json(name = "ext")
+    val ext: Map<String, Any>,
+    @Json(name = "deviceIdType")
+    val deviceIdType: String = "gaid",
+    @Json(name = "deviceOs")
+    val deviceOs: String = "android"
+)

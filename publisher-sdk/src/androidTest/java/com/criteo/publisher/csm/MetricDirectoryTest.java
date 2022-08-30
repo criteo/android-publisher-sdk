@@ -27,6 +27,7 @@ import android.util.AtomicFile;
 import com.criteo.publisher.csm.Metric.Builder;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.util.BuildConfigWrapper;
+import com.criteo.publisher.util.JsonSerializer;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
@@ -54,13 +55,13 @@ public class MetricDirectoryTest {
   private BuildConfigWrapper buildConfigWrapper;
 
   @Mock
-  private MetricParser parser;
+  private JsonSerializer jsonSerializer;
 
   private MetricDirectory directory;
 
   @Before
   public void setUp() throws Exception {
-    directory = new MetricDirectory(context, buildConfigWrapper, parser);
+    directory = new MetricDirectory(context, buildConfigWrapper, jsonSerializer);
   }
 
   @After

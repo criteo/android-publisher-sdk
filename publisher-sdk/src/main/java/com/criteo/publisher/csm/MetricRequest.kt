@@ -14,143 +14,71 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.csm;
+package com.criteo.publisher.csm
 
-import static java.util.Collections.singletonList;
+import com.criteo.publisher.annotation.OpenForTesting
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.auto.value.AutoValue;
-import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
-import com.google.gson.annotations.SerializedName;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+@OpenForTesting
+@JsonClass(generateAdapter = true)
+data class MetricRequest internal constructor(
+    val feedbacks: List<MetricRequestFeedback>,
+    @Json(name = "wrapper_version")
+    val wrapperVersion: String,
+    @Json(name = "profile_id")
+    val profileId: Int
+) {
+  constructor(
+      metrics: Collection<Metric>,
+      sdkVersion: String,
+      profileId: Int
+  ) : this(metrics.map { MetricRequestFeedback(it) }, sdkVersion, profileId)
 
-@AutoValue
-public abstract class MetricRequest {
+  @OpenForTesting
+  @JsonClass(generateAdapter = true)
+  data class MetricRequestSlot(
+      val impressionId: String,
+      val zoneId: Int?,
+      val cachedBidUsed: Boolean
+  )
 
-  @NonNull
-  static MetricRequest create(
-      @NonNull Collection<Metric> metrics,
-      @NonNull String sdkVersion,
-      int profileId
+  @OpenForTesting
+  @JsonClass(generateAdapter = true)
+  data class MetricRequestFeedback(
+      val slots: List<MetricRequestSlot>,
+      val elapsed: Long?,
+      @Json(name = "isTimeout")
+      val isTimeout: Boolean,
+      val cdbCallStartElapsed: Long,
+      val cdbCallEndElapsed: Long?,
+      val requestGroupId: String?
   ) {
-    List<MetricRequestFeedback> feedbacks = new ArrayList<>();
-    for (Metric metric : metrics) {
-      feedbacks.add(MetricRequestFeedback.create(metric));
-    }
 
-    return new AutoValue_MetricRequest(
-        feedbacks,
-        sdkVersion,
-        profileId
-    );
-  }
+    constructor(metric: Metric) : this(
+        listOf(
+            MetricRequestSlot(
+                metric.impressionId,
+                metric.zoneId,
+                metric.isCachedBidUsed
+            )
+        ),
+        calculateDifferenceSafely(metric.elapsedTimestamp, metric.cdbCallStartTimestamp),
+        metric.isCdbCallTimeout,
+        0L,
+        calculateDifferenceSafely(metric.cdbCallEndTimestamp, metric.cdbCallStartTimestamp),
+        metric.requestGroupId
+    )
 
-  public static TypeAdapter<MetricRequest> typeAdapter(Gson gson) {
-    return new AutoValue_MetricRequest.GsonTypeAdapter(gson);
-  }
-
-  @NonNull
-  abstract List<MetricRequestFeedback> getFeedbacks();
-
-  @SerializedName("wrapper_version")
-  @NonNull
-  abstract String getWrapperVersion();
-
-  @SerializedName("profile_id")
-  abstract int getProfileId();
-
-  @AutoValue
-  public abstract static class MetricRequestFeedback {
-
-    @NonNull
-    static MetricRequestFeedback create(@NonNull Metric metric) {
-      List<MetricRequestSlot> slots = singletonList(MetricRequestSlot.create(
-          metric.getImpressionId(),
-          metric.getZoneId(),
-          metric.isCachedBidUsed()
-          )
-      );
-
-      Long elapsed = calculateDifferenceSafely(
-          metric.getElapsedTimestamp(),
-          metric.getCdbCallStartTimestamp()
-      );
-
-      Long cdbCallEndElapsed = calculateDifferenceSafely(
-          metric.getCdbCallEndTimestamp(),
-          metric.getCdbCallStartTimestamp()
-      );
-
-      return new AutoValue_MetricRequest_MetricRequestFeedback(
-          slots,
-          elapsed,
-          metric.isCdbCallTimeout(),
-          0L,
-          cdbCallEndElapsed,
-          metric.getRequestGroupId()
-      );
-    }
-
-    public static TypeAdapter<MetricRequestFeedback> typeAdapter(Gson gson) {
-      return new AutoValue_MetricRequest_MetricRequestFeedback.GsonTypeAdapter(gson);
-    }
-
-    @Nullable
-    private static Long calculateDifferenceSafely(
-        @Nullable Long leftOperand,
-        @Nullable Long rightOperand
-    ) {
-      if (leftOperand == null || rightOperand == null) {
-        return null;
+    companion object {
+      private fun calculateDifferenceSafely(
+          leftOperand: Long?,
+          rightOperand: Long?
+      ): Long? {
+        return if (leftOperand == null || rightOperand == null) {
+          null
+        } else leftOperand - rightOperand
       }
-      return leftOperand - rightOperand;
     }
-
-    @NonNull
-    abstract List<MetricRequestSlot> getSlots();
-
-    @Nullable
-    abstract Long getElapsed();
-
-    @SerializedName("isTimeout")
-    abstract boolean isTimeout();
-
-    abstract long getCdbCallStartElapsed();
-
-    @Nullable
-    abstract Long getCdbCallEndElapsed();
-
-    @Nullable
-    abstract String getRequestGroupId();
-  }
-
-  @AutoValue
-  public abstract static class MetricRequestSlot {
-
-    @NonNull
-    static MetricRequestSlot create(
-        @NonNull String impressionId,
-        @Nullable Integer zoneId,
-        boolean cachedBidUsed
-    ) {
-      return new AutoValue_MetricRequest_MetricRequestSlot(impressionId, zoneId, cachedBidUsed);
-    }
-
-    public static TypeAdapter<MetricRequestSlot> typeAdapter(Gson gson) {
-      return new AutoValue_MetricRequest_MetricRequestSlot.GsonTypeAdapter(gson);
-    }
-
-
-    @Nullable
-    abstract String getImpressionId();
-
-    @Nullable
-    abstract Integer getZoneId();
-
-    abstract boolean getCachedBidUsed();
   }
 }

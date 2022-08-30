@@ -158,7 +158,7 @@ class MetricSendingQueueConsumerTest {
       on { poll(42) } doReturn listOf(metric1, metric2)
     }
 
-    val expectedRequest = MetricRequest.create(
+    val expectedRequest = MetricRequest(
         listOf(metric1, metric2),
         "1.2.3",
         1337
@@ -211,13 +211,13 @@ class MetricSendingQueueConsumerTest {
       on { poll(42) } doReturn listOf(metric1, metric2, metric3, metric4)
     }
 
-    val expectedRequest1 = MetricRequest.create(
+    val expectedRequest1 = MetricRequest(
         listOf(metric1, metric3),
         "1.2.3",
         FALLBACK.profileId
     )
 
-    val expectedRequest2 = MetricRequest.create(
+    val expectedRequest2 = MetricRequest(
         listOf(metric2, metric4),
         "1.2.3",
         1337

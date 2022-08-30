@@ -17,7 +17,9 @@
 package com.criteo.publisher.logging
 
 import android.util.Log
+import com.squareup.moshi.JsonClass
 
+@JsonClass(generateAdapter = true)
 internal data class LogMessage(
     val level: Int = Log.INFO,
     val message: String?,

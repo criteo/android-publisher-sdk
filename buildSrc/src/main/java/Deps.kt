@@ -48,17 +48,6 @@ object Deps {
     const val AssertJ = "org.assertj:assertj-core:$version"
   }
 
-  object AutoValue {
-    private const val googleVersion = "1.7.2"
-    private const val gsonVersion = "1.3.0"
-
-    const val Annotation = "com.google.auto.value:auto-value-annotations:$googleVersion"
-    const val AutoValue = "com.google.auto.value:auto-value:$googleVersion"
-    const val GsonRuntime = "com.ryanharter.auto.value:auto-value-gson-runtime:$gsonVersion"
-    const val GsonExtension = "com.ryanharter.auto.value:auto-value-gson-extension:$gsonVersion"
-    const val GsonFactory = "com.ryanharter.auto.value:auto-value-gson-factory:$gsonVersion"
-  }
-
   object Criteo {
     object PublisherSdk {
       const val group = "com.criteo.publisher"
@@ -153,6 +142,13 @@ object Deps {
       private const val version = "1.2.3"
 
       const val Tape = "com.squareup:tape:$version"
+    }
+
+    object Moshi {
+      private const val version = "1.12.0"
+
+      const val Kapt = "com.squareup.moshi:moshi-kotlin-codegen:$version"
+      const val Adapter = "com.squareup.moshi:moshi-adapters:$version"
     }
   }
 }

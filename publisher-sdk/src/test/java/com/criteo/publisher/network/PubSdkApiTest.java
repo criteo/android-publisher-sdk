@@ -26,6 +26,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import androidx.annotation.NonNull;
+import com.criteo.publisher.csm.Metric;
 import com.criteo.publisher.csm.MetricRequest;
 import com.criteo.publisher.logging.RemoteLogRecords;
 import com.criteo.publisher.mock.MockedDependenciesRule;
@@ -144,7 +145,7 @@ public class PubSdkApiTest {
 
   @Test
   public void postCsm_GivenSerializedRequest_SendItWithPost() throws Exception {
-    MetricRequest request = mock(MetricRequest.class);
+    MetricRequest request = givenMetricRequest();
     String json = "{\"expectedJson\": 42}";
 
     givenSerializerWriting(request, json);
@@ -162,7 +163,7 @@ public class PubSdkApiTest {
 
   @Test
   public void postCsm_GivenConnectionError_ThrowIOException() throws Exception {
-    MetricRequest request = mock(MetricRequest.class);
+    MetricRequest request = givenMetricRequest();
 
     givenConnectionError();
 
@@ -171,7 +172,7 @@ public class PubSdkApiTest {
 
   @Test
   public void postCsm_GivenHttpError_ThrowIOException() throws Exception {
-    MetricRequest request = mock(MetricRequest.class);
+    MetricRequest request = givenMetricRequest();
 
     mockWebServer.enqueue(new MockResponse().setResponseCode(400));
 
@@ -182,7 +183,7 @@ public class PubSdkApiTest {
   public void postCsm_GivenLongRequestError_ThrowTimeoutError() throws Exception {
     when(buildConfigWrapper.getNetworkTimeoutInMillis()).thenReturn(10);
 
-    MetricRequest request = mock(MetricRequest.class);
+    MetricRequest request = givenMetricRequest();
 
     mockWebServer.enqueue(new MockResponse()
         .throttleBody(1, 100, TimeUnit.MILLISECONDS)
@@ -467,4 +468,7 @@ public class PubSdkApiTest {
     mockWebServer.shutdown();
   }
 
+  private MetricRequest givenMetricRequest() {
+    return new MetricRequest(new ArrayList<Metric>(), "1.2.3", 88);
+  }
 }

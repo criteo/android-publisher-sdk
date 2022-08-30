@@ -17,14 +17,16 @@
 package com.criteo.publisher.model
 
 import com.criteo.publisher.annotation.OpenForTesting
-import com.google.gson.annotations.SerializedName
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 
 @OpenForTesting
+@JsonClass(generateAdapter = true)
 data class Publisher(
-    @SerializedName("bundleId")
+    @Json(name = "bundleId")
     val bundleId: String,
-    @SerializedName("cpId")
+    @Json(name = "cpId")
     val criteoPublisherId: String,
-    @SerializedName("ext")
+    @Json(name = "ext")
     val ext: Map<String, Any>
 )

@@ -54,7 +54,7 @@ internal class MetricSendingTask(
     }
 
     return metricsPerProfile.mapKeys {
-      MetricRequest.create(
+      MetricRequest(
           it.value,
           sdkVersion,
           it.key

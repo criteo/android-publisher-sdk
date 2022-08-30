@@ -20,6 +20,7 @@ plugins {
     signing
     jacoco
     kotlin("android")
+    kotlin("kapt")
     id("kotlin-allopen")
     id("com.vanniktech.dependency.graph.generator") version "0.5.0"
     id("com.vanniktech.android.javadoc") version "0.3.0"
@@ -110,14 +111,8 @@ dependencies {
     compileOnly(Deps.Google.AdMob)
     compileOnly(Deps.Google.AdsIdentifier)
 
-    implementation(Deps.AutoValue.Annotation)
-    annotationProcessor(Deps.AutoValue.AutoValue)
-
-    implementation(Deps.AutoValue.GsonRuntime)
-    annotationProcessor(Deps.AutoValue.GsonExtension)
-
-    // Optional @GsonTypeAdapterFactory support
-    annotationProcessor(Deps.AutoValue.GsonFactory)
+    implementation(Deps.Square.Moshi.Adapter)
+    kapt(Deps.Square.Moshi.Kapt)
 
     implementation(Deps.Square.Picasso.Picasso)
 
@@ -131,6 +126,7 @@ dependencies {
     testImplementation(Deps.Kotlin.JUnit)
     testImplementation(Deps.Mockito.Kotlin)
     testImplementation(Deps.AndroidX.Annotations)
+    kaptTest(Deps.Square.Moshi.Kapt)
 
     androidTestImplementation(project(":test-utils"))
     androidTestImplementation(project(":publisher-sdk-tests"))
