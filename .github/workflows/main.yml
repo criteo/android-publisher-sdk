@@ -90,7 +90,11 @@ jobs:
               tag: 'playstore' # Explicitly need the PlayStore to fetch GAID
 
             - api: '31'
-              abi: 'x86_64' # x86 ABI is not yet available for API 31
+              abi: 'x86_64'
+              tag: 'google_apis'
+
+            - api: '32'
+              abi: 'x86_64'
               tag: 'google_apis'
     steps:
       - name: Checkout (latest)
@@ -181,7 +185,7 @@ jobs:
 
       - name: Upload XML reports for quality-tests
         uses: actions/upload-artifact@v2
-        if: matrix.api == '31' # Only report latest supported version
+        if: matrix.api == '32' # Only report latest supported version
         with:
           name: android-quality-reports
           path: |
