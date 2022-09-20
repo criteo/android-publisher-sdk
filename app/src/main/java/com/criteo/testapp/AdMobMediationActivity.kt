@@ -37,7 +37,6 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 import java.security.MessageDigest
-import java.util.Locale
 
 class AdMobMediationActivity : AppCompatActivity() {
 
@@ -75,7 +74,7 @@ class AdMobMediationActivity : AppCompatActivity() {
     // Google requires hashed(MD5) DEVICE_ID
     val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
         .toMD5()
-        .toUpperCase(Locale.ROOT)
+        .uppercase()
     MobileAds.setRequestConfiguration(
         RequestConfiguration.Builder()
             .setTestDeviceIds(listOf(deviceId))
@@ -87,7 +86,7 @@ class AdMobMediationActivity : AppCompatActivity() {
 
   private fun loadBanner() {
     val adView = AdView(this)
-    adView.adSize = AdSize.BANNER
+    adView.setAdSize(AdSize.BANNER)
     adView.adUnitId = ADMOB_BANNER
     adView.adListener = TestAppDfpAdListener(tag, "Banner")
 

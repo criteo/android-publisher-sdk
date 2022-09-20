@@ -1,5 +1,6 @@
 # Next Version
 - Add support of Android 12L (API level 32)
+- Bump AdMob to v21.2.0
 
 # Version 4.7.0
 - Deprecate API related to MoPub and stop supporting MoPub App Bidding
