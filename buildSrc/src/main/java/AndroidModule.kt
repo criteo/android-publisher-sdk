@@ -97,7 +97,7 @@ private fun Project.defaultAndroidModule() {
     compileSdkVersion(32)
 
     defaultConfig {
-      minSdkVersion(16)
+      minSdkVersion(19)
       targetSdkVersion(32)
       versionCode = 1
       versionName = sdkVersion()
