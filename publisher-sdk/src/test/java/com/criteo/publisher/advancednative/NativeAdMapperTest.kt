@@ -23,10 +23,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import com.criteo.publisher.activity.TopActivityFinder
 import com.criteo.publisher.adview.Redirection
-import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
 import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
-import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.model.nativeads.NativeAssets
 import com.criteo.publisher.model.nativeads.NativeProduct
 import com.criteo.publisher.network.PubSdkApi
@@ -37,7 +35,6 @@ import org.mockito.Answers
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.check
-import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
@@ -57,9 +54,6 @@ class NativeAdMapperTest {
   @Rule
   @JvmField
   val mockedDependenciesRule = MockedDependenciesRule()
-
-  @SpyBean
-  private lateinit var runOnUiThreadExecutor: RunOnUiThreadExecutor
 
   @MockBean
   private lateinit var visibilityTracker: VisibilityTracker
@@ -138,8 +132,6 @@ class NativeAdMapperTest {
     val view1 = mock<View>()
     val view2 = mock<View>()
 
-    givenDirectUiExecutor()
-
     // when
     val nativeAd = mapper.map(assets, WeakReference(listener), mock())
 
@@ -185,8 +177,6 @@ class NativeAdMapperTest {
       on { topActivityName } doReturn topActivity
     }
 
-    givenDirectUiExecutor()
-
     // when
     val nativeAd = mapper.map(assets, WeakReference(listener), mock())
     nativeAd.setProductClickableView(view1)
@@ -221,8 +211,6 @@ class NativeAdMapperTest {
     topActivityFinder.stub {
       on { topActivityName } doReturn topActivity
     }
-
-    givenDirectUiExecutor()
 
     // when
     val nativeAd = mapper.map(assets, WeakReference(listener), mock())
@@ -281,15 +269,6 @@ class NativeAdMapperTest {
       verify(nativeAd).watchForImpression(nativeView)
       verify(nativeAd).setProductClickableView(nativeView)
       verify(nativeAd).setAdChoiceClickableView(adChoiceView)
-    }
-  }
-
-  private fun givenDirectUiExecutor() {
-    runOnUiThreadExecutor.stub {
-      on { executeAsync(any()) } doAnswer {
-        val command: Runnable = it.getArgument(0)
-        command.run()
-      }
     }
   }
 }

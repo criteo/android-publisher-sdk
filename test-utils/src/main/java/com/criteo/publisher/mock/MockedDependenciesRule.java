@@ -297,7 +297,6 @@ public class MockedDependenciesRule implements MethodRule {
     injection.process(testInstance);
   }
 
-  @RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)
   private void resetAllPersistedData() {
     DependencyProvider dependencyProvider = dependencyProviderRef.get();
 

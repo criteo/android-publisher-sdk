@@ -63,6 +63,9 @@ public class DeviceUtil {
   }
 
   public boolean isVersionSupported() {
-    return android.os.Build.VERSION.SDK_INT >= 19;
+    // Currently minimum supported version is 19 and minSdk is set to 19
+    // return true since all versions starting from 19 are supported
+    // Use this mechanism to deprecate SDK version before raising minSdk version
+    return true;
   }
 }

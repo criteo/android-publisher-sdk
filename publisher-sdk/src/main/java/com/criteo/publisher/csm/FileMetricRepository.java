@@ -16,9 +16,7 @@
 
 package com.criteo.publisher.csm;
 
-import android.os.Build.VERSION_CODES;
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.util.MapUtilKt;
@@ -31,7 +29,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import kotlin.jvm.functions.Function0;
 
-@RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)
 class FileMetricRepository extends MetricRepository {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());

@@ -19,8 +19,6 @@ package com.criteo.publisher.model;
 import static com.criteo.publisher.model.DeviceInfoLogMessage.onErrorDuringWebViewUserAgentGet;
 
 import android.content.Context;
-import android.os.Build.VERSION;
-import android.os.Build.VERSION_CODES;
 import android.webkit.WebSettings;
 import androidx.annotation.NonNull;
 import androidx.annotation.VisibleForTesting;
@@ -102,12 +100,7 @@ public class DeviceInfo {
 
   @WorkerThread
   private String getWebViewUserAgent() {
-    if (VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN_MR1) {
-      return WebSettings.getDefaultUserAgent(context);
-    } else {
-      throw new UnsupportedOperationException(
-          "WebSettings.getDefaultUserAgent() is not supported on this API level");
-    }
+    return WebSettings.getDefaultUserAgent(context);
   }
 
   @NonNull

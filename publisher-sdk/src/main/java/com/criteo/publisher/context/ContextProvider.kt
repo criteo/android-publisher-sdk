@@ -109,7 +109,7 @@ internal class ContextProvider(
    * ## Definition
    * Physical width of the screen in pixels.
    */
-  internal fun fetchDeviceWidth(): Int? = fetchDevicePhysicalSize()?.x
+  internal fun fetchDeviceWidth(): Int? = fetchDevicePhysicalSize().x
 
   /**
    * OpenRTB field: `device.h`
@@ -117,13 +117,9 @@ internal class ContextProvider(
    * ## Definition
    * Physical height of the screen in pixels.
    */
-  internal fun fetchDeviceHeight(): Int? = fetchDevicePhysicalSize()?.y
+  internal fun fetchDeviceHeight(): Int? = fetchDevicePhysicalSize().y
 
-  private fun fetchDevicePhysicalSize(): Point? {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN_MR1) {
-      return null
-    }
-
+  private fun fetchDevicePhysicalSize(): Point {
     val point = Point()
     val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     windowManager.defaultDisplay.getRealSize(point)
