@@ -16,11 +16,9 @@
 
 package com.criteo.publisher.csm;
 
-import android.os.Build.VERSION_CODES;
 import android.util.AtomicFile;
 import androidx.annotation.GuardedBy;
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.csm.MetricRepository.MetricUpdater;
 import com.criteo.publisher.util.JsonSerializer;
@@ -39,7 +37,6 @@ import java.lang.ref.SoftReference;
  * <p>
  * So only, at most, one {@link SyncMetricFile} should exist for an underlying file.
  */
-@RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)
 class SyncMetricFile {
 
   @NonNull

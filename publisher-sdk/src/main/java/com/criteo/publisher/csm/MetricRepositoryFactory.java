@@ -17,14 +17,11 @@
 package com.criteo.publisher.csm;
 
 import android.content.Context;
-import android.os.Build.VERSION_CODES;
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import com.criteo.publisher.DependencyProvider.Factory;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.JsonSerializer;
 
-@RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)
 public class MetricRepositoryFactory implements Factory<MetricRepository> {
 
   @NonNull

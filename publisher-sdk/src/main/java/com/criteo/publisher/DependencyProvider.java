@@ -20,10 +20,8 @@ import static java.util.Arrays.asList;
 
 import android.app.Application;
 import android.content.Context;
-import android.os.Build.VERSION_CODES;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import com.criteo.publisher.AppEvents.AppEvents;
 import com.criteo.publisher.activity.TopActivityFinder;
 import com.criteo.publisher.advancednative.AdChoiceOverlay;
@@ -399,16 +397,14 @@ public class DependencyProvider {
       CompositeBidLifecycleListener listener = new CompositeBidLifecycleListener();
       listener.add(new LoggingBidLifecycleListener(provideRemoteLogSendingQueueConsumer()));
 
-      if (android.os.Build.VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN_MR1) {
-        listener.add(new CsmBidLifecycleListener(
-            provideMetricRepository(),
-            provideMetricSendingQueueProducer(),
-            provideClock(),
-            provideConfig(),
-            provideConsentData(),
-            provideThreadPoolExecutor()
-        ));
-      }
+      listener.add(new CsmBidLifecycleListener(
+          provideMetricRepository(),
+          provideMetricSendingQueueProducer(),
+          provideClock(),
+          provideConfig(),
+          provideConsentData(),
+          provideThreadPoolExecutor()
+      ));
 
       return listener;
     });
@@ -598,7 +594,6 @@ public class DependencyProvider {
   }
 
   @NonNull
-  @RequiresApi(api = VERSION_CODES.JELLY_BEAN_MR1)
   public MetricRepository provideMetricRepository() {
     return getOrCreate(MetricRepository.class, new MetricRepositoryFactory(
         provideContext(),

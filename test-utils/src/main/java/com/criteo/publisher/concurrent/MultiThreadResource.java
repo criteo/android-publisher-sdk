@@ -21,6 +21,7 @@ import android.os.Build.VERSION_CODES;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import com.criteo.publisher.application.InstrumentationUtil;
 import com.criteo.publisher.mock.DependencyProviderRef;
 import com.criteo.publisher.mock.TestDependencyProvider;
 import com.criteo.publisher.mock.TestResource;
@@ -54,6 +55,13 @@ public class MultiThreadResource implements TestResource {
 
     dependencyProvider.inject(Executor.class, trackingCommandsExecutor);
     dependencyProvider.inject(AsyncResources.class, trackingCommandsExecutor.asAsyncResources());
+    if (!InstrumentationUtil.isRunningInInstrumentationTest()) {
+      // Main Lopper is not available in unit tests, so just execute code on current thread
+      // By doing this we lose parallelism when posting tasks from background to UI thread
+      // Currently we don't have any unit tests which explicitly test parallel execution. RunOnUiThreadExecutor is
+      // only used when initializing Criteo and in NativeAdMapperTest
+      dependencyProvider.inject(RunOnUiThreadExecutor.class, new DirectMockRunOnUiThreadExecutor());
+    }
   }
 
   @Override
