@@ -46,6 +46,7 @@ data class RemoteLogRecords(
       @Json(name = "deviceOs") val deviceOs: String?
   )
 
+  @JsonClass(generateAdapter = false)
   enum class RemoteLogLevel {
     @Json(name = "Debug")
     DEBUG,
