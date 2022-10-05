@@ -1,5 +1,8 @@
 # Next Version
 
+# Version 4.8.1
+- Fix error on Criteo init
+
 # Version 4.8.0
 - Add support of Android 12L (API level 32)
 - Bump AdMob to v21.2.0
