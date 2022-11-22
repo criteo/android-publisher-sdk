@@ -95,14 +95,14 @@ maxSizeOfRemoteLogSendingQueue = 250 * 1024
 environments {
     debug {
         eventUrl = 'https://an.url.that.does.not.exist'
-        // eventUrl = 'https://gum.par.preprod.crto.in' // Uncomment to use preprod GUM
+        // eventUrl = 'https://gum.preprod.crto.in' // Uncomment to use preprod GUM
 
         // In tests, if DI rule is set, a CDB stub server is spawn and injected
         cdbUrl = 'https://an.url.that.does.not.exist'
 
         // Uncomment to use another CDB, you'll also need to deactivate the CDB stub in
         // MockedDependenciesRule
-        cdbUrl = 'https://directbidder-test-app.par.preprod.crto.in' // preprod
+        cdbUrl = 'https://directbidder-test-app.preprod.crto.in' // preprod
         // cdbUrl = 'http://10.0.2.2:9991' // local
 
         defaultMinLogLevel = 2 // All
