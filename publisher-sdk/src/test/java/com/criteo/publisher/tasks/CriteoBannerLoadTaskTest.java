@@ -69,7 +69,7 @@ public class CriteoBannerLoadTaskTest {
     verify(webView.getSettings()).setJavaScriptEnabled(true);
     verify(webView).setWebViewClient(webViewClient);
     verify(webView).loadDataWithBaseURL(
-        "",
+        "https://www.criteo.com",
         "myDisplayUrl: https://www.criteo.com",
         "text/html",
         "UTF-8",

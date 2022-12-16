@@ -116,6 +116,10 @@ dependencies {
 
     implementation(Deps.Square.Picasso.Picasso)
 
+    releaseImplementation(Deps.Criteo.MraidBridge.Release)
+    "stagingImplementation"(Deps.Criteo.MraidBridge.Release)
+    debugImplementation(Deps.Criteo.MraidBridge.Snapshot)
+
     testImplementation(project(":test-utils"))
     testImplementation(Deps.JUnit.JUnit)
     testImplementation(Deps.Mockito.Core)
