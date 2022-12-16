@@ -56,6 +56,13 @@ object Deps {
     object Mediation {
       fun AdMob(version: String) = "com.criteo.mediation.google:criteo-adapter-development:$version"
     }
+
+    object MraidBridge {
+      private const val version = "0.1.0"
+
+      const val Release = "com.criteo.publisher:mraid-bridge:$version"
+      const val Snapshot = "$Release-SNAPSHOT"
+    }
   }
 
   object Detekt {

@@ -65,7 +65,7 @@ public class CriteoBannerLoadTask extends SafeRunnable {
 
       webView.getSettings().setJavaScriptEnabled(true);
       webView.setWebViewClient(this.webViewClient);
-      webView.loadDataWithBaseURL("", finalDisplayUrl, "text/html", "UTF-8", "");
+      webView.loadDataWithBaseURL("https://www.criteo.com", finalDisplayUrl, "text/html", "UTF-8", "");
     }
   }
 
