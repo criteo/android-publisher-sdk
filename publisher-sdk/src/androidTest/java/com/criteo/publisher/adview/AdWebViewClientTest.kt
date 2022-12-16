@@ -14,123 +14,121 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.adview;
+package com.criteo.publisher.adview
 
-import static com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait;
-import static com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import android.content.Context
+import android.webkit.WebView
+import androidx.test.rule.ActivityTestRule
+import com.criteo.publisher.concurrent.ThreadingUtil
+import com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait
+import com.criteo.publisher.mock.MockedDependenciesRule
+import com.criteo.publisher.mock.SpyBean
+import com.criteo.publisher.test.activity.DummyActivity
+import com.criteo.publisher.view.WebViewClicker
+import com.criteo.publisher.view.WebViewLookup
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.mockito.ArgumentMatchers
+import org.mockito.Mock
+import org.mockito.kotlin.inOrder
+import org.mockito.kotlin.never
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoMoreInteractions
+import org.mockito.junit.MockitoJUnit
 
-import android.app.Activity;
-import android.content.Context;
-import android.webkit.WebView;
-import androidx.annotation.NonNull;
-import androidx.test.rule.ActivityTestRule;
-import com.criteo.publisher.mock.MockedDependenciesRule;
-import com.criteo.publisher.mock.SpyBean;
-import com.criteo.publisher.test.activity.DummyActivity;
-import com.criteo.publisher.view.WebViewClicker;
-import com.criteo.publisher.view.WebViewLookup;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-
-public class AdWebViewClientTest {
+class AdWebViewClientTest {
 
   @Rule
-  public MockitoRule mockitoRule = MockitoJUnit.rule();
+  @JvmField
+  val mockitoRule = MockitoJUnit.rule()
 
   @Rule
-  public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(DummyActivity.class);
+  @JvmField
+  val activityRule = ActivityTestRule(
+      DummyActivity::class.java
+  )
 
   @Rule
-  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+  @JvmField
+  val mockedDependenciesRule = MockedDependenciesRule()
 
-  private WebViewLookup lookup = new WebViewLookup();
-
-  private WebViewClicker clicker = new WebViewClicker();
+  private val lookup = WebViewLookup()
+  private val clicker = WebViewClicker()
 
   @SpyBean
-  private Context context;
+  private lateinit var context: Context
 
   @Mock
-  private RedirectionListener listener;
-
-  private WebView webView;
-
-  private AdWebViewClient webViewClient;
+  private lateinit var listener: RedirectionListener
+  private lateinit var webView: WebView
+  private lateinit var webViewClient: AdWebViewClient
 
   @Before
-  public void setUp() throws Exception {
-    webViewClient = spy(new AdWebViewClient(
-        listener,
-        activityRule.getActivity().getComponentName()
-    ));
+  fun setUp() {
+    webViewClient = spy(
+        AdWebViewClient(
+            listener,
+            activityRule.activity.componentName
+        )
+    )
 
-    webView = callOnMainThreadAndWait(() -> {
-      WebView view = new WebView(context);
-      view.getSettings().setJavaScriptEnabled(true);
-      view.setWebViewClient(webViewClient);
-      return view;
-    });
+    webView = ThreadingUtil.callOnMainThreadAndWait {
+      val view = WebView(context)
+      view.settings.javaScriptEnabled = true
+      view.webViewClient = webViewClient
+      view
+    }
   }
 
   @Test
-  public void whenUserClickOnAd_GivenHttpUrl_OpenActivityAndNotifyListener() throws Exception {
+  fun whenUserClickOnAd_GivenHttpUrl_OpenActivityAndNotifyListener() {
     // We assume that there is a browser installed on the test device.
+    whenUserClickOnAd("https://criteo.com")
 
-    whenUserClickOnAd("https://criteo.com");
-
-    verify(context).startActivity(any());
-    verify(listener).onUserRedirectedToAd();
-    verifyNoMoreInteractions(listener);
+    verify(context).startActivity(ArgumentMatchers.any())
+    verify(listener).onUserRedirectedToAd()
+    verifyNoMoreInteractions(listener)
   }
 
   @Test
-  public void whenUserClickOnAd_GivenDeepLinkAndInstalledAppToHandleIt_OpenActivityAndNotifyListener() throws Exception {
-    whenUserClickOnAd("criteo-test://dummy-ad-activity");
+  fun whenUserClickOnAd_GivenDeepLinkAndInstalledAppToHandleIt_OpenActivityAndNotifyListener() {
+    whenUserClickOnAd("criteo-test://dummy-ad-activity")
 
-    verify(context).startActivity(any());
-    verify(listener).onUserRedirectedToAd();
-    verifyNoMoreInteractions(listener);
+    verify(context).startActivity(ArgumentMatchers.any())
+    verify(listener).onUserRedirectedToAd()
+    verifyNoMoreInteractions(listener)
   }
 
   @Test
-  public void whenUserClickOnAd_GivenTargetAppIsNotInstalled_DontThrowActivityNotFoundAndDoNotRedirectUser() throws Exception {
+  fun whenUserClickOnAd_GivenTargetAppIsNotInstalled_DontThrowActivityNotFoundAndDoNotRedirectUser() {
     // We assume that no application can handle such URL.
+    whenUserClickOnAd("fake-deeplink://fakeappdispatch")
 
-    whenUserClickOnAd("fake-deeplink://fakeappdispatch");
-
-    verify(context, never()).startActivity(any());
-    verifyNoMoreInteractions(listener);
+    verify(context, never()).startActivity(ArgumentMatchers.any())
+    verifyNoMoreInteractions(listener)
   }
 
   @Test
-  public void whenUserClickOnAdAndGoBack_GivenDeepLinkAndInstalledAppToHandleIt_NotifyListener() throws Exception {
-    Activity activity = lookup.lookForResumedActivity(() -> {
-      whenUserClickOnAd("criteo-test://dummy-ad-activity");
-    }).get();
+  fun whenUserClickOnAdAndGoBack_GivenDeepLinkAndInstalledAppToHandleIt_NotifyListener() {
+    val activity = lookup.lookForResumedActivity {
+      whenUserClickOnAd(
+          "criteo-test://dummy-ad-activity"
+      )
+    }.get()
 
-    lookup.lookForResumedActivity(() -> {
-      runOnMainThreadAndWait(activity::onBackPressed);
-    }).get();
+    lookup.lookForResumedActivity {
+      runOnMainThreadAndWait { activity.onBackPressed() }
+    }.get()
 
-    InOrder inOrder = inOrder(listener);
-    inOrder.verify(listener).onUserRedirectedToAd();
-    inOrder.verify(listener).onUserBackFromAd();
-    inOrder.verifyNoMoreInteractions();
+    val inOrder = inOrder(listener)
+    inOrder.verify(listener).onUserRedirectedToAd()
+    inOrder.verify(listener).onUserBackFromAd()
+    inOrder.verifyNoMoreInteractions()
   }
 
-  private void whenUserClickOnAd(@NonNull String url) throws Exception {
-    clicker.loadHtmlAndSimulateClickOnAd(webView, url);
+  private fun whenUserClickOnAd(url: String) {
+    clicker.loadHtmlAndSimulateClickOnAd(webView, url)
   }
-
 }

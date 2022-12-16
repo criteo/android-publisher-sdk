@@ -14,40 +14,24 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.adview;
+package com.criteo.publisher.adview
 
-import android.content.ComponentName;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.criteo.publisher.DependencyProvider;
+import android.content.ComponentName
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import com.criteo.publisher.DependencyProvider
+import com.criteo.publisher.annotation.OpenForTesting
 
-public class AdWebViewClient extends WebViewClient {
+@OpenForTesting
+class AdWebViewClient(
+    private val listener: RedirectionListener,
+    private val hostActivityName: ComponentName?
+) : WebViewClient() {
 
-  @NonNull
-  private final RedirectionListener listener;
+  private val redirection: Redirection = DependencyProvider.getInstance().provideRedirection()
 
-  @Nullable
-  private final ComponentName hostActivityName;
-
-  @NonNull
-  private final Redirection redirection;
-
-  public AdWebViewClient(
-      @NonNull RedirectionListener listener,
-      @Nullable ComponentName hostActivityName
-  ) {
-    this.listener = listener;
-    this.hostActivityName = hostActivityName;
-    this.redirection = DependencyProvider.getInstance().provideRedirection();
+  override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+    redirection.redirect(url.orEmpty(), hostActivityName, listener)
+    return true
   }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public boolean shouldOverrideUrlLoading(WebView view, String url) {
-    redirection.redirect(url, hostActivityName, listener);
-    return true;
-  }
-
 }
