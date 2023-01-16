@@ -35,6 +35,7 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.adview.AdWebView;
 import com.criteo.publisher.adview.AdWebViewClient;
 import com.criteo.publisher.adview.RedirectionListener;
 import com.criteo.publisher.logging.Logger;
@@ -71,7 +72,7 @@ public class CriteoInterstitialActivity extends Activity {
       is created via the XML file. In order to avoid leaking the Activity context, a workaround
       consists in creating the WebView by hand by passing the Application context instead.
      */
-    webView = new WebView(getApplicationContext());
+    webView = new AdWebView(getApplicationContext());
     adLayout.addView(webView, 0);
 
     ImageButton closeButton = findViewById(R.id.closeButton);

@@ -30,13 +30,18 @@ import com.criteo.publisher.logging.LoggerFactory
 import java.io.IOException
 
 @OpenForTesting
-class AdWebViewClient(
+internal class AdWebViewClient(
     private val listener: RedirectionListener,
     private val hostActivityName: ComponentName?
 ) : WebViewClient() {
 
   private val redirection: Redirection = DependencyProvider.getInstance().provideRedirection()
   private val logger = LoggerFactory.getLogger(javaClass)
+  private var adWebViewClientListener: AdWebViewClientListener? = null
+
+  fun setAdWebViewClientListener(listener: AdWebViewClientListener) {
+    adWebViewClientListener = listener
+  }
 
   override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
     redirection.redirect(url.orEmpty(), hostActivityName, listener)
@@ -54,6 +59,11 @@ class AdWebViewClient(
   ): WebResourceResponse? {
     val url = request?.url?.toString().orEmpty()
     return shouldInterceptRequest(view.context, url)
+  }
+
+  override fun onPageFinished(view: WebView?, url: String?) {
+    super.onPageFinished(view, url)
+    adWebViewClientListener?.onPageFinished()
   }
 
   private fun shouldInterceptRequest(context: Context, url: String): WebResourceResponse? {

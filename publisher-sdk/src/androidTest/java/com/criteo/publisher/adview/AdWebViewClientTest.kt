@@ -20,14 +20,15 @@ import android.content.Context
 import android.webkit.WebView
 import androidx.test.rule.ActivityTestRule
 import com.criteo.publisher.MraidData
+import com.criteo.publisher.callMraidObjectBlocking
 import com.criteo.publisher.concurrent.ThreadingUtil
 import com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait
+import com.criteo.publisher.loadMraidHtml
 import com.criteo.publisher.logging.Logger
 import com.criteo.publisher.mock.MockBean
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.test.activity.DummyActivity
-import com.criteo.publisher.util.CompletableFuture
 import com.criteo.publisher.view.WebViewClicker
 import com.criteo.publisher.view.WebViewLookup
 import org.assertj.core.api.Assertions.assertThat
@@ -36,13 +37,13 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mock
+import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.never
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
-import org.mockito.junit.MockitoJUnit
 import java.io.IOException
 
 class AdWebViewClientTest {
@@ -74,24 +75,21 @@ class AdWebViewClientTest {
   @Mock
   private lateinit var listener: RedirectionListener
   private lateinit var webView: WebView
-  private lateinit var webViewClient: AdWebViewClient
-  private val pageFinishedLoading = CompletableFuture<Unit>()
+  private lateinit var webViewClient: TestAdWebViewClient
+
+  @MockBean
+  private lateinit var mraidInteractor: MraidInteractor
 
   @Before
   fun setUp() {
     webViewClient = spy(
-        object : AdWebViewClient(
+        TestAdWebViewClient(
             listener,
             activityRule.activity.componentName
-        ) {
-          override fun onPageFinished(view: WebView?, url: String?) {
-            super.onPageFinished(view, url)
-            pageFinishedLoading.complete(Unit)
-          }
-        }
+        )
     )
     webView = ThreadingUtil.callOnMainThreadAndWait {
-      val view = WebView(context)
+      val view = AdWebView(context)
       view.settings.javaScriptEnabled = true
       view.webViewClient = webViewClient
       view
@@ -148,7 +146,7 @@ class AdWebViewClientTest {
   fun whenHtmlWithMraidIsLoaded_GivenMraidInScriptTag_ShouldLoadMraidScript() {
     val mraidHtml = mraidData.getHtmlWithMraidScriptTag()
 
-    loadHtml(mraidHtml)
+    webView.loadMraidHtml(mraidHtml)
     waitForPageToFinishLoading()
 
     verifyMraidObjectAvailable()
@@ -158,7 +156,7 @@ class AdWebViewClientTest {
   fun whenHtmlWithMraidIsLoaded_GivenMraidViaDocumentWrite_ShouldLoadMraidScript() {
     val mraidHtml = mraidData.getHtmlWithDocumentWriteMraidScriptTag()
 
-    loadHtml(mraidHtml)
+    webView.loadMraidHtml(mraidHtml)
     waitForPageToFinishLoading()
 
     verifyMraidObjectAvailable()
@@ -168,7 +166,7 @@ class AdWebViewClientTest {
   fun whenHtmlWithoutMraidIsLoaded_GivenHtmlWithoutMraidScript_ShouldNotLoadMraidObject() {
     val html = mraidData.getHtmlWithoutMraidScript()
 
-    loadHtml(html)
+    webView.loadMraidHtml(html)
     waitForPageToFinishLoading()
 
     verifyMraidObjectNotAvailable()
@@ -180,22 +178,20 @@ class AdWebViewClientTest {
     val thrownException = IOException()
     whenever(context.assets.open("criteo-mraid.js")).thenAnswer { throw thrownException }
 
-    loadHtml(mraidHtml)
+    webView.loadMraidHtml(mraidHtml)
     waitForPageToFinishLoading()
 
     verify(logger).log(MraidLogMessage.onErrorDuringMraidFileInject(thrownException))
   }
 
-  private fun loadHtml(html: String) {
-    runOnMainThreadAndWait {
-      webView.loadDataWithBaseURL(
-          "https://www.criteo.com",
-          html,
-          "text/html",
-          "UTF-8",
-          ""
-      )
-    }
+  @Test
+  fun whenHtmlWithMraidIsLoaded_GivenPageFinished_ShouldCallMraidInteractor() {
+    val mraidData = mraidData.getHtmlWithMraidScriptTag()
+
+    webView.loadMraidHtml(mraidData)
+    waitForPageToFinishLoading()
+
+    verify(mraidInteractor).notifyReady()
   }
 
   private fun verifyMraidObjectAvailable() {
@@ -210,20 +206,12 @@ class AdWebViewClientTest {
     }
   }
 
-  private fun verifyMraidObject(assertion: (String) -> Unit) {
-    val mraidResult = CompletableFuture<String>()
-    runOnMainThreadAndWait {
-      webView.evaluateJavascript(
-          "javascript:window.mraid",
-          mraidResult::complete
-      )
-    }
-    assertion(mraidResult.get())
-
+  private fun verifyMraidObject(code: String = "", assertion: (String) -> Unit) {
+    assertion(webView.callMraidObjectBlocking(code))
   }
 
   private fun waitForPageToFinishLoading() {
-    pageFinishedLoading.get()
+    webViewClient.waitForPageToFinishLoading()
   }
 
   private fun whenUserClickOnAd(url: String) {

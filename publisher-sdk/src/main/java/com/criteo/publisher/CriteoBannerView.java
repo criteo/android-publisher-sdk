@@ -21,11 +21,11 @@ import static com.criteo.publisher.ErrorLogMessage.onUncaughtErrorAtPublicApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.webkit.WebView;
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
+import com.criteo.publisher.adview.AdWebView;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
@@ -36,7 +36,7 @@ import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.util.PreconditionsUtil;
 
 @Keep
-public class CriteoBannerView extends WebView {
+public class CriteoBannerView extends AdWebView {
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
   private static final int UNSET_DIMENSION_VALUE = -1;
