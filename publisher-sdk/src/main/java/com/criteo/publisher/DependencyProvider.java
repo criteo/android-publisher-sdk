@@ -20,6 +20,7 @@ import static java.util.Arrays.asList;
 
 import android.app.Application;
 import android.content.Context;
+import android.webkit.WebView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.criteo.publisher.AppEvents.AppEvents;
@@ -35,6 +36,7 @@ import com.criteo.publisher.advancednative.NativeAdMapper;
 import com.criteo.publisher.advancednative.RendererHelper;
 import com.criteo.publisher.advancednative.VisibilityChecker;
 import com.criteo.publisher.advancednative.VisibilityTracker;
+import com.criteo.publisher.adview.MraidInteractor;
 import com.criteo.publisher.adview.Redirection;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.bid.CompositeBidLifecycleListener;
@@ -728,6 +730,11 @@ public class DependencyProvider {
   @NonNull
   public ConsentData provideConsentData() {
     return getOrCreate(ConsentData.class, () -> new ConsentData(provideSharedPreferencesFactory().getInternal()));
+  }
+
+  @NonNull
+  public MraidInteractor provideMraidInteractor(WebView webView) {
+    return new MraidInteractor(webView);
   }
 
   public interface Factory<T> {
