@@ -1,4 +1,5 @@
 # Next Version
+- Add support of Android 13 (API level 33)
 
 # Version 4.8.1
 - Fix error on Criteo init
