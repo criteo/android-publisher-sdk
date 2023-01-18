@@ -94,11 +94,11 @@ fun Project.androidLibModule(configure: AndroidModule.() -> Unit = {}) {
 
 private fun Project.defaultAndroidModule() {
   androidBase {
-    compileSdkVersion(32)
+    compileSdkVersion(33)
 
     defaultConfig {
       minSdkVersion(19)
-      targetSdkVersion(32)
+      targetSdkVersion(33)
       versionCode = 1
       versionName = sdkVersion()
       testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
