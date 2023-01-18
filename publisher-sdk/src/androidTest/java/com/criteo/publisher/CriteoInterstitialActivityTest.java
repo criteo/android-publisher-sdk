@@ -203,7 +203,7 @@ public class CriteoInterstitialActivityTest {
   private CriteoInterstitialActivity givenOpenedInterstitialActivity(@NonNull String html) throws Exception {
     Activity activity = lookup.lookForResumedActivity(() -> {
       InterstitialListenerNotifier listenerNotifier = new InterstitialListenerNotifier(
-          mock(CriteoInterstitial.class),
+          new CriteoInterstitial(),
           listener,
           runOnUiThreadExecutor
       );
