@@ -66,7 +66,7 @@ object Deps {
   }
 
   object Detekt {
-    const val version = "1.19.0"
+    const val version = "1.22.0"
     const val DetektFormatting = "io.gitlab.arturbosch.detekt:detekt-formatting:$version"
   }
 
