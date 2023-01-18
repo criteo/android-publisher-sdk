@@ -77,7 +77,9 @@ data class MetricRequest internal constructor(
       ): Long? {
         return if (leftOperand == null || rightOperand == null) {
           null
-        } else leftOperand - rightOperand
+        } else {
+          leftOperand - rightOperand
+        }
       }
     }
   }
