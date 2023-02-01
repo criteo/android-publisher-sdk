@@ -13,17 +13,16 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.criteo.publisher.advancednative
 
-package com.criteo.publisher.advancednative;
+import com.criteo.publisher.annotation.OpenForTesting
 
-import android.view.View;
-
-interface VisibilityListener {
-
+@OpenForTesting
+internal interface VisibilityListener {
   /**
    * Invoked callback in case a
-   * {@linkplain VisibilityTracker#watch(View, VisibilityListener) watched view} was detected as
+   * [watched view][VisibilityTracker.watch] was detected as
    * visible.
    */
-  void onVisible();
+  fun onVisible()
 }

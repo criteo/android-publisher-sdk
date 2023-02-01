@@ -13,43 +13,31 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.criteo.publisher.advancednative
 
-package com.criteo.publisher.advancednative;
+import android.view.View
+import android.view.ViewTreeObserver
+import androidx.annotation.GuardedBy
+import androidx.annotation.VisibleForTesting
+import com.criteo.publisher.annotation.OpenForTesting
+import java.lang.ref.Reference
+import java.lang.ref.WeakReference
+import java.util.WeakHashMap
 
-import android.view.View;
-import android.view.ViewTreeObserver;
-import android.view.ViewTreeObserver.OnPreDrawListener;
-import androidx.annotation.GuardedBy;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-import java.util.Map;
-import java.util.WeakHashMap;
-
-public class VisibilityTracker {
-
-  @NonNull
-  private final VisibilityChecker visibilityChecker;
-
-  @NonNull
+@OpenForTesting
+internal class VisibilityTracker(private val visibilityChecker: VisibilityChecker) {
   @GuardedBy("lock")
-  private final Map<View, VisibilityTrackingTask> trackedViews = new WeakHashMap<>();
-
-  private final Object lock = new Object();
-
-  public VisibilityTracker(@NonNull VisibilityChecker visibilityChecker) {
-    this.visibilityChecker = visibilityChecker;
-  }
+  private val trackedViews: MutableMap<View, VisibilityTrackingTask> = WeakHashMap()
+  private val lock = Any()
 
   /**
-   * Add the given {@link View} to the set of watched views.
-   * <p>
-   * As long as this view live, if at one moment it is drawn and {@linkplain
-   * VisibilityChecker#isVisible(View) visible} on user screen, then the given listener will be
+   * Add the given [View] to the set of watched views.
+   *
+   *
+   * As long as this view live, if at one moment it is drawn and [ ][VisibilityChecker.isVisible] on user screen, then the given listener will be
    * invoked.
-   * <p>
+   *
+   *
    * It is safe to call again this method with the same view and listener, and it is also same to
    * call again with the same view and an other listener. For a given view, only the last registered
    * listener will be invoked. Hence, when having recycled view, you do not need to clean it
@@ -58,84 +46,65 @@ public class VisibilityTracker {
    * @param view     new or recycle view to watch for visibility
    * @param listener listener to trigger once visibility is detected
    */
-  void watch(@NonNull View view, @NonNull VisibilityListener listener) {
-    VisibilityTrackingTask trackingTask;
-
-    synchronized (lock) {
-      trackingTask = trackedViews.get(view);
+  fun watch(view: View, listener: VisibilityListener) {
+    var trackingTask: VisibilityTrackingTask?
+    synchronized(lock) {
+      trackingTask = trackedViews[view]
       if (trackingTask == null) {
-        trackingTask = startTrackingNewView(view);
-        trackedViews.put(view, trackingTask);
+        trackingTask = startTrackingNewView(view)
+        trackedViews[view] = trackingTask!!
       }
     }
-
-    trackingTask.setListener(listener);
+    trackingTask!!.setListener(listener)
   }
 
-  @NonNull
-  private VisibilityTrackingTask startTrackingNewView(@NonNull View view) {
-    return new VisibilityTrackingTask(new WeakReference<>(view), visibilityChecker);
+  private fun startTrackingNewView(view: View): VisibilityTrackingTask {
+    return VisibilityTrackingTask(
+        WeakReference(view),
+        visibilityChecker
+    )
   }
 
   @VisibleForTesting
-  static class VisibilityTrackingTask implements OnPreDrawListener {
+  internal class VisibilityTrackingTask(
+      private val trackedViewRef: Reference<View>,
+      private val visibilityChecker: VisibilityChecker
+  ) :
+      ViewTreeObserver.OnPreDrawListener {
+    @Volatile
+    private var listener: VisibilityListener? = null
 
-    @NonNull
-    private final Reference<View> trackedViewRef;
-
-    @NonNull
-    private final VisibilityChecker visibilityChecker;
-
-    @Nullable
-    private volatile VisibilityListener listener = null;
-
-    VisibilityTrackingTask(@NonNull Reference<View> viewRef, @NonNull VisibilityChecker visibilityChecker) {
-      this.trackedViewRef = viewRef;
-      this.visibilityChecker = visibilityChecker;
-
-      setUpObserver();
+    init {
+      setUpObserver()
     }
 
-    private void setUpObserver() {
-      View view = trackedViewRef.get();
-      if (view == null) {
-        return;
-      }
-
-      ViewTreeObserver observer = view.getViewTreeObserver();
-      if (observer.isAlive()) {
-        observer.addOnPreDrawListener(this);
+    private fun setUpObserver() {
+      val view = trackedViewRef.get() ?: return
+      val observer = view.viewTreeObserver
+      if (observer.isAlive) {
+        observer.addOnPreDrawListener(this)
       }
     }
 
-    void setListener(@Nullable VisibilityListener listener) {
-      this.listener = listener;
+    fun setListener(listener: VisibilityListener?) {
+      this.listener = listener
     }
 
-    @Override
-    public boolean onPreDraw() {
+    override fun onPreDraw(): Boolean {
       if (shouldTrigger()) {
-        triggerListener();
+        triggerListener()
       }
-      return true;
+      return true
     }
 
-    private boolean shouldTrigger() {
-      View trackedView = trackedViewRef.get();
-      if (trackedView == null) {
-        return false;
-      }
-
-      return visibilityChecker.isVisible(trackedView);
+    private fun shouldTrigger(): Boolean {
+      val trackedView = trackedViewRef.get() ?: return false
+      return visibilityChecker.isVisible(trackedView)
     }
 
-    private void triggerListener() {
-      VisibilityListener listener = this.listener;
-
-      if (listener != null) {
-        listener.onVisible();
-      }
+    private fun triggerListener() {
+      val listener = listener
+      listener?.onVisible()
     }
   }
-
 }
