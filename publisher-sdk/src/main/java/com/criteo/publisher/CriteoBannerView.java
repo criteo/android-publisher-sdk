@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.adview.AdWebView;
+import com.criteo.publisher.adview.MraidPlacementType;
 import com.criteo.publisher.context.ContextData;
 import com.criteo.publisher.integration.Integration;
 import com.criteo.publisher.integration.IntegrationRegistry;
@@ -168,6 +169,12 @@ public class CriteoBannerView extends AdWebView {
     } catch (Throwable tr) {
       logger.log(onUncaughtErrorAtPublicApi(tr));
     }
+  }
+
+  @NonNull
+  @Override
+  protected MraidPlacementType getPlacementType() {
+    return MraidPlacementType.INLINE;
   }
 
   private void doLoadAd(@Nullable Bid bid) {

@@ -16,6 +16,7 @@
 
 package com.criteo.publisher.concurrent;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -90,4 +91,34 @@ public class RunOnUiThreadExecutorTest {
     assertTrue(latch2.await(1, TimeUnit.SECONDS));
   }
 
+  @Test
+  public void executeAsyncWithDelay_GivenCommandWhenOnOtherThread_ExecuteItAsyncOnMainThreadAfterDelay()
+      throws InterruptedException {
+    CountDownLatch latch = new CountDownLatch(1);
+    executor.executeAsync(() -> {
+      assertSame(Thread.currentThread(), Looper.getMainLooper().getThread());
+      latch.countDown();
+    }, 1000);
+
+    assertTrue(latch.await(2, TimeUnit.SECONDS));
+  }
+
+  @Test
+  public void executeAsyncWithDelayAndCancel_GivenCommandWhenOnOtherThread_ShouldNotExecuteCommand()
+      throws InterruptedException {
+    CountDownLatch latch = new CountDownLatch(1);
+    Runnable command = () -> {
+      assertSame(Thread.currentThread(), Looper.getMainLooper().getThread());
+      latch.countDown();
+    };
+    executor.executeAsync(command, 1000);
+    executor.cancel(command);
+
+    assertFalse(latch.await(2, TimeUnit.SECONDS));
+  }
+
+  @Test
+  public void cancelWithoutExecuting_ShouldNotThrow() {
+    executor.cancel(() -> {});
+  }
 }

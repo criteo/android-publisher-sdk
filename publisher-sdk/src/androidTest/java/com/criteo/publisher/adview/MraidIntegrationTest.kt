@@ -55,7 +55,7 @@ class MraidIntegrationTest {
 
   @Mock
   private lateinit var listener: RedirectionListener
-  private lateinit var webView: WebView
+  private lateinit var webView: AdWebView
   private lateinit var webViewClient: TestAdWebViewClient
 
   private val mraidData = MraidData()
@@ -85,5 +85,20 @@ class MraidIntegrationTest {
 
     val state = webView.callMraidObjectBlocking("getState()")
     assertThat(state).isEqualTo("\"default\"")
+  }
+
+  @Test
+  fun whenHtmlWithMraidIsLoaded_GivenViewIsVisible_ShouldHaveIsViewableAsTrue() {
+    val mraidHtml = mraidData.getHtmlWithMraidScriptTag()
+
+    webView.loadMraidHtml(mraidHtml)
+    webViewClient.waitForPageToFinishLoading()
+    ThreadingUtil.callOnMainThreadAndWait {
+      webView.onVisible()
+    }
+
+    val isViewable = webView.callMraidObjectBlocking("isViewable()")
+    assertThat(isViewable).isEqualTo("true")
+
   }
 }

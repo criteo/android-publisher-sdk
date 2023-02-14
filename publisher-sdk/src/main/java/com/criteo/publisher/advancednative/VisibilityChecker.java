@@ -22,6 +22,8 @@ import androidx.annotation.NonNull;
 
 public class VisibilityChecker {
 
+  private Rect rect = new Rect();
+
   /**
    * Detect the visibility on screen of the given view.
    * <p>
@@ -42,6 +44,6 @@ public class VisibilityChecker {
 
     // FIXME EE-931 Handle when the given view is completely covered by other views.
 
-    return view.getGlobalVisibleRect(new Rect());
+    return view.getGlobalVisibleRect(rect);
   }
 }

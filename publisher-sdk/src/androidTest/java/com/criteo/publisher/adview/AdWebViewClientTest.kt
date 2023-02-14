@@ -38,6 +38,7 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnit
+import org.mockito.kotlin.any
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.never
 import org.mockito.kotlin.spy
@@ -143,6 +144,11 @@ class AdWebViewClientTest {
   }
 
   @Test
+  fun whenWebViewClientIsCreated_ShouldReturnFalseForIsMraidAd() {
+    assertThat(webViewClient.isMraidAd()).isFalse
+  }
+
+  @Test
   fun whenHtmlWithMraidIsLoaded_GivenMraidInScriptTag_ShouldLoadMraidScript() {
     val mraidHtml = mraidData.getHtmlWithMraidScriptTag()
 
@@ -150,6 +156,16 @@ class AdWebViewClientTest {
     waitForPageToFinishLoading()
 
     verifyMraidObjectAvailable()
+  }
+
+  @Test
+  fun whenHtmlWithMraidIsLoaded_GivenMraidInScriptTag_ShouldReturnTrueForIsMraidAd() {
+    val mraidHtml = mraidData.getHtmlWithMraidScriptTag()
+
+    webView.loadMraidHtml(mraidHtml)
+    waitForPageToFinishLoading()
+
+    assertThat(webViewClient.isMraidAd()).isTrue
   }
 
   @Test
@@ -173,6 +189,16 @@ class AdWebViewClientTest {
   }
 
   @Test
+  fun whenHtmlWithoutMraidIsLoaded_GivenHtmlWithoutMraidScript_ShouldReturnFalseForIsMraidAd() {
+    val html = mraidData.getHtmlWithoutMraidScript()
+
+    webView.loadMraidHtml(html)
+    waitForPageToFinishLoading()
+
+    assertThat(webViewClient.isMraidAd()).isFalse
+  }
+
+  @Test
   fun whenHtmlWithMraidIsLoaded_GivenAssetsThrowIOException_ShouldLogError() {
     val mraidHtml = mraidData.getHtmlWithDocumentWriteMraidScriptTag()
     val thrownException = IOException()
@@ -191,7 +217,7 @@ class AdWebViewClientTest {
     webView.loadMraidHtml(mraidData)
     waitForPageToFinishLoading()
 
-    verify(mraidInteractor).notifyReady()
+    verify(mraidInteractor).notifyReady(any())
   }
 
   private fun verifyMraidObjectAvailable() {

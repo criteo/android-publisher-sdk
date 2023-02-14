@@ -38,10 +38,13 @@ internal class AdWebViewClient(
   private val redirection: Redirection = DependencyProvider.getInstance().provideRedirection()
   private val logger = LoggerFactory.getLogger(javaClass)
   private var adWebViewClientListener: AdWebViewClientListener? = null
+  private var isMraidAd = false
 
   fun setAdWebViewClientListener(listener: AdWebViewClientListener) {
     adWebViewClientListener = listener
   }
+
+  fun isMraidAd(): Boolean = isMraidAd
 
   override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
     redirection.redirect(url.orEmpty(), hostActivityName, listener)
@@ -71,6 +74,7 @@ internal class AdWebViewClient(
       try {
         val stream = context.assets.open(MRAID_FILENAME)
 
+        isMraidAd = true
         WebResourceResponse("text/javascript", "UTF-8", stream)
       } catch (e: IOException) {
         logger.log(MraidLogMessage.onErrorDuringMraidFileInject(e))

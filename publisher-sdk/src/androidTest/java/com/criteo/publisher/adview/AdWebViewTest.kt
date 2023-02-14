@@ -27,9 +27,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnit
+import org.mockito.kotlin.any
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
+import org.mockito.kotlin.whenever
 import javax.inject.Inject
 
 class AdWebViewTest {
@@ -73,10 +75,37 @@ class AdWebViewTest {
   }
 
   @Test
-  fun whenOnPageFinished_ShouldDelegateToMraidInteractor() {
+  fun whenMraidAdAndOnPageFinished_ShouldDelegateToMraidInteractor() {
+    whenever(adWebViewClient.isMraidAd()).thenReturn(true)
     webView.onPageFinished()
 
-    verify(mraidInteractor).notifyReady()
+    verify(mraidInteractor).notifyReady(any())
     verifyNoMoreInteractions(mraidInteractor)
+  }
+
+  @Test
+  fun whenNotMraidAdAndOnPageFinished_ShouldNotInteractWithMraidInteractor() {
+    whenever(adWebViewClient.isMraidAd()).thenReturn(false)
+    webView.onPageFinished()
+
+    verifyNoMoreInteractions(mraidInteractor)
+  }
+
+  @Test
+  fun whenOnVisible_ShouldDelegateToMraidInteractor() {
+    whenever(adWebViewClient.isMraidAd()).thenReturn(true)
+
+    webView.onVisible()
+
+    verify(mraidInteractor).setIsViewable(true)
+  }
+
+  @Test
+  fun whenOnGone_ShouldDelegateToMraidInteractor() {
+    whenever(adWebViewClient.isMraidAd()).thenReturn(true)
+
+    webView.onGone()
+
+    verify(mraidInteractor).setIsViewable(false)
   }
 }

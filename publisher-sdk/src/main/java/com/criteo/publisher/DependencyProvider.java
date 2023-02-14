@@ -435,7 +435,8 @@ public class DependencyProvider {
   @NonNull
   public VisibilityTracker provideVisibilityTracker() {
     return getOrCreate(VisibilityTracker.class, () -> new VisibilityTracker(
-        new VisibilityChecker()
+        new VisibilityChecker(),
+        provideRunOnUiThreadExecutor()
     ));
   }
 

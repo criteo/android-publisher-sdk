@@ -42,10 +42,18 @@ class MraidInteractorTest {
   }
 
   @Test
-  fun whenNotifyReady_ShouldEvaluateNotifyReadyOnMraidObject() {
-    mraidInteractor.notifyReady()
+  fun whenNotifyReadyWithInlinePlacement_ShouldEvaluateNotifyReadyOnMraidObject() {
+    mraidInteractor.notifyReady(MraidPlacementType.INLINE)
 
-    verify(webView).evaluateJavascript("window.mraid.notifyReady()", null)
+    verify(webView).evaluateJavascript("window.mraid.notifyReady(\"inline\")", null)
+    verifyNoMoreInteractions(webView)
+  }
+
+  @Test
+  fun whenNotifyReadyWithInterstitialPlacement_ShouldEvaluateNotifyReadyOnMraidObject() {
+    mraidInteractor.notifyReady(MraidPlacementType.INTERSTITIAL)
+
+    verify(webView).evaluateJavascript("window.mraid.notifyReady(\"interstitial\")", null)
     verifyNoMoreInteractions(webView)
   }
 
@@ -77,6 +85,28 @@ class MraidInteractorTest {
 
     verify(webView).evaluateJavascript(
         "window.mraid.notifyError(\"message\", undefined)",
+        null
+    )
+    verifyNoMoreInteractions(webView)
+  }
+
+  @Test
+  fun whenSetIsViewable_GivenIsViewableIsTrue_ShouldEvaluateSetIsViewableOnMraidObject() {
+    mraidInteractor.setIsViewable(true)
+
+    verify(webView).evaluateJavascript(
+        "window.mraid.setIsViewable(true)",
+        null
+    )
+    verifyNoMoreInteractions(webView)
+  }
+
+  @Test
+  fun whenSetIsViewable_GivenIsViewableIsFalse_ShouldEvaluateSetIsViewableOnMraidObject() {
+    mraidInteractor.setIsViewable(false)
+
+    verify(webView).evaluateJavascript(
+        "window.mraid.setIsViewable(false)",
         null
     )
     verifyNoMoreInteractions(webView)

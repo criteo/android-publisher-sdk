@@ -25,7 +25,10 @@ import static org.mockito.Mockito.when;
 
 import android.view.View;
 import androidx.test.rule.ActivityTestRule;
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor;
+import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.test.activity.DummyActivity;
+import javax.inject.Inject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,23 +42,28 @@ public class VisibilityTrackerTest {
   public ActivityTestRule<DummyActivity> activityRule = new ActivityTestRule<>(DummyActivity.class);
 
   @Rule
+  public MockedDependenciesRule mockedDependenciesRule = new MockedDependenciesRule();
+
+  @Rule
   public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   private UiHelper uiHelper;
 
   @Mock
   private VisibilityChecker visibilityChecker;
+  @Inject
+  private RunOnUiThreadExecutor runOnUiThreadExecutor;
 
   private VisibilityTracker tracker;
 
   @Before
   public void setUp() throws Exception {
     uiHelper = new UiHelper(activityRule);
-    tracker = new VisibilityTracker(visibilityChecker);
+    tracker = new VisibilityTracker(visibilityChecker, runOnUiThreadExecutor);
   }
 
   @Test
-  public void watch_GivenDrawnVisibleView_TriggerItsListener() throws Exception {
+  public void watch_GivenDrawnVisibleView_TriggerItsOnVisibleListener() throws Exception {
     View view = uiHelper.createView();
     VisibilityListener listener = mock(VisibilityListener.class);
 
@@ -68,7 +76,7 @@ public class VisibilityTrackerTest {
   }
 
   @Test
-  public void watch_GivenDrawnNotVisibleView_DoNotTriggerListener() throws Exception {
+  public void watch_GivenDrawnNotVisibleView_DoNotTriggerOnVisibleListener() throws Exception {
     View view = uiHelper.createView();
     VisibilityListener listener = mock(VisibilityListener.class);
 
@@ -81,18 +89,32 @@ public class VisibilityTrackerTest {
   }
 
   @Test
-  public void watch_GivenNotDrawnView_DoNotTriggerListener() throws Exception {
+  public void watch_GivenDrawnNotVisibleView_TriggerOnGoneListener() {
+    View view = uiHelper.createView();
+    VisibilityListener listener = mock(VisibilityListener.class);
+
+    when(visibilityChecker.isVisible(view)).thenReturn(false);
+
+    tracker.watch(view, listener);
+    uiHelper.drawViews(view);
+
+    verify(listener, atLeastOnce()).onGone();
+  }
+
+  @Test
+  public void watch_GivenNotDrawnView_DoNotTriggerAnyListener() throws Exception {
     View view = uiHelper.createView();
     VisibilityListener listener = mock(VisibilityListener.class);
 
     tracker.watch(view, listener);
 
     verify(listener, never()).onVisible();
+    verify(listener, never()).onGone();
     verifyNoInteractions(visibilityChecker);
   }
 
   @Test
-  public void watch_GivenTwoDrawnVisibleViews_TriggerBothListeners() throws Exception {
+  public void watch_GivenTwoDrawnVisibleViews_TriggerBothOnVisibleListeners() throws Exception {
     View view1 = uiHelper.createView();
     View view2 = uiHelper.createView();
     VisibilityListener listener1 = mock(VisibilityListener.class);
@@ -110,7 +132,7 @@ public class VisibilityTrackerTest {
   }
 
   @Test
-  public void watch_GivenTwoDrawnViews_TriggerListenerOnlyForVisibleView() throws Exception {
+  public void watch_GivenTwoDrawnViews_TriggerOnVisibleListenerOnlyForVisibleView() {
     View visibleView = uiHelper.createView();
     View notVisibleView = uiHelper.createView();
     VisibilityListener listener1 = mock(VisibilityListener.class);
@@ -128,7 +150,7 @@ public class VisibilityTrackerTest {
   }
 
   @Test
-  public void watch_GivenDrawnVisibleReusedViews_TriggerLastListenerOnly() throws Exception {
+  public void watch_GivenDrawnVisibleReusedViews_TriggerLastOnVisibleListenerOnly() {
     View view = uiHelper.createView();
     VisibilityListener listener1 = mock(VisibilityListener.class);
     VisibilityListener listener2 = mock(VisibilityListener.class);
@@ -142,5 +164,4 @@ public class VisibilityTrackerTest {
     verify(listener1, never()).onVisible();
     verify(listener2, atLeastOnce()).onVisible();
   }
-
 }
