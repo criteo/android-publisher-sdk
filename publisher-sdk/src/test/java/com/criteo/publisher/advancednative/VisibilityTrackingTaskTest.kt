@@ -19,17 +19,22 @@ package com.criteo.publisher.advancednative
 import android.view.View
 import android.view.ViewTreeObserver
 import com.criteo.publisher.advancednative.VisibilityTracker.VisibilityTrackingTask
+import com.criteo.publisher.concurrent.DirectMockRunOnUiThreadExecutor
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Answers
 import org.mockito.Mock
+import org.mockito.Mockito.any
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
+import org.mockito.Mockito.spy
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.lang.ref.Reference
@@ -46,9 +51,12 @@ class VisibilityTrackingTaskTest {
     @Mock
     private lateinit var visibilityChecker: VisibilityChecker
 
+    private lateinit var runOnUiThreadExecutor: RunOnUiThreadExecutor
+
     @Before
     fun setUp() {
         whenever(viewRef.get()).thenReturn(mock(defaultAnswer = Answers.RETURNS_DEEP_STUBS))
+        runOnUiThreadExecutor = spy(DirectMockRunOnUiThreadExecutor())
     }
 
     @Test
@@ -91,7 +99,7 @@ class VisibilityTrackingTaskTest {
     }
 
     @Test
-    fun onPreDraw_GivenListenerAndReferenceAndVisibilityDetected_NotifyListener() {
+    fun onPreDraw_GivenListenerAndReferenceAndIsVisible_NotifyListener() {
         val listener = mock<VisibilityListener>()
         whenever(visibilityChecker.isVisible(viewRef.get()!!)).thenReturn(true)
 
@@ -100,6 +108,46 @@ class VisibilityTrackingTaskTest {
         task.onPreDraw()
 
         verify(listener).onVisible()
+    }
+
+    @Test
+    fun onGlobalLayout_GivenListenerAndReferenceAndIsGone_NotifyListener() {
+        val listener = mock<VisibilityListener>()
+        whenever(visibilityChecker.isVisible(viewRef.get()!!)).thenReturn(false)
+
+        val task = createTask()
+        task.setListener(listener)
+        task.onGlobalLayout()
+
+        verify(listener).onGone()
+    }
+
+    @Test
+    fun onPreDraw_GivenListenerAndReferenceAndIsGone_CancelAndAndExecuteAndExecuteAsyncWithDelay() {
+        val listener = mock<VisibilityListener>()
+        whenever(visibilityChecker.isVisible(viewRef.get()!!)).thenReturn(false)
+        givenViewTreeObserver(true)
+
+        val task = createTask()
+        task.setListener(listener)
+        task.onPreDraw()
+
+        verify(runOnUiThreadExecutor).cancel(any())
+        verify(runOnUiThreadExecutor).execute(any())
+        verify(runOnUiThreadExecutor).executeAsync(any(), eq(VisibilityTrackingTask.VISIBILITY_POLL_INTERVAL))
+    }
+
+    @Test
+    fun onPreDraw_GivenListenerAndReferenceAndViewTreeObserverIsNotAlive_ShouldNotExecuteAsyncWithDelay() {
+        val listener = mock<VisibilityListener>()
+        givenViewTreeObserver(false)
+
+        val task = createTask()
+        task.setListener(listener)
+        task.onPreDraw()
+
+        verify(runOnUiThreadExecutor).cancel(any())
+        verify(runOnUiThreadExecutor, never()).executeAsync(any(), eq(VisibilityTrackingTask.VISIBILITY_POLL_INTERVAL))
     }
 
     private fun givenViewTreeObserver(isAlive: Boolean): ViewTreeObserver {
@@ -112,6 +160,6 @@ class VisibilityTrackingTaskTest {
     }
 
     private fun createTask(): VisibilityTrackingTask {
-        return VisibilityTrackingTask(viewRef, visibilityChecker)
+        return VisibilityTrackingTask(viewRef, visibilityChecker, runOnUiThreadExecutor)
     }
 }

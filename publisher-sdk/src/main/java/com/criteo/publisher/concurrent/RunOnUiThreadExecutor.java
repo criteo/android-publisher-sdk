@@ -71,4 +71,21 @@ public class RunOnUiThreadExecutor implements Executor {
   public void executeAsync(@NonNull Runnable command) {
     handler.post(command);
   }
+
+  /**
+   * Same as {@link #execute(Runnable)}} but has ability to specify delay.
+   * @param command to execute.
+   * @param delay in milliseconds
+   */
+  public void executeAsync(@NonNull Runnable command, long delay) {
+    handler.postDelayed(command, delay);
+  }
+
+  /**
+   * Cancels provided {@link java.lang.Runnable} if it was never executed
+   * @param command to cancel
+   */
+  public void cancel(@NonNull Runnable command) {
+    handler.removeCallbacks(command);
+  }
 }

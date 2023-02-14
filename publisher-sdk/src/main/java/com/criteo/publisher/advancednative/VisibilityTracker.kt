@@ -20,12 +20,16 @@ import android.view.ViewTreeObserver
 import androidx.annotation.GuardedBy
 import androidx.annotation.VisibleForTesting
 import com.criteo.publisher.annotation.OpenForTesting
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
 import java.lang.ref.Reference
 import java.lang.ref.WeakReference
 import java.util.WeakHashMap
 
 @OpenForTesting
-internal class VisibilityTracker(private val visibilityChecker: VisibilityChecker) {
+internal class VisibilityTracker(
+    private val visibilityChecker: VisibilityChecker,
+    private val runOnUiThreadExecutor: RunOnUiThreadExecutor
+) {
   @GuardedBy("lock")
   private val trackedViews: MutableMap<View, VisibilityTrackingTask> = WeakHashMap()
   private val lock = Any()
@@ -34,8 +38,9 @@ internal class VisibilityTracker(private val visibilityChecker: VisibilityChecke
    * Add the given [View] to the set of watched views.
    *
    *
-   * As long as this view live, if at one moment it is drawn and [ ][VisibilityChecker.isVisible] on user screen, then the given listener will be
-   * invoked.
+   * As long as this view is alive, tracker will check(periodically/onDraw/onLayout) for current
+   * visibility state on screen by invoking [VisibilityChecker.isVisible],
+   * then the given listener will be invoked with appropriate state.
    *
    *
    * It is safe to call again this method with the same view and listener, and it is also same to
@@ -44,7 +49,7 @@ internal class VisibilityTracker(private val visibilityChecker: VisibilityChecke
    * before.
    *
    * @param view     new or recycle view to watch for visibility
-   * @param listener listener to trigger once visibility is detected
+   * @param listener listener to trigger on visibility change
    */
   fun watch(view: View, listener: VisibilityListener) {
     var trackingTask: VisibilityTrackingTask?
@@ -61,28 +66,39 @@ internal class VisibilityTracker(private val visibilityChecker: VisibilityChecke
   private fun startTrackingNewView(view: View): VisibilityTrackingTask {
     return VisibilityTrackingTask(
         WeakReference(view),
-        visibilityChecker
+        visibilityChecker,
+        runOnUiThreadExecutor
     )
   }
 
   @VisibleForTesting
   internal class VisibilityTrackingTask(
       private val trackedViewRef: Reference<View>,
-      private val visibilityChecker: VisibilityChecker
-  ) :
-      ViewTreeObserver.OnPreDrawListener {
+      private val visibilityChecker: VisibilityChecker,
+      private val runOnUiThreadExecutor: RunOnUiThreadExecutor
+  ) : ViewTreeObserver.OnPreDrawListener,
+      ViewTreeObserver.OnGlobalLayoutListener {
     @Volatile
     private var listener: VisibilityListener? = null
+
+    private val checkVisibilityRunnable: Runnable = object : Runnable {
+      override fun run() {
+        checkVisibility()
+        if (shouldPollView()) {
+          runOnUiThreadExecutor.executeAsync(this, VISIBILITY_POLL_INTERVAL)
+        }
+      }
+    }
 
     init {
       setUpObserver()
     }
 
     private fun setUpObserver() {
-      val view = trackedViewRef.get() ?: return
-      val observer = view.viewTreeObserver
-      if (observer.isAlive) {
-        observer.addOnPreDrawListener(this)
+      if (shouldPollView()) {
+        val observer = trackedViewRef.get()?.viewTreeObserver
+        observer?.addOnPreDrawListener(this)
+        observer?.addOnGlobalLayoutListener(this)
       }
     }
 
@@ -91,20 +107,33 @@ internal class VisibilityTracker(private val visibilityChecker: VisibilityChecke
     }
 
     override fun onPreDraw(): Boolean {
-      if (shouldTrigger()) {
-        triggerListener()
-      }
+      invalidateVisibility()
       return true
     }
 
-    private fun shouldTrigger(): Boolean {
-      val trackedView = trackedViewRef.get() ?: return false
-      return visibilityChecker.isVisible(trackedView)
+    override fun onGlobalLayout() {
+      invalidateVisibility()
     }
 
-    private fun triggerListener() {
-      val listener = listener
-      listener?.onVisible()
+    private fun invalidateVisibility() {
+      runOnUiThreadExecutor.cancel(checkVisibilityRunnable)
+      runOnUiThreadExecutor.execute(checkVisibilityRunnable)
+    }
+
+    private fun checkVisibility() {
+      trackedViewRef.get()?.apply {
+        val isVisible = visibilityChecker.isVisible(this)
+        if (isVisible) listener?.onVisible() else listener?.onGone()
+      }
+    }
+
+    private fun shouldPollView(): Boolean {
+      val view = trackedViewRef.get()
+      return view != null && view.viewTreeObserver.isAlive
+    }
+
+    companion object {
+      const val VISIBILITY_POLL_INTERVAL = 200L
     }
   }
 }

@@ -13,23 +13,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.criteo.publisher.advancednative
 
-import com.criteo.publisher.annotation.OpenForTesting
+package com.criteo.publisher.adview
 
-@OpenForTesting
-open interface VisibilityListener {
-  /**
-   * Invoked callback in case a
-   * [VisibilityTracker.watch] watched view was detected as
-   * visible.
-   */
-  fun onVisible()
-
-  /**
-   * Invoked callback in case a
-   * [VisibilityTracker.watch] watched view was detected as
-   * off screen.
-   */
-  fun onGone()
+internal enum class MraidPlacementType(val value: String) {
+  INLINE("inline"),
+  INTERSTITIAL("interstitial")
 }

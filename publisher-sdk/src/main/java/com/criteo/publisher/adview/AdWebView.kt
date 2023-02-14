@@ -21,24 +21,62 @@ import android.util.AttributeSet
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.criteo.publisher.DependencyProvider
+import com.criteo.publisher.advancednative.VisibilityListener
 
 internal open class AdWebView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
-) : WebView(context, attrs), AdWebViewClientListener {
+) : WebView(context, attrs), AdWebViewClientListener, VisibilityListener {
+
+  private var adWebViewClient: AdWebViewClient? = null
 
   private val mraidInteractor by lazy {
     DependencyProvider.getInstance().provideMraidInteractor(
         this
     )
   }
+  private val visibilityTracker by lazy {
+    DependencyProvider.getInstance()
+        .provideVisibilityTracker()
+  }
+  private var isViewable: Boolean? = null
 
   override fun setWebViewClient(client: WebViewClient) {
-    (client as? AdWebViewClient)?.setAdWebViewClientListener(this)
+    (client as? AdWebViewClient)?.let {
+      adWebViewClient = it
+      it.setAdWebViewClientListener(this)
+    }
     super.setWebViewClient(client)
   }
 
   override fun onPageFinished() {
-    mraidInteractor.notifyReady()
+    invokeIfMraidAd {
+      visibilityTracker.watch(this, this)
+      mraidInteractor.notifyReady(getPlacementType())
+    }
+  }
+
+  protected fun getPlacementType(): MraidPlacementType = MraidPlacementType.INTERSTITIAL
+  override fun onVisible() {
+    reportViewabilityIfNeeded(true)
+  }
+
+  override fun onGone() {
+    reportViewabilityIfNeeded(false)
+  }
+
+  private fun reportViewabilityIfNeeded(isVisible: Boolean) {
+    if (isViewable != isVisible) {
+      isViewable = isVisible
+      isViewable?.let {
+        mraidInteractor.setIsViewable(it)
+      }
+    }
+  }
+
+  private fun invokeIfMraidAd(action: () -> Unit) {
+    adWebViewClient?.isMraidAd()
+        ?.takeIf { it }
+        ?.let { action.invoke() }
   }
 }

@@ -58,4 +58,9 @@ class ImpressionTask implements VisibilityListener {
       helper.notifyImpression(listener);
     }
   }
+
+  @Override
+  public void onGone() {
+    // no-op
+  }
 }

@@ -25,12 +25,16 @@ internal class MraidInteractor(private val webView: WebView) {
 
   private val logger = LoggerFactory.getLogger(MraidInteractor::class.java)
 
-  fun notifyReady() {
-    "notifyReady"()
+  fun notifyReady(placementType: MraidPlacementType) {
+    "notifyReady"(placementType.value)
   }
 
   fun notifyError(message: String, action: String? = null) {
     "notifyError"(message, action)
+  }
+
+  fun setIsViewable(isViewable: Boolean) {
+    "setIsViewable"(isViewable)
   }
 
   private operator fun String.invoke(vararg params: Any? = emptyArray()) {
@@ -48,6 +52,7 @@ internal class MraidInteractor(private val webView: WebView) {
       when (it) {
         null -> "undefined"
         is String -> "\"$it\""
+        is Boolean -> it.toString()
         else -> throw UnsupportedOperationException(
             "${it.javaClass.name} conversion is not supported, please update code if you need this conversion"
         )
