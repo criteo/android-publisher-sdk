@@ -26,6 +26,10 @@ import com.criteo.publisher.TestAdUnits
 import com.criteo.publisher.context.ContextData
 import com.criteo.publisher.context.EmailHasher.hash
 import com.criteo.publisher.context.UserData
+import com.criteo.publisher.model.AdSize
+import com.criteo.publisher.model.BannerAdUnit
+import com.criteo.publisher.model.InterstitialAdUnit
+import com.criteo.publisher.model.NativeAdUnit
 import com.criteo.publisher.network.CdbMock
 import com.criteo.publisher.util.BuildConfigWrapper
 import com.criteo.testapp.integration.IntegrationSelectionMode
@@ -35,8 +39,14 @@ import leakcanary.LeakCanary.config
 
 class PubSdkDemoApplication : MultiDexApplication() {
   companion object {
+    private const val CDB_DEMO_BANNER_PLACEMENT_ID = "30s6zt3ayypfyemwjvmp"
+    private const val CDB_DEMO_INTERSTITIAL_PLACEMENT_ID = "6yws53jyfjgoq1ghnuqb"
+    private const val CDB_DEMO_NATIVE_PLACEMENT_ID = "190tsfngohsvfkh3hmkm"
+
     @JvmField
-    val INTERSTITIAL = TestAdUnits.INTERSTITIAL_PREPROD
+    val INTERSTITIAL = InterstitialAdUnit(
+        CDB_DEMO_INTERSTITIAL_PLACEMENT_ID
+    )
 
     @JvmField
     val INTERSTITIAL_IBV_DEMO = TestAdUnits.INTERSTITIAL_IBV_DEMO
@@ -45,10 +55,15 @@ class PubSdkDemoApplication : MultiDexApplication() {
     val INTERSTITIAL_VIDEO = TestAdUnits.INTERSTITIAL_VIDEO_PREPROD
 
     @JvmField
-    val NATIVE = TestAdUnits.NATIVE_PREPROD
+    val NATIVE = NativeAdUnit(
+        CDB_DEMO_NATIVE_PLACEMENT_ID
+    )
 
     @JvmField
-    val BANNER = TestAdUnits.BANNER_320_50_PREPROD
+    val BANNER = BannerAdUnit(
+        CDB_DEMO_BANNER_PLACEMENT_ID,
+        AdSize(320, 50)
+    )
 
     @JvmField
     val CONTEXT_DATA = ContextData().set(ContextData.CONTENT_URL, "https://dummy.content.url")
@@ -100,7 +115,7 @@ class PubSdkDemoApplication : MultiDexApplication() {
         NATIVE
     )
 
-    val builder = Criteo.Builder(this, "B-056946")
+    val builder = Criteo.Builder(this, "B-000000")
         .adUnits(adUnits)
 
     if ("release" == BuildConfig.BUILD_TYPE) {
