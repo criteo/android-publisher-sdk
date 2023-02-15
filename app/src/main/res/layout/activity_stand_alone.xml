@@ -71,7 +71,7 @@
       android:layout_height="match_parent"
       app:criteoAdUnitHeight="50"
       app:criteoAdUnitWidth="320"
-      app:criteoAdUnitId="/140800857/Endeavour_320x50"
+      app:criteoAdUnitId="30s6zt3ayypfyemwjvmp"
       app:layout_constraintStart_toStartOf="parent"
       />
     <FrameLayout
