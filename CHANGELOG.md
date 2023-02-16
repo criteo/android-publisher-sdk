@@ -1,5 +1,8 @@
 # Next Version
 
+# Version 4.9.1
+- Add support of Android 13 (API level 33)
+
 # Version 4.9.0
 - Add support of Android 13 (API level 33)
 
