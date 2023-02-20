@@ -8,3 +8,8 @@
 -keepclassmembers class com.squareup.tape.FileObjectQueue {
   private com.squareup.tape.QueueFile queueFile;
 }
+
+-keepnames class kotlin.jvm.internal.DefaultConstructorMarker
+-keepclassmembers @kotlin.Metadata @com.squareup.moshi.JsonClass class * {
+    synthetic <init>(...);
+}
