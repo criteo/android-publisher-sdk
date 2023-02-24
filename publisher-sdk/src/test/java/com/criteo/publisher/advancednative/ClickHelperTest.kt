@@ -115,7 +115,7 @@ class ClickHelperTest {
     val activityName = mock<ComponentName>()
 
     topActivityFinder.stub {
-      on { topActivityName } doReturn activityName
+      on { getTopActivityName() } doReturn activityName
     }
 
     clickHelper.redirectUserTo(uri, listener)
