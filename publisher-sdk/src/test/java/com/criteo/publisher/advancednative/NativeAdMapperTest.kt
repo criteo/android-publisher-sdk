@@ -174,7 +174,7 @@ class NativeAdMapperTest {
 
     val topActivity = mock<ComponentName>()
     topActivityFinder.stub {
-      on { topActivityName } doReturn topActivity
+      on { getTopActivityName() } doReturn topActivity
     }
 
     // when
@@ -209,7 +209,7 @@ class NativeAdMapperTest {
 
     val topActivity = mock<ComponentName>()
     topActivityFinder.stub {
-      on { topActivityName } doReturn topActivity
+      on { getTopActivityName() } doReturn topActivity
     }
 
     // when
