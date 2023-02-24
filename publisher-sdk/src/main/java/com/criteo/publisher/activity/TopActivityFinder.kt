@@ -13,88 +13,66 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.criteo.publisher.activity
 
-package com.criteo.publisher.activity;
+import android.app.Activity
+import android.app.ActivityManager
+import android.app.Application
+import android.content.ComponentName
+import android.content.Context
+import com.criteo.publisher.annotation.OpenForTesting
+import com.criteo.publisher.util.PreconditionsUtil
+import java.lang.ref.WeakReference
 
-import static android.content.Context.ACTIVITY_SERVICE;
+@OpenForTesting
+class TopActivityFinder(private val context: Context) {
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningTaskInfo;
-import android.app.Application;
-import android.content.ComponentName;
-import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.criteo.publisher.util.PreconditionsUtil;
-import java.lang.ref.WeakReference;
-import java.util.List;
+  private var topActivityRef = WeakReference<Activity?>(null)
 
-public class TopActivityFinder {
-
-  @NonNull
-  private final Context context;
-
-  @NonNull
-  private WeakReference<Activity> topActivityRef = new WeakReference<>(null);
-
-  public TopActivityFinder(@NonNull Context context) {
-    this.context = context;
-  }
-
-  @SuppressWarnings("deprecation")
-  @Nullable
-  public ComponentName getTopActivityName() {
-    Activity topActivity = topActivityRef.get();
+  @Suppress("ReturnCount")
+  fun getTopActivityName(): ComponentName? {
+    val topActivity = topActivityRef.get()
     if (topActivity != null) {
-      return topActivity.getComponentName();
+      return topActivity.componentName
     }
 
     // Else we fallback on reading running tasks. ActivityManager.getRunningTasks is deprecated
     // since Lollipop, but for backward compatibility, the method still returns information on
     // owned activities, which is what we look for.
-    ActivityManager am = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
+    val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     if (!PreconditionsUtil.isNotNull(am)) {
-      return null;
+      return null
     }
-
-    List<RunningTaskInfo> taskInfo;
-    try {
-      taskInfo = am.getRunningTasks(1);
-    } catch (SecurityException e) {
-      PreconditionsUtil.throwOrLog(e);
-      return null;
+    val taskInfo = try {
+      am.getRunningTasks(1)
+    } catch (e: SecurityException) {
+      PreconditionsUtil.throwOrLog(e)
+      null
     }
-
-    if (taskInfo.isEmpty()) {
-      return null;
+    if (taskInfo.isNullOrEmpty()) {
+      return null
     }
 
     // The getRunningTasks may return information about an activity that the host application does
     // not own, but that is safe to share. This is the cases for launchers. So we need to filter on
     // activities that looks like our own ones.
-    ComponentName topActivityName = taskInfo.get(0).topActivity;
-    if (topActivityName.getPackageName().startsWith(context.getPackageName())) {
-      return topActivityName;
-    }
-
-    return null;
+    val topActivityName = taskInfo[0].topActivity
+    return if (topActivityName!!.packageName.startsWith(context.packageName)) {
+      topActivityName
+    } else null
   }
 
-  public void registerActivityLifecycleFor(@NonNull Application application) {
-    application.registerActivityLifecycleCallbacks(new NoOpActivityLifecycleCallbacks() {
-      @Override
-      public void onActivityResumed(@NonNull Activity activity) {
-        topActivityRef = new WeakReference<>(activity);
+  fun registerActivityLifecycleFor(application: Application) {
+    application.registerActivityLifecycleCallbacks(object : NoOpActivityLifecycleCallbacks() {
+      override fun onActivityResumed(activity: Activity) {
+        topActivityRef = WeakReference(activity)
       }
 
-      @Override
-      public void onActivityPaused(@NonNull Activity activity) {
-        if (activity.equals(topActivityRef.get())) {
-          topActivityRef = new WeakReference<>(null);
+      override fun onActivityPaused(activity: Activity) {
+        if (activity == topActivityRef.get()) {
+          topActivityRef = WeakReference(null)
         }
       }
-    });
+    })
   }
-
 }
