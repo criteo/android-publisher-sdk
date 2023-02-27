@@ -56,10 +56,12 @@ class TopActivityFinder(private val context: Context) {
     // The getRunningTasks may return information about an activity that the host application does
     // not own, but that is safe to share. This is the cases for launchers. So we need to filter on
     // activities that looks like our own ones.
-    val topActivityName = taskInfo[0].topActivity
-    return if (topActivityName!!.packageName.startsWith(context.packageName)) {
+    val topActivityName = taskInfo.firstOrNull()?.topActivity
+    return if (topActivityName?.packageName?.startsWith(context.packageName) == true) {
       topActivityName
-    } else null
+    } else {
+      null
+    }
   }
 
   fun registerActivityLifecycleFor(application: Application) {
