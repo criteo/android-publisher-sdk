@@ -1,5 +1,9 @@
 # Next Version
 
+# Version 4.9.2
+- Fix proguard issue with `RemoteConfigResponse`
+- Add null checks in `TopActivityFinder`
+
 # Version 4.9.1
 - Add support of Android 13 (API level 33)
 
