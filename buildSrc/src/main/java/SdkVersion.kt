@@ -18,7 +18,7 @@ import org.gradle.api.Project
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-private const val sdkBaseVersion = "4.9.1"
+private const val sdkBaseVersion = "4.9.2"
 
 private val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd.HHmm"))
 
