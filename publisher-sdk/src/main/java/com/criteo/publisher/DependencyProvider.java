@@ -36,6 +36,7 @@ import com.criteo.publisher.advancednative.NativeAdMapper;
 import com.criteo.publisher.advancednative.RendererHelper;
 import com.criteo.publisher.advancednative.VisibilityChecker;
 import com.criteo.publisher.advancednative.VisibilityTracker;
+import com.criteo.publisher.adview.MraidMessageHandler;
 import com.criteo.publisher.adview.MraidInteractor;
 import com.criteo.publisher.adview.Redirection;
 import com.criteo.publisher.bid.BidLifecycleListener;
@@ -736,6 +737,11 @@ public class DependencyProvider {
   @NonNull
   public MraidInteractor provideMraidInteractor(WebView webView) {
     return new MraidInteractor(webView);
+  }
+
+  @NonNull
+  public MraidMessageHandler provideMraidMessageHandler() {
+    return new MraidMessageHandler();
   }
 
   public interface Factory<T> {
