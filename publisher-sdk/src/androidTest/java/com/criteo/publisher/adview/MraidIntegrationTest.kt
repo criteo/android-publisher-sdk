@@ -17,11 +17,11 @@
 package com.criteo.publisher.adview
 
 import android.content.Context
-import android.webkit.WebView
 import androidx.test.rule.ActivityTestRule
 import com.criteo.publisher.MraidData
 import com.criteo.publisher.callMraidObjectBlocking
 import com.criteo.publisher.concurrent.ThreadingUtil
+import com.criteo.publisher.getJavascriptResultBlocking
 import com.criteo.publisher.loadMraidHtml
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
@@ -100,5 +100,16 @@ class MraidIntegrationTest {
     val isViewable = webView.callMraidObjectBlocking("isViewable()")
     assertThat(isViewable).isEqualTo("true")
 
+  }
+
+  @Test
+  fun whenHtmlWithMraidIsLoaded_ShouldHaveCriteoMraidBridgeGlobalObject() {
+    val mraidHtml = mraidData.getHtmlWithMraidScriptTag()
+
+    webView.loadMraidHtml(mraidHtml)
+    webViewClient.waitForPageToFinishLoading()
+
+    val criteoMraidObject = webView.getJavascriptResultBlocking("window.criteoMraidBridge")
+    assertThat(criteoMraidObject).isNotEmpty
   }
 }

@@ -33,13 +33,17 @@ fun WebView.loadMraidHtml(html: String) {
 }
 
 fun WebView.callMraidObjectBlocking(code: String = ""): String {
-  val mraidResult = CompletableFuture<String>()
   val codeToAppend = if (code.isEmpty()) "" else ".$code"
+  return getJavascriptResultBlocking("window.mraid$codeToAppend")
+}
+
+fun WebView.getJavascriptResultBlocking(code: String): String {
+  val result = CompletableFuture<String>()
   ThreadingUtil.runOnMainThreadAndWait {
     evaluateJavascript(
-        "javascript:window.mraid$codeToAppend",
-        mraidResult::complete
+        "javascript:$code",
+        result::complete
     )
   }
-  return mraidResult.get()
+  return result.get()
 }

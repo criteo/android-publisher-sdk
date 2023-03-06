@@ -1,0 +1,65 @@
+/*
+ *    Copyright 2020 Criteo
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package com.criteo.publisher.adview
+
+import android.util.Log
+import com.criteo.publisher.logging.LogMessage
+import com.criteo.publisher.logging.Logger
+import com.criteo.publisher.mock.MockedDependenciesRule
+import com.criteo.publisher.mock.SpyBean
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.mockito.kotlin.verify
+
+class MraidMessageHandlerTest {
+
+  @Rule
+  @JvmField
+  var mockedDependenciesRule = MockedDependenciesRule().withSpiedLogger()
+
+  @SpyBean
+  private lateinit var logger: Logger
+
+  private lateinit var mraidMessageHandler: MraidMessageHandler
+
+  @Before
+  fun setUp() {
+    mraidMessageHandler = MraidMessageHandler()
+  }
+
+  @Test
+  fun whenLog_shouldDelegateToLoggerWithProperParams() {
+    mraidMessageHandler.log("Warning", "TestMessage", "id")
+
+    verify(logger).log(LogMessage(Log.WARN, "TestMessage", logId = "id"))
+  }
+
+  @Test
+  fun whenLogWithNullLogId_shouldDelegateToLoggerWithProperParams() {
+    mraidMessageHandler.log("Info", "TestMessage", null)
+
+    verify(logger).log(LogMessage(Log.INFO, "TestMessage"))
+  }
+
+  @Test
+  fun whenLogWithInvalidLogLevel_shouldPassDebugAsLogLevel() {
+    mraidMessageHandler.log("Lol", "TestMessage", null)
+
+    verify(logger).log(LogMessage(Log.DEBUG, "TestMessage"))
+  }
+}

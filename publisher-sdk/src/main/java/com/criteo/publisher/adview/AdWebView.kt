@@ -39,7 +39,14 @@ internal open class AdWebView @JvmOverloads constructor(
     DependencyProvider.getInstance()
         .provideVisibilityTracker()
   }
+
+  private val mraidMessageHandler = DependencyProvider.getInstance().provideMraidMessageHandler()
+
   private var isViewable: Boolean? = null
+
+  init {
+    setupMessageHandler()
+  }
 
   override fun setWebViewClient(client: WebViewClient) {
     (client as? AdWebViewClient)?.let {
@@ -57,6 +64,7 @@ internal open class AdWebView @JvmOverloads constructor(
   }
 
   protected fun getPlacementType(): MraidPlacementType = MraidPlacementType.INTERSTITIAL
+
   override fun onVisible() {
     reportViewabilityIfNeeded(true)
   }
@@ -78,5 +86,13 @@ internal open class AdWebView @JvmOverloads constructor(
     adWebViewClient?.isMraidAd()
         ?.takeIf { it }
         ?.let { action.invoke() }
+  }
+
+  private fun setupMessageHandler() {
+    addJavascriptInterface(mraidMessageHandler, WEB_VIEW_INTERFACE_NAME)
+  }
+
+  companion object {
+    private const val WEB_VIEW_INTERFACE_NAME = "criteoMraidBridge"
   }
 }
