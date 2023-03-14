@@ -13,19 +13,17 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.criteo.publisher.adview
 
-package com.criteo.publisher.adview;
-
-public interface RedirectionListener {
-
+interface RedirectionListener {
   /**
    * Callback notified when the user click on the ad view, and is then redirected to the ad.
    */
-  void onUserRedirectedToAd();
+  fun onUserRedirectedToAd()
 
   /**
    * Callback notified when the user is back from an ad. This happens generally when user press the
    * back button after being redirected to an ad.
    */
-  void onUserBackFromAd();
+  fun onUserBackFromAd()
 }
