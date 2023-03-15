@@ -46,8 +46,12 @@ internal class AdWebViewClient(
 
   fun isMraidAd(): Boolean = isMraidAd
 
+  fun open(url: String) {
+    openUrl(url)
+  }
+
   override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-    redirection.redirect(url.orEmpty(), hostActivityName, listener)
+    openUrl(url)
     return true
   }
 
@@ -83,6 +87,23 @@ internal class AdWebViewClient(
     } else {
       null
     }
+  }
+
+  private fun openUrl(url: String?) {
+    redirection.redirect(url.orEmpty(), hostActivityName, object : RedirectionListener {
+      override fun onUserRedirectedToAd() {
+        listener.onUserRedirectedToAd()
+      }
+
+      override fun onRedirectionFailed() {
+        listener.onRedirectionFailed()
+        adWebViewClientListener?.onOpenFailed()
+      }
+
+      override fun onUserBackFromAd() {
+        listener.onUserBackFromAd()
+      }
+    })
   }
 
   companion object {

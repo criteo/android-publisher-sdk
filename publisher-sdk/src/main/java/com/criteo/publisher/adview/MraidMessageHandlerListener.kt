@@ -13,22 +13,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package com.criteo.publisher.adview
 
-interface RedirectionListener {
-  /**
-   * Callback notified when the user click on the ad view, and is then redirected to the ad.
-   */
-  fun onUserRedirectedToAd()
-
-  /**
-   * Callback notified when redirection fails
-   */
-  fun onRedirectionFailed()
-
-  /**
-   * Callback notified when the user is back from an ad. This happens generally when user press the
-   * back button after being redirected to an ad.
-   */
-  fun onUserBackFromAd()
+interface MraidMessageHandlerListener {
+  fun onOpen(url: String)
 }

@@ -26,7 +26,7 @@ import com.criteo.publisher.advancednative.VisibilityListener
 internal open class AdWebView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
-) : WebView(context, attrs), AdWebViewClientListener, VisibilityListener {
+) : WebView(context, attrs), AdWebViewClientListener, VisibilityListener, MraidMessageHandlerListener {
 
   private var adWebViewClient: AdWebViewClient? = null
 
@@ -63,6 +63,12 @@ internal open class AdWebView @JvmOverloads constructor(
     }
   }
 
+  override fun onOpenFailed() {
+    invokeIfMraidAd {
+      mraidInteractor.notifyError("Error during url open", "open")
+    }
+  }
+
   protected fun getPlacementType(): MraidPlacementType = MraidPlacementType.INTERSTITIAL
 
   override fun onVisible() {
@@ -71,6 +77,10 @@ internal open class AdWebView @JvmOverloads constructor(
 
   override fun onGone() {
     reportViewabilityIfNeeded(false)
+  }
+
+  override fun onOpen(url: String) {
+    adWebViewClient?.open(url)
   }
 
   private fun reportViewabilityIfNeeded(isVisible: Boolean) {
@@ -90,6 +100,7 @@ internal open class AdWebView @JvmOverloads constructor(
 
   private fun setupMessageHandler() {
     addJavascriptInterface(mraidMessageHandler, WEB_VIEW_INTERFACE_NAME)
+    mraidMessageHandler.setListener(this)
   }
 
   companion object {

@@ -21,12 +21,20 @@ import com.criteo.publisher.logging.LogMessage
 import com.criteo.publisher.logging.Logger
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
+import org.assertj.core.api.Assertions
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mock
+import org.mockito.junit.MockitoJUnit
+import org.mockito.junit.MockitoRule
 import org.mockito.kotlin.verify
 
 class MraidMessageHandlerTest {
+
+  @Rule
+  @JvmField
+  val mockitoRule: MockitoRule = MockitoJUnit.rule()
 
   @Rule
   @JvmField
@@ -34,6 +42,9 @@ class MraidMessageHandlerTest {
 
   @SpyBean
   private lateinit var logger: Logger
+
+  @Mock
+  private lateinit var listener: MraidMessageHandlerListener
 
   private lateinit var mraidMessageHandler: MraidMessageHandler
 
@@ -61,5 +72,21 @@ class MraidMessageHandlerTest {
     mraidMessageHandler.log("Lol", "TestMessage", null)
 
     verify(logger).log(LogMessage(Log.DEBUG, "TestMessage"))
+  }
+
+  @Test
+  fun whenOpen_givenListenerIsNull_shouldNotThrow() {
+    Assertions.assertThatCode { mraidMessageHandler.open("https://www.criteo.com") }
+        .doesNotThrowAnyException()
+  }
+
+  @Test
+  fun whenOpen_givenListener_shouldCallOnOpenOnListener() {
+    val url = "https://www.criteo.com"
+    mraidMessageHandler.setListener(listener)
+
+    mraidMessageHandler.open(url)
+
+    verify(listener).onOpen(url)
   }
 }

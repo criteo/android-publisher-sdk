@@ -32,7 +32,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnit
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.spy
+import org.mockito.kotlin.verify
 
 class MraidIntegrationTest {
 
@@ -52,6 +55,8 @@ class MraidIntegrationTest {
 
   @SpyBean
   private lateinit var context: Context
+  @SpyBean
+  private lateinit var redirection: Redirection
 
   @Mock
   private lateinit var listener: RedirectionListener
@@ -111,5 +116,17 @@ class MraidIntegrationTest {
 
     val criteoMraidObject = webView.getJavascriptResultBlocking("window.criteoMraidBridge")
     assertThat(criteoMraidObject).isNotEmpty
+  }
+
+  @Test
+  fun whenHtmlWithMraidIsLoadedAndOpen_ShouldCallOpenOnRedirection() {
+    val url = "https://www.criteo.com"
+    val mraidHtml = mraidData.getHtmlWithMraidScriptTag()
+
+    webView.loadMraidHtml(mraidHtml)
+    webViewClient.waitForPageToFinishLoading()
+
+    webView.getJavascriptResultBlocking("window.mraid.open(\"$url\")")
+    verify(redirection).redirect(eq(url), eq(activityRule.activity.componentName), any())
   }
 }

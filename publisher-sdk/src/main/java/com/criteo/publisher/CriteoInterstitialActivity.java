@@ -164,6 +164,11 @@ public class CriteoInterstitialActivity extends Activity {
     }
 
     @Override
+    public void onRedirectionFailed() {
+      //no-op
+    }
+
+    @Override
     public void onUserBackFromAd() {
       CriteoInterstitialActivity criteoInterstitialActivity = activityRef.get();
       if (criteoInterstitialActivity != null) {

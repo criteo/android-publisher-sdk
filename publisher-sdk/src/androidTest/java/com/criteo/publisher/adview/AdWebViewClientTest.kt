@@ -39,6 +39,9 @@ import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.never
 import org.mockito.kotlin.spy
@@ -77,6 +80,8 @@ class AdWebViewClientTest {
   private lateinit var listener: RedirectionListener
   private lateinit var webView: WebView
   private lateinit var webViewClient: TestAdWebViewClient
+  @SpyBean
+  private lateinit var redirection: Redirection
 
   @MockBean
   private lateinit var mraidInteractor: MraidInteractor
@@ -218,6 +223,50 @@ class AdWebViewClientTest {
     waitForPageToFinishLoading()
 
     verify(mraidInteractor).notifyReady(any())
+  }
+
+  @Test
+  fun whenOpenIsCalled_ShouldCallRedirectionListener() {
+    val url = "https://www.criteo.com/"
+    webViewClient.open(url)
+
+    verify(redirection).redirect(eq(url), eq(activityRule.activity.componentName), any())
+  }
+
+  @Test
+  fun whenOpenIsCalledAndUserRedirectedToAd_ThenShouldCallRedirectionListener() {
+    val url = "https://www.criteo.com/"
+    doAnswer {
+      (it.getArgument(2) as? RedirectionListener)?.onUserRedirectedToAd()
+    }.whenever(redirection).redirect(eq(url), eq(activityRule.activity.componentName), any())
+
+    webViewClient.open(url)
+
+    verify(listener).onUserRedirectedToAd()
+  }
+
+  @Test
+  fun whenOpenIsCalledAndUserBackFromAd_ThenShouldCallRedirectionListener() {
+    val url = "https://www.criteo.com/"
+    doAnswer {
+      (it.getArgument(2) as? RedirectionListener)?.onUserBackFromAd()
+    }.whenever(redirection).redirect(eq(url), eq(activityRule.activity.componentName), any())
+
+    webViewClient.open(url)
+
+    verify(listener).onUserBackFromAd()
+  }
+
+  @Test
+  fun whenOpenIsCalledAndRedirectionFailed_ThenShouldCallRedirectionListener() {
+    val url = "https://www.criteo.com/"
+    doAnswer {
+      (it.getArgument(2) as? RedirectionListener)?.onRedirectionFailed()
+    }.whenever(redirection).redirect(eq(url), eq(activityRule.activity.componentName), any())
+
+    webViewClient.open(url)
+
+    verify(listener).onRedirectionFailed()
   }
 
   private fun verifyMraidObjectAvailable() {

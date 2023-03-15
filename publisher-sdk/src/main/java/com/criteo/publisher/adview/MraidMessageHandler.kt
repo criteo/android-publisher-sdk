@@ -31,9 +31,19 @@ import com.criteo.publisher.util.asAndroidLogLevel
 class MraidMessageHandler {
 
   private val logger = LoggerFactory.getLogger(javaClass)
+  private var listener: MraidMessageHandlerListener? = null
+
+  fun setListener(listener: MraidMessageHandlerListener) {
+    this.listener = listener
+  }
 
   @JavascriptInterface
   fun log(logLevel: String, message: String, logId: String?) {
     logger.log(LogMessage(logLevel.asAndroidLogLevel() ?: Log.DEBUG, message, logId = logId))
+  }
+
+  @JavascriptInterface
+  fun open(url: String) {
+    listener?.onOpen(url)
   }
 }

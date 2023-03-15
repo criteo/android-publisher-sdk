@@ -22,4 +22,9 @@ internal interface AdWebViewClientListener {
    * Notifies when [android.webkit.WebViewClient.onPageFinished] is called
    */
   fun onPageFinished()
+
+  /**
+   * Notifies when url open failed
+   */
+  fun onOpenFailed()
 }
