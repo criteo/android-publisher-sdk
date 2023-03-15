@@ -108,4 +108,22 @@ class AdWebViewTest {
 
     verify(mraidInteractor).setIsViewable(false)
   }
+
+  @Test
+  fun whenOnOpen_ShouldDelegateToAdWebViewClient() {
+    val url = "https://www.criteo.com"
+    whenever(adWebViewClient.isMraidAd()).thenReturn(true)
+
+    webView.onOpen(url)
+
+    verify(adWebViewClient).open(url)
+  }
+
+  @Test
+  fun whenOnOpenFailed_ShouldReportErrorToMraidInteractor() {
+    whenever(adWebViewClient.isMraidAd()).thenReturn(true)
+
+    webView.onOpenFailed()
+    verify(mraidInteractor).notifyError("Error during url open", "open")
+  }
 }

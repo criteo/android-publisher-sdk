@@ -118,6 +118,11 @@ public class CriteoBannerEventController {
       }
 
       @Override
+      public void onRedirectionFailed() {
+        //no-op
+      }
+
+      @Override
       public void onUserBackFromAd() {
         // Do nothing
       }

@@ -51,6 +51,11 @@ class AdChoiceClickHandler implements NativeViewClickHandler {
       }
 
       @Override
+      public void onRedirectionFailed() {
+        // no-op
+      }
+
+      @Override
       public void onUserBackFromAd() {
         helper.notifyUserIsBackToApplicationAsync(listenerRef.get());
       }
