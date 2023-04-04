@@ -69,7 +69,7 @@ internal open class AdWebView @JvmOverloads constructor(
     }
   }
 
-  protected fun getPlacementType(): MraidPlacementType = MraidPlacementType.INTERSTITIAL
+  internal fun getPlacementType(): MraidPlacementType = MraidPlacementType.INTERSTITIAL
 
   override fun onVisible() {
     reportViewabilityIfNeeded(true)
