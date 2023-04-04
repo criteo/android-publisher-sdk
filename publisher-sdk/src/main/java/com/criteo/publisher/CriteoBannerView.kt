@@ -13,192 +13,167 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.criteo.publisher
 
-package com.criteo.publisher;
-
-import static com.criteo.publisher.ErrorLogMessage.onUncaughtErrorAtPublicApi;
-
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.util.AttributeSet;
-import androidx.annotation.Keep;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
-import com.criteo.publisher.adview.AdWebView;
-import com.criteo.publisher.adview.MraidPlacementType;
-import com.criteo.publisher.context.ContextData;
-import com.criteo.publisher.integration.Integration;
-import com.criteo.publisher.integration.IntegrationRegistry;
-import com.criteo.publisher.logging.Logger;
-import com.criteo.publisher.logging.LoggerFactory;
-import com.criteo.publisher.model.AdSize;
-import com.criteo.publisher.model.BannerAdUnit;
-import com.criteo.publisher.util.PreconditionsUtil;
+import android.content.Context
+import android.util.AttributeSet
+import androidx.annotation.Keep
+import androidx.annotation.VisibleForTesting
+import com.criteo.publisher.BannerLogMessage.onBannerViewInitialized
+import com.criteo.publisher.BannerLogMessage.onBannerViewLoading
+import com.criteo.publisher.ErrorLogMessage.onUncaughtErrorAtPublicApi
+import com.criteo.publisher.adview.AdWebView
+import com.criteo.publisher.adview.MraidPlacementType
+import com.criteo.publisher.context.ContextData
+import com.criteo.publisher.integration.Integration
+import com.criteo.publisher.integration.IntegrationRegistry
+import com.criteo.publisher.logging.LoggerFactory
+import com.criteo.publisher.model.AdSize
+import com.criteo.publisher.model.BannerAdUnit
+import com.criteo.publisher.util.PreconditionsUtil
 
 @Keep
-public class CriteoBannerView extends AdWebView {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+class CriteoBannerView : AdWebView {
 
-  private static final int UNSET_DIMENSION_VALUE = -1;
+  private val logger = LoggerFactory.getLogger(javaClass)
 
-  @Nullable
-  final BannerAdUnit bannerAdUnit;
+  final val bannerAdUnit: BannerAdUnit?
 
   /**
-   * Null means that the singleton Criteo should be used.
-   * <p>
-   * {@link Criteo#getInstance()} is fetched lazily so publishers may call the constructor without
-   * having to init the SDK before.
-   */
-  @Nullable
-  private final Criteo criteo;
+  * Null means that the singleton Criteo should be used.
+  *
+  *
+  * [Criteo.getInstance] is fetched lazily so publishers may call the constructor without
+  * having to init the SDK before.
+  */
+  private var criteo: Criteo? = null
 
-  @Nullable
-  private CriteoBannerAdListener criteoBannerAdListener;
+  var adListener: CriteoBannerAdListener? = null
 
-  @Nullable
-  private CriteoBannerEventController criteoBannerEventController;
+  private var criteoBannerEventController: CriteoBannerEventController? = null
 
   /**
-   * Used when setting {@link CriteoBannerView} in XML
+   * Used when setting [CriteoBannerView] in XML
    */
-  public CriteoBannerView(@NonNull Context context, AttributeSet attrs) {
-    super(context, attrs);
-    criteo = null;
-
-    TypedArray a = context.getTheme().obtainStyledAttributes(
+  constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+    val a = context.theme.obtainStyledAttributes(
         attrs,
         R.styleable.CriteoBannerView,
         0,
         0
-    );
-
+    )
     try {
-      int width = a.getInteger(
+      val width = a.getInteger(
           R.styleable.CriteoBannerView_criteoAdUnitWidth,
           UNSET_DIMENSION_VALUE
-      );
-      int height = a.getInteger(
+      )
+      val height = a.getInteger(
           R.styleable.CriteoBannerView_criteoAdUnitHeight,
           UNSET_DIMENSION_VALUE
-      );
-      String adUnitId = a.getString(R.styleable.CriteoBannerView_criteoAdUnitId);
-
+      )
+      val adUnitId = a.getString(R.styleable.CriteoBannerView_criteoAdUnitId)
       if (adUnitId != null && width != UNSET_DIMENSION_VALUE && height != UNSET_DIMENSION_VALUE) {
-        bannerAdUnit = new BannerAdUnit(adUnitId, new AdSize(width, height));
-      } else if (adUnitId == null && width == UNSET_DIMENSION_VALUE
-          && height == UNSET_DIMENSION_VALUE) {
-        bannerAdUnit = null;
+        bannerAdUnit = BannerAdUnit(adUnitId, AdSize(width, height))
+      } else if (adUnitId == null && width == UNSET_DIMENSION_VALUE && height == UNSET_DIMENSION_VALUE) {
+        bannerAdUnit = null
       } else {
-        bannerAdUnit = null;
-        PreconditionsUtil.throwOrLog(new IllegalStateException(
-            "CriteoBannerView was not properly inflated. For InHouse integration, no attribute must "
-                + "be set. For Standalone integration, all of: criteoAdUnitId, criteoAdUnitWidth and "
-                + "criteoAdUnitHeight must be set.")
-        );
+        bannerAdUnit = null
+        PreconditionsUtil.throwOrLog(
+            IllegalStateException(
+                "CriteoBannerView was not properly inflated. For InHouse integration, no attribute must "
+                    + "be set. For Standalone integration, all of: criteoAdUnitId, criteoAdUnitWidth and "
+                    + "criteoAdUnitHeight must be set."
+            )
+        )
       }
     } finally {
-      a.recycle();
+      a.recycle()
     }
-
-    logger.log(BannerLogMessage.onBannerViewInitialized(bannerAdUnit));
+    logger.log(onBannerViewInitialized(bannerAdUnit))
   }
 
   /**
    * Used by server side bidding and in-house auction
    */
-  public CriteoBannerView(@NonNull Context context) {
-    this(context, null, null);
-  }
+  constructor(context: Context) : this(context, null, null)
 
   /**
    * Used by Standalone
    */
-  public CriteoBannerView(@NonNull Context context, @NonNull BannerAdUnit bannerAdUnit) {
-    this(context, bannerAdUnit, null);
-  }
+  constructor(context: Context, bannerAdUnit: BannerAdUnit) : this(context, bannerAdUnit, null)
 
   @VisibleForTesting
-  CriteoBannerView(
-      @NonNull Context context,
-      @Nullable BannerAdUnit bannerAdUnit,
-      @Nullable Criteo criteo
-  ) {
-    super(context);
-    this.bannerAdUnit = bannerAdUnit;
-    this.criteo = criteo;
-    logger.log(BannerLogMessage.onBannerViewInitialized(bannerAdUnit));
+  internal constructor(
+      context: Context,
+      bannerAdUnit: BannerAdUnit?,
+      criteo: Criteo?
+  ) : super(context) {
+    this.bannerAdUnit = bannerAdUnit
+    this.criteo = criteo
+    logger.log(onBannerViewInitialized(bannerAdUnit))
   }
 
-  public void setCriteoBannerAdListener(@Nullable CriteoBannerAdListener criteoBannerAdListener) {
-    this.criteoBannerAdListener = criteoBannerAdListener;
+  fun setCriteoBannerAdListener(criteoBannerAdListener: CriteoBannerAdListener?) {
+    this.adListener = criteoBannerAdListener
   }
 
-  @Nullable
-  CriteoBannerAdListener getCriteoBannerAdListener() {
-    return criteoBannerAdListener;
+  fun getCriteoBannerAdListener(): CriteoBannerAdListener? {
+    return adListener
   }
 
-  public void loadAd() {
-    loadAd(new ContextData());
-  }
-
-  public void loadAd(@NonNull ContextData contextData) {
+  @JvmOverloads
+  fun loadAd(contextData: ContextData = ContextData()) {
     try {
-      doLoadAd(contextData);
-    } catch (Throwable tr) {
-      logger.log(onUncaughtErrorAtPublicApi(tr));
+      doLoadAd(contextData)
+    } catch (tr: Throwable) {
+      logger.log(onUncaughtErrorAtPublicApi(tr))
     }
   }
 
-  public void loadAdWithDisplayData(@NonNull String displayData) {
-    getOrCreateController().notifyFor(CriteoListenerCode.VALID);
-    getOrCreateController().displayAd(displayData);
+  fun loadAdWithDisplayData(displayData: String) {
+    getOrCreateController().notifyFor(CriteoListenerCode.VALID)
+    getOrCreateController().displayAd(displayData)
   }
 
-  private void doLoadAd(@NonNull ContextData contextData) {
-    logger.log(BannerLogMessage.onBannerViewLoading(this));
-    getIntegrationRegistry().declare(Integration.STANDALONE);
-    getOrCreateController().fetchAdAsync(bannerAdUnit, contextData);
+  private fun doLoadAd(contextData: ContextData) {
+    logger.log(onBannerViewLoading(this))
+    integrationRegistry.declare(Integration.STANDALONE)
+    getOrCreateController().fetchAdAsync(bannerAdUnit, contextData)
   }
 
-  public void loadAd(@Nullable Bid bid) {
+  fun loadAd(bid: Bid?) {
     try {
-      doLoadAd(bid);
-    } catch (Throwable tr) {
-      logger.log(onUncaughtErrorAtPublicApi(tr));
+      doLoadAd(bid)
+    } catch (tr: Throwable) {
+      logger.log(onUncaughtErrorAtPublicApi(tr))
     }
   }
 
-  @NonNull
-  @Override
-  protected MraidPlacementType getPlacementType() {
-    return MraidPlacementType.INLINE;
+  override fun getPlacementType(): MraidPlacementType {
+    return MraidPlacementType.INLINE
   }
 
-  private void doLoadAd(@Nullable Bid bid) {
-    logger.log(BannerLogMessage.onBannerViewLoading(this, bid));
-    getIntegrationRegistry().declare(Integration.IN_HOUSE);
-    getOrCreateController().fetchAdAsync(bid);
+  private fun doLoadAd(bid: Bid?) {
+    logger.log(onBannerViewLoading(this, bid))
+    integrationRegistry.declare(Integration.IN_HOUSE)
+    getOrCreateController().fetchAdAsync(bid)
   }
 
-  @NonNull
-  @VisibleForTesting
-  CriteoBannerEventController getOrCreateController() {
-    if (criteoBannerEventController == null) {
-      criteoBannerEventController = getCriteo().createBannerController(this);
+  internal fun getOrCreateController() : CriteoBannerEventController {
+      if (criteoBannerEventController == null) {
+        criteoBannerEventController = getCriteo().createBannerController(this)
+      }
+      return criteoBannerEventController!!
     }
-    return criteoBannerEventController;
+
+  private fun getCriteo(): Criteo {
+    return criteo ?: Criteo.getInstance()
   }
 
-  @NonNull
-  private Criteo getCriteo() {
-    return criteo == null ? Criteo.getInstance() : criteo;
-  }
+  private val integrationRegistry: IntegrationRegistry
+    private get() = DependencyProvider.getInstance().provideIntegrationRegistry()
 
-  @NonNull
-  private IntegrationRegistry getIntegrationRegistry() {
-    return DependencyProvider.getInstance().provideIntegrationRegistry();
+  companion object {
+    private const val UNSET_DIMENSION_VALUE = -1
   }
 }
