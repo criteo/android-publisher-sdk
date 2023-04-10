@@ -37,6 +37,23 @@ internal class MraidInteractor(private val webView: WebView) {
     "setIsViewable"(isViewable)
   }
 
+  fun notifyExpanded() {
+    "notifyExpanded"()
+  }
+
+  fun notifyClosed() {
+    "notifyClosed"()
+  }
+
+  /**
+   * [width] in dp
+   * [height] in dp
+   * [pixelMultiplier] - value co calculate width or height in pixels
+   */
+  fun setMaxSize(width: Int, height: Int, pixelMultiplier: Double) {
+    "setMaxSize"(width, height, pixelMultiplier)
+  }
+
   private operator fun String.invoke(vararg params: Any? = emptyArray()) {
     callOnMraidObject("$this(${asJsArgs(*params)})")
   }
@@ -53,6 +70,8 @@ internal class MraidInteractor(private val webView: WebView) {
         null -> "undefined"
         is String -> "\"$it\""
         is Boolean -> it.toString()
+        is Int -> it.toString()
+        is Double -> it.toString()
         else -> throw UnsupportedOperationException(
             "${it.javaClass.name} conversion is not supported, please update code if you need this conversion"
         )

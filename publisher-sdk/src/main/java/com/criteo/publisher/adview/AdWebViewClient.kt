@@ -17,7 +17,6 @@
 package com.criteo.publisher.adview
 
 import android.content.ComponentName
-import android.content.Context
 import android.os.Build
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -26,8 +25,6 @@ import android.webkit.WebViewClient
 import androidx.annotation.RequiresApi
 import com.criteo.publisher.DependencyProvider
 import com.criteo.publisher.annotation.OpenForTesting
-import com.criteo.publisher.logging.LoggerFactory
-import java.io.IOException
 
 @OpenForTesting
 internal class AdWebViewClient(
@@ -36,15 +33,11 @@ internal class AdWebViewClient(
 ) : WebViewClient() {
 
   private val redirection: Redirection = DependencyProvider.getInstance().provideRedirection()
-  private val logger = LoggerFactory.getLogger(javaClass)
   private var adWebViewClientListener: AdWebViewClientListener? = null
-  private var isMraidAd = false
 
   fun setAdWebViewClientListener(listener: AdWebViewClientListener) {
     adWebViewClientListener = listener
   }
-
-  fun isMraidAd(): Boolean = isMraidAd
 
   fun open(url: String) {
     openUrl(url)
@@ -56,7 +49,7 @@ internal class AdWebViewClient(
   }
 
   override fun shouldInterceptRequest(view: WebView, url: String?): WebResourceResponse? {
-    return shouldInterceptRequest(view.context, url.orEmpty())
+    return adWebViewClientListener?.shouldInterceptRequest(url.orEmpty())
   }
 
   @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -65,28 +58,12 @@ internal class AdWebViewClient(
       request: WebResourceRequest?
   ): WebResourceResponse? {
     val url = request?.url?.toString().orEmpty()
-    return shouldInterceptRequest(view.context, url)
+    return adWebViewClientListener?.shouldInterceptRequest(url)
   }
 
   override fun onPageFinished(view: WebView?, url: String?) {
     super.onPageFinished(view, url)
     adWebViewClientListener?.onPageFinished()
-  }
-
-  private fun shouldInterceptRequest(context: Context, url: String): WebResourceResponse? {
-    return if (url.endsWith(MRAID_SCRIPT_NAME)) {
-      try {
-        val stream = context.assets.open(MRAID_FILENAME)
-
-        isMraidAd = true
-        WebResourceResponse("text/javascript", "UTF-8", stream)
-      } catch (e: IOException) {
-        logger.log(MraidLogMessage.onErrorDuringMraidFileInject(e))
-        null
-      }
-    } else {
-      null
-    }
   }
 
   private fun openUrl(url: String?) {
@@ -104,10 +81,5 @@ internal class AdWebViewClient(
         listener.onUserBackFromAd()
       }
     })
-  }
-
-  companion object {
-    private const val MRAID_SCRIPT_NAME = "mraid.js"
-    private const val MRAID_FILENAME = "criteo-mraid.js"
   }
 }

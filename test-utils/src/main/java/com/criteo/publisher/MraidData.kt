@@ -51,4 +51,33 @@ class MraidData {
       </html>
     """.trimIndent()
   }
+
+  val emptyPageHtml = "<html><head></head><body></body></html>"
+
+  fun getTestJavascript() = """
+      window.mraidTester = {
+        callOnReady: function callOnReady() {
+          console.log('callingOnReady');
+          window.mraidTesterBridge.onReady();
+        },
+        
+        callStateChange: function callStateChange(newState) {
+          console.log('callStateChange');
+          console.log(newState);
+          window.mraidTesterBridge.onStateChange(newState);
+        },
+      
+        init: function init() {
+        console.log('init');
+          if (window.mraid.getState() != 'default') {
+            window.mraid.addEventListener('ready', this.callOnReady);
+          } else {
+            this.callOnReady()
+          }
+          
+          window.mraid.addEventListener('stateChange', this.callStateChange);
+        }       
+      };
+      window.mraidTester.init()
+    """.trimIndent()
 }

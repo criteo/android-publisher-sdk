@@ -21,7 +21,7 @@ import com.criteo.publisher.logging.LogMessage
 import com.criteo.publisher.logging.Logger
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -76,7 +76,7 @@ class MraidMessageHandlerTest {
 
   @Test
   fun whenOpen_givenListenerIsNull_shouldNotThrow() {
-    Assertions.assertThatCode { mraidMessageHandler.open("https://www.criteo.com") }
+    assertThatCode { mraidMessageHandler.open("https://www.criteo.com") }
         .doesNotThrowAnyException()
   }
 
@@ -88,5 +88,36 @@ class MraidMessageHandlerTest {
     mraidMessageHandler.open(url)
 
     verify(listener).onOpen(url)
+  }
+
+  @Test
+  fun whenExpand_givenListener_shouldCallOnExpandOnListener() {
+    val width = 100.0
+    val height = 100.0
+    mraidMessageHandler.setListener(listener)
+
+    mraidMessageHandler.expand(width, height)
+
+    verify(listener).onExpand(width, height)
+  }
+
+  @Test
+  fun whenExpand_givenListenerIsNull_shouldNotThrow() {
+    assertThatCode { mraidMessageHandler.expand(100.0, 100.0) }
+        .doesNotThrowAnyException()
+  }
+
+  @Test
+  fun whenClose_givenListener_shouldCallOnCloseOnListener() {
+    mraidMessageHandler.setListener(listener)
+
+    mraidMessageHandler.close()
+
+    verify(listener).onClose()
+  }
+
+  @Test
+  fun whenClose_givenListenerIsNull_shouldNotThrow() {
+    assertThatCode { mraidMessageHandler.close() }.doesNotThrowAnyException()
   }
 }

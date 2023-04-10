@@ -16,7 +16,9 @@
 
 package com.criteo.publisher.adview
 
-enum class MraidPlacementType(val value: String) {
-  INLINE("inline"),
-  INTERSTITIAL("interstitial")
+enum class MraidState(val stringValue: String) {
+  LOADING("loading"),
+  DEFAULT("default"),
+  EXPANDED("expanded"),
+  HIDDEN("hidden"),
 }

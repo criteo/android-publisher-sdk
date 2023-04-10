@@ -66,7 +66,7 @@ public class CriteoBannerEventControllerTest {
   private CriteoBannerEventController criteoBannerEventController;
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private CriteoBannerView criteoBannerView;
+  private CriteoBannerAdWebView criteoBannerView;
 
   @Mock
   private CriteoBannerAdListener criteoBannerAdListener;
@@ -164,7 +164,7 @@ public class CriteoBannerEventControllerTest {
     criteoBannerEventController.fetchAdAsync(adUnit, contextData);
     waitForIdleState();
 
-    verify(criteoBannerAdListener).onAdReceived(criteoBannerView);
+    verify(criteoBannerAdListener).onAdReceived(criteoBannerView.getParentContainer());
     verify(criteoBannerEventController).displayAd("http://my.display.url");
   }
 
@@ -188,9 +188,9 @@ public class CriteoBannerEventControllerTest {
 
     InOrder inOrder = inOrder(criteoBannerAdListener, criteoBannerEventController);
     inOrder.verify(criteoBannerEventController).displayAd("http://my.display.url1");
-    inOrder.verify(criteoBannerAdListener).onAdReceived(criteoBannerView);
+    inOrder.verify(criteoBannerAdListener).onAdReceived(criteoBannerView.getParentContainer());
     inOrder.verify(criteoBannerEventController).displayAd("http://my.display.url2");
-    inOrder.verify(criteoBannerAdListener).onAdReceived(criteoBannerView);
+    inOrder.verify(criteoBannerAdListener).onAdReceived(criteoBannerView.getParentContainer());
     inOrder.verifyNoMoreInteractions();
   }
 
@@ -224,7 +224,7 @@ public class CriteoBannerEventControllerTest {
     criteoBannerEventController.fetchAdAsync(bid);
     waitForIdleState();
 
-    verify(criteoBannerAdListener).onAdReceived(criteoBannerView);
+    verify(criteoBannerAdListener).onAdReceived(criteoBannerView.getParentContainer());
     verify(criteoBannerEventController).displayAd("http://my.display.url");
   }
 
@@ -244,9 +244,9 @@ public class CriteoBannerEventControllerTest {
 
     InOrder inOrder = inOrder(criteoBannerAdListener, criteoBannerEventController);
     inOrder.verify(criteoBannerEventController).displayAd("http://my.display.url1");
-    inOrder.verify(criteoBannerAdListener).onAdReceived(criteoBannerView);
+    inOrder.verify(criteoBannerAdListener).onAdReceived(criteoBannerView.getParentContainer());
     inOrder.verify(criteoBannerEventController).displayAd("http://my.display.url2");
-    inOrder.verify(criteoBannerAdListener).onAdReceived(criteoBannerView);
+    inOrder.verify(criteoBannerAdListener).onAdReceived(criteoBannerView.getParentContainer());
     inOrder.verifyNoMoreInteractions();
   }
 

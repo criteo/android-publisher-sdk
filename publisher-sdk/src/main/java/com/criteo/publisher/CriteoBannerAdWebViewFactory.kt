@@ -14,9 +14,23 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.adview
+package com.criteo.publisher
 
-enum class MraidPlacementType(val value: String) {
-  INLINE("inline"),
-  INTERSTITIAL("interstitial")
+import android.content.Context
+import android.util.AttributeSet
+import com.criteo.publisher.annotation.OpenForTesting
+import com.criteo.publisher.model.BannerAdUnit
+
+@OpenForTesting
+class CriteoBannerAdWebViewFactory {
+
+  fun create(
+      context: Context,
+      attrs: AttributeSet?,
+      bannerAdUnit: BannerAdUnit?,
+      criteo: Criteo?,
+      parentContainer: CriteoBannerView
+  ): CriteoBannerAdWebView {
+    return CriteoBannerAdWebView(context, attrs, bannerAdUnit, criteo, parentContainer)
+  }
 }

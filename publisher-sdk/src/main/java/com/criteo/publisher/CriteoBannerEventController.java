@@ -40,7 +40,7 @@ import java.lang.ref.WeakReference;
 
 public class CriteoBannerEventController {
   @NonNull
-  private final WeakReference<CriteoBannerView> view;
+  private final WeakReference<CriteoBannerAdWebView> view;
 
   @Nullable
   private final CriteoBannerAdListener adListener;
@@ -55,7 +55,7 @@ public class CriteoBannerEventController {
   private final RunOnUiThreadExecutor executor;
 
   public CriteoBannerEventController(
-      @NonNull CriteoBannerView bannerView,
+      @NonNull CriteoBannerAdWebView bannerView,
       @NonNull Criteo criteo,
       @NonNull TopActivityFinder topActivityFinder,
       @NonNull RunOnUiThreadExecutor runOnUiThreadExecutor
@@ -94,7 +94,7 @@ public class CriteoBannerEventController {
   }
 
   void notifyFor(@NonNull CriteoListenerCode code) {
-    executor.executeAsync(new CriteoBannerListenerCallTask(adListener, view, code));
+    executor.executeAsync(new CriteoBannerListenerCallTask(adListener, new WeakReference(view.get().getParentContainer()), code));
   }
 
   void displayAd(@NonNull String displayUrl) {

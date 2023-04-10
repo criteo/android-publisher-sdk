@@ -14,9 +14,22 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.adview
+package com.criteo.publisher
 
-enum class MraidPlacementType(val value: String) {
-  INLINE("inline"),
-  INTERSTITIAL("interstitial")
+import android.content.Context
+import android.graphics.Color
+import android.util.AttributeSet
+import android.widget.ImageView
+
+internal class CloseButton @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null
+) : ImageView(context, attrs) {
+
+  init {
+    contentDescription = resources.getString(R.string.close_button)
+    scaleType = ScaleType.FIT_XY
+    setImageResource(R.drawable.closebtn)
+    setBackgroundColor(Color.TRANSPARENT)
+  }
 }

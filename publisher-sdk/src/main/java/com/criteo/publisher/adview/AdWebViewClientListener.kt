@@ -16,6 +16,8 @@
 
 package com.criteo.publisher.adview
 
+import android.webkit.WebResourceResponse
+
 internal interface AdWebViewClientListener {
 
   /**
@@ -27,4 +29,9 @@ internal interface AdWebViewClientListener {
    * Notifies when url open failed
    */
   fun onOpenFailed()
+
+  /**
+   * Allows listener to override response for specific [url]
+   */
+  fun shouldInterceptRequest(url: String): WebResourceResponse?
 }

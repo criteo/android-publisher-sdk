@@ -17,93 +17,30 @@
 package com.criteo.publisher.adview
 
 import android.content.Context
+import android.content.res.Configuration
 import android.util.AttributeSet
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.criteo.publisher.DependencyProvider
-import com.criteo.publisher.advancednative.VisibilityListener
 
-internal open class AdWebView @JvmOverloads constructor(
+abstract class AdWebView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
-) : WebView(context, attrs), AdWebViewClientListener, VisibilityListener, MraidMessageHandlerListener {
+) : WebView(context, attrs) {
 
-  private var adWebViewClient: AdWebViewClient? = null
+  var mraidController: MraidController = DummyMraidController()
+  private set
 
-  private val mraidInteractor by lazy {
-    DependencyProvider.getInstance().provideMraidInteractor(
-        this
-    )
-  }
-  private val visibilityTracker by lazy {
-    DependencyProvider.getInstance()
-        .provideVisibilityTracker()
-  }
-
-  private val mraidMessageHandler = DependencyProvider.getInstance().provideMraidMessageHandler()
-
-  private var isViewable: Boolean? = null
-
-  init {
-    setupMessageHandler()
-  }
+  abstract fun provideMraidController(): MraidController
 
   override fun setWebViewClient(client: WebViewClient) {
-    (client as? AdWebViewClient)?.let {
-      adWebViewClient = it
-      it.setAdWebViewClientListener(this)
-    }
+    // create new mraid controller since new ad is loaded
+    mraidController = provideMraidController()
+    mraidController.onWebViewClientSet(client)
     super.setWebViewClient(client)
   }
 
-  override fun onPageFinished() {
-    invokeIfMraidAd {
-      visibilityTracker.watch(this, this)
-      mraidInteractor.notifyReady(getPlacementType())
-    }
-  }
-
-  override fun onOpenFailed() {
-    invokeIfMraidAd {
-      mraidInteractor.notifyError("Error during url open", "open")
-    }
-  }
-
-  internal fun getPlacementType(): MraidPlacementType = MraidPlacementType.INTERSTITIAL
-
-  override fun onVisible() {
-    reportViewabilityIfNeeded(true)
-  }
-
-  override fun onGone() {
-    reportViewabilityIfNeeded(false)
-  }
-
-  override fun onOpen(url: String) {
-    adWebViewClient?.open(url)
-  }
-
-  private fun reportViewabilityIfNeeded(isVisible: Boolean) {
-    if (isViewable != isVisible) {
-      isViewable = isVisible
-      isViewable?.let {
-        mraidInteractor.setIsViewable(it)
-      }
-    }
-  }
-
-  private fun invokeIfMraidAd(action: () -> Unit) {
-    adWebViewClient?.isMraidAd()
-        ?.takeIf { it }
-        ?.let { action.invoke() }
-  }
-
-  private fun setupMessageHandler() {
-    addJavascriptInterface(mraidMessageHandler, WEB_VIEW_INTERFACE_NAME)
-    mraidMessageHandler.setListener(this)
-  }
-
-  companion object {
-    private const val WEB_VIEW_INTERFACE_NAME = "criteoMraidBridge"
+  override fun onConfigurationChanged(newConfig: Configuration?) {
+    super.onConfigurationChanged(newConfig)
+    mraidController.onConfigurationChange(newConfig)
   }
 }

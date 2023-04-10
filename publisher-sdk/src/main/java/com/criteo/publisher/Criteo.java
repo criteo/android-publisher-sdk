@@ -216,7 +216,7 @@ public abstract class Criteo {
   abstract InterstitialActivityHelper getInterstitialActivityHelper();
 
   @NonNull
-  public abstract CriteoBannerEventController createBannerController(@NonNull CriteoBannerView bannerView);
+  public abstract CriteoBannerEventController createBannerController(@NonNull CriteoBannerAdWebView bannerView);
 
   public abstract void setUsPrivacyOptOut(boolean usPrivacyOptOut);
 
