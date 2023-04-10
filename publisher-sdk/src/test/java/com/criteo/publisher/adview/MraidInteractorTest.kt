@@ -111,4 +111,37 @@ class MraidInteractorTest {
     )
     verifyNoMoreInteractions(webView)
   }
+
+  @Test
+  fun whenNotifyExpanded_ShouldEvaluateNotifyExpandedOnMraidObject() {
+    mraidInteractor.notifyExpanded()
+
+    verify(webView).evaluateJavascript(
+        "window.mraid.notifyExpanded()",
+        null
+    )
+    verifyNoMoreInteractions(webView)
+  }
+
+  @Test
+  fun whenNotifyClosed_ShouldEvaluateNotifyClosedOnMraidObject() {
+    mraidInteractor.notifyClosed()
+
+    verify(webView).evaluateJavascript(
+        "window.mraid.notifyClosed()",
+        null
+    )
+    verifyNoMoreInteractions(webView)
+  }
+
+  @Test
+  fun whenSetMaxSize_ShouldEvaluateSetMaxSizeOnMraidObject() {
+    mraidInteractor.setMaxSize(50, 60, 2.1)
+
+    verify(webView).evaluateJavascript(
+        "window.mraid.setMaxSize(50, 60, 2.1)",
+        null
+    )
+    verifyNoMoreInteractions(webView)
+  }
 }

@@ -13,47 +13,36 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+
 package com.criteo.publisher
 
 import android.content.Context
 import android.util.AttributeSet
+import android.widget.FrameLayout
 import androidx.annotation.Keep
 import androidx.annotation.VisibleForTesting
-import com.criteo.publisher.BannerLogMessage.onBannerViewInitialized
-import com.criteo.publisher.BannerLogMessage.onBannerViewLoading
-import com.criteo.publisher.ErrorLogMessage.onUncaughtErrorAtPublicApi
-import com.criteo.publisher.adview.AdWebView
-import com.criteo.publisher.adview.MraidPlacementType
+import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.context.ContextData
-import com.criteo.publisher.integration.Integration
-import com.criteo.publisher.integration.IntegrationRegistry
 import com.criteo.publisher.logging.LoggerFactory
 import com.criteo.publisher.model.AdSize
 import com.criteo.publisher.model.BannerAdUnit
 import com.criteo.publisher.util.PreconditionsUtil
 
+@OpenForTesting
 @Keep
-class CriteoBannerView : AdWebView {
+class CriteoBannerView : FrameLayout {
 
   private val logger = LoggerFactory.getLogger(javaClass)
 
-  final val bannerAdUnit: BannerAdUnit?
+  @VisibleForTesting
+  final lateinit var adWebView: CriteoBannerAdWebView
+  private set
+
+  @JvmField
+  final var bannerAdUnit: BannerAdUnit? = null
 
   /**
-  * Null means that the singleton Criteo should be used.
-  *
-  *
-  * [Criteo.getInstance] is fetched lazily so publishers may call the constructor without
-  * having to init the SDK before.
-  */
-  private var criteo: Criteo? = null
-
-  var adListener: CriteoBannerAdListener? = null
-
-  private var criteoBannerEventController: CriteoBannerEventController? = null
-
-  /**
-   * Used when setting [CriteoBannerView] in XML
+   * Used when setting [CriteoBannerAdWebView] in XML
    */
   constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
     val a = context.theme.obtainStyledAttributes(
@@ -80,16 +69,17 @@ class CriteoBannerView : AdWebView {
         bannerAdUnit = null
         PreconditionsUtil.throwOrLog(
             IllegalStateException(
-                "CriteoBannerView was not properly inflated. For InHouse integration, no attribute must "
-                    + "be set. For Standalone integration, all of: criteoAdUnitId, criteoAdUnitWidth and "
-                    + "criteoAdUnitHeight must be set."
+                "CriteoBannerView was not properly inflated. For InHouse integration, no attribute must " +
+                    "be set. For Standalone integration, all of: criteoAdUnitId, criteoAdUnitWidth and " +
+                    "criteoAdUnitHeight must be set."
             )
         )
       }
     } finally {
       a.recycle()
     }
-    logger.log(onBannerViewInitialized(bannerAdUnit))
+    createAndAddAdWebView(context, attrs, bannerAdUnit, null)
+    logger.log(BannerLogMessage.onBannerViewInitialized(bannerAdUnit))
   }
 
   /**
@@ -108,70 +98,53 @@ class CriteoBannerView : AdWebView {
       bannerAdUnit: BannerAdUnit?,
       criteo: Criteo?
   ) : super(context) {
-    this.bannerAdUnit = bannerAdUnit
-    this.criteo = criteo
-    logger.log(onBannerViewInitialized(bannerAdUnit))
+    createAndAddAdWebView(context, null, bannerAdUnit, criteo)
+    logger.log(BannerLogMessage.onBannerViewInitialized(bannerAdUnit))
   }
 
   fun setCriteoBannerAdListener(criteoBannerAdListener: CriteoBannerAdListener?) {
-    this.adListener = criteoBannerAdListener
+    this.adWebView.setCriteoBannerAdListener(criteoBannerAdListener)
   }
 
   fun getCriteoBannerAdListener(): CriteoBannerAdListener? {
-    return adListener
+    return this.adWebView.getCriteoBannerAdListener()
   }
 
   @JvmOverloads
   fun loadAd(contextData: ContextData = ContextData()) {
-    try {
-      doLoadAd(contextData)
-    } catch (tr: Throwable) {
-      logger.log(onUncaughtErrorAtPublicApi(tr))
-    }
+    this.adWebView.loadAd(contextData)
   }
 
   fun loadAdWithDisplayData(displayData: String) {
-    getOrCreateController().notifyFor(CriteoListenerCode.VALID)
-    getOrCreateController().displayAd(displayData)
-  }
-
-  private fun doLoadAd(contextData: ContextData) {
-    logger.log(onBannerViewLoading(this))
-    integrationRegistry.declare(Integration.STANDALONE)
-    getOrCreateController().fetchAdAsync(bannerAdUnit, contextData)
+    this.adWebView.loadAdWithDisplayData(displayData)
   }
 
   fun loadAd(bid: Bid?) {
-    try {
-      doLoadAd(bid)
-    } catch (tr: Throwable) {
-      logger.log(onUncaughtErrorAtPublicApi(tr))
-    }
+    this.adWebView.loadAd(bid)
   }
 
-  override fun getPlacementType(): MraidPlacementType {
-    return MraidPlacementType.INLINE
+  fun destroy() {
+    adWebView.destroy()
+    removeAllViews()
   }
 
-  private fun doLoadAd(bid: Bid?) {
-    logger.log(onBannerViewLoading(this, bid))
-    integrationRegistry.declare(Integration.IN_HOUSE)
-    getOrCreateController().fetchAdAsync(bid)
+  private fun createAndAddAdWebView(
+      context: Context,
+      attrs: AttributeSet?,
+      bannerAdUnit: BannerAdUnit?,
+      criteo: Criteo?
+  ) {
+    this.bannerAdUnit = bannerAdUnit
+    adWebView = DependencyProvider.getInstance()
+        .provideAdWebViewFactory()
+        .create(context, attrs, bannerAdUnit, criteo, this)
+    this.addView(
+        adWebView, LayoutParams(
+        LayoutParams.MATCH_PARENT,
+        LayoutParams.MATCH_PARENT
+    )
+    )
   }
-
-  internal fun getOrCreateController() : CriteoBannerEventController {
-      if (criteoBannerEventController == null) {
-        criteoBannerEventController = getCriteo().createBannerController(this)
-      }
-      return criteoBannerEventController!!
-    }
-
-  private fun getCriteo(): Criteo {
-    return criteo ?: Criteo.getInstance()
-  }
-
-  private val integrationRegistry: IntegrationRegistry
-    private get() = DependencyProvider.getInstance().provideIntegrationRegistry()
 
   companion object {
     private const val UNSET_DIMENSION_VALUE = -1

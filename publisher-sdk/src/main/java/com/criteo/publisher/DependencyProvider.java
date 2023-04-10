@@ -36,8 +36,12 @@ import com.criteo.publisher.advancednative.NativeAdMapper;
 import com.criteo.publisher.advancednative.RendererHelper;
 import com.criteo.publisher.advancednative.VisibilityChecker;
 import com.criteo.publisher.advancednative.VisibilityTracker;
+import com.criteo.publisher.adview.AdWebView;
+import com.criteo.publisher.adview.CriteoMraidController;
+import com.criteo.publisher.adview.MraidController;
 import com.criteo.publisher.adview.MraidMessageHandler;
 import com.criteo.publisher.adview.MraidInteractor;
+import com.criteo.publisher.adview.MraidPlacementType;
 import com.criteo.publisher.adview.Redirection;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.bid.CompositeBidLifecycleListener;
@@ -69,7 +73,9 @@ import com.criteo.publisher.headerbidding.HeaderBidding;
 import com.criteo.publisher.headerbidding.OtherAdServersHeaderBidding;
 import com.criteo.publisher.integration.IntegrationDetector;
 import com.criteo.publisher.integration.IntegrationRegistry;
+import com.criteo.publisher.interstitial.CriteoInterstitialMraidController;
 import com.criteo.publisher.interstitial.InterstitialActivityHelper;
+import com.criteo.publisher.interstitial.InterstitialAdWebView;
 import com.criteo.publisher.logging.ConsoleHandler;
 import com.criteo.publisher.logging.LoggerFactory;
 import com.criteo.publisher.logging.PublisherCodeRemover;
@@ -742,6 +748,35 @@ public class DependencyProvider {
   @NonNull
   public MraidMessageHandler provideMraidMessageHandler() {
     return new MraidMessageHandler();
+  }
+
+  @NonNull
+  public MraidController provideMraidController(
+      MraidPlacementType placementType,
+      AdWebView adWebView
+  ) {
+    if (placementType == MraidPlacementType.INLINE) {
+      return new CriteoBannerMraidController(
+          (CriteoBannerAdWebView) adWebView,
+          provideRunOnUiThreadExecutor(),
+          provideVisibilityTracker(),
+          provideMraidInteractor(adWebView),
+          provideMraidMessageHandler()
+      );
+    } else {
+      return new CriteoInterstitialMraidController(
+          (InterstitialAdWebView) adWebView,
+          provideRunOnUiThreadExecutor(),
+          provideVisibilityTracker(),
+          provideMraidInteractor(adWebView),
+          provideMraidMessageHandler()
+      );
+    }
+  }
+
+  @NonNull
+  public CriteoBannerAdWebViewFactory provideAdWebViewFactory() {
+    return getOrCreate(CriteoBannerAdWebViewFactory.class, CriteoBannerAdWebViewFactory::new);
   }
 
   public interface Factory<T> {

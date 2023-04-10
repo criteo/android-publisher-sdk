@@ -336,12 +336,16 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
 
       val response = """
       (function(){
-      var s = "";
+      var mraid = "<script src=\"mraid.js\">"+ "</scr"+"ipt>";
+      document.write(mraid);
+      
+      var s = ""; 
       s += "<"+"a href=\"https://criteo.com\">\n";
       s += "  <"+"img width='$width' height='$height' src=\"$STUB_CREATIVE_IMAGE\"/>\n";
       s += "<"+"/a>\n";
-      s += "\n";
-      document.write(s);})();
+      document.write(s);
+  
+      })();
     """.trimIndent()
 
       return MockResponse()

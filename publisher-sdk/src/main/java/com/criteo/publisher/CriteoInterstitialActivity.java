@@ -33,20 +33,21 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import androidx.annotation.VisibleForTesting;
-import com.criteo.publisher.adview.AdWebView;
 import com.criteo.publisher.adview.AdWebViewClient;
 import com.criteo.publisher.adview.RedirectionListener;
+import com.criteo.publisher.interstitial.InterstitialAdWebView;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import java.lang.ref.WeakReference;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 
 public class CriteoInterstitialActivity extends Activity {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  private WebView webView;
+  private InterstitialAdWebView webView;
   private ResultReceiver resultReceiver;
   private FrameLayout adLayout;
   private ComponentName callingActivityName;
@@ -72,10 +73,10 @@ public class CriteoInterstitialActivity extends Activity {
       is created via the XML file. In order to avoid leaking the Activity context, a workaround
       consists in creating the WebView by hand by passing the Application context instead.
      */
-    webView = new AdWebView(getApplicationContext());
+    webView = new InterstitialAdWebView(getApplicationContext());
     adLayout.addView(webView, 0);
 
-    ImageButton closeButton = findViewById(R.id.closeButton);
+    CloseButton closeButton = findViewById(R.id.closeButton);
 
     Bundle bundle = getIntent().getExtras();
     if (bundle != null && bundle.getString(WEB_VIEW_DATA) != null) {
@@ -87,15 +88,18 @@ public class CriteoInterstitialActivity extends Activity {
       displayWebView(webViewData);
     }
 
-    closeButton.setOnClickListener(new OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        close();
-      }
+    closeButton.setOnClickListener(v -> close(true));
+    webView.setOnCloseRequestedListener(() -> {
+      close(false);
+      return null;
     });
   }
 
-  private void close() {
+  private void close(boolean notifyClosed) {
+    if (webView != null && notifyClosed) {
+      webView.onClosed();
+    }
+
     Bundle bundle = new Bundle();
     bundle.putInt(INTERSTITIAL_ACTION, ACTION_CLOSED);
     resultReceiver.send(RESULT_CODE_SUCCESSFUL, bundle);
@@ -118,8 +122,9 @@ public class CriteoInterstitialActivity extends Activity {
   }
 
   private void displayWebView(String webViewData) {
-    webView.loadDataWithBaseURL("https://criteo.com", webViewData, "text/html", "UTF-8",
-        "about:blank");
+    webView.loadDataWithBaseURL("https://www.criteo.com", webViewData, "text/html", "UTF-8",
+        ""
+    );
   }
 
   private void prepareWebView() {
@@ -139,7 +144,7 @@ public class CriteoInterstitialActivity extends Activity {
 
   @Override
   public void onBackPressed() {
-    close();
+    close(true);
   }
 
   @VisibleForTesting
@@ -172,10 +177,8 @@ public class CriteoInterstitialActivity extends Activity {
     public void onUserBackFromAd() {
       CriteoInterstitialActivity criteoInterstitialActivity = activityRef.get();
       if (criteoInterstitialActivity != null) {
-        criteoInterstitialActivity.close();
+        criteoInterstitialActivity.close(true);
       }
     }
   }
 }
-
-

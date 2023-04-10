@@ -16,6 +16,7 @@
 
 package com.criteo.publisher
 
+import android.util.Log
 import com.criteo.publisher.logging.LogMessage
 import com.criteo.publisher.model.BannerAdUnit
 
@@ -44,5 +45,25 @@ internal object BannerLogMessage {
   @JvmStatic
   fun onBannerViewFailedToLoad(bannerView: CriteoBannerView?) = LogMessage(message =
     "BannerView(${bannerView?.bannerAdUnit}) failed to load"
+  )
+
+  @JvmStatic
+  fun onBannerViewFailedToReloadDuringExpandedState() = LogMessage(
+      message = "BannerView can't be reloaded during expanded state",
+      level = Log.ERROR
+  )
+
+  @JvmStatic
+  fun onBannerFailedToExpand(bannerView: CriteoBannerView?, throwable: Throwable) = LogMessage(
+      message = "BannerView(${bannerView?.bannerAdUnit}) failed to expand",
+      level = Log.ERROR,
+      throwable = throwable
+  )
+
+  @JvmStatic
+  fun onBannerFailedToClose(bannerView: CriteoBannerView?, throwable: Throwable) = LogMessage(
+      message = "BannerView(${bannerView?.bannerAdUnit}) failed to close",
+      level = Log.ERROR,
+      throwable = throwable
   )
 }

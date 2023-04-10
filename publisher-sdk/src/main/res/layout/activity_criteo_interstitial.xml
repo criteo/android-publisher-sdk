@@ -5,14 +5,11 @@
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   tools:context=".CriteoInterstitialActivity">
-  <ImageButton
+  <com.criteo.publisher.CloseButton
     android:id="@+id/closeButton"
-    android:layout_width="45dp"
-    android:layout_height="45dp"
-    android:background="@android:color/transparent"
-    android:contentDescription="@string/close_button"
-    android:scaleType="fitXY"
-    android:src="@drawable/closebtn"
+    android:layout_gravity="end"
+    android:layout_width="@dimen/close_button_size"
+    android:layout_height="@dimen/close_button_size"
     tools:layout_editor_absoluteX="239dp"
     tools:layout_editor_absoluteY="1dp"/>
 </FrameLayout>

@@ -46,4 +46,14 @@ class MraidMessageHandler {
   fun open(url: String) {
     listener?.onOpen(url)
   }
+
+  @JavascriptInterface
+  fun expand(width: Double, height: Double) {
+    listener?.onExpand(width, height)
+  }
+
+  @JavascriptInterface
+  fun close() {
+    listener?.onClose()
+  }
 }

@@ -168,7 +168,7 @@ class CriteoInternal extends Criteo {
 
   @NonNull
   @Override
-  public CriteoBannerEventController createBannerController(@NonNull CriteoBannerView bannerView) {
+  public CriteoBannerEventController createBannerController(@NonNull CriteoBannerAdWebView bannerView) {
     return new CriteoBannerEventController(
         bannerView,
         this,
