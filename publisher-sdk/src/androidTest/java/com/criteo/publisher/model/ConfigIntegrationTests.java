@@ -313,7 +313,8 @@ public class ConfigIntegrationTests {
         true,
         1337,
         true,
-        RemoteLogLevel.DEBUG
+        RemoteLogLevel.DEBUG,
+        true
     );
 
     givenRemoteConfigInLocalStorage(persistedConfig);
@@ -340,6 +341,7 @@ public class ConfigIntegrationTests {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -353,7 +355,8 @@ public class ConfigIntegrationTests {
         true,
         42,
         false,
-        RemoteLogLevel.INFO
+        RemoteLogLevel.INFO,
+        false
     );
 
     RemoteConfigResponse expectedRemoteConfig = new RemoteConfigResponse(
@@ -366,7 +369,8 @@ public class ConfigIntegrationTests {
         true,
         42,
         false,
-        RemoteLogLevel.INFO
+        RemoteLogLevel.INFO,
+        false
     );
 
     givenRemoteConfigInLocalStorage(oldPersistedConfig);

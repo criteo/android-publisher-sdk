@@ -136,7 +136,13 @@ data class RemoteConfigResponse(
      * means that this is a fresh start of a new application, then a default value is taken.
      */
     @Json(name = "remoteLogLevel")
-    val remoteLogLevel: RemoteLogLevel? = null
+    val remoteLogLevel: RemoteLogLevel? = null,
+
+    /**
+     * Feature flag for activating/deactivating MRAID for banners and interstitials
+     */
+    @Json(name = "mraidEnabled")
+    val isMraidEnabled: Boolean? = null
 ) {
 
   fun withKillSwitch(killSwitch: Boolean?): RemoteConfigResponse {

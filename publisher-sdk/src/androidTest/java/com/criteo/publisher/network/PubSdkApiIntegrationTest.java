@@ -381,7 +381,8 @@ public class PubSdkApiIntegrationTest {
         DefaultConfig.LIVE_BIDDING_ENABLED,
         DefaultConfig.LIVE_BIDDING_TIME_BUDGET_IN_MILLIS,
         DefaultConfig.PREFETCH_ON_INIT_ENABLED,
-        DefaultConfig.REMOTE_LOG_LEVEL
+        DefaultConfig.REMOTE_LOG_LEVEL,
+        DefaultConfig.IS_MRAID_ENABLED
     );
   }
 }

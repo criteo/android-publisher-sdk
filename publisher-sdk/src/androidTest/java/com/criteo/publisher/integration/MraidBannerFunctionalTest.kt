@@ -36,6 +36,7 @@ import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.model.AdUnit
 import com.criteo.publisher.model.BannerAdUnit
+import com.criteo.publisher.model.Config
 import com.criteo.publisher.test.activity.DummyActivity
 import com.criteo.publisher.view.WebViewLookup
 import org.assertj.core.api.Assertions.assertThat
@@ -46,6 +47,7 @@ import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import java.util.concurrent.CountDownLatch
 
 class MraidBannerFunctionalTest {
@@ -67,6 +69,9 @@ class MraidBannerFunctionalTest {
   @SpyBean
   private lateinit var redirection: Redirection
 
+  @SpyBean
+  private lateinit var config: Config
+
   private lateinit var bannerView: CriteoBannerView
 
   private val validBannerAdUnit = TestAdUnits.BANNER_320_50
@@ -81,6 +86,8 @@ class MraidBannerFunctionalTest {
 
   @Before
   fun setUp() {
+    whenever(config.isMraidEnabled).thenReturn(true)
+
     onReady = CountDownLatch(1)
     onExpanded = CountDownLatch(1)
     onHidden = CountDownLatch(1)

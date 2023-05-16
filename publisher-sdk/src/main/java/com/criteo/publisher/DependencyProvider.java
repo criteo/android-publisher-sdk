@@ -37,7 +37,7 @@ import com.criteo.publisher.advancednative.RendererHelper;
 import com.criteo.publisher.advancednative.VisibilityChecker;
 import com.criteo.publisher.advancednative.VisibilityTracker;
 import com.criteo.publisher.adview.AdWebView;
-import com.criteo.publisher.adview.CriteoMraidController;
+import com.criteo.publisher.adview.DummyMraidController;
 import com.criteo.publisher.adview.MraidController;
 import com.criteo.publisher.adview.MraidMessageHandler;
 import com.criteo.publisher.adview.MraidInteractor;
@@ -755,6 +755,10 @@ public class DependencyProvider {
       MraidPlacementType placementType,
       AdWebView adWebView
   ) {
+    if (!provideConfig().isMraidEnabled()) {
+      return new DummyMraidController();
+    }
+
     if (placementType == MraidPlacementType.INLINE) {
       return new CriteoBannerMraidController(
           (CriteoBannerAdWebView) adWebView,
