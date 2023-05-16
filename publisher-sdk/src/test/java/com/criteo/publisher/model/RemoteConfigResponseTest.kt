@@ -86,7 +86,8 @@ class RemoteConfigResponseTest {
       "liveBiddingEnabled": true,
       "liveBiddingTimeBudgetInMillis": 42,
       "prefetchOnInitEnabled": true,
-      "remoteLogLevel": "Warning"
+      "remoteLogLevel": "Warning",
+      "mraidEnabled": true
     }""".trimIndent()
 
     val response = readFromString(json)
@@ -101,6 +102,7 @@ class RemoteConfigResponseTest {
     assertThat(response.liveBiddingTimeBudgetInMillis).isEqualTo(42)
     assertThat(response.prefetchOnInitEnabled).isTrue()
     assertThat(response.remoteLogLevel).isEqualTo(RemoteLogLevel.WARNING)
+    assertThat(response.isMraidEnabled).isTrue
   }
 
   @Test

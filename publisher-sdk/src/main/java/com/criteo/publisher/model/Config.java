@@ -52,6 +52,7 @@ public class Config {
     public static final int LIVE_BIDDING_TIME_BUDGET_IN_MILLIS = 8_000;
     public static final boolean PREFETCH_ON_INIT_ENABLED = true;
     public static final RemoteLogLevel REMOTE_LOG_LEVEL = RemoteLogLevel.WARNING;
+    public static final boolean IS_MRAID_ENABLED = false;
 
   }
 
@@ -156,6 +157,10 @@ public class Config {
         getOrElse(
             overrideRemoteConfig.getRemoteLogLevel(),
             baseRemoteConfig.getRemoteLogLevel()
+        ),
+        getOrElse(
+            overrideRemoteConfig.isMraidEnabled(),
+            baseRemoteConfig.isMraidEnabled()
         )
     );
   }
@@ -279,4 +284,10 @@ public class Config {
     );
   }
 
+  public boolean isMraidEnabled() {
+    return getOrElse(
+        cachedRemoteConfig.isMraidEnabled(),
+        DefaultConfig.IS_MRAID_ENABLED
+    );
+  }
 }

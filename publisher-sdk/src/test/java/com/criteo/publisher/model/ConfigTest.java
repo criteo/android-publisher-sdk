@@ -214,6 +214,16 @@ public class ConfigTest {
     refreshConfig_assertItIsUnchanged(newConfig, Config::getRemoteLogLevel);
   }
 
+  @Test
+  public void refreshConfig_GivenMissingIsMraidEnabled_ItIsUnchanged() throws Exception {
+    givenNewConfig();
+
+    RemoteConfigResponse newConfig = givenFullNewPayload(config);
+    when(newConfig.isMraidEnabled()).thenReturn(null);
+
+    refreshConfig_assertItIsUnchanged(newConfig, Config::isMraidEnabled);
+  }
+
   private <T> void refreshConfig_assertItIsUnchanged(
       RemoteConfigResponse newConfig,
       Function<Config, T> projection
@@ -242,7 +252,8 @@ public class ConfigTest {
         false,
         42,
         false,
-        RemoteLogLevel.ERROR
+        RemoteLogLevel.ERROR,
+        false
     );
 
     doAnswer(answerVoid((RemoteConfigResponse ignored, OutputStream outputStream) -> {
@@ -284,6 +295,7 @@ public class ConfigTest {
     boolean csmEnabled = config.isCsmEnabled();
     boolean liveBiddingEnabled = config.isLiveBiddingEnabled();
     int liveBiddingTimeBudgetInMillis = config.getLiveBiddingTimeBudgetInMillis();
+    boolean isMraidEnabled = config.isMraidEnabled();
 
     RemoteConfigResponse newConfig = givenFullNewPayload(config);
 
@@ -297,7 +309,7 @@ public class ConfigTest {
     assertEquals(csmEnabled, !config.isCsmEnabled());
     assertEquals(liveBiddingEnabled, !config.isLiveBiddingEnabled());
     assertEquals(1 + liveBiddingTimeBudgetInMillis, config.getLiveBiddingTimeBudgetInMillis());
-
+    assertEquals(isMraidEnabled, !config.isMraidEnabled());
   }
 
   private void givenNewConfig() {
@@ -322,6 +334,8 @@ public class ConfigTest {
         .findFirst().get();
 
     when(response.getRemoteLogLevel()).thenReturn(otherLogLevel);
+    when(response.isMraidEnabled()).thenReturn(!config.isMraidEnabled());
+
     return response;
   }
 
@@ -338,6 +352,7 @@ public class ConfigTest {
     assertTrue(config.isCsmEnabled());
     assertFalse(config.isLiveBiddingEnabled());
     assertEquals(8000, config.getLiveBiddingTimeBudgetInMillis());
+    assertFalse(config.isMraidEnabled());
   }
 
 }
