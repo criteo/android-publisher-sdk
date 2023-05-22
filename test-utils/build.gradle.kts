@@ -67,6 +67,8 @@ dependencies {
   androidTestImplementation(Deps.AssertJ.AssertJ)
   androidTestImplementation(Deps.Mockito.Android)
   androidTestImplementation(Deps.Mockito.Kotlin)
+  androidTestImplementation(Deps.Google.AdMob)
+  androidTestImplementation(Deps.Google.AdsIdentifier)
 
   detektPlugins(Deps.Detekt.DetektFormatting)
 }

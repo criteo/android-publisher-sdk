@@ -77,9 +77,9 @@ object Deps {
   }
 
   object Google {
-    const val AdMob = "com.google.android.gms:play-services-ads:21.2.0"
+    const val AdMob = "com.google.android.gms:play-services-ads:22.1.0"
     const val AdMob19 = "com.google.android.gms:play-services-ads:19.0.1"
-    const val AdsIdentifier = "com.google.android.gms:play-services-ads-identifier:17.1.0"
+    const val AdsIdentifier = "com.google.android.gms:play-services-ads-identifier:18.0.1"
   }
 
   object Jacoco {

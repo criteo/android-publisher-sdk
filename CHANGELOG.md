@@ -1,4 +1,5 @@
 # Next Version
+- Bump AdMob to v22.1.0
 
 # Version 4.9.2
 - Fix proguard issue with `RemoteConfigResponse`
