@@ -31,7 +31,7 @@ androidAppModule("com.criteo.pubsdk_android") {
 }
 
 android {
-    flavorDimensions("mode")
+    flavorDimensions += listOf("mode")
     productFlavors {
         create("memoryLeaksHunt") {
             dimension = "mode"

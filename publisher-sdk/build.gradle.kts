@@ -22,7 +22,7 @@ plugins {
     kotlin("android")
     kotlin("kapt")
     id("kotlin-allopen")
-    id("com.vanniktech.dependency.graph.generator") version "0.5.0"
+    id("com.vanniktech.dependency.graph.generator") version "0.8.0"
     id("com.vanniktech.android.javadoc") version "0.3.0"
     id("fr.pturpin.slack-publish")
     id("io.gitlab.arturbosch.detekt")

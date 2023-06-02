@@ -145,6 +145,8 @@ private fun Project.defaultAndroidModule() {
 
     lintOptions {
       isAbortOnError = true
+      // Does not work when disable using lint.xml file below
+      disable("NotificationPermission")
 
       file("lint.xml").takeIf { it.exists() }
           ?.let { lintConfig = it }
