@@ -180,13 +180,9 @@ class MraidBannerFunctionalTest {
 
     val sync = CriteoSync(bannerView)
     loadAdAndWait(bannerView)
-    sync.waitForBid()
+    sync.waitForDisplay()
 
-    ThreadingUtil.callOnMainThreadAndWait {
-      bannerView.adWebView.evaluateJavascript(
-          mraidData.getTestJavascript(), null
-      )
-    }
+    bannerView.adWebView.getJavascriptResultBlocking(mraidData.getTestJavascript())
 
     return bannerView
   }
