@@ -17,17 +17,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (latest)
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         if: github.event.inputs.git-ref == ''
 
       - name: Checkout (custom ref)
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         if: github.event.inputs.git-ref != ''
         with:
           ref: ${{ github.event.inputs.git-ref }}
 
       - name: Store Gradle cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
@@ -38,13 +38,13 @@ jobs:
         run: sudo ethtool -K eth0 tx off rx off
 
       - name: Set up Android SDK
-        uses: malinskiy/action-android/install-sdk@release/0.1.2
+        uses: malinskiy/action-android/install-sdk@release/0.1.4
 
       # This cache below is not fully working: it should go above the "Set up Android SDK" but:
       # - The action does not support having a SDK already setup -> platform-tools, licenses are re-downloaded
       # - Having this cache still prevents Gradle to re-download every time the build-tools.
       - name: Store Android SDK
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ env.ANDROID_HOME }}
           key: ${{ runner.os }}-android-${{ hashFiles('**/*.gradle*') }}
@@ -61,14 +61,14 @@ jobs:
           name: "Java JUnit Report"
 
       - name: Upload all human readable reports (JUnit+Lint+Detekt+Jacoco)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: junit-report
           path: "**/build/reports/**/*"
 
       - name: Upload XML reports for quality-tests
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: java-quality-reports
           path: |
@@ -100,11 +100,11 @@ jobs:
               tag: 'google_apis'
     steps:
       - name: Checkout (latest)
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         if: github.event.inputs.git-ref == ''
 
       - name: Checkout (custom ref)
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         if: github.event.inputs.git-ref != ''
         with:
           ref: ${{ github.event.inputs.git-ref }}
@@ -116,7 +116,7 @@ jobs:
           java-version: '11'
 
       - name: Store Gradle cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
@@ -145,7 +145,7 @@ jobs:
             ./gradlew gordon --tests=androidx.test.filters.FlakyTest && ./gradlew connectedCheck -Pandroid.testInstrumentationRunnerArguments.notAnnotation=androidx.test.filters.FlakyTest
 
       - name: Upload logcat output
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: logcat-${{ matrix.api }}
@@ -159,14 +159,14 @@ jobs:
           name: "Android JUnit Report (API ${{ matrix.api }})"
 
       - name: Upload all human readable reports (JUnit+Jacoco)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: failure()
         with:
           name: junit-report-${{ matrix.api }}
           path: "**/build/reports"
 
       - name: Upload XML reports for quality-tests
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: matrix.api == '33' # Only report latest supported version
         with:
           name: android-quality-reports
@@ -184,7 +184,7 @@ jobs:
 
     steps:
       - name: Checkout (latest)
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         if: github.event.inputs.git-ref == ''
         with:
           # Fetch the whole history to activate the auto-assignment of Sonar issues.
@@ -192,7 +192,7 @@ jobs:
           fetch-depth: 0
 
       - name: Checkout (custom ref)
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         if: github.event.inputs.git-ref != ''
         with:
           fetch-depth: 0 # Same as above
@@ -207,12 +207,12 @@ jobs:
           java-version: '11'
 
       - name: Download quality reports of java-tests
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: java-quality-reports
 
       - name: Download quality reports of android-tests
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: android-quality-reports
 
@@ -232,14 +232,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Disable TCP/UDP Offloading (Linux)
         shell: bash
         run: sudo ethtool -K eth0 tx off rx off
 
       - name: Set up Android SDK
-        uses: malinskiy/action-android/install-sdk@release/0.1.2
+        uses: malinskiy/action-android/install-sdk@release/0.1.4
 
       - name: Deploy artifacts and notify on Slack
         env:
