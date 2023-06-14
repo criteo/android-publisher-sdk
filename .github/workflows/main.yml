@@ -110,7 +110,7 @@ jobs:
           ref: ${{ github.event.inputs.git-ref }}
 
       - name: Setup Java 11
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '11'
@@ -201,7 +201,7 @@ jobs:
       # Sonar drops support of Java 8 in favor of the new LTS: Java 11.
       # See https://sonarcloud.io/documentation/user-guide/move-analysis-java-11/
       - name: Setup Java 11
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '11'
