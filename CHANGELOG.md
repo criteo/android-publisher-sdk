@@ -1,5 +1,8 @@
 # Next Version
+
+# Version 5.0.0
 - Bump AdMob to v22.1.0
+- Add support for MRAID v1 specification. Everything is supported except for useCustomClose and two-part creatives.
 
 # Version 4.9.2
 - Fix proguard issue with `RemoteConfigResponse`
