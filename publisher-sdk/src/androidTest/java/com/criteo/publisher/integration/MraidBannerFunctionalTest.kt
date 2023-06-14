@@ -100,8 +100,6 @@ class MraidBannerFunctionalTest {
   @Test
   @FlakyTest(detail = "Flakiness comes from UI and concurrency")
   fun whenExpand_ShouldMoveWebViewToDialogAndUpdateState() {
-    waitForReady()
-
     expand()
 
     onExpanded.await()
@@ -118,12 +116,12 @@ class MraidBannerFunctionalTest {
   @Test
   @FlakyTest(detail = "Flakiness comes from UI and concurrency")
   fun whenCloseInDefaultState_ShouldClearAd() {
-    waitForReady()
-
     close()
-    onHidden.await()
     mockedDependenciesRule.waitForIdleState()
 
+    // It takes some time to clear WebView content. Locally it works fine without delay but
+    // on CI it is extremely flaky
+    Thread.sleep(2000)
     val content = webViewLookup.lookForHtmlContent(bannerView).get()
 
     assertThat(content).isEqualTo(mraidData.emptyPageHtml)
@@ -132,8 +130,6 @@ class MraidBannerFunctionalTest {
   @Test
   @FlakyTest(detail = "Flakiness comes from UI and concurrency")
   fun whenExpandAndThenClose_ShouldMoveBackToOriginalContainer() {
-    waitForReady()
-
     val originalLayoutParams = getWebView().layoutParams
     expand()
     onExpanded.await()
@@ -150,8 +146,6 @@ class MraidBannerFunctionalTest {
   @Test
   @FlakyTest(detail = "Flakiness comes from UI and concurrency")
   fun whenOpen_ShouldDelegateToRedirection() {
-    waitForReady()
-
     open()
     mockedDependenciesRule.waitForIdleState()
 
@@ -180,8 +174,11 @@ class MraidBannerFunctionalTest {
 
     val sync = CriteoSync(bannerView)
     loadAdAndWait(bannerView)
-    sync.waitForDisplay()
+    sync.waitForBid()
 
+    // It takes some time for WebView to load ad into itself. Locally it works fine without delay but
+    // on CI it is extremely flaky
+    Thread.sleep(2000)
     bannerView.adWebView.getJavascriptResultBlocking(mraidData.getTestJavascript())
 
     return bannerView
@@ -228,7 +225,6 @@ class MraidBannerFunctionalTest {
       MraidState.EXPANDED -> onExpanded.countDown()
       MraidState.HIDDEN -> onHidden.countDown()
     }
-    onExpanded.countDown()
   }
 
   private fun String.toMraidState(): MraidState {
