@@ -58,7 +58,7 @@ object Deps {
     }
 
     object MraidBridge {
-      private const val version = "0.1.0"
+      private const val version = "1.0.0"
 
       const val Release = "com.criteo.publisher:mraid-bridge:$version"
       const val Snapshot = "$Release-SNAPSHOT"
