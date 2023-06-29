@@ -1,5 +1,8 @@
 # Next Version
 
+# Version 5.0.1
+- Downgrade Moshi to 1.12 and Kotlin to 1.15.31
+
 # Version 5.0.0
 - Bump AdMob to v22.1.0
 - Add support for MRAID v1 specification. Everything is supported except for useCustomClose and two-part creatives.
