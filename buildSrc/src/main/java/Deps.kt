@@ -54,7 +54,8 @@ object Deps {
     }
 
     object Mediation {
-      fun AdMob(version: String) = "com.criteo.mediation.google:criteo-adapter-development:$version"
+      // TODO: remove on next PR. Temp fix to downgrade version and run tests
+      fun AdMob(version: String) = "com.criteo.mediation.google:criteo-adapter-development:4.9.2.0-20230301.1644"
     }
 
     object MraidBridge {
