@@ -35,16 +35,31 @@ data class CdbRequestSlot internal constructor(
     @Json(name = "rewarded")
     val isRewarded: Boolean?,
     @Json(name = "sizes")
-    val sizes: Collection<String>
+    val sizes: Collection<String>,
+    @Json(name = "banner")
+    val banner: Banner?
 ) {
 
-  constructor(impressionId: String, placementId: String, adUnitType: AdUnitType, size: AdSize) :
+  constructor(
+      impressionId: String,
+      placementId: String,
+      adUnitType: AdUnitType,
+      size: AdSize,
+      apiFramework: List<ApiFramework>
+  ) :
       this(
           impressionId,
           placementId,
           if (adUnitType == AdUnitType.CRITEO_CUSTOM_NATIVE) true else null,
           if (adUnitType == AdUnitType.CRITEO_INTERSTITIAL) true else null,
           if (adUnitType == AdUnitType.CRITEO_REWARDED) true else null,
-          listOf(size.formattedSize)
+          listOf(size.formattedSize),
+          apiFramework.takeIf { it.isNotEmpty() }?.run { Banner(api = this.map { it.code }) }
       )
 }
+
+@JsonClass(generateAdapter = true)
+data class Banner internal constructor(
+    @Json(name = "api")
+    val api: List<Int>
+)

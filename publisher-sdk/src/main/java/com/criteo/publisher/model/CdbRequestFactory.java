@@ -73,6 +73,9 @@ public class CdbRequestFactory {
   @NonNull
   private final UserDataHolder userDataHolder;
 
+  @NonNull
+  private final Config config;
+
   public CdbRequestFactory(
       @NonNull Context context,
       @NonNull String criteoPublisherId,
@@ -83,7 +86,8 @@ public class CdbRequestFactory {
       @NonNull BuildConfigWrapper buildConfigWrapper,
       @NonNull IntegrationRegistry integrationRegistry,
       @NonNull ContextProvider contextProvider,
-      @NonNull UserDataHolder userDataHolder
+      @NonNull UserDataHolder userDataHolder,
+      @NonNull Config config
   ) {
     this.context = context;
     this.criteoPublisherId = criteoPublisherId;
@@ -95,6 +99,7 @@ public class CdbRequestFactory {
     this.integrationRegistry = integrationRegistry;
     this.contextProvider = contextProvider;
     this.userDataHolder = userDataHolder;
+    this.config = config;
   }
 
   @NonNull
@@ -149,7 +154,8 @@ public class CdbRequestFactory {
         uniqueIdGenerator.generateId(),
         requestedAdUnit.getPlacementId(),
         requestedAdUnit.getAdUnitType(),
-        requestedAdUnit.getSize()
+        requestedAdUnit.getSize(),
+        getSdkFeatures()
     );
   }
 
@@ -263,5 +269,14 @@ public class CdbRequestFactory {
   private CdbRegs createRegs() {
     Boolean tagForChildTreatment = userPrivacyUtil.getTagForChildDirectedTreatment();
     return tagForChildTreatment == null ? null : new CdbRegs(tagForChildTreatment);
+  }
+
+  @NonNull
+  private List<ApiFramework> getSdkFeatures() {
+    if (config.isMraidEnabled()) {
+      return Collections.singletonList(ApiFramework.MRAID_1);
+    } else {
+      return Collections.emptyList();
+    }
   }
 }

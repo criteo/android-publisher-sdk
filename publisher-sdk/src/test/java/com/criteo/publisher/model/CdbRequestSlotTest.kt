@@ -46,6 +46,8 @@ class CdbRequestSlotTest {
     const val IS_INTERSTITIAL = "interstitial"
     const val IS_NATIVE = "isNative"
     const val IS_REWARDED = "rewarded"
+    const val BANNER = "banner"
+    const val API = "api"
   }
 
   @Test
@@ -54,7 +56,8 @@ class CdbRequestSlotTest {
         "myImpBanner",
         "myBanner",
         CRITEO_BANNER,
-        AdSize(42, 1337)
+        AdSize(42, 1337),
+        listOf(ApiFramework.MRAID_1, ApiFramework.MRAID_2, ApiFramework.MRAID_3)
     )
 
     val json = slot.toJson()
@@ -62,7 +65,12 @@ class CdbRequestSlotTest {
     json.assertPayloadMatch(
         "myImpBanner",
         "myBanner",
-        listOf("42x1337")
+        listOf("42x1337"),
+        expectedApis = listOf(
+            ApiFramework.MRAID_1.code,
+            ApiFramework.MRAID_2.code,
+            ApiFramework.MRAID_3.code
+        )
     )
   }
 
@@ -72,7 +80,8 @@ class CdbRequestSlotTest {
         "myImpInterstitial",
         "myInterstitial",
         CRITEO_INTERSTITIAL,
-        AdSize(1337, 42)
+        AdSize(1337, 42),
+        listOf(ApiFramework.MRAID_1)
     )
 
     val json = slot.toJson()
@@ -81,7 +90,8 @@ class CdbRequestSlotTest {
         "myImpInterstitial",
         "myInterstitial",
         listOf("1337x42"),
-        expectedIsInterstitial = true
+        expectedIsInterstitial = true,
+        expectedApis = listOf(3)
     )
   }
 
@@ -91,7 +101,8 @@ class CdbRequestSlotTest {
         "myImpNative",
         "myNative",
         CRITEO_CUSTOM_NATIVE,
-        AdSize(2, 2)
+        AdSize(2, 2),
+        emptyList()
     )
 
     val json = slot.toJson()
@@ -110,7 +121,8 @@ class CdbRequestSlotTest {
         "myImpRewarded",
         "myRewarded",
         CRITEO_REWARDED,
-        AdSize(1337, 42)
+        AdSize(1337, 42),
+        emptyList()
     )
 
     val json = slot.toJson()
@@ -130,7 +142,8 @@ class CdbRequestSlotTest {
       expectedSizes: List<String>,
       expectedIsInterstitial: Boolean = false,
       expectedIsNative: Boolean = false,
-      expectedIsRewarded: Boolean = false
+      expectedIsRewarded: Boolean = false,
+      expectedApis: List<Int> = emptyList()
   ) {
     val expectedKeys = mutableListOf(
         IMPRESSION_ID,
@@ -146,6 +159,9 @@ class CdbRequestSlotTest {
     }
     if (expectedIsRewarded) {
       expectedKeys.add(IS_REWARDED)
+    }
+    if (expectedApis.isNotEmpty()) {
+      expectedKeys.add(BANNER)
     }
 
     assertThat(keys()).toIterable().containsExactlyInAnyOrderElementsOf(expectedKeys)
@@ -165,6 +181,10 @@ class CdbRequestSlotTest {
     if (expectedIsRewarded) {
       assertThat(this[IS_REWARDED]).isEqualTo(true)
     }
+
+    if (expectedApis.isNotEmpty()) {
+      assertThat(readApis()).isEqualTo(expectedApis)
+    }
   }
 
   private fun JSONObject.readSizes(): List<String> {
@@ -172,6 +192,15 @@ class CdbRequestSlotTest {
 
     return (0 until sizes.length())
         .map { sizes[it] as String }
+        .toList()
+  }
+
+  private fun JSONObject.readApis(): List<Int> {
+    val banner = this[BANNER] as JSONObject
+    val apis = banner[API] as JSONArray
+
+    return (0 until apis.length())
+        .map { apis[it] as Int }
         .toList()
   }
 

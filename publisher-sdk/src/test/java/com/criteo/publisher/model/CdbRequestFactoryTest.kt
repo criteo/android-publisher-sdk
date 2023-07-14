@@ -71,6 +71,9 @@ class CdbRequestFactoryTest {
   @Mock
   private lateinit var contextProvider: ContextProvider
 
+  @Mock
+  private lateinit var config: Config
+
   private val userDataHolder = UserDataHolder()
 
   private val cpId = "myCpId"
@@ -94,7 +97,8 @@ class CdbRequestFactoryTest {
         buildConfigWrapper,
         integrationRegistry,
         contextProvider,
-        userDataHolder
+        userDataHolder,
+        config
     )
   }
 
@@ -119,7 +123,8 @@ class CdbRequestFactoryTest {
         "impId",
         adUnit.placementId,
         adUnit.adUnitType,
-        adUnit.size
+        adUnit.size,
+        emptyList()
     )
 
     buildConfigWrapper.stub {
@@ -185,7 +190,8 @@ class CdbRequestFactoryTest {
         "impId",
         adUnit.placementId,
         adUnit.adUnitType,
-        adUnit.size
+        adUnit.size,
+        emptyList()
     )
 
     buildConfigWrapper.stub {
@@ -238,14 +244,16 @@ class CdbRequestFactoryTest {
         "impId1",
         adUnit1.placementId,
         adUnit1.adUnitType,
-        adUnit1.size
+        adUnit1.size,
+        emptyList()
     )
 
     val expectedSlot2 = CdbRequestSlot(
         "impId2",
         adUnit2.placementId,
         adUnit2.adUnitType,
-        adUnit2.size
+        adUnit2.size,
+        emptyList()
     )
 
     uniqueIdGenerator.stub {
@@ -353,6 +361,39 @@ class CdbRequestFactoryTest {
 
     assertThat(request.regs).isNotNull
     assertThat(request.regs!!.tagForChildDirectedTreatment).isFalse
+  }
+
+  @Test
+  fun createRequest_GivenMraidIsEnabledTrue_CreateRequestWithMraid1ApiInEverySlot() {
+    mockRequiredObjects()
+    whenever(config.isMraidEnabled).thenReturn(true)
+
+    val request = factory.createRequest(listOf(createAdUnit(), createAdUnit()), ContextData())
+
+    request.slots.forEach {
+      assertThat(it.banner?.api).contains(ApiFramework.MRAID_1.code)
+    }
+  }
+
+  @Test
+  fun createRequest_GivenMraidIsEnabledFalse_CreateRequestWithoutBannerFieldInEachSlot() {
+    mockRequiredObjects()
+    whenever(config.isMraidEnabled).thenReturn(false)
+
+    val request = factory.createRequest(listOf(createAdUnit(), createAdUnit()), ContextData())
+
+    request.slots.forEach {
+      assertThat(it.banner).isNull()
+    }
+  }
+
+  private fun mockRequiredObjects() {
+    whenever(userPrivacyUtil.tagForChildDirectedTreatment).thenReturn(true)
+    whenever(context.packageName).thenReturn("bundle.id")
+    whenever(integrationRegistry.profileId).thenReturn(42)
+    whenever(uniqueIdGenerator.generateId())
+        .thenReturn("myRequestId")
+    whenever(buildConfigWrapper.sdkVersion).thenReturn("1.1.1")
   }
 
   private fun createAdUnit(): CacheAdUnit {
