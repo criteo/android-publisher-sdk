@@ -355,7 +355,8 @@ public class DependencyProvider {
         provideBuildConfigWrapper(),
         provideIntegrationRegistry(),
         provideContextProvider(),
-        provideUserDataHolder()
+        provideUserDataHolder(),
+        provideConfig()
     ));
   }
 
