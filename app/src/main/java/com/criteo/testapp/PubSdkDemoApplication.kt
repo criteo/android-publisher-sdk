@@ -19,6 +19,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
+import android.webkit.WebView
 import androidx.multidex.MultiDexApplication
 import com.criteo.publisher.Criteo
 import com.criteo.publisher.DependencyProvider
@@ -82,6 +83,8 @@ class PubSdkDemoApplication : MultiDexApplication() {
             .penaltyLog()
             .build()
     )
+
+    WebView.setWebContentsDebuggingEnabled(true)
 
     // Enable leak canary
     // JUnit is in the classpath through the test-utils module. So LeakCanary is deactivated automatically just after
