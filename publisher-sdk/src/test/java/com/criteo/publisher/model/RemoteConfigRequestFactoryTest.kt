@@ -18,7 +18,6 @@ package com.criteo.publisher.model
 
 import android.content.Context
 import com.criteo.publisher.integration.IntegrationRegistry
-import com.criteo.publisher.util.AdvertisingInfo
 import com.criteo.publisher.util.BuildConfigWrapper
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -44,9 +43,6 @@ class RemoteConfigRequestFactoryTest {
     @Mock
     private lateinit var integrationRegistry: IntegrationRegistry
 
-    @Mock
-    private lateinit var advertisingInfo: AdvertisingInfo
-
     private lateinit var factory: RemoteConfigRequestFactory
 
     @Before
@@ -55,8 +51,7 @@ class RemoteConfigRequestFactoryTest {
             context,
             "myCpId",
             buildConfigWrapper,
-            integrationRegistry,
-            advertisingInfo
+            integrationRegistry
         )
     }
 
@@ -74,16 +69,11 @@ class RemoteConfigRequestFactoryTest {
             on { packageName } doReturn "my.bundle"
         }
 
-        advertisingInfo.stub {
-            on { advertisingId } doReturn "myAdvertisingId"
-        }
-
         val request = factory.createRequest()
 
         assertThat(request.bundleId).isEqualTo("my.bundle")
         assertThat(request.criteoPublisherId).isEqualTo("myCpId")
         assertThat(request.sdkVersion).isEqualTo("1.2.3")
         assertThat(request.profileId).isEqualTo(456)
-        assertThat(request.deviceId).isEqualTo("myAdvertisingId")
     }
 }
