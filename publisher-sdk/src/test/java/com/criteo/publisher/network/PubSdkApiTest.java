@@ -403,7 +403,7 @@ public class PubSdkApiTest {
         "myAppId",
         "myVersion",
         456,
-        "myDeviceId"
+        "android"
     );
 
     String expectedJson = ""
@@ -412,7 +412,6 @@ public class PubSdkApiTest {
         + "  \"bundleId\" : \"myAppId\",\n"
         + "  \"sdkVersion\" : \"myVersion\",\n"
         + "  \"rtbProfileId\": 456,\n"
-        + "  \"deviceId\": \"myDeviceId\",\n"
         + "  \"deviceOs\": \"android\""
         + "}";
 

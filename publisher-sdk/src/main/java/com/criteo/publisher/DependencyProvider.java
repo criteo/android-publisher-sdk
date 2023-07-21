@@ -373,8 +373,7 @@ public class DependencyProvider {
         provideContext(),
         provideCriteoPublisherId(),
         provideBuildConfigWrapper(),
-        provideIntegrationRegistry(),
-        provideAdvertisingInfo()
+        provideIntegrationRegistry()
     ));
   }
 

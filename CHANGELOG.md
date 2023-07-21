@@ -3,6 +3,7 @@
 # Version 5.0.2
 - Send SDK MRAID capability
 - Fix MRAID iframe issues
+- Do not send `deviceId` in config request
 
 # Version 5.0.1
 - Downgrade Moshi to 1.12 and Kotlin to 1.15.31

@@ -30,11 +30,6 @@ data class RemoteConfigRequest @JvmOverloads constructor(
     val sdkVersion: String,
     @Json(name = "rtbProfileId")
     val profileId: Int,
-    /**
-     * Field used by the remote config to A/B test some configurations.
-     */
-    @Json(name = "deviceId")
-    val deviceId: String?,
     @Json(name = "deviceOs")
     val deviceOs: String = "android"
 )

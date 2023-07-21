@@ -18,7 +18,6 @@ package com.criteo.publisher.model
 import android.content.Context
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.integration.IntegrationRegistry
-import com.criteo.publisher.util.AdvertisingInfo
 import com.criteo.publisher.util.BuildConfigWrapper
 
 @OpenForTesting
@@ -26,16 +25,14 @@ class RemoteConfigRequestFactory(
     private val context: Context,
     private val criteoPublisherId: String,
     private val buildConfigWrapper: BuildConfigWrapper,
-    private val integrationRegistry: IntegrationRegistry,
-    private val advertisingInfo: AdvertisingInfo
+    private val integrationRegistry: IntegrationRegistry
 ) {
   fun createRequest(): RemoteConfigRequest {
     return RemoteConfigRequest(
         criteoPublisherId,
         context.packageName,
         buildConfigWrapper.sdkVersion,
-        integrationRegistry.profileId,
-        advertisingInfo.advertisingId
+        integrationRegistry.profileId
     )
   }
 }

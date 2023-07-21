@@ -39,8 +39,7 @@ class RemoteConfigRequestTest {
         "myCpId",
         "my.bundle.id",
         "1.2.3",
-        456,
-        "myDeviceId"
+        456
     )
 
     val json = serializer.writeIntoString(request)
@@ -52,7 +51,6 @@ class RemoteConfigRequestTest {
         "bundleId" : "my.bundle.id",
         "sdkVersion" : "1.2.3",
         "rtbProfileId": 456,
-        "deviceId": "myDeviceId",
         "deviceOs": "android"
       }
     """.trimIndent())
