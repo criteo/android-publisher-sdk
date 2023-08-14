@@ -68,6 +68,7 @@ class CriteoInterstitialMraidControllerTest {
             runOnUiThreadExecutor,
             mock(),
             mock(),
+            mock(),
             mock()
         )
     )

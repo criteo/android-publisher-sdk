@@ -59,6 +59,7 @@ class CriteoBannerMraidControllerTest {
             runOnUiThreadExecutor,
             mock(),
             mock(),
+            mock(),
             mock()
         )
     )

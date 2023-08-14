@@ -765,7 +765,8 @@ public class DependencyProvider {
           provideRunOnUiThreadExecutor(),
           provideVisibilityTracker(),
           provideMraidInteractor(adWebView),
-          provideMraidMessageHandler()
+          provideMraidMessageHandler(),
+          provideDeviceUtil()
       );
     } else {
       return new CriteoInterstitialMraidController(
@@ -773,7 +774,8 @@ public class DependencyProvider {
           provideRunOnUiThreadExecutor(),
           provideVisibilityTracker(),
           provideMraidInteractor(adWebView),
-          provideMraidMessageHandler()
+          provideMraidMessageHandler(),
+          provideDeviceUtil()
       );
     }
   }

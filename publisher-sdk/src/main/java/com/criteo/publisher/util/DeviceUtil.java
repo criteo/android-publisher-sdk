@@ -17,7 +17,12 @@
 package com.criteo.publisher.util;
 
 import android.content.Context;
+import android.graphics.Point;
+import android.os.Build;
 import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.WindowManager;
+import android.view.WindowMetrics;
 import androidx.annotation.NonNull;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
@@ -37,7 +42,8 @@ public class DeviceUtil {
   /**
    * Indicate if the device is a tablet or not.
    * <p>
-   * The definition of a tablet is based on its <a href="https://developer.android.com/training/multiscreen/screensizes.html#TaskUseSWQuali">smallest
+   * The definition of a tablet is based on its <a
+   * href="https://developer.android.com/training/multiscreen/screensizes.html#TaskUseSWQuali">smallest
    * width</a>: if width is above or equal to 600dp, then it is a tablet.
    * <p>
    * The corollary is that, if this is not a tablet, then we consider this as a mobile.
@@ -53,13 +59,42 @@ public class DeviceUtil {
 
   public AdSize getCurrentScreenSize() {
     DisplayMetrics metrics = getDisplayMetrics();
-    int widthInDp = Math.round(metrics.widthPixels / metrics.density);
-    int heightInDp = Math.round(metrics.heightPixels / metrics.density);
+    int widthInDp = pxToDp(metrics.widthPixels);
+    int heightInDp = pxToDp(metrics.heightPixels);
+
     return new AdSize(widthInDp, heightInDp);
+  }
+
+  /**
+   *
+   * @return device screenSize including status and navigation bar
+   */
+  public AdSize getRealScreenSize() {
+    WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+
+    int widthPx;
+    int heightPx;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      WindowMetrics windowMetrics = windowManager.getMaximumWindowMetrics();
+
+      widthPx = windowMetrics.getBounds().width();
+      heightPx = windowMetrics.getBounds().height();
+    } else {
+      Point point = new Point();
+      windowManager.getDefaultDisplay().getRealSize(point);
+      widthPx = point.x;
+      heightPx = point.y;
+    }
+
+    return new AdSize(pxToDp(widthPx), pxToDp(heightPx));
   }
 
   private DisplayMetrics getDisplayMetrics() {
     return context.getResources().getDisplayMetrics();
+  }
+
+  private int pxToDp(int pxValue) {
+    return Math.round(pxValue / getDisplayMetrics().density);
   }
 
   public boolean isVersionSupported() {

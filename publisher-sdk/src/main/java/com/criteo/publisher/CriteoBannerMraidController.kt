@@ -37,6 +37,7 @@ import com.criteo.publisher.adview.MraidPlacementType
 import com.criteo.publisher.adview.MraidState
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
+import com.criteo.publisher.util.DeviceUtil
 import com.criteo.publisher.util.doOnNextLayout
 
 @OpenForTesting
@@ -46,8 +47,9 @@ internal class CriteoBannerMraidController(
     private val runOnUiThreadExecutor: RunOnUiThreadExecutor,
     visibilityTracker: VisibilityTracker,
     mraidInteractor: MraidInteractor,
-    mraidMessageHandler: MraidMessageHandler
-) : CriteoMraidController(bannerView, visibilityTracker, mraidInteractor, mraidMessageHandler) {
+    mraidMessageHandler: MraidMessageHandler,
+    deviceUtil: DeviceUtil
+) : CriteoMraidController(bannerView, visibilityTracker, mraidInteractor, mraidMessageHandler, deviceUtil) {
 
   private val defaultBannerViewLayoutParams: LayoutParams = bannerView.layoutParams
   private var dialog: Dialog? = null

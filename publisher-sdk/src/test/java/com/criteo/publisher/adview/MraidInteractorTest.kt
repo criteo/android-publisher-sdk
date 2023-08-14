@@ -144,4 +144,15 @@ class MraidInteractorTest {
     )
     verifyNoMoreInteractions(webView)
   }
+
+  @Test
+  fun whenSetScreenSize_ShouldEvaluateSetScreenSizeOnMraidObject() {
+    mraidInteractor.setScreenSize(123, 456)
+
+    verify(webView).evaluateJavascript(
+        "window.mraid.setScreenSize(123, 456)",
+        null
+    )
+    verifyNoMoreInteractions(webView)
+  }
 }
