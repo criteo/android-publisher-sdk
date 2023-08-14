@@ -23,6 +23,8 @@ import com.criteo.publisher.advancednative.VisibilityTracker
 import com.criteo.publisher.logging.Logger
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
+import com.criteo.publisher.model.AdSize
+import com.criteo.publisher.util.DeviceUtil
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
@@ -33,6 +35,7 @@ import org.mockito.Mock
 import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -74,6 +77,9 @@ class CriteoMraidControllerTest {
   @Mock
   private lateinit var displayMetrics: DisplayMetrics
 
+  @Mock
+  private lateinit var deviceUtil: DeviceUtil
+
   @SpyBean
   private lateinit var logger: Logger
 
@@ -88,7 +94,8 @@ class CriteoMraidControllerTest {
         adWebView,
         visibilityTracker,
         mraidInteractor,
-        mraidMessageHandler
+        mraidMessageHandler,
+        deviceUtil
     ) {
       override fun getPlacementType(): MraidPlacementType {
         return placementType
@@ -110,6 +117,7 @@ class CriteoMraidControllerTest {
     whenever(adWebView.resources).thenReturn(resources)
     whenever(resources.configuration).thenReturn(configuration)
     whenever(resources.displayMetrics).thenReturn(displayMetrics)
+    whenever(deviceUtil.realScreenSize).thenReturn(AdSize(100, 100))
   }
 
   @Test
@@ -224,12 +232,16 @@ class CriteoMraidControllerTest {
     givenMraidAdAndPageIsFinished()
 
     verify(visibilityTracker).watch(adWebView, criteoMraidController)
-    verify(mraidInteractor).setMaxSize(
+
+    val inOrder = inOrder(mraidInteractor)
+    inOrder.verify(mraidInteractor).setMaxSize(
         configuration.screenWidthDp,
         configuration.screenHeightDp,
         adWebView.resources.displayMetrics.density.toDouble()
     )
-    verify(mraidInteractor).notifyReady(criteoMraidController.getPlacementType())
+    inOrder.verify(mraidInteractor).setScreenSize(100, 100)
+    inOrder.verify(mraidInteractor).notifyReady(criteoMraidController.getPlacementType())
+
     assertThat(criteoMraidController.currentState).isEqualTo(MraidState.DEFAULT)
   }
 
@@ -310,6 +322,11 @@ class CriteoMraidControllerTest {
         configuration.screenWidthDp,
         configuration.screenHeightDp,
         adWebView.resources.displayMetrics.density.toDouble()
+    )
+
+    verify(mraidInteractor, times(2)).setScreenSize(
+        100,
+        100
     )
   }
 

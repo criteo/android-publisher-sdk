@@ -23,6 +23,7 @@ import com.criteo.publisher.advancednative.VisibilityListener
 import com.criteo.publisher.advancednative.VisibilityTracker
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.logging.LoggerFactory
+import com.criteo.publisher.util.DeviceUtil
 import java.io.IOException
 
 @OpenForTesting
@@ -31,7 +32,8 @@ internal abstract class CriteoMraidController(
     private val adWebView: AdWebView,
     private val visibilityTracker: VisibilityTracker,
     private val mraidInteractor: MraidInteractor,
-    private val mraidMessageHandler: MraidMessageHandler
+    private val mraidMessageHandler: MraidMessageHandler,
+    private val deviceUtil: DeviceUtil
 ) : MraidController, VisibilityListener, MraidMessageHandlerListener, AdWebViewClientListener {
 
   private var isViewable: Boolean? = null
@@ -118,7 +120,10 @@ internal abstract class CriteoMraidController(
 
   override fun onConfigurationChange(newConfig: Configuration?) {
     invokeIfMraidAd {
-      newConfig?.let { setMaxSize(it) }
+      newConfig?.let {
+        setMaxSize(it)
+        setScreenSize()
+      }
     }
   }
 
@@ -131,6 +136,7 @@ internal abstract class CriteoMraidController(
   private fun onMraidLoaded() {
     visibilityTracker.watch(adWebView, this)
     setMaxSize(adWebView.resources.configuration)
+    setScreenSize()
     mraidState = MraidState.DEFAULT
     mraidInteractor.notifyReady(getPlacementType())
   }
@@ -161,6 +167,11 @@ internal abstract class CriteoMraidController(
         configuration.screenHeightDp,
         adWebView.resources.displayMetrics.density.toDouble()
     )
+  }
+
+  private fun setScreenSize() {
+    val screenSize = deviceUtil.realScreenSize
+    mraidInteractor.setScreenSize(screenSize.width, screenSize.height)
   }
 
   private fun updateCurrentStateOnClose() {

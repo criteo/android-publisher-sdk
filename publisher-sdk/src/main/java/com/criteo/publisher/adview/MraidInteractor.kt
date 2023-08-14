@@ -46,12 +46,20 @@ internal class MraidInteractor(private val webView: WebView) {
   }
 
   /**
+   * Report max size available to render ad
    * [width] in dp
    * [height] in dp
-   * [pixelMultiplier] - value co calculate width or height in pixels
+   * [pixelMultiplier] - value to calculate width or height in pixels
    */
   fun setMaxSize(width: Int, height: Int, pixelMultiplier: Double) {
     "setMaxSize"(width, height, pixelMultiplier)
+  }
+
+  /**
+   * Reports screen size of device in dp
+   */
+  fun setScreenSize(width: Int, height: Int) {
+    "setScreenSize"(width, height)
   }
 
   private operator fun String.invoke(vararg params: Any? = emptyArray()) {
