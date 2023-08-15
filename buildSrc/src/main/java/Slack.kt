@@ -100,7 +100,7 @@ private fun Project.addSlackDeploymentMessage(publication: MavenPublication, rep
 - Install the <${testAppUrl(publication.version)}|TestApp APK>
 - Go on <$confluenceSpaceUrl/Bugfest+Android+${publication.version}|Bugfest page> and execute tests
 *Release the RC*
-- (Optional) Release new mraid-bridge version as described here <${howToReleaseConfluencePage}>
+- (Optional) Release new mraid-bridge version as described <${howToReleaseConfluencePage}|here>
 - Create a <https://github.com/criteo/android-publisher-sdk/releases/new|new GitHub release> and insert:
   - Tag version, target, Release title: `v${sdkVersion()}`
   - Description: the changelog above
