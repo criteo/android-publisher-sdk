@@ -170,7 +170,7 @@ internal abstract class CriteoMraidController(
   }
 
   private fun setScreenSize() {
-    val screenSize = deviceUtil.realScreenSize
+    val screenSize = deviceUtil.getRealSceeenSize()
     mraidInteractor.setScreenSize(screenSize.width, screenSize.height)
   }
 

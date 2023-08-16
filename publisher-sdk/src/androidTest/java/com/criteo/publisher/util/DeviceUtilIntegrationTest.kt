@@ -46,7 +46,7 @@ class DeviceUtilIntegrationTest {
       throw AssumptionViolatedException("Version of device should be >= 19")
     }
 
-    val versionSupported = deviceUtil.isVersionSupported
+    val versionSupported = deviceUtil.isVersionSupported()
 
     assertThat(versionSupported).isTrue()
   }
@@ -54,10 +54,10 @@ class DeviceUtilIntegrationTest {
   @Test
   fun getCurrentScreenSize_GivenOrientationChange_ReturnDifferentScreenSize() {
     setOrientationAndWait(activityRule, ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-    val portraitSize = deviceUtil.currentScreenSize
+    val portraitSize = deviceUtil.getCurrentScreenSize()
 
     setOrientationAndWait(activityRule, ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
-    val landscapeSize = deviceUtil.currentScreenSize
+    val landscapeSize = deviceUtil.getCurrentScreenSize()
 
     assertThat(portraitSize).isNotEqualTo(landscapeSize)
   }

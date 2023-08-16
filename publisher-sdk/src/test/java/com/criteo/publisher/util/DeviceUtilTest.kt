@@ -13,150 +13,138 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.criteo.publisher.util
 
-package com.criteo.publisher.util;
+import android.content.Context
+import android.graphics.Point
+import android.os.Build
+import android.util.DisplayMetrics
+import android.view.WindowManager
+import android.view.WindowMetrics
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.mockito.Answers
+import org.mockito.ArgumentMatchers
+import org.mockito.InjectMocks
+import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.junit.MockitoJUnit
+import org.mockito.kotlin.whenever
+import java.lang.reflect.Field
+import java.lang.reflect.Modifier
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import android.content.Context;
-import android.graphics.Point;
-import android.graphics.Rect;
-import android.os.Build;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.WindowManager;
-import android.view.WindowMetrics;
-import com.criteo.publisher.model.AdSize;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.Answers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-
-public class DeviceUtilTest {
+class DeviceUtilTest {
 
   @Rule
-  public MockitoRule mockitoRule = MockitoJUnit.rule();
+  @JvmField
+  var mockitoRule = MockitoJUnit.rule()
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private Context context;
+  private lateinit var context: Context
 
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-  private WindowManager windowManager;
+  private lateinit var windowManager: WindowManager
 
   @InjectMocks
-  private DeviceUtil deviceUtil;
+  private lateinit var deviceUtil: DeviceUtil
 
-  private DisplayMetrics metrics;
+  private lateinit var metrics: DisplayMetrics
 
   @Before
-  public void setUp() {
-    metrics = new DisplayMetrics();
-    when(context.getResources().getDisplayMetrics()).thenReturn(metrics);
-
-    when(context.getSystemService(Context.WINDOW_SERVICE)).thenReturn(windowManager);
+  fun setUp() {
+    metrics = DisplayMetrics()
+    whenever(context.resources.displayMetrics).thenReturn(metrics)
+    whenever(context.getSystemService(Context.WINDOW_SERVICE)).thenReturn(windowManager)
   }
 
   @Test
-  public void isTablet_GivenDeviceInPortraitAndWidthBelow600dp_ReturnFalse() throws Exception {
-    metrics.density = 1.25f;
-    metrics.widthPixels = 749; // 600dp is 750pixel
-    metrics.heightPixels = 1000;
+  fun isTablet_GivenDeviceInPortraitAndWidthBelow600dp_ReturnFalse() {
+    metrics.density = 1.25f
+    metrics.widthPixels = 749 // 600dp is 750pixel
+    metrics.heightPixels = 1000
 
-    boolean isTablet = deviceUtil.isTablet();
+    val isTablet = deviceUtil.isTablet()
 
-    assertThat(isTablet).isFalse();
+    assertThat(isTablet).isFalse
   }
 
   @Test
-  public void isTablet_GivenDeviceInPortraitAndWidthAboveOrEqualTo600dp_ReturnTrue() throws Exception {
-    metrics.density = 1.25f;
-    metrics.widthPixels = 750; // 600dp is 750pixel
-    metrics.heightPixels = 1000;
+  fun isTablet_GivenDeviceInPortraitAndWidthAboveOrEqualTo600dp_ReturnTrue() {
+    metrics.density = 1.25f
+    metrics.widthPixels = 750 // 600dp is 750pixel
+    metrics.heightPixels = 1000
 
-    boolean isTablet = deviceUtil.isTablet();
+    val isTablet = deviceUtil.isTablet()
 
-    assertThat(isTablet).isTrue();
+    assertThat(isTablet).isTrue
   }
 
   @Test
-  public void isTablet_GivenDeviceInLandscapeAndHeightBelow600dp_ReturnFalse() throws Exception {
-    metrics.density = 1.25f;
-    metrics.widthPixels = 1000;
-    metrics.heightPixels = 749; // 600dp is 750pixel
+  fun isTablet_GivenDeviceInLandscapeAndHeightBelow600dp_ReturnFalse() {
+    metrics.density = 1.25f
+    metrics.widthPixels = 1000
+    metrics.heightPixels = 749 // 600dp is 750pixel
 
-    boolean isTablet = deviceUtil.isTablet();
+    val isTablet = deviceUtil.isTablet()
 
-    assertThat(isTablet).isFalse();
+    assertThat(isTablet).isFalse
   }
 
   @Test
-  public void isTablet_GivenDeviceInLandscapeAndHeightAboveOrEqualTo600dp_ReturnTrue() throws Exception {
-    metrics.density = 1.25f;
-    metrics.widthPixels = 1000;
-    metrics.heightPixels = 750; // 600dp is 750pixel
+  fun isTablet_GivenDeviceInLandscapeAndHeightAboveOrEqualTo600dp_ReturnTrue() {
+    metrics.density = 1.25f
+    metrics.widthPixels = 1000
+    metrics.heightPixels = 750 // 600dp is 750pixel
 
-    boolean isTablet = deviceUtil.isTablet();
+    val isTablet = deviceUtil.isTablet()
 
-    assertThat(isTablet).isTrue();
+    assertThat(isTablet).isTrue
   }
 
   @Test
-  public void getRealScreenSize_GivenApiLevel29_ShouldReturnScreenSizeInDp()
-      throws Exception {
-    setSdkIntVersion(29);
-    metrics.density = 2f;
+  fun realScreenSize_GivenApiLevel29_ShouldReturnScreenSizeInDp() {
+    setSdkIntVersion(29)
+    metrics.density = 2f
+    val display = windowManager.defaultDisplay
+    Mockito.doAnswer { invocation: InvocationOnMock ->
+      val args = invocation.arguments
+      val point = args[0] as Point
+      point.x = 100
+      point.y = 100
+      null
+    }.whenever(display).getRealSize(ArgumentMatchers.any())
 
-    Display display = windowManager.getDefaultDisplay();
-    doAnswer(invocation -> {
-      Object[] args = invocation.getArguments();
-      Point point = (Point) args[0];
-      point.x = 100;
-      point.y = 100;
-      return null;
-    }).when(display).getRealSize(any());
+    val (width, height) = deviceUtil.getRealSceeenSize()
 
-    AdSize screenSize = deviceUtil.getRealScreenSize();
-    assertThat(screenSize.getWidth()).isEqualTo(50);
-    assertThat(screenSize.getHeight()).isEqualTo(50);
+    assertThat(width).isEqualTo(50)
+    assertThat(height).isEqualTo(50)
   }
 
   @Test
-  public void getRealScreenSize_GivenApiLevel30_ShouldReturnScreenSizeInDp()
-      throws Exception {
-    setSdkIntVersion(30);
-    metrics.density = 2f;
+  fun realScreenSize_GivenApiLevel30_ShouldReturnScreenSizeInDp() {
+    setSdkIntVersion(30)
+    metrics.density = 2f
+    val windowMetrics = Mockito.mock(WindowMetrics::class.java, Mockito.RETURNS_DEEP_STUBS)
+    val bounds = windowMetrics.bounds
+    whenever(bounds.height()).thenReturn(100)
+    whenever(bounds.width()).thenReturn(100)
+    whenever(windowManager.maximumWindowMetrics).thenReturn(windowMetrics)
 
-    WindowMetrics windowMetrics = mock(WindowMetrics.class, RETURNS_DEEP_STUBS);
-    Rect bounds = windowMetrics.getBounds();
-    when(bounds.height()).thenReturn(100);
-    when(bounds.width()).thenReturn(100);
-    when(windowManager.getMaximumWindowMetrics()).thenReturn(windowMetrics);
+    val (width, height) = deviceUtil.getRealSceeenSize()
 
-    AdSize screenSize = deviceUtil.getRealScreenSize();
-    assertThat(screenSize.getWidth()).isEqualTo(50);
-    assertThat(screenSize.getHeight()).isEqualTo(50);
+    assertThat(width).isEqualTo(50)
+    assertThat(height).isEqualTo(50)
   }
 
-  static void setSdkIntVersion(int newValue) throws Exception {
-    Field sdkIntField = Build.VERSION.class.getField("SDK_INT");
-    sdkIntField.setAccessible(true);
-
-    Field modifiersField = Field.class.getDeclaredField("modifiers");
-    modifiersField.setAccessible(true);
-    modifiersField.setInt(sdkIntField, sdkIntField.getModifiers() & ~Modifier.FINAL);
-
-    sdkIntField.set(null, newValue);
+  private fun setSdkIntVersion(newValue: Int) {
+    val sdkIntField = Build.VERSION::class.java.getField("SDK_INT")
+    sdkIntField.isAccessible = true
+    val modifiersField = Field::class.java.getDeclaredField("modifiers")
+    modifiersField.isAccessible = true
+    modifiersField.setInt(sdkIntField, sdkIntField.modifiers and Modifier.FINAL.inv())
+    sdkIntField[null] = newValue
   }
-
 }

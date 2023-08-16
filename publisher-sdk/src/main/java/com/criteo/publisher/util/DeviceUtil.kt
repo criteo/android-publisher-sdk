@@ -13,94 +13,78 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+package com.criteo.publisher.util
 
-package com.criteo.publisher.util;
+import android.content.Context
+import android.graphics.Point
+import android.os.Build
+import android.util.DisplayMetrics
+import android.view.WindowManager
+import com.criteo.publisher.model.AdSize
+import kotlin.math.min
+import kotlin.math.roundToInt
 
-import android.content.Context;
-import android.graphics.Point;
-import android.os.Build;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
-import android.view.WindowManager;
-import android.view.WindowMetrics;
-import androidx.annotation.NonNull;
-import com.criteo.publisher.logging.Logger;
-import com.criteo.publisher.logging.LoggerFactory;
-import com.criteo.publisher.model.AdSize;
-
-public class DeviceUtil {
-
-  private final Logger logger = LoggerFactory.getLogger(getClass());
-
-  @NonNull
-  private final Context context;
-
-  public DeviceUtil(@NonNull Context context) {
-    this.context = context;
-  }
+class DeviceUtil(private val context: Context) {
 
   /**
    * Indicate if the device is a tablet or not.
-   * <p>
-   * The definition of a tablet is based on its <a
-   * href="https://developer.android.com/training/multiscreen/screensizes.html#TaskUseSWQuali">smallest
-   * width</a>: if width is above or equal to 600dp, then it is a tablet.
-   * <p>
+   *
+   * The definition of a tablet is based on its
+   * [smallest width](https://developer.android.com/training/multiscreen/screensizes.html#TaskUseSWQuali):
+   * if width is above or equal to 600dp, then it is a tablet.
+   *
    * The corollary is that, if this is not a tablet, then we consider this as a mobile.
    *
-   * @return <code>true</code> if this device is a tablet
+   * @return `true` if this device is a tablet
    */
-  public boolean isTablet() {
-    DisplayMetrics metrics = getDisplayMetrics();
-    int smallestWidthInPixel = Math.min(metrics.widthPixels, metrics.heightPixels);
-    float thresholdInPixel = 600.f * metrics.density;
-    return smallestWidthInPixel >= thresholdInPixel;
+  @Suppress("MagicNumber")
+  fun isTablet(): Boolean {
+    val metrics = displayMetrics
+    val smallestWidthInPixel = min(metrics.widthPixels, metrics.heightPixels)
+    val thresholdInPixel = 600f * metrics.density
+    return smallestWidthInPixel >= thresholdInPixel
   }
 
-  public AdSize getCurrentScreenSize() {
-    DisplayMetrics metrics = getDisplayMetrics();
-    int widthInDp = pxToDp(metrics.widthPixels);
-    int heightInDp = pxToDp(metrics.heightPixels);
-
-    return new AdSize(widthInDp, heightInDp);
+  fun getCurrentScreenSize(): AdSize {
+    val metrics = displayMetrics
+    val widthInDp = pxToDp(metrics.widthPixels)
+    val heightInDp = pxToDp(metrics.heightPixels)
+    return AdSize(widthInDp, heightInDp)
   }
 
   /**
    *
    * @return device screenSize including status and navigation bar
    */
-  public AdSize getRealScreenSize() {
-    WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-
-    int widthPx;
-    int heightPx;
+  fun getRealSceeenSize(): AdSize {
+    val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    val widthPx: Int
+    val heightPx: Int
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-      WindowMetrics windowMetrics = windowManager.getMaximumWindowMetrics();
-
-      widthPx = windowMetrics.getBounds().width();
-      heightPx = windowMetrics.getBounds().height();
+      val windowMetrics = windowManager.maximumWindowMetrics
+      widthPx = windowMetrics.bounds.width()
+      heightPx = windowMetrics.bounds.height()
     } else {
-      Point point = new Point();
-      windowManager.getDefaultDisplay().getRealSize(point);
-      widthPx = point.x;
-      heightPx = point.y;
+      val point = Point()
+      windowManager.defaultDisplay.getRealSize(point)
+      widthPx = point.x
+      heightPx = point.y
     }
-
-    return new AdSize(pxToDp(widthPx), pxToDp(heightPx));
+    return AdSize(pxToDp(widthPx), pxToDp(heightPx))
   }
 
-  private DisplayMetrics getDisplayMetrics() {
-    return context.getResources().getDisplayMetrics();
+  private val displayMetrics: DisplayMetrics
+    get() = context.resources.displayMetrics
+
+  private fun pxToDp(pxValue: Int): Int {
+    return (pxValue / displayMetrics.density).roundToInt()
   }
 
-  private int pxToDp(int pxValue) {
-    return Math.round(pxValue / getDisplayMetrics().density);
-  }
-
-  public boolean isVersionSupported() {
-    // Currently minimum supported version is 19 and minSdk is set to 19
-    // return true since all versions starting from 19 are supported
-    // Use this mechanism to deprecate SDK version before raising minSdk version
-    return true;
+  // Currently minimum supported version is 19 and minSdk is set to 19
+  // return true since all versions starting from 19 are supported
+  // Use this mechanism to deprecate SDK version before raising minSdk version
+  @Suppress("FunctionOnlyReturningConstant")
+  fun isVersionSupported(): Boolean {
+    return true
   }
 }

@@ -117,7 +117,7 @@ class CriteoMraidControllerTest {
     whenever(adWebView.resources).thenReturn(resources)
     whenever(resources.configuration).thenReturn(configuration)
     whenever(resources.displayMetrics).thenReturn(displayMetrics)
-    whenever(deviceUtil.realScreenSize).thenReturn(AdSize(100, 100))
+    whenever(deviceUtil.getRealSceeenSize()).thenReturn(AdSize(100, 100))
   }
 
   @Test
