@@ -16,14 +16,18 @@
 package com.criteo.publisher.util
 
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Point
+import android.net.Uri
 import android.os.Build
 import android.util.DisplayMetrics
 import android.view.WindowManager
+import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.model.AdSize
 import kotlin.math.min
-import kotlin.math.roundToInt
 
+@OpenForTesting
 class DeviceUtil(private val context: Context) {
 
   /**
@@ -73,11 +77,14 @@ class DeviceUtil(private val context: Context) {
     return AdSize(pxToDp(widthPx), pxToDp(heightPx))
   }
 
-  private val displayMetrics: DisplayMetrics
-    get() = context.resources.displayMetrics
+  fun canSendSms(): Boolean {
+    val smsIntent = Intent(Intent.ACTION_VIEW, Uri.parse("sms:123456"))
+    return canHandleIntent(smsIntent)
+  }
 
-  private fun pxToDp(pxValue: Int): Int {
-    return (pxValue / displayMetrics.density).roundToInt()
+  fun canInitiateCall(): Boolean {
+    val callIntent = Intent(Intent.ACTION_VIEW, Uri.parse("tel:123456"))
+    return canHandleIntent(callIntent)
   }
 
   // Currently minimum supported version is 19 and minSdk is set to 19
@@ -86,5 +93,24 @@ class DeviceUtil(private val context: Context) {
   @Suppress("FunctionOnlyReturningConstant")
   fun isVersionSupported(): Boolean {
     return true
+  }
+
+  private val displayMetrics: DisplayMetrics
+    get() = context.resources.displayMetrics
+
+  private fun pxToDp(pxValue: Int): Int {
+    return Math.round(pxValue / displayMetrics.density)
+  }
+
+  private fun canHandleIntent(intent: Intent): Boolean {
+    val activities = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      context.packageManager.queryIntentActivities(
+          intent,
+          PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY.toLong())
+      )
+    } else {
+      context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+    }
+    return activities.isNotEmpty()
   }
 }

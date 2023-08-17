@@ -21,6 +21,7 @@ import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.logging.LoggerFactory
 
 @OpenForTesting
+@Suppress("TooManyFunctions")
 internal class MraidInteractor(private val webView: WebView) {
 
   private val logger = LoggerFactory.getLogger(MraidInteractor::class.java)
@@ -62,6 +63,13 @@ internal class MraidInteractor(private val webView: WebView) {
     "setScreenSize"(width, height)
   }
 
+  fun setSupports(sms: Boolean, tel: Boolean) {
+    "setSupports"(mapOf(
+        "sms" to sms,
+        "tel" to tel
+    ))
+  }
+
   private operator fun String.invoke(vararg params: Any? = emptyArray()) {
     callOnMraidObject("$this(${asJsArgs(*params)})")
   }
@@ -80,6 +88,7 @@ internal class MraidInteractor(private val webView: WebView) {
         is Boolean -> it.toString()
         is Int -> it.toString()
         is Double -> it.toString()
+        is Map<*, *> -> "{${it.map { it.key.toString() + ": " + asJsArgs(it.value)}.joinToString(", ")}}"
         else -> throw UnsupportedOperationException(
             "${it.javaClass.name} conversion is not supported, please update code if you need this conversion"
         )

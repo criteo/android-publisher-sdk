@@ -137,6 +137,7 @@ internal abstract class CriteoMraidController(
     visibilityTracker.watch(adWebView, this)
     setMaxSize(adWebView.resources.configuration)
     setScreenSize()
+    setSupports()
     mraidState = MraidState.DEFAULT
     mraidInteractor.notifyReady(getPlacementType())
   }
@@ -172,6 +173,10 @@ internal abstract class CriteoMraidController(
   private fun setScreenSize() {
     val screenSize = deviceUtil.getRealSceeenSize()
     mraidInteractor.setScreenSize(screenSize.width, screenSize.height)
+  }
+
+  private fun setSupports() {
+    mraidInteractor.setSupports(deviceUtil.canSendSms(), deviceUtil.canInitiateCall())
   }
 
   private fun updateCurrentStateOnClose() {
