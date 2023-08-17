@@ -155,4 +155,15 @@ class MraidInteractorTest {
     )
     verifyNoMoreInteractions(webView)
   }
+
+  @Test
+  fun whenSetSupports_ShouldEvaluateSupportsOnMraidObject() {
+    mraidInteractor.setSupports(sms = true, tel = true)
+
+    verify(webView).evaluateJavascript(
+        "window.mraid.setSupports({sms: true, tel: true})",
+        null
+    )
+    verifyNoMoreInteractions(webView)
+  }
 }

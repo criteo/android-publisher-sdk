@@ -229,6 +229,8 @@ class CriteoMraidControllerTest {
 
   @Test
   fun onPageFinishedGivenMraidAd_ShouldInitializeDefaultValues() {
+    whenever(deviceUtil.canSendSms()).thenReturn(true)
+    whenever(deviceUtil.canInitiateCall()).thenReturn(false)
     givenMraidAdAndPageIsFinished()
 
     verify(visibilityTracker).watch(adWebView, criteoMraidController)
@@ -240,6 +242,7 @@ class CriteoMraidControllerTest {
         adWebView.resources.displayMetrics.density.toDouble()
     )
     inOrder.verify(mraidInteractor).setScreenSize(100, 100)
+    inOrder.verify(mraidInteractor).setSupports(sms = true, tel = false)
     inOrder.verify(mraidInteractor).notifyReady(criteoMraidController.getPlacementType())
 
     assertThat(criteoMraidController.currentState).isEqualTo(MraidState.DEFAULT)
