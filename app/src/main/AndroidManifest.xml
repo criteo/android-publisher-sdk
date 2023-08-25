@@ -131,6 +131,14 @@
       android:configChanges="orientation|screenSize"
       android:parentActivityName=".MainActivity"
       android:theme="@style/AppTheme"/>
+    
+    <activity
+      android:label="@string/title_activity_mraid"
+      android:name=".MraidActivity"
+      android:configChanges="orientation|screenSize"
+      android:parentActivityName=".MainActivity"
+      android:theme="@style/AppTheme" />
+
   </application>
 
 </manifest>

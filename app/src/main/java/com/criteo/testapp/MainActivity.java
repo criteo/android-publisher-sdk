@@ -52,6 +52,10 @@ public class MainActivity extends AppCompatActivity {
       Intent intent = new Intent(getApplicationContext(), InHouseActivity.class);
       startActivity(intent);
     });
+    findViewById(R.id.buttonMraid).setOnClickListener((View v) -> {
+      Intent intent = new Intent(getApplicationContext(), MraidActivity.class);
+      startActivity(intent);
+    });
 
     findViewById(R.id.buttonAdMobMediation).setOnClickListener((View v) -> {
       Intent intent = new Intent(getApplicationContext(), AdMobMediationActivity.class);

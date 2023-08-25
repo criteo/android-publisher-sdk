@@ -117,7 +117,7 @@ dependencies {
     implementation(Deps.Square.Picasso.Picasso)
 
     releaseImplementation(Deps.Criteo.MraidBridge.Release)
-    "stagingImplementation"(Deps.Criteo.MraidBridge.Release)
+    "stagingImplementation"(Deps.Criteo.MraidBridge.Snapshot)
     debugImplementation(Deps.Criteo.MraidBridge.Snapshot)
 
     testImplementation(project(":test-utils"))

@@ -8,6 +8,7 @@
   <string name="title_activity_dfp">Google DFP</string>
   <string name="title_activity_server_bidding">Server Bidding</string>
   <string name="title_activity_coppa_selector">COPPA Flag Selector</string>
+  <string name="title_activity_mraid">MRAID</string>
 
   <string name="btn_interstitial">Interstitial</string>
   <string name="btn_interstitial_ibv">Interstitial IBV</string>
@@ -17,6 +18,7 @@
   <string name="btn_standalone">Standalone</string>
   <string name="btn_custom_native">Custom Native</string>
   <string name="btn_in_house_mediation">In-house Mediation</string>
+  <string name="btn_mraid">MRAID</string>
   <string name="btn_admob_mediation">AdMob-Mediation</string>
   <string name="btn_server_bidding">Server Bidding</string>
   <string name="btn_ccpa_consent_selector">CCPA Consent Selector</string>
