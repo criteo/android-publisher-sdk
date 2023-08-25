@@ -50,6 +50,15 @@
         android:text="@string/btn_in_house_mediation"/>
 
       <Button
+        android:id="@+id/buttonMraid"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="#81C784"
+        android:text="@string/btn_mraid"/>
+
+      <Button
         android:id="@+id/buttonAdMobMediation"
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="match_parent"

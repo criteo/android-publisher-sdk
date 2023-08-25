@@ -43,6 +43,7 @@ class PubSdkDemoApplication : MultiDexApplication() {
     private const val CDB_DEMO_BANNER_PLACEMENT_ID = "30s6zt3ayypfyemwjvmp"
     private const val CDB_DEMO_INTERSTITIAL_PLACEMENT_ID = "6yws53jyfjgoq1ghnuqb"
     private const val CDB_DEMO_NATIVE_PLACEMENT_ID = "190tsfngohsvfkh3hmkm"
+    private const val CDB_DEMO_MRAID_PLACEMENT_ID = "7fspp28x445grwm378ck"
 
     @JvmField
     val INTERSTITIAL = InterstitialAdUnit(
@@ -65,6 +66,8 @@ class PubSdkDemoApplication : MultiDexApplication() {
         CDB_DEMO_BANNER_PLACEMENT_ID,
         AdSize(320, 50)
     )
+
+    val MRAID_INTERSTITIAL_DEMO = InterstitialAdUnit(CDB_DEMO_MRAID_PLACEMENT_ID)
 
     @JvmField
     val CONTEXT_DATA = ContextData().set(ContextData.CONTENT_URL, "https://dummy.content.url")
