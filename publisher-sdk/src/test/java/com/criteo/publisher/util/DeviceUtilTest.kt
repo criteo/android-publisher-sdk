@@ -277,6 +277,24 @@ class DeviceUtilTest {
     assertThat(canInitiateCall).isEqualTo(false)
   }
 
+  @Test
+  fun pxToDp_GivenNonZeroValue_ShouldReturnProperlyConvertedValue() {
+    metrics.density = 2f
+
+    val result = deviceUtil.pxToDp(100)
+
+    assertThat(result).isEqualTo(50)
+  }
+
+  @Test
+  fun pxToDp_GivenZero_ShouldReturnZero() {
+    metrics.density = 2f
+
+    val result = deviceUtil.pxToDp(0)
+
+    assertThat(result).isEqualTo(0)
+  }
+
   private fun setSdkIntVersion(newValue: Int) {
     val sdkIntField = Build.VERSION::class.java.getField("SDK_INT")
     sdkIntField.isAccessible = true

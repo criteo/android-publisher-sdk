@@ -70,6 +70,10 @@ internal class MraidInteractor(private val webView: WebView) {
     ))
   }
 
+  fun setCurrentPosition(x: Int, y: Int, width: Int, height: Int) {
+    "setCurrentPosition"(x, y, width, height)
+  }
+
   private operator fun String.invoke(vararg params: Any? = emptyArray()) {
     callOnMraidObject("$this(${asJsArgs(*params)})")
   }

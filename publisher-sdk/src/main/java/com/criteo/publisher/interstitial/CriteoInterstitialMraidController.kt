@@ -27,17 +27,25 @@ import com.criteo.publisher.adview.MraidState
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
 import com.criteo.publisher.util.DeviceUtil
+import com.criteo.publisher.util.ViewPositionTracker
 
 @OpenForTesting
+@Suppress("LongParameterList")
 internal class CriteoInterstitialMraidController(
     private val interstitialAdWebView: InterstitialAdWebView,
     private val runOnUiThreadExecutor: RunOnUiThreadExecutor,
     visibilityTracker: VisibilityTracker,
     mraidInteractor: MraidInteractor,
     mraidMessageHandler: MraidMessageHandler,
-    deviceUtil: DeviceUtil
+    deviceUtil: DeviceUtil,
+    viewPositionTracker: ViewPositionTracker
 ) : CriteoMraidController(
-    interstitialAdWebView, visibilityTracker, mraidInteractor, mraidMessageHandler, deviceUtil
+    interstitialAdWebView,
+    visibilityTracker,
+    mraidInteractor,
+    mraidMessageHandler,
+    deviceUtil,
+    viewPositionTracker
 ) {
   override fun getPlacementType(): MraidPlacementType = MraidPlacementType.INTERSTITIAL
 
