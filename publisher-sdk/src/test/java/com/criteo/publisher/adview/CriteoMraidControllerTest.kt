@@ -25,6 +25,7 @@ import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.model.AdSize
 import com.criteo.publisher.util.DeviceUtil
+import com.criteo.publisher.util.ViewPositionTracker
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
@@ -80,6 +81,9 @@ class CriteoMraidControllerTest {
   @Mock
   private lateinit var deviceUtil: DeviceUtil
 
+  @Mock
+  private lateinit var viewPositionTracker: ViewPositionTracker
+
   @SpyBean
   private lateinit var logger: Logger
 
@@ -95,7 +99,8 @@ class CriteoMraidControllerTest {
         visibilityTracker,
         mraidInteractor,
         mraidMessageHandler,
-        deviceUtil
+        deviceUtil,
+        viewPositionTracker
     ) {
       override fun getPlacementType(): MraidPlacementType {
         return placementType
@@ -234,6 +239,7 @@ class CriteoMraidControllerTest {
     givenMraidAdAndPageIsFinished()
 
     verify(visibilityTracker).watch(adWebView, criteoMraidController)
+    verify(viewPositionTracker).watch(adWebView, criteoMraidController)
 
     val inOrder = inOrder(mraidInteractor)
     inOrder.verify(mraidInteractor).setMaxSize(
@@ -414,6 +420,13 @@ class CriteoMraidControllerTest {
 
     verifyZeroInteractions(mraidInteractor)
     assertThat(criteoMraidController.currentState).isEqualTo(MraidState.LOADING)
+  }
+
+  @Test
+  fun onPositionChange_ShouldDelegateToMraidInteractor() {
+    criteoMraidController.onPositionChange(1, 2, 123, 234)
+
+    verify(mraidInteractor).setCurrentPosition(1, 2, 123, 234)
   }
 
   private fun givenMraidAdAndPageIsFinished() {

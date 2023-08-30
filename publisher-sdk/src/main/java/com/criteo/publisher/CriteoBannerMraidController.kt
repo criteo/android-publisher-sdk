@@ -38,18 +38,27 @@ import com.criteo.publisher.adview.MraidState
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
 import com.criteo.publisher.util.DeviceUtil
+import com.criteo.publisher.util.ViewPositionTracker
 import com.criteo.publisher.util.doOnNextLayout
 
 @OpenForTesting
-@Suppress("TooManyFunctions")
+@Suppress("TooManyFunctions", "LongParameterList")
 internal class CriteoBannerMraidController(
     private val bannerView: CriteoBannerAdWebView,
     private val runOnUiThreadExecutor: RunOnUiThreadExecutor,
     visibilityTracker: VisibilityTracker,
     mraidInteractor: MraidInteractor,
     mraidMessageHandler: MraidMessageHandler,
-    deviceUtil: DeviceUtil
-) : CriteoMraidController(bannerView, visibilityTracker, mraidInteractor, mraidMessageHandler, deviceUtil) {
+    deviceUtil: DeviceUtil,
+    viewPositionTracker: ViewPositionTracker
+) : CriteoMraidController(
+    bannerView,
+    visibilityTracker,
+    mraidInteractor,
+    mraidMessageHandler,
+    deviceUtil,
+    viewPositionTracker
+) {
 
   private val defaultBannerViewLayoutParams: LayoutParams = bannerView.layoutParams
   private var dialog: Dialog? = null
@@ -162,7 +171,10 @@ internal class CriteoBannerMraidController(
       removeBannerFromParent()
 
       val bannerContainer = bannerView.parentContainer
-      bannerContainer.addView(bannerView, LayoutParams(placeholderView.width, placeholderView.height))
+      bannerContainer.addView(
+          bannerView,
+          LayoutParams(placeholderView.width, placeholderView.height)
+      )
       bannerContainer.removeView(placeholderView)
       bannerView.doOnNextLayout {
         bannerView.layoutParams = defaultBannerViewLayoutParams

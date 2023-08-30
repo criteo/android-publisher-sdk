@@ -69,6 +69,7 @@ class CriteoInterstitialMraidControllerTest {
             mock(),
             mock(),
             mock(),
+            mock(),
             mock()
         )
     )

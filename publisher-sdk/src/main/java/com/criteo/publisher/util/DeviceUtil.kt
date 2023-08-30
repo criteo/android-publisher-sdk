@@ -95,12 +95,12 @@ class DeviceUtil(private val context: Context) {
     return true
   }
 
-  private val displayMetrics: DisplayMetrics
-    get() = context.resources.displayMetrics
-
-  private fun pxToDp(pxValue: Int): Int {
+  fun pxToDp(pxValue: Int): Int {
     return Math.round(pxValue / displayMetrics.density)
   }
+
+  private val displayMetrics: DisplayMetrics
+    get() = context.resources.displayMetrics
 
   private fun canHandleIntent(intent: Intent): Boolean {
     val activities = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

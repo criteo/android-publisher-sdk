@@ -24,6 +24,7 @@ import com.criteo.publisher.advancednative.VisibilityTracker
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.logging.LoggerFactory
 import com.criteo.publisher.util.DeviceUtil
+import com.criteo.publisher.util.ViewPositionTracker
 import java.io.IOException
 
 @OpenForTesting
@@ -33,8 +34,10 @@ internal abstract class CriteoMraidController(
     private val visibilityTracker: VisibilityTracker,
     private val mraidInteractor: MraidInteractor,
     private val mraidMessageHandler: MraidMessageHandler,
-    private val deviceUtil: DeviceUtil
-) : MraidController, VisibilityListener, MraidMessageHandlerListener, AdWebViewClientListener {
+    private val deviceUtil: DeviceUtil,
+    private val positionTracker: ViewPositionTracker
+) : MraidController, VisibilityListener, MraidMessageHandlerListener, AdWebViewClientListener,
+    ViewPositionTracker.PositionListener {
 
   private var isViewable: Boolean? = null
   private var adWebViewClient: AdWebViewClient? = null
@@ -52,6 +55,10 @@ internal abstract class CriteoMraidController(
 
   override fun onVisible() {
     reportViewabilityIfNeeded(true)
+  }
+
+  override fun onPositionChange(x: Int, y: Int, width: Int, height: Int) {
+    mraidInteractor.setCurrentPosition(x, y, width, height)
   }
 
   override fun onGone() {
@@ -135,6 +142,7 @@ internal abstract class CriteoMraidController(
 
   private fun onMraidLoaded() {
     visibilityTracker.watch(adWebView, this)
+    positionTracker.watch(adWebView, this)
     setMaxSize(adWebView.resources.configuration)
     setScreenSize()
     setSupports()

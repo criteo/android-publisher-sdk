@@ -166,4 +166,15 @@ class MraidInteractorTest {
     )
     verifyNoMoreInteractions(webView)
   }
+
+  @Test
+  fun whenSetCurrentPosition_ShouldEvaluateSetCurrentPositionOnMraidObject() {
+    mraidInteractor.setCurrentPosition(1, 2, 123, 234)
+
+    verify(webView).evaluateJavascript(
+        "window.mraid.setCurrentPosition(1, 2, 123, 234)",
+        null
+    )
+    verifyNoMoreInteractions(webView)
+  }
 }

@@ -109,6 +109,7 @@ import com.criteo.publisher.util.MapUtilKt;
 import com.criteo.publisher.util.SafeSharedPreferences;
 import com.criteo.publisher.util.SharedPreferencesFactory;
 import com.criteo.publisher.util.TextUtils;
+import com.criteo.publisher.util.ViewPositionTracker;
 import com.criteo.publisher.util.jsonadapter.BooleanJsonAdapter;
 import com.criteo.publisher.util.jsonadapter.URIAdapter;
 import com.criteo.publisher.util.jsonadapter.URLAdapter;
@@ -482,7 +483,10 @@ public class DependencyProvider {
 
   @NonNull
   public ImageLoaderHolder provideImageLoaderHolder() {
-    return getOrCreate(ImageLoaderHolder.class, () -> new ImageLoaderHolder(provideDefaultImageLoader()));
+    return getOrCreate(
+        ImageLoaderHolder.class,
+        () -> new ImageLoaderHolder(provideDefaultImageLoader())
+    );
   }
 
   @NonNull
@@ -500,7 +504,10 @@ public class DependencyProvider {
 
   @NonNull
   public SharedPreferencesFactory provideSharedPreferencesFactory() {
-    return getOrCreate(SharedPreferencesFactory.class, () -> new SharedPreferencesFactory(provideContext()));
+    return getOrCreate(
+        SharedPreferencesFactory.class,
+        () -> new SharedPreferencesFactory(provideContext())
+    );
   }
 
   @NonNull
@@ -598,9 +605,12 @@ public class DependencyProvider {
 
   @NonNull
   public MetricSendingQueueConfiguration provideMetricSendingQueueConfiguration() {
-    return getOrCreate(MetricSendingQueueConfiguration.class, () -> new MetricSendingQueueConfiguration(
-        provideBuildConfigWrapper()
-    ));
+    return getOrCreate(
+        MetricSendingQueueConfiguration.class,
+        () -> new MetricSendingQueueConfiguration(
+            provideBuildConfigWrapper()
+        )
+    );
   }
 
   @NonNull
@@ -690,9 +700,12 @@ public class DependencyProvider {
 
   @NonNull
   public RemoteLogSendingQueueConfiguration provideRemoteLogSendingQueueConfiguration() {
-    return getOrCreate(RemoteLogSendingQueueConfiguration.class, () -> new RemoteLogSendingQueueConfiguration(
-        provideBuildConfigWrapper()
-    ));
+    return getOrCreate(
+        RemoteLogSendingQueueConfiguration.class,
+        () -> new RemoteLogSendingQueueConfiguration(
+            provideBuildConfigWrapper()
+        )
+    );
   }
 
   @NonNull
@@ -737,7 +750,10 @@ public class DependencyProvider {
 
   @NonNull
   public ConsentData provideConsentData() {
-    return getOrCreate(ConsentData.class, () -> new ConsentData(provideSharedPreferencesFactory().getInternal()));
+    return getOrCreate(
+        ConsentData.class,
+        () -> new ConsentData(provideSharedPreferencesFactory().getInternal())
+    );
   }
 
   @NonNull
@@ -766,7 +782,8 @@ public class DependencyProvider {
           provideVisibilityTracker(),
           provideMraidInteractor(adWebView),
           provideMraidMessageHandler(),
-          provideDeviceUtil()
+          provideDeviceUtil(),
+          provideViewPositionTracker()
       );
     } else {
       return new CriteoInterstitialMraidController(
@@ -775,7 +792,8 @@ public class DependencyProvider {
           provideVisibilityTracker(),
           provideMraidInteractor(adWebView),
           provideMraidMessageHandler(),
-          provideDeviceUtil()
+          provideDeviceUtil(),
+          provideViewPositionTracker()
       );
     }
   }
@@ -783,6 +801,13 @@ public class DependencyProvider {
   @NonNull
   public CriteoBannerAdWebViewFactory provideAdWebViewFactory() {
     return getOrCreate(CriteoBannerAdWebViewFactory.class, CriteoBannerAdWebViewFactory::new);
+  }
+
+  public ViewPositionTracker provideViewPositionTracker() {
+    return getOrCreate(
+        ViewPositionTracker.class,
+        () -> new ViewPositionTracker(provideRunOnUiThreadExecutor(), provideDeviceUtil())
+    );
   }
 
   public interface Factory<T> {
