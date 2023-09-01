@@ -27,6 +27,7 @@ import com.criteo.publisher.adview.MraidState
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
 import com.criteo.publisher.util.DeviceUtil
+import com.criteo.publisher.util.ExternalVideoPlayer
 import com.criteo.publisher.util.ViewPositionTracker
 
 @OpenForTesting
@@ -38,14 +39,16 @@ internal class CriteoInterstitialMraidController(
     mraidInteractor: MraidInteractor,
     mraidMessageHandler: MraidMessageHandler,
     deviceUtil: DeviceUtil,
-    viewPositionTracker: ViewPositionTracker
+    viewPositionTracker: ViewPositionTracker,
+    externalVideoPlayer: ExternalVideoPlayer
 ) : CriteoMraidController(
     interstitialAdWebView,
     visibilityTracker,
     mraidInteractor,
     mraidMessageHandler,
     deviceUtil,
-    viewPositionTracker
+    viewPositionTracker,
+    externalVideoPlayer
 ) {
   override fun getPlacementType(): MraidPlacementType = MraidPlacementType.INTERSTITIAL
 

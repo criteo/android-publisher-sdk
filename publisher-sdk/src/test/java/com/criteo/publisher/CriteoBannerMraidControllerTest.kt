@@ -61,6 +61,7 @@ class CriteoBannerMraidControllerTest {
             mock(),
             mock(),
             mock(),
+            mock(),
             mock()
         )
     )

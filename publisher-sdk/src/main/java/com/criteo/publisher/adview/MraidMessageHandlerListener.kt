@@ -20,4 +20,5 @@ interface MraidMessageHandlerListener {
   fun onOpen(url: String)
   fun onExpand(width: Double, height: Double)
   fun onClose()
+  fun onPlayVideo(url: String)
 }

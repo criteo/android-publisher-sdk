@@ -104,6 +104,7 @@ import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.AppLifecycleUtil;
 import com.criteo.publisher.util.BuildConfigWrapper;
 import com.criteo.publisher.util.DeviceUtil;
+import com.criteo.publisher.util.ExternalVideoPlayer;
 import com.criteo.publisher.util.JsonSerializer;
 import com.criteo.publisher.util.MapUtilKt;
 import com.criteo.publisher.util.SafeSharedPreferences;
@@ -783,7 +784,8 @@ public class DependencyProvider {
           provideMraidInteractor(adWebView),
           provideMraidMessageHandler(),
           provideDeviceUtil(),
-          provideViewPositionTracker()
+          provideViewPositionTracker(),
+          provideExternalVideoPlayer()
       );
     } else {
       return new CriteoInterstitialMraidController(
@@ -793,7 +795,8 @@ public class DependencyProvider {
           provideMraidInteractor(adWebView),
           provideMraidMessageHandler(),
           provideDeviceUtil(),
-          provideViewPositionTracker()
+          provideViewPositionTracker(),
+          provideExternalVideoPlayer()
       );
     }
   }
@@ -807,6 +810,13 @@ public class DependencyProvider {
     return getOrCreate(
         ViewPositionTracker.class,
         () -> new ViewPositionTracker(provideRunOnUiThreadExecutor(), provideDeviceUtil())
+    );
+  }
+
+  public ExternalVideoPlayer provideExternalVideoPlayer() {
+    return getOrCreate(
+        ExternalVideoPlayer.class,
+        () -> new ExternalVideoPlayer(provideContext(), provideDeviceUtil())
     );
   }
 

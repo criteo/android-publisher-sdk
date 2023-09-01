@@ -38,6 +38,7 @@ import com.criteo.publisher.adview.MraidState
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
 import com.criteo.publisher.util.DeviceUtil
+import com.criteo.publisher.util.ExternalVideoPlayer
 import com.criteo.publisher.util.ViewPositionTracker
 import com.criteo.publisher.util.doOnNextLayout
 
@@ -50,14 +51,16 @@ internal class CriteoBannerMraidController(
     mraidInteractor: MraidInteractor,
     mraidMessageHandler: MraidMessageHandler,
     deviceUtil: DeviceUtil,
-    viewPositionTracker: ViewPositionTracker
+    viewPositionTracker: ViewPositionTracker,
+    externalVideoPlayer: ExternalVideoPlayer
 ) : CriteoMraidController(
     bannerView,
     visibilityTracker,
     mraidInteractor,
     mraidMessageHandler,
     deviceUtil,
-    viewPositionTracker
+    viewPositionTracker,
+    externalVideoPlayer
 ) {
 
   private val defaultBannerViewLayoutParams: LayoutParams = bannerView.layoutParams

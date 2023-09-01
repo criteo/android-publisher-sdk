@@ -99,10 +99,7 @@ class DeviceUtil(private val context: Context) {
     return Math.round(pxValue / displayMetrics.density)
   }
 
-  private val displayMetrics: DisplayMetrics
-    get() = context.resources.displayMetrics
-
-  private fun canHandleIntent(intent: Intent): Boolean {
+  fun canHandleIntent(intent: Intent): Boolean {
     val activities = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
       context.packageManager.queryIntentActivities(
           intent,
@@ -113,4 +110,7 @@ class DeviceUtil(private val context: Context) {
     }
     return activities.isNotEmpty()
   }
+
+  private val displayMetrics: DisplayMetrics
+    get() = context.resources.displayMetrics
 }

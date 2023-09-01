@@ -29,14 +29,15 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Answers
 import org.mockito.ArgumentMatchers
-import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.spy
 import org.mockito.kotlin.whenever
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -53,13 +54,13 @@ class DeviceUtilTest {
   @Mock(answer = Answers.RETURNS_DEEP_STUBS)
   private lateinit var windowManager: WindowManager
 
-  @InjectMocks
   private lateinit var deviceUtil: DeviceUtil
 
   private lateinit var metrics: DisplayMetrics
 
   @Before
   fun setUp() {
+    deviceUtil = spy(DeviceUtil(context))
     metrics = DisplayMetrics()
     whenever(context.resources.displayMetrics).thenReturn(metrics)
     whenever(context.getSystemService(Context.WINDOW_SERVICE)).thenReturn(windowManager)
@@ -150,15 +151,8 @@ class DeviceUtilTest {
   }
 
   @Test
-  fun canSendSms_GivenAppToHandleSmsExistsAndApiLevel33_ShouldReturnTrue() {
-    setSdkIntVersion(33)
-    val packageManager = context.packageManager
-    whenever(
-        packageManager.queryIntentActivities(
-            any(),
-            eq(PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY.toLong()))
-        )
-    ).thenReturn(listOf(mock()))
+  fun canSendSms_GivenCanHandleIntentIsTrue_ShouldReturnTrue() {
+    doReturn(true).whenever(deviceUtil).canHandleIntent(any())
 
     val canSendSms = deviceUtil.canSendSms()
 
@@ -166,15 +160,8 @@ class DeviceUtilTest {
   }
 
   @Test
-  fun canSendSms_GivenNoAppToHandleSmsExistsAndApiLevel33_ShouldReturnFalse() {
-    setSdkIntVersion(33)
-    val packageManager = context.packageManager
-    whenever(
-        packageManager.queryIntentActivities(
-            any(),
-            eq(PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY.toLong()))
-        )
-    ).thenReturn(listOf())
+  fun canSendSms_GivenCanHandleIntentIsFalse_ShouldReturnFalse() {
+    doReturn(false).whenever(deviceUtil).canHandleIntent(any())
 
     val canSendSms = deviceUtil.canSendSms()
 
@@ -182,99 +169,21 @@ class DeviceUtilTest {
   }
 
   @Test
-  fun canSendSms_GivenAppToHandleSmsExistsAndApiLevel27_ShouldReturnTrue() {
-    setSdkIntVersion(27)
-    val packageManager = context.packageManager
-    whenever(
-        packageManager.queryIntentActivities(
-            any(),
-            eq(PackageManager.MATCH_DEFAULT_ONLY)
-        )
-    ).thenReturn(listOf(mock()))
+  fun canInitiateCall_GivenCanHandleIntentIsTrue_ShouldReturnTrue() {
+    doReturn(true).whenever(deviceUtil).canHandleIntent(any())
 
-    val canSendSms = deviceUtil.canSendSms()
+    val canSendSms = deviceUtil.canInitiateCall()
 
     assertThat(canSendSms).isEqualTo(true)
   }
 
   @Test
-  fun canSendSms_GivenNoAppToHandleSmsExistsAndApiLevel27_ShouldReturnFalse() {
-    setSdkIntVersion(27)
-    val packageManager = context.packageManager
-    whenever(
-        packageManager.queryIntentActivities(
-            any(),
-            eq(PackageManager.MATCH_DEFAULT_ONLY)
-        )
-    ).thenReturn(listOf())
+  fun canInitiateCall_GivenCanHandleIntentIsFalse_ShouldReturnFalse() {
+    doReturn(false).whenever(deviceUtil).canHandleIntent(any())
 
-    val canSendSms = deviceUtil.canSendSms()
+    val canSendSms = deviceUtil.canInitiateCall()
 
     assertThat(canSendSms).isEqualTo(false)
-  }
-
-  @Test
-  fun canInitiateCall_GivenAppToInitiateCallExistsAndApiLevel33_ShouldReturnTrue() {
-    setSdkIntVersion(33)
-    val packageManager = context.packageManager
-    whenever(
-        packageManager.queryIntentActivities(
-            any(),
-            eq(PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY.toLong()))
-        )
-    ).thenReturn(listOf(mock()))
-
-    val canInitiateCall = deviceUtil.canInitiateCall()
-
-    assertThat(canInitiateCall).isEqualTo(true)
-  }
-
-  @Test
-  fun canInitiateCall_GivenNoAppToInitiateCallExistsAndApiLevel33_ShouldReturnFalse() {
-    setSdkIntVersion(33)
-    val packageManager = context.packageManager
-    whenever(
-        packageManager.queryIntentActivities(
-            any(),
-            eq(PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY.toLong()))
-        )
-    ).thenReturn(listOf())
-
-    val canInitiateCall = deviceUtil.canInitiateCall()
-
-    assertThat(canInitiateCall).isEqualTo(false)
-  }
-
-  @Test
-  fun canInitiateCall_GivenAppToInitiateCallExistsAndApiLevel27_ShouldReturnTrue() {
-    setSdkIntVersion(27)
-    val packageManager = context.packageManager
-    whenever(
-        packageManager.queryIntentActivities(
-            any(),
-            eq(PackageManager.MATCH_DEFAULT_ONLY)
-        )
-    ).thenReturn(listOf(mock()))
-
-    val canInitiateCall = deviceUtil.canInitiateCall()
-
-    assertThat(canInitiateCall).isEqualTo(true)
-  }
-
-  @Test
-  fun canInitiateCall_GivenNoAppToInitiateCallExistsAndApiLevel27_ShouldReturnFalse() {
-    setSdkIntVersion(27)
-    val packageManager = context.packageManager
-    whenever(
-        packageManager.queryIntentActivities(
-            any(),
-            eq(PackageManager.MATCH_DEFAULT_ONLY)
-        )
-    ).thenReturn(listOf())
-
-    val canInitiateCall = deviceUtil.canInitiateCall()
-
-    assertThat(canInitiateCall).isEqualTo(false)
   }
 
   @Test
@@ -293,6 +202,62 @@ class DeviceUtilTest {
     val result = deviceUtil.pxToDp(0)
 
     assertThat(result).isEqualTo(0)
+  }
+
+  @Test
+  fun canHandleIntent_GivenAppToHandleIntentExistsAndApiLevel33_ShouldReturnTrue() {
+    setSdkIntVersion(33)
+    val packageManager = context.packageManager
+    whenever(
+        packageManager.queryIntentActivities(
+            any(),
+            eq(PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY.toLong()))
+        )
+    ).thenReturn(listOf(mock()))
+
+    assertThat(deviceUtil.canHandleIntent(mock())).isEqualTo(true)
+  }
+
+  @Test
+  fun canHandleIntent_GivenNoAppToHandleIntentExistsAndApiLevel33_ShouldReturnFalse() {
+    setSdkIntVersion(33)
+    val packageManager = context.packageManager
+    whenever(
+        packageManager.queryIntentActivities(
+            any(),
+            eq(PackageManager.ResolveInfoFlags.of(PackageManager.MATCH_DEFAULT_ONLY.toLong()))
+        )
+    ).thenReturn(listOf())
+
+    assertThat(deviceUtil.canHandleIntent(mock())).isEqualTo(false)
+  }
+
+  @Test
+  fun canHandleIntent_GivenAppToHandleIntentExistsAndApiLevel27_ShouldReturnTrue() {
+    setSdkIntVersion(27)
+    val packageManager = context.packageManager
+    whenever(
+        packageManager.queryIntentActivities(
+            any(),
+            eq(PackageManager.MATCH_DEFAULT_ONLY)
+        )
+    ).thenReturn(listOf(mock()))
+
+    assertThat(deviceUtil.canHandleIntent(mock())).isEqualTo(true)
+  }
+
+  @Test
+  fun canHandleIntent_GivenNoAppToHandleIntentExistsAndApiLevel27_ShouldReturnFalse() {
+    setSdkIntVersion(27)
+    val packageManager = context.packageManager
+    whenever(
+        packageManager.queryIntentActivities(
+            any(),
+            eq(PackageManager.MATCH_DEFAULT_ONLY)
+        )
+    ).thenReturn(listOf())
+
+    assertThat(deviceUtil.canHandleIntent(mock())).isEqualTo(false)
   }
 
   private fun setSdkIntVersion(newValue: Int) {
