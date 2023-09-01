@@ -56,4 +56,9 @@ class MraidMessageHandler {
   fun close() {
     listener?.onClose()
   }
+
+  @JavascriptInterface
+  fun playVideo(url: String) {
+    listener?.onPlayVideo(url)
+  }
 }

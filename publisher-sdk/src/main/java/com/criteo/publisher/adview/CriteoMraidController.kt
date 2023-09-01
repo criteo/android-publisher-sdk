@@ -24,18 +24,20 @@ import com.criteo.publisher.advancednative.VisibilityTracker
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.logging.LoggerFactory
 import com.criteo.publisher.util.DeviceUtil
+import com.criteo.publisher.util.ExternalVideoPlayer
 import com.criteo.publisher.util.ViewPositionTracker
 import java.io.IOException
 
 @OpenForTesting
-@Suppress("TooManyFunctions")
+@Suppress("TooManyFunctions", "LongParameterList")
 internal abstract class CriteoMraidController(
     private val adWebView: AdWebView,
     private val visibilityTracker: VisibilityTracker,
     private val mraidInteractor: MraidInteractor,
     private val mraidMessageHandler: MraidMessageHandler,
     private val deviceUtil: DeviceUtil,
-    private val positionTracker: ViewPositionTracker
+    private val positionTracker: ViewPositionTracker,
+    private val externalVideoPlayer: ExternalVideoPlayer
 ) : MraidController, VisibilityListener, MraidMessageHandlerListener, AdWebViewClientListener,
     ViewPositionTracker.PositionListener {
 
@@ -67,6 +69,12 @@ internal abstract class CriteoMraidController(
 
   override fun onOpen(url: String) {
     adWebViewClient?.open(url)
+  }
+
+  override fun onPlayVideo(url: String) {
+    externalVideoPlayer.play(url) {
+      mraidInteractor.notifyError(it, "playVideo")
+    }
   }
 
   override fun onExpand(width: Double, height: Double) {

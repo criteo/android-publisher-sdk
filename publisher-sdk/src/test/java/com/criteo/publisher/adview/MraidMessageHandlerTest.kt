@@ -120,4 +120,18 @@ class MraidMessageHandlerTest {
   fun whenClose_givenListenerIsNull_shouldNotThrow() {
     assertThatCode { mraidMessageHandler.close() }.doesNotThrowAnyException()
   }
+
+  @Test
+  fun whenPlayerVideo_givenListener_shouldCallOnPlayVideoOnListener() {
+    mraidMessageHandler.setListener(listener)
+
+    mraidMessageHandler.playVideo("https://criteo.com/cat_video.mp4")
+
+    verify(listener).onPlayVideo("https://criteo.com/cat_video.mp4")
+  }
+
+  @Test
+  fun whenPlayVideo_givenListenerIsNull_shouldNotThrow() {
+    assertThatCode { mraidMessageHandler.playVideo("https://criteo.com/cat_video.mp4") }.doesNotThrowAnyException()
+  }
 }

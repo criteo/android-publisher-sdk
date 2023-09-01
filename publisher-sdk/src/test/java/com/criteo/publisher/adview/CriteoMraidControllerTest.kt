@@ -25,6 +25,7 @@ import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
 import com.criteo.publisher.model.AdSize
 import com.criteo.publisher.util.DeviceUtil
+import com.criteo.publisher.util.ExternalVideoPlayer
 import com.criteo.publisher.util.ViewPositionTracker
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatCode
@@ -36,6 +37,7 @@ import org.mockito.Mock
 import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -84,6 +86,9 @@ class CriteoMraidControllerTest {
   @Mock
   private lateinit var viewPositionTracker: ViewPositionTracker
 
+  @Mock
+  private lateinit var externalVideoPlayer: ExternalVideoPlayer
+
   @SpyBean
   private lateinit var logger: Logger
 
@@ -100,7 +105,8 @@ class CriteoMraidControllerTest {
         mraidInteractor,
         mraidMessageHandler,
         deviceUtil,
-        viewPositionTracker
+        viewPositionTracker,
+        externalVideoPlayer
     ) {
       override fun getPlacementType(): MraidPlacementType {
         return placementType
@@ -427,6 +433,24 @@ class CriteoMraidControllerTest {
     criteoMraidController.onPositionChange(1, 2, 123, 234)
 
     verify(mraidInteractor).setCurrentPosition(1, 2, 123, 234)
+  }
+
+  @Test
+  fun onPlayVideo_GivenNoError_ShouldDelegateCallToExternalVideoPlayer() {
+    criteoMraidController.onPlayVideo("https://criteo.com/cat_video.mp4")
+
+    verify(externalVideoPlayer).play(eq("https://criteo.com/cat_video.mp4"), any())
+    verifyZeroInteractions(mraidInteractor)
+  }
+
+  @Test
+  fun onPlayVideo_GivenErrorInExternalVideoPlayer_ShouldDelegateErrorToMraidInteractor() {
+    whenever(externalVideoPlayer.play(eq("https://criteo.com/cat_video.mp4"), any())).thenAnswer {
+      (it.arguments[1] as (String) -> Unit).invoke("error message")
+    }
+    criteoMraidController.onPlayVideo("https://criteo.com/cat_video.mp4")
+
+    verify(mraidInteractor).notifyError("error message", "playVideo")
   }
 
   private fun givenMraidAdAndPageIsFinished() {
