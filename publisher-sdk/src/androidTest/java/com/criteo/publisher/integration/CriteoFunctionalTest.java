@@ -29,6 +29,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -50,6 +51,7 @@ import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdUnit;
 import com.criteo.publisher.model.BannerAdUnit;
 import com.criteo.publisher.model.CdbResponse;
+import com.criteo.publisher.model.Config;
 import com.criteo.publisher.model.InterstitialAdUnit;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.test.activity.DummyActivity;
@@ -57,6 +59,7 @@ import com.criteo.publisher.util.BuildConfigWrapper;
 import java.util.Collections;
 import java.util.List;
 import javax.inject.Inject;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
@@ -97,6 +100,15 @@ public class CriteoFunctionalTest {
 
   @SpyBean
   private Logger logger;
+
+  @SpyBean
+  private Config config;
+
+  @Before
+  public void setUp() {
+    doReturn(true).when(config).isPrefetchOnInitEnabled();
+    doReturn(false).when(config).isLiveBiddingEnabled();
+  }
 
   @Test
   @SuppressWarnings("deprecation")
