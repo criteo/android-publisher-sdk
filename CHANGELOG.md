@@ -1,5 +1,8 @@
 # Next Version
 
+# Version 5.0.3
+- Make prefetch feature false by default
+
 # Version 5.0.2
 - Send SDK MRAID capability
 - Fix MRAID iframe issues
