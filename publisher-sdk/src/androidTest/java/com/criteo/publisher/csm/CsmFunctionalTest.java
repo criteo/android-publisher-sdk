@@ -28,6 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -46,6 +47,7 @@ import com.criteo.publisher.integration.IntegrationRegistry;
 import com.criteo.publisher.mock.MockedDependenciesRule;
 import com.criteo.publisher.mock.SpyBean;
 import com.criteo.publisher.model.AdUnit;
+import com.criteo.publisher.model.Config;
 import com.criteo.publisher.network.CdbMock;
 import com.criteo.publisher.network.PubSdkApi;
 import com.criteo.publisher.util.BuildConfigWrapper;
@@ -87,8 +89,13 @@ public class CsmFunctionalTest {
   @Inject
   private CdbMock cdbMock;
 
+  @SpyBean
+  private Config config;
+
   @Before
   public void setUp() throws Exception {
+    doReturn(true).when(config).isPrefetchOnInitEnabled();
+    doReturn(false).when(config).isLiveBiddingEnabled();
     integrationRegistry.declare(Integration.IN_HOUSE);
     givenConsentGiven();
   }

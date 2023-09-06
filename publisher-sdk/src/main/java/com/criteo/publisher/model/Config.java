@@ -48,9 +48,9 @@ public class Config {
     public static final String AD_TAG_DATA_MACRO = "%%adTagData%%";
     public static final String AD_TAG_DATA_MODE = "<html><body style='text-align:center; margin:0px; padding:0px; horizontal-align:center;'><script>%%adTagData%%</script></body></html>";
     public static final boolean CSM_ENABLED = true;
-    public static final boolean LIVE_BIDDING_ENABLED = false;
+    public static final boolean LIVE_BIDDING_ENABLED = true;
     public static final int LIVE_BIDDING_TIME_BUDGET_IN_MILLIS = 8_000;
-    public static final boolean PREFETCH_ON_INIT_ENABLED = true;
+    public static final boolean PREFETCH_ON_INIT_ENABLED = false;
     public static final RemoteLogLevel REMOTE_LOG_LEVEL = RemoteLogLevel.WARNING;
     public static final boolean IS_MRAID_ENABLED = false;
 

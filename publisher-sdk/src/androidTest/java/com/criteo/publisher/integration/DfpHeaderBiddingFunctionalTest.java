@@ -177,6 +177,7 @@ public class DfpHeaderBiddingFunctionalTest {
   @Before
   public void setUp() {
     doReturn(isLiveBiddingEnabled).when(config).isLiveBiddingEnabled();
+    doReturn(true).when(config).isPrefetchOnInitEnabled();
 
     RequestConfiguration requestConfiguration = new RequestConfiguration.Builder().setTestDeviceIds(Collections.singletonList(AdRequest.DEVICE_ID_EMULATOR)).build();
     MobileAds.setRequestConfiguration(requestConfiguration);

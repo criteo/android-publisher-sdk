@@ -25,7 +25,6 @@ import com.criteo.publisher.TestAdUnits.BANNER_320_480
 import com.criteo.publisher.TestAdUnits.INTERSTITIAL
 import com.criteo.publisher.TestAdUnits.NATIVE
 import com.criteo.publisher.advancednative.CriteoNativeLoader
-import com.criteo.publisher.concurrent.ThreadingUtil.callOnMainThreadAndWait
 import com.criteo.publisher.concurrent.ThreadingUtil.runOnMainThreadAndWait
 import com.criteo.publisher.context.ContextData
 import com.criteo.publisher.csm.MetricHelper
@@ -34,10 +33,12 @@ import com.criteo.publisher.csm.MetricSendingQueueConsumer
 import com.criteo.publisher.csm.MetricSendingQueueProducer
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
+import com.criteo.publisher.model.Config
 import com.criteo.publisher.network.PubSdkApi
 import com.criteo.publisher.privacy.ConsentData
 import com.google.android.gms.ads.admanager.AdManagerAdRequest
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
@@ -46,6 +47,7 @@ import org.mockito.kotlin.check
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doCallRealMethod
 import org.mockito.kotlin.doNothing
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -74,6 +76,15 @@ class ProfileIdFunctionalTest {
 
   @SpyBean
   private lateinit var consentData: ConsentData
+
+  @SpyBean
+  private lateinit var config: Config
+
+  @Before
+  fun setUp() {
+    doReturn(true).whenever(config).isPrefetchOnInitEnabled()
+    doReturn(false).whenever(config).isLiveBiddingEnabled()
+  }
 
   @Test
   fun prefetch_GivenSdkUsedForTheFirstTime_UseFallbackProfileId() {
@@ -331,12 +342,14 @@ class ProfileIdFunctionalTest {
     givenInitializedCriteo()
     bidInHouseInterstitial()
     mockedDependenciesRule.resetAllDependencies()
+    setUp()
   }
 
   private fun givenPreviousStandaloneIntegrationWithResetDependencies() {
     givenInitializedCriteo()
     bidStandaloneInterstitial()
     mockedDependenciesRule.resetAllDependencies()
+    setUp()
   }
 
   private fun triggerMetricRequest() {

@@ -116,6 +116,7 @@ public class InHouseFunctionalTest {
   @Before
   public void setUp() throws Exception {
     doReturn(isLiveBiddingEnabled).when(config).isLiveBiddingEnabled();
+    doReturn(true).when(config).isPrefetchOnInitEnabled();
   }
 
   @Test
