@@ -20,6 +20,7 @@ plugins {
   signing
   jacoco
   kotlin("android")
+  kotlin("kapt")
   id("kotlin-allopen")
   id("com.vanniktech.android.javadoc") version "0.3.0"
   id("io.gitlab.arturbosch.detekt")
@@ -45,7 +46,8 @@ dependencies {
   implementation(Deps.JUnit.JUnit)
   implementation(Deps.Square.OkHttp.MockWebServer)
   implementation(Deps.Square.OkHttp.OkHttpTls)
-  compileOnly(Deps.Square.Moshi.Adapter)
+  implementation(Deps.Square.Moshi.Adapter)
+  kapt(Deps.Square.Moshi.Kapt)
 
   compileOnly(Deps.Mockito.Core) {
     because("Brings injected mock mechanism. Caller should provide its own Mockito deps.")

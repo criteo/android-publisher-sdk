@@ -117,13 +117,15 @@ internal class ViewPositionTracker(
         this.getLocationInWindow(outWindowLocation)
         val currentPosition = previousPosition
 
-        val newX = deviceUtil.pxToDp(outWindowLocation[0])
-        val newY = deviceUtil.pxToDp(outWindowLocation[1])
-        val newWidth = deviceUtil.pxToDp(width)
-        val newHeight = deviceUtil.pxToDp(height)
+        // we subtract top bar height and only work in coordinates between status and navigation bar
+        val newYInPixel = outWindowLocation[1] - deviceUtil.getTopSystemBarHeight(this)
+        val newXInDp = deviceUtil.pixelToDp(outWindowLocation[0])
+        val newYInDp = deviceUtil.pixelToDp(newYInPixel)
+        val newWidthInDp = deviceUtil.pixelToDp(width)
+        val newHeightInDp = deviceUtil.pixelToDp(height)
 
         fun onPositionChange() {
-          val newPosition = Position(newX, newY, newWidth, newHeight)
+          val newPosition = Position(newXInDp, newYInDp, newWidthInDp, newHeightInDp)
           notifyPositionChange(newPosition)
           previousPosition = newPosition
         }
@@ -132,10 +134,10 @@ internal class ViewPositionTracker(
           currentPosition == null -> {
             onPositionChange()
           }
-          newX != currentPosition.x ||
-              newY != currentPosition.y ||
-              newWidth != currentPosition.width ||
-              newHeight != currentPosition.height -> {
+          newXInDp != currentPosition.x ||
+              newYInDp != currentPosition.y ||
+              newWidthInDp != currentPosition.width ||
+              newHeightInDp != currentPosition.height -> {
             onPositionChange()
           }
         }

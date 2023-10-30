@@ -465,7 +465,7 @@ public class DependencyProvider {
   public AdChoiceOverlay provideAdChoiceOverlay() {
     return getOrCreate(AdChoiceOverlay.class, () -> new AdChoiceOverlay(
         provideBuildConfigWrapper(),
-        provideAndroidUtil()
+        provideDeviceUtil()
     ));
   }
 

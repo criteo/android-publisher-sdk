@@ -31,6 +31,8 @@ class CriteoBannerAdWebViewFactory {
       criteo: Criteo?,
       parentContainer: CriteoBannerView
   ): CriteoBannerAdWebView {
-    return CriteoBannerAdWebView(context, attrs, bannerAdUnit, criteo, parentContainer)
+    return CriteoBannerAdWebView(context, attrs, bannerAdUnit, criteo, parentContainer).also {
+      it.id = R.id.bannerAdWebView
+    }
   }
 }

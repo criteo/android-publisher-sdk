@@ -28,8 +28,8 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.criteo.publisher.util.AndroidUtil;
 import com.criteo.publisher.util.BuildConfigWrapper;
+import com.criteo.publisher.util.DeviceUtil;
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -45,14 +45,14 @@ public class AdChoiceOverlay {
   private final BuildConfigWrapper buildConfigWrapper;
 
   @NonNull
-  private final AndroidUtil androidUtil;
+  private final DeviceUtil deviceUtil;
 
   public AdChoiceOverlay(
       @NonNull BuildConfigWrapper buildConfigWrapper,
-      @NonNull AndroidUtil androidUtil
+      @NonNull DeviceUtil deviceUtil
   ) {
     this.buildConfigWrapper = buildConfigWrapper;
-    this.androidUtil = androidUtil;
+    this.deviceUtil = deviceUtil;
   }
 
   /**
@@ -92,8 +92,8 @@ public class AdChoiceOverlay {
     // Put the AdChoice at the top right corner
     FrameLayout.LayoutParams adChoiceLayoutParams = (FrameLayout.LayoutParams) adChoiceImageView.getLayoutParams();
     adChoiceLayoutParams.gravity = Gravity.RIGHT;
-    adChoiceLayoutParams.width = androidUtil.dpToPixel(buildConfigWrapper.getAdChoiceIconWidthInDp());
-    adChoiceLayoutParams.height = androidUtil.dpToPixel(buildConfigWrapper.getAdChoiceIconHeightInDp());
+    adChoiceLayoutParams.width = deviceUtil.dpToPixel(buildConfigWrapper.getAdChoiceIconWidthInDp());
+    adChoiceLayoutParams.height = deviceUtil.dpToPixel(buildConfigWrapper.getAdChoiceIconHeightInDp());
     adChoiceImageView.setMinimumWidth(adChoiceLayoutParams.width);
     adChoiceImageView.setMinimumHeight(adChoiceLayoutParams.height);
 

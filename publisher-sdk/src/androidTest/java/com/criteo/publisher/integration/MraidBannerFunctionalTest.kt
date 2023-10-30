@@ -23,9 +23,12 @@ import androidx.test.filters.FlakyTest
 import androidx.test.rule.ActivityTestRule
 import com.criteo.publisher.CriteoBannerView
 import com.criteo.publisher.CriteoUtil
+import com.criteo.publisher.DependencyProvider
 import com.criteo.publisher.MraidData
+import com.criteo.publisher.MraidPosition
 import com.criteo.publisher.R
 import com.criteo.publisher.TestAdUnits
+import com.criteo.publisher.adview.MraidResizeCustomClosePosition
 import com.criteo.publisher.adview.MraidState
 import com.criteo.publisher.adview.Redirection
 import com.criteo.publisher.callMraidObjectBlocking
@@ -83,6 +86,7 @@ class MraidBannerFunctionalTest {
   private lateinit var onExpanded: CountDownLatch
   private lateinit var onHidden: CountDownLatch
   private lateinit var onDefault: CountDownLatch
+  private lateinit var onResized: CountDownLatch
 
   @Before
   fun setUp() {
@@ -92,6 +96,7 @@ class MraidBannerFunctionalTest {
     onExpanded = CountDownLatch(1)
     onHidden = CountDownLatch(1)
     onDefault = CountDownLatch(1)
+    resetResizeCounter()
 
     givenInitializedSdk(validBannerAdUnit)
     bannerView = whenLoadingABanner(validBannerAdUnit)!!
@@ -105,12 +110,7 @@ class MraidBannerFunctionalTest {
     onExpanded.await()
     mockedDependenciesRule.waitForIdleState()
 
-    assertThat(getCurrentState()).isEqualTo(MraidState.EXPANDED)
-    assertThat(getWebView().parent).isNotNull
-    assertThat(getWebView().parent).isNotEqualTo(bannerView)
-    assertThat(bannerView.childCount).isEqualTo(1)
-    assertThat(bannerView.getChildAt(0).id).isEqualTo(R.id.adWebViewPlaceholder)
-    assertThat((getWebView().parent as ViewGroup).id).isEqualTo(R.id.adWebViewDialogContainer)
+    assertExpandedCorrectly()
   }
 
   @Test
@@ -138,9 +138,30 @@ class MraidBannerFunctionalTest {
     onDefault.await()
     mockedDependenciesRule.waitForIdleState()
 
+    assertClosedCorrectly(originalLayoutParams)
+  }
+
+  private fun assertClosedCorrectly(originalLayoutParams: ViewGroup.LayoutParams?) {
     assertThat(getCurrentState()).isEqualTo(MraidState.DEFAULT)
     assertThat(getWebView().parent).isEqualTo(bannerView)
     assertThat(getWebView().layoutParams).isEqualTo(originalLayoutParams)
+  }
+
+  @Test
+  @FlakyTest(detail = "Flakiness comes from UI and concurrency")
+  fun whenExpandFromResizedState_ShouldMoveWebViewToDialogAndUpdateState() {
+    setResizeProperties(100, 100, 0, 0, MraidResizeCustomClosePosition.CENTER, true)
+    resize()
+
+    onResized.await()
+    mockedDependenciesRule.waitForIdleState()
+
+    expand()
+
+    onExpanded.await()
+    mockedDependenciesRule.waitForIdleState()
+
+    assertExpandedCorrectly()
   }
 
   @Test
@@ -149,7 +170,78 @@ class MraidBannerFunctionalTest {
     open()
     mockedDependenciesRule.waitForIdleState()
 
-    verify(redirection).redirect(eq("https://www.criteo.com"), eq(activityRule.activity.componentName), any())
+    verify(redirection).redirect(
+        eq("https://www.criteo.com"),
+        eq(activityRule.activity.componentName),
+        any()
+    )
+  }
+
+  @Test
+  @FlakyTest(detail = "Flakiness comes from UI and concurrency")
+  fun whenResize_shouldMoveViewAboveAllViewsWithProperParamsAndUpdateState() {
+    val originalPosition = getCurrentPosition()
+
+    setResizeProperties(100, 100, 20, 20, MraidResizeCustomClosePosition.CENTER, true)
+    resize()
+
+    onResized.await()
+    mockedDependenciesRule.waitForIdleState()
+
+    assertThat(getCurrentState()).isEqualTo(MraidState.RESIZED)
+    val currentPosition = getCurrentPosition()
+    assertThat(currentPosition.width).isEqualTo(100)
+    assertThat(currentPosition.height).isEqualTo(100)
+    assertThat(currentPosition.x).isEqualTo(originalPosition.x + 20)
+    assertThat(currentPosition.y).isEqualTo(originalPosition.y + 20)
+    assertThat(getWebView().parent).isNotEqualTo(bannerView)
+    assertThat(bannerView.getChildAt(0).id).isEqualTo(R.id.adWebViewPlaceholder)
+  }
+
+  @Test
+  @FlakyTest(detail = "Flakiness comes from UI and concurrency")
+  fun whenResizeAndThenResizeWithDifferentParameter_shouldMoveViewAboveAllViewsWithProperParamsAndUpdateState() {
+    val originalPosition = getCurrentPosition()
+
+    setResizeProperties(100, 100, 15, 15, MraidResizeCustomClosePosition.CENTER, true)
+    resize()
+
+    onResized.await()
+    mockedDependenciesRule.waitForIdleState()
+
+    resetResizeCounter()
+    setResizeProperties(150, 150, 10, 10, MraidResizeCustomClosePosition.TOP_CENTER, false)
+    resize()
+
+    onResized.await()
+    mockedDependenciesRule.waitForIdleState()
+
+    assertThat(getCurrentState()).isEqualTo(MraidState.RESIZED)
+    val currentPosition = getCurrentPosition()
+    assertThat(currentPosition.width).isEqualTo(150)
+    assertThat(currentPosition.height).isEqualTo(150)
+    assertThat(currentPosition.x).isEqualTo(originalPosition.x + 15 + 10)
+    assertThat(currentPosition.y).isEqualTo(originalPosition.y + 15 + 10)
+
+    assertThat(getWebView().parent).isNotEqualTo(bannerView)
+    assertThat(bannerView.getChildAt(0).id).isEqualTo(R.id.adWebViewPlaceholder)
+  }
+
+  @Test
+  @FlakyTest(detail = "Flakiness comes from UI and concurrency")
+  fun whenResizeAndThenClose_ShouldMoveBackToOriginalContainer() {
+    val originalLayoutParams = getWebView().layoutParams
+    setResizeProperties(100, 100, 0, 0, MraidResizeCustomClosePosition.CENTER, true)
+    resize()
+
+    onResized.await()
+    mockedDependenciesRule.waitForIdleState()
+
+    close()
+    onDefault.await()
+    mockedDependenciesRule.waitForIdleState()
+
+    assertClosedCorrectly(originalLayoutParams)
   }
 
   private fun givenInitializedSdk(vararg preloadedAdUnits: AdUnit) {
@@ -189,6 +281,15 @@ class MraidBannerFunctionalTest {
     waitForBids()
   }
 
+  private fun assertExpandedCorrectly() {
+    assertThat(getCurrentState()).isEqualTo(MraidState.EXPANDED)
+    assertThat(getWebView().parent).isNotNull
+    assertThat(getWebView().parent).isNotEqualTo(bannerView)
+    assertThat(bannerView.childCount).isEqualTo(1)
+    assertThat(bannerView.getChildAt(0).id).isEqualTo(R.id.adWebViewPlaceholder)
+    assertThat((getWebView().parent as ViewGroup).id).isEqualTo(R.id.adWebViewDialogContainer)
+  }
+
   private fun expand() {
     getWebView().callMraidObjectBlocking("expand()")
   }
@@ -197,12 +298,50 @@ class MraidBannerFunctionalTest {
     getWebView().callMraidObjectBlocking("close()")
   }
 
+  private fun setResizeProperties(
+      width: Int,
+      height: Int,
+      offsetX: Int,
+      offsetY: Int,
+      customClosePosition: MraidResizeCustomClosePosition,
+      allowOffscreen: Boolean
+  ) {
+    getWebView().callMraidObjectBlocking(buildString {
+      append("setResizeProperties")
+      append("(")
+      append("{")
+      append("width:")
+      append(width)
+      append(", height:")
+      append(height)
+      append(", offsetX:")
+      append(offsetX)
+      append(", offsetY:")
+      append(offsetY)
+      append(", customClosePosition:")
+      append("\"")
+      append(customClosePosition.value)
+      append("\"")
+      append(", allowOffscreen:")
+      append(allowOffscreen)
+      append("}")
+      append(")")
+    })
+  }
+
+  private fun resize() {
+    getWebView().callMraidObjectBlocking("resize()")
+  }
+
   private fun open() {
     getWebView().callMraidObjectBlocking("open(\"https://www.criteo.com\")")
   }
 
   private fun getCurrentState() = getWebView().getJavascriptResultBlocking("window.mraid.getState()")
       .toMraidState()
+
+  private fun getCurrentPosition() = getWebView().getJavascriptResultBlocking("window.mraid.getCurrentPosition()")
+      .toMraidPosition()
 
   private fun getWebView(): WebView {
     return bannerView.adWebView
@@ -217,6 +356,10 @@ class MraidBannerFunctionalTest {
     onReady.countDown()
   }
 
+  fun resetResizeCounter() {
+    onResized = CountDownLatch(1)
+  }
+
   @JavascriptInterface
   fun onStateChange(newState: String) {
     when (newState.toMraidState()) {
@@ -224,6 +367,7 @@ class MraidBannerFunctionalTest {
       MraidState.DEFAULT -> onDefault.countDown()
       MraidState.EXPANDED -> onExpanded.countDown()
       MraidState.HIDDEN -> onHidden.countDown()
+      MraidState.RESIZED -> onResized.countDown()
     }
   }
 
@@ -231,4 +375,9 @@ class MraidBannerFunctionalTest {
     val unquotedState = this.replace("\"", "")
     return MraidState.values().first { it.stringValue == unquotedState }
   }
+
+  private fun String.toMraidPosition(): MraidPosition = DependencyProvider.getInstance()
+      .provideMoshi()
+      .adapter(MraidPosition::class.java)
+      .fromJson(this)!!
 }

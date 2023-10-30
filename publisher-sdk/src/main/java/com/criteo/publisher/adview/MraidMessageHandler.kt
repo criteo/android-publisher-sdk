@@ -61,4 +61,24 @@ class MraidMessageHandler {
   fun playVideo(url: String) {
     listener?.onPlayVideo(url)
   }
+
+  @Suppress("LongParameterList")
+  @JavascriptInterface
+  fun resize(
+      width: Double,
+      height: Double,
+      offsetX: Double,
+      offsetY: Double,
+      customClosePosition: String,
+      allowOffscreen: Boolean
+  ) {
+    listener?.onResize(
+        width,
+        height,
+        offsetX,
+        offsetY,
+        customClosePosition.asCustomClosePosition(),
+        allowOffscreen
+    )
+  }
 }

@@ -2,4 +2,6 @@
 <resources>
     <item type="id" name="adWebViewPlaceholder" />
     <item type="id" name="adWebViewDialogContainer" />
+    <item type="id" name="adWebViewCloseRegion"/>
+    <item type="id" name="bannerAdWebView" />
 </resources>

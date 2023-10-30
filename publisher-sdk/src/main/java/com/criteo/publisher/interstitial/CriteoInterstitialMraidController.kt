@@ -23,6 +23,8 @@ import com.criteo.publisher.adview.MraidActionResult
 import com.criteo.publisher.adview.MraidInteractor
 import com.criteo.publisher.adview.MraidMessageHandler
 import com.criteo.publisher.adview.MraidPlacementType
+import com.criteo.publisher.adview.MraidResizeActionResult
+import com.criteo.publisher.adview.MraidResizeCustomClosePosition
 import com.criteo.publisher.adview.MraidState
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
@@ -79,6 +81,25 @@ internal class CriteoInterstitialMraidController(
           )
       )
     }
+  }
+
+  override fun doResize(
+      width: Double,
+      height: Double,
+      offsetX: Double,
+      offsetY: Double,
+      customClosePosition: MraidResizeCustomClosePosition,
+      allowOffscreen: Boolean,
+      onResult: (result: MraidResizeActionResult) -> Unit
+  ) {
+    runOnUiThreadExecutor.execute {
+      onResult(MraidResizeActionResult.Error("Interstitial ad can't be resized", "resize"))
+    }
+  }
+
+  override fun resetToDefault() {
+    // nothing to do here
+    // interstitial AdWebView is never removed
   }
 
   private fun close(onResult: (result: MraidActionResult) -> Unit) {

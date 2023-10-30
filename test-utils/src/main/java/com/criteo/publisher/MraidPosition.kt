@@ -14,21 +14,9 @@
  *    limitations under the License.
  */
 
-package com.criteo.publisher.adview
+package com.criteo.publisher
 
-interface MraidMessageHandlerListener {
-  fun onOpen(url: String)
-  fun onExpand(width: Double, height: Double)
-  fun onClose()
-  fun onPlayVideo(url: String)
+import com.squareup.moshi.JsonClass
 
-  @Suppress("LongParameterList")
-  fun onResize(
-      width: Double,
-      height: Double,
-      offsetX: Double,
-      offsetY: Double,
-      customClosePosition: MraidResizeCustomClosePosition,
-      allowOffscreen: Boolean
-  )
-}
+@JsonClass(generateAdapter = true)
+data class MraidPosition(val x: Int, val y: Int, val width: Int, val height: Int)

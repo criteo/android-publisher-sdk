@@ -19,6 +19,8 @@ package com.criteo.publisher.interstitial
 import androidx.test.rule.ActivityTestRule
 import com.criteo.publisher.adview.MraidActionResult
 import com.criteo.publisher.adview.MraidPlacementType
+import com.criteo.publisher.adview.MraidResizeActionResult
+import com.criteo.publisher.adview.MraidResizeCustomClosePosition
 import com.criteo.publisher.adview.MraidState
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
 import com.criteo.publisher.mock.MockedDependenciesRule
@@ -89,6 +91,24 @@ class CriteoInterstitialMraidControllerTest {
     mockedDependenciesRule.waitForIdleState()
 
     verify(callbackMock).invoke(argThat { this is MraidActionResult.Error })
+  }
+
+  @Test
+  fun doResize_ShouldCallbackError() {
+    val callbackMock = mock<(result: MraidResizeActionResult) -> Unit>()
+
+    criteoInterstitialMraidController.doResize(
+        100.0,
+        100.0,
+        0.0,
+        0.0,
+        MraidResizeCustomClosePosition.CENTER,
+        true,
+        callbackMock
+    )
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(callbackMock).invoke(argThat { this is MraidResizeActionResult.Error })
   }
 
   @Test

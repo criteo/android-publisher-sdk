@@ -22,14 +22,19 @@ import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
 import com.criteo.publisher.concurrent.ThreadingUtil
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.test.activity.DummyActivity
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.ArgumentCaptor
+import org.mockito.Captor
+import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.atMost
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.lastValue
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -57,8 +62,14 @@ class ViewPositionTrackerTest {
 
   private lateinit var viewPositionTracker: ViewPositionTracker
 
+  @Captor private lateinit var xCaptor: ArgumentCaptor<Int>
+  @Captor private lateinit var yCaptor: ArgumentCaptor<Int>
+  @Captor private lateinit var widthCaptor: ArgumentCaptor<Int>
+  @Captor private lateinit var heightCaptor: ArgumentCaptor<Int>
+
   @Before
   fun setUp() {
+    MockitoAnnotations.openMocks(this)
     listener = mock()
     uiHelper = UiHelper(activityRule)
     viewPositionTracker = ViewPositionTracker(runOnUiThreadExecutor, deviceUtil)
@@ -74,12 +85,22 @@ class ViewPositionTrackerTest {
     val outWindowLocation = IntArray(2)
     view.getLocationInWindow(outWindowLocation)
 
+    val expectedX = deviceUtil.pixelToDp(outWindowLocation[0])
+    val expectedY = deviceUtil.pixelToDp(outWindowLocation[1] - deviceUtil.getTopSystemBarHeight(view))
+    val expectedWidth = deviceUtil.pixelToDp(view.width)
+    val expectedHeight = deviceUtil.pixelToDp(view.height)
+
     verify(listener, atLeastOnce()).onPositionChange(
-        eq(deviceUtil.pxToDp(outWindowLocation[0])),
-        eq(deviceUtil.pxToDp(outWindowLocation[1])),
-        eq(deviceUtil.pxToDp(view.width)),
-        eq(deviceUtil.pxToDp(view.height))
+        xCaptor.capture(),
+        yCaptor.capture(),
+        widthCaptor.capture(),
+        heightCaptor.capture()
     )
+
+    assertThat(xCaptor.lastValue).isEqualTo(expectedX)
+    assertThat(yCaptor.lastValue).isEqualTo(expectedY)
+    assertThat(widthCaptor.lastValue).isEqualTo(expectedWidth)
+    assertThat(heightCaptor.lastValue).isEqualTo(expectedHeight)
   }
 
   @Test

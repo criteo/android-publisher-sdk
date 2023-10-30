@@ -34,6 +34,17 @@ interface MraidController {
 
   fun doClose(@MainThread onResult: (result: MraidActionResult) -> Unit)
 
+  @Suppress("LongParameterList")
+  fun doResize(
+      width: Double,
+      height: Double,
+      offsetX: Double,
+      offsetY: Double,
+      customClosePosition: MraidResizeCustomClosePosition,
+      allowOffscreen: Boolean,
+      @MainThread onResult: (result: MraidResizeActionResult) -> Unit
+  )
+
   fun onWebViewClientSet(client: WebViewClient)
 
   fun onConfigurationChange(newConfig: Configuration?)
@@ -42,9 +53,22 @@ interface MraidController {
    * Notify when ad was closed by non-MRAID call (eg. by clicking on SDK provided button)
    */
   fun onClosed()
+
+  /**
+   * Brings back [AdWebViewClient] to default container if
+   * it absent
+   */
+  fun resetToDefault()
 }
 
 sealed class MraidActionResult {
   object Success : MraidActionResult()
   data class Error(val message: String, val action: String) : MraidActionResult()
+}
+
+sealed class MraidResizeActionResult {
+  data class Success(val x: Int, val y: Int, val width: Int, val height: Int) :
+      MraidResizeActionResult()
+
+  data class Error(val message: String, val action: String) : MraidResizeActionResult()
 }

@@ -20,5 +20,6 @@ enum class MraidState(val stringValue: String) {
   LOADING("loading"),
   DEFAULT("default"),
   EXPANDED("expanded"),
+  RESIZED("resized"),
   HIDDEN("hidden"),
 }

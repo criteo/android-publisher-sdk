@@ -16,19 +16,17 @@
 
 package com.criteo.publisher.adview
 
-interface MraidMessageHandlerListener {
-  fun onOpen(url: String)
-  fun onExpand(width: Double, height: Double)
-  fun onClose()
-  fun onPlayVideo(url: String)
+enum class MraidResizeCustomClosePosition(val value: String) {
+  TOP_LEFT("top-left"),
+  TOP_RIGHT("top-right"),
+  CENTER("center"),
+  BOTTOM_LEFT("bottom-left"),
+  BOTTOM_RIGHT("bottom-right"),
+  TOP_CENTER("top-center"),
+  BOTTOM_CENTER("bottom-center")
+}
 
-  @Suppress("LongParameterList")
-  fun onResize(
-      width: Double,
-      height: Double,
-      offsetX: Double,
-      offsetY: Double,
-      customClosePosition: MraidResizeCustomClosePosition,
-      allowOffscreen: Boolean
-  )
+internal fun String.asCustomClosePosition(): MraidResizeCustomClosePosition {
+  return MraidResizeCustomClosePosition.values().firstOrNull { it.value == this }
+      ?: MraidResizeCustomClosePosition.TOP_RIGHT
 }
