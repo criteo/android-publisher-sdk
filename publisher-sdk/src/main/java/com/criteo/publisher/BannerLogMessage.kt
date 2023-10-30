@@ -66,4 +66,11 @@ internal object BannerLogMessage {
       level = Log.ERROR,
       throwable = throwable
   )
+
+  @JvmStatic
+  fun onBannerFailedToResize(bannerView: CriteoBannerView?, throwable: Throwable) = LogMessage(
+      message = "BannerView(${bannerView?.bannerAdUnit}) failed to resize",
+      level = Log.ERROR,
+      throwable = throwable
+  )
 }

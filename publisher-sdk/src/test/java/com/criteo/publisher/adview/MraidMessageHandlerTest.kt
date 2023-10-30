@@ -134,4 +134,27 @@ class MraidMessageHandlerTest {
   fun whenPlayVideo_givenListenerIsNull_shouldNotThrow() {
     assertThatCode { mraidMessageHandler.playVideo("https://criteo.com/cat_video.mp4") }.doesNotThrowAnyException()
   }
+
+  @Test
+  fun whenResize_givenListener_shouldCallOnResizeOnListener() {
+    mraidMessageHandler.setListener(listener)
+
+    mraidMessageHandler.resize(100.0, 100.0, 0.0, 0.0, "center", true)
+
+    verify(listener).onResize(100.0, 100.0, 0.0, 0.0, MraidResizeCustomClosePosition.CENTER, true)
+  }
+
+  @Test
+  fun whenResize_givenListenerIsNull_shouldNotThrow() {
+    assertThatCode {
+      mraidMessageHandler.resize(
+          100.0,
+          100.0,
+          0.0,
+          0.0,
+          "center",
+          true
+      )
+    }.doesNotThrowAnyException()
+  }
 }

@@ -128,7 +128,7 @@ class DeviceUtilTest {
       null
     }.whenever(display).getRealSize(ArgumentMatchers.any())
 
-    val (width, height) = deviceUtil.getRealSceeenSize()
+    val (width, height) = deviceUtil.getRealScreenSize()
 
     assertThat(width).isEqualTo(50)
     assertThat(height).isEqualTo(50)
@@ -144,7 +144,7 @@ class DeviceUtilTest {
     whenever(bounds.width()).thenReturn(100)
     whenever(windowManager.maximumWindowMetrics).thenReturn(windowMetrics)
 
-    val (width, height) = deviceUtil.getRealSceeenSize()
+    val (width, height) = deviceUtil.getRealScreenSize()
 
     assertThat(width).isEqualTo(50)
     assertThat(height).isEqualTo(50)
@@ -187,21 +187,37 @@ class DeviceUtilTest {
   }
 
   @Test
-  fun pxToDp_GivenNonZeroValue_ShouldReturnProperlyConvertedValue() {
+  fun pixelToDp_GivenNonZeroValue_ShouldReturnProperlyConvertedValue() {
     metrics.density = 2f
 
-    val result = deviceUtil.pxToDp(100)
+    val result = deviceUtil.pixelToDp(100)
 
     assertThat(result).isEqualTo(50)
   }
 
   @Test
-  fun pxToDp_GivenZero_ShouldReturnZero() {
+  fun pixelToDp_GivenZero_ShouldReturnZero() {
     metrics.density = 2f
 
-    val result = deviceUtil.pxToDp(0)
+    val result = deviceUtil.pixelToDp(0)
 
     assertThat(result).isEqualTo(0)
+  }
+
+  @Test
+  fun dpToPixel_GivenIntegerDensity_ReturnsScaledValue() {
+    metrics.density = 2f
+
+    assertThat(deviceUtil.dpToPixel(1)).isEqualTo(2)
+    assertThat(deviceUtil.dpToPixel(42)).isEqualTo(84)
+  }
+
+  @Test
+  fun dpToPixel_GivenFloatDensity_ReturnsScaledCeilValue() {
+    metrics.density = 31.82f
+
+    assertThat(deviceUtil.dpToPixel(1)).isEqualTo(32)
+    assertThat(deviceUtil.dpToPixel(42)).isEqualTo(1337)
   }
 
   @Test

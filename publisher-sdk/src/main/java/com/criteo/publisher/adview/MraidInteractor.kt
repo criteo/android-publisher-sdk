@@ -42,6 +42,10 @@ internal class MraidInteractor(private val webView: WebView) {
     "notifyExpanded"()
   }
 
+  fun notifyResized() {
+    "notifyResized"()
+  }
+
   fun notifyClosed() {
     "notifyClosed"()
   }

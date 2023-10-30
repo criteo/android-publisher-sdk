@@ -45,11 +45,14 @@ internal abstract class CriteoMraidController(
   private var adWebViewClient: AdWebViewClient? = null
   private var mraidState: MraidState = MraidState.LOADING
   private var isMraidAd = false
+  private var ignoreOnPositionChange = false
 
   override val currentState: MraidState
     get() = mraidState
 
   protected val logger = LoggerFactory.getLogger(javaClass)
+  protected var currentPosition: Pair<Int, Int>? = null // x, y in dp
+  protected var maxSize: Pair<Int, Int>? = null // width, height in dp
 
   init {
     setupMessageHandler()
@@ -60,7 +63,9 @@ internal abstract class CriteoMraidController(
   }
 
   override fun onPositionChange(x: Int, y: Int, width: Int, height: Int) {
-    mraidInteractor.setCurrentPosition(x, y, width, height)
+    if (!ignoreOnPositionChange) {
+      updateCurrentPosition(x, y, width, height)
+    }
   }
 
   override fun onGone() {
@@ -96,6 +101,35 @@ internal abstract class CriteoMraidController(
         MraidActionResult.Success -> setAsClosed()
       }
     })
+  }
+
+  override fun onResize(
+      width: Double,
+      height: Double,
+      offsetX: Double,
+      offsetY: Double,
+      customClosePosition: MraidResizeCustomClosePosition,
+      allowOffscreen: Boolean
+  ) {
+    ignoreOnPositionChange = true
+    doResize(width, height, offsetX, offsetY, customClosePosition, allowOffscreen) {
+      when (it) {
+        is MraidResizeActionResult.Error -> {
+          mraidInteractor.notifyError(it.message, it.action)
+          ignoreOnPositionChange = false
+        }
+        is MraidResizeActionResult.Success -> {
+          mraidInteractor.notifyResized()
+          updateCurrentPosition(
+              it.x,
+              it.y,
+              it.width,
+              it.height
+          )
+          mraidState = MraidState.RESIZED
+        }
+      }
+    }
   }
 
   override fun onPageFinished() {
@@ -178,16 +212,27 @@ internal abstract class CriteoMraidController(
     }
   }
 
+  private fun updateCurrentPosition(
+      x: Int,
+      y: Int,
+      width: Int,
+      height: Int
+  ) {
+    mraidInteractor.setCurrentPosition(x, y, width, height)
+    currentPosition = x to y
+  }
+
   private fun setMaxSize(configuration: Configuration) {
     mraidInteractor.setMaxSize(
         configuration.screenWidthDp,
         configuration.screenHeightDp,
         adWebView.resources.displayMetrics.density.toDouble()
     )
+    maxSize = configuration.screenWidthDp to configuration.screenHeightDp
   }
 
   private fun setScreenSize() {
-    val screenSize = deviceUtil.getRealSceeenSize()
+    val screenSize = deviceUtil.getRealScreenSize()
     mraidInteractor.setScreenSize(screenSize.width, screenSize.height)
   }
 
@@ -197,15 +242,18 @@ internal abstract class CriteoMraidController(
 
   private fun updateCurrentStateOnClose() {
     mraidState = when (currentState) {
-      MraidState.EXPANDED -> MraidState.DEFAULT
+      MraidState.EXPANDED, MraidState.RESIZED -> MraidState.DEFAULT
       MraidState.DEFAULT -> MraidState.HIDDEN
       else -> currentState
     }
   }
 
   private fun setAsClosed() {
-    if (currentState == MraidState.DEFAULT || currentState == MraidState.EXPANDED) {
+    if (currentState == MraidState.DEFAULT ||
+        currentState == MraidState.EXPANDED ||
+        currentState == MraidState.RESIZED) {
       mraidInteractor.notifyClosed()
+      ignoreOnPositionChange = false
     }
     updateCurrentStateOnClose()
   }

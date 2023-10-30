@@ -38,6 +38,18 @@ internal class DummyMraidController : MraidController {
     // no-op
   }
 
+  override fun doResize(
+      width: Double,
+      height: Double,
+      offsetX: Double,
+      offsetY: Double,
+      customClosePosition: MraidResizeCustomClosePosition,
+      allowOffscreen: Boolean,
+      onResult: (result: MraidResizeActionResult) -> Unit
+  ) {
+    // no-op
+  }
+
   override fun onWebViewClientSet(client: WebViewClient) {
     // no-op
   }
@@ -47,6 +59,10 @@ internal class DummyMraidController : MraidController {
   }
 
   override fun onClosed() {
+    // no-op
+  }
+
+  override fun resetToDefault() {
     // no-op
   }
 }

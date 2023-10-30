@@ -16,24 +16,32 @@
 
 package com.criteo.publisher
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
+import android.content.Context.WINDOW_SERVICE
+import android.graphics.PixelFormat
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.view.Window
 import android.view.WindowManager
+import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import androidx.annotation.MainThread
 import com.criteo.publisher.BannerLogMessage.onBannerFailedToClose
 import com.criteo.publisher.BannerLogMessage.onBannerFailedToExpand
+import com.criteo.publisher.BannerLogMessage.onBannerFailedToResize
 import com.criteo.publisher.advancednative.VisibilityTracker
 import com.criteo.publisher.adview.CriteoMraidController
 import com.criteo.publisher.adview.MraidActionResult
 import com.criteo.publisher.adview.MraidInteractor
 import com.criteo.publisher.adview.MraidMessageHandler
 import com.criteo.publisher.adview.MraidPlacementType
+import com.criteo.publisher.adview.MraidResizeActionResult
+import com.criteo.publisher.adview.MraidResizeCustomClosePosition
 import com.criteo.publisher.adview.MraidState
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
@@ -41,6 +49,8 @@ import com.criteo.publisher.util.DeviceUtil
 import com.criteo.publisher.util.ExternalVideoPlayer
 import com.criteo.publisher.util.ViewPositionTracker
 import com.criteo.publisher.util.doOnNextLayout
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
 @OpenForTesting
 @Suppress("TooManyFunctions", "LongParameterList")
@@ -50,7 +60,7 @@ internal class CriteoBannerMraidController(
     visibilityTracker: VisibilityTracker,
     mraidInteractor: MraidInteractor,
     mraidMessageHandler: MraidMessageHandler,
-    deviceUtil: DeviceUtil,
+    private val deviceUtil: DeviceUtil,
     viewPositionTracker: ViewPositionTracker,
     externalVideoPlayer: ExternalVideoPlayer
 ) : CriteoMraidController(
@@ -70,6 +80,9 @@ internal class CriteoBannerMraidController(
       id = R.id.adWebViewPlaceholder
     }
   }
+  private var resizedRoot: FrameLayout? = null
+  private var resizedAdContainer: RelativeLayout? = null
+  private var resizedCloseRegion: View? = null
 
   override fun getPlacementType(): MraidPlacementType = MraidPlacementType.INLINE
 
@@ -86,7 +99,11 @@ internal class CriteoBannerMraidController(
                 EXPAND_ACTION
             )
         )
-        MraidState.DEFAULT -> expandFromDefaultState(width, height, onResult)
+        MraidState.DEFAULT, MraidState.RESIZED -> expandFromDefaultOrResizedState(
+            width,
+            height,
+            onResult
+        )
         MraidState.EXPANDED -> onResult(MraidActionResult.Error("Ad already expanded", "expand"))
         MraidState.HIDDEN -> onResult(
             MraidActionResult.Error(
@@ -108,7 +125,7 @@ internal class CriteoBannerMraidController(
             )
         )
         MraidState.DEFAULT -> closeFromDefaultState(onResult)
-        MraidState.EXPANDED -> closeFromExpandedState(onResult)
+        MraidState.EXPANDED, MraidState.RESIZED -> closeFromExpandedOrResizedState(onResult)
         MraidState.HIDDEN -> onResult(
             MraidActionResult.Error(
                 "Can't close in hidden state",
@@ -119,23 +136,80 @@ internal class CriteoBannerMraidController(
     }
   }
 
+  override fun doResize(
+      width: Double,
+      height: Double,
+      offsetX: Double,
+      offsetY: Double,
+      customClosePosition: MraidResizeCustomClosePosition,
+      allowOffscreen: Boolean,
+      onResult: (result: MraidResizeActionResult) -> Unit
+  ) {
+    runOnUiThreadExecutor.execute {
+      when (currentState) {
+        MraidState.LOADING -> onResult(
+            MraidResizeActionResult.Error(
+                "Can't resize in loading state",
+                RESIZE_ACTION
+            )
+        )
+        MraidState.DEFAULT, MraidState.RESIZED -> resizeFromDefaultOrResizedState(
+            width,
+            height,
+            offsetX,
+            offsetY,
+            customClosePosition,
+            allowOffscreen,
+            onResult
+        )
+        MraidState.EXPANDED -> MraidActionResult.Error(
+            "Can't resize in expanded state",
+            RESIZE_ACTION
+        )
+        MraidState.HIDDEN -> onResult(
+            MraidResizeActionResult.Error(
+                "Can't resize in hidden state",
+                RESIZE_ACTION
+            )
+        )
+      }
+    }
+  }
+
   @Suppress("TooGenericExceptionCaught")
-  private fun expandFromDefaultState(
+  override fun resetToDefault() {
+    try {
+      if (currentState == MraidState.RESIZED) {
+        removeBannerFromParentAndCleanupResize()
+      } else {
+        removeBannerFromParent()
+      }
+      reattachBannerToOriginalContainer()
+    } catch (t: Throwable) {
+      logger.log(onBannerFailedToClose(bannerView.parentContainer, t))
+    }
+  }
+
+  @Suppress("TooGenericExceptionCaught")
+  private fun expandFromDefaultOrResizedState(
       width: Double,
       height: Double,
       onResult: (result: MraidActionResult) -> Unit
   ) {
     try {
       if (!bannerView.isAttachedToWindow) {
-        onResult(MraidActionResult.Error("View is detached from window", EXPAND_ACTION))
+        onResult(MraidActionResult.Error(DETACHED_FROM_WINDOW_MESSAGE, EXPAND_ACTION))
         return
       }
 
       val bannerContainer = bannerView.parentContainer
       val context = (bannerContainer.parent as View).context
 
-      bannerContainer.addView(placeholderView, LayoutParams(bannerView.width, bannerView.height))
-      bannerContainer.removeView(bannerView)
+      if (currentState == MraidState.RESIZED) {
+        removeBannerFromParentAndCleanupResize()
+      } else {
+        replaceBannerWithPlaceholder(bannerContainer)
+      }
 
       val expandedLayout = RelativeLayout(context)
       expandedLayout.id = R.id.adWebViewDialogContainer
@@ -164,31 +238,44 @@ internal class CriteoBannerMraidController(
   }
 
   @Suppress("TooGenericExceptionCaught")
-  private fun closeFromExpandedState(onResult: (result: MraidActionResult) -> Unit) {
+  private fun closeFromExpandedOrResizedState(onResult: (result: MraidActionResult) -> Unit) {
     try {
       if (!bannerView.isAttachedToWindow) {
-        onResult(MraidActionResult.Error("View is detached from window", CLOSE_ACTION))
+        onResult(MraidActionResult.Error(DETACHED_FROM_WINDOW_MESSAGE, CLOSE_ACTION))
         return
       }
 
-      removeBannerFromParent()
-
-      val bannerContainer = bannerView.parentContainer
-      bannerContainer.addView(
-          bannerView,
-          LayoutParams(placeholderView.width, placeholderView.height)
-      )
-      bannerContainer.removeView(placeholderView)
-      bannerView.doOnNextLayout {
-        bannerView.layoutParams = defaultBannerViewLayoutParams
+      if (currentState == MraidState.EXPANDED) {
+        dialog?.dismiss()
+        removeBannerFromParent()
+      } else {
+        removeBannerFromParentAndCleanupResize()
       }
 
-      dialog?.dismiss()
+      reattachBannerToOriginalContainer()
+
       onResult(MraidActionResult.Success)
     } catch (t: Throwable) {
       logger.log(onBannerFailedToClose(bannerView.parentContainer, t))
       onResult(MraidActionResult.Error("Banner failed to close", CLOSE_ACTION))
     }
+  }
+
+  private fun reattachBannerToOriginalContainer() {
+    val bannerContainer = bannerView.parentContainer
+    bannerContainer.addView(
+        bannerView,
+        LayoutParams(placeholderView.width, placeholderView.height)
+    )
+    bannerContainer.removeView(placeholderView)
+    bannerView.doOnNextLayout {
+      bannerView.layoutParams = defaultBannerViewLayoutParams
+    }
+  }
+
+  private fun replaceBannerWithPlaceholder(bannerContainer: CriteoBannerView) {
+    bannerContainer.addView(placeholderView, LayoutParams(bannerView.width, bannerView.height))
+    bannerContainer.removeView(bannerView)
   }
 
   private fun removeBannerFromParent() {
@@ -231,9 +318,356 @@ internal class CriteoBannerMraidController(
     return closeButton
   }
 
+  @Suppress("TooGenericExceptionCaught")
+  private fun resizeFromDefaultOrResizedState(
+      width: Double,
+      height: Double,
+      offsetX: Double,
+      offsetY: Double,
+      customClosePosition: MraidResizeCustomClosePosition,
+      allowOffscreen: Boolean,
+      onResult: (result: MraidResizeActionResult) -> Unit
+  ) {
+    try {
+      if (!bannerView.isAttachedToWindow) {
+        onResult(MraidResizeActionResult.Error(DETACHED_FROM_WINDOW_MESSAGE, RESIZE_ACTION))
+        return
+      }
+
+      var newXInPx = (currentPosition?.first
+          ?: 0).let { deviceUtil.dpToPixel(it) } + deviceUtil.dpToPixel(offsetX.roundToInt())
+      var newYInPx = (currentPosition?.second
+          ?: 0).let { deviceUtil.dpToPixel(it) } + deviceUtil.dpToPixel(offsetY.roundToInt())
+
+      val widthInPx = deviceUtil.dpToPixel(width.roundToInt())
+      val heightInPx = deviceUtil.dpToPixel(height.roundToInt())
+
+      // adjust view position to fit on screen
+      if (!allowOffscreen) {
+        newXInPx = findClosestPositionOnScreen(newXInPx, maxWidthInPx(), widthInPx)
+        newYInPx = findClosestPositionOnScreen(newYInPx, maxHeightInPx(), heightInPx)
+      }
+
+      if (!isCloseRegionOnScreen(
+              newXInPx,
+              newYInPx,
+              widthInPx,
+              heightInPx,
+              customClosePosition
+          )) {
+        onResult(MraidResizeActionResult.Error("Close button will be offscreen", RESIZE_ACTION))
+        return
+      }
+
+      if (resizedRoot != null) {
+        updateResizedPopup(
+            widthInPx,
+            heightInPx,
+            customClosePosition,
+            newXInPx,
+            newYInPx,
+            allowOffscreen
+        )
+      } else {
+        showResizedPopup(
+            widthInPx,
+            heightInPx,
+            customClosePosition,
+            newXInPx,
+            newYInPx,
+            allowOffscreen
+        )
+      }
+      onResult(
+          MraidResizeActionResult.Success(
+              deviceUtil.pixelToDp(newXInPx),
+              deviceUtil.pixelToDp(newYInPx),
+              width.roundToInt(),
+              height.roundToInt()
+          )
+      )
+    } catch (t: Throwable) {
+      logger.log(onBannerFailedToResize(bannerView.parentContainer, t))
+      onResult(MraidResizeActionResult.Error("Banner failed to resize", RESIZE_ACTION))
+    }
+  }
+
+  private fun updateResizedPopup(
+      widthInPx: Int,
+      heightInPx: Int,
+      customClosePosition: MraidResizeCustomClosePosition,
+      newXInPx: Int,
+      newYInPx: Int,
+      allowOffscreen: Boolean
+  ) {
+    resizedRoot?.let { root ->
+      resizedCloseRegion?.layoutParams = getCloseRegionLayoutParams(customClosePosition)
+      resizedAdContainer?.layoutParams = getResizedBannerViewLayoutParams(
+          newXInPx,
+          newYInPx,
+          widthInPx,
+          heightInPx,
+          allowOffscreen
+      )
+      val layoutParams = (root.layoutParams as WindowManager.LayoutParams).also {
+        it.y = calculateWindowY(newYInPx)
+        it.x = newXInPx
+        it.width = getOnScreenWidth(widthInPx, newXInPx, allowOffscreen)
+        it.height = getOnScreenHeight(heightInPx, newYInPx, allowOffscreen)
+      }
+      val windowManager = root.context.getSystemService(WINDOW_SERVICE) as WindowManager
+      windowManager.updateViewLayout(resizedRoot, layoutParams)
+    }
+  }
+
+  @SuppressLint("ClickableViewAccessibility")
+  private fun showResizedPopup(
+      widthInPx: Int,
+      heightInPx: Int,
+      customClosePosition: MraidResizeCustomClosePosition,
+      newXInPx: Int,
+      newYInPx: Int,
+      allowOffscreen: Boolean
+  ) {
+    val bannerContainer = bannerView.parentContainer
+    val context = (bannerContainer.parent as View).context
+
+    replaceBannerWithPlaceholder(bannerContainer)
+
+    val resizedRoot = FrameLayout(context)
+    resizedRoot.clipChildren = false
+    val resizedAdContainer = RelativeLayout(context)
+    resizedAdContainer.addView(
+        bannerView,
+        RelativeLayout.LayoutParams(widthInPx, heightInPx)
+    )
+    resizedRoot.addView(
+        resizedAdContainer,
+        getResizedBannerViewLayoutParams(newXInPx, newYInPx, widthInPx, heightInPx, allowOffscreen)
+    )
+    addCloseRegion(resizedAdContainer, customClosePosition)
+
+    val params = WindowManager.LayoutParams(
+        getOnScreenWidth(widthInPx, newXInPx, allowOffscreen),
+        getOnScreenHeight(heightInPx, newYInPx, allowOffscreen),
+        WindowManager.LayoutParams.LAST_SUB_WINDOW,
+        WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL,
+        PixelFormat.TRANSLUCENT
+    ).also {
+      it.y = calculateWindowY(newYInPx)
+      it.x = newXInPx
+      it.gravity = Gravity.TOP or Gravity.LEFT
+    }
+    getWindowManager().addView(resizedRoot, params)
+    this.resizedRoot = resizedRoot
+    this.resizedAdContainer = resizedAdContainer
+  }
+
+  // window coordinates include status bar even if app does not draws behind it
+  // we are always drawing past status bar(event if it is transparent) to not overlap it's gestures
+  private fun calculateWindowY(newYInPx: Int) = newYInPx + getTopBarHeight()
+
+  private fun getOnScreenHeight(
+      heightInPx: Int,
+      newYInPx: Int,
+      allowOffscreen: Boolean
+  ) = heightInPx - abs(
+      when {
+        !allowOffscreen -> 0
+        newYInPx < 0 -> {
+          newYInPx
+        }
+        newYInPx + heightInPx > maxHeightInPx() -> {
+          newYInPx + heightInPx - maxHeightInPx()
+        }
+        else -> {
+          0
+        }
+      }
+  )
+
+  private fun getOnScreenWidth(
+      widthInPx: Int,
+      newXInPx: Int,
+      allowOffscreen: Boolean
+  ) = widthInPx - abs(
+      when {
+        !allowOffscreen -> 0
+        newXInPx < 0 -> newXInPx
+        newXInPx + widthInPx > maxWidthInPx() -> {
+          newXInPx + widthInPx - maxWidthInPx()
+        }
+        else -> 0
+      }
+  )
+
+  private fun findClosestPositionOnScreen(position: Int, maxSize: Int, dimensionSize: Int): Int {
+    val minPosition = 0
+    val maxPosition = maxSize - dimensionSize
+
+    val validPosition = when {
+      position < minPosition -> minPosition
+      position > maxPosition -> maxPosition
+      else -> position
+    }
+
+    return validPosition
+  }
+
+  private fun getResizedBannerViewLayoutParams(
+      x: Int,
+      y: Int,
+      widthInPx: Int,
+      heightInPx: Int,
+      allowOffscreen: Boolean
+  ): FrameLayout.LayoutParams {
+    return FrameLayout.LayoutParams(
+        widthInPx,
+        heightInPx
+    ).also {
+      it.gravity = Gravity.CENTER
+      val leftMargin = when {
+        !allowOffscreen -> 0
+        x < 0 -> {
+          x
+        }
+        x + widthInPx > maxWidthInPx() -> {
+          x + widthInPx - maxWidthInPx()
+        }
+        else -> {
+          0
+        }
+      }
+
+      val topMargin = when {
+        !allowOffscreen -> 0
+        y < 0 -> {
+          y
+        }
+        y + heightInPx > maxHeightInPx() -> {
+          y + heightInPx - maxHeightInPx()
+        }
+        else -> {
+          0
+        }
+      }
+
+      it.setMargins(leftMargin / 2, topMargin / 2, 0, 0)
+    }
+  }
+
+  private fun addCloseRegion(
+      resizedLayout: RelativeLayout,
+      customClosePosition: MraidResizeCustomClosePosition
+  ) {
+    val closeRegion = View(resizedLayout.context)
+    closeRegion.id = R.id.adWebViewCloseRegion
+    closeRegion.setOnClickListener {
+      onClose()
+    }
+
+    resizedLayout.addView(
+        closeRegion,
+        getCloseRegionLayoutParams(customClosePosition)
+    )
+    resizedCloseRegion = closeRegion
+  }
+
+  private fun getCloseRegionLayoutParams(customClosePosition: MraidResizeCustomClosePosition):
+      RelativeLayout.LayoutParams {
+    val closeRegionInPx = deviceUtil.dpToPixel(CLOSE_REGION_SIZE)
+
+    return RelativeLayout.LayoutParams(closeRegionInPx, closeRegionInPx).also {
+      if (customClosePosition == MraidResizeCustomClosePosition.CENTER) {
+        it.addRule(RelativeLayout.CENTER_IN_PARENT)
+      } else {
+        if (customClosePosition.value.startsWith("top")) {
+          it.addRule(RelativeLayout.ALIGN_TOP, bannerView.id)
+        }
+        if (customClosePosition.value.startsWith("bottom")) {
+          it.addRule(RelativeLayout.ALIGN_BOTTOM, bannerView.id)
+        }
+        if (customClosePosition.value.endsWith("left")) {
+          it.addRule(RelativeLayout.ALIGN_LEFT, bannerView.id)
+        }
+        if (customClosePosition.value.endsWith("right")) {
+          it.addRule(RelativeLayout.ALIGN_RIGHT, bannerView.id)
+        }
+        if (customClosePosition.value.endsWith("center")) {
+          it.addRule(RelativeLayout.CENTER_HORIZONTAL, bannerView.id)
+        }
+      }
+    }
+  }
+
+  private fun isCloseRegionOnScreen(
+      x: Int,
+      y: Int,
+      width: Int,
+      height: Int,
+      customClosePosition: MraidResizeCustomClosePosition
+  ): Boolean {
+    var closeX = 0
+    var closeY = 0
+    val closeRegionSize = deviceUtil.dpToPixel(CLOSE_REGION_SIZE)
+    val halfCloseRegionSize = closeRegionSize / 2
+
+    when (customClosePosition) {
+      MraidResizeCustomClosePosition.TOP_CENTER -> {
+        closeX = x + (width / 2 - halfCloseRegionSize)
+        closeY = y
+      }
+      MraidResizeCustomClosePosition.TOP_RIGHT -> {
+        closeX = x + width - closeRegionSize
+        closeY = y
+      }
+      MraidResizeCustomClosePosition.TOP_LEFT -> {
+        closeX = x
+        closeY = y
+      }
+      MraidResizeCustomClosePosition.CENTER -> {
+        closeX = x + (width / 2 - halfCloseRegionSize)
+        closeY = y + (height / 2 - halfCloseRegionSize)
+      }
+      MraidResizeCustomClosePosition.BOTTOM_CENTER -> {
+        closeX = x + (width / 2 - halfCloseRegionSize)
+        closeY = y + height - closeRegionSize
+      }
+      MraidResizeCustomClosePosition.BOTTOM_RIGHT -> {
+        closeX = x + width - closeRegionSize
+        closeY = y + height - closeRegionSize
+      }
+      MraidResizeCustomClosePosition.BOTTOM_LEFT -> {
+        closeX = x
+        closeY = y + height - closeRegionSize
+      }
+    }
+
+    return closeX >= 0 &&
+        closeX <= maxWidthInPx() - closeRegionSize &&
+        closeY >= 0 &&
+        closeY <= maxHeightInPx() - closeRegionSize
+  }
+
+  private fun removeBannerFromParentAndCleanupResize() {
+    resizedAdContainer?.removeView(bannerView)
+    getWindowManager().removeView(resizedRoot)
+    resizedAdContainer = null
+    resizedRoot = null
+    resizedCloseRegion = null
+  }
+
   private fun getAvailableWidthInPixels() = bannerView.resources.configuration.screenWidthDp * getDensity()
   private fun getAvailableHeightInPixels() = bannerView.resources.configuration.screenHeightDp * getDensity()
   private fun getDensity() = bannerView.resources.displayMetrics.density
+
+  private fun maxWidthInPx() = maxSize?.first?.let { deviceUtil.dpToPixel(it) } ?: 0
+
+  private fun maxHeightInPx() = maxSize?.second?.let { deviceUtil.dpToPixel(it) } ?: 0
+
+  private fun getWindowManager() = bannerView.context.getSystemService(WINDOW_SERVICE) as WindowManager
+
+  private fun getTopBarHeight() = deviceUtil.getTopSystemBarHeight(bannerView.parentContainer)
 
   private class ExpandedDialog(context: Context, val onBackPressedCallback: () -> Unit) : Dialog(
       context,
@@ -259,6 +693,9 @@ internal class CriteoBannerMraidController(
   private companion object {
     private const val EXPAND_ACTION = "expand"
     private const val CLOSE_ACTION = "close"
+    private const val RESIZE_ACTION = "resize"
+    private const val DETACHED_FROM_WINDOW_MESSAGE = "View is detached from window"
     private const val DIM_AMOUNT = 0.8f
+    private const val CLOSE_REGION_SIZE = 50
   }
 }

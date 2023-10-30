@@ -124,6 +124,17 @@ class MraidInteractorTest {
   }
 
   @Test
+  fun whenNotifyResized_ShouldEvaluateNotifyResizedOnMraidObject() {
+    mraidInteractor.notifyResized()
+
+    verify(webView).evaluateJavascript(
+        "window.mraid.notifyResized()",
+        null
+    )
+    verifyNoMoreInteractions(webView)
+  }
+
+  @Test
   fun whenNotifyClosed_ShouldEvaluateNotifyClosedOnMraidObject() {
     mraidInteractor.notifyClosed()
 

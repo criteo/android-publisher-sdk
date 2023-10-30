@@ -94,6 +94,7 @@ class CriteoMraidControllerTest {
 
   private var placementType: MraidPlacementType = MraidPlacementType.INLINE
   private var actionResult: MraidActionResult = MraidActionResult.Success
+  private lateinit var resizeActionResult: MraidResizeActionResult
 
   private lateinit var criteoMraidController: CriteoMraidController
 
@@ -123,12 +124,28 @@ class CriteoMraidControllerTest {
       override fun doClose(onResult: (result: MraidActionResult) -> Unit) {
         onResult(actionResult)
       }
+
+      override fun doResize(
+          width: Double,
+          height: Double,
+          offsetX: Double,
+          offsetY: Double,
+          customClosePosition: MraidResizeCustomClosePosition,
+          allowOffscreen: Boolean,
+          onResult: (result: MraidResizeActionResult) -> Unit
+      ) {
+        onResult(resizeActionResult)
+      }
+
+      override fun resetToDefault() {
+        // no-op
+      }
     }
 
     whenever(adWebView.resources).thenReturn(resources)
     whenever(resources.configuration).thenReturn(configuration)
     whenever(resources.displayMetrics).thenReturn(displayMetrics)
-    whenever(deviceUtil.getRealSceeenSize()).thenReturn(AdSize(100, 100))
+    whenever(deviceUtil.getRealScreenSize()).thenReturn(AdSize(100, 100))
   }
 
   @Test
@@ -236,6 +253,42 @@ class CriteoMraidControllerTest {
 
     verify(mraidInteractor).notifyError(errorResult.message, errorResult.action)
     verify(mraidInteractor, never()).notifyClosed()
+  }
+
+  @Test
+  fun onResizeWithSuccess_ShouldNotifyMraidInteractorAboutResizeAndChangeCurrentState() {
+    resizeActionResult = MraidResizeActionResult.Success(0, 0, 100, 100)
+
+    criteoMraidController.onResize(
+        100.0,
+        100.0,
+        0.0,
+        0.0,
+        MraidResizeCustomClosePosition.CENTER,
+        true
+    )
+
+    verify(mraidInteractor).notifyResized()
+    verify(mraidInteractor).setCurrentPosition(0, 0, 100, 100)
+    assertThat(criteoMraidController.currentState).isEqualTo(MraidState.RESIZED)
+  }
+
+  @Test
+  fun onResizeWithError_ShouldNotifyMraidInteractorAboutError() {
+    val errorResult = MraidResizeActionResult.Error("message", "action")
+    resizeActionResult = errorResult
+
+    criteoMraidController.onResize(
+        100.0,
+        100.0,
+        0.0,
+        0.0,
+        MraidResizeCustomClosePosition.CENTER,
+        true
+    )
+
+    verify(mraidInteractor).notifyError(errorResult.message, errorResult.action)
+    verify(mraidInteractor, never()).notifyResized()
   }
 
   @Test

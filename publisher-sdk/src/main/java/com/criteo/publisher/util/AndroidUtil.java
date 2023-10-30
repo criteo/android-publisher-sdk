@@ -60,14 +60,4 @@ public class AndroidUtil {
         : Configuration.ORIENTATION_LANDSCAPE;
   }
 
-  /**
-   * Transform given distance in DP (density-independent pixel) into pixels.
-   *
-   * @param dp distance in DP
-   * @return equivalent in pixels
-   */
-  public int dpToPixel(int dp) {
-    return (int) Math.ceil(dp * context.getResources().getDisplayMetrics().density);
-  }
-
 }

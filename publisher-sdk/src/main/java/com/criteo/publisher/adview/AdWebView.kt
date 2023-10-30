@@ -33,6 +33,7 @@ abstract class AdWebView @JvmOverloads constructor(
   abstract fun provideMraidController(): MraidController
 
   override fun setWebViewClient(client: WebViewClient) {
+    mraidController.resetToDefault()
     // create new mraid controller since new ad is loaded
     mraidController = provideMraidController()
     mraidController.onWebViewClientSet(client)

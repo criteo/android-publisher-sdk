@@ -15,6 +15,7 @@
  */
 package com.criteo.publisher.util
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -22,11 +23,14 @@ import android.graphics.Point
 import android.net.Uri
 import android.os.Build
 import android.util.DisplayMetrics
+import android.view.View
+import android.view.WindowInsets
 import android.view.WindowManager
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.model.AdSize
 import kotlin.math.min
 
+@Suppress("TooManyFunctions")
 @OpenForTesting
 class DeviceUtil(private val context: Context) {
 
@@ -51,8 +55,8 @@ class DeviceUtil(private val context: Context) {
 
   fun getCurrentScreenSize(): AdSize {
     val metrics = displayMetrics
-    val widthInDp = pxToDp(metrics.widthPixels)
-    val heightInDp = pxToDp(metrics.heightPixels)
+    val widthInDp = pixelToDp(metrics.widthPixels)
+    val heightInDp = pixelToDp(metrics.heightPixels)
     return AdSize(widthInDp, heightInDp)
   }
 
@@ -60,7 +64,7 @@ class DeviceUtil(private val context: Context) {
    *
    * @return device screenSize including status and navigation bar
    */
-  fun getRealSceeenSize(): AdSize {
+  fun getRealScreenSize(): AdSize {
     val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     val widthPx: Int
     val heightPx: Int
@@ -74,7 +78,7 @@ class DeviceUtil(private val context: Context) {
       widthPx = point.x
       heightPx = point.y
     }
-    return AdSize(pxToDp(widthPx), pxToDp(heightPx))
+    return AdSize(pixelToDp(widthPx), pixelToDp(heightPx))
   }
 
   fun canSendSms(): Boolean {
@@ -95,8 +99,24 @@ class DeviceUtil(private val context: Context) {
     return true
   }
 
-  fun pxToDp(pxValue: Int): Int {
-    return Math.round(pxValue / displayMetrics.density)
+  /**
+   * Transform given distance in pixels into DP (density-independent pixel).
+   *
+   * @param pixelValue distance in pixels
+   * @return equivalent in DP
+   */
+  fun pixelToDp(pixelValue: Int): Int {
+    return Math.round(pixelValue / displayMetrics.density)
+  }
+
+  /**
+   * Transform given distance in DP (density-independent pixel) into pixels.
+   *
+   * @param dp distance in DP
+   * @return equivalent in pixels
+   */
+  fun dpToPixel(dp: Int): Int {
+    return Math.ceil((dp * context.resources.displayMetrics.density).toDouble()).toInt()
   }
 
   fun canHandleIntent(intent: Intent): Boolean {
@@ -109,6 +129,32 @@ class DeviceUtil(private val context: Context) {
       context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
     }
     return activities.isNotEmpty()
+  }
+
+  /**
+   * @return top system bar height in pixels
+   */
+  fun getTopSystemBarHeight(view: View): Int {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        view.rootWindowInsets?.getInsetsIgnoringVisibility(WindowInsets.Type.systemBars())?.top ?: 0
+      } else {
+        view.rootWindowInsets?.systemWindowInsetTop ?: 0
+      }
+    } else {
+      getStatusBarHeight(view.context)
+    }
+  }
+
+  @SuppressLint("DiscouragedApi", "InternalInsetResource")
+  private fun getStatusBarHeight(context: Context): Int {
+    val resources = context.resources
+    var result = 0
+    val resourceId = resources.getIdentifier("status_bar_height", "dimen", "android")
+    if (resourceId > 0) {
+      result = resources.getDimensionPixelSize(resourceId)
+    }
+    return result
   }
 
   private val displayMetrics: DisplayMetrics
