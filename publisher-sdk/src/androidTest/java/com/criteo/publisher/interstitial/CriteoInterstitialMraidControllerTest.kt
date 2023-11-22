@@ -18,6 +18,7 @@ package com.criteo.publisher.interstitial
 
 import androidx.test.rule.ActivityTestRule
 import com.criteo.publisher.adview.MraidActionResult
+import com.criteo.publisher.adview.MraidOrientation
 import com.criteo.publisher.adview.MraidPlacementType
 import com.criteo.publisher.adview.MraidResizeActionResult
 import com.criteo.publisher.adview.MraidResizeCustomClosePosition
@@ -150,5 +151,45 @@ class CriteoInterstitialMraidControllerTest {
 
     verify(interstitialAdWebView).requestClose()
     verify(callbackMock).invoke(argThat { this is MraidActionResult.Success })
+  }
+
+  @Test
+  fun doSetOrientationProperties_ShouldDelegateToInterstitialWebViewAndCallbackSuccessResult() {
+    val callbackMock = mock<(result: MraidActionResult) -> Unit>()
+
+    criteoInterstitialMraidController.doSetOrientationProperties(
+        false,
+        MraidOrientation.PORTRAIT,
+        callbackMock
+    )
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(interstitialAdWebView).requestOrientationChange(false, MraidOrientation.PORTRAIT)
+    verify(callbackMock).invoke(argThat { this is MraidActionResult.Success })
+  }
+
+  @Test
+  fun doSetOrientationProperties_GivenWebViewThrowsException_ShouldCallbackErrorResult() {
+    val callbackMock = mock<(result: MraidActionResult) -> Unit>()
+    whenever(
+        interstitialAdWebView.requestOrientationChange(
+            false,
+            MraidOrientation.LANDSCAPE
+        )
+    ).thenThrow(java.lang.RuntimeException())
+
+    criteoInterstitialMraidController.doSetOrientationProperties(
+        false,
+        MraidOrientation.LANDSCAPE,
+        callbackMock
+    )
+    mockedDependenciesRule.waitForIdleState()
+
+    verify(callbackMock).invoke(argThat {
+      (this as? MraidActionResult.Error).let {
+        it?.action == "setOrientationProperties" &&
+        it.message == "Failed to set orientation properties"
+      }
+    })
   }
 }

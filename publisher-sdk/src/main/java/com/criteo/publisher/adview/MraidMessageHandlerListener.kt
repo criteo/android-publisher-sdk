@@ -31,4 +31,9 @@ interface MraidMessageHandlerListener {
       customClosePosition: MraidResizeCustomClosePosition,
       allowOffscreen: Boolean
   )
+
+  fun onSetOrientationProperties(
+      allowOrientationChange: Boolean,
+      forceOrientation: MraidOrientation
+  )
 }

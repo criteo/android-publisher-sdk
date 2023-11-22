@@ -28,38 +28,57 @@ import com.criteo.publisher.model.InterstitialAdUnit
 internal object InterstitialLogMessage {
 
   @JvmStatic
-  fun onInterstitialInitialized(adUnit: InterstitialAdUnit?) = LogMessage(message =
-    "Interstitial initialized for $adUnit"
+  fun onInterstitialInitialized(adUnit: InterstitialAdUnit?) = LogMessage(
+      message =
+      "Interstitial initialized for $adUnit"
   )
 
   @JvmStatic
-  fun onInterstitialLoading(interstitial: CriteoInterstitial) = LogMessage(message =
-    "Interstitial(${interstitial.adUnit}) is loading"
+  fun onInterstitialLoading(interstitial: CriteoInterstitial) = LogMessage(
+      message =
+      "Interstitial(${interstitial.adUnit}) is loading"
   )
 
   @JvmStatic
-  fun onInterstitialLoading(interstitial: CriteoInterstitial, bid: Bid?) = LogMessage(message =
-    "Interstitial(${interstitial.adUnit}) is loading with bid ${bid?.loggingId}"
+  fun onInterstitialLoading(interstitial: CriteoInterstitial, bid: Bid?) = LogMessage(
+      message =
+      "Interstitial(${interstitial.adUnit}) is loading with bid ${bid?.loggingId}"
   )
 
   @JvmStatic
-  fun onInterstitialLoaded(interstitial: CriteoInterstitial?) = LogMessage(message =
-    "Interstitial(${interstitial?.adUnit}) is loaded"
+  fun onInterstitialLoaded(interstitial: CriteoInterstitial?) = LogMessage(
+      message =
+      "Interstitial(${interstitial?.adUnit}) is loaded"
   )
 
   @JvmStatic
-  fun onInterstitialFailedToLoad(interstitial: CriteoInterstitial?) = LogMessage(message =
-    "Interstitial(${interstitial?.adUnit}) failed to load"
+  fun onInterstitialFailedToLoad(interstitial: CriteoInterstitial?) = LogMessage(
+      message =
+      "Interstitial(${interstitial?.adUnit}) failed to load"
   )
 
   @JvmStatic
-  fun onCheckingIfInterstitialIsLoaded(interstitial: CriteoInterstitial, isAdLoaded: Boolean) = LogMessage(message =
-  "Interstitial(${interstitial.adUnit}) is isAdLoaded=$isAdLoaded"
+  fun onCheckingIfInterstitialIsLoaded(
+      interstitial: CriteoInterstitial,
+      isAdLoaded: Boolean
+  ) = LogMessage(
+      message =
+      "Interstitial(${interstitial.adUnit}) is isAdLoaded=$isAdLoaded"
   )
 
   @JvmStatic
-  fun onInterstitialShowing(interstitial: CriteoInterstitial) = LogMessage(message =
-    "Interstitial(${interstitial.adUnit}) is showing"
+  fun onInterstitialShowing(interstitial: CriteoInterstitial) = LogMessage(
+      message =
+      "Interstitial(${interstitial.adUnit}) is showing"
+  )
+
+  @JvmStatic
+  fun onInterstitialFailedToSetOrientationProperties(
+      throwable: Throwable
+  ) = LogMessage(
+      message = "Interstitial is failed to setOrientationProperties",
+      level = Log.ERROR,
+      throwable = throwable
   )
 
   @JvmStatic

@@ -22,12 +22,14 @@ import com.criteo.publisher.adview.CriteoMraidController
 import com.criteo.publisher.adview.MraidActionResult
 import com.criteo.publisher.adview.MraidInteractor
 import com.criteo.publisher.adview.MraidMessageHandler
+import com.criteo.publisher.adview.MraidOrientation
 import com.criteo.publisher.adview.MraidPlacementType
 import com.criteo.publisher.adview.MraidResizeActionResult
 import com.criteo.publisher.adview.MraidResizeCustomClosePosition
 import com.criteo.publisher.adview.MraidState
 import com.criteo.publisher.annotation.OpenForTesting
 import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
+import com.criteo.publisher.interstitial.InterstitialLogMessage.onInterstitialFailedToSetOrientationProperties
 import com.criteo.publisher.util.DeviceUtil
 import com.criteo.publisher.util.ExternalVideoPlayer
 import com.criteo.publisher.util.ViewPositionTracker
@@ -94,6 +96,28 @@ internal class CriteoInterstitialMraidController(
   ) {
     runOnUiThreadExecutor.execute {
       onResult(MraidResizeActionResult.Error("Interstitial ad can't be resized", "resize"))
+    }
+  }
+
+  @Suppress("TooGenericExceptionCaught")
+  override fun doSetOrientationProperties(
+      allowOrientationChange: Boolean,
+      forceOrientation: MraidOrientation,
+      @MainThread onResult: (result: MraidActionResult) -> Unit
+  ) {
+    runOnUiThreadExecutor.execute {
+      try {
+        interstitialAdWebView.requestOrientationChange(allowOrientationChange, forceOrientation)
+        onResult(MraidActionResult.Success)
+      } catch (t: Throwable) {
+        logger.log(onInterstitialFailedToSetOrientationProperties(t))
+        onResult(
+            MraidActionResult.Error(
+                "Failed to set orientation properties",
+                "setOrientationProperties"
+            )
+        )
+      }
     }
   }
 

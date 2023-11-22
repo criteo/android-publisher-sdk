@@ -50,6 +50,14 @@ internal class DummyMraidController : MraidController {
     // no-op
   }
 
+  override fun doSetOrientationProperties(
+      allowOrientationChange: Boolean,
+      forceOrientation: MraidOrientation,
+      onResult: (result: MraidActionResult) -> Unit
+  ) {
+    // no-op
+  }
+
   override fun onWebViewClientSet(client: WebViewClient) {
     // no-op
   }

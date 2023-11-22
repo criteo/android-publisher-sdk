@@ -43,6 +43,7 @@ import com.criteo.publisher.adview.MraidMessageHandler;
 import com.criteo.publisher.adview.MraidInteractor;
 import com.criteo.publisher.adview.MraidPlacementType;
 import com.criteo.publisher.adview.Redirection;
+import com.criteo.publisher.adview.MraidExpandBannerMediator;
 import com.criteo.publisher.bid.BidLifecycleListener;
 import com.criteo.publisher.bid.CompositeBidLifecycleListener;
 import com.criteo.publisher.bid.LoggingBidLifecycleListener;
@@ -817,6 +818,13 @@ public class DependencyProvider {
     return getOrCreate(
         ExternalVideoPlayer.class,
         () -> new ExternalVideoPlayer(provideContext(), provideDeviceUtil())
+    );
+  }
+
+  public MraidExpandBannerMediator provideMraidExpandBannerMediator() {
+    return getOrCreate(
+        MraidExpandBannerMediator.class,
+        () -> new MraidExpandBannerMediator()
     );
   }
 

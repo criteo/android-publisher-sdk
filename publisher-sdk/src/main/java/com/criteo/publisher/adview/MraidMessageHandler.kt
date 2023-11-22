@@ -81,4 +81,12 @@ class MraidMessageHandler {
         allowOffscreen
     )
   }
+
+  @JavascriptInterface
+  fun setOrientationProperties(
+      allowOrientationChange: Boolean,
+      forceOrientation: String
+  ) {
+    listener?.onSetOrientationProperties(allowOrientationChange, forceOrientation.asMraidOrientation())
+  }
 }

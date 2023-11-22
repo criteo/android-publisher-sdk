@@ -21,6 +21,7 @@ import android.util.AttributeSet
 import com.criteo.publisher.DependencyProvider
 import com.criteo.publisher.adview.AdWebView
 import com.criteo.publisher.adview.MraidController
+import com.criteo.publisher.adview.MraidOrientation
 import com.criteo.publisher.adview.MraidPlacementType
 import com.criteo.publisher.annotation.OpenForTesting
 
@@ -31,6 +32,8 @@ internal class InterstitialAdWebView @JvmOverloads constructor(
 ) : AdWebView(context, attrs) {
 
   private var onCloseRequestedListener: (() -> Unit)? = null
+  private var onOrientationRequestedListener:
+      ((allowOrientationChange: Boolean, forceOrientation: MraidOrientation) -> Unit)? = null
 
   override fun provideMraidController(): MraidController {
     return DependencyProvider.getInstance()
@@ -41,8 +44,22 @@ internal class InterstitialAdWebView @JvmOverloads constructor(
     this.onCloseRequestedListener = onCloseRequestedListener
   }
 
+  fun setOnOrientationRequestedListener(
+      onOrientationRequestedListener:
+      (allowOrientationChange: Boolean, forceOrientation: MraidOrientation) -> Unit
+  ) {
+    this.onOrientationRequestedListener = onOrientationRequestedListener
+  }
+
   fun requestClose() {
     onCloseRequestedListener?.invoke()
+  }
+
+  fun requestOrientationChange(
+      allowOrientationChange: Boolean,
+      forceOrientation: MraidOrientation
+  ) {
+    onOrientationRequestedListener?.invoke(allowOrientationChange, forceOrientation)
   }
 
   fun onClosed() {

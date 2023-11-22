@@ -12,6 +12,11 @@
       android:name=".CriteoInterstitialActivity"
       android:configChanges="orientation|screenSize"
     />
+    <activity
+      android:theme="@style/Theme.Transparent"
+      android:name=".adview.MraidExpandedActivity"
+      android:configChanges="orientation|screenSize"
+      />
   </application>
 
   <queries>
