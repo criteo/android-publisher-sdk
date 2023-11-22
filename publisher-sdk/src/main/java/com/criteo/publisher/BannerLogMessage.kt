@@ -73,4 +73,11 @@ internal object BannerLogMessage {
       level = Log.ERROR,
       throwable = throwable
   )
+
+  @JvmStatic
+  fun onBannerFailedToSetOrientationProperties(bannerView: CriteoBannerView?, throwable: Throwable) = LogMessage(
+      message = "BannerView(${bannerView?.bannerAdUnit}) is failed to setOrientationProperties",
+      level = Log.ERROR,
+      throwable = throwable
+  )
 }

@@ -45,6 +45,12 @@ interface MraidController {
       @MainThread onResult: (result: MraidResizeActionResult) -> Unit
   )
 
+  fun doSetOrientationProperties(
+      allowOrientationChange: Boolean,
+      forceOrientation: MraidOrientation,
+      @MainThread onResult: (result: MraidActionResult) -> Unit
+  )
+
   fun onWebViewClientSet(client: WebViewClient)
 
   fun onConfigurationChange(newConfig: Configuration?)

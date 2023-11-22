@@ -157,4 +157,20 @@ class MraidMessageHandlerTest {
       )
     }.doesNotThrowAnyException()
   }
+
+  @Test
+  fun whenSetOrientationProperties_givenListener_shouldCallOnSetOrientationPropertiesOnListener() {
+    mraidMessageHandler.setListener(listener)
+
+    mraidMessageHandler.setOrientationProperties(true, "portrait")
+
+    verify(listener).onSetOrientationProperties(true, MraidOrientation.PORTRAIT)
+  }
+
+  @Test
+  fun whenSetOrientationProperties_givenListenerIsNull_shouldNotThrow() {
+    assertThatCode {
+      mraidMessageHandler.setOrientationProperties(true, "portrait")
+    }.doesNotThrowAnyException()
+  }
 }

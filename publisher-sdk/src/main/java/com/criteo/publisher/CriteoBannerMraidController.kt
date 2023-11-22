@@ -17,16 +17,14 @@
 package com.criteo.publisher
 
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.Context
 import android.content.Context.WINDOW_SERVICE
+import android.content.Intent
 import android.graphics.PixelFormat
-import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
-import android.view.Window
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
@@ -34,11 +32,15 @@ import androidx.annotation.MainThread
 import com.criteo.publisher.BannerLogMessage.onBannerFailedToClose
 import com.criteo.publisher.BannerLogMessage.onBannerFailedToExpand
 import com.criteo.publisher.BannerLogMessage.onBannerFailedToResize
+import com.criteo.publisher.BannerLogMessage.onBannerFailedToSetOrientationProperties
 import com.criteo.publisher.advancednative.VisibilityTracker
 import com.criteo.publisher.adview.CriteoMraidController
 import com.criteo.publisher.adview.MraidActionResult
+import com.criteo.publisher.adview.MraidExpandedActivity
+import com.criteo.publisher.adview.MraidExpandedActivityListener
 import com.criteo.publisher.adview.MraidInteractor
 import com.criteo.publisher.adview.MraidMessageHandler
+import com.criteo.publisher.adview.MraidOrientation
 import com.criteo.publisher.adview.MraidPlacementType
 import com.criteo.publisher.adview.MraidResizeActionResult
 import com.criteo.publisher.adview.MraidResizeCustomClosePosition
@@ -71,10 +73,9 @@ internal class CriteoBannerMraidController(
     deviceUtil,
     viewPositionTracker,
     externalVideoPlayer
-) {
+), MraidExpandedActivityListener {
 
   private val defaultBannerViewLayoutParams: LayoutParams = bannerView.layoutParams
-  private var dialog: Dialog? = null
   private val placeholderView by lazy {
     View(bannerView.context).apply {
       id = R.id.adWebViewPlaceholder
@@ -83,6 +84,11 @@ internal class CriteoBannerMraidController(
   private var resizedRoot: FrameLayout? = null
   private var resizedAdContainer: RelativeLayout? = null
   private var resizedCloseRegion: View? = null
+  private var orientationProperties: Pair<Boolean, MraidOrientation> = true to MraidOrientation.NONE
+  private val mediator by lazy {
+    DependencyProvider.getInstance()
+        .provideMraidExpandBannerMediator()
+  }
 
   override fun getPlacementType(): MraidPlacementType = MraidPlacementType.INLINE
 
@@ -177,6 +183,31 @@ internal class CriteoBannerMraidController(
   }
 
   @Suppress("TooGenericExceptionCaught")
+  override fun doSetOrientationProperties(
+      allowOrientationChange: Boolean,
+      forceOrientation: MraidOrientation,
+      @MainThread onResult: (result: MraidActionResult) -> Unit
+  ) {
+    runOnUiThreadExecutor.execute {
+      try {
+        orientationProperties = allowOrientationChange to forceOrientation
+        if (mediator.hasAnyExpandedBanner()) {
+          mediator.requestOrientationChange(allowOrientationChange, forceOrientation)
+        }
+        onResult(MraidActionResult.Success)
+      } catch (t: Throwable) {
+        logger.log(onBannerFailedToSetOrientationProperties(bannerView.parentContainer, t))
+        onResult(
+            MraidActionResult.Error(
+                "Failed to set orientation properties",
+                "setOrientationProperties"
+            )
+        )
+      }
+    }
+  }
+
+  @Suppress("TooGenericExceptionCaught")
   override fun resetToDefault() {
     try {
       if (currentState == MraidState.RESIZED) {
@@ -185,9 +216,14 @@ internal class CriteoBannerMraidController(
         removeBannerFromParent()
       }
       reattachBannerToOriginalContainer()
+      reattachBannerToOriginalContainer()
     } catch (t: Throwable) {
       logger.log(onBannerFailedToClose(bannerView.parentContainer, t))
     }
+  }
+
+  override fun onBackClicked() {
+    onClose()
   }
 
   @Suppress("TooGenericExceptionCaught")
@@ -199,6 +235,11 @@ internal class CriteoBannerMraidController(
     try {
       if (!bannerView.isAttachedToWindow) {
         onResult(MraidActionResult.Error(DETACHED_FROM_WINDOW_MESSAGE, EXPAND_ACTION))
+        return
+      }
+
+      if (mediator.hasAnyExpandedBanner()) {
+        onResult(MraidActionResult.Error("Another banner is already expanded", EXPAND_ACTION))
         return
       }
 
@@ -225,10 +266,12 @@ internal class CriteoBannerMraidController(
       val closeButton = createCloseButton(width, height, context)
       expandedLayout.addView(closeButton)
 
-      dialog = ExpandedDialog(context, ::onClose).apply {
-        setContentView(expandedLayout)
-        show()
-      }
+      mediator.saveForExpandedActivity(expandedLayout)
+      mediator.setExpandedActivityListener(this)
+      val intent = Intent(context, MraidExpandedActivity::class.java)
+      intent.putExtra(MraidExpandedActivity.ALLOW_ORIENTATION_CHANGE, orientationProperties.first)
+      intent.putExtra(MraidExpandedActivity.ORIENTATION, orientationProperties.second.value)
+      context.startActivity(intent)
 
       onResult(MraidActionResult.Success)
     } catch (t: Throwable) {
@@ -246,7 +289,7 @@ internal class CriteoBannerMraidController(
       }
 
       if (currentState == MraidState.EXPANDED) {
-        dialog?.dismiss()
+        mediator.requestClose()
         removeBannerFromParent()
       } else {
         removeBannerFromParentAndCleanupResize()
@@ -669,33 +712,11 @@ internal class CriteoBannerMraidController(
 
   private fun getTopBarHeight() = deviceUtil.getTopSystemBarHeight(bannerView.parentContainer)
 
-  private class ExpandedDialog(context: Context, val onBackPressedCallback: () -> Unit) : Dialog(
-      context,
-      android.R.style.Theme_Translucent
-  ) {
-
-    init {
-      setCancelable(false)
-      requestWindowFeature(Window.FEATURE_NO_TITLE)
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-      super.onCreate(savedInstanceState)
-      window?.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-      window?.setDimAmount(DIM_AMOUNT)
-    }
-
-    override fun onBackPressed() {
-      onBackPressedCallback()
-    }
-  }
-
   private companion object {
     private const val EXPAND_ACTION = "expand"
     private const val CLOSE_ACTION = "close"
     private const val RESIZE_ACTION = "resize"
     private const val DETACHED_FROM_WINDOW_MESSAGE = "View is detached from window"
-    private const val DIM_AMOUNT = 0.8f
     private const val CLOSE_REGION_SIZE = 50
   }
 }

@@ -29,19 +29,17 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.os.Bundle;
 import android.os.ResultReceiver;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
 import androidx.annotation.VisibleForTesting;
 import com.criteo.publisher.adview.AdWebViewClient;
+import com.criteo.publisher.adview.MraidOrientation;
+import com.criteo.publisher.adview.MraidOrientationKt;
 import com.criteo.publisher.adview.RedirectionListener;
 import com.criteo.publisher.interstitial.InterstitialAdWebView;
 import com.criteo.publisher.logging.Logger;
 import com.criteo.publisher.logging.LoggerFactory;
 import java.lang.ref.WeakReference;
-import kotlin.Unit;
-import kotlin.jvm.functions.Function0;
 
 public class CriteoInterstitialActivity extends Activity {
 
@@ -93,6 +91,10 @@ public class CriteoInterstitialActivity extends Activity {
       close(false);
       return null;
     });
+    webView.setOnOrientationRequestedListener((allowOrientationChange, forceOrientation) -> {
+      setRequestedOrientation(allowOrientationChange, forceOrientation);
+      return null;
+    });
   }
 
   private void close(boolean notifyClosed) {
@@ -140,6 +142,13 @@ public class CriteoInterstitialActivity extends Activity {
     );
 
     webView.setWebViewClient(adWebViewClient);
+  }
+
+  private void setRequestedOrientation(
+      Boolean allowOrientationChange,
+      MraidOrientation forceOrientation
+  ) {
+    MraidOrientationKt.setRequestedOrientation(this, allowOrientationChange, forceOrientation);
   }
 
   @Override

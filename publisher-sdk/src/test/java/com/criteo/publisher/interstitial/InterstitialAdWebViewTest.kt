@@ -20,6 +20,7 @@ import android.content.Context
 import com.criteo.publisher.DependencyProvider
 import com.criteo.publisher.adview.AdWebViewClient
 import com.criteo.publisher.adview.MraidController
+import com.criteo.publisher.adview.MraidOrientation
 import com.criteo.publisher.adview.MraidPlacementType
 import com.criteo.publisher.mock.MockedDependenciesRule
 import org.assertj.core.api.Assertions.assertThatCode
@@ -50,7 +51,11 @@ class InterstitialAdWebViewTest {
   private lateinit var mraidController: MraidController
 
   @Mock
-  private lateinit var listener: () -> Unit
+  private lateinit var onCloseRequestedListener: () -> Unit
+
+  @Mock
+  private lateinit var onOrientationRequestedListener:
+      (allowOrientationChange: Boolean, forceOrientation: MraidOrientation) -> Unit
 
   private lateinit var interstitialAdWebView: InterstitialAdWebView
 
@@ -74,17 +79,33 @@ class InterstitialAdWebViewTest {
 
   @Test
   fun setOnCloseRequestedListenerAndRequestClose_ShouldCallListener() {
-    interstitialAdWebView.setOnCloseRequestedListener(listener)
+    interstitialAdWebView.setOnCloseRequestedListener(onCloseRequestedListener)
 
     interstitialAdWebView.requestClose()
 
-    verify(listener).invoke()
+    verify(onCloseRequestedListener).invoke()
   }
 
   @Test
   fun requestCloseWithoutListener_ShouldNotThrow() {
     assertThatCode {
       interstitialAdWebView.requestClose()
+    }.doesNotThrowAnyException()
+  }
+
+  @Test
+  fun setOnOrientationRequestedListenerAndRequestOrientationChange() {
+    interstitialAdWebView.setOnOrientationRequestedListener(onOrientationRequestedListener)
+
+    interstitialAdWebView.requestOrientationChange(true, MraidOrientation.LANDSCAPE)
+
+    verify(onOrientationRequestedListener).invoke(true, MraidOrientation.LANDSCAPE)
+  }
+
+  @Test
+  fun requestOrientationChangeWithoutListener_ShouldNotThrow() {
+    assertThatCode {
+      interstitialAdWebView.requestOrientationChange(true, MraidOrientation.PORTRAIT)
     }.doesNotThrowAnyException()
   }
 

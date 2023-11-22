@@ -132,6 +132,18 @@ internal abstract class CriteoMraidController(
     }
   }
 
+  override fun onSetOrientationProperties(
+      allowOrientationChange: Boolean,
+      forceOrientation: MraidOrientation
+  ) {
+    doSetOrientationProperties(allowOrientationChange, forceOrientation) {
+      when (it) {
+        is MraidActionResult.Error -> mraidInteractor.notifyError(it.message, it.action)
+        MraidActionResult.Success -> Unit // nothing to do
+      }
+    }
+  }
+
   override fun onPageFinished() {
     invokeIfMraidAd {
       onMraidLoaded()

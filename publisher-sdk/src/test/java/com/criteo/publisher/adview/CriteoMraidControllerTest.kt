@@ -137,6 +137,14 @@ class CriteoMraidControllerTest {
         onResult(resizeActionResult)
       }
 
+      override fun doSetOrientationProperties(
+          allowOrientationChange: Boolean,
+          forceOrientation: MraidOrientation,
+          onResult: (result: MraidActionResult) -> Unit
+      ) {
+        onResult(actionResult)
+      }
+
       override fun resetToDefault() {
         // no-op
       }
@@ -289,6 +297,23 @@ class CriteoMraidControllerTest {
 
     verify(mraidInteractor).notifyError(errorResult.message, errorResult.action)
     verify(mraidInteractor, never()).notifyResized()
+  }
+
+  @Test
+  fun onSetOrientationPropertiesWithError_ShouldNotifyMraidInteractorAboutError() {
+    val errorResult = MraidActionResult.Error("message", "action")
+    actionResult = errorResult
+
+    criteoMraidController.onSetOrientationProperties(true, MraidOrientation.LANDSCAPE)
+
+    verify(mraidInteractor).notifyError(errorResult.message, errorResult.action)
+  }
+
+  @Test
+  fun onSetOrientationPropertiesWithSuccess_ShouldNotThrow() {
+    assertThatCode {
+      criteoMraidController.onSetOrientationProperties(true, MraidOrientation.LANDSCAPE)
+    }.doesNotThrowAnyException()
   }
 
   @Test
