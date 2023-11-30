@@ -371,14 +371,40 @@ class CdbRequestFactoryTest {
     val request = factory.createRequest(listOf(createAdUnit(), createAdUnit()), ContextData())
 
     request.slots.forEach {
-      assertThat(it.banner?.api).contains(ApiFramework.MRAID_1.code)
+      assertThat(it.banner?.api).containsExactly(ApiFramework.MRAID_1.code)
     }
   }
 
   @Test
-  fun createRequest_GivenMraidIsEnabledFalse_CreateRequestWithoutBannerFieldInEachSlot() {
+  fun createRequest_GivenMraid2IsEnabledTrue_CreateRequestWithMraid2ApiInEverySlot() {
+    mockRequiredObjects()
+    whenever(config.isMraid2Enabled).thenReturn(true)
+
+    val request = factory.createRequest(listOf(createAdUnit(), createAdUnit()), ContextData())
+
+    request.slots.forEach {
+      assertThat(it.banner?.api).containsExactly(ApiFramework.MRAID_2.code)
+    }
+  }
+
+  @Test
+  fun createRequest_GivenMraidAndMraid2IsEnabled_CreateRequestWithMraid1AndMraid2InEverySlot() {
+    mockRequiredObjects()
+    whenever(config.isMraidEnabled).thenReturn(true)
+    whenever(config.isMraid2Enabled).thenReturn(true)
+
+    val request = factory.createRequest(listOf(createAdUnit(), createAdUnit()), ContextData())
+
+    request.slots.forEach {
+      assertThat(it.banner?.api).containsExactly(ApiFramework.MRAID_1.code, ApiFramework.MRAID_2.code)
+    }
+  }
+
+  @Test
+  fun createRequest_GivenMraidIsEnabledFalseAndMraid2IsEnabledFalse_CreateRequestWithoutBannerFieldInEachSlot() {
     mockRequiredObjects()
     whenever(config.isMraidEnabled).thenReturn(false)
+    whenever(config.isMraid2Enabled).thenReturn(false)
 
     val request = factory.createRequest(listOf(createAdUnit(), createAdUnit()), ContextData())
 

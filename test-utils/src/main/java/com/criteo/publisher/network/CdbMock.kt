@@ -204,7 +204,8 @@ class CdbMock(private val jsonSerializer: JsonSerializer) {
               "liveBiddingTimeBudgetInMillis": 8000,
               "prefetchOnInitEnabled": true,
               "remoteLogLevel": "Warning",
-              "mraidEnabled": false
+              "mraidEnabled": false,
+              "mraid2Enabled": false
             }
           """
           )

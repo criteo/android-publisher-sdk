@@ -53,6 +53,7 @@ public class Config {
     public static final boolean PREFETCH_ON_INIT_ENABLED = true;
     public static final RemoteLogLevel REMOTE_LOG_LEVEL = RemoteLogLevel.WARNING;
     public static final boolean IS_MRAID_ENABLED = false;
+    public static final boolean IS_MRAID2_ENABLED = false;
 
   }
 
@@ -161,6 +162,10 @@ public class Config {
         getOrElse(
             overrideRemoteConfig.isMraidEnabled(),
             baseRemoteConfig.isMraidEnabled()
+        ),
+        getOrElse(
+            overrideRemoteConfig.isMraid2Enabled(),
+            baseRemoteConfig.isMraid2Enabled()
         )
     );
   }
@@ -288,6 +293,13 @@ public class Config {
     return getOrElse(
         cachedRemoteConfig.isMraidEnabled(),
         DefaultConfig.IS_MRAID_ENABLED
+    );
+  }
+
+  public boolean isMraid2Enabled() {
+    return getOrElse(
+        cachedRemoteConfig.isMraid2Enabled(),
+        DefaultConfig.IS_MRAID2_ENABLED
     );
   }
 }

@@ -314,6 +314,7 @@ public class ConfigIntegrationTests {
         1337,
         true,
         RemoteLogLevel.DEBUG,
+        true,
         true
     );
 
@@ -342,6 +343,7 @@ public class ConfigIntegrationTests {
         null,
         null,
         null,
+        null,
         null
     );
 
@@ -356,6 +358,7 @@ public class ConfigIntegrationTests {
         42,
         false,
         RemoteLogLevel.INFO,
+        false,
         false
     );
 
@@ -370,6 +373,7 @@ public class ConfigIntegrationTests {
         42,
         false,
         RemoteLogLevel.INFO,
+        false,
         false
     );
 

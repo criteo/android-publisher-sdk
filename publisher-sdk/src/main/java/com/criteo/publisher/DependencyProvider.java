@@ -773,7 +773,7 @@ public class DependencyProvider {
       MraidPlacementType placementType,
       AdWebView adWebView
   ) {
-    if (!provideConfig().isMraidEnabled()) {
+    if (!provideConfig().isMraidEnabled() && !provideConfig().isMraid2Enabled()) {
       return new DummyMraidController();
     }
 

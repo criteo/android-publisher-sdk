@@ -155,7 +155,7 @@ public class CdbRequestFactory {
         requestedAdUnit.getPlacementId(),
         requestedAdUnit.getAdUnitType(),
         requestedAdUnit.getSize(),
-        getSdkFeatures()
+        getSupportedApiFrameworkList()
     );
   }
 
@@ -272,11 +272,14 @@ public class CdbRequestFactory {
   }
 
   @NonNull
-  private List<ApiFramework> getSdkFeatures() {
+  private List<ApiFramework> getSupportedApiFrameworkList() {
+    List<ApiFramework> supportedApiFrameworkList = new ArrayList<>();
     if (config.isMraidEnabled()) {
-      return Collections.singletonList(ApiFramework.MRAID_1);
-    } else {
-      return Collections.emptyList();
+      supportedApiFrameworkList.add(ApiFramework.MRAID_1);
     }
+    if (config.isMraid2Enabled()) {
+      supportedApiFrameworkList.add(ApiFramework.MRAID_2);
+    }
+    return supportedApiFrameworkList;
   }
 }
