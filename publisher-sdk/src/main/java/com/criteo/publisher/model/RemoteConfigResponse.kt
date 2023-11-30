@@ -139,10 +139,19 @@ data class RemoteConfigResponse(
     val remoteLogLevel: RemoteLogLevel? = null,
 
     /**
-     * Feature flag for activating/deactivating MRAID for banners and interstitials
+     * Feature flag that indicates if we should send in [CdbRequest.slots] that we support MRAID v1 spec
+     *
+     * Note: If [isMraidEnabled] or [isMraid2Enabled] is set to true SDK will inject mraid script
+     * into supported ads
      */
     @Json(name = "mraidEnabled")
-    val isMraidEnabled: Boolean? = null
+    val isMraidEnabled: Boolean? = null,
+
+    /**
+     * Feature flag that indicates if we should send in [CdbRequest.slots] that we support MRAID v2 spec
+     */
+    @Json(name = "mraid2Enabled")
+    val isMraid2Enabled: Boolean? = null
 ) {
 
   fun withKillSwitch(killSwitch: Boolean?): RemoteConfigResponse {

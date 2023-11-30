@@ -224,6 +224,16 @@ public class ConfigTest {
     refreshConfig_assertItIsUnchanged(newConfig, Config::isMraidEnabled);
   }
 
+  @Test
+  public void refreshConfig_GivenMissingIsMraid2Enabled_ItIsUnchanged() throws Exception {
+    givenNewConfig();
+
+    RemoteConfigResponse newConfig = givenFullNewPayload(config);
+    when(newConfig.isMraid2Enabled()).thenReturn(null);
+
+    refreshConfig_assertItIsUnchanged(newConfig, Config::isMraid2Enabled);
+  }
+
   private <T> void refreshConfig_assertItIsUnchanged(
       RemoteConfigResponse newConfig,
       Function<Config, T> projection
@@ -253,6 +263,7 @@ public class ConfigTest {
         42,
         false,
         RemoteLogLevel.ERROR,
+        false,
         false
     );
 
@@ -296,6 +307,7 @@ public class ConfigTest {
     boolean liveBiddingEnabled = config.isLiveBiddingEnabled();
     int liveBiddingTimeBudgetInMillis = config.getLiveBiddingTimeBudgetInMillis();
     boolean isMraidEnabled = config.isMraidEnabled();
+    boolean isMraid2Enabled = config.isMraid2Enabled();
 
     RemoteConfigResponse newConfig = givenFullNewPayload(config);
 
@@ -310,6 +322,7 @@ public class ConfigTest {
     assertEquals(liveBiddingEnabled, !config.isLiveBiddingEnabled());
     assertEquals(1 + liveBiddingTimeBudgetInMillis, config.getLiveBiddingTimeBudgetInMillis());
     assertEquals(isMraidEnabled, !config.isMraidEnabled());
+    assertEquals(isMraid2Enabled, !config.isMraid2Enabled());
   }
 
   private void givenNewConfig() {
@@ -335,6 +348,7 @@ public class ConfigTest {
 
     when(response.getRemoteLogLevel()).thenReturn(otherLogLevel);
     when(response.isMraidEnabled()).thenReturn(!config.isMraidEnabled());
+    when(response.isMraid2Enabled()).thenReturn(!config.isMraid2Enabled());
 
     return response;
   }
@@ -353,6 +367,7 @@ public class ConfigTest {
     assertFalse(config.isLiveBiddingEnabled());
     assertEquals(8000, config.getLiveBiddingTimeBudgetInMillis());
     assertFalse(config.isMraidEnabled());
+    assertFalse(config.isMraid2Enabled());
   }
 
 }

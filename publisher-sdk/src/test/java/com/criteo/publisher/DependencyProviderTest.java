@@ -196,9 +196,9 @@ public class DependencyProviderTest {
 
 
   @Test
-  public void provideMraidController_WhenMraidEnabledIsFalseAndInlinePlacement_ReturnsDummyMraidController()
+  public void provideMraidController_WhenMraidEnabledIsFalseAndMraid2EnabledIsFalseAndInlinePlacement_ReturnsDummyMraidController()
       throws Exception {
-    givenMraidIsEnabledEquals(false, provider -> {
+    givenMraidIsEnabledEquals(false, false, provider -> {
 
       assertThat(provider.provideMraidController(
           MraidPlacementType.INLINE,
@@ -211,9 +211,9 @@ public class DependencyProviderTest {
   }
 
   @Test
-  public void provideMraidController_WhenMraidEnabledIsFalseAndInterstitialPlacement_ReturnsDummyMraidController()
+  public void provideMraidController_WhenMraidEnabledIsFalseAndMraid2EnabledIsFalseAndInterstitialPlacement_ReturnsDummyMraidController()
       throws Exception {
-    givenMraidIsEnabledEquals(false, provider -> {
+    givenMraidIsEnabledEquals(false, false, provider -> {
 
       assertThat(provider.provideMraidController(
           MraidPlacementType.INTERSTITIAL,
@@ -228,7 +228,7 @@ public class DependencyProviderTest {
   @Test
   public void provideMraidController_WhenMraidEnabledIsTrueAndInterstitialPlacement_ReturnsInterstitialMraidController()
       throws Exception {
-    givenMraidIsEnabledEquals(true, provider -> {
+    givenMraidIsEnabledEquals(true, false, provider -> {
 
       assertThat(provider.provideMraidController(
           MraidPlacementType.INTERSTITIAL,
@@ -243,7 +243,7 @@ public class DependencyProviderTest {
   @Test
   public void provideMraidController_WhenMraidEnabledIsTrueAndInlinePlacement_ReturnsBannerMraidController()
       throws Exception {
-    givenMraidIsEnabledEquals(true, provider -> {
+    givenMraidIsEnabledEquals(true, false, provider -> {
 
       assertThat(provider.provideMraidController(
           MraidPlacementType.INLINE,
@@ -255,12 +255,73 @@ public class DependencyProviderTest {
     });
   }
 
-  private void givenMraidIsEnabledEquals(Boolean isEnabled, Function<DependencyProvider, Void> providing) {
+  @Test
+  public void provideMraidController_WhenMraid2EnabledIsTrueAndInterstitialPlacement_ReturnsInterstitialMraidController()
+      throws Exception {
+    givenMraidIsEnabledEquals(false, true, provider -> {
+
+      assertThat(provider.provideMraidController(
+          MraidPlacementType.INTERSTITIAL,
+          mock(InterstitialAdWebView.class)
+      )).isInstanceOf(
+          CriteoInterstitialMraidController.class);
+
+      return null;
+    });
+  }
+
+  @Test
+  public void provideMraidController_WhenMraid2EnabledIsTrueAndInlinePlacement_ReturnsBannerMraidController()
+      throws Exception {
+    givenMraidIsEnabledEquals(false, true, provider -> {
+
+      assertThat(provider.provideMraidController(
+          MraidPlacementType.INLINE,
+          mock(CriteoBannerAdWebView.class, Answers.RETURNS_DEEP_STUBS)
+      )).isInstanceOf(
+          CriteoBannerMraidController.class);
+
+      return null;
+    });
+  }
+
+  @Test
+  public void provideMraidController_WhenMraidEnabledIsTrueAndMraid2EnabledIsTrueAndInterstitialPlacement_ReturnsInterstitialMraidController()
+      throws Exception {
+    givenMraidIsEnabledEquals(true, true, provider -> {
+
+      assertThat(provider.provideMraidController(
+          MraidPlacementType.INTERSTITIAL,
+          mock(InterstitialAdWebView.class)
+      )).isInstanceOf(
+          CriteoInterstitialMraidController.class);
+
+      return null;
+    });
+  }
+
+  @Test
+  public void provideMraidController_WhenMraidEnabledIsTrueAndMraid2EnabledIsTrueAndInlinePlacement_ReturnsBannerMraidController()
+      throws Exception {
+    givenMraidIsEnabledEquals(false, true, provider -> {
+
+      assertThat(provider.provideMraidController(
+          MraidPlacementType.INLINE,
+          mock(CriteoBannerAdWebView.class, Answers.RETURNS_DEEP_STUBS)
+      )).isInstanceOf(
+          CriteoBannerMraidController.class);
+
+      return null;
+    });
+  }
+
+  private void givenMraidIsEnabledEquals(Boolean isMraidEnabled, Boolean isMraid2Enabled, Function<DependencyProvider, Void> providing) {
     DependencyProvider instance = spy(DependencyProvider.getInstance());
     instance.setApplication(ApplicationMock.newMock());
     instance.setCriteoPublisherId(CriteoUtil.TEST_CP_ID);
     Config config = mock(Config.class);
-    when(config.isMraidEnabled()).thenReturn(isEnabled);
+    when(config.isMraidEnabled()).thenReturn(isMraidEnabled);
+    when(config.isMraid2Enabled()).thenReturn(isMraid2Enabled);
     doReturn(config).when(instance).provideConfig();
 
     providing.apply(instance);
