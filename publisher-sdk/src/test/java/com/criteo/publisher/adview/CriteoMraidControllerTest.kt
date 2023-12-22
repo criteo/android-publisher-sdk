@@ -20,6 +20,7 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import android.util.DisplayMetrics
 import com.criteo.publisher.advancednative.VisibilityTracker
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
 import com.criteo.publisher.logging.Logger
 import com.criteo.publisher.mock.MockedDependenciesRule
 import com.criteo.publisher.mock.SpyBean
@@ -46,6 +47,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyZeroInteractions
 import org.mockito.kotlin.whenever
 import java.io.IOException
+import javax.inject.Inject
 
 class CriteoMraidControllerTest {
   @Rule
@@ -92,6 +94,9 @@ class CriteoMraidControllerTest {
   @SpyBean
   private lateinit var logger: Logger
 
+  @Inject
+  private lateinit var runOnUiThreadExecutor: RunOnUiThreadExecutor
+
   private var placementType: MraidPlacementType = MraidPlacementType.INLINE
   private var actionResult: MraidActionResult = MraidActionResult.Success
   private lateinit var resizeActionResult: MraidResizeActionResult
@@ -107,7 +112,8 @@ class CriteoMraidControllerTest {
         mraidMessageHandler,
         deviceUtil,
         viewPositionTracker,
-        externalVideoPlayer
+        externalVideoPlayer,
+        runOnUiThreadExecutor
     ) {
       override fun getPlacementType(): MraidPlacementType {
         return placementType

@@ -55,6 +55,8 @@ class Redirection(private val context: Context) {
         )
         application.registerActivityLifecycleCallbacks(tracker)
       }
+    } else {
+      listener.onRedirectionFailed()
     }
   }
 
