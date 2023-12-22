@@ -58,7 +58,7 @@ import kotlin.math.roundToInt
 @Suppress("TooManyFunctions", "LongParameterList")
 internal class CriteoBannerMraidController(
     private val bannerView: CriteoBannerAdWebView,
-    private val runOnUiThreadExecutor: RunOnUiThreadExecutor,
+    runOnUiThreadExecutor: RunOnUiThreadExecutor,
     visibilityTracker: VisibilityTracker,
     mraidInteractor: MraidInteractor,
     mraidMessageHandler: MraidMessageHandler,
@@ -72,7 +72,8 @@ internal class CriteoBannerMraidController(
     mraidMessageHandler,
     deviceUtil,
     viewPositionTracker,
-    externalVideoPlayer
+    externalVideoPlayer,
+    runOnUiThreadExecutor
 ), MraidExpandedActivityListener {
 
   private val defaultBannerViewLayoutParams: LayoutParams = bannerView.layoutParams

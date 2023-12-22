@@ -22,6 +22,7 @@ import android.webkit.WebViewClient
 import com.criteo.publisher.advancednative.VisibilityListener
 import com.criteo.publisher.advancednative.VisibilityTracker
 import com.criteo.publisher.annotation.OpenForTesting
+import com.criteo.publisher.concurrent.RunOnUiThreadExecutor
 import com.criteo.publisher.logging.LoggerFactory
 import com.criteo.publisher.util.DeviceUtil
 import com.criteo.publisher.util.ExternalVideoPlayer
@@ -37,7 +38,8 @@ internal abstract class CriteoMraidController(
     private val mraidMessageHandler: MraidMessageHandler,
     private val deviceUtil: DeviceUtil,
     private val positionTracker: ViewPositionTracker,
-    private val externalVideoPlayer: ExternalVideoPlayer
+    private val externalVideoPlayer: ExternalVideoPlayer,
+    protected val runOnUiThreadExecutor: RunOnUiThreadExecutor
 ) : MraidController, VisibilityListener, MraidMessageHandlerListener, AdWebViewClientListener,
     ViewPositionTracker.PositionListener {
 
@@ -78,7 +80,9 @@ internal abstract class CriteoMraidController(
 
   override fun onPlayVideo(url: String) {
     externalVideoPlayer.play(url) {
-      mraidInteractor.notifyError(it, "playVideo")
+      runOnUiThreadExecutor.execute {
+        mraidInteractor.notifyError(it, "playVideo")
+      }
     }
   }
 
@@ -152,7 +156,9 @@ internal abstract class CriteoMraidController(
 
   override fun onOpenFailed() {
     invokeIfMraidAd {
-      mraidInteractor.notifyError("Error during url open", "open")
+      runOnUiThreadExecutor.execute {
+        mraidInteractor.notifyError("Error during url open", "open")
+      }
     }
   }
 

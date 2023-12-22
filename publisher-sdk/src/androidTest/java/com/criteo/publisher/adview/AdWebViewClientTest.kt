@@ -120,12 +120,12 @@ class AdWebViewClientTest {
   }
 
   @Test
-  fun whenUserClickOnAd_GivenTargetAppIsNotInstalled_DontThrowActivityNotFoundAndDoNotRedirectUser() {
+  fun whenUserClickOnAd_GivenTargetAppIsNotInstalled_DontThrowActivityNotFoundAndNotifyOnRedirectionFailed() {
     // We assume that no application can handle such URL.
     whenUserClickOnAd("fake-deeplink://fakeappdispatch")
 
     verify(context, never()).startActivity(ArgumentMatchers.any())
-    verifyNoMoreInteractions(listener)
+    verify(listener).onRedirectionFailed()
   }
 
   @Test
