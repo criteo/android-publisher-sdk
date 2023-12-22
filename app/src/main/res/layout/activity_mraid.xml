@@ -41,10 +41,10 @@
     android:id="@+id/criteoBannerView"
     android:layout_width="match_parent"
     android:layout_height="0dp"
-    app:criteoAdUnitHeight="320"
+    app:criteoAdUnitHeight="500"
     app:layout_constraintTop_toBottomOf="@id/buttons"
     app:layout_constraintBottom_toBottomOf="parent"
     app:criteoAdUnitId="7fspp28x445grwm378ck"
-    app:criteoAdUnitWidth="320"
+    app:criteoAdUnitWidth="400"
     app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
