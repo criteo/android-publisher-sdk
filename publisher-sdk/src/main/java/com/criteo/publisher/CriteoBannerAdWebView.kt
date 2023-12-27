@@ -31,6 +31,7 @@ import com.criteo.publisher.integration.IntegrationRegistry
 import com.criteo.publisher.logging.LoggerFactory
 import com.criteo.publisher.model.BannerAdUnit
 
+@Suppress("TooManyFunctions")
 @OpenForTesting
 class CriteoBannerAdWebView(
     context: Context,
@@ -124,6 +125,17 @@ class CriteoBannerAdWebView(
 
   private fun getCriteo(): Criteo {
     return criteo ?: Criteo.getInstance()
+  }
+
+  override fun destroy() {
+    // We do not destroy webView in expanded state since mraid ad
+    // might request orientation change. If rotation is performed
+    // original container will be destroyed and webView will not
+    // return to original container. WebView in expanded state
+    // survives orientation change and will be kept until it is closed
+    if (mraidController.currentState != MraidState.EXPANDED) {
+      super.destroy()
+    }
   }
 
   private val integrationRegistry: IntegrationRegistry
