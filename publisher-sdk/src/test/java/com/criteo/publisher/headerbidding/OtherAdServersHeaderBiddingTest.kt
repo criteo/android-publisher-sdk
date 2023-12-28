@@ -24,7 +24,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyZeroInteractions
+import org.mockito.kotlin.verifyNoInteractions
 
 class OtherAdServersHeaderBiddingTest {
 
@@ -65,7 +65,7 @@ class OtherAdServersHeaderBiddingTest {
 
     headerBidding.cleanPreviousBid(builder)
 
-    verifyZeroInteractions(builder)
+    verifyNoInteractions(builder)
   }
 
   @Test
@@ -96,7 +96,7 @@ class OtherAdServersHeaderBiddingTest {
 
     headerBidding.enrichBid(builder, CRITEO_BANNER, mock())
 
-    verifyZeroInteractions(builder)
+    verifyNoInteractions(builder)
   }
 
   @Test

@@ -117,11 +117,11 @@ object Deps {
   }
 
   object Mockito {
-    private const val version = "3.9.0"
+    private const val version = "5.8.0"
 
     const val Android = "org.mockito:mockito-android:$version"
     const val Core = "org.mockito:mockito-core:$version"
-    const val Kotlin = "org.mockito.kotlin:mockito-kotlin:3.2.0"
+    const val Kotlin = "org.mockito.kotlin:mockito-kotlin:4.0.0"
   }
 
   object Square {

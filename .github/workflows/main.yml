@@ -81,10 +81,6 @@ jobs:
         fail-fast: false
         matrix:
           include:
-            - api: '29'
-              abi: 'x86'
-              tag: 'google_apis'
-
             - api: '30'
               abi: 'x86'
               tag: 'playstore' # Explicitly need the PlayStore to fetch GAID
@@ -96,6 +92,10 @@ jobs:
             # api 32 is an interim release of Android without api changes, so it is skipped here
 
             - api: '33'
+              abi: 'x86_64'
+              tag: 'google_apis'
+
+            - api: '34'
               abi: 'x86_64'
               tag: 'google_apis'
     steps:
@@ -167,7 +167,7 @@ jobs:
 
       - name: Upload XML reports for quality-tests
         uses: actions/upload-artifact@v3
-        if: matrix.api == '33' # Only report latest supported version
+        if: matrix.api == '34' # Only report latest supported version
         with:
           name: android-quality-reports
           path: |

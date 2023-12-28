@@ -1,4 +1,5 @@
 # Next Version
+- Add support of Android 14 (API level 34)
 
 # Version 5.0.2
 - Send SDK MRAID capability

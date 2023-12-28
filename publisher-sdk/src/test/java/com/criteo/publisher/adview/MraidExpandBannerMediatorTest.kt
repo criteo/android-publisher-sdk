@@ -26,7 +26,7 @@ import org.mockito.Mock
 import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyZeroInteractions
+import org.mockito.kotlin.verifyNoInteractions
 
 class MraidExpandBannerMediatorTest {
 
@@ -129,7 +129,7 @@ class MraidExpandBannerMediatorTest {
     mediator.requestClose()
     mediator.requestOrientationChange(true, MraidOrientation.PORTRAIT)
 
-    verifyZeroInteractions(bannerListener)
+    verifyNoInteractions(bannerListener)
   }
 
   @Test
@@ -155,6 +155,6 @@ class MraidExpandBannerMediatorTest {
     mediator.removeExpandedActivityListener()
     mediator.notifyOnBackClicked()
 
-    verifyZeroInteractions(expandedActivityListener)
+    verifyNoInteractions(expandedActivityListener)
   }
 }

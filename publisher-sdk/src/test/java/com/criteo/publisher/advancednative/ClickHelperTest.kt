@@ -32,7 +32,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyZeroInteractions
+import org.mockito.kotlin.verifyNoInteractions
 import java.net.URI
 
 class ClickHelperTest {
@@ -61,7 +61,7 @@ class ClickHelperTest {
   fun notifyUserClick_GivenNull_DoNothing() {
     clickHelper.notifyUserClickAsync(null)
 
-    verifyZeroInteractions(runOnUiThreadExecutor)
+    verifyNoInteractions(runOnUiThreadExecutor)
   }
 
   @Test
@@ -78,7 +78,7 @@ class ClickHelperTest {
   fun notifyUserIsLeavingApplication_GivenNull_DoNothing() {
     clickHelper.notifyUserIsLeavingApplicationAsync(null)
 
-    verifyZeroInteractions(runOnUiThreadExecutor)
+    verifyNoInteractions(runOnUiThreadExecutor)
   }
 
   @Test
@@ -95,7 +95,7 @@ class ClickHelperTest {
   fun notifyUserIsBackToApplication_GivenNull_DoNothing() {
     clickHelper.notifyUserIsBackToApplicationAsync(null)
 
-    verifyZeroInteractions(runOnUiThreadExecutor)
+    verifyNoInteractions(runOnUiThreadExecutor)
   }
 
   @Test

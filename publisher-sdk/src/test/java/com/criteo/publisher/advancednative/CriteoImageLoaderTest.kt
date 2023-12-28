@@ -23,6 +23,7 @@ import com.squareup.picasso.Picasso
 import com.squareup.picasso.RequestCreator
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Answers
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.verify
@@ -41,7 +42,7 @@ class CriteoImageLoaderTest {
     @Mock
     private lateinit var picasso: Picasso
 
-    @Mock
+    @Mock(answer = Answers.CALLS_REAL_METHODS)
     @Suppress("UnusedPrivateMember")
     private lateinit var asyncResources: AsyncResources
 

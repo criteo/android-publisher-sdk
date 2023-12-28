@@ -34,7 +34,7 @@ import org.mockito.junit.MockitoJUnit
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyZeroInteractions
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class AdChoiceOverlayNativeRendererTest {
@@ -118,6 +118,6 @@ class AdChoiceOverlayNativeRendererTest {
 
     renderer.renderNativeView(helper, nativeView, nativeAd)
 
-    verifyZeroInteractions(delegate)
+    verifyNoInteractions(delegate)
   }
 }

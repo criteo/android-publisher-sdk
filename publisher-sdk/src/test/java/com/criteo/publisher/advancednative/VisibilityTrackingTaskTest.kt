@@ -37,7 +37,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.lang.ref.Reference
+import java.lang.ref.WeakReference
 
 class VisibilityTrackingTaskTest {
 
@@ -46,25 +46,22 @@ class VisibilityTrackingTaskTest {
     val mockitoRule = MockitoJUnit.rule()
 
     @Mock
-    private lateinit var viewRef: Reference<View>
-
-    @Mock
     private lateinit var visibilityChecker: VisibilityChecker
+
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    private lateinit var view: View
 
     private lateinit var runOnUiThreadExecutor: RunOnUiThreadExecutor
 
     @Before
     fun setUp() {
-        whenever(viewRef.get()).thenReturn(mock(defaultAnswer = Answers.RETURNS_DEEP_STUBS))
         runOnUiThreadExecutor = spy(DirectMockRunOnUiThreadExecutor())
     }
 
     @Test
     fun new_GivenEmptyReference_DoNotThrow() {
-        whenever(viewRef.get()).thenReturn(null)
-
         assertThatCode {
-            createTask()
+            createTask(null)
         }.doesNotThrowAnyException()
     }
 
@@ -90,8 +87,7 @@ class VisibilityTrackingTaskTest {
     fun onPreDraw_GivenListenerAndEmptyReference_DoesNothing() {
         val listener = mock(VisibilityListener::class.java)
 
-        val task = createTask()
-        whenever(viewRef.get()).thenReturn(null)
+        val task = createTask(null)
 
         task.onPreDraw()
 
@@ -101,7 +97,7 @@ class VisibilityTrackingTaskTest {
     @Test
     fun onPreDraw_GivenListenerAndReferenceAndIsVisible_NotifyListener() {
         val listener = mock<VisibilityListener>()
-        whenever(visibilityChecker.isVisible(viewRef.get()!!)).thenReturn(true)
+        whenever(visibilityChecker.isVisible(view)).thenReturn(true)
 
         val task = createTask()
         task.setListener(listener)
@@ -113,7 +109,7 @@ class VisibilityTrackingTaskTest {
     @Test
     fun onGlobalLayout_GivenListenerAndReferenceAndIsGone_NotifyListener() {
         val listener = mock<VisibilityListener>()
-        whenever(visibilityChecker.isVisible(viewRef.get()!!)).thenReturn(false)
+        whenever(visibilityChecker.isVisible(view)).thenReturn(false)
 
         val task = createTask()
         task.setListener(listener)
@@ -125,7 +121,7 @@ class VisibilityTrackingTaskTest {
     @Test
     fun onPreDraw_GivenListenerAndReferenceAndIsGone_CancelAndAndExecuteAndExecuteAsyncWithDelay() {
         val listener = mock<VisibilityListener>()
-        whenever(visibilityChecker.isVisible(viewRef.get()!!)).thenReturn(false)
+        whenever(visibilityChecker.isVisible(view)).thenReturn(false)
         givenViewTreeObserver(true)
 
         val task = createTask()
@@ -155,11 +151,11 @@ class VisibilityTrackingTaskTest {
             on { isAlive() } doReturn isAlive
         }
 
-        whenever(viewRef.get()!!.viewTreeObserver).thenReturn(viewTreeObserver)
+        whenever(view.viewTreeObserver).thenReturn(viewTreeObserver)
         return viewTreeObserver
     }
 
-    private fun createTask(): VisibilityTrackingTask {
-        return VisibilityTrackingTask(viewRef, visibilityChecker, runOnUiThreadExecutor)
+    private fun createTask(view: View? = this.view): VisibilityTrackingTask {
+        return VisibilityTrackingTask(WeakReference(view), visibilityChecker, runOnUiThreadExecutor)
     }
 }
