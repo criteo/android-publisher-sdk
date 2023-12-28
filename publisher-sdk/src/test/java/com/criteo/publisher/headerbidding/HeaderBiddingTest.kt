@@ -31,8 +31,8 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
-import org.mockito.kotlin.verifyZeroInteractions
 
 class HeaderBiddingTest {
 
@@ -51,9 +51,9 @@ class HeaderBiddingTest {
 
     headerBidding.enrichBid(null, bid)
 
-    verifyZeroInteractions(bid)
-    verifyZeroInteractions(handler)
-    verifyZeroInteractions(integrationRegistry)
+    verifyNoInteractions(bid)
+    verifyNoInteractions(handler)
+    verifyNoInteractions(integrationRegistry)
   }
 
   @Test

@@ -35,8 +35,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
-import org.mockito.kotlin.verifyZeroInteractions
 import org.mockito.kotlin.whenever
 import javax.inject.Inject
 
@@ -98,7 +98,7 @@ class RemoteHandlerTest {
     remoteHandler.log("tag", logMessage)
     mockedDependenciesRule.waitForIdleState()
 
-    verifyZeroInteractions(sendingQueue)
+    verifyNoInteractions(sendingQueue)
   }
 
   @Test
@@ -122,8 +122,8 @@ class RemoteHandlerTest {
     remoteHandler.log("tag", logMessage)
     mockedDependenciesRule.waitForIdleState()
 
-    verifyZeroInteractions(remoteLogRecordsFactory)
-    verifyZeroInteractions(sendingQueue)
+    verifyNoInteractions(remoteLogRecordsFactory)
+    verifyNoInteractions(sendingQueue)
   }
 
   @Test

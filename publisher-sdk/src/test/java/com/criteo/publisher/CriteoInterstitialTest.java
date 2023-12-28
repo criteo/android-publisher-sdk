@@ -70,8 +70,6 @@ public class CriteoInterstitialTest {
 
   @Test
   public void loadAdStandalone_GivenNoContext_LoadAdWithEmptyContext() throws Exception {
-    interstitial = spy(interstitial);
-
     interstitial.loadAd();
 
     verify(interstitial).loadAd(eq(new ContextData()));

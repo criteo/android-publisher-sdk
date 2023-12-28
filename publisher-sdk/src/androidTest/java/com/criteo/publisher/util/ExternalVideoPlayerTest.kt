@@ -33,7 +33,7 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyZeroInteractions
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 class ExternalVideoPlayerTest {
@@ -86,7 +86,7 @@ class ExternalVideoPlayerTest {
 
     externalVideoPlayer.play("https://criteo.com/cat_video.mp4", onErrorListener)
 
-    verifyZeroInteractions(onErrorListener)
+    verifyNoInteractions(onErrorListener)
     val argumentCaptor = argumentCaptor<Intent>()
     verify(context).startActivity(argumentCaptor.capture())
     val intent = argumentCaptor.lastValue

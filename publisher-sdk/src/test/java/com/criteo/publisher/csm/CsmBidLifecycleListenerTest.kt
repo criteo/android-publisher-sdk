@@ -42,8 +42,8 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
-import org.mockito.kotlin.verifyZeroInteractions
 import org.mockito.kotlin.whenever
 import java.io.IOException
 import java.io.InterruptedIOException
@@ -385,7 +385,7 @@ class CsmBidLifecycleListenerTest {
 
     listener.onBidConsumed(adUnit, slot)
 
-    verifyZeroInteractions(repository)
+    verifyNoInteractions(repository)
   }
 
   @Test
@@ -523,8 +523,8 @@ class CsmBidLifecycleListenerTest {
   }
 
   private fun verifyFeatureIsDeactivated() {
-    verifyZeroInteractions(repository)
-    verifyZeroInteractions(clock)
-    verifyZeroInteractions(sendingQueueProducer)
+    verifyNoInteractions(repository)
+    verifyNoInteractions(clock)
+    verifyNoInteractions(sendingQueueProducer)
   }
 }

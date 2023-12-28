@@ -50,7 +50,7 @@ import org.mockito.kotlin.spy
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyZeroInteractions
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.IOException
 import java.util.concurrent.CountDownLatch
@@ -273,7 +273,7 @@ class BidRequestSenderTest {
     fun sendBidRequest_GivenNoAdUnits_DoesNothing() {
         sender.sendBidRequest(emptyList(), mock(), mock())
 
-        verifyZeroInteractions(api)
+        verifyNoInteractions(api)
     }
 
     @Test

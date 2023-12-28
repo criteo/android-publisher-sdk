@@ -116,8 +116,6 @@ public class CriteoBannerAdWebViewTest {
 
   @Test
   public void loadAdStandalone_GivenNoContext_UseEmptyContext() throws Exception {
-    bannerView = spy(bannerView);
-
     bannerView.loadAd();
 
     verify(bannerView).loadAd(eq(new ContextData()));

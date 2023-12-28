@@ -28,6 +28,7 @@ buildscript {
 plugins {
   id("org.sonarqube") version "3.0"
   id("io.github.gradle-nexus.publish-plugin")
+  id("com.github.ben-manes.versions") version "0.50.0"
 }
 
 allprojects {

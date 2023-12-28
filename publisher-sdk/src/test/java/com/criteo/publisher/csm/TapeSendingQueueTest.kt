@@ -47,7 +47,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyZeroInteractions
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.mockito.stubbing.Answer
 import java.io.File
@@ -194,7 +194,7 @@ class TapeSendingQueueTest(private val tapeImplementation: TapeImplementation) {
     val metrics = queue.poll(0)
 
     assertThat(metrics).isEmpty()
-    verifyZeroInteractions(tapeQueue)
+    verifyNoInteractions(tapeQueue)
   }
 
   @Test

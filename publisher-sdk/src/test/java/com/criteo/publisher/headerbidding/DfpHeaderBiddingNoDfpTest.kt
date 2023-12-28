@@ -22,7 +22,7 @@ import org.assertj.core.api.Assertions.assertThatCode
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyZeroInteractions
+import org.mockito.kotlin.verifyNoInteractions
 
 class DfpHeaderBiddingNoDfpTest {
 
@@ -60,6 +60,6 @@ via IntelliJ delegating test run to Gradle.
 
     headerBidding.enrichBid(builder, AdUnitType.CRITEO_BANNER, mock())
 
-    verifyZeroInteractions(builder)
+    verifyNoInteractions(builder)
   }
 }

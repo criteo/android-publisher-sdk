@@ -44,7 +44,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyZeroInteractions
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.IOException
 import javax.inject.Inject
@@ -348,8 +348,8 @@ class CriteoMraidControllerTest {
   fun onPageFinishedGivenNonMraidAd_ShouldNotInitializeDefaultValues() {
     givenNonMraidAdAndPageIsFinished()
 
-    verifyZeroInteractions(visibilityTracker)
-    verifyZeroInteractions(mraidInteractor)
+    verifyNoInteractions(visibilityTracker)
+    verifyNoInteractions(mraidInteractor)
   }
 
   @Test
@@ -367,7 +367,7 @@ class CriteoMraidControllerTest {
 
     criteoMraidController.onOpenFailed()
 
-    verifyZeroInteractions(mraidInteractor)
+    verifyNoInteractions(mraidInteractor)
   }
 
   @Test
@@ -437,7 +437,7 @@ class CriteoMraidControllerTest {
       criteoMraidController.onConfigurationChange(configuration)
     }.doesNotThrowAnyException()
 
-    verifyZeroInteractions(mraidInteractor)
+    verifyNoInteractions(mraidInteractor)
   }
 
   @Test
@@ -464,7 +464,7 @@ class CriteoMraidControllerTest {
       criteoMraidController.onConfigurationChange(null)
     }.doesNotThrowAnyException()
 
-    verifyZeroInteractions(mraidInteractor)
+    verifyNoInteractions(mraidInteractor)
   }
 
   @Test
@@ -508,7 +508,7 @@ class CriteoMraidControllerTest {
       criteoMraidController.onClosed()
     }.doesNotThrowAnyException()
 
-    verifyZeroInteractions(mraidInteractor)
+    verifyNoInteractions(mraidInteractor)
     assertThat(criteoMraidController.currentState).isEqualTo(MraidState.LOADING)
   }
 
@@ -524,7 +524,7 @@ class CriteoMraidControllerTest {
     criteoMraidController.onPlayVideo("https://criteo.com/cat_video.mp4")
 
     verify(externalVideoPlayer).play(eq("https://criteo.com/cat_video.mp4"), any())
-    verifyZeroInteractions(mraidInteractor)
+    verifyNoInteractions(mraidInteractor)
   }
 
   @Test

@@ -37,8 +37,8 @@ import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
-import org.mockito.kotlin.verifyZeroInteractions
 import org.mockito.kotlin.whenever
 import java.io.IOException
 
@@ -91,8 +91,8 @@ class MetricSendingQueueConsumerTest {
 
     consumer.sendMetricBatch()
 
-    verifyZeroInteractions(queue)
-    verifyZeroInteractions(api)
+    verifyNoInteractions(queue)
+    verifyNoInteractions(api)
   }
 
   @Test
@@ -106,8 +106,8 @@ class MetricSendingQueueConsumerTest {
 
     consumer.sendMetricBatch()
 
-    verifyZeroInteractions(queue)
-    verifyZeroInteractions(api)
+    verifyNoInteractions(queue)
+    verifyNoInteractions(api)
   }
 
   @Test
