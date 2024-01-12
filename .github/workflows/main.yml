@@ -83,7 +83,7 @@ jobs:
           include:
             - api: '30'
               abi: 'x86'
-              tag: 'playstore' # Explicitly need the PlayStore to fetch GAID
+              tag: 'google_apis'
 
             - api: '31'
               abi: 'x86_64'
