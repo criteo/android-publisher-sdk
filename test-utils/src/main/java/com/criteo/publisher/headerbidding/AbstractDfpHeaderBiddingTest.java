@@ -467,7 +467,8 @@ public abstract class AbstractDfpHeaderBiddingTest {
               + CRT_NATIVE_PR_TEXT + "=" + encodeForDfp("privacy legal text") + ","
               + CRT_NATIVE_PIXEL_URL + "0=" + encodeForDfp("http://pixel.url/0") + ","
               + CRT_NATIVE_PIXEL_URL + "1=" + encodeForDfp("http://pixel.url/1") + ","
-              + CRT_NATIVE_PIXEL_COUNT + "=2"
+              + CRT_NATIVE_PIXEL_COUNT + "=2" + ","
+              + CRT_FORMAT + "=native"
       );
       return true;
     }));

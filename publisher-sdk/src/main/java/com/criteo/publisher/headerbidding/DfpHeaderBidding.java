@@ -66,6 +66,7 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
   private static final String CRT_NATIVE_PIXEL_COUNT = "crtn_pixcount";
 
   private static final String VIDEO = "video";
+  private static final String NATIVE = "native";
 
   @NonNull
   private final AndroidUtil androidUtil;
@@ -132,6 +133,10 @@ public class DfpHeaderBidding implements HeaderBiddingHandler {
 
     if (slot.isVideo()) {
       builder.addCustomTargeting(CRT_FORMAT, VIDEO);
+    }
+
+    if(slot.isNative()) {
+      builder.addCustomTargeting(CRT_FORMAT, NATIVE);
     }
 
     logger.log(AppBiddingLogMessage.onAdObjectEnrichedSuccessfully(getIntegration(), builder.getDescription()));
