@@ -315,6 +315,12 @@ public class DependencyProviderTest {
     });
   }
 
+  @Test
+  public void setInventoryGroupId_GivenNullIsOk() {
+    dependencyProvider = DependencyProvider.getInstance();
+    dependencyProvider.setInventoryGroupId(null);
+  }
+
   private void givenMraidIsEnabledEquals(Boolean isMraidEnabled, Boolean isMraid2Enabled, Function<DependencyProvider, Void> providing) {
     DependencyProvider instance = spy(DependencyProvider.getInstance());
     instance.setApplication(ApplicationMock.newMock());

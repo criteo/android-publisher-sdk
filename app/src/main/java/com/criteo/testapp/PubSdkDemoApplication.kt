@@ -123,6 +123,7 @@ class PubSdkDemoApplication : MultiDexApplication() {
 
     val builder = Criteo.Builder(this, "B-000000")
         .adUnits(adUnits)
+        .inventoryGroupId("myInventoryGroupId")
 
     if ("release" == BuildConfig.BUILD_TYPE) {
       // Enable debug logs only on release build.

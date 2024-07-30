@@ -54,11 +54,11 @@ import java.util.Collections;
 public class DfpActivity extends AppCompatActivity {
 
   private static final String TAG = DfpActivity.class.getSimpleName();
-  private static final String DFP_INTERSTITIAL_AD_UNIT_ID = "/140800857/Endeavour_Interstitial_320x480";
-  private static final String DFP_BANNER_AD_UNIT_ID = "/140800857/Endeavour_320x50";
-  private static final String DFP_NATIVE_AD_UNIT_ID = "/140800857/Endeavour_Native";
-  private static final String DFP_INTERSTITIAL_VIDEO_ID = INTERSTITIAL_VIDEO.getAdUnitId();
-  private static final String DFP_REWARDED_VIDEO_ID = DFP_INTERSTITIAL_VIDEO_ID; // TODO?
+  private static final String DFP_INTERSTITIAL_AD_UNIT_ID = "/21775744923/example/interstitial";
+  private static final String DFP_BANNER_AD_UNIT_ID = "/6499/example/banner";
+  private static final String DFP_NATIVE_AD_UNIT_ID = "/6499/example/native";
+  private static final String DFP_INTERSTITIAL_VIDEO_ID = "/21775744923/example/rewarded-interstitial";
+  private static final String DFP_REWARDED_VIDEO_ID = "/21775744923/example/rewarded";
 
   private LinearLayout linearLayout;
   private Criteo criteo;

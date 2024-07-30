@@ -27,6 +27,8 @@ data class Publisher(
     val bundleId: String,
     @Json(name = "cpId")
     val criteoPublisherId: String,
+    @Json(name = "inventoryGroupId")
+    val inventoryGroupId: String?,
     @Json(name = "ext")
     val ext: Map<String, Any>
 )

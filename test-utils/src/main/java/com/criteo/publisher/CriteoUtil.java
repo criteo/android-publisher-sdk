@@ -27,6 +27,7 @@ public class CriteoUtil {
   public static final String TEST_CP_ID = "B-000001";
   public static final String PROD_CP_ID = "B-056946";
   public static final String PROD_CDB_URL = "https://bidder.criteo.com";
+  public static final String TEST_INVENTORY_GROUP_ID = "testInventoryGroupId";
 
   public static Criteo givenInitializedCriteo(AdUnit... preloadedAdUnits)
       throws CriteoInitException {

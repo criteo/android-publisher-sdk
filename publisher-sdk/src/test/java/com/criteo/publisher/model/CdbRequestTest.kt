@@ -41,6 +41,7 @@ class CdbRequestTest {
         Publisher(
             "myBundleId",
             "myCpId",
+            "myInventoryGroupId",
             mapOf(
                 "content" to mapOf(
                     "url" to "https://www.criteo.com"
@@ -82,6 +83,7 @@ class CdbRequestTest {
         "publisher": {
           "bundleId": "myBundleId",
           "cpId": "myCpId",
+          "inventoryGroupId": "myInventoryGroupId",
           "ext": {
             "content": {
               "url": "https://www.criteo.com"
@@ -126,7 +128,7 @@ class CdbRequestTest {
   fun toJson_GivenNoGdpr_DoesNotMapIt() {
     val request = CdbRequest(
         "myRequestId",
-        Publisher("myBundleId", "myCpId", mapOf()),
+        Publisher("myBundleId", "myCpId", "myInventoryGroupId", mapOf()),
         User(null, null, null, mapOf()),
         "1.2.3",
         456,
@@ -144,7 +146,7 @@ class CdbRequestTest {
   fun toJson_GivenCdbRegsObjectIsNull_DoesNotMapIt() {
     val request = CdbRequest(
         "myRequestId",
-        Publisher("myBundleId", "myCpId", mapOf()),
+        Publisher("myBundleId", "myCpId", "myInventoryGroupId", mapOf()),
         User(null, null, null, mapOf()),
         "1.2.3",
         456,
@@ -156,5 +158,23 @@ class CdbRequestTest {
     val json = serializer.writeIntoString(request)
 
     assertThat(json).doesNotContain("regs")
+  }
+
+  @Test
+  fun toJson_GivenInventoryGroupIdIsNull_DoesNotMapIt() {
+    val request = CdbRequest(
+      "myRequestId",
+      Publisher("myBundleId", "myCpId", null, mapOf()),
+      User(null, null, null, mapOf()),
+      "1.2.3",
+      456,
+      null,
+      listOf(),
+      null
+    )
+
+    val json = serializer.writeIntoString(request)
+
+    assertThat(json).doesNotContain("inventoryGroupId")
   }
 }

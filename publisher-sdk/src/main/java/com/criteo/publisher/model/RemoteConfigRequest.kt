@@ -24,6 +24,8 @@ import com.squareup.moshi.JsonClass
 data class RemoteConfigRequest @JvmOverloads constructor(
     @Json(name = "cpId")
     val criteoPublisherId: String,
+    @Json(name = "inventoryGroupId")
+    val inventoryGroupId: String?,
     @Json(name = "bundleId")
     val bundleId: String,
     @Json(name = "sdkVersion")

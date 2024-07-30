@@ -139,6 +139,7 @@ public class DependencyProvider {
 
   private Application application;
   private String criteoPublisherId;
+  private String inventoryGroupId;
 
   protected DependencyProvider() {
   }
@@ -167,6 +168,10 @@ public class DependencyProvider {
   public void setCriteoPublisherId(@NonNull String criteoPublisherId) {
     this.criteoPublisherId = criteoPublisherId;
     checkCriteoPublisherIdIsSet();
+  }
+
+  public void setInventoryGroupId(@Nullable String inventoryGroupId) {
+    this.inventoryGroupId = inventoryGroupId;
   }
 
   boolean isApplicationSet() {
@@ -205,6 +210,11 @@ public class DependencyProvider {
   public String provideCriteoPublisherId() {
     checkCriteoPublisherIdIsSet();
     return criteoPublisherId;
+  }
+
+  @Nullable
+  public String provideInventoryGroupId() {
+    return inventoryGroupId;
   }
 
   @NonNull
@@ -351,6 +361,7 @@ public class DependencyProvider {
     return getOrCreate(CdbRequestFactory.class, () -> new CdbRequestFactory(
         provideContext(),
         provideCriteoPublisherId(),
+        provideInventoryGroupId(),
         provideDeviceInfo(),
         provideAdvertisingInfo(),
         provideUserPrivacyUtil(),
@@ -375,6 +386,7 @@ public class DependencyProvider {
     return getOrCreate(RemoteConfigRequestFactory.class, () -> new RemoteConfigRequestFactory(
         provideContext(),
         provideCriteoPublisherId(),
+        provideInventoryGroupId(),
         provideBuildConfigWrapper(),
         provideIntegrationRegistry()
     ));
