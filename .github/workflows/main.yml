@@ -76,7 +76,7 @@ jobs:
             **/TEST-*.xml
 
   android-tests:
-    runs-on: macos-13
+    runs-on: macos-12
     strategy:
         fail-fast: false
         matrix:
@@ -137,6 +137,7 @@ jobs:
           force-avd-creation: false
           # Use a medium size skin rather than default size. Some tests need to have a decent size.
           emulator-options: -no-snapshot-save -noaudio -no-boot-anim -skin 360x640
+          emulator-build: 6110076
           disable-animations: true
           script: |
             adb logcat -c # clear logs
