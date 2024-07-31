@@ -128,12 +128,6 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
           restore-keys: ${{ runner.os }}-gradle-
 
-      - name: Disable TCP/UDP Offloading (macOS)
-        shell: bash
-        run: |
-          sudo sysctl -w net.link.generic.system.hwcksum_tx=0
-          sudo sysctl -w net.link.generic.system.hwcksum_rx=0
-
       - name: Run all Android tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
