@@ -37,7 +37,6 @@ public class CriteoUtil {
 
     return new Criteo.Builder(app, TEST_CP_ID)
         .adUnits(Arrays.asList(preloadedAdUnits))
-        .inventoryGroupId(TEST_INVENTORY_GROUP_ID)
         .init();
   }
 
@@ -55,9 +54,7 @@ public class CriteoUtil {
     Criteo.setInstance(null);
 
     List<AdUnit> adUnits = Arrays.asList(preloadedAdUnits);
-    return new Criteo.Builder(app, TEST_CP_ID)
-        .adUnits(adUnits)
-        .inventoryGroupId(TEST_INVENTORY_GROUP_ID);
+    return new Criteo.Builder(app, TEST_CP_ID).adUnits(adUnits);
   }
 
 }
