@@ -135,6 +135,7 @@ class MraidBannerFunctionalTest {
     onExpanded.await()
 
     close()
+    onDefault.await()
     mockedDependenciesRule.waitForIdleState()
 
     Thread.sleep(2000)
