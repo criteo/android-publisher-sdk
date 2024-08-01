@@ -19,3 +19,5 @@ include ':publisher-sdk'
 include ':publisher-sdk-tests'
 include ':test-utils'
 include ':publisher-sdk-admob19-retrocompat-tests'
+
+System.setProperty("sonar.gradle.skipCompile", "true")
