@@ -217,7 +217,7 @@ jobs:
           name: android-quality-reports
 
       - name: SonarQube Analysis
-        run: ./gradlew sonarqube
+        run: ./gradlew -Dsonar.gradle.skipCompile=true sonarqube
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
