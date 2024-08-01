@@ -1,5 +1,8 @@
 # Next Version
 
+# Version 7.0.0
+- Add inventoryGroupId parameter
+
 # Version 6.0.0
 - Add support of Android 14 (API level 34)
 - Add support for MRAID 2.0 specification

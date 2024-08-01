@@ -36,6 +36,7 @@ public class ApplicationResource implements TestResource {
     DependencyProvider dependencyProvider = dependencyProviderRef.get();
     dependencyProvider.setApplication(InstrumentationUtil.getApplication());
     dependencyProvider.setCriteoPublisherId(CriteoUtil.TEST_CP_ID);
+    dependencyProvider.setInventoryGroupId(CriteoUtil.TEST_INVENTORY_GROUP_ID);
   }
 
   @Override

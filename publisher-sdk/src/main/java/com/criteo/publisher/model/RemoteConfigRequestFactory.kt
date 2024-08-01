@@ -24,12 +24,14 @@ import com.criteo.publisher.util.BuildConfigWrapper
 class RemoteConfigRequestFactory(
     private val context: Context,
     private val criteoPublisherId: String,
+    private val inventoryGroupId: String?,
     private val buildConfigWrapper: BuildConfigWrapper,
-    private val integrationRegistry: IntegrationRegistry
+    private val integrationRegistry: IntegrationRegistry,
 ) {
   fun createRequest(): RemoteConfigRequest {
     return RemoteConfigRequest(
         criteoPublisherId,
+        inventoryGroupId,
         context.packageName,
         buildConfigWrapper.sdkVersion,
         integrationRegistry.profileId

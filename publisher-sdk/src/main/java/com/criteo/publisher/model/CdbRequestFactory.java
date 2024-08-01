@@ -49,6 +49,9 @@ public class CdbRequestFactory {
   @NonNull
   private final String criteoPublisherId;
 
+  @Nullable
+  private final String inventoryGroupId;
+
   @NonNull
   private final DeviceInfo deviceInfo;
 
@@ -79,6 +82,7 @@ public class CdbRequestFactory {
   public CdbRequestFactory(
       @NonNull Context context,
       @NonNull String criteoPublisherId,
+      @Nullable String inventoryGroupId,
       @NonNull DeviceInfo deviceInfo,
       @NonNull AdvertisingInfo advertisingInfo,
       @NonNull UserPrivacyUtil userPrivacyUtil,
@@ -91,6 +95,7 @@ public class CdbRequestFactory {
   ) {
     this.context = context;
     this.criteoPublisherId = criteoPublisherId;
+    this.inventoryGroupId = inventoryGroupId;
     this.deviceInfo = deviceInfo;
     this.advertisingInfo = advertisingInfo;
     this.userPrivacyUtil = userPrivacyUtil;
@@ -112,6 +117,7 @@ public class CdbRequestFactory {
     Publisher publisher = new Publisher(
         context.getPackageName(),
         criteoPublisherId,
+        inventoryGroupId,
         publisherExt
     );
 

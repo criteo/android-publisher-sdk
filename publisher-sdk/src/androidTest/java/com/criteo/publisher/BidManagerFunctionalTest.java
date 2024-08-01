@@ -527,6 +527,7 @@ public class BidManagerFunctionalTest {
     Publisher expectedPublisher = new Publisher(
         "bundle.id",
         CriteoUtil.TEST_CP_ID,
+        CriteoUtil.TEST_INVENTORY_GROUP_ID,
         new HashMap<>()
     );
 

@@ -400,6 +400,7 @@ public class PubSdkApiTest {
   public void loadConfig_GivenInput_SendGetRequestWithQueryParameters() throws Exception {
     RemoteConfigRequest request = new RemoteConfigRequest(
         "myCpId",
+        null,
         "myAppId",
         "myVersion",
         456,
@@ -409,6 +410,37 @@ public class PubSdkApiTest {
     String expectedJson = ""
         + "{\n"
         + "  \"cpId\" : \"myCpId\",\n"
+        + "  \"bundleId\" : \"myAppId\",\n"
+        + "  \"sdkVersion\" : \"myVersion\",\n"
+        + "  \"rtbProfileId\": 456,\n"
+        + "  \"deviceOs\": \"android\""
+        + "}";
+
+    mockWebServer.enqueue(new MockResponse().setResponseCode(200).setBody("{}"));
+
+    api.loadConfig(request);
+
+    RecordedRequest webRequest = mockWebServer.takeRequest();
+    assertThat(webRequest.getPath()).isEqualTo("/config/app");
+    assertThat(webRequest.getMethod()).isEqualTo("POST");
+    assertThat(webRequest.getBody().snapshot().utf8()).isEqualToIgnoringWhitespace(expectedJson);
+  }
+
+  @Test
+  public void loadConfig_GivenInput_SendGetRequestWithInventoryGroupId() throws Exception {
+    RemoteConfigRequest request = new RemoteConfigRequest(
+        "myCpId",
+        "myInventoryGroupId",
+        "myAppId",
+        "myVersion",
+        456,
+        "android"
+    );
+
+    String expectedJson = ""
+        + "{\n"
+        + "  \"cpId\" : \"myCpId\",\n"
+        + "  \"inventoryGroupId\" : \"myInventoryGroupId\",\n"
         + "  \"bundleId\" : \"myAppId\",\n"
         + "  \"sdkVersion\" : \"myVersion\",\n"
         + "  \"rtbProfileId\": 456,\n"

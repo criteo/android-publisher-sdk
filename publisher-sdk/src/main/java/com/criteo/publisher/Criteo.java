@@ -66,6 +66,9 @@ public abstract class Criteo {
     @Nullable
     private Boolean tagForChildDirectedTreatment = null;
 
+    @Nullable
+    private String inventoryGroupId = null;
+
     public Builder(@NonNull Application application, @NonNull String criteoPublisherId) {
       this.application = application;
       this.criteoPublisherId = criteoPublisherId;
@@ -105,6 +108,11 @@ public abstract class Criteo {
       return this;
     }
 
+    public Builder inventoryGroupId(@Nullable String inventoryGroupId) {
+      this.inventoryGroupId = inventoryGroupId;
+      return this;
+    }
+
     public Criteo init() throws CriteoInitException {
       return Criteo.init(this);
     }
@@ -119,6 +127,7 @@ public abstract class Criteo {
           DependencyProvider dependencyProvider = DependencyProvider.getInstance();
           dependencyProvider.setApplication(builder.application);
           dependencyProvider.setCriteoPublisherId(builder.criteoPublisherId);
+          dependencyProvider.setInventoryGroupId(builder.inventoryGroupId);
 
           if (builder.isDebugLogsEnabled) {
             dependencyProvider.provideConsoleHandler().setMinLogLevel(Log.INFO);

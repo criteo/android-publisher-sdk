@@ -50,6 +50,7 @@ class RemoteConfigRequestFactoryTest {
         factory = RemoteConfigRequestFactory(
             context,
             "myCpId",
+            null,
             buildConfigWrapper,
             integrationRegistry
         )
@@ -73,6 +74,36 @@ class RemoteConfigRequestFactoryTest {
 
         assertThat(request.bundleId).isEqualTo("my.bundle")
         assertThat(request.criteoPublisherId).isEqualTo("myCpId")
+        assertThat(request.sdkVersion).isEqualTo("1.2.3")
+        assertThat(request.profileId).isEqualTo(456)
+    }
+
+    @Test
+    fun createRequest_GivenInput_CreateRemoteConfigRequestWithInventoryGroupId() {
+        buildConfigWrapper.stub {
+            on { sdkVersion } doReturn "1.2.3"
+        }
+
+        integrationRegistry.stub {
+            on { profileId } doReturn 456
+        }
+
+        context.stub {
+            on { packageName } doReturn "my.bundle"
+        }
+
+        val factory = RemoteConfigRequestFactory(
+            context,
+            "myCpId",
+            "myInventoryGroupId",
+            buildConfigWrapper,
+            integrationRegistry
+        )
+        val request = factory.createRequest()
+
+        assertThat(request.bundleId).isEqualTo("my.bundle")
+        assertThat(request.criteoPublisherId).isEqualTo("myCpId")
+        assertThat(request.inventoryGroupId).isEqualTo("myInventoryGroupId")
         assertThat(request.sdkVersion).isEqualTo("1.2.3")
         assertThat(request.profileId).isEqualTo(456)
     }

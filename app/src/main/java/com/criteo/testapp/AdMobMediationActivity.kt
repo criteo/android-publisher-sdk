@@ -41,14 +41,9 @@ import java.security.MessageDigest
 class AdMobMediationActivity : AppCompatActivity() {
 
   private companion object {
-    /** This AdMob AdUnit is mapped to this Criteo AdUnit: /140800857/Endeavour_320x50 */
-    const val ADMOB_BANNER = "ca-app-pub-8459323526901202/2832836926"
-
-    /** This AdMob AdUnit is mapped to this Criteo AdUnit: /140800857/Endeavour_320x480 */
-    const val ADMOB_INTERSTITIAL = "ca-app-pub-8459323526901202/6462812944"
-
-    /** This AdMob AdUnit is mapped to this Criteo AdUnit: /140800857/Endeavour_Native */
-    const val ADMOB_NATIVE = "ca-app-pub-8459323526901202/2863808899"
+    const val ADMOB_BANNER = "ca-app-pub-3940256099942544/9214589741"
+    const val ADMOB_INTERSTITIAL = "ca-app-pub-3940256099942544/1033173712"
+    const val ADMOB_NATIVE = "ca-app-pub-3940256099942544/2247696110"
   }
 
   private val tag = javaClass.simpleName

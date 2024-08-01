@@ -90,6 +90,7 @@ class CdbRequestFactoryTest {
     factory = CdbRequestFactory(
         context,
         cpId,
+        null,
         deviceInfo,
         advertisingInfo,
         userPrivacyUtil,
@@ -153,6 +154,7 @@ class CdbRequestFactoryTest {
     val expectedPublisher = Publisher(
         "bundle.id",
         "myCpId",
+        null,
         mapOf(
             "a" to mapOf("a" to "foo"),
             "b" to "bar"
@@ -213,7 +215,7 @@ class CdbRequestFactoryTest {
     var request = factory.createRequest(adUnits, contextData)
 
     assertThat(request.id).isEqualTo("myRequestId")
-    assertThat(request.publisher).isEqualTo(Publisher("bundle.id", "myCpId", mapOf()))
+    assertThat(request.publisher).isEqualTo(Publisher("bundle.id", "myCpId", null, mapOf()))
     assertThat(request.sdkVersion).isEqualTo("1.2.3")
     assertThat(request.profileId).isEqualTo(1337)
     assertThat(request.gdprData).isEqualTo(expectedGdpr)
@@ -411,6 +413,50 @@ class CdbRequestFactoryTest {
     request.slots.forEach {
       assertThat(it.banner).isNull()
     }
+  }
+
+  @Test
+  fun createRequest_GivenInput_BuildRequestWithInventoryGroupId() {
+    val adUnit = createAdUnit()
+    val adUnits: List<CacheAdUnit> = listOf(adUnit)
+    val contextData: ContextData = ContextData().set("a.a", "foo").set("b", "bar")
+
+    buildConfigWrapper.stub {
+      on { sdkVersion } doReturn "1.2.3"
+    }
+
+    whenever(context.packageName).thenReturn("bundle.id")
+    whenever(uniqueIdGenerator.generateId())
+      .thenReturn("myRequestId")
+      .thenReturn("impId")
+
+    val expectedPublisher = Publisher(
+      "bundle.id",
+      "myCpId",
+      "myInventoryGroupId",
+      mapOf(
+        "a" to mapOf("a" to "foo"),
+        "b" to "bar"
+      )
+    )
+
+    val factory = CdbRequestFactory(
+      context,
+      cpId,
+      "myInventoryGroupId",
+      deviceInfo,
+      advertisingInfo,
+      userPrivacyUtil,
+      uniqueIdGenerator,
+      buildConfigWrapper,
+      integrationRegistry,
+      contextProvider,
+      userDataHolder,
+      config
+    )
+    val request = factory.createRequest(adUnits, contextData)
+
+    assertThat(request.publisher).isEqualTo(expectedPublisher)
   }
 
   private fun mockRequiredObjects() {

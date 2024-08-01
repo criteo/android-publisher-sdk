@@ -20,6 +20,7 @@ import android.view.ViewGroup
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.test.filters.FlakyTest
+import androidx.test.filters.LargeTest
 import androidx.test.rule.ActivityTestRule
 import com.criteo.publisher.CriteoBannerView
 import com.criteo.publisher.CriteoUtil
@@ -128,6 +129,7 @@ class MraidBannerFunctionalTest {
   }
 
   @Test
+  @LargeTest
   @FlakyTest(detail = "Flakiness comes from UI and concurrency")
   fun whenExpandAndThenClose_ShouldMoveBackToOriginalContainer() {
     val originalLayoutParams = getWebView().layoutParams
