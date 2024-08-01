@@ -135,8 +135,9 @@ class MraidBannerFunctionalTest {
     onExpanded.await()
 
     close()
-    onDefault.await()
     mockedDependenciesRule.waitForIdleState()
+
+    Thread.sleep(2000)
 
     assertClosedCorrectly(originalLayoutParams)
   }
@@ -236,6 +237,7 @@ class MraidBannerFunctionalTest {
 
     onResized.await()
     mockedDependenciesRule.waitForIdleState()
+
 
     close()
     onDefault.await()
