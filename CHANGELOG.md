@@ -1,5 +1,8 @@
 # Next Version
 
+# Version 7.1.0
+- Bump AdMob to v23.3.0
+
 # Version 7.0.0
 - Add inventoryGroupId parameter
 

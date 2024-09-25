@@ -76,7 +76,8 @@ internal class CriteoInterstitialMraidController(
           )
       )
       MraidState.DEFAULT -> close(onResult)
-      MraidState.EXPANDED -> onResult(MraidActionResult.Error("", CLOSE_ACTION))
+      MraidState.EXPANDED, MraidState.RESIZED ->
+        onResult(MraidActionResult.Error("", CLOSE_ACTION))
       MraidState.HIDDEN -> onResult(
           MraidActionResult.Error(
               "Can't close from hidden state",
