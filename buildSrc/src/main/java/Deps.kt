@@ -35,10 +35,10 @@ object Deps {
     }
 
     object Test {
-      const val Core = "androidx.test:core:1.4.0"
-      const val Monitor = "androidx.test:monitor:1.5.0"
-      const val Runner = "androidx.test:runner:1.3.0"
-      const val Rules = "androidx.test:rules:1.3.0"
+      const val Core = "androidx.test:core:1.5.0"
+      const val Monitor = "androidx.test:monitor:1.6.1"
+      const val Runner = "androidx.test:runner:1.5.2"
+      const val Rules = "androidx.test:rules:1.5.0"
     }
   }
 
@@ -77,7 +77,7 @@ object Deps {
   }
 
   object Google {
-    const val AdMob = "com.google.android.gms:play-services-ads:22.1.0"
+    const val AdMob = "com.google.android.gms:play-services-ads:23.3.0"
     const val AdMob19 = "com.google.android.gms:play-services-ads:19.0.1"
     const val AdsIdentifier = "com.google.android.gms:play-services-ads-identifier:18.0.1"
   }
@@ -108,7 +108,7 @@ object Deps {
   }
 
   object Kotlin {
-    private const val version = "1.5.31"
+    private const val version = "1.7.21"
 
     const val GradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$version"
     const val AllOpenPlugin = "org.jetbrains.kotlin:kotlin-allopen:$version"
@@ -152,7 +152,7 @@ object Deps {
     }
 
     object Moshi {
-      private const val version = "1.12.0"
+      private const val version = "1.14.0"
 
       const val Kapt = "com.squareup.moshi:moshi-kotlin-codegen:$version"
       const val Adapter = "com.squareup.moshi:moshi-adapters:$version"
