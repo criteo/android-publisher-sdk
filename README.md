@@ -4,6 +4,9 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=com.criteo.publisher%3Acriteo-publisher-sdk&metric=coverage)](https://sonarcloud.io/dashboard?id=com.criteo.publisher%3Acriteo-publisher-sdk)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=com.criteo.publisher%3Acriteo-publisher-sdk&metric=alert_status)](https://sonarcloud.io/dashboard?id=com.criteo.publisher%3Acriteo-publisher-sdk)
 
+> [!WARNING]
+> **This repository is deprecated.** Criteo publisher SDK is deprecated as of September 30, 2025. Please contact your Criteo Commerce Grid point of contact for information on alternative integration methods.
+
 # Criteo Publisher SDK
 > Criteo Publisher SDK is meant for app publishers wanting to integrate in their app the Criteo Direct 
 > Bidder product. Direct Bidder for App allows you to monetize your mobile apps by accessing Criteo’s 
